@@ -19,15 +19,15 @@
                     </p>
                 </div>
                 <div class="horizontal-view toolbar">
-                    <button form="generate_ooi_report" type="submit" class="button">{% translate "Generate Report" %}</button>
+                    <button form="report_view" type="submit" class="button">{% translate "View Report" %}</button>
                 </div>
             </div>
             {% translate "Filter" as filter_title %}
             {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
 
-            <form id="generate_ooi_report"
+            <form id="report_view"
                   method="post"
-                  action="{% url 'generate_report' organization.code 'ooi_report' %}"
+                  action="{% url 'report_view' organization.code %}"
                   class="inline">
                 {% csrf_token %}
                 <table>

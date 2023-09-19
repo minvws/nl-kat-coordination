@@ -1,9 +1,9 @@
 from django.urls import path
 
-from reports.views import GenerateReportView, OOIReportView, ReportView
+from reports.views import ReportOOISelectionView, ReportTypeSelectionView, ReportView
 
 urlpatterns = [
-    path("", ReportView.as_view(), name="reports"),
-    path("ooi-report/", OOIReportView.as_view(), name="ooi_report"),
-    path("<report_type>/generate/", GenerateReportView.as_view(), name="generate_report"),
+    path("select/report-type/", ReportTypeSelectionView.as_view(), name="report_type_selection"),
+    path("select/ooi/", ReportOOISelectionView.as_view(), name="report_ooi_selection"),
+    path("view/", ReportView.as_view(), name="report_view"),
 ]

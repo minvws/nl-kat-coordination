@@ -11,7 +11,7 @@
     <button type="button"
             class="toggle-all toggle-on ghost"
             data-toggle-target="ooi_type">{% translate "Toggle all" %}</button>
-    {% include "partials/form/fieldset.html" with fields=clearance_level_filter_form %}
+    {% include "partials/form/fieldset.html" with fields=clearance_filter_form %}
 
     <input type="submit"
            value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}" />
