@@ -4,7 +4,7 @@ from tools.forms.base import BaseRockyForm
 
 from reports.report_types.definitions import get_ooi_types_with_report
 
-SORTED_OOI_TYPES_FOR_REPORT = sorted([ooi_class.ooi_type for ooi_class in get_ooi_types_with_report()])
+SORTED_OOI_TYPES_FOR_REPORT = sorted([ooi_class.get_ooi_type() for ooi_class in get_ooi_types_with_report()])
 
 OOI_TYPE_CHOICES_FOR_REPORT = ((ooi_type, ooi_type) for ooi_type in SORTED_OOI_TYPES_FOR_REPORT)
 
