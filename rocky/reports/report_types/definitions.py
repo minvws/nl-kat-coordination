@@ -53,9 +53,9 @@ def get_reports() -> Dict[str, ReportDefinition]:
     return report_definitions
 
 
-def get_ooi_types_with_report() -> List[str]:
+def get_ooi_types_with_report() -> List[Type[OOI]]:
     oois = []
     for _, report in get_reports().values():
         for ooi_type in report.input_ooi_types:
-            oois.append(ooi_type.ooi_type)
+            oois.append(ooi_type)
     return oois
