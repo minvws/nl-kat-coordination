@@ -10,7 +10,7 @@ from pydantic.fields import SHAPE_LIST, ModelField
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.question import Question
-from octopoes.models.types import get_relations
+from octopoes.models.types import get_collapsed_types, get_relations
 from tools.forms.base import BaseRockyForm, CheckboxGroup
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
@@ -161,3 +161,17 @@ class ClearanceFilterForm(ClearanceTypeFilterForm, ClearanceLevelFilterForm):
         super().__init__(*args, **kwargs)
         self.fields["clearance_level"].initial = clearance_level
         self.fields["clearance_type"].initial = selected_clearance_types
+
+
+SORTED_OOI_TYPES = sorted([ooi_class.get_ooi_type() for ooi_class in get_collapsed_types()])
+
+OOI_TYPE_CHOICES = ((ooi_type, ooi_type) for ooi_type in SORTED_OOI_TYPES)
+
+
+class OOITypeMultiCheckboxForm(BaseRockyForm):
+    ooi_type = forms.MultipleChoiceField(
+        label=_("Filter by OOI types"),
+        required=False,
+        choices=OOI_TYPE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+    )

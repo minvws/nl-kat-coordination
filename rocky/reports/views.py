@@ -23,11 +23,11 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
 
 
 class ReportView(ReportBreadcrumbs, OrganizationView, TemplateView):
-    template_name = "reports.html"
+    template_name = "choose_report_type.html"
 
 
 class OOIReportView(ReportBreadcrumbs, BaseOOIListView, OrganizationView, ListView):
-    template_name = "ooi_report.html"
+    template_name = "choose_oois.html"
 
     def get_queryset(self) -> OOIList:
         """Show only declared OOIs"""
@@ -55,4 +55,6 @@ class OOIReportView(ReportBreadcrumbs, BaseOOIListView, OrganizationView, ListVi
 
 
 class GenerateReportView(ReportBreadcrumbs, OrganizationView, TemplateView):
+    """One Report Type for one OOI"""
+
     pass
