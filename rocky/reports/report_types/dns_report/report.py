@@ -1,10 +1,11 @@
-from octopoes.models.ooi.dns.zone import Hostname
-from rocky.reports.report_types.definitions import ReportDefinition
+from typing import List
 
-REPORT = ReportDefinition(
-    name="dns-report",
-    required_boefjes=[],
-    optional_boefjes=[],
-    input_ooi_types={Hostname},
-    html_template_path="report.html",
-)
+from octopoes.models.ooi.dns.zone import Hostname
+from reports.report_types.definitions import Report
+
+
+class DNSReport(Report):
+    name: str = ("dns-report",)
+    required_boefjes: List = []
+    optional_boefjes: List = []
+    input_ooi_types = {Hostname}

@@ -1,12 +1,10 @@
 import importlib
+import inspect
 import pkgutil
-from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, List, Set, Type
-
-from pydantic import BaseModel
+from typing import List, Set, Type
 
 from octopoes.models import OOI
 
@@ -15,7 +13,7 @@ REPORT_ATTR_NAME = "REPORT"
 logger = getLogger(__name__)
 
 
-class ReportDefinition(BaseModel):
+class Report:
     name: str
     required_boefjes: List
     optional_boefjes: List
@@ -29,33 +27,32 @@ class ReportDefinition(BaseModel):
         return NotImplementedError
 
 
-@lru_cache(maxsize=32)
-def get_reports() -> Dict[str, ReportDefinition]:
-    report_definitions = {}
+def get_reports() -> List:
+    reports = []
 
     for package in pkgutil.walk_packages([str(REPORTS_DIR)]):
-        if package.name in ["definitions", "runner"]:
+        if package.name in ["definitions"]:
             continue
 
         try:
-            module: ModuleType = importlib.import_module(".report", f"{REPORTS_DIR.name}.{package.name}")
+            module: ModuleType = importlib.import_module(
+                ".report", package=f"reports.{REPORTS_DIR.name}.{package.name}"
+            )
 
-            if hasattr(module, REPORT_ATTR_NAME):
-                report_definition: ReportDefinition = getattr(module, REPORT_ATTR_NAME)
-                report_definitions[report_definition.name] = report_definition
-
-            else:
-                logger.warning('module "%s" has no attribute %s', package.name, REPORT_ATTR_NAME)
+            for name, obj in inspect.getmembers(module):
+                # Check if the member is a class, is a subclass of Report, and is not Report itself
+                if inspect.isclass(obj) and issubclass(obj, Report) and obj != Report:
+                    reports.append(obj)
 
         except ModuleNotFoundError:
             logger.warning('package "%s" has no module %s', package.name, "report")
 
-    return report_definitions
+    return reports
 
 
 def get_ooi_types_with_report() -> List[Type[OOI]]:
     oois = []
-    for _, report in get_reports().values():
+    for report in get_reports():
         for ooi_type in report.input_ooi_types:
             oois.append(ooi_type)
     return oois
