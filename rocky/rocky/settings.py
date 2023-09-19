@@ -285,7 +285,7 @@ STATICFILES_FINDERS = [
 
 COMPRESS_OFFLINE = True
 
-LOGIN_URL = "two_factor:login"
+LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
 
 # Default primary key field type

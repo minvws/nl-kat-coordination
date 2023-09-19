@@ -1923,6 +1923,18 @@ msgstr "Promé ku aktivá, por fabor pone e ajustamentunan necesario pa '{}'."
 msgid "{} '{}' enabled."
 msgstr "{} '{}' aktiva."
 
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
+"Your clearance level is not set. Go to your profile page to see your "
+"clearance or contact the administrator to set a clearance level."
+msgstr ""
+"Bo nivel di autorisashon no ta establésí. Bai na bo página di perfil pa wak "
+"bo autorisashon òf kontakta e administradó pa establésí un nivel di autorisashon."
+
+#: katalogus/views/plugin_enable_disable.py
+msgid "To enable {} you need at least a clearance level of L{}. "
+msgstr "Pa aktivá {} bo mester tin mínimo un nivel di autorisashon di L{}."
+
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
 msgstr "Ta trata di agrega ajustenan na boefje sin esquema"
@@ -3769,7 +3781,7 @@ msgstr "E vèld aki ta obligatorio"
 
 #: rocky/templates/graph-d3.html
 msgid ""
-"Click a circle top collapse / expand the tree, click the text to view the "
+"Click a circle to collapse / expand the tree, click the text to view the "
 "tree from that OOI and hover over the text to see details."
 msgstr ""
 "Click e sírkulo top collapse / expande e mapa, click e teksto pa habri e "

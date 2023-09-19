@@ -1938,6 +1938,19 @@ msgstr "Stel vóór het inschakelen de vereiste instellingen in voor '{}'."
 msgid "{} '{}' enabled."
 msgstr "{} '{}' aangezet."
 
+#: katalogus/views/plugin_enable_disable.py
+msgid ""
+"Your clearance level is not set. Go to your profile page to see your "
+"clearance or contact the administrator to set a clearance level."
+msgstr ""
+"Uw vrijwaring niveau is niet ingesteld. Ga naar uw profielpagina om uw "
+"vrijwaring te controleren of neem contact op met de beheerder om een vrijwaring niveau in te stellen."
+
+#: katalogus/views/plugin_enable_disable.py
+msgid "To enable {} you need at least a clearance level of L{}. "
+msgstr ""
+"Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} nodig."
+
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
 msgstr "Probeer instellingen toe te voegen aan boefje zonder schema"
@@ -3775,7 +3788,7 @@ msgstr "Dit veld is verplicht"
 
 #: rocky/templates/graph-d3.html
 msgid ""
-"Click a circle top collapse / expand the tree, click the text to view the "
+"Click a circle to collapse / expand the tree, click the text to view the "
 "tree from that OOI and hover over the text to see details."
 msgstr ""
 "Klik op een cirkel om de boom in of uit te klappen, klik op de tekst om de "
