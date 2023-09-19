@@ -1,8 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from tools.forms.base import BaseRockyForm
 
-from rocky.reports.report_types.definitions import get_ooi_types_with_report
-from rocky.tools.forms.base import BaseRockyForm
+from reports.report_types.definitions import get_ooi_types_with_report
 
 SORTED_OOI_TYPES_FOR_REPORT = sorted([ooi_class.ooi_type for ooi_class in get_ooi_types_with_report()])
 
