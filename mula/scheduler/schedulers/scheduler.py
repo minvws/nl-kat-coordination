@@ -6,7 +6,7 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from scheduler import connectors, context, models, queues, utils
+from scheduler import connectors, context, models, queues, storage, utils
 from scheduler.utils import thread
 
 
@@ -132,11 +132,11 @@ class Scheduler(abc.ABC):
 
         return None
 
-    def pop_item_from_queue(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
+    def pop_item_from_queue(self, filter_request: Optional[storage.filters.FilterRequest] = None) -> Optional[models.PrioritizedItem]:
         """Pop an item from the queue.
 
         Args:
-            filters: A list of filters to apply to get a filtered set of
+            filter_request: A FilterRequest instance to filter the
             prioritized items from the queue.
 
         Returns:
@@ -151,7 +151,7 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
-            p_item = self.queue.pop(filters)
+            p_item = self.queue.pop(filter_request)
         except queues.QueueEmptyError as exc:
             raise exc
 

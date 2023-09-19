@@ -2,6 +2,7 @@ from typing import List, Optional, Tuple
 
 from scheduler import models
 
+from .filters import FilterRequest, apply_filter
 from .storage import DBConn, retry
 
 
@@ -12,15 +13,14 @@ class PriorityQueueStore:
         self.dbconn = dbconn
 
     @retry()
-    def pop(self, scheduler_id: str, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
+    def pop(self, scheduler_id: str, filter_request: Optional[FilterRequest] = None) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemDB).filter(
                 models.PrioritizedItemDB.scheduler_id == scheduler_id
             )
 
-            if filters is not None:
-                for f in filters:
-                    query = query.filter(models.PrioritizedItemDB.data[f.get_field()].as_string() == f.value)
+            if filter_request is not None:
+                query = apply_filter(models.PrioritizedItem, query, filter_request)
 
             item_orm = query.first()
 

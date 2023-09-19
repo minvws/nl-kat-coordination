@@ -14,7 +14,7 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from scheduler import context, models, queues, schedulers, version
+from scheduler import context, models, queues, schedulers, storage, version
 from scheduler.config import settings
 
 from .pagination import PaginatedResponse, paginate
@@ -367,7 +367,7 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str, filters: Optional[List[models.Filter]] = None) -> Any:
+    def pop_queue(self, queue_id: str, filter_request: Optional[storage.filters.FilterRequest] = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -376,7 +376,7 @@ class Server:
             )
 
         try:
-            p_item = s.pop_item_from_queue(filters)
+            p_item = s.pop_item_from_queue(filter_request)
         except queues.QueueEmptyError:
             return None
 

@@ -3,6 +3,7 @@ from typing import List, Optional, Tuple
 
 from scheduler import models
 
+from .filters import FilterRequest, apply_filter
 from .storage import DBConn, retry
 
 
@@ -20,7 +21,7 @@ class TaskStore:
         status: Optional[str] = None,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
-        filters: Optional[List[models.Filter]] = None,
+        filter_request: Optional[FilterRequest] = None,
     ) -> Tuple[List[models.Task], int]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.TaskDB).filter(
@@ -42,9 +43,8 @@ class TaskStore:
             if max_created_at is not None:
                 query = query.filter(models.TaskDB.created_at <= max_created_at)
 
-            if filters is not None:
-                for f in filters:
-                    query.filter(models.TaskDB.p_item[f.get_field()].astext == f.value)
+            if filter_request is not None:
+                query = apply_filter(models.TaskDB, query, filter_request)
 
             count = query.count()
             tasks_orm = query.all()

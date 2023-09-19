@@ -389,7 +389,7 @@ class APITestCase(APITemplateTestCase):
 
         # Should get the first item
         response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/pop", json=[{"field": "name", "operator": "eq", "value": "test"}]
+            f"/queues/{self.scheduler.scheduler_id}/pop", json={"filters": [{"column": "data", "field": "name", "operator": "eq", "value": "test"}]}
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(str(first_item.id), response.json().get("id"))
@@ -397,7 +397,7 @@ class APITestCase(APITemplateTestCase):
 
         # Should not return any items
         response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/pop", json=[{"field": "id", "operator": "eq", "value": "123"}]
+            f"/queues/{self.scheduler.scheduler_id}/pop", json={"filters": [{"column": "data", "field": "id", "operator": "eq", "value": "123"}]}
         )
         self.assertEqual(404, response.status_code)
         self.assertEqual({"detail": "could not pop item from queue, check your filters"}, response.json())
