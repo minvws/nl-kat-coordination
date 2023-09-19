@@ -199,7 +199,7 @@ class FindingList:
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
         severities: Set[RiskLevelSeverity],
-        exclude_muted: bool = False,
+        exclude_muted: bool = True,
         only_muted: bool = False,
     ):
         self.octopoes_connector = octopoes_connector
