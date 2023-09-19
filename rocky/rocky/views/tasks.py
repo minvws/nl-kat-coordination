@@ -12,7 +12,7 @@ from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 
-from rocky.scheduler import TaskAlreadyQueued, client
+from rocky.scheduler import BadRequestError, ConflictError, TooManyRequestsError, client
 
 TASK_LIMIT = 50
 
@@ -90,19 +90,24 @@ class TaskListView(OrganizationView, ListView):
             task = client.get_task_details(task_id)
 
             # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-            new_id = uuid.uuid4().hex
+            new_id = uuid.uuid4()
 
             task.p_item.id = new_id
             task.p_item.data.id = new_id
 
             try:
                 client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
-            except TaskAlreadyQueued:
-                messages.add_message(
-                    self.request,
-                    messages.WARNING,
-                    _("Cannot reschedule task: it has probably already been queued."),
-                )
+            except TooManyRequestsError:
+                error_message = _("Task queue is full, please try again later.")
+                messages.add_message(self.request, messages.ERROR, error_message)
+                return
+            except ConflictError:
+                error_message = _("Task already queued.")
+                messages.add_message(self.request, messages.ERROR, error_message)
+                return
+            except BadRequestError:
+                error_message = _("Task is invalid.")
+                messages.add_message(self.request, messages.ERROR, error_message)
                 return
 
             success_message = (

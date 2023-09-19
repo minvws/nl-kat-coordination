@@ -1,19 +1,6 @@
 #!/bin/sh
 set -e
-. /usr/share/debconf/confmodule
-
-adduser --home /etc/kat --no-create-home --system --group kat || true
-
-chown -R root:kat /etc/kat
-
-db_stop || true
-
-if [ "$1" = "upgrade" ]; then
-    systemctl daemon-reload
-
-    if systemctl is-active --quiet kat-mula.service; then
-        systemctl restart kat-mula.service
-    fi
-fi
 
 #DEBHELPER#
+
+chown -R root:kat /etc/kat

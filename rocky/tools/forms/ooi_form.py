@@ -142,7 +142,7 @@ def default_field_options(field: ModelField) -> Dict[str, Union[str, bool]]:
 
 class ClearanceLevelFilterForm(BaseRockyForm):
     clearance_level = forms.CharField(
-        label="Filter by clearance level",
+        label=_("Filter by clearance level"),
         widget=CheckboxGroup(toggle_all_button=True, choices=SCAN_LEVEL.choices),
         required=False,
     )
@@ -150,7 +150,7 @@ class ClearanceLevelFilterForm(BaseRockyForm):
 
 class ClearanceTypeFilterForm(BaseRockyForm):
     clearance_type = forms.CharField(
-        label="Filter by clearance type",
+        label=_("Filter by clearance type"),
         widget=CheckboxGroup(toggle_all_button=True, choices=CLEARANCE_TYPE_CHOICES),
         required=False,
     )

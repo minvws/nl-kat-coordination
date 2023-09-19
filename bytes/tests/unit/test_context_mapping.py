@@ -17,7 +17,7 @@ def test_context_mapping_boefje() -> None:
     boefje_meta_in_db = to_boefje_meta_in_db(boefje_meta)
 
     assert isinstance(boefje_meta_in_db, BoefjeMetaInDB)
-    assert boefje_meta.id == boefje_meta_in_db.id
+    assert str(boefje_meta.id) == boefje_meta_in_db.id
     assert boefje_meta.boefje.id == boefje_meta_in_db.boefje_id
     assert boefje_meta.organization == boefje_meta_in_db.organization
     assert boefje_meta.input_ooi == boefje_meta_in_db.input_ooi
@@ -39,12 +39,12 @@ def test_context_mapping_normalizer() -> None:
     normalizer_meta_in_db.raw_file.boefje_meta = to_boefje_meta_in_db(normalizer_meta.raw_data.boefje_meta)
 
     assert isinstance(normalizer_meta_in_db, NormalizerMetaInDB)
-    assert normalizer_meta.id == normalizer_meta_in_db.id
+    assert str(normalizer_meta.id) == normalizer_meta_in_db.id
     assert normalizer_meta.normalizer.id == normalizer_meta_in_db.normalizer_id
     assert normalizer_meta.normalizer.version == normalizer_meta_in_db.normalizer_version
     assert normalizer_meta.started_at == normalizer_meta_in_db.started_at
     assert normalizer_meta.ended_at == normalizer_meta_in_db.ended_at
-    assert normalizer_meta.raw_data.id == normalizer_meta_in_db.raw_file_id
+    assert str(normalizer_meta.raw_data.id) == normalizer_meta_in_db.raw_file_id
 
     normalizer_meta_new = to_normalizer_meta(normalizer_meta_in_db)
 

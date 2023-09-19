@@ -200,9 +200,9 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
 
     assertNotContains(response, new_member.user.full_name)
     assertNotContains(response, blocked_member.user.full_name)
-    assertContains(response, 'class="blocked"')
-    assertNotContains(response, 'class="new"')
-    assertNotContains(response, 'class="active"')
+    assertContains(response, 'class="icon negative"')
+    assertNotContains(response, 'class="icon neutral"')
+    assertNotContains(response, 'class="icon positive"')
 
     # Test with only filter option status "new" checked
     request2 = setup_request(rf.get("organization_member_list", {"client_status": "new"}), superuser_member.user)
@@ -210,9 +210,9 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
 
     assertNotContains(response2, new_member.user.full_name)
     assertNotContains(response2, blocked_member.user.full_name)
-    assertContains(response2, 'class="new"')
-    assertNotContains(response2, 'class="blocked"')
-    assertNotContains(response2, 'class="active"')
+    assertContains(response2, 'class="icon neutral"')
+    assertNotContains(response2, 'class="icon negative"')
+    assertNotContains(response2, 'class="icon positive"')
 
     # Test with every filter option checked (new, active, blocked and unblocked)
     request3 = setup_request(
@@ -229,9 +229,9 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     assertNotContains(response3, new_member.user.full_name)
     assertNotContains(response3, blocked_member.user.full_name)
 
-    assertContains(response3, 'class="new"')
-    assertContains(response3, 'class="blocked"')
-    assertContains(response3, 'class="active"')
+    assertContains(response3, 'class="icon neutral"')
+    assertContains(response3, 'class="icon negative"')
+    assertContains(response3, 'class="icon positive"')
 
 
 def test_organization_does_not_exist(client, client_member):
