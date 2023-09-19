@@ -1,5 +1,5 @@
 from octopoes.models.ooi.dns.zone import Hostname
-from rocky.reports.reports.definitions import ReportDefinition
+from rocky.reports.report_types.definitions import ReportDefinition
 
 REPORT = ReportDefinition(
     name="dns-report",

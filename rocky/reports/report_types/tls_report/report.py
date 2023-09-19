@@ -1,5 +1,5 @@
 from octopoes.models.ooi.service import IPService
-from rocky.reports.reports.definitions import ReportDefinition
+from rocky.reports.report_types.definitions import ReportDefinition
 
 REPORT = ReportDefinition(
     name="tls-report",
