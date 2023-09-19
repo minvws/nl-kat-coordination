@@ -9,7 +9,6 @@ from typing import List, Set, Type
 from octopoes.models import OOI
 
 REPORTS_DIR = Path(__file__).parent
-REPORT_ATTR_NAME = "REPORT"
 logger = getLogger(__name__)
 
 
@@ -51,8 +50,4 @@ def get_reports() -> List:
 
 
 def get_ooi_types_with_report() -> List[Type[OOI]]:
-    oois = []
-    for report in get_reports():
-        for ooi_type in report.input_ooi_types:
-            oois.append(ooi_type)
-    return oois
+    return [ooi_type for report in get_reports() for ooi_type in report.input_ooi_types]
