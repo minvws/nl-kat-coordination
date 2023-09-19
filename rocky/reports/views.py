@@ -2,7 +2,7 @@ from account.mixins import OrganizationView
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, TemplateView
-from tools.forms.ooi_form import ClearanceLevelFilterForm
+from tools.forms.ooi_form import ClearanceLevelFilterForm, OOITypeMultiCheckboxForReportForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import ScanLevel, ScanProfileType
@@ -50,6 +50,7 @@ class OOIReportView(ReportBreadcrumbs, BaseOOIListView, OrganizationView, ListVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["object_type_filters"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
         context["clearance_level_filter_form"] = ClearanceLevelFilterForm(self.request.GET)
         return context
 
