@@ -2,10 +2,11 @@ from account.mixins import OrganizationView
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, TemplateView
-from tools.forms.ooi_form import ClearanceLevelFilterForm, OOITypeMultiCheckboxForReportForm
+from tools.forms.ooi_form import ClearanceLevelFilterForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import ScanLevel, ScanProfileType
+from reports.forms import OOITypeMultiCheckboxForReportForm
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
