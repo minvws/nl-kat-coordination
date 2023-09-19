@@ -36,14 +36,13 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
-        self.ooi_type = request.GET.getlist("ooi_type", [])
         self.clearance_level = request.GET.getlist("clearance_level", [])
         self.clearance_type = request.GET.getlist("clearance_type", [])
 
     def get_active_filters(self) -> Dict[str, str]:
         active_filters = {}
-        if self.ooi_type:
-            active_filters[_("OOI types: ")] = ", ".join(self.ooi_type)
+        if self.filtered_ooi_types:
+            active_filters[_("OOI types: ")] = ", ".join(self.filtered_ooi_types)
         if self.clearance_level:
             clearance_level = ["L" + str(level) for level in self.clearance_level]
             active_filters[_("Clearance level: ")] = ", ".join(clearance_level)
@@ -75,7 +74,6 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         context["observed_at"] = self.get_observed_at()
         context["total_oois"] = len(self.object_list)
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
-
         return context
 
 

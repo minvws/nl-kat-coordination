@@ -8,12 +8,11 @@
     {% include "partials/form/fieldset.html" with fields=observed_at_form %}
     {% include "partials/form/fieldset.html" with fields=object_type_filters custom_class="column-4" %}
 
-    {% for field in clearance_level_filter_form %}
-        <fieldset>
-            <legend>{{ field.label }}</legend>
-            {{ field }}
-        </fieldset>
-    {% endfor %}
+    <button type="button"
+            class="toggle-all toggle-on ghost"
+            data-toggle-target="ooi_type">{% translate "Toggle all OOI types" %}</button>
+    {% include "partials/form/fieldset.html" with fields=clearance_level_filter_form %}
+
     <div class="button-container">
         <input type="submit"
                value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}" />

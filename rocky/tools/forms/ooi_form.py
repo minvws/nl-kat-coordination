@@ -154,7 +154,9 @@ class ClearanceFilterForm(BaseRockyForm):
     )
 
 
-OOI_TYPE_CHOICES = ((ooi_class.get_ooi_type(), ooi_class.get_ooi_type()) for ooi_class in get_collapsed_types())
+SORTED_OOI_TYPES = sorted([ooi_class.get_ooi_type() for ooi_class in get_collapsed_types()])
+
+OOI_TYPE_CHOICES = ((ooi_type, ooi_type) for ooi_type in SORTED_OOI_TYPES)
 
 
 class OOITypeMultiCheckboxForm(BaseRockyForm):

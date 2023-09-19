@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 07:53+0000\n"
+"POT-Creation-Date: 2023-09-19 08:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4122,6 +4122,10 @@ msgstr ""
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 #: rocky/templates/partials/elements/ooi_report_settings.html
 msgid "Hide settings"
+msgstr ""
+
+#: rocky/templates/partials/elements/ooi_list_settings_form.html
+msgid "Toggle all OOI types"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
