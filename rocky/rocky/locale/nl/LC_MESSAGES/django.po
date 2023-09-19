@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-12 15:49+0000\n"
+"POT-Creation-Date: 2023-09-19 07:53+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1710,7 +1710,7 @@ msgstr "Acties"
 msgid "Plugins Navigation"
 msgstr "Plug-ins navigatie"
 
-#: katalogus/templates/partials/plugins_navigation.html rocky/views/mixins.py
+#: katalogus/templates/partials/plugins_navigation.html
 msgid "All"
 msgstr "Alle"
 
@@ -1966,7 +1966,8 @@ msgid ""
 "clearance or contact the administrator to set a clearance level."
 msgstr ""
 "Uw vrijwaring niveau is niet ingesteld. Ga naar uw profielpagina om uw "
-"vrijwaring te controleren of neem contact op met de beheerder om een vrijwaring niveau in te stellen."
+"vrijwaring te controleren of neem contact op met de beheerder om een "
+"vrijwaring niveau in te stellen."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "To enable {} you need at least a clearance level of L{}. "
@@ -3240,6 +3241,10 @@ msgstr "Filter op vrijwaring niveau"
 msgid "Filter by clearance type"
 msgstr "Filter op vrijwaringstype"
 
+#: tools/forms/ooi_form.py
+msgid "Filter by OOI types"
+msgstr "Filter op OOI-types"
+
 #: tools/forms/settings.py
 msgid "--- Show all ----"
 msgstr "Toon alles"
@@ -3784,6 +3789,7 @@ msgid "Set filters"
 msgstr "Selecteer filters"
 
 #: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Clear filters"
 msgstr "Filters wissen"
 
@@ -4495,8 +4501,6 @@ msgid "Active"
 msgstr "Actief"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy
-#| msgid "new"
 msgid "New"
 msgstr "Nieuw"
 
@@ -4568,14 +4572,6 @@ msgstr "Toon instellingen"
 #: rocky/templates/partials/elements/ooi_report_settings.html
 msgid "Hide settings"
 msgstr "Verberg instellingen"
-
-#: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Filter by OOI types"
-msgstr "Filter op OOI-types"
-
-#: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Toggle all"
-msgstr "Alles (de-)selecteren"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Children"
@@ -5600,6 +5596,18 @@ msgstr "Boom"
 msgid "Graph Visualisation"
 msgstr "Graaf"
 
+#: rocky/views/ooi_view.py
+msgid "OOI types: "
+msgstr "OOI-typen: "
+
+#: rocky/views/ooi_view.py
+msgid "Clearance level: "
+msgstr "Vrijwaring niveau: "
+
+#: rocky/views/ooi_view.py
+msgid "Clearance type: "
+msgstr "Vrijwaring niveau: "
+
 #: rocky/views/organization_add.py
 msgid "Setup"
 msgstr "Instellingen"
@@ -5812,3 +5820,6 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#~ msgid "Toggle all"
+#~ msgstr "Alles (de-)selecteren"

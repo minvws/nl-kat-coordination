@@ -1,5 +1,5 @@
 from time import sleep
-from typing import List, Type
+from typing import Dict, List, Set, Type
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -30,21 +30,43 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
     paginate_by = 150
     context_object_name = "ooi_list"
     ooi_types = get_collapsed_types().difference({Finding, FindingType})
+    scan_levels = DEFAULT_SCAN_LEVEL_FILTER
+    scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
+        self.ooi_type = request.GET.getlist("ooi_type", [])
+        self.clearance_level = request.GET.getlist("clearance_level", [])
+        self.clearance_type = request.GET.getlist("clearance_type", [])
+
+    def get_active_filters(self) -> Dict[str, str]:
+        active_filters = {}
+        if self.ooi_type:
+            active_filters[_("OOI types: ")] = ", ".join(self.ooi_type)
+        if self.clearance_level:
+            clearance_level = ["L" + str(level) for level in self.clearance_level]
+            active_filters[_("Clearance level: ")] = ", ".join(clearance_level)
+        if self.clearance_type:
+            active_filters[_("Clearance type: ")] = ", ".join(self.clearance_type)
+        return active_filters
+
+    def get_ooi_scan_levels(self) -> Set[ScanLevel]:
+        if not self.clearance_level:
+            return self.scan_levels
+        return {ScanLevel(int(s)) for s in self.clearance_level}
+
+    def get_ooi_profile_types(self) -> Set[ScanProfileType]:
+        if not self.clearance_type:
+            return self.scan_profile_types
+        return {ScanProfileType(s) for s in self.clearance_type}
 
     def get_queryset(self) -> OOIList:
-        scan_levels = DEFAULT_SCAN_LEVEL_FILTER
-        selected_clearance_level = self.request.GET.getlist("clearance_level")
-        if selected_clearance_level is not None:
-            scan_levels = {ScanLevel(int(s)) for s in selected_clearance_level}
-
-        scan_profile_types = DEFAULT_SCAN_PROFILE_TYPE_FILTER
-        selected_clearance_type = self.request.GET.getlist("clearance_type")
-        if selected_clearance_type is not None:
-            scan_profile_types = {ScanProfileType(s) for s in selected_clearance_type}
-
-        self.filtered_ooi_types = self.request.GET.getlist("ooi_type", [])
-
-        return self.get_list(self.get_observed_at(), scan_level=scan_levels, scan_profile_type=scan_profile_types)
+        return self.get_list(
+            observed_at=self.get_observed_at(),
+            scan_level=self.get_ooi_scan_levels(),
+            scan_profile_type=self.get_ooi_profile_types(),
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-12 15:49+0000\n"
+"POT-Creation-Date: 2023-09-19 07:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1574,7 +1574,7 @@ msgstr ""
 msgid "Plugins Navigation"
 msgstr ""
 
-#: katalogus/templates/partials/plugins_navigation.html rocky/views/mixins.py
+#: katalogus/templates/partials/plugins_navigation.html
 msgid "All"
 msgstr ""
 
@@ -2879,6 +2879,10 @@ msgstr ""
 msgid "Filter by clearance type"
 msgstr ""
 
+#: tools/forms/ooi_form.py
+msgid "Filter by OOI types"
+msgstr ""
+
 #: tools/forms/settings.py
 msgid "--- Show all ----"
 msgstr ""
@@ -3398,6 +3402,7 @@ msgid "Set filters"
 msgstr ""
 
 #: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Clear filters"
 msgstr ""
 
@@ -4117,14 +4122,6 @@ msgstr ""
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 #: rocky/templates/partials/elements/ooi_report_settings.html
 msgid "Hide settings"
-msgstr ""
-
-#: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Filter by OOI types"
-msgstr ""
-
-#: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Toggle all"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -5058,6 +5055,18 @@ msgstr ""
 
 #: rocky/views/ooi_tree.py
 msgid "Graph Visualisation"
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "OOI types: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Clearance level: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Clearance type: "
 msgstr ""
 
 #: rocky/views/organization_add.py

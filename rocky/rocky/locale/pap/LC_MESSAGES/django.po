@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-12 15:49+0000\n"
+"POT-Creation-Date: 2023-09-19 07:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1697,7 +1697,7 @@ msgstr "Akshonnan"
 msgid "Plugins Navigation"
 msgstr "Navegashon di Plug-innan"
 
-#: katalogus/templates/partials/plugins_navigation.html rocky/views/mixins.py
+#: katalogus/templates/partials/plugins_navigation.html
 msgid "All"
 msgstr "Tur"
 
@@ -1951,7 +1951,8 @@ msgid ""
 "clearance or contact the administrator to set a clearance level."
 msgstr ""
 "Bo nivel di autorisashon no ta establésí. Bai na bo página di perfil pa wak "
-"bo autorisashon òf kontakta e administradó pa establésí un nivel di autorisashon."
+"bo autorisashon òf kontakta e administradó pa establésí un nivel di "
+"autorisashon."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "To enable {} you need at least a clearance level of L{}. "
@@ -3235,6 +3236,10 @@ msgstr "Filtra pa nivel di autorisashon"
 msgid "Filter by clearance type"
 msgstr "Filtra pa tipo autorisashon"
 
+#: tools/forms/ooi_form.py
+msgid "Filter by OOI types"
+msgstr "Filtra pa tiponan di OOI"
+
 #: tools/forms/settings.py
 msgid "--- Show all ----"
 msgstr "--- Mustra tur ---"
@@ -3777,6 +3782,7 @@ msgid "Set filters"
 msgstr "Pone filternan"
 
 #: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Clear filters"
 msgstr "Kita filters"
 
@@ -4489,8 +4495,6 @@ msgid "Active"
 msgstr "Aktivá"
 
 #: rocky/templates/organizations/organization_member_list.html
-#, fuzzy
-#| msgid "new"
 msgid "New"
 msgstr "Nobo"
 
@@ -4562,14 +4566,6 @@ msgstr "Mustra settings"
 #: rocky/templates/partials/elements/ooi_report_settings.html
 msgid "Hide settings"
 msgstr "Skonde settings"
-
-#: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Filter by OOI types"
-msgstr "Filtra pa tiponan di OOI"
-
-#: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Toggle all"
-msgstr "Pone tur"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Children"
@@ -5586,6 +5582,18 @@ msgstr "Visualisá mapa di resultado"
 msgid "Graph Visualisation"
 msgstr "Visualisá grafa"
 
+#: rocky/views/ooi_view.py
+msgid "OOI types: "
+msgstr "OOI-tiponan: "
+
+#: rocky/views/ooi_view.py
+msgid "Clearance level: "
+msgstr "Nivél di autorisashon: "
+
+#: rocky/views/ooi_view.py
+msgid "Clearance type: "
+msgstr "Tipo di autorisashon: "
+
 #: rocky/views/organization_add.py
 msgid "Setup"
 msgstr "Setup"
@@ -5796,3 +5804,6 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "Toggle all"
+#~ msgstr "Pone tur"
