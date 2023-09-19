@@ -5,7 +5,7 @@ from reports.report_types.definitions import Report
 
 
 class DNSReport(Report):
-    name: str = ("dns-report",)
+    name = "dns-report"
     required_boefjes: List = []
     optional_boefjes: List = []
     input_ooi_types = {Hostname}
