@@ -6,11 +6,13 @@
     {% if ooi_id %}<input type="hidden" name="ooi_id" value="{{ ooi_id }}" />{% endif %}
     {% include "partials/form/field_hidden_from_list.html" with list=mandatory_fields form=observed_at_form %}
     {% include "partials/form/fieldset.html" with fields=observed_at_form %}
-    {% include "partials/form/fieldset.html" with fields=object_type_filters custom_class="column-4" %}
+    {% include "partials/form/fieldset.html" with fields=ooi_type_form custom_class="column-4" %}
 
-    <button type="button"
-            class="toggle-all toggle-on ghost"
-            data-toggle-target="ooi_type">{% translate "Toggle all OOI types" %}</button>
+    {% if ooi_list|length > 4 %}
+        <button type="button"
+                class="toggle-all toggle-on ghost"
+                data-toggle-target="ooi_type">{% translate "Toggle all OOI types" %}</button>
+    {% endif %}
     {% include "partials/form/fieldset.html" with fields=clearance_level_filter_form %}
 
     <div class="button-container">
