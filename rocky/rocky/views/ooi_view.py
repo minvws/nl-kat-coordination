@@ -64,7 +64,7 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         if not selected_clearance_types:
             selected_clearance_types = [choice for choice, _ in CLEARANCE_TYPE_CHOICES]
 
-        context["clearance_filter_form"] = ClearanceFilterForm(selected_clearance_levels, selected_clearance_types)
+        context["clearance_filter_form"] = ClearanceFilterForm(self.request.GET)
 
         return context
 
