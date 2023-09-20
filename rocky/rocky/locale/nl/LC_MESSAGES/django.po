@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-20 12:52+0000\n"
+"POT-Creation-Date: 2023-09-20 15:20+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -4198,6 +4198,10 @@ msgstr ""
 "informatie."
 
 #: rocky/templates/oois/ooi_list.html
+msgid "Currently filtered on:"
+msgstr "Momenteel gefilterd op:"
+
+#: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
@@ -5002,10 +5006,6 @@ msgstr "Mijn organisaties"
 #: rocky/templates/partials/secondary-menu.html
 msgid "Profile"
 msgstr "Profiel"
-
-#: rocky/templates/partials/show_active_filters.html
-msgid "Currently filtered on:"
-msgstr "Momenteel gefilterd op:"
 
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
