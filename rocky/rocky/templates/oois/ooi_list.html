@@ -21,7 +21,12 @@
                         Click an object for additional information.
                     {% endblocktranslate %}
                 </p>
-                {% include "partials/show_active_filters.html" %}
+                <p class="de-emphasized">
+                    {% if active_filters %}
+                        <strong>{% translate "Currently filtered on:" %}</strong>
+                        {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value|title }}&nbsp;{% endfor %}
+                    {% endif %}
+                </p>
                 {% include "partials/ooi_list_toolbar.html" %}
 
                 {% translate "Filter" as filter_title %}
