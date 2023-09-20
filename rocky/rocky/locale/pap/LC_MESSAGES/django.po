@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-19 08:28+0000\n"
+"POT-Creation-Date: 2023-09-20 12:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4193,10 +4193,6 @@ msgstr ""
 "informashon."
 
 #: rocky/templates/oois/ooi_list.html
-msgid "Currently filtered on:"
-msgstr "Aktuálmente filtrá riba:"
-
-#: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
@@ -4999,6 +4995,10 @@ msgstr "Mi organisashonnan"
 #: rocky/templates/partials/secondary-menu.html
 msgid "Profile"
 msgstr "Perfil"
+
+#: rocky/templates/partials/show_active_filters.html
+msgid "Currently filtered on:"
+msgstr "Aktuálmente filtrá riba:"
 
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
