@@ -144,9 +144,19 @@ def _cast_expression(expression: BinaryExpression, filter_: Filter) -> BinaryExp
         else:
             raise UnsupportedTypeError(f"Unsupported type {element_type}")
     elif value_type == str:
+        # Check if value is a json object, or just a string. so we need to
+        # check if the value can be decoded. If it can't be decoded, we assume
+        # it is a string and cast it to text. NOTE: "123" is a valid json
+        # object, so we need to check if the value is a dict after decoding
+        # it. If it is a dict, we assume it is a json object and return the
+        # expression as is. If it is not a dict, we assume it is a string and
+        # cast it to text.
         try:
-            json.loads(filter_.value)
-        except ValueError:
+            decoded_value = json.loads(filter_.value)
+            if isinstance(decoded_value, dict):
+                return expression
+            expression = expression.astext
+        except json.JSONDecodeError:
             expression = expression.astext
     elif value_type in [int, float]:
         expression = expression.cast(Numeric)
@@ -166,7 +176,6 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest):
             filter_field = filter_.field if filter_.field else filter_.column
 
             # Return the selected attribute of the model, e.g. Model.selected_attr
-            breakpoint()
             entity_attr = getattr(entity, filter_.column)
 
             # When selecting a nested field sqlalchemy uses index operators,

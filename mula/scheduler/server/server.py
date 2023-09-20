@@ -124,7 +124,7 @@ class Server:
         self.api.add_api_route(
             path="/tasks",
             endpoint=self.list_tasks,
-            methods=["GET"],
+            methods=["GET", "POST"],
             response_model=PaginatedResponse,
             status_code=200,
         )
@@ -257,14 +257,13 @@ class Server:
         limit: int = 10,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
-        input_ooi: Optional[str] = None,
-        plugin_id: Optional[str] = None,
+        filter_request: Optional[storage.filters.FilterRequest] = None,
     ) -> Any:
         try:
             if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
                 raise ValueError("min_date must be less than max_date")
 
-            results, count = self.ctx.datastores.task_store.api_list_tasks(
+            results, count = self.ctx.datastores.task_store.get_tasks(
                 scheduler_id=scheduler_id,
                 task_type=task_type,
                 status=status,
@@ -272,8 +271,7 @@ class Server:
                 limit=limit,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
-                input_ooi=input_ooi,
-                plugin_id=plugin_id,
+                filter_request=filter_request,
             )
         except ValueError as exc:
             raise fastapi.HTTPException(
@@ -281,10 +279,11 @@ class Server:
                 detail=str(exc),
             ) from exc
         except Exception as exc:
+            # TODO: Handle AttributeError while filtering
             self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=500,
-                detail="failed to get tasks",
+                detail=f"failed to get tasks ({str(exc)})",
             ) from exc
 
         return paginate(request, results, count=count, offset=offset, limit=limit)

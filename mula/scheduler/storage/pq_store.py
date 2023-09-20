@@ -20,7 +20,7 @@ class PriorityQueueStore:
             )
 
             if filter_request is not None:
-                query = apply_filter(models.PrioritizedItem, query, filter_request)
+                query = apply_filter(models.PrioritizedItemDB, query, filter_request)
 
             item_orm = query.first()
 
