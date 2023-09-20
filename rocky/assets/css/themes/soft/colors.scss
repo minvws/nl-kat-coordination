@@ -2,7 +2,6 @@
 
 :root {
   --colors-white: #ffffff;
-  --Invisible: rgba(255, 255, 255, 0);
 
   /* Grey */
   --colors-grey-1: #f6f6f6;
@@ -16,10 +15,10 @@
   --colors-grey-9: #585858;
   --colors-grey-10: #464646;
   --colors-grey-11: #3b3b3b;
-  --colors-grey-12: rgba(0, 0, 0, 0.05);
-  --colors-grey-13: rgba(0, 0, 0, 0.1);
-  --colors-grey-14: rgba(0, 0, 0, 0.15);
-  --colors-grey-15: rgba(17, 20, 22, 0.5);
+  --colors-grey-12: rgb(0 0 0 / 5%);
+  --colors-grey-13: rgb(0 0 0 / 10%);
+  --colors-grey-14: rgb(0 0 0 / 15%);
+  --colors-grey-15: rgb(17 20 22 / 50%);
 
   /* Red */
   --colors-red-1: #fff4f3;
