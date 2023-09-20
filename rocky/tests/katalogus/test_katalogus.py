@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import PermissionDenied
+from django.urls import resolve
 from katalogus.client import KATalogusClientV1, parse_plugin
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
@@ -117,8 +118,10 @@ def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mock
     mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = get_plugins_data()
 
+    request = rf.get("/en/test/kat-alogus/")
+    request.resolver_match = resolve(request.path)
     response = KATalogusView.as_view()(
-        setup_request(rf.get("katalogus"), client_member.user), organization_code=client_member.organization.code
+        setup_request(request, client_member.user), organization_code=client_member.organization.code
     )
     assert response.status_code == 200
 
