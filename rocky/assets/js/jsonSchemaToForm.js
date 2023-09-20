@@ -261,7 +261,9 @@ function renderfield(required, originalvalue, path, name, field) {
   if (field['maxLength']) {
     input.maxlength = parseInt(field['maxLength']);
   }
-
+  if (field['default']) {
+    input.placeholder = field['default'];
+  }
   let label = document.createElement('label');
   label.htmlFor = input.id;
 
