@@ -15,9 +15,8 @@
                     {% for ooi in oois %}<li>{{ ooi }}</li>{% endfor %}
                 </ul>
                 <p>{% translate "Choose from which report type you want to generate a report:" %}</p>
-                <ul>
-                    {% for report_type in report_types %}<li>{{ report_type }}</li>{% endfor %}
-                </ul>
+                {% include "partials/form/fieldset.html" with fields=report_types_form %}
+
             </div>
         </section>
     </main>

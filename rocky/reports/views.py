@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.view_helpers import BreadcrumbsMixin
 
-from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.forms import OOITypeMultiCheckboxForReportForm, ReportTypeMultiselectForm
 from reports.report_types.definitions import get_ooi_types_with_report, get_report_types_for_oois
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -90,5 +90,5 @@ class ReportSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.ooi_selection
-        context["report_types"] = get_report_types_for_oois(self.ooi_selection)
+        context["report_types_form"] = ReportTypeMultiselectForm(get_report_types_for_oois(self.ooi_selection))
         return context
