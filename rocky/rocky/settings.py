@@ -67,7 +67,6 @@ LOGGING = {
     },
 }
 
-
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
 REMOTE_USER_HEADER = env("REMOTE_USER_HEADER", default=None)
@@ -321,7 +320,7 @@ WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
 # TODO: set this to True when we aren't using uWSGI anymore
 WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
-LOGIN_URL = "two_factor:login"
+LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
 
 # Default primary key field type
