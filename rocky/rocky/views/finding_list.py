@@ -55,10 +55,20 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         super().setup(request, *args, **kwargs)
         self.severities = self.get_severities()
         self.valid_time = self.get_observed_at()
-        self.muted_findings = request.GET.get("muted_findings", "non-muted")
+        self.muted_findings = self.request.GET.get("muted_findings", "non-muted")
 
         self.exclude_muted = self.muted_findings == "non-muted"
         self.only_muted = self.muted_findings == "muted"
+
+    def get_muted_finding_filter_text(self):
+        if self.exclude_muted and self.exclude_muted:
+            return _("All")
+
+    def get_active_filters(self):
+        return {
+            _("Severities"): ", ".join([severity.value for severity in self.severities]),
+            _("Muted findings"): self.get_muted_finding_filter_text(),
+        }
 
     def get_queryset(self) -> FindingList:
         return FindingList(
@@ -75,6 +85,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         context["valid_time"] = self.valid_time
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
+        context["active_filters"] = self.get_active_filters()
         return context
 
 
