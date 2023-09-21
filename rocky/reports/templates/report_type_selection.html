@@ -6,17 +6,22 @@
 {% block content %}
     {% include "header.html" %}
 
-    <main id="main-content" tabindex="-1" class="generate-report">
+    <main id="main-content" tabindex="-1" class="choose-report">
         <section>
             <div>
-                <h1>{% translate "Reports" %}</h1>
-                <p class="emphasized">
-                    {% blocktranslate trimmed %}
-                        Choose below which report you want. You will then be guided how to generate a report according to your choice.
-                    {% endblocktranslate %}
-                </p>
-                <a class="button"
-                   href="{% url 'report_oois_selection' organization.code %}">{% translate "Select from OOI list" %}</a>
+                <h1>{% translate "Choose report" %}</h1>
+                <p class="emphasized">{% translate "You have chosen to view a report for the following OOIs:" %}</p>
+                <ul>
+                    {% for ooi in oois %}<li>{{ ooi }}</li>{% endfor %}
+                </ul>
+                <p>{% translate "Choose from which report type you want to generate a report:" %}</p>
+                <form method="post" action="{% url 'report_view' organization.code %}">
+                    {% csrf_token %}
+                    {% include "partials/form/fieldset.html" with fields=report_types_form %}
+
+                    {% for ooi in oois %}<input type="hidden" value={{ ooi }}>{% endfor %}
+                    <button type="submit">{% translate "Generate Report" %}</button>
+                </form>
             </div>
         </section>
     </main>

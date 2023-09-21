@@ -23,31 +23,26 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
         kwargs = {"organization_code": self.organization.code}
         breadcrumbs = [
             {
-                "url": reverse("report_type_selection", kwargs=kwargs),
-                "text": _("Reports"),
-            },
-            {
                 "url": reverse("report_oois_selection", kwargs=kwargs),
-                "text": _("OOI Selection"),
+                "text": _("Select OOIs"),
             },
             {
-                "url": reverse("report_selection", kwargs=kwargs),
-                "text": _("Select Report"),
+                "url": reverse("report_type_selection", kwargs=kwargs),
+                "text": _("Select report type"),
+            },
+            {
+                "url": reverse("report_view", kwargs=kwargs),
+                "text": _("View Report"),
             },
         ]
 
         return breadcrumbs[: self.current_step]
 
 
-class ReportTypeSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView):
-    current_step = 1
-    template_name = "report_type_selection.html"
-
-
 class ReportOOISelectionView(ReportBreadcrumbs, BaseOOIListView, OrganizationView):
     template_name = "report_oois_selection.html"
     ooi_types = get_ooi_types_with_report()
-    current_step = 2
+    current_step = 1
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -55,11 +50,14 @@ class ReportOOISelectionView(ReportBreadcrumbs, BaseOOIListView, OrganizationVie
         return context
 
 
-class ReportSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView):
-    """One Report Type for one OOI"""
+class ReportTypeSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView):
+    """
+    Shows all possible report types from a list of OOIs.
+    Chooses report types to generate a report.
+    """
 
-    template_name = "report_selection.html"
-    current_step = 3
+    template_name = "report_type_selection.html"
+    current_step = 2
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -95,19 +93,28 @@ class ReportSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView):
         return context
 
 
-class ReportView(OctopoesView):
+class ReportView(ReportBreadcrumbs, OctopoesView, TemplateView):
     template_name = "report.html"
+    current_step = 3
 
-    def get_reports_data(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.oois = request.POST.getlist("oois", [])
+        self.report_types = request.POST.getlist("report_types", [])
+
+    def get_reports_data(self):
         report_data = {}
-        for ooi in request.POST.getlist("oois", []):
-            for report in request.POST.getlist("report_types", []):
+        for ooi in self.oois:
+            for report in self.report_types:
                 if ooi.get_type() in report.input_ooi_types:
                     data, template = report(self.octopoes_api_connector).generate_report(ooi)
                     report_data[f"{report.name}|{str(ooi.primary_key)}"] = {"data": data, "template": template}
         return report_data
 
+    def post(self, request, *args, **kwargs):
+        return self.get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["report_data"] = self.get_reports_data(self.request, *self.args, **self.kwargs)
+        context["report_data"] = self.get_reports_data()
         return context

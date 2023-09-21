@@ -10,11 +10,11 @@
         <section>
             <div class="fifty-fifty">
                 <div>
-                    <h1>{% translate "OOI Report" %}</h1>
+                    <h1>{% translate "Create Report from OOIs" %}</h1>
                     <p class="emphasized">
                         {% blocktranslate trimmed %}
-                            Select from the list which OOI you want to include in the report.
-                            Pay attention that the filters will be included in the report.
+                            Select from the list which OOI you want to create a report.
+                            Filters will be applied in the report.
                         {% endblocktranslate %}
                     </p>
                 </div>
@@ -27,7 +27,7 @@
 
             <form id="report_view"
                   method="post"
-                  action="{% url 'report_selection' organization.code %}"
+                  action="{% url 'report_type_selection' organization.code %}"
                   class="inline">
                 {% csrf_token %}
                 <table>
