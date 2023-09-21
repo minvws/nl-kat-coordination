@@ -11,6 +11,7 @@ from requests import RequestException
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
+from boefjes.docker_boefjes_runner import DockerBoefjesRunner
 from boefjes.job_models import (
     BoefjeMeta,
     NormalizerMeta,
@@ -129,6 +130,18 @@ class BoefjeHandler(Handler):
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, boefje_meta.id)
 
+        # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
+        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
+        if boefje_resource.oci_image:
+            logger.info(
+                "Delegating boefje %s[task_id=%s] to Docker runner with OCI image",
+                boefje_meta.boefje.id,
+                boefje_meta.id,
+                boefje_resource.oci_image,
+            )
+            docker_runner = DockerBoefjesRunner(boefje_resource, boefje_meta)
+            return docker_runner.run()
+
         if boefje_meta.input_ooi:
             boefje_meta.arguments["input"] = serialize_ooi(
                 _find_ooi_in_past(
@@ -136,8 +149,6 @@ class BoefjeHandler(Handler):
                     get_octopoes_api_connector(boefje_meta.organization),
                 )
             )
-
-        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
 
         env_keys = boefje_resource.environment_keys
 

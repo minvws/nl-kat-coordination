@@ -105,6 +105,8 @@ services:
     env_file:
       - .env-defaults
       - .env
+    environment:
+      - BOEFJE_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME}_default
 
   normalizer:
     restart: unless-stopped
