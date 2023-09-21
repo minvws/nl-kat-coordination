@@ -37,13 +37,13 @@ COPY rocky/requirements*.txt .
 RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
     && if [ "$ENVIRONMENT" = "dev" ]; \
-    then grep -v git+https:// requirements-dev.txt > /tmp/requirements-nogit.txt ; \
-    grep git+https:// requirements-dev.txt > /tmp/requirements-git.txt ; \
-    pip install -r /tmp/requirements-nogit.txt && pip install -r /tmp/requirements-git.txt ; \
-    else grep -v git+https:// requirements.txt > /tmp/requirements-nogit.txt; \
-    grep git+https:// requirements.txt > /tmp/requirements-git.txt; \
-    pip install -r /tmp/requirements-nogit.txt && pip install -r /tmp/requirements-git.txt; fi && \
-    rm /tmp/requirements-nogit.txt /tmp/requirements-git.txt
+    then \
+    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
+    grep git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
+    else \
+    grep -v git+https:// requirements.txt | pip install -r /dev/stdin ;\
+    grep git+https:// requirements.txt | pip install -r /dev/stdin ; \
+    fi
 
 FROM dev
 
