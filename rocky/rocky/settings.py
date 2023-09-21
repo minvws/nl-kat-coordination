@@ -308,12 +308,14 @@ STORAGES = {
     },
 }
 
+_IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
+
 
 def immutable_file_test(path, url):
     # Match filename with 12 hex digits before the extension e.g.
     # app.db8f2edc0c8a.js. Confifguraring this is necessary because whitenoise
     # doesn't automatically detect the django-compressor files as immutable.
-    return re.match(r"^.+\.[0-9a-f]{12}\..+$", url)
+    return _IMMUTABLE_FILE_TEST_PATTERN.match(url)
 
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
