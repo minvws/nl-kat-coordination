@@ -9,8 +9,8 @@ from django.views.generic import TemplateView
 from tools.view_helpers import BreadcrumbsMixin
 
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import get_ooi_types_with_report, get_report_types_for_oois
-from rocky.rocky.views.mixins import OctopoesView
+from reports.report_types.helpers import get_ooi_types_with_report, get_report_types_for_oois
+from rocky.views.mixins import OctopoesView
 from rocky.views.ooi_view import BaseOOIListView
 
 logger = getLogger(__name__)
