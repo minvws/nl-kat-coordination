@@ -29,3 +29,13 @@ def get_report_types_for_oois(ooi_pks: List[str]) -> Set[Type[Report]]:
     Get all report types that can be generated for a given list of OOIs
     """
     return {report for ooi_pk in ooi_pks for report in get_report_types_for_ooi(ooi_pk)}
+
+
+def get_report_by_id(report_id: str) -> Type[Report]:
+    """
+    Get report type by id
+    """
+    for report in REPORTS:
+        if report.id == report_id:
+            return report
+    raise ValueError(f"Report with id {report_id} not found")
