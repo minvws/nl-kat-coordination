@@ -7,7 +7,7 @@ Development: make kat
 make kat
 ========
 
-Install OpenKAT on your own machine with ``make kat`` or ``make kat-stable``. KAT-stable, as the name implies, is the last major release. If you want to deploy OpenKAT in a production environment use the hardening settings as well.
+Install OpenKAT on your own machine with ``make kat``. If you want to deploy OpenKAT in a production environment use the hardening settings as well.
 
 Requirements
 ------------
@@ -119,7 +119,7 @@ If you to start over with a clean slate, you can do so with the following comman
 
 This removes all Docker containers and volumes, and then brings up the containers again.
 
-Optionally, first remove the ``.env`` file (``rm .env``) before running ``make reset`` to also reset all configuration in environment variables. This should also resolve issues such as database authentication errors (``password authentication failed``).
+Optionally, first remove the ``.env`` file (``rm .env``) before running ``make env`` and ``make reset`` to also reset all configuration in environment variables. This should also resolve issues such as database authentication errors (``password authentication failed``).
 
 OpenTelemetry
 =============

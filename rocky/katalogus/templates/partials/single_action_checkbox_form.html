@@ -6,11 +6,10 @@
     {% if key %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
     <div class="checkbox">
         <input type="checkbox"
-            class="submit-on-click {{ input_class }}"
-            {% if input_checked %}checked{% endif %}
-            {% if input_disabled %}disabled{% endif %}>
+               class="submit-on-click {{ input_class }}"
+               {% if input_checked %}checked{% endif %}
+               {% if input_disabled %}disabled{% endif %}>
         {% if label_text %}<label>{{ label_text }}</label>{% endif %}
     </div>
 </form>
-<script src="{% static "/js/autoSubmit.js" %}"
-        nonce="{{ request.csp_nonce }}"></script>
+<script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>

@@ -1192,7 +1192,9 @@
     },
     "valid_time": "2022-08-26 08:23:58.373810+00:00",
     "report_source_type": "Hostname",
-    "report_source_value": "mispo.es."
+    "report_source_value": "mispo.es.",
+    "filters": {},
+    "report_url": "http://test.123"
   },
   "glossary": "dutch.hiero.csv",
   "debug": true

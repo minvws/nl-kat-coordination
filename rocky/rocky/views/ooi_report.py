@@ -24,7 +24,9 @@ from octopoes.models.ooi.dns.records import (
 )
 from octopoes.models.ooi.dns.zone import Hostname
 from rocky.keiko import (
+    FindingReportQuery,
     GeneratingReportFailed,
+    OOIReportQuery,
     ReportNotFoundException,
     ReportsService,
     build_findings_list_from_store,
@@ -88,6 +90,13 @@ class OOIReportPDFView(SingleOOITreeMixin):
                 self.ooi.object_type,
                 self.ooi.human_readable,
                 self.tree.store,
+                OOIReportQuery(
+                    self.organization.code,
+                    valid_time.date(),
+                    self.ooi,
+                    self.depth,
+                    origin=f"{request.scheme}://{request.get_host()}",
+                ),
             )
         except GeneratingReportFailed:
             messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
@@ -104,14 +113,25 @@ class OOIReportPDFView(SingleOOITreeMixin):
 
 
 class FindingReportPDFView(SeveritiesMixin, OctopoesView):
+    """Used from the FindingListView. The request to this endpoint inherits all query parameters from this page, so that
+    the report shows the same filtered findings.
+    """
+
     paginate_by = None
 
     def get(self, request, *args, **kwargs):
         severities = self.get_severities()
+        muted_findings = request.GET.get("muted_findings", "non-muted")
+
+        exclude_muted = muted_findings == "non-muted"
+        only_muted = muted_findings == "muted"
+
         findings = FindingList(
             self.octopoes_api_connector,
             self.get_observed_at(),
             severities,
+            exclude_muted=exclude_muted,
+            only_muted=only_muted,
         )
 
         reports_service = ReportsService(keiko_client)
@@ -121,6 +141,14 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
                 self.get_observed_at(),
                 self.organization.name,
                 generate_findings_metadata(findings, severities),
+                FindingReportQuery(
+                    self.organization.code,
+                    self.get_observed_at().date(),
+                    severities,
+                    origin=f"{request.scheme}://{request.get_host()}",
+                    exclude_muted=exclude_muted,
+                    only_muted=only_muted,
+                ),
             )
         except GeneratingReportFailed:
             messages.error(request, _("Generating report failed. See Keiko logs for more information."))

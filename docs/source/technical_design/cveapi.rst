@@ -9,9 +9,9 @@ service for this. The kat-cveapi Debian package that can be downloaded from
 be used for this.
 
 The package has a script that will download all the CVE information to the
-`/var/lib/kat-cveapi` directory. The package includes a systemd timer that will
+``/var/lib/kat-cveapi`` directory. The package includes a systemd timer that will
 run the script after the package is installed and hourly to keep the CVE
-information up-to-date. The `/var/lib/kat-cveapi` can then be served as static
+information up-to-date. The ``/var/lib/kat-cveapi`` can then be served as static
 files by your webserver. Example nginx configuration that is used by
 https://cve.openkat.dev/:
 

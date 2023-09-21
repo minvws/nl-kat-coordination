@@ -30,7 +30,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         )
     )
     hostnames: List[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
-    task_id = uuid.uuid4().hex
+    task_id = uuid.uuid4()
 
     octopoes_api_connector.save_observation(
         Observation(
@@ -50,7 +50,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
     assert octopoes_api_connector.list(types={Hostname}).count == 10
     assert octopoes_api_connector.list(types={Network, Hostname}).count == 11
 
-    assert len(octopoes_api_connector.list_origins(task_id="abc")) == 0
+    assert len(octopoes_api_connector.list_origins(task_id=uuid.uuid4())) == 0
     origins = octopoes_api_connector.list_origins(task_id=task_id)
     assert len(origins) == 1
     assert origins[0].dict() == {

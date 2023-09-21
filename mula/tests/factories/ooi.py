@@ -1,4 +1,4 @@
-from factory import Factory, Faker, Sequence, fuzzy
+from factory import Factory, Faker, fuzzy
 from scheduler.models import OOI, ScanProfile
 
 
@@ -20,7 +20,7 @@ class OOIFactory(Factory):
     class Meta:
         model = OOI
 
-    primary_key: str = Sequence(lambda n: n)
+    primary_key: str = Faker("uuid4")
 
     scan_profile: ScanProfile
 

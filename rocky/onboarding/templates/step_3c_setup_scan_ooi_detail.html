@@ -16,58 +16,46 @@
                 <h3>{% translate "Creating an object" %}</h3>
                 <p>
                     {% blocktranslate trimmed %}
-            Based on the url you provided OpenKAT added the necessary additional
-            objects to create a url object.
-         {% endblocktranslate %}
+                        Based on the url you provided OpenKAT added the necessary additional
+                        objects to create a url object.
+                    {% endblocktranslate %}
                 </p>
             </div>
             <div>
                 <p>{% translate "URL" %}</p>
                 <dl>
                     <div>
-                        <dt>
-                            {% translate "Type" %}
-                        </dt>
+                        <dt>{% translate "Type" %}</dt>
                         <dd>
                             {{ ooi.ooi_type }}
                         </dd>
                     </div>
                     <div>
-                        <dt>
-                            {% translate "Path" %}
-                        </dt>
+                        <dt>{% translate "Path" %}</dt>
                         <dd>
                             {{ ooi.raw }}
                         </dd>
                     </div>
                     <div>
-                        <dt>
-                            {% translate "Hostname" %}
-                        </dt>
+                        <dt>{% translate "Hostname" %}</dt>
                         <dd>
                             {{ ooi.raw.host }}
                         </dd>
                     </div>
                     <div>
-                        <dt>
-                            {% translate "scheme" %}
-                        </dt>
+                        <dt>{% translate "scheme" %}</dt>
                         <dd>
                             {{ ooi.raw.scheme }}
                         </dd>
                     </div>
                     <div>
-                        <dt>
-                            {% translate "DNS Zone" %}
-                        </dt>
+                        <dt>{% translate "DNS Zone" %}</dt>
                         <dd>
                             {{ ooi.raw.tld }}
                         </dd>
                     </div>
                     <div>
-                        <dt>
-                            {% translate "Network" %}
-                        </dt>
+                        <dt>{% translate "Network" %}</dt>
                         <dd>
                             {{ ooi.network }}
                         </dd>

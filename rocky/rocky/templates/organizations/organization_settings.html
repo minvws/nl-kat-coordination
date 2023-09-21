@@ -4,89 +4,86 @@
 {% load static %}
 
 {% block content %}
-  {% include "header.html" %}
+    {% include "header.html" %}
 
-  <main id="main-content">
-    <section>
-      <div>
-        <h1>{% translate "Organization" %}: {{ organization.name }}</h1>
-        <p>
-          {% blocktranslate with organization_name=organization.name %}
+    <main id="main-content">
+        <section>
+            <div>
+                <h1>{% translate "Organization" %}: {{ organization.name }}</h1>
+                <p>
+                    {% blocktranslate with organization_name=organization.name %}
             An overview of "{{ organization_name }}". This shows general information and its settings.
           {% endblocktranslate %}
-        </p>
-        {% if not indemnification_present %}
-          <p class="warning"
-             role="group"
-             aria-label="{% translate "indemnification warning" %}">
-            {% url "organization_settings" organization.code as organization_settings %}
-            {% blocktranslate %}
+                </p>
+                {% if not indemnification_present %}
+                    <p class="warning"
+                       role="group"
+                       aria-label="{% translate "indemnification warning" %}">
+                        {% url "organization_settings" organization.code as organization_settings %}
+                        {% blocktranslate %}
               <strong>Warning:</strong>
               Indemnification is not set for this organization.
             {% endblocktranslate %}
-          </p>
-        {% endif %}
-        <h2>{% translate "Organization details" %}</h2>
-        <div class="horizontal-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>{% translate "Name" %}</th>
-                <th>{% translate "Code" %}</th>
-                {% if perms.tools.change_organization %}
-                  <th>{% translate "Edit" %}</th>
+                    </p>
                 {% endif %}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{ organization.name }}</td>
-                <td>{{ organization.code }}</td>
-                {% if perms.tools.change_organization %}
-                  <td>
-                    {% spaceless %}
-                      <a href="{% url "organization_edit" organization.code %}">
-                        <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
-                      </a>
-                    {% endspaceless %}
-                  </td>
+                <h2>{% translate "Organization details" %}</h2>
+                <div class="horizontal-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>{% translate "Name" %}</th>
+                                <th>{% translate "Code" %}</th>
+                                {% if perms.tools.change_organization %}
+                                    <th>{% translate "Edit" %}</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ organization.name }}</td>
+                                <td>{{ organization.code }}</td>
+                                {% if perms.tools.change_organization %}
+                                    <td>
+                                        {% spaceless %}
+                                            <a href="{% url "organization_edit" organization.code %}">
+                                                <button class="icon ti-edit action-button">{% translate "Edit" %}</button>
+                                            </a>
+                                        {% endspaceless %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h2>{% translate "Settings" %}</h2>
+                {% if perms.tools.add_indemnification %}
+                    <a href="{% url "indemnification_add" organization.code %}"
+                       class="button ghost">{% translate "Add indemnification" %}</a>
                 {% endif %}
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <h2>{% translate "Settings" %}</h2>
-        {% if perms.tools.add_indemnification %}
-          <a href="{% url "indemnification_add" organization.code %}"
-             class="button ghost">{% translate "Add indemnification" %}</a>
-        {% endif %}
+                <h2>{% translate "Actions" %}</h2>
+                {% if perms.tools.can_recalculate_bits %}
+                    <form method="post" class="inline">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="dropdown-button"
+                                name="action"
+                                value="recalculate">{% translate "Rerun all bits" %}</button>
+                    </form>
+                {% endif %}
+            </div>
+        </section>
+        {% if organization.tags.all %}
+            <section>
+                <div>
+                    <h2>{% translate "Tags" %}</h2>
+                    {% include "organizations/organization_tags.html" %}
 
-        <h2>{% translate "Actions" %}</h2>
-        {% if perms.tools.can_recalculate_bits %}
-          <form method="post" class="inline">
-            {% csrf_token %}
-            <button type="submit"
-                    class="dropdown-button"
-                    name="action"
-                    value="recalculate">
-              {% translate "Rerun all bits" %}
-            </button>
-          </form>
+                </div>
+            </section>
         {% endif %}
-      </div>
-    </section>
-    {% if organization.tags.all %}
-      <section>
-        <div>
-          <h2>{% translate "Tags" %}</h2>
-          {% include "organizations/organization_tags.html" %}
-
-        </div>
-      </section>
-    {% endif %}
-  </main>
+    </main>
 {% endblock content %}
 {% block html_at_end_body %}
-  {{ block.super }}
-  <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {{ block.super }}
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

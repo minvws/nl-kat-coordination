@@ -25,20 +25,30 @@ class NormalizerScheduler(Scheduler):
         self,
         ctx: context.AppContext,
         scheduler_id: str,
-        queue: queues.PriorityQueue,
-        ranker: rankers.Ranker,
         organisation: Organisation,
+        queue: Optional[queues.PriorityQueue] = None,
         callback: Optional[Callable[..., None]] = None,
     ):
         self.logger = logging.getLogger(__name__)
         self.organisation: Organisation = organisation
 
+        self.queue = queue or queues.NormalizerPriorityQueue(
+            pq_id=scheduler_id,
+            maxsize=ctx.config.pq_maxsize,
+            item_type=NormalizerTask,
+            allow_priority_updates=True,
+            pq_store=ctx.datastores.pq_store,
+        )
+
         super().__init__(
             ctx=ctx,
+            queue=self.queue,
             scheduler_id=scheduler_id,
-            queue=queue,
-            ranker=ranker,
             callback=callback,
+        )
+
+        self.ranker = rankers.NormalizerRanker(
+            ctx=self.ctx,
         )
 
     def run(self) -> None:
@@ -52,10 +62,10 @@ class NormalizerScheduler(Scheduler):
         file.
         """
         listener = listeners.RawData(
-            dsn=self.ctx.config.host_raw_data,
+            dsn=str(self.ctx.config.host_raw_data),
             queue=f"{self.organisation.id}__raw_file_received",
             func=self.push_tasks_for_received_raw_data,
-            prefetch_count=self.ctx.config.queue_prefetch_count,
+            prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
         )
 
         self.listeners["raw_data"] = listener
@@ -96,7 +106,7 @@ class NormalizerScheduler(Scheduler):
         # Get all normalizers for the mime types of the raw data
         normalizers: Dict[str, Normalizer] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: List[Normalizer] = self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type: List[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -118,7 +128,7 @@ class NormalizerScheduler(Scheduler):
                     self.push_tasks_for_received_raw_data.__name__,
                 )
 
-    def push_task(self, normalizer: Normalizer, raw_data: RawData, caller: str = "") -> None:
+    def push_task(self, normalizer: Plugin, raw_data: RawData, caller: str = "") -> None:
         """Given a normalizer and raw data, create a task and push it to the
         queue.
 
@@ -128,7 +138,7 @@ class NormalizerScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
         """
         task = NormalizerTask(
-            normalizer=normalizer,
+            normalizer=Normalizer(id=normalizer.id),
             raw_data=raw_data,
         )
 
@@ -185,7 +195,7 @@ class NormalizerScheduler(Scheduler):
             id=task.id,
             scheduler_id=self.scheduler_id,
             priority=score,
-            data=task,
+            data=task.model_dump(),
             hash=task.hash,
         )
 
@@ -216,7 +226,7 @@ class NormalizerScheduler(Scheduler):
             caller,
         )
 
-    def get_normalizers_for_mime_type(self, mime_type: str) -> List[Normalizer]:
+    def get_normalizers_for_mime_type(self, mime_type: str) -> List[Plugin]:
         """Get available normalizers for a given mime type.
 
         Args:
@@ -257,7 +267,7 @@ class NormalizerScheduler(Scheduler):
             len(normalizers),
             mime_type,
             mime_type,
-            [normalizer.name for normalizer in normalizers],
+            [normalizer.id for normalizer in normalizers],
             self.organisation.id,
             self.scheduler_id,
         )
@@ -297,7 +307,7 @@ class NormalizerScheduler(Scheduler):
         # Get the last tasks that have run or are running for the hash
         # of this particular NormalizerTask.
         try:
-            task_db = self.ctx.task_store.get_latest_task_by_hash(task.hash)
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
             self.logger.warning(
                 "Could not get latest task by hash: %s [organisation_id=%s, scheduler_id=%s]",

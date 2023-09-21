@@ -5,11 +5,9 @@ import time
 import unittest
 import uuid
 from typing import Optional
+from unittest import mock
 
-from scheduler import config, models, queues
-from scheduler.models import Base
-from scheduler.repositories import sqlalchemy
-from sqlalchemy.orm import sessionmaker
+from scheduler import config, models, queues, storage
 
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
@@ -18,10 +16,10 @@ from tests.utils import functions
 class PriorityQueueTestCase(unittest.TestCase):
     def setUp(self) -> None:
         cfg = config.settings.Settings()
-        self.datastore = sqlalchemy.SQLAlchemy(cfg.db_uri)
-        Base.metadata.create_all(self.datastore.engine)
+        self.dbconn = storage.DBConn(str(cfg.db_uri))
+        models.Base.metadata.create_all(self.dbconn.engine)
 
-        self.pq_store = sqlalchemy.PriorityQueueStore(datastore=self.datastore)
+        self.pq_store = storage.PriorityQueueStore(self.dbconn)
 
         self.pq = mock_queue.MockPriorityQueue(
             pq_id="test",
@@ -33,15 +31,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         self._check_queue_empty()
 
     def tearDown(self) -> None:
-        session = sessionmaker(bind=self.datastore.engine)()
-
-        for table in Base.metadata.tables:
-            session.execute(f"DELETE FROM {table}")
-
-        session.commit()
-        session.close()
-
-        del self.pq
+        models.Base.metadata.drop_all(self.dbconn.engine)
 
     def _check_queue_empty(self):
         self.assertEqual(0, self.pq.qsize())
@@ -52,13 +42,45 @@ class PriorityQueueTestCase(unittest.TestCase):
         item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
         self.pq.push(p_item=item)
 
+        item_db = self.pq_store.get(self.pq.pq_id, item.id)
+        self.assertIsNotNone(item_db)
+        self.assertEqual(item.id, item_db.id)
+
         self.assertEqual(1, self.pq.qsize())
+
+    @mock.patch("scheduler.storage.PriorityQueueStore.push")
+    def test_push_item_not_found_in_db(self, mock_push):
+        """When adding an item to the priority queue, but the item is not
+        found in the database, the item shouldn't be added.
+        """
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+
+        mock_push.return_value = None
+
+        with self.assertRaises(queues.errors.PrioritizedItemNotFoundError):
+            self.pq.push(p_item=item)
+
+        self.assertEqual(0, self.pq.qsize())
+        item_db = self.pq_store.get(self.pq.pq_id, item.id)
+        self.assertIsNone(item_db)
 
     def test_push_incorrect_p_item_type(self):
         """When pushing an item that is not of the correct type, the item
         shouldn't be pushed.
         """
         p_item = {"priority": 1, "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)}
+
+        with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
+            self.pq.push(p_item=p_item)
+
+        self.assertEqual(0, self.pq.qsize())
+
+    def test_push_invalid_p_item(self):
+        """When pushing an item that can not be validated, the item shouldn't
+        be pushed.
+        """
+        p_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        p_item.data = {"invalid": "data"}
 
         with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
             self.pq.push(p_item=p_item)
@@ -415,3 +437,24 @@ class PriorityQueueTestCase(unittest.TestCase):
         # Pop the item
         popped_item = self.pq.pop()
         self.assertEqual(first_item.priority, popped_item.priority)
+
+    def test_is_item_on_queue(self):
+        """When checking if an item is on the queue, it should return True if
+        the item is on the queue, and False if it isn't.
+        """
+        # Add an item to the queue
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=item)
+
+        # Check if the item is on the queue
+        self.assertTrue(self.pq.is_item_on_queue(item))
+
+    def test_is_item_not_on_queue(self):
+        """When checking if an item is on the queue, it should return True if
+        the item is on the queue, and False if it isn't.
+        """
+        # Add an item to the queue
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+
+        # Check if the item is on the queue
+        self.assertFalse(self.pq.is_item_on_queue(item))

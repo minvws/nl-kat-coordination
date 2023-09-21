@@ -44,9 +44,10 @@ from onboarding.view_helpers import (
 )
 from rocky.bytes_client import get_bytes_client
 from rocky.exceptions import (
-    ClearanceLevelTooLowException,
+    AcknowledgedClearanceLevelTooLowException,
     IndemnificationNotPresentException,
     RockyError,
+    TrustedClearanceLevelTooLowException,
 )
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
@@ -285,15 +286,32 @@ class OnboardingSetupScanOOIDetailView(
                 ),
             )
             return self.get(request, *args, **kwargs)
-        except ClearanceLevelTooLowException:
+        except TrustedClearanceLevelTooLowException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
                 _(
-                    "Could not raise clearance level of {} to L{}. "
-                    "You acknowledged a clearance level of L{}. "
+                    "Could not raise clearance level of %s to L%s. "
+                    "You were trusted a clearance level of L%s. "
                     "Contact your administrator to receive a higher clearance."
-                ).format(
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
+            return self.get(request, *args, **kwargs)
+        except AcknowledgedClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Please accept the clearance level first on your profile page to proceed."
+                )
+                % (
                     ooi.reference.human_readable,
                     level,
                     self.organization_member.acknowledged_clearance_level,
@@ -323,22 +341,23 @@ class OnboardingClearanceLevelIntroductionView(
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
 
-    def get_boefje_cover_img(self, boefje_id):
-        return reverse("plugin_cover", kwargs={"plugin_id": boefje_id, "organization_code": self.organization.code})
-
     def get_boefjes_tiles(self):
         tiles = [
             {
-                "tile_image": self.get_boefje_cover_img("dns_zone"),
+                "id": "dns_zone",
+                "type": "boefje",
                 "scan_level": "l1",
                 "name": "DNS-Zone",
                 "description": "Fetch the parent DNS zone of a hostname",
+                "enabled": False,
             },
             {
-                "tile_image": self.get_boefje_cover_img("fierce"),
+                "id": "fierce",
+                "type": "boefje",
                 "scan_level": "l3",
                 "name": "Fierce",
                 "description": "Finds subdomains by brute force",
+                "enabled": False,
             },
         ]
         return tiles

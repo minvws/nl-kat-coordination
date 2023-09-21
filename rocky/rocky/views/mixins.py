@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from katalogus.client import Plugin, get_katalogus
+from katalogus.client import Boefje, get_katalogus
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
@@ -46,7 +46,7 @@ class HydratedFinding:
 class OriginData(BaseModel):
     origin: Origin
     normalizer: Optional[dict]
-    boefje: Optional[Plugin]
+    boefje: Optional[Boefje]
     params: Optional[Dict[str, str]]
 
 
@@ -199,7 +199,7 @@ class FindingList:
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
         severities: Set[RiskLevelSeverity],
-        exclude_muted: bool = False,
+        exclude_muted: bool = True,
         only_muted: bool = False,
     ):
         self.octopoes_connector = octopoes_connector

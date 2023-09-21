@@ -2,9 +2,9 @@
 {% load ooi_extra %}
 
 {% spaceless %}
-        <div class="horizontal-scroll">
-            <h2>{% translate "Clearance level inheritance" %}</h2>
-            {% if clearance_level_inheritance %}
+    <div class="horizontal-scroll">
+        <h2>{% translate "Clearance level inheritance" %}</h2>
+        {% if clearance_level_inheritance %}
             <table id="clearance_level_inheritance">
                 <thead>
                     <tr>
@@ -17,7 +17,6 @@
                 <tbody>
                     {% for section in clearance_level_inheritance %}
                         <tr>
-
                             {% if forloop.first %}
                                 <td>{% translate "OOI" %}</td>
                             {% elif forloop.last %}
@@ -26,17 +25,16 @@
                                 <td>Object</td>
                             {% endif %}
                             <td>
-                              <a href="{% ooi_url 'ooi_detail' section.primary_key organization.code %}">{{ section.human_readable }}</a>
+                                <a href="{% ooi_url 'ooi_detail' section.primary_key organization.code %}">{{ section.human_readable }}</a>
                             </td>
                             <td>{{ section.object_type }}</td>
                             <td>L{{ section.level }}</td>
                         </tr>
-
                     {% endfor %}
                 </tbody>
             </table>
-              {% else %}
-                <a href="{% ooi_url 'ooi_detail' ooi_id=ooi organization_code=organization.code show_clearance_level_inheritance=True %}#clearance_level_inheritance">{% translate "Show clearance level inheritance" %}</a>
-              {% endif %}
-        </div>
+        {% else %}
+            <a href="{% ooi_url 'ooi_detail' ooi_id=ooi organization_code=organization.code show_clearance_level_inheritance=True %}#clearance_level_inheritance">{% translate "Show clearance level inheritance" %}</a>
+        {% endif %}
+    </div>
 {% endspaceless %}

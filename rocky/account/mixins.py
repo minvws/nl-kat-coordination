@@ -69,7 +69,7 @@ class OrganizationView(View):
         super().__init__(*args, **kwargs)
         self.organization: Optional[Organization] = None
         self.octopoes_api_connector: Optional[OctopoesAPIConnector] = None
-        self.bytes_client: BytesClient = None
+        self.bytes_client: Optional[BytesClient] = None
         self.organization_member = None
         self.indemnification_present = False
 
@@ -89,7 +89,16 @@ class OrganizationView(View):
                 user=self.request.user, organization=self.organization
             )
         except OrganizationMember.DoesNotExist:
-            raise Http404()
+            if not self.request.user.is_superuser:
+                raise Http404()
+
+            self.organization_member = OrganizationMember(
+                user=self.request.user,
+                organization=self.organization,
+                status=OrganizationMember.STATUSES.ACTIVE,
+                trusted_clearance_level=4,
+                acknowledged_clearance_level=0,
+            )
 
         if self.organization_member.blocked:
             raise PermissionDenied()
@@ -119,10 +128,10 @@ class OrganizationView(View):
     def verify_raise_clearance_level(self, level: int) -> bool:
         if not self.indemnification_present:
             raise IndemnificationNotPresentException()
-        if self.organization_member.acknowledged_clearance_level < level:
-            raise AcknowledgedClearanceLevelTooLowException()
         if self.organization_member.trusted_clearance_level < level:
             raise TrustedClearanceLevelTooLowException()
+        if self.organization_member.acknowledged_clearance_level < level:
+            raise AcknowledgedClearanceLevelTooLowException()
         return True
 
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:

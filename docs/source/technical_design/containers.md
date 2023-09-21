@@ -26,16 +26,19 @@ To set up an installation with pre-built containers, you can pull the repository
 git clone https://github.com/minvws/nl-kat-coordination.git
 ```
 
-If this is your first install, and you do not have an .env file yet, you can create an .env file using the following command:
+If this is your first install, and you do not have an .env file yet, you can create an `.env` file using the following command:
 
 ```shell
 make env
 ```
 
-This will create an .env file with the default values. You can edit this file to change the default values. Now you can pull and start the containers using the following command:
+This will create an `.env` file with the default values. You can edit this file to change the default values.
+Make sure that you also add the keys and values from `.env-defaults` to your `.env` file, and modify them for production use where necessary.
+
+Now you can pull and start the containers using the following command:
 
 ```shell
-docker-compose -f docker-compose.release-example.yml up -d
+docker compose --env-file .env-prod -f docker-compose.release-example.yml up -d
 ```
 
 
@@ -52,7 +55,7 @@ python3 -m boefjes.seed
 With docker-compose you would run this as:
 
 ```shell
-docker-compose -f docker-compose.release-example.yml exec katalogus python3 -m boefjes.seed
+docker compose --env-file .env-prod -f docker-compose.release-example.yml exec katalogus python3 -m boefjes.seed
 ```
 
 In the rocky container we first need to import the OOI database seed:
@@ -64,7 +67,7 @@ python3 manage.py loaddata OOI_database_seed.json
 With docker-compose you would run this as:
 
 ```shell
-docker-compose -f docker-compose.release-example.yml exec rocky python3 manage.py loaddata OOI_database_seed.json
+docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py loaddata OOI_database_seed.json
 ```
 
 Next we need to create the superuser, this will prompt for the e-mail address and password:
@@ -76,7 +79,7 @@ python3 manage.py createsuperuser
 With docker-compose you would run this as:
 
 ```shell
-docker-compose -f docker-compose.release-example.yml exec rocky python3 manage.py createsuperuser
+docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py createsuperuser
 ```
 
 
@@ -89,7 +92,7 @@ python3 manage.py setup_dev_account
 With docker-compose you would run this as:
 
 ```shell
-docker-compose -f docker-compose.release-example.yml exec rocky python3 manage.py setup_dev_account
+docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py setup_dev_account
 ```
 
 ## Container commands
@@ -119,5 +122,5 @@ python3 manage.py loaddata OOI_database_seed.json
 With docker-compose you would run this as:
 
 ```shell
-docker-compose -f docker-compose.release-example.yml exec rocky python3 manage.py loaddata OOI_database_seed.json
+docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py loaddata OOI_database_seed.json
 ```
