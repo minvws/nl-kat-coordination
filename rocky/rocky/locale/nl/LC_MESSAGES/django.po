@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-12 15:49+0000\n"
+"POT-Creation-Date: 2023-09-21 10:16+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1514,7 +1514,6 @@ msgstr[1] ""
 "                      "
 
 #: katalogus/templates/katalogus_settings.html
-#: katalogus/templates/katalogus.html
 msgid "KAT-alogus Settings"
 msgstr "KAT-alogus Instellingen"
 
@@ -1550,8 +1549,6 @@ msgid "Value"
 msgstr "Waarde"
 
 #: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-#: onboarding/templates/partials/boefje_tile_static.html
 msgid "Scan level:"
 msgstr "Vrijwaringsniveau:"
 
@@ -1561,7 +1558,7 @@ msgstr "Uitgever"
 
 #: katalogus/templates/partials/boefje_tile.html
 #: katalogus/templates/partials/plugin_tile.html
-#: katalogus/templates/partials/plugins.html katalogus/templates/katalogus.html
+#: katalogus/templates/partials/plugins.html
 msgid "See details"
 msgstr "Zie details"
 
@@ -1592,7 +1589,7 @@ msgstr "Filters wissen"
 #: katalogus/views/plugin_settings_add.py
 #: katalogus/views/plugin_settings_delete.py
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html katalogus/templates/katalogus.html
+#: rocky/templates/header.html
 msgid "KAT-alogus"
 msgstr "KAT-alogus"
 
@@ -1706,7 +1703,6 @@ msgstr "Plug-in beschrijving"
 
 #: katalogus/templates/partials/plugins.html
 #: rocky/templates/organizations/organization_settings.html
-#: katalogus/templates/katalogus.html
 msgid "Actions"
 msgstr "Acties"
 
@@ -3629,7 +3625,7 @@ msgstr "Vrijwaringen"
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/ooi_report_findings_block.html
 #: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py rocky/templates/findings/finding_list.html
+#: rocky/views/ooi_view.py
 msgid "Findings"
 msgstr "Bevindingen"
 
@@ -4578,7 +4574,6 @@ msgid "Filter by OOI types"
 msgstr "Filter op OOI-types"
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
-#: rocky/templates/partials/ooi_type_filters.html
 msgid "Toggle all"
 msgstr "Alles (de-)selecteren"
 
@@ -4897,8 +4892,6 @@ msgid "Blocked status"
 msgstr "Geblokkeerde status"
 
 #: rocky/templates/partials/organization_member_list_filters.html
-#: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/ooi_type_filters.html
 msgid "Update List"
 msgstr "Lijst updaten"
 
@@ -5018,7 +5011,7 @@ msgstr "Profiel"
 msgid "Go to content"
 msgstr "Ga direct naar de inhoud"
 
-#: rocky/templates/scan.html katalogus/templates/katalogus.html
+#: rocky/templates/scan.html
 msgid "Boefjes overview:"
 msgstr "Boefjes-overzicht:"
 
@@ -5820,247 +5813,225 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
 
-#: katalogus/templates/katalogus.html
-msgid ""
-"\n"
-"                An overview of all available boefjes.\n"
-"                Boefjes can be used to scan for vulnerablilities and "
-"security issues within specified objects.\n"
-"                Each boefje has his own focus area and strengths.\n"
-"              "
-msgstr ""
-"\n"
-"                Een overzicht van alle beschikbare boefjes.\n"
-"                Boefjes kunnen worden gebruikt om te scannen op "
-"kwetsbaarheden en beveiligingsproblemen binnen gespecificeerde objecten.\n"
-"                Elk boefje heeft zijn eigen toepassing.\n"
-"              "
+#~ msgid ""
+#~ "\n"
+#~ "                An overview of all available boefjes.\n"
+#~ "                Boefjes can be used to scan for vulnerablilities and "
+#~ "security issues within specified objects.\n"
+#~ "                Each boefje has his own focus area and strengths.\n"
+#~ "              "
+#~ msgstr ""
+#~ "\n"
+#~ "                Een overzicht van alle beschikbare boefjes.\n"
+#~ "                Boefjes kunnen worden gebruikt om te scannen op "
+#~ "kwetsbaarheden en beveiligingsproblemen binnen gespecificeerde objecten.\n"
+#~ "                Elk boefje heeft zijn eigen toepassing.\n"
+#~ "              "
 
-#: katalogus/templates/katalogus.html
-msgid "Boefje name"
-msgstr "Naam boefje"
+#~ msgid "Boefje name"
+#~ msgstr "Naam boefje"
 
-#: katalogus/templates/katalogus.html
-msgid "Boefje description"
-msgstr "Omschrijving boefje"
+#~ msgid "Boefje description"
+#~ msgstr "Omschrijving boefje"
 
-#: katalogus/templates/partials/katalogus_filter.html
-msgid "Available plugins"
-msgstr "Beschikbare plug-ins"
+#~ msgid "Available plugins"
+#~ msgstr "Beschikbare plug-ins"
 
-#: katalogus/templates/partials/objects_to_scan.html
 #, python-format
-msgid ""
-"This boefje will only scan objects with a corresponding clearance level of "
-"<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
-"this boefje to scan an OOI with a lower clearance level than "
-"<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
-"clearance level."
-msgstr ""
-"Dit boefje scant alleen objecten met een overeenkomstig vrijwaringsniveau "
-"van <strong>(%(scan_level)s)</strong> of hoger. Er is geen vrijwaring voor "
-"dit boefje om een OOI met een lager scan level te scannen "
-"dan<strong>L%(scan_level)s</strong>. Gebruik het filter om OOI's met een "
-"lagere vrijwaringssniveau."
+#~ msgid ""
+#~ "This boefje will only scan objects with a corresponding clearance level "
+#~ "of <strong>L%(scan_level)s</strong> or higher. There is no "
+#~ "indemnification for this boefje to scan an OOI with a lower clearance "
+#~ "level than <strong>L%(scan_level)s</strong>. Use the filter to show OOI's "
+#~ "with a lower clearance level."
+#~ msgstr ""
+#~ "Dit boefje scant alleen objecten met een overeenkomstig vrijwaringsniveau "
+#~ "van <strong>(%(scan_level)s)</strong> of hoger. Er is geen vrijwaring "
+#~ "voor dit boefje om een OOI met een lager scan level te scannen "
+#~ "dan<strong>L%(scan_level)s</strong>. Gebruik het filter om OOI's met een "
+#~ "lagere vrijwaringssniveau."
 
-#: katalogus/templates/partials/objects_to_scan.html
-msgid ""
-"\n"
-"          <span>Warning scan level:</span>\n"
-"          Scanning OOI's with a lower clearance level will result in OpenKAT "
-"increasing the clearance level on that OOI,\n"
-"          not only for this scan but from now on out, until it manually gets "
-"set to something else again.\n"
-"          This means that all other enabled Boefjes will use this higher "
-"clearance level aswel.\n"
-"        "
-msgstr ""
-"\n"
-"         <span>Waarschuwingsscanniveau:</span>\n"
-"          Het scannen van OOI's met een lager vrijgaveniveau leidt ertoe dat "
-"OpenKAT het vrijgaveniveau op die OOI verhoogt,\n"
-"          niet alleen voor deze scan maar vanaf nu, totdat het handmatig "
-"weer op iets anders wordt ingesteld.\n"
-"          Dit betekent dat alle andere ingeschakelde Boefjes ook dit hogere "
-"vrijgaveniveau zullen gebruiken.\n"
-"        "
+#~ msgid ""
+#~ "\n"
+#~ "          <span>Warning scan level:</span>\n"
+#~ "          Scanning OOI's with a lower clearance level will result in "
+#~ "OpenKAT increasing the clearance level on that OOI,\n"
+#~ "          not only for this scan but from now on out, until it manually "
+#~ "gets set to something else again.\n"
+#~ "          This means that all other enabled Boefjes will use this higher "
+#~ "clearance level aswel.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "         <span>Waarschuwingsscanniveau:</span>\n"
+#~ "          Het scannen van OOI's met een lager vrijgaveniveau leidt ertoe "
+#~ "dat OpenKAT het vrijgaveniveau op die OOI verhoogt,\n"
+#~ "          niet alleen voor deze scan maar vanaf nu, totdat het handmatig "
+#~ "weer op iets anders wordt ingesteld.\n"
+#~ "          Dit betekent dat alle andere ingeschakelde Boefjes ook dit "
+#~ "hogere vrijgaveniveau zullen gebruiken.\n"
+#~ "        "
 
-#: katalogus/templates/partials/objects_to_scan.html
 #, python-format
-msgid ""
-"\n"
-"          You currently don't have any objects that meet the scan level of "
-"%(name)s.\n"
-"          Add objects with a complying clearance level, or alter the "
-"clearance level of existing objects.\n"
-"        "
-msgstr ""
-"\n"
-"              U heeft momenteel geen objecten die voldoen aan het scanniveau "
-"van %(name)s. \n"
-"              Voeg objecten toe met een voldoend vrijwaringsniveau, of "
-"wijzig het vrijwaringsniveau van bestaande objecten.\n"
-"            "
+#~ msgid ""
+#~ "\n"
+#~ "          You currently don't have any objects that meet the scan level "
+#~ "of %(name)s.\n"
+#~ "          Add objects with a complying clearance level, or alter the "
+#~ "clearance level of existing objects.\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "              U heeft momenteel geen objecten die voldoen aan het "
+#~ "scanniveau van %(name)s. \n"
+#~ "              Voeg objecten toe met een voldoend vrijwaringsniveau, of "
+#~ "wijzig het vrijwaringsniveau van bestaande objecten.\n"
+#~ "            "
 
-#: katalogus/templates/partials/objects_to_scan.html
 #, python-format
-msgid ""
-"\n"
-"          You currently don't have scannable objects for %(name)s.\n"
-"          Add objects to use this boefje. This boefje is able to scan "
-"objects of the following types:\n"
-"        "
-msgstr ""
-"\n"
-"              U heeft momenteel geen scanbare objecten voor %(name)s. \n"
-"              Voeg objecten toe om dit boefje te gebruiken. Dit boefje kan "
-"objecten scannen van de volgende soorten:\n"
-"            "
+#~ msgid ""
+#~ "\n"
+#~ "          You currently don't have scannable objects for %(name)s.\n"
+#~ "          Add objects to use this boefje. This boefje is able to scan "
+#~ "objects of the following types:\n"
+#~ "        "
+#~ msgstr ""
+#~ "\n"
+#~ "              U heeft momenteel geen scanbare objecten voor %(name)s. \n"
+#~ "              Voeg objecten toe om dit boefje te gebruiken. Dit boefje "
+#~ "kan objecten scannen van de volgende soorten:\n"
+#~ "            "
 
-#: katalogus/templates/partials/plugin_tile.html
-msgid "Publisher:"
-msgstr "Uitgever:"
+#~ msgid "Publisher:"
+#~ msgstr "Uitgever:"
 
-#: katalogus/views/katalogus.py
-msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-msgstr ""
-"Het laden van plug-ins in KATalogus is mislukt. Controleer de KATalogus-"
-"logboeken."
+#~ msgid ""
+#~ "Loading plugins in KATalogus failed. Please check the KATalogus logs."
+#~ msgstr ""
+#~ "Het laden van plug-ins in KATalogus is mislukt. Controleer de KATalogus-"
+#~ "logboeken."
 
-#: katalogus/views/plugin_enable_disable.py
 #, python-brace-format
-msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_name}' uitgezet."
+#~ msgid "Boefje '{boefje_name}' disabled."
+#~ msgstr "Boefje '{boefje_name}' uitgezet."
 
-#: katalogus/views/plugin_enable_disable.py
 #, python-brace-format
-msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
-msgstr ""
-"Ophalen van instellingen voor boefje {boefje_name} mislukt. Is de Katalogus "
-"actief?"
+#~ msgid ""
+#~ "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
+#~ msgstr ""
+#~ "Ophalen van instellingen voor boefje {boefje_name} mislukt. Is de "
+#~ "Katalogus actief?"
 
-#: katalogus/views/plugin_enable_disable.py
 #, python-brace-format
-msgid ""
-"Before enabling, please set the required settings for boefje '{boefje_name}'."
-msgstr ""
-"Voordat je '{boefje_name}' inschakeld, zet alsjeblieft de verplichte "
-"instellingen."
+#~ msgid ""
+#~ "Before enabling, please set the required settings for boefje "
+#~ "'{boefje_name}'."
+#~ msgstr ""
+#~ "Voordat je '{boefje_name}' inschakeld, zet alsjeblieft de verplichte "
+#~ "instellingen."
 
-#: katalogus/views/plugin_enable_disable.py
 #, python-brace-format
-msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_name}' aangezet."
+#~ msgid "Boefje '{boefje_name}' enabled."
+#~ msgstr "Boefje '{boefje_name}' aangezet."
 
-#: tools/forms/ooi.py
-msgid "Show objects that don't meet the Boefjes scan level"
-msgstr "Toon objecten die niet overeenkomen met het scanniveau van de Boefjes"
+#~ msgid "Show objects that don't meet the Boefjes scan level"
+#~ msgstr ""
+#~ "Toon objecten die niet overeenkomen met het scanniveau van de Boefjes"
 
-#: tools/forms/ooi.py
-msgid "Show Boefjes that exceed the objects clearance level"
-msgstr "Toon Boefjes die het vrijwaring niveau van OOI's overschrijden"
+#~ msgid "Show Boefjes that exceed the objects clearance level"
+#~ msgstr "Toon Boefjes die het vrijwaring niveau van OOI's overschrijden"
 
-#: rocky/templates/findings/finding_list.html
 #, python-format
-msgid ""
-"An overview of all findings OpenKAT found on %(date)s. Each finding relates "
-"to an object. Click a finding for additional information."
-msgstr ""
-"Een overzicht van alle bevindingen die OpenKAT heeft gevonden op %(date)s. "
-"Elke bevinding heeft betrekking op een object. Klik op een bevinding voor "
-"meer informatie."
+#~ msgid ""
+#~ "An overview of all findings OpenKAT found on %(date)s. Each finding "
+#~ "relates to an object. Click a finding for additional information."
+#~ msgstr ""
+#~ "Een overzicht van alle bevindingen die OpenKAT heeft gevonden op "
+#~ "%(date)s. Elke bevinding heeft betrekking op een object. Klik op een "
+#~ "bevinding voor meer informatie."
 
-#: rocky/templates/graph-d3.html
-msgid ""
-"Click a circle top collapse / expand the tree, click the text to view the "
-"tree from that OOI and hover over the text to see details."
-msgstr ""
-"Klik op een cirkel om de boom in of uit te klappen, klik op de tekst om de "
-"boom van die OOI te bekijken en beweeg over de tekst om details te zien."
+#~ msgid ""
+#~ "Click a circle top collapse / expand the tree, click the text to view the "
+#~ "tree from that OOI and hover over the text to see details."
+#~ msgstr ""
+#~ "Klik op een cirkel om de boom in of uit te klappen, klik op de tekst om "
+#~ "de boom van die OOI te bekijken en beweeg over de tekst om details te "
+#~ "zien."
 
-#: rocky/templates/oois/ooi_list.html
-msgid ""
-"An overview of your object list. Objects can be added manually or by running "
-"boefjes. </br> Click an object for additional information."
-msgstr ""
-"Een overzicht van uw objectenlijst. Objecten kunnen handmatig worden "
-"toegevoegd of door het uitvoeren van boefjes.</br> Klik op een object voor "
-"meer informatie."
+#~ msgid ""
+#~ "An overview of your object list. Objects can be added manually or by "
+#~ "running boefjes. </br> Click an object for additional information."
+#~ msgstr ""
+#~ "Een overzicht van uw objectenlijst. Objecten kunnen handmatig worden "
+#~ "toegevoegd of door het uitvoeren van boefjes.</br> Klik op een object "
+#~ "voor meer informatie."
 
-#: rocky/templates/partials/form/checkbox_group_table_form.html
-msgid "Please enable plugin to start scanning"
-msgstr "Alsjeblieft schakel plugin in om scanning te starten"
+#~ msgid "Please enable plugin to start scanning"
+#~ msgstr "Alsjeblieft schakel plugin in om scanning te starten"
 
-#: rocky/views/tasks.py
-msgid "Cannot reschedule task: it has probably already been queued."
-msgstr "Taak kan niet worden herstart: waarschijnlijk staat deze al ingepland."
+#~ msgid "Cannot reschedule task: it has probably already been queued."
+#~ msgstr ""
+#~ "Taak kan niet worden herstart: waarschijnlijk staat deze al ingepland."
 
-#: katalogus/views/mixins.py rocky/views/scan_profile.py
 #, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Contact your administrator to receive a higher clearance."
-msgstr ""
-"Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een vrijwaring "
-"niveau bevestigd van L%s. Neem contact op met uw beheerder om je vrijwaring "
-"niveau te verhogen."
+#~ msgid ""
+#~ "Could not raise clearance level of %s to L%s. You acknowledged a "
+#~ "clearance level of L%s. Contact your administrator to receive a higher "
+#~ "clearance."
+#~ msgstr ""
+#~ "Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een "
+#~ "vrijwaring niveau bevestigd van L%s. Neem contact op met uw beheerder om "
+#~ "je vrijwaring niveau te verhogen."
 
-#: onboarding/views.py
-msgid ""
-"Could not raise clearance level of {} to L{}. You acknowledged a clearance "
-"level of L{}. Contact your administrator to receive a higher clearance."
-msgstr ""
-"Het was niet mogelijk om het vrijwaring niveau van {} te verhogen naar L{}. "
-"Je hebt een vrijwaring niveau van L{} erkend. Neem contact op met je "
-"beheerder om een hoger vrijwaring niveau te verkrijgen."
+#~ msgid ""
+#~ "Could not raise clearance level of {} to L{}. You acknowledged a "
+#~ "clearance level of L{}. Contact your administrator to receive a higher "
+#~ "clearance."
+#~ msgstr ""
+#~ "Het was niet mogelijk om het vrijwaring niveau van {} te verhogen naar "
+#~ "L{}. Je hebt een vrijwaring niveau van L{} erkend. Neem contact op met je "
+#~ "beheerder om een hoger vrijwaring niveau te verkrijgen."
 
-#: rocky/templates/landing_page.html
-msgid ""
-"Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br>Our motto is therefore: I see, I see, what you do not see."
-msgstr ""
-"In OpenKAT zijn tientallen hulpmiddelen geïntegreerd om de wereld (digitaal "
-"en analoog) te bekijken. <br>Het motto is dan ook: Ik zie, ik zie, wat jij "
-"niet ziet."
+#~ msgid ""
+#~ "Dozens of tools are integrated in OpenKAT to view the world (digital and "
+#~ "analog). <br>Our motto is therefore: I see, I see, what you do not see."
+#~ msgstr ""
+#~ "In OpenKAT zijn tientallen hulpmiddelen geïntegreerd om de wereld "
+#~ "(digitaal en analoog) te bekijken. <br>Het motto is dan ook: Ik zie, ik "
+#~ "zie, wat jij niet ziet."
 
-#: rocky/templates/oois/ooi_list.html
-msgid ""
-"An overview of your object list. Objects can be added manually or by running "
-"boefjes.</br> Click an object for additional information."
-msgstr ""
-"Een overzicht van uw objectenlijst. Objecten kunnen handmatig of door "
-"Boefjes toegevoegd worden. Klik op een object voor meer informatie."
+#~ msgid ""
+#~ "An overview of your object list. Objects can be added manually or by "
+#~ "running boefjes.</br> Click an object for additional information."
+#~ msgstr ""
+#~ "Een overzicht van uw objectenlijst. Objecten kunnen handmatig of door "
+#~ "Boefjes toegevoegd worden. Klik op een object voor meer informatie."
 
-#: rocky/templates/oois/ooi_report_404.html
 #, python-format
-msgid ""
-"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
-"Try some other dates!"
-msgstr ""
-"Misschien heeft het nooit bestaan, misschien alleen niet op "
-"%(observed_at)s<br>. Probeer eens een ander tijdstip!"
+#~ msgid ""
+#~ "Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
+#~ "Try some other dates!"
+#~ msgstr ""
+#~ "Misschien heeft het nooit bestaan, misschien alleen niet op "
+#~ "%(observed_at)s<br>. Probeer eens een ander tijdstip!"
 
-#: rocky/templates/partials/ooi_type_filters.html
-msgid "Shown types"
-msgstr "Getoonde typen"
+#~ msgid "Shown types"
+#~ msgstr "Getoonde typen"
 
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Quickly filter by type"
-msgstr "Snel filteren op type"
+#~ msgid "Quickly filter by type"
+#~ msgstr "Snel filteren op type"
 
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Filter by"
-msgstr "Filteren op"
+#~ msgid "Filter by"
+#~ msgstr "Filteren op"
 
-#: rocky/views/ooi_list.py
 #, python-format
-msgid ""
-"Could not raise clearance level to L%s. You acknowledged a clearance level "
-"of L%s. Contact your administrator to receive a higher clearance."
-msgstr ""
-"Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau "
-"bevestigd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring "
-"te krijgen."
+#~ msgid ""
+#~ "Could not raise clearance level to L%s. You acknowledged a clearance "
+#~ "level of L%s. Contact your administrator to receive a higher clearance."
+#~ msgstr ""
+#~ "Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring "
+#~ "niveau bevestigd van L%s. Neem contact op met uw beheerder om een ​​hogere "
+#~ "vrijwaring te krijgen."
 
 #~ msgid ""
 #~ "To enable {} you need at least a clearance level of L{}. Your clearance "
