@@ -89,18 +89,18 @@
                             {% endif %}
                         </td>
                         <td class="nowrap">
-                            {% if task.status.value == "pending" or task.status.value == "queued" %}
-                                <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% elif task.status.value == "running" or task.status.value == "dispatched" %}
-                                <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% elif task.status.value == "cancelled" %}
-                                <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% elif task.status.value == "failed" %}
-                                <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% elif task.status.value == "completed" %}
-                                <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                            {% if scan.status.value == "pending" or scan.status.value == "queued" %}
+                                <i class="icon queued"></i>&nbsp;{{ scan.status.value|capfirst }}
+                            {% elif scan.status.value == "running" or scan.status.value == "dispatched" %}
+                                <i class="icon running"></i>&nbsp;{{ scan.status.value|capfirst }}
+                            {% elif scan.status.value == "cancelled" %}
+                                <i class="icon cancelled"></i>&nbsp;{{ scan.status.value|capfirst }}
+                            {% elif scan.status.value == "failed" %}
+                                <i class="icon negative"></i>&nbsp;{{ scan.status.value|capfirst }}
+                            {% elif scan.status.value == "completed" %}
+                                <i class="icon positive"></i>&nbsp;{{ scan.status.value|capfirst }}
                             {% else %}
-                                <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                <i class="icon neutral"></i>&nbsp;{{ scan.status.value|capfirst }}
                             {% endif %}
                         </td>
                         <td>{{ scan.created_at }}</td>

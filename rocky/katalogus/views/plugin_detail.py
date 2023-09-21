@@ -89,10 +89,42 @@ class NormalizerDetailView(PluginDetailView):
 
 
 class BoefjeDetailView(BoefjeMixin, PluginDetailView):
-    """Detail view for a boefje plugin. Shows plugin settings and consumable oois for scanning."""
+    """Detail view for a specific boefje. Shows boefje settings and consumable oois for scanning."""
 
     template_name = "boefje_detail.html"
+    scan_history_limit = 10
     limit_ooi_list = 9999
+
+    def get_scan_history(self) -> Page:
+        scheduler_id = f"{self.plugin.type}-{self.organization.code}"
+        plugin_type = self.plugin.type
+        plugin_id = self.plugin.id
+        input_ooi = self.request.GET.get("scan_history_search")
+        status = self.request.GET.get("scan_history_status")
+
+        if self.request.GET.get("scan_history_from"):
+            min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+        else:
+            min_created_at = None
+
+        if self.request.GET.get("scan_history_to"):
+            max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
+        else:
+            max_created_at = None
+
+        page = int(self.request.GET.get("scan_history_page", 1))
+
+        scan_history = scheduler.client.get_lazy_task_list(
+            scheduler_id=scheduler_id,
+            task_type=plugin_type,
+            plugin_id=plugin_id,
+            input_ooi=input_ooi,
+            status=status,
+            min_created_at=min_created_at,
+            max_created_at=max_created_at,
+        )
+
+        return Paginator(scan_history, self.scan_history_limit).page(page)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -106,6 +138,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
             context["select_oois_form"] = SelectOOIForm(
                 oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
+        context["plugin"] = self.plugin.dict()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
@@ -121,6 +154,15 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
                 ),
                 "text": self.plugin.name,
             },
+        ]
+
+        context["scan_history"] = self.get_scan_history()
+        context["scan_history_form_fields"] = [
+            "scan_history_from",
+            "scan_history_to",
+            "scan_history_status",
+            "scan_history_search",
+            "scan_history_page",
         ]
 
         return context
