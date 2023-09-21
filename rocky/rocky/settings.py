@@ -52,6 +52,20 @@ ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}
+
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
 REMOTE_USER_HEADER = env("REMOTE_USER_HEADER", default=None)
@@ -135,6 +149,7 @@ INSTALLED_APPS = [
     "django_password_validators.password_history",
     "rest_framework",
     "tagulous",
+    "compressor",
     # "drf_standardized_errors",
 ]
 
@@ -274,8 +289,15 @@ LANGUAGES = [
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = env.path("STATIC_ROOT", BASE_DIR / "static")
 STATICFILES_DIRS = (BASE_DIR / "assets",)
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
+
+COMPRESS_OFFLINE = True
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
