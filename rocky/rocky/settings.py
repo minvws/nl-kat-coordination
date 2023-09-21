@@ -167,7 +167,7 @@ ROOT_URLCONF = "rocky.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "rocky/templates"],
+        "DIRS": [BASE_DIR / "rocky/templates", BASE_DIR / "reports/report_types"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
