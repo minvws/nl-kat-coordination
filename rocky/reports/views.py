@@ -99,8 +99,8 @@ class ReportView(ReportBreadcrumbs, OctopoesView, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.oois = request.POST.getlist("oois", [])
-        self.report_types = request.POST.getlist("report_types", [])
+        self.oois = request.POST.getlist("ooi", [])
+        self.report_types = request.POST.getlist("report_type", [])
 
     def get_reports_data(self):
         report_data = {}

@@ -1,13 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Title</title>
-    </head>
-    <body>
-        {% for key,value in master_data.items %}
-            {% include value.template with data=value.data %}
+{% extends "layouts/base.html" %}
 
-        {% endfor %}
-    </body>
-</html>
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="choose-report">
+        <section>
+            <div>
+                {{ report_data }}
+                {% for key,value in report_data.items %}
+                    {% include value.template with data=value.data %}
+
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

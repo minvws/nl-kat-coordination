@@ -19,7 +19,7 @@
                     {% csrf_token %}
                     {% include "partials/form/fieldset.html" with fields=report_types_form %}
 
-                    {% for ooi in oois %}<input type="hidden" value={{ ooi }}>{% endfor %}
+                    {% for ooi in oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
                     <button type="submit">{% translate "Generate Report" %}</button>
                 </form>
             </div>
