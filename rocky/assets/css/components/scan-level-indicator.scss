@@ -34,19 +34,19 @@ Markup:
   }
 
   &.l1 li:first-child::before {
-    color: var(--colors-violet-8);
+    color: var(--colors-purrple-8);
   }
 
   &.l2 li:nth-child(-n + 2)::before {
-    color: var(--colors-violet-9);
+    color: var(--colors-purrple-9);
   }
 
   &.l3 li:nth-child(-n + 3)::before {
-    color: var(--colors-violet-10);
+    color: var(--colors-purrple-10);
   }
 
   &.l4 li:nth-child(-n + 4)::before {
-    color: var(--colors-violet-11);
+    color: var(--colors-purrple-11);
   }
 
   &-form {
