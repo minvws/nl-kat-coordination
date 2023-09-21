@@ -50,8 +50,9 @@
 @import "manon/breadcrumb-bar";
 @import "manon/button-ghost";
 
-/* Ghost button */
+/* Button */
 @import "manon/button-icon";
+@import "manon/button-destructive";
 
 /* Icon button */
 @import "manon/collapsible";
@@ -73,6 +74,7 @@
 @import "manon/form-radio";
 @import "manon/form-help";
 @import "manon/form-inline";
+@import "manon/form-button";
 @import "manon/layout";
 @import "manon/login-meta";
 @import "manon/logo";
