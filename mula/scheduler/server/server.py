@@ -257,7 +257,7 @@ class Server:
         limit: int = 10,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
-        filter_request: Optional[storage.filters.FilterRequest] = None,
+        filters: Optional[storage.filters.FilterRequest] = None,
     ) -> Any:
         try:
             if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
@@ -271,7 +271,7 @@ class Server:
                 limit=limit,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
-                filter_request=filter_request,
+                filters=filters,
             )
         except ValueError as exc:
             raise fastapi.HTTPException(
@@ -366,7 +366,7 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str, filter_request: Optional[storage.filters.FilterRequest] = None) -> Any:
+    def pop_queue(self, queue_id: str, filters: Optional[storage.filters.FilterRequest] = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -375,7 +375,7 @@ class Server:
             )
 
         try:
-            p_item = s.pop_item_from_queue(filter_request)
+            p_item = s.pop_item_from_queue(filters)
         except queues.QueueEmptyError:
             return None
 

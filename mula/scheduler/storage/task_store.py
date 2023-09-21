@@ -21,7 +21,7 @@ class TaskStore:
         status: Optional[str] = None,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
-        filter_request: Optional[FilterRequest] = None,
+        filters: Optional[FilterRequest] = None,
         offset: int = 0,
         limit: int = 100,
     ) -> Tuple[List[models.Task], int]:
@@ -43,8 +43,8 @@ class TaskStore:
             if max_created_at is not None:
                 query = query.filter(models.TaskDB.created_at <= max_created_at)
 
-            if filter_request is not None:
-                query = apply_filter(models.TaskDB, query, filter_request)
+            if filters is not None:
+                query = apply_filter(models.TaskDB, query, filters)
 
 
             count = query.count()

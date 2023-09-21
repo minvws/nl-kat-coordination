@@ -90,12 +90,12 @@ class PriorityQueue(abc.ABC):
         self.pq_store: storage.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
-    def pop(self, filter_request: Optional[storage.filters.FilterRequest] = None) -> Optional[models.PrioritizedItem]:
+    def pop(self, filters: Optional[storage.filters.FilterRequest] = None) -> Optional[models.PrioritizedItem]:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
 
         Args:
-            filter_request: A FilterRequest instance that defines the filters
+            filters: A FilterRequest instance that defines the filters
 
         Returns:
             The highest priority item from the queue.
@@ -107,7 +107,7 @@ class PriorityQueue(abc.ABC):
             if self.empty():
                 raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
 
-            item = self.pq_store.pop(self.pq_id, filter_request)
+            item = self.pq_store.pop(self.pq_id, filters)
             if item is None:
                 return None
 

@@ -132,11 +132,11 @@ class Scheduler(abc.ABC):
 
         return None
 
-    def pop_item_from_queue(self, filter_request: Optional[storage.filters.FilterRequest] = None) -> Optional[models.PrioritizedItem]:
+    def pop_item_from_queue(self, filters: Optional[storage.filters.FilterRequest] = None) -> Optional[models.PrioritizedItem]:
         """Pop an item from the queue.
 
         Args:
-            filter_request: A FilterRequest instance to filter the
+            filters: A FilterRequest instance to filter the
             prioritized items from the queue.
 
         Returns:
@@ -151,7 +151,7 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
-            p_item = self.queue.pop(filter_request)
+            p_item = self.queue.pop(filters)
         except queues.QueueEmptyError as exc:
             raise exc
 
