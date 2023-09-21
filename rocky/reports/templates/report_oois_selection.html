@@ -27,7 +27,7 @@
 
             <form id="report_view"
                   method="post"
-                  action="{% url 'report_view' organization.code %}"
+                  action="{% url 'report_selection' organization.code %}"
                   class="inline">
                 {% csrf_token %}
                 <table>

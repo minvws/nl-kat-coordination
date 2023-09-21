@@ -5,45 +5,48 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, TemplateView
+from django.views.generic import TemplateView
 from tools.view_helpers import BreadcrumbsMixin
 
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import get_ooi_types_with_report, get_report_types_for_ooi
+from reports.report_types.definitions import get_ooi_types_with_report, get_report_types_for_oois
 from rocky.views.ooi_view import BaseOOIListView
 
 logger = getLogger(__name__)
 
 
 class ReportBreadcrumbs(BreadcrumbsMixin):
+    current_step: int = 0
+
     def build_breadcrumbs(self):
+        kwargs = {"organization_code": self.organization.code}
         breadcrumbs = [
             {
-                "url": reverse("report_type_selection", kwargs={"organization_code": self.organization.code}),
+                "url": reverse("report_type_selection", kwargs=kwargs),
                 "text": _("Reports"),
-            }
+            },
+            {
+                "url": reverse("report_oois_selection", kwargs=kwargs),
+                "text": _("OOI Selection"),
+            },
+            {
+                "url": reverse("report_selection", kwargs=kwargs),
+                "text": _("Select Report"),
+            },
         ]
 
-        return breadcrumbs
+        return breadcrumbs[: self.current_step]
 
 
 class ReportTypeSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView):
+    current_step = 1
     template_name = "report_type_selection.html"
 
 
-class ReportOOISelectionView(ReportBreadcrumbs, BaseOOIListView, OrganizationView, ListView):
-    template_name = "report_ooi_selection.html"
+class ReportOOISelectionView(ReportBreadcrumbs, BaseOOIListView, OrganizationView):
+    template_name = "report_oois_selection.html"
     ooi_types = get_ooi_types_with_report()
-
-    def build_breadcrumbs(self):
-        breadcrumbs = super().build_breadcrumbs()
-        breadcrumbs.append(
-            {
-                "url": reverse("report_ooi_selection", kwargs={"organization_code": self.organization.code}),
-                "text": _("OOI Selection"),
-            },
-        )
-        return breadcrumbs
+    current_step = 2
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -51,22 +54,24 @@ class ReportOOISelectionView(ReportBreadcrumbs, BaseOOIListView, OrganizationVie
         return context
 
 
-class ReportView(ReportBreadcrumbs, OrganizationView):
+class ReportSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView):
     """One Report Type for one OOI"""
 
-    template_name = "report_view.html"
+    template_name = "report_selection.html"
+    current_step = 3
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.ooi_selection = request.POST.getlist("ooi", [])
 
     def error_url(self):
-        return redirect(reverse("report_ooi_selection", kwargs={"organization_code": self.organization.code}))
+        return redirect(reverse("report_oois_selection", kwargs={"organization_code": self.organization.code}))
 
     def post(self, request, *args, **kwargs):
-        ooi_selection = request.POST.getlist("ooi", [])
-        logger.error("OOI selection is: %s", str(ooi_selection))
-        logger.error("Reports are: %s", str(get_report_types_for_ooi(ooi_selection[0])))
-        if not ooi_selection:
+        if not self.ooi_selection:
             messages.add_message(self.request, messages.ERROR, _("Select at least one OOI to proceed."))
             return self.error_url()
-        if len(ooi_selection) > 1:
+        if len(self.ooi_selection) > 1:
             messages.add_message(
                 self.request,
                 messages.WARNING,
@@ -77,5 +82,13 @@ class ReportView(ReportBreadcrumbs, OrganizationView):
                 ),
             )
             return self.error_url()
+        logger.error("OOI selection is: %s", str(self.ooi_selection))
+        logger.error("Reports are: %s", str(get_report_types_for_oois(self.ooi_selection)))
         messages.add_message(self.request, messages.SUCCESS, _("Your report is being processed."))
-        return redirect(reverse("report_ooi_selection", kwargs={"organization_code": self.organization.code}))
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["oois"] = self.ooi_selection
+        context["report_types"] = get_report_types_for_oois(self.ooi_selection)
+        return context
