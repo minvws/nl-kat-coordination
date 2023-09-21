@@ -57,3 +57,7 @@ def get_report_types_for_ooi(ooi_pk: str) -> List[Type[Report]]:
     reference = Reference.from_str(ooi_pk)
     ooi_type = reference.class_type
     return [report for report in get_reports() if ooi_type in report.input_ooi_types]
+
+
+def get_report_types_for_oois(ooi_pks: List[str]) -> Set[Type[Report]]:
+    return {report for ooi_pk in ooi_pks for report in get_report_types_for_ooi(ooi_pk)}
