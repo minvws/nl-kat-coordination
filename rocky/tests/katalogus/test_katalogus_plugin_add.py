@@ -170,7 +170,6 @@ def test_plugin_single_settings_add_view_no_schema(rf, superuser_member, mock_mi
         "boefje_detail",
         kwargs={
             "organization_code": superuser_member.organization.code,
-            "plugin_type": "boefje",
             "plugin_id": "test-boefje",
         },
     )

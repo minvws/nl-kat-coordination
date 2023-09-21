@@ -30,36 +30,8 @@ class PluginCoverImgView(OrganizationView):
         return file
 
 
-class PluginDetailView(TemplateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["plugin"] = self.plugin.dict()
-        # context["scan_history_form_fields"] = [
-        #     "scan_history_from",
-        #     "scan_history_to",
-        #     "scan_history_status",
-        #     "scan_history_search",
-        #     "scan_history_page",
-
-        return context
-
-
-class NormalizerDetailView(PluginDetailView):
-    template_name = "normalizer_detail.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        return context
-
-
-class BoefjeDetailView(PluginSettingsListView, BoefjeMixin, PluginDetailView):
-    """Detail view for a boefje plugin. Shows plugin settings and consumable oois for scanning."""
-
-    template_name = "boefje_detail.html"
+class PluginDetailView(PluginSettingsListView, TemplateView):
     scan_history_limit = 10
-    limit_ooi_list = 9999
 
     def get_scan_history(self) -> Page:
         scheduler_id = f"{self.plugin.type}-{self.organization.code}"
@@ -91,6 +63,36 @@ class BoefjeDetailView(PluginSettingsListView, BoefjeMixin, PluginDetailView):
         )
 
         return Paginator(scan_history, self.scan_history_limit).page(page)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["plugin"] = self.plugin.dict()
+        context["scan_history_form_fields"] = [
+            "scan_history_from",
+            "scan_history_to",
+            "scan_history_status",
+            "scan_history_search",
+            "scan_history_page",
+        ]
+
+        return context
+
+
+class NormalizerDetailView(PluginDetailView):
+    template_name = "normalizer_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        return context
+
+
+class BoefjeDetailView(BoefjeMixin, PluginDetailView):
+    """Detail view for a boefje plugin. Shows plugin settings and consumable oois for scanning."""
+
+    template_name = "boefje_detail.html"
+    limit_ooi_list = 9999
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

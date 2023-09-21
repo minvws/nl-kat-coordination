@@ -45,7 +45,6 @@ class PluginEnableDisableView(SinglePluginView):
                     kwargs={
                         "organization_code": self.organization.code,
                         "plugin_id": self.plugin.id,
-                        "plugin_type": self.plugin.type,
                     },
                 )
             )

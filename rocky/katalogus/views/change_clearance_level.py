@@ -27,7 +27,6 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
                     kwargs={
                         "organization_code": self.organization.code,
                         "plugin_id": kwargs["plugin_id"],
-                        "plugin_type": kwargs["plugin_type"],
                     },
                 )
             )
@@ -60,7 +59,6 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
                     "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin.type,
                         "plugin_id": self.plugin.id,
                     },
                 ),
