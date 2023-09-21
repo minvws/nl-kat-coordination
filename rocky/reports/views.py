@@ -1,3 +1,5 @@
+from logging import getLogger
+
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -7,8 +9,10 @@ from django.views.generic import ListView, TemplateView
 from tools.view_helpers import BreadcrumbsMixin
 
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import get_ooi_types_with_report
+from reports.report_types.definitions import get_ooi_types_with_report, get_report_types_for_ooi
 from rocky.views.ooi_view import BaseOOIListView
+
+logger = getLogger(__name__)
 
 
 class ReportBreadcrumbs(BreadcrumbsMixin):
@@ -57,6 +61,8 @@ class ReportView(ReportBreadcrumbs, OrganizationView):
 
     def post(self, request, *args, **kwargs):
         ooi_selection = request.POST.getlist("ooi", [])
+        logger.error("OOI selection is: %s", str(ooi_selection))
+        logger.error("Reports are: %s", str(get_report_types_for_ooi(ooi_selection[0])))
         if not ooi_selection:
             messages.add_message(self.request, messages.ERROR, _("Select at least one OOI to proceed."))
             return self.error_url()
