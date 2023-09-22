@@ -6,7 +6,7 @@
 django-rest-framework makes changes to the loaded scripts we need to update
 these here too. -->
 {% block script %}
-    <script type="application/json" id="drf_csrf">
+    <script type="application/json" id="drf_csrf" nonce="{{ request.csp_nonce }}">
   {
       "csrfHeaderName": "{{ csrf_header_name|default:'X-CSRFToken' }}",
       "csrfToken": "{% if request %}{{ csrf_token }}{% endif %}"

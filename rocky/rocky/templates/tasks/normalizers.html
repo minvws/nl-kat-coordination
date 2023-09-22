@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -87,7 +88,7 @@
                                                     <div class="button-container">
                                                         {% if task.status.value in "completed,failed" %}
                                                             <a class="button"
-                                                               href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                                               href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
                                                             {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
 
                                                         {% else %}
@@ -112,5 +113,7 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/renderNormalizerOutputOOIs.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "/js/renderNormalizerOutputOOIs.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}

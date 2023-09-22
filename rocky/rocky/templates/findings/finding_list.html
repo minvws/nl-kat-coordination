@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -140,5 +141,7 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}
