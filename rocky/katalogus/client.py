@@ -131,6 +131,14 @@ class KATalogusClientV1:
     def get_boefjes(self) -> List[Boefje]:
         return self.get_plugins(plugin_type="boefje")
 
+    def enable_disable_plugin(self, plugin: Plugin):
+        body = {"enabled": not plugin.enabled}  # if enable, disable and if disable, enable
+        response = self.session.patch(
+            f"{self.organization_uri}/repositories/{plugin.repository_id}/plugins/{plugin.id}",
+            data=json.dumps(body),
+        )
+        response.raise_for_status()
+
     def enable_boefje(self, plugin: Boefje) -> None:
         self._patch_boefje_state(plugin.id, True, plugin.repository_id)
 
