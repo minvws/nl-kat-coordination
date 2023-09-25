@@ -5610,7 +5610,7 @@ msgstr "Vrijwaring niveau: "
 
 #: rocky/views/ooi_view.py
 msgid "Clearance type: "
-msgstr "Vrijwaring niveau: "
+msgstr "Vrijwaring-type: "
 
 #: rocky/views/organization_add.py
 msgid "Setup"
