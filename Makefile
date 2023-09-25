@@ -122,8 +122,3 @@ poetry-dependencies:
 		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt; \
 		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt; \
 	done
-
-	# NOTE: pip does not yet support hash verification for git dependencies;
-	# rocky's requirements-dev.txt unfortunately has no hashing until then
-	sed -i.bak '/--hash/d; s/ \\$$//' rocky/requirements-dev.txt
-	rm rocky/requirements-dev.txt.bak
