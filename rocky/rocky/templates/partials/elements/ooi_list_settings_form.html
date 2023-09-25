@@ -8,7 +8,7 @@
     {% include "partials/form/fieldset.html" with fields=observed_at_form %}
     {% include "partials/form/fieldset.html" with fields=ooi_type_form custom_class="column-4" %}
 
-    {% if ooi_list|length > 4 %}
+    {% if ooi_type_form.fields.ooi_type.choices|length > 4 %}
         <button type="button"
                 class="toggle-all toggle-on ghost"
                 data-toggle-target="ooi_type">{% translate "Toggle all OOI types" %}</button>
