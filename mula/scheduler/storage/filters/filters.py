@@ -12,9 +12,41 @@ class Filter(BaseModel):
         operator: The comparison operator for the filter.
         value: The value to compare against.
     """
+
     column: str
     field: Optional[str] = None
-    operator: Literal["==", "eq", "is", "!=", "ne", "is_not", "is_null", "is_not_null", ">", "gt", "<", "lt", ">=", "gte", "<=", "lte", "like", "not_like", "ilike", "not_ilike", "in", "not_in", "contains", "any", "match", "starts_with", "@>", "<@", "@?", "@@"]
+    operator: Literal[
+        "==",
+        "eq",
+        "is",
+        "!=",
+        "ne",
+        "is_not",
+        "is_null",
+        "is_not_null",
+        ">",
+        "gt",
+        "<",
+        "lt",
+        ">=",
+        "gte",
+        "<=",
+        "lte",
+        "like",
+        "not_like",
+        "ilike",
+        "not_ilike",
+        "in",
+        "not_in",
+        "contains",
+        "any",
+        "match",
+        "starts_with",
+        "@>",
+        "<@",
+        "@?",
+        "@@",
+    ]
     value: Union[str, int, float, bool, None, List[str], List[int], List[float], List[bool], List[None]]
 
 

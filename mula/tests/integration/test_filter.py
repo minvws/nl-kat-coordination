@@ -14,6 +14,7 @@ from tests.utils import functions
 
 def compile_query_postgres(query):
     from sqlalchemy.dialects import postgresql
+
     return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
 
 
@@ -55,16 +56,10 @@ class FilterTestCase(unittest.TestCase):
 
             # sqlalchemy 2.0
             # sqlalchemy.sql.selectable.Select
-            query1 = select(models.TaskDB)\
-                .where(
-                    expression.op('@>')(values)
-                )
+            query1 = select(models.TaskDB).where(expression.op("@>")(values))
 
             # sqlalchemy.orm.query.Query
-            query2 = session.query(models.TaskDB)\
-                .filter(
-                    expression.op('@>')(values)
-                )
+            query2 = session.query(models.TaskDB).filter(expression.op("@>")(values))
 
             print(session.execute(query1).all())
             print(query2.all())
@@ -108,7 +103,7 @@ class FilterTestCase(unittest.TestCase):
                     field="data__name",
                     operator="==",
                     value=value_name,
-                )
+                ),
             ],
         )
 
@@ -232,15 +227,13 @@ class FilterTestCase(unittest.TestCase):
     def test_apply_filter_json_gt(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -290,15 +283,13 @@ class FilterTestCase(unittest.TestCase):
     def test_apply_filter_json_gte(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -350,15 +341,13 @@ class FilterTestCase(unittest.TestCase):
     def test_apply_filter_json_lt(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -408,15 +397,13 @@ class FilterTestCase(unittest.TestCase):
     def test_apply_filter_json_lte(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -683,7 +670,6 @@ class FilterTestCase(unittest.TestCase):
             self.assertEqual(len(results), 1)
             self.assertEqual(results[0].p_item["data"]["id"], first_p_item.data.get("id"))
 
-
     @unittest.skip("TODO")
     def test_apply_filter_json_match(self):
         # Arrange
@@ -750,22 +736,25 @@ class FilterTestCase(unittest.TestCase):
     def test_apply_filter_jsonb_contains(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"]),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"]),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
 
         third_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"]),
         )
         third_task = functions.create_task(third_p_item)
         self.mock_ctx.datastores.task_store.create_task(third_task)
@@ -798,22 +787,25 @@ class FilterTestCase(unittest.TestCase):
     def test_apply_filter_jsonb_is_contained_by(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"]),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"]),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
 
         third_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"]),
         )
         third_task = functions.create_task(third_p_item)
         self.mock_ctx.datastores.task_store.create_task(third_task)
@@ -846,18 +838,22 @@ class FilterTestCase(unittest.TestCase):
     def test_apply_filter_jsonb_exists(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"]),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0,
+            self.organisation.id,
+            0,
             functions.TestModel(
-                id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2,
+                id=uuid.uuid4().hex,
+                name=uuid.uuid4().hex,
+                count=2,
                 child=functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1),
-            )
+            ),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -916,7 +912,6 @@ class FilterTestCase(unittest.TestCase):
             # Assert
             self.assertEqual(len(results), 1)
             self.assertEqual(results[0].id, first_task.id)
-
 
     def test_apply_filter_multiple_filters_and(self):
         # Arrange
@@ -997,22 +992,25 @@ class FilterTestCase(unittest.TestCase):
     def test_apply_filter_multiple_filters_not(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"]),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"]),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
 
         third_p_item = functions.create_p_item(
-            self.organisation.id, 0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"])
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"]),
         )
         third_task = functions.create_task(third_p_item)
         self.mock_ctx.datastores.task_store.create_task(third_task)
@@ -1040,7 +1038,7 @@ class FilterTestCase(unittest.TestCase):
                         operator=">",
                         value=1,
                     ),
-                ]
+                ],
             },
         )
 

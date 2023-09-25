@@ -46,7 +46,6 @@ class TaskStore:
             if filters is not None:
                 query = apply_filter(models.TaskDB, query, filters)
 
-
             count = query.count()
             tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
 

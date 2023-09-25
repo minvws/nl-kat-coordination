@@ -55,8 +55,6 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest):
             expressions.append(expression)
 
         # Apply the filter operation to the query
-        query = query.filter(
-            FILTER_OPERATORS[operator](*expressions)  # type: ignore
-        )
+        query = query.filter(FILTER_OPERATORS[operator](*expressions))  # type: ignore
 
     return query

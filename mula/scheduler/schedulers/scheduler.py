@@ -132,7 +132,9 @@ class Scheduler(abc.ABC):
 
         return None
 
-    def pop_item_from_queue(self, filters: Optional[storage.filters.FilterRequest] = None) -> Optional[models.PrioritizedItem]:
+    def pop_item_from_queue(
+        self, filters: Optional[storage.filters.FilterRequest] = None
+    ) -> Optional[models.PrioritizedItem]:
         """Pop an item from the queue.
 
         Args:
