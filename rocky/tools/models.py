@@ -11,7 +11,7 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from katalogus.client import KATalogusClientV1, get_katalogus
+from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
 from katalogus.exceptions import (
     KATalogusDownException,
     KATalogusException,
@@ -248,8 +248,11 @@ class OrganizationMember(models.Model):
     def has_perms(self, perm_list: Iterable[str]) -> bool:
         return all(self.has_perm(perm) for perm in perm_list)
 
-    def has_clearance(self, scan_level: int) -> bool:
-        return self.acknowledged_clearance_level >= scan_level
+    def has_clearance(self, plugin: Plugin) -> bool:
+        perm = self.has_perm("tools.can_enable_disable_boefje")
+        if hasattr(plugin, "scan_level"):
+            return perm and self.acknowledged_clearance_level >= plugin.scan_level.value
+        return perm
 
     class Meta:
         unique_together = ["user", "organization"]

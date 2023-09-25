@@ -67,7 +67,7 @@ class PluginEnableDisableView(SinglePluginView):
                 )
             )
 
-        if self.plugin.type == "normalizer" or self.organization_member.has_clearance(self.plugin.scan_level.value):
+        if self.organization_member.has_clearance(self.plugin):
             self.katalogus_client.enable_boefje(self.plugin)
             messages.add_message(
                 self.request,
