@@ -5,6 +5,7 @@ table .high,
 table .medium,
 table .low,
 table .informational,
+table .recommendation,
 table .pending,
 table .unknown {
   --risk-level-critical: #f84638;
@@ -17,6 +18,8 @@ table .unknown {
 
   display: flex;
   align-items: center;
+  gap: 0.5rem;
+  padding: 0;
 
   &::before {
     content: "";
@@ -24,6 +27,7 @@ table .unknown {
     width: 0.75rem;
     height: 0.75rem;
     border-radius: 50%;
+    margin: 0;
   }
 }
 
@@ -43,7 +47,8 @@ table .low::before {
   background-color: var(--risk-level-low);
 }
 
-table .informational::before {
+table .informational::before,
+table .recommendation::before {
   background-color: var(--risk-level-informational);
 }
 
