@@ -10,7 +10,6 @@ import pytest
 from fastapi.testclient import TestClient
 from pydantic import parse_raw_as
 
-import boefjes.api
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings
@@ -132,12 +131,4 @@ def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager
 def api(tmp_path):
     from boefjes.api import app
 
-    # test task without OOI to prevent call enrichment call to Octopoes
-    scheduler_client = MockSchedulerClient(
-        get_dummy_data("scheduler/queues_response.json"),
-        [get_dummy_data("scheduler/pop_response_boefje_no_ooi.json")],
-        [],
-        tmp_path / "patch_task_log",
-    )
-    boefjes.api.scheduler_client = scheduler_client
     return TestClient(app)
