@@ -1,0 +1,12 @@
+{% for report_type in report_types %}
+    <p>{{ report_type }}</p>
+    <div class="tile">
+        <div class="tile-container">
+            <p class="tile-name">{{ report_type.name }}</p>
+            <input type="checkbox"
+                   name="{{ report_type.name }}"
+                   value="{{ report_type.id }}" />
+            <p class="tile-description">{{ report_type.description }}</p>
+        </div>
+    </div>
+{% endfor %}

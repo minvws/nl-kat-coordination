@@ -9,16 +9,34 @@
     <main id="main-content" tabindex="-1" class="choose-report">
         <section>
             <div>
-                <h1>{% translate "Choose report" %}</h1>
-                <p class="emphasized">{% translate "You have chosen to view a report for the following OOIs:" %}</p>
+                <h1>{% translate "Choose report types" %}</h1>
+                <p>
+                    {% blocktranslate trimmed %}
+                        Various types of reports, such as DNS reports and TLS reports, are essential for identifying
+                        vulnerabilities in different aspects of a system's security. DNS reports focus on domain name
+                        system configuration and potential weaknesses, while TLS reports assess the security of data
+                        encryption and transmission protocols, helping organizations pinpoint areas where security
+                        improvements are needed.
+                    {% endblocktranslate %}
+                </p>
+                <h2>
+                    {% blocktranslate trimmed count counter=oois|length %}
+                        Selected object
+                    {% plural %}
+                        Selected objects
+                    {% endblocktranslate %}
+                </h2>
                 <ul>
                     {% for ooi in oois %}<li>{{ ooi }}</li>{% endfor %}
                 </ul>
                 <p>{% translate "Choose from which report type you want to generate a report:" %}</p>
-                <form method="post" action="{% url 'report_view' organization.code %}">
+                {{ report_types }}
+                {% for rt in report_types %}{{ rt }}{% endfor %}
+                <form class="inline"
+                      method="post"
+                      action="{% url 'report_view' organization.code %}">
                     {% csrf_token %}
-                    {% include "partials/form/fieldset.html" with fields=report_types_form %}
-
+                    <div class="column-4"></div>
                     {% for ooi in oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
                     <button type="submit">{% translate "Generate Report" %}</button>
                 </form>

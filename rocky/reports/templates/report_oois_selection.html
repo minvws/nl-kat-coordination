@@ -10,26 +10,30 @@
         <section>
             <div class="fifty-fifty">
                 <div>
-                    <h1>{% translate "Create Report from OOIs" %}</h1>
-                    <p class="emphasized">
-                        {% blocktranslate trimmed %}
-                            Select from the list which OOI you want to create a report.
-                            Filters will be applied in the report.
-                        {% endblocktranslate %}
-                    </p>
+                    <h1>{% translate "Reports" %}</h1>
+                    <p class="emphasized">{% translate "Overview of reports" %}</p>
                 </div>
                 <div class="horizontal-view toolbar">
-                    <button form="report_view" type="submit" class="button">{% translate "Select Report" %}</button>
+                    <button form="report_type_selection_form" type="submit" class="button">
+                        {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
+                    </button>
                 </div>
             </div>
+            <h2>
+                {% blocktranslate trimmed count counter=object_list|length %}
+                    Select OOI
+                {% plural %}
+                    Select OOIs
+                {% endblocktranslate %}
+            </h2>
+            <p>{% translate "Select which objects you want to include in your report." %}</p>
             {% translate "Filter" as filter_title %}
             {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
 
-            <form id="report_view"
-                  method="post"
+            <form id="report_type_selection_form"
+                  method="get"
                   action="{% url 'report_type_selection' organization.code %}"
                   class="inline">
-                {% csrf_token %}
                 <table>
                     <thead>
                         <th>

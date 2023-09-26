@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import Reference
-from reports.forms import OOITypeMultiCheckboxForReportForm, ReportTypeMultiselectForm
+from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.helpers import get_ooi_types_with_report, get_report_by_id, get_report_types_for_oois
 from rocky.views.mixins import OctopoesView
 from rocky.views.ooi_view import BaseOOIListView
@@ -25,11 +25,11 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
         breadcrumbs = [
             {
                 "url": reverse("report_oois_selection", kwargs=kwargs),
-                "text": _("Select OOIs"),
+                "text": _("Reports"),
             },
             {
                 "url": reverse("report_type_selection", kwargs=kwargs),
-                "text": _("Select report type"),
+                "text": _("Choose report types"),
             },
             {
                 "url": reverse("report_view", kwargs=kwargs),
@@ -62,22 +62,22 @@ class ReportTypeSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView)
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.ooi_selection = request.POST.getlist("ooi", [])
+        self.ooi_selection = request.GET.getlist("ooi", [])
+        self.report_types = get_report_types_for_oois(self.ooi_selection)
 
     def error_url(self):
         return redirect(reverse("report_oois_selection", kwargs={"organization_code": self.organization.code}))
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         if not self.ooi_selection:
             messages.add_message(self.request, messages.ERROR, _("Select at least one OOI to proceed."))
             return self.error_url()
-        messages.add_message(self.request, messages.SUCCESS, _("Your report is being processed."))
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.ooi_selection
-        context["report_types_form"] = ReportTypeMultiselectForm(get_report_types_for_oois(self.ooi_selection))
+        context["report_types"] = get_report_types_for_oois(self.ooi_selection)
         return context
 
 
