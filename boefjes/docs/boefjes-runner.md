@@ -165,7 +165,7 @@ JSON schema:
                         }
                     }
                 },
-                "required": ["content", "tags"]
+                "required": ["content"]
             }
         }
     },

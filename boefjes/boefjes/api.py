@@ -74,20 +74,10 @@ class File(BaseModel):
     content: str = Field(..., contentEncoding="base64")
     tags: Optional[List[str]]
 
-    class Config:
-        schema_extra = {
-            "required": ["content", "tags"],
-        }
-
 
 class BoefjeOutput(BaseModel):
     status: StatusEnum
     files: Optional[List[File]]
-
-    class Config:
-        schema_extra = {
-            "required": ["status"],
-        }
 
 
 @app.get("/healthz")
