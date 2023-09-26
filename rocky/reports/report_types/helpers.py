@@ -1,4 +1,4 @@
-from typing import List, Set, Type
+from typing import Dict, List, Set, Type
 
 from octopoes.models import OOI, Reference
 from reports.report_types.definitions import Report
@@ -39,3 +39,15 @@ def get_report_by_id(report_id: str) -> Type[Report]:
         if report.id == report_id:
             return report
     raise ValueError(f"Report with id {report_id} not found")
+
+
+def get_boefjes_for_reports(reports: Set[Type[Report]]) -> Dict[str, List[str]]:
+    """
+    Get all boefjes that are required and optional for a given list of reports
+    """
+    required_boefjes = set()
+    optional_boefjes = set()
+    for report in reports:
+        required_boefjes.update(report.required_boefjes)
+        optional_boefjes.update(report.optional_boefjes)
+    return {"required": list(required_boefjes), "optional": list(optional_boefjes)}
