@@ -68,6 +68,12 @@ class ReportTypeSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView)
     def error_url(self):
         return redirect(reverse("report_oois_selection", kwargs={"organization_code": self.organization.code}))
 
+    def get_report_types(self):
+        return [
+            {"id": report_type.id, "name": report_type.name, "description": report_type.description}
+            for report_type in self.report_types
+        ]
+
     def get(self, request, *args, **kwargs):
         if not self.ooi_selection:
             messages.add_message(self.request, messages.ERROR, _("Select at least one OOI to proceed."))
@@ -77,7 +83,7 @@ class ReportTypeSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.ooi_selection
-        context["report_types"] = get_report_types_for_oois(self.ooi_selection)
+        context["report_types"] = self.get_report_types()
         return context
 
 

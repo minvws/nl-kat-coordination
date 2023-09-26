@@ -30,8 +30,7 @@
                     {% for ooi in oois %}<li>{{ ooi }}</li>{% endfor %}
                 </ul>
                 <p>{% translate "Choose from which report type you want to generate a report:" %}</p>
-                {{ report_types }}
-                {% for rt in report_types %}{{ rt }}{% endfor %}
+                {% for report_type in report_types %}report: {{ report_type.id }}{% endfor %}
                 <form class="inline"
                       method="post"
                       action="{% url 'report_view' organization.code %}">
