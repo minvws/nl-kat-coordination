@@ -66,14 +66,14 @@ class Settings(BaseSettings):
     octopoes_api: AnyHttpUrl = Field(
         ..., example="http://localhost:8001", description="Octopoes API URL", env="OCTOPOES_API"
     )
-    boefje_api: AnyHttpUrl = Field(..., example="http://boefje", description="Boefje API URL", env="BOEFJE_API")
+    boefje_api: AnyHttpUrl = Field(..., example="http://boefje:8000", description="Boefje API URL", env="BOEFJE_API")
     # Boefje server settings
     boefje_api_host: str = Field(
         "0.0.0.0",
         description="Host address of the Boefje API server",
     )
     boefje_api_port: int = Field(
-        80,
+        8000,
         description="Host port of the Boefje API server",
     )
 
