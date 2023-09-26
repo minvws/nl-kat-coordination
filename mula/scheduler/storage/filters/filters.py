@@ -18,9 +18,9 @@ class Filter(BaseModel):
     operator: Literal[
         "==",
         "eq",
-        "is",
         "!=",
         "ne",
+        "is",
         "is_not",
         "is_null",
         "is_not_null",
@@ -63,7 +63,7 @@ class FilterRequest(BaseModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if isinstance(self.filters, list):
-            expressions: List[Filter] = []
+            expressions = []
             for expression in self.filters:
                 expressions.append(expression)
 

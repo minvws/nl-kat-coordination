@@ -1,5 +1,5 @@
 class Comparator:
-    # Comparision operators and their corresponding functions
+    # Comparison operators and their corresponding functions
     OPERATORS = {
         "==": lambda x, y: x == y,
         "eq": lambda x, y: x == y,
