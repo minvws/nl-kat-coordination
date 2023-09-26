@@ -25,7 +25,7 @@
                 {% translate "Object list" as filter_title %}
                 {% if object_list|length > 1 and perms.tools.can_mute_findings %}
                     <form method="post"
-                          class="inline"
+                          class="inline layout-wide"
                           action="{% url 'finding_mute_bulk' organization.code %}">
                         {% csrf_token %}
                     {% endif %}
@@ -142,6 +142,6 @@
 {% block html_at_end_body %}
     {{ block.super }}
     {% compress js %}
-        <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
     {% endcompress %}
 {% endblock html_at_end_body %}
