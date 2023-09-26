@@ -28,7 +28,7 @@ def get_report_types_for_oois(ooi_pks: List[str]) -> Set[Type[Report]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
-    return [report for ooi_pk in ooi_pks for report in get_report_types_for_ooi(ooi_pk)]
+    return {report for ooi_pk in ooi_pks for report in get_report_types_for_ooi(ooi_pk)}
 
 
 def get_report_by_id(report_id: str) -> Type[Report]:
