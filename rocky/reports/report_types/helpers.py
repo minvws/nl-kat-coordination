@@ -41,13 +41,14 @@ def get_report_by_id(report_id: str) -> Type[Report]:
     raise ValueError(f"Report with id {report_id} not found")
 
 
-def get_boefjes_for_reports(reports: Set[Type[Report]]) -> Dict[str, List[str]]:
+def get_boefjes_for_report_ids(reports: List[str]) -> Dict[str, List[str]]:
     """
     Get all boefjes that are required and optional for a given list of reports
     """
     required_boefjes = set()
     optional_boefjes = set()
-    for report in reports:
+    for report_id in reports:
+        report = get_report_by_id(report_id)
         required_boefjes.update(report.required_boefjes)
         optional_boefjes.update(report.optional_boefjes)
     return {"required": list(required_boefjes), "optional": list(optional_boefjes)}
