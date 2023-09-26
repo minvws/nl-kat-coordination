@@ -9,7 +9,9 @@ logger = getLogger(__name__)
 
 
 class Report:
+    id: str
     name: str
+    description: str
     required_boefjes: List
     optional_boefjes: List
     input_ooi_types: Set[Type[OOI]]
