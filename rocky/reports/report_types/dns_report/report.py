@@ -10,6 +10,7 @@ from reports.report_types.definitions import Report
 class DNSReport(Report):
     id = "dns-report"
     name = _("DNS Report")
+    description = _("Report on DNS records of a Hostname")
     required_boefjes = ["dns-records"]
     optional_boefjes: List = []
     input_ooi_types = {Hostname}
