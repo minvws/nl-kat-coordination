@@ -32,6 +32,6 @@
 {% block html_at_end_body %}
     {{ block.super }}
     {% compress js %}
-        <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
     {% endcompress %}
 {% endblock html_at_end_body %}

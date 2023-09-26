@@ -36,11 +36,11 @@
     {{ tree|json_script:"tree-data" }}
     {
     {% compress js %}
-        <script src="{% static "/js/stringHelpers.js" %}" nonce="{{ request.csp_nonce }}"></script>
-        <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-        <script src="{% static "/dist/imports/graph.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/stringHelpers.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "dist/imports/graph.js" %}" nonce="{{ request.csp_nonce }}"></script>
     {% endcompress %}
     {% compress css %}
-        <link href="{% static "/dist/imports/graph.css" %}" rel="stylesheet">
+        <link href="{% static "dist/imports/graph.css" %}" rel="stylesheet">
     {% endcompress %}
 {% endblock html_at_end_body %}
