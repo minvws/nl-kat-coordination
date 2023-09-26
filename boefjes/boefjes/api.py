@@ -146,12 +146,12 @@ def create_boefje_meta(task):
     environment = get_environment_settings(task.p_item.data, env_keys) if env_keys else {}
 
     organization = task.p_item.data.organization
-    input_ooi_pk = task.p_item.data.input_ooi
+    input_ooi = task.p_item.data.input_ooi
     arguments = {}
-    if input_ooi_pk:
+    if input_ooi:
         arguments["input"] = serialize_ooi(
             _find_ooi_in_past(
-                Reference.from_str(input_ooi_pk),
+                Reference.from_str(input_ooi),
                 get_octopoes_api_connector(organization),
             )
         )
@@ -159,7 +159,7 @@ def create_boefje_meta(task):
     boefje_meta = BoefjeMeta(
         id=task.id,
         boefje=boefje,
-        input_ooi=input_ooi_pk,
+        input_ooi=input_ooi,
         arguments=arguments,
         organization=organization,
         environment=environment,
