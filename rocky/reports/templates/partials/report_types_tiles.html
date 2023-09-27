@@ -5,7 +5,7 @@
             <input type="checkbox"
                    name="report_type"
                    value="{{ report_type.id }}"
-                   {% if report_type.id in request.GET.report_type %}checked{% endif %} />
+                   {% if report_type.id in request.GET.urlencode %}checked{% endif %} />
         </p>
         <p class="tile-description">{{ report_type.description }}</p>
     </div>
