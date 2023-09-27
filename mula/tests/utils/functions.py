@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar, List, Optional
 
 import pydantic
 from scheduler import models
@@ -10,7 +10,7 @@ class TestModel(pydantic.BaseModel):
     id: str
     name: str
     count: int = 0
-    categories: list[str] = None
+    categories: List[str] = None
     child: Any = None
 
     def __init__(self, **data: Any):
