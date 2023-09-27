@@ -1,3 +1,5 @@
 DNS REPORT TEMPLATE PLACEHOLDER
 
-{{ data.mock_oois }}
+{% for ooi in data.oois %}
+<p>{{ ooi }}</p>
+{% endfor %}

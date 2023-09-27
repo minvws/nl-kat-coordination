@@ -2,7 +2,8 @@ from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
+from octopoes.models.ooi.dns.records import DNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from reports.report_types.definitions import Report
 
@@ -17,4 +18,13 @@ class DNSReport(Report):
     html_template_path = "dns_report/report.html"
 
     def generate_data(self, input_ooi: OOI):
-        return {"mock_oois": ["mock_ooi1", "mock_ooi2"]}, self.html_template_path
+        ref = Reference.from_str(input_ooi)
+        tree = self.octopoes_api_connector.get_tree(ref, depth=2, types={DNSRecord}).store
+
+        oois = []
+        for a, b in tree.items():
+            oois.append(a)
+
+        self.octopoes_api_connector.list_origins(result=ref)
+
+        return {"oois": oois}, self.html_template_path
