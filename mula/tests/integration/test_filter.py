@@ -11,7 +11,7 @@ from tests.factories import OrganisationFactory
 from tests.utils import functions
 
 
-def compile_query_postgres(query):
+def compile_query(query):
     from sqlalchemy.dialects import postgresql
 
     return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
@@ -664,9 +664,6 @@ class FilterTestCase(unittest.TestCase):
             query = filters.apply_filter(models.TaskDB, query, f_req)
             results = query.all()
 
-            print(compile_query_postgres(query))
-
-            # Assert
             self.assertEqual(len(results), 2)
             self.assertEqual(results[0].p_item["data"]["id"], first_p_item.data.get("id"))
             self.assertEqual(results[1].p_item["data"]["id"], second_p_item.data.get("id"))

@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 Base = declarative_base()
 
 
-def compile_query_postgres(query):
+def compile_query(query):
     from sqlalchemy.dialects import postgresql
 
     return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
