@@ -2,7 +2,10 @@
     <div class="tile-container">
         <p class="tile-title">
             {{ report_type.name }}
-            <input type="checkbox" name="report_type" value="{{ report_type.id }}" />
+            <input type="checkbox"
+                   name="report_type"
+                   value="{{ report_type.id }}"
+                   {% if report_type.id in request.GET.report_type %}checked{% endif %} />
         </p>
         <p class="tile-description">{{ report_type.description }}</p>
     </div>

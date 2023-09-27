@@ -12,7 +12,12 @@ from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.helpers import get_ooi_types_with_report, get_report_by_id, get_report_types_for_oois
+from reports.report_types.helpers import (
+    get_ooi_types_with_report,
+    get_plugins_for_report_ids,
+    get_report_by_id,
+    get_report_types_for_oois,
+)
 from rocky.views.mixins import OctopoesView
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -32,6 +37,10 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
             {
                 "url": reverse("report_type_selection", kwargs=kwargs),
                 "text": _("Choose report types"),
+            },
+            {
+                "url": reverse("report_setup_scan", kwargs=kwargs),
+                "text": _("Set up scan"),
             },
             {
                 "url": reverse("report_view", kwargs=kwargs),
@@ -89,6 +98,20 @@ class ReportTypeSelectionView(ReportBreadcrumbs, OrganizationView, TemplateView)
         context = super().get_context_data(**kwargs)
         context["oois"] = self.ooi_selection
         context["report_types"] = self.get_report_types()
+        return context
+
+
+class ReportSetupScanView(ReportBreadcrumbs, OrganizationView, TemplateView):
+    template_name = "report_setup_scan.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.oois = request.GET.getlist("ooi", [])
+        self.report_types = request.GET.getlist("report_type", [])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["plugins"] = get_plugins_for_report_ids(self.report_types)
         return context
 
 

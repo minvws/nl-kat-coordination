@@ -41,7 +41,7 @@ def get_report_by_id(report_id: str) -> Type[Report]:
     raise ValueError(f"Report with id {report_id} not found")
 
 
-def get_boefjes_for_report_ids(reports: List[str]) -> Dict[str, List[str]]:
+def get_plugins_for_report_ids(reports: List[str]) -> Dict[str, List[str]]:
     """
     Get all boefjes that are required and optional for a given list of reports
     """

@@ -51,7 +51,7 @@
                 <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
                 <form class="inline"
                       method="get"
-                      action="{% url 'report_view' organization.code %}">
+                      action="{% url 'report_setup_scan' organization.code %}">
                     <div class="column-4 tiles">
                         {% include "partials/report_types_tiles.html" with report_types=report_types %}
 
