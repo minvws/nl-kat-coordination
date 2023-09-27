@@ -16,7 +16,7 @@ class DNSReport(Report):
     id = "dns-report"
     name = _("DNS Report")
     description = _("DNS reports focus on domain name system configuration and potential weaknesses.")
-    required_boefjes = ["dns-records", "dnssec"]
+    required_boefjes = ["dns-records", "dns-sec"]
     optional_boefjes: List = []
     input_ooi_types = {Hostname}
     html_template_path = "dns_report/report.html"
