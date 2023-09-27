@@ -1,16 +1,18 @@
 <fieldset class="{{ fieldset_class }}">
     <legend>{{ field.label }}</legend>
-    {% for choice in field %}
-        <div class="checkbox">
-            <input type="{% if choice.data.value < 0 %}hidden{% else %}checkbox{% endif %}"
-                   name="{{ field.name }}"
-                   value="{{ choice.data.value }}"
-                   id="id_{{ field.name }}_{{ forloop.counter0 }}"
-                   {% if choice.data.attrs.disabled %}disabled{% endif %}
-                   {% if choice.data.attrs.checked %}checked{% endif %} />
-            <label for="id_{{ field.name }}_{{ forloop.counter0 }}">{{ choice.choice_label|capfirst }}</label>
-        </div>
-    {% endfor %}
+    <div class="{{ custom_class }}">
+        {% for choice in field %}
+            <div class="checkbox">
+                <input type="{% if choice.data.value < 0 %}hidden{% else %}checkbox{% endif %}"
+                       name="{{ field.name }}"
+                       value="{{ choice.data.value }}"
+                       id="id_{{ field.name }}_{{ forloop.counter0 }}"
+                       {% if choice.data.attrs.disabled %}disabled{% endif %}
+                       {% if choice.data.attrs.checked %}checked{% endif %} />
+                <label for="id_{{ field.name }}_{{ forloop.counter0 }}">{{ choice.choice_label|capfirst }}</label>
+            </div>
+        {% endfor %}
+    </div>
     {% include "partials/form/field_input_help_text.html" with help_text=field.help_text %}
     {% include "partials/form/field_input_errors.html" with field=field %}
 
