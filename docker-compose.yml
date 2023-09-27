@@ -87,6 +87,8 @@ services:
     depends_on:
       - rabbitmq
       - bytes
+    ports:
+      - "127.0.0.1:8006:8000"
     build:
       context: .
       dockerfile: boefjes/Dockerfile
