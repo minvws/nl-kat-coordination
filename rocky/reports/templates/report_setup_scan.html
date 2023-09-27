@@ -24,12 +24,20 @@
                 </p>
                 <h3>{% translate "Required plugins" %}</h3>
                 <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
-                {% for plugin in plugins.required %}{{ plugin }}{% endfor %}
+                <div class="column-4 tiles plugins images-cover">
+                    {% for plugin in plugins.required %}
+                        {% include "partials/plugin_tile.html" with plugin=plugin %}
+
+                    {% endfor %}
+                </div>
                 <h3>{% translate "Suggested plugins" %}</h3>
                 <p>
                     {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
                 </p>
-                {% for plugin in plugins.optional %}{{ plugin }}{% endfor %}
+                {% for plugin in plugins.optional %}
+                    {% include "partials/plugin_tile.html" with plugin=plugin %}
+
+                {% endfor %}
                 <a href="{% url 'report_view' organization.code %}?{{ request.GET.urlencode }}"
                    class="button">
                     {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
