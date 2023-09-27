@@ -26,20 +26,46 @@
                         Selected objects
                     {% endblocktranslate %}
                 </h2>
-                <ul>
-                    {% for ooi in oois %}<li>{{ ooi }}</li>{% endfor %}
-                </ul>
-                <p>{% translate "Choose from which report type you want to generate a report:" %}</p>
-                {% for report_type in report_types %}report: {{ report_type.id }}{% endfor %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>{% translate "Object" %}</th>
+                            <th>{% translate "Type" %}</th>
+                            <th>{% translate "Clearance level" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ooi in oois %}
+                            <tr>
+                                <td>{{ ooi }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{% url 'report_oois_selection' organization.code %}?{{ request.GET.urlencode }}"
+                   class="button ghost">
+                    <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
+                </a>
+                <h2>{% translate "Available report types" %} ({{ report_types|length }})</h2>
+                <p>{% translate "All report types that are available for your selection." %}</p>
+                <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
                 <form class="inline"
-                      method="post"
+                      method="get"
                       action="{% url 'report_view' organization.code %}">
-                    {% csrf_token %}
-                    <div class="column-4"></div>
+                    <div class="column-4 tiles">
+                        {% include "partials/report_types_tiles.html" with report_types=report_types %}
+
+                    </div>
                     {% for ooi in oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
-                    <button type="submit">{% translate "Generate Report" %}</button>
+                    <button type="submit">
+                        {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
+                    </button>
                 </form>
             </div>
         </section>
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

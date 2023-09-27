@@ -3,13 +3,14 @@ $bit-bg: #42145f;
 $normalizer-bg: #e17000;
 
 
-.plugins {
+.tiles {
   &.tiles {
     img {
       object-fit: cover;
       object-position: center;
       height: 15rem;
     }
+
   }
 
   /* Tile */
@@ -74,7 +75,7 @@ $normalizer-bg: #e17000;
     }
   }
 
-  .plugin-title,
+  .tile-title,
   .action-buttons a {
     font-weight: 700;
     line-height: 1.25rem;
@@ -86,12 +87,12 @@ $normalizer-bg: #e17000;
 
   }
 
-  .plugin-detail-link {
+  .tile-detail-link {
     padding: 4px 16px;
     line-height: var(--form-button-line-height);
   }
 
-  .plugin-description {
+  .tile-description {
     font-size: var(--tile-font-size);
   }
 

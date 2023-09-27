@@ -11,6 +11,7 @@ from reports.report_types.definitions import Report
 class TLSReport(Report):
     id = "tls-report"
     name = _("TLS Report")
+    description: str = _("TLS reports assess the security of data encryption and transmission protocols.")
     required_boefjes: List = []
     optional_boefjes: List = []
     input_ooi_types = {IPService, Hostname}

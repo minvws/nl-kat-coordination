@@ -1,7 +1,9 @@
 from logging import getLogger
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -44,6 +46,9 @@ class ReportOOISelectionView(ReportBreadcrumbs, BaseOOIListView, OrganizationVie
     template_name = "report_oois_selection.html"
     ooi_types = get_ooi_types_with_report()
     current_step = 1
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
