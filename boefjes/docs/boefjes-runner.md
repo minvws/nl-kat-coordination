@@ -87,28 +87,46 @@ The input is a JSON object, specified by the following JSON schema:
             "type": "object",
             "properties": {
                 "boefje": {
-                    "type": "string"
-                },
-                "input_ooi_pk": {
-                    "type": "string"
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "version": {
+                            "type": "string"
+                        }
+                    }
                 },
                 "input_ooi": {
-                    "type": "object"
+                    "type": "string"
                 },
                 "arguments": {
+                    "type": "object"
+                },
+                "organization": {
+                    "type": "string"
+                },
+                "environment": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     }
-                },
-                "organization": {
-                    "type": "string"
                 }
             }
         },
-        "required": ["boefje", "input_ooi_pk", "input_ooi", "arguments", "organization"]
+        "required": [
+            "boefje",
+            "input_ooi",
+            "arguments",
+            "organization",
+            "environment"
+        ]
     },
-    "required": ["task_id", "output_url", "boefje_meta"]
+    "required": [
+        "task_id",
+        "output_url",
+        "boefje_meta"
+    ]
 }
 ```
 
@@ -147,7 +165,7 @@ JSON schema:
                         }
                     }
                 },
-                "required": ["content", "tags"]
+                "required": ["content"]
             }
         }
     },
