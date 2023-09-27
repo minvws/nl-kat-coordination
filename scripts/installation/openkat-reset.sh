@@ -2,15 +2,27 @@
 
 set -e
 
+source /etc/os-release
+
+if [ "$ID" != "debian" ]; then
+    echo "The installation script is only supported on Debian"
+    exit 1
+fi
+
+# Check Debian version
+if [ "$VERSION_ID" != "11" ] && [ "$VERSION_ID" != "12" ]; then
+    echo "Only Debian version 11 and 12 are supported"
+    exit 1
+fi
+
 if [ $# -gt 1 ]; then
-	echo "Usage: $0 [no_super_user]"
-	exit 1
+    echo "Usage: $0 [no_super_user]"
+    exit 1
 fi
 
 read -p "This script will delete all OpenKAT data. Are you sure? (y/n) " -n 1 -r
 echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 1
 fi
 
@@ -72,8 +84,8 @@ sudo -u kat update-katalogus-db
 sudo -u kat update-mula-db
 
 if [[ ${1} != "no_super_user" ]]; then
-	echo "Create Superuser"
-	sudo -u kat rocky-cli createsuperuser
+    echo "Create Superuser"
+    sudo -u kat rocky-cli createsuperuser
 fi
 
 echo "Start OpenKAT"
