@@ -7,7 +7,7 @@
     <p class="tile-title">
         <strong>{{ plugin.name }}</strong><span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
     </p>
-    {% if tile.description %}<p class="plugin-description">{{ plugin.description }}</p>{% endif %}
+    {% if plugin.description %}<p class="tile-description">{{ plugin.description }}</p>{% endif %}
     {% if not show_meta %}
         {% if plugin.type == "boefje" %}
             <div class="horizontal-view scan-intensity">
