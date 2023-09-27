@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.views import redirect_to_login
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils import translation
@@ -6,12 +7,11 @@ from django.utils import translation
 
 def AuthRequiredMiddleware(get_response):
     def middleware(request):
-        login_path = reverse("login")
         two_factor_setup_path = reverse("setup")
         # URLs excluded from login and 2fa
         excluded = [
             "/",
-            login_path,
+            reverse("login"),
             reverse("recover_email"),
             reverse("password_reset"),
             reverse("landing_page"),
@@ -40,7 +40,7 @@ def AuthRequiredMiddleware(get_response):
             # check if path starts with anything in excluded_prefix
             or any([request.path.startswith(prefix) for prefix in excluded_prefix])
         ):
-            return redirect(login_path)
+            return redirect_to_login(request.get_full_path())
 
         # When 2fa is enabled, check if user is verified, otherwise redirect to 2fa setup page
         if (

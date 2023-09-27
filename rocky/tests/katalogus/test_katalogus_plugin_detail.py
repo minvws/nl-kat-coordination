@@ -24,7 +24,7 @@ def test_plugin_detail_view(
     assertContains(response, "TestBoefje")
     assertContains(response, "Completed")
     assertContains(response, "Consumes")
-    assertContains(response, "TestBoefje is able to scan the following object types")
+    assertContains(response, plugin_details.description)
 
 
 def test_plugin_detail_view_no_consumes(

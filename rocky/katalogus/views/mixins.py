@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import List, Optional
+from typing import List, Optional, Union
 from uuid import uuid4
 
 from account.mixins import OrganizationView
@@ -11,7 +11,16 @@ from django.utils.translation import gettext_lazy as _
 from requests import HTTPError, RequestException
 from rest_framework.status import HTTP_404_NOT_FOUND
 
-from katalogus.client import KATalogusClientV1, Plugin, get_katalogus
+from katalogus.client import (
+    Boefje as KATalogusBoefje,
+)
+from katalogus.client import (
+    KATalogusClientV1,
+    get_katalogus,
+)
+from katalogus.client import (
+    Normalizer as KATalogusNormalizer,
+)
 from octopoes.models import OOI
 from rocky.exceptions import (
     AcknowledgedClearanceLevelTooLowException,
@@ -29,7 +38,7 @@ class SinglePluginView(OrganizationView):
         super().__init__(*args, **kwargs)
         self.katalogus_client: Optional[KATalogusClientV1] = None
         self.plugin_schema = None
-        self.plugin: Optional[Plugin] = None
+        self.plugin: Union[KATalogusBoefje, KATalogusNormalizer] = None
 
     def setup(self, request, *args, **kwargs):
         """
@@ -70,9 +79,9 @@ class NormalizerMixin:
     this mixin provides the method to construct the normalizer task for that data and run it.
     """
 
-    def run_normalizer(self, normalizer: Plugin, raw_data: RawData) -> None:
+    def run_normalizer(self, normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
         normalizer_task = NormalizerTask(
-            id=uuid4().hex, normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
+            id=uuid4(), normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
         )
 
         item = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
@@ -85,10 +94,10 @@ class BoefjeMixin(OctopoesView):
     this mixin provides the methods to construct the boefjes for the OOI's and run them.
     """
 
-    def run_boefje(self, katalogus_boefje: Plugin, ooi: Optional[OOI]) -> None:
+    def run_boefje(self, katalogus_boefje: KATalogusBoefje, ooi: Optional[OOI]) -> None:
         boefje_task = BoefjeTask(
             id=uuid4().hex,
-            boefje=Boefje(id=katalogus_boefje.id, version=None),
+            boefje=Boefje.parse_obj(katalogus_boefje.dict()),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
@@ -98,7 +107,7 @@ class BoefjeMixin(OctopoesView):
 
     def run_boefje_for_oois(
         self,
-        boefje: Plugin,
+        boefje: KATalogusBoefje,
         oois: List[OOI],
     ) -> None:
         if not oois and not boefje.consumes:

@@ -1,0 +1,10 @@
+/* Button destructive */
+
+:root {
+  --button-destructive-background-color: var(--color-alert-negative);
+  --button-destructive-text-color: white;
+  --button-destructive-hover-background-color: var(
+    --color-alert-negative-darker
+  );
+  --button-destructive-hover-text-color: white;
+}

@@ -1,5 +1,6 @@
 import logging
 from typing import List, Optional
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response
@@ -39,7 +40,7 @@ def create_boefje_meta(
 
 @router.get("/boefje_meta/{boefje_meta_id}", response_model=BoefjeMeta, tags=[BOEFJE_META_TAG])
 def get_boefje_meta_by_id(
-    boefje_meta_id: str,
+    boefje_meta_id: UUID,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
 ) -> BoefjeMeta:
     with meta_repository:
@@ -100,7 +101,7 @@ def create_normalizer_meta(
 
 @router.get("/normalizer_meta/{normalizer_meta_id}", response_model=NormalizerMeta, tags=[NORMALIZER_META_TAG])
 def get_normalizer_meta_by_id(
-    normalizer_meta_id: str,
+    normalizer_meta_id: UUID,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
 ) -> NormalizerMeta:
     with meta_repository:
@@ -111,7 +112,7 @@ def get_normalizer_meta_by_id(
 def get_normalizer_meta(
     organization: str,
     normalizer_id: Optional[str] = None,
-    raw_id: Optional[str] = None,
+    raw_id: Optional[UUID] = None,
     limit: int = 1,
     offset: int = 0,
     descending: bool = True,
@@ -144,7 +145,7 @@ def get_normalizer_meta(
 @router.post("/raw", tags=[RAW_TAG])
 async def create_raw(
     request: Request,
-    boefje_meta_id: str,
+    boefje_meta_id: UUID,
     mime_types: Optional[List[str]] = Query(None),
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
@@ -181,7 +182,7 @@ async def create_raw(
 
 @router.get("/raw/{raw_id}", tags=[RAW_TAG])
 def get_raw_by_id(
-    raw_id: str,
+    raw_id: UUID,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
 ) -> Response:
     try:
@@ -195,7 +196,7 @@ def get_raw_by_id(
 @router.get("/raw", response_model=List[RawDataMeta], tags=[RAW_TAG])
 def get_raws(
     organization: Optional[str] = None,
-    boefje_meta_id: Optional[str] = None,
+    boefje_meta_id: Optional[UUID] = None,
     normalized: Optional[bool] = None,
     limit: int = 1,
     mime_types: Optional[List[str]] = Query(None),

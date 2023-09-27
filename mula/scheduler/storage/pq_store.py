@@ -1,4 +1,5 @@
 from typing import List, Optional, Tuple
+from uuid import UUID
 
 from scheduler import models
 
@@ -65,22 +66,22 @@ class PriorityQueueStore:
             )
 
     @retry()
-    def remove(self, scheduler_id: str, item_id: str) -> None:
+    def remove(self, scheduler_id: str, item_id: UUID) -> None:
         with self.dbconn.session.begin() as session:
             (
                 session.query(models.PrioritizedItemDB)
                 .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
-                .filter(models.PrioritizedItemDB.id == item_id)
+                .filter(models.PrioritizedItemDB.id == str(item_id))
                 .delete()
             )
 
     @retry()
-    def get(self, scheduler_id, item_id: str) -> Optional[models.PrioritizedItem]:
+    def get(self, scheduler_id, item_id: UUID) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.PrioritizedItemDB)
                 .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
-                .filter(models.PrioritizedItemDB.id == item_id)
+                .filter(models.PrioritizedItemDB.id == str(item_id))
                 .first()
             )
 
