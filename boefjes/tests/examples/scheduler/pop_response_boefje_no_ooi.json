@@ -1,0 +1,19 @@
+{
+    "id": "70da7d4f-f41f-4940-901b-d98a92e9014b",
+    "priority": 1,
+    "hash": "70da7d4f-f41f-4940-901b-d98a92e9014b",
+    "data": {
+        "id": "70da7d4f-f41f-4940-901b-d98a92e9014b",
+        "boefje": {
+            "id": "dns-records",
+            "version": null
+        },
+        "input_ooi": "",
+        "organization": "_dev",
+        "arguments": {},
+        "started_at": null,
+        "runnable_hash": null,
+        "environment": null,
+        "ended_at": null
+    }
+}
