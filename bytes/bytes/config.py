@@ -50,6 +50,9 @@ class BackwardsCompatibleEnvSettings:
         if "rfc3161_provider" in d and not d["rfc3161_provider"]:
             del d["rfc3161_provider"]
 
+        if "rfc3161_cert_file" in d and not d["rfc3161_cert_file"]:
+            del d["rfc3161_cert_file"]
+
         return d
 
 

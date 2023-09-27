@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load compress %}
 
 <footer>
     <span>Kwetsbaarheden Analyse Tool</span>
@@ -21,4 +22,6 @@
         </ul>
     </nav>
 </footer>
-<script src="{% static "/js/dropdown.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% compress js %}
+    <script src="{% static "js/dropdown.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endcompress %}
