@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from uuid import UUID
 
 import pytest
+from fastapi.testclient import TestClient
 from pydantic import parse_raw_as
 
 from boefjes.app import SchedulerWorkerManager
@@ -124,3 +125,10 @@ def manager(item_handler: MockHandler, tmp_path: Path) -> SchedulerWorkerManager
     )
 
     return SchedulerWorkerManager(item_handler, scheduler_client, Settings(pool_size=1, poll_interval=0.01), "DEBUG")
+
+
+@pytest.fixture
+def api(tmp_path):
+    from boefjes.api import app
+
+    return TestClient(app)
