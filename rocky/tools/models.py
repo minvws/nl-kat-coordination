@@ -250,7 +250,7 @@ class OrganizationMember(models.Model):
 
     def has_clearance(self, plugin: Plugin) -> bool:
         perm = self.has_perm("tools.can_enable_disable_boefje")
-        if hasattr(plugin, "scan_level"):
+        if isinstance(plugin, Boefje):
             return perm and self.acknowledged_clearance_level >= plugin.scan_level.value
         return perm
 
