@@ -1,11 +1,12 @@
 from logging import getLogger
+from typing import Any, Dict, List
 
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from katalogus.client import get_katalogus
+from katalogus.client import Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import Reference
@@ -54,20 +55,23 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.ooi_selection = request.GET.getlist("ooi", [])
+        self.oois_selection = request.GET.getlist("ooi", [])
         self.report_types_selection = request.GET.getlist("report_type", [])
         self.katalogus_client = get_katalogus(self.organization.code)
 
-    def get_report_types(self):
+    def get_report_types_from_oois_selection(self) -> List[Dict[str, str]]:
         return [
             {"id": report_type.id, "name": report_type.name, "description": report_type.description}
-            for report_type in get_report_types_for_oois(self.ooi_selection)
+            for report_type in get_report_types_for_oois(self.oois_selection)
         ]
 
-    def get_reports_data(self):
+    def get_oois_from_selection(self):
+        return [self.get_single_ooi(ooi) for ooi in self.oois_selection]
+
+    def get_reports_data(self) -> Dict[str, Any]:
         report_data = {}
-        if self.ooi_selection and self.report_types_selection:
-            for ooi in self.ooi_selection:
+        if self.oois_selection and self.report_types_selection:
+            for ooi in self.oois_selection:
                 for report in self.report_types_selection:
                     report = get_report_by_id(report)
                     if Reference.from_str(ooi).class_type in report.input_ooi_types:
@@ -75,7 +79,9 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
                         report_data[f"{report.name}|{str(ooi)}"] = {"data": data, "template": template}
         return report_data
 
-    def get_required_optional_plugins(self):
+    def get_required_optional_plugins(self) -> Dict[str, Plugin]:
+        if not self.report_types_selection:
+            return {}
         plugins = get_plugins_for_report_ids(self.report_types_selection)
         for plugin, value in plugins.items():
             plugins[plugin] = [self.katalogus_client.get_plugin(plugin_id) for plugin_id in value]
@@ -83,11 +89,10 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.ooi_selection
-        context["report_types"] = self.get_report_types()
         context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
-        if self.report_types_selection:
-            context["plugins"] = self.get_required_optional_plugins()
+        context["oois"] = self.get_oois_from_selection()
+        context["report_types"] = self.get_report_types_from_oois_selection()
+        context["plugins"] = self.get_required_optional_plugins()
         context["report_data"] = self.get_reports_data()
         return context
 
@@ -111,7 +116,7 @@ class ReportTypeSelectionView(BaseReportView, TemplateView):
     current_step = 2
 
     def get(self, request, *args, **kwargs):
-        if not self.ooi_selection:
+        if not self.oois_selection:
             messages.add_message(self.request, messages.ERROR, _("Select at least one OOI to proceed."))
             return redirect(reverse("report_oois_selection", kwargs={"organization_code": self.organization.code}))
         return super().get(request, *args, **kwargs)
