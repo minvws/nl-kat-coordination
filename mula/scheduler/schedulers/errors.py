@@ -1,2 +1,0 @@
-class TaskStalledError(Exception):
-    pass

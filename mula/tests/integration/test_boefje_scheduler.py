@@ -368,7 +368,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
 
         # Act
-        self.assertTrue(self.scheduler.is_task_running(task))
+        self.assertFalse(self.scheduler.is_task_stalled(task))
 
     def test_is_task_running_stalled_after_grace_period(self):
         # Arrange
@@ -403,8 +403,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
 
         # Act
-        with self.assertRaises(schedulers.errors.TaskStalledError):
-            self.scheduler.is_task_running(task)
+        self.assertTrue(self.scheduler.is_task_stalled(task))
 
     def test_is_task_running_mismatch_before_grace_period(self):
         """When a task has finished according to the datastore, (e.g. failed
@@ -694,6 +693,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertIn("Could not add task to queue, queue was full", cm.output[-1])
         self.assertEqual(1, self.scheduler.queue.qsize())
 
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_stalled")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
     @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
@@ -706,6 +706,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_has_grace_period_passed,
         mock_is_task_allowed_to_run,
         mock_is_task_running,
+        mock_is_task_stalled,
     ):
         """When a task has stalled it should be set to failed."""
         # Arrange
@@ -749,7 +750,8 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         mock_is_task_allowed_to_run.return_value = True
         mock_has_grace_period_passed.return_value = True
-        mock_is_task_running.side_effect = schedulers.errors.TaskStalledError()
+        mock_is_task_stalled.return_value = True
+        mock_is_task_running.return_value = False
         self.mock_get_latest_task_by_hash.return_value = task_db
         mock_is_item_on_queue_by_hash.return_value = False
         mock_get_tasks_by_hash.return_value = None
