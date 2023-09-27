@@ -66,3 +66,33 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
     # Delete even-numbered test hostnames
     octopoes_api_connector.delete_many([Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)])
     assert octopoes_api_connector.list(types={Network, Hostname}).count == 6
+
+
+def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+    network = Network(name="test")
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=network,
+            valid_time=valid_time,
+        )
+    )
+    hostnames: List[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
+    task_id = uuid.uuid4()
+
+    octopoes_api_connector.save_observation(
+        Observation(
+            method="normalizer_id",
+            source=network.reference,
+            task_id=task_id,
+            valid_time=valid_time,
+            result=hostnames,
+        )
+    )
+
+    octopoes_api_connector.save_many_scan_profiles(
+        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in hostnames + [network]], valid_time
+    )
+
+    query = "Hostname.network"
+    results = octopoes_api_connector.query(query, valid_time)
+    assert len(results) == 10
