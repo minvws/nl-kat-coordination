@@ -4,7 +4,7 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
-from octopoes.models.ooi.dns.records import DNSRecord
+from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
 from reports.report_types.definitions import Report
@@ -25,27 +25,34 @@ class DNSReport(Report):
         ref = Reference.from_str(input_ooi)
         tree = self.octopoes_api_connector.get_tree(ref, depth=3, types={DNSRecord, Finding}).store
 
-        oois = []
+        other_records = []
         security = {
             "spf": True,
             "dkim": True,
             "dmarc": True,
             "dnssec": True,
         }
+        ipv4 = []
+        ipv6 = []
         for ooi_type, ooi in tree.items():
             reference = Reference.from_str(ooi)
-            logger.error(ooi)
-            if isinstance(ooi, DNSRecord):
+            if isinstance(ooi, DNSARecord):
+                if ref.tokenized.name == ooi.hostname.tokenized.name:
+                    ipv4.append(ooi.value)
+            elif isinstance(ooi, DNSAAAARecord):
+                if ref.tokenized.name == ooi.hostname.tokenized.name:
+                    ipv6.append(ooi.value)
+            elif isinstance(ooi, DNSRecord):
                 origin = self.octopoes_api_connector.list_origins(source=ref, result=reference)
                 if origin:
-                    oois.append(
+                    other_records.append(
                         {
                             "human_readable": reference.human_readable,
                             "content": ooi.value,
                             "origin": origin[0].method,
                         }
                     )
-            if isinstance(ooi, Finding):
+            elif isinstance(ooi, Finding):
                 if "NO-SPF" in ooi.finding_type.tokenized.id:
                     security["spf"] = False
                 if "NO-DKIM" in ooi.finding_type.tokenized.id:
@@ -55,4 +62,13 @@ class DNSReport(Report):
                 if "NO-DNSSEC" in ooi.finding_type.tokenized.id:
                     security["dnssec"] = False
 
-        return {"input_ooi": input_ooi, "oois": oois, "security": security}, self.html_template_path
+        enough_ipv6_webservers = len(ipv6) >= 2
+
+        return {
+            "input_ooi": input_ooi,
+            "other_records": other_records,
+            "security": security,
+            "ipv4": ipv4,
+            "ipv6": ipv6,
+            "enough_ipv6_webservers": enough_ipv6_webservers,
+        }, self.html_template_path

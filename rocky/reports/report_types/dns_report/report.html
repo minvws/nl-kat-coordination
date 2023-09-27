@@ -1,7 +1,29 @@
 {% load i18n %}
 <h1>DNS report for {{ data.input_ooi }}</h1>
 
-<h2>All DNS records</h2>
+<h2>IPV4 addresses</h2>
+
+<ul>
+  {% for ip in data.ipv4 %}
+    <li>{{ ip }}</li>
+  {% endfor %}
+</ul>
+
+<h2>IPV6 addresses</h2>
+
+<ul>
+  {% for ip in data.ipv6 %}
+    <li>{{ ip }}</li>
+  {% endfor %}
+</ul>
+
+{% if data.enough_ipv6_webservers %}
+This means that you have have more than one webserver that is reachable over IPv6, which is in compliance to internet.nl standards.
+{% else %}
+This means that you have less than one webserver that is reachable over IPv6, which is not in compliance to internet.nl standards.
+{% endif %}
+
+<h2>All other records</h2>
 <table>
   <thead>
   <tr>
@@ -11,7 +33,7 @@
   </tr>
   </thead>
   <tbody>
-  {% for ooi in data.oois %}
+  {% for ooi in data.other_records %}
     <tr>
       <td> {{ ooi.human_readable }} </td>
       <td> {{ ooi.content }} </td>
