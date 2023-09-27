@@ -6,13 +6,18 @@
     {% if ooi_id %}<input type="hidden" name="ooi_id" value="{{ ooi_id }}" />{% endif %}
     {% include "partials/form/field_hidden_from_list.html" with list=mandatory_fields form=observed_at_form %}
     {% include "partials/form/fieldset.html" with fields=observed_at_form %}
-    {% include "partials/form/fieldset.html" with fields=object_type_filters custom_class="column-4" %}
+    {% include "partials/form/fieldset.html" with fields=ooi_type_form custom_class="column-4" %}
 
-    <button type="button"
-            class="toggle-all toggle-on ghost"
-            data-toggle-target="ooi_type">{% translate "Toggle all OOI types" %}</button>
-    {% include "partials/form/fieldset.html" with fields=clearance_filter_form %}
+    {% if ooi_type_form.fields.ooi_type.choices|length > 4 %}
+        <button type="button"
+                class="toggle-all toggle-on ghost"
+                data-toggle-target="ooi_type">{% translate "Toggle all OOI types" %}</button>
+    {% endif %}
+    {% include "partials/form/fieldset.html" with fields=clearance_level_filter_form %}
 
-    <input type="submit"
-           value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}" />
+    <div class="button-container">
+        <input type="submit"
+               value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}" />
+        <a href="{{ request.path }}" class="button ghost">{% translate "Clear filters" %}</a>
+    </div>
 </form>

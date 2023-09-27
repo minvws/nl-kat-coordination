@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import re
 from pathlib import Path
 
 import environ
@@ -51,6 +52,20 @@ ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}
 
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
@@ -114,6 +129,7 @@ HELP_DESK_EMAIL = env("HELP_DESK_EMAIL", default="")
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -135,12 +151,14 @@ INSTALLED_APPS = [
     "django_password_validators.password_history",
     "rest_framework",
     "tagulous",
-    "reports"
+    "compressor",
+    "reports",
     # "drf_standardized_errors",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -275,8 +293,35 @@ LANGUAGES = [
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = env.path("STATIC_ROOT", BASE_DIR / "static")
 STATICFILES_DIRS = (BASE_DIR / "assets",)
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
+COMPRESS_OFFLINE = True
+COMPRESS_STORAGE = "compressor.storage.BrotliCompressorFileStorage"
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+_IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
+
+
+def immutable_file_test(path, url):
+    # Match filename with 12 hex digits before the extension e.g.
+    # app.db8f2edc0c8a.js. Confifguraring this is necessary because whitenoise
+    # doesn't automatically detect the django-compressor files as immutable.
+    return _IMMUTABLE_FILE_TEST_PATTERN.match(url)
+
+
+WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
+# TODO: set this to True when we aren't using uWSGI anymore
+WHITENOISE_KEEP_ONLY_HASHED_FILES = False
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"

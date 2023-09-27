@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - rocky/**
+      - .github/workflows/rocky_makelang.yml
   pull_request:
     paths:
       - rocky/**
+      - .github/workflows/rocky_makelang.yml
 
 jobs:
   makelang:
@@ -26,7 +28,9 @@ jobs:
         run: sudo apt-get install -y --no-install-recommends gettext
 
       - name: Install requirements.txt
-        run: pip install -r requirements.txt
+        run: |
+          grep -v git+https:// requirements.txt | pip install -r /dev/stdin
+          grep git+https:// requirements.txt | pip install -r /dev/stdin
         working-directory: ./rocky
 
       - name: Install Octopoes
