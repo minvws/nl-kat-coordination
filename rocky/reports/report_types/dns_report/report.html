@@ -1,5 +1,51 @@
-DNS REPORT TEMPLATE PLACEHOLDER
+{% load i18n %}
+<h1>DNS report for {{ data.input_ooi }}</h1>
 
-{% for ooi in data.oois %}
-<p>{{ ooi }}</p>
-{% endfor %}
+<h2>All DNS records</h2>
+<table>
+  <thead>
+  <tr>
+    <th>{% translate "OOI" %}</th>
+    <th>{% translate "Value" %}</th>
+    <th>{% translate "Found by" %}</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for ooi in data.oois %}
+    <tr>
+      <td> {{ ooi.human_readable }} </td>
+      <td> {{ ooi.content }} </td>
+      <td> {{ ooi.origin }} </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Security</h2>
+<table>
+  <thead>
+  <tr>
+    <th>{% translate "Type" %}</th>
+    <th>{% translate "Enabled" %}</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>SPF</td>
+    <td>{{ data.security.spf }}</td>
+  </tr>
+  <tr>
+    <td>DMARC</td>
+    <td>{{ data.security.dmarc }}</td>
+  </tr>
+  <tr>
+    <td>DKIM</td>
+    <td>{{ data.security.dkim }}</td>
+  </tr>
+  <tr>
+    <td>DNSSEC</td>
+    <td>{{ data.security.dnssec }}</td>
+  </tr>
+  </tbody>
+
+</table>
