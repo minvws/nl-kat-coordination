@@ -30,7 +30,7 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import get_collapsed_types, get_relations, type_by_name
+from octopoes.models.types import get_relations, type_by_name
 from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
@@ -199,7 +199,7 @@ class FindingList:
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
         severities: Set[RiskLevelSeverity],
-        exclude_muted: bool = False,
+        exclude_muted: bool = True,
         only_muted: bool = False,
     ):
         self.octopoes_connector = octopoes_connector
@@ -276,28 +276,6 @@ class MultipleOOIMixin(OctopoesView):
             scan_level=scan_level,
             scan_profile_type=scan_profile_type,
         )
-
-    def get_filtered_ooi_types(self):
-        return self.request.GET.getlist("ooi_type", [])
-
-    def get_ooi_type_filters(self):
-        ooi_type_filters = [
-            {
-                "label": ooi_class.get_ooi_type(),
-                "value": ooi_class.get_ooi_type(),
-                "checked": not self.filtered_ooi_types or ooi_class.get_ooi_type() in self.filtered_ooi_types,
-            }
-            for ooi_class in get_collapsed_types()
-        ]
-
-        ooi_type_filters = sorted(ooi_type_filters, key=lambda filter_: filter_["label"])
-        return ooi_type_filters
-
-    def get_ooi_types_display(self):
-        if not self.filtered_ooi_types or len(self.filtered_ooi_types) == len(get_collapsed_types()):
-            return _("All")
-
-        return ", ".join(self.filtered_ooi_types)
 
 
 class ConnectorFormMixin:

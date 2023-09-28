@@ -27,6 +27,12 @@ def cli(worker_type: str, log_level: str):
 
     queue = WorkerManager.Queue(worker_type)
     runtime = get_runtime_manager(settings, queue, log_level)
+
+    if worker_type == "boefje":
+        import boefjes.api
+
+        boefjes.api.run()
+
     runtime.run(queue)
 
 

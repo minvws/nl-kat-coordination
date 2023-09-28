@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -22,7 +23,10 @@
                     {% endblocktranslate %}
                 </p>
                 <p class="de-emphasized">
-                    <strong>{% translate "Currently filtered on:" %}</strong> {{ types_display }}
+                    {% if active_filters %}
+                        <strong>{% translate "Currently filtered on:" %}</strong>
+                        {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value|title }}&nbsp;{% endfor %}
+                    {% endif %}
                 </p>
                 {% include "partials/ooi_list_toolbar.html" %}
 
@@ -71,5 +75,7 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}
