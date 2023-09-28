@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-28 13:22+0000\n"
+"POT-Creation-Date: 2023-09-28 12:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2058,7 +2058,8 @@ msgid "DNS Tree"
 msgstr ""
 
 #: onboarding/templates/step_1_introduction.html
-msgid "Welcome to OpenKATz"
+#: rocky/templates/landing_page.html
+msgid "Welcome to OpenKAT"
 msgstr ""
 
 #: onboarding/templates/step_1_introduction.html
@@ -3427,10 +3428,6 @@ msgstr ""
 
 #: rocky/templates/indemnification_present.html
 msgid "Go to"
-msgstr ""
-
-#: rocky/templates/landing_page.html
-msgid "Welcome to OpenKAT"
 msgstr ""
 
 #: rocky/templates/landing_page.html
