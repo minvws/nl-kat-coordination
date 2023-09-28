@@ -3397,9 +3397,9 @@ msgid ""
 msgstr ""
 "<p>Aggiungi un set di tipi MIME, separati da virgole, ad esempio:</"
 "p><p><i>\"text/html, image/jpeg\"</i> o <i>\"boefje/dns-records\"</i>.</"
-"p><p>I tipi MIME vengono utilizzati per abbinare il normalizzatore corretto "
+"p><p>I tipi MIME vengono utilizzati per abbinare il Normalizer corretto "
 "a un file raw. Quando viene aggiunto il tipo MIME \"boefje/dns-records\", il "
-"normalizzatore si aspetta che il file raw contenga informazioni sulla "
+"Normalizer si aspetta che il file raw contenga informazioni sulla "
 "scansione DNS.</p>"
 
 #: tools/forms/upload_raw.py rocky/templates/partials/ooi_list_toolbar.html
