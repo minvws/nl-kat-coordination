@@ -23,7 +23,7 @@
         {% block extrastyle %}
         {% endblock extrastyle %}
         {% if LANGUAGE_BIDI %}
-            <link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock extrastyle %}">
+            <link rel="stylesheet" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock stylesheet_rtl %}">
         {% endif %}
         {% block extrahead %}
         {% endblock extrahead %}
