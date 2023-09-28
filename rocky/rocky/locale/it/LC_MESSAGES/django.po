@@ -627,6 +627,12 @@ msgstr "La tua sessione è scaduta. Effettua nuovamente l'accesso."
 msgid "OpenKAT"
 msgstr "OpenKAT"
 
+#: account/views/login.py account/views/password_reset.py
+#: account/views/recover_email.py rocky/templates/partials/secondary-menu.html
+#: rocky/templates/two_factor/core/login.html
+msgid "Login"
+msgstr ""
+
 #: account/views/login.py
 msgid "Two factor authentication"
 msgstr "Autenticazione a due fattori"
@@ -1361,6 +1367,40 @@ msgstr "Opzioni di ordinamento"
 msgid "This field is required."
 msgstr "Questo campo è obbligatorio."
 
+#: katalogus/templates/about_plugins.html
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "About plugins"
+msgstr ""
+
+#: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
+msgid ""
+"Plugins gather data, objects and insight. Each plugin has its own focus area "
+"and strengths and may be able to work with other plugins to gain even more "
+"insights."
+msgstr ""
+
+#: katalogus/templates/about_plugins.html katalogus/templates/boefjes.html
+msgid ""
+"Boefjes gather factual information, such as by calling an external scanning "
+"tool like nmap or using a database like shodan."
+msgstr ""
+
+#: katalogus/templates/about_plugins.html katalogus/templates/normalizers.html
+msgid ""
+"Normalizers analyze the information and turn it into objects for the data "
+"model in Octopoes."
+msgstr ""
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"Bits are business rules that look for insight within the current dataset and "
+"search for specific insight and draw conclusions."
+msgstr ""
+
+#: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
+msgid "available"
+msgstr ""
+
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
 msgid "scan level warning"
@@ -1478,7 +1518,6 @@ msgstr ""
 "forza.\n"
 "              "
 
-#: katalogus/templates/katalogus.html
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
 msgstr "Impostazioni KAT-alogus"
@@ -1538,14 +1577,18 @@ msgid "Value"
 msgstr "Valore"
 
 #: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-#: onboarding/templates/partials/boefje_tile_static.html
 msgid "Scan level:"
 msgstr "Livello di scansione:"
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Publisher"
 msgstr "Editore"
+
+#: katalogus/templates/partials/boefje_tile.html
+#: katalogus/templates/partials/plugin_tile.html
+#: katalogus/templates/partials/plugins.html
+msgid "See details"
+msgstr ""
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "Enable"
@@ -1587,9 +1630,9 @@ msgstr "Elenco oggetti"
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"This boefje will only scan objects with a corresponding clearance level of "
+"This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
-"this boefje to scan an OOI with a lower clearance level than "
+"this Boefje to scan an OOI with a lower clearance level than "
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
@@ -1602,15 +1645,11 @@ msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid ""
-"\n"
-"          <span>Warning scan level:</span>\n"
-"          Scanning OOI's with a lower clearance level will result in OpenKAT "
-"increasing the clearance level on that OOI,\n"
-"          not only for this scan but from now on out, until it manually gets "
-"set to something else again.\n"
-"          This means that all other enabled Boefjes will use this higher "
-"clearance level aswel.\n"
-"        "
+"<span>Warning scan level:</span> Scanning OOI's with a lower clearance level "
+"will result in OpenKAT increasing the clearance level on that OOI, not only "
+"for this scan but from now on out, until it manually gets set to something "
+"else again. This means that all other enabled Boefjes will use this higher "
+"clearance level aswel."
 msgstr ""
 "\n"
 "<span>Avviso livello di scansione:</span>\n"
@@ -1624,12 +1663,9 @@ msgstr ""
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"\n"
-"          You currently don't have any objects that meet the scan level of "
-"%(name)s.\n"
-"          Add objects with a complying clearance level, or alter the "
-"clearance level of existing objects.\n"
-"        "
+"You currently don't have any objects that meet the scan level of %(name)s. "
+"Add objects with a complying clearance level, or alter the clearance level "
+"of existing objects."
 msgstr ""
 "\n"
 "Attualmente non hai oggetti che soddisfano il livello di scansione di "
@@ -1640,11 +1676,8 @@ msgstr ""
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"\n"
-"          You currently don't have scannable objects for %(name)s.\n"
-"          Add objects to use this boefje. This boefje is able to scan "
-"objects of the following types:\n"
-"        "
+"You currently don't have scannable objects for %(name)s. Add objects to use "
+"this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
 "\n"
 "Attualmente non hai oggetti scansionabili per %(name)s.\n"
@@ -1884,16 +1917,23 @@ msgid "Boefje '{boefje_name}' disabled."
 msgstr "Boefje '{boefje_name}' disabilitato."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
+msgid "Failed fetching settings for {}. Is the Katalogus up?"
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid "Before enabling, please set the required settings for '{}'."
+msgstr ""
+
+#: katalogus/views/plugin_enable_disable.py
+msgid "{} '{}' enabled."
 msgstr ""
 "Recupero delle impostazioni del boefje {boefje_name} non riuscito. Katalogus "
 "è attivo?"
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
 msgid ""
-"Before enabling, please set the required settings for boefje '{boefje_name}'."
+"Your clearance level is not set. Go to your profile page to see your "
+"clearance or contact the administrator to set a clearance level."
 msgstr ""
 "Prima di abilitare, impostare le impostazioni richieste per il boefje "
 "'{boefje_name}'."
@@ -3195,7 +3235,7 @@ msgid "Show objects that don't meet the Boefjes scan level"
 msgstr "Mostra gli oggetti che non soddisfano il livello di scansione Boefjes"
 
 #: tools/forms/ooi.py
-msgid "Show Boefjes that exceed the objects clearance level"
+msgid "Show Boefjes that exceed the objects clearance level."
 msgstr ""
 "Mostra i Boefjes che superano il livello di autorizzazione degli oggetti"
 
@@ -3219,6 +3259,10 @@ msgstr ""
 
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance type"
+msgstr ""
+
+#: tools/forms/ooi_form.py
+msgid "Filter by OOI types"
 msgstr ""
 
 #: tools/forms/settings.py
@@ -3601,7 +3645,7 @@ msgid "Indemnifications"
 msgstr "Indennizzi"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/findings/finding_list.html rocky/templates/header.html
+#: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/oois/ooi_page_tabs.html
@@ -3665,10 +3709,15 @@ msgid "Finding"
 msgstr "Rilevamento"
 
 #: rocky/templates/findings/finding_list.html
+msgid "Findings @ "
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 #, python-format
 msgid ""
-"An overview of all findings OpenKAT found on %(date)s. Each finding relates "
-"to an object. Click a finding for additional information."
+"An overview of all findings OpenKAT found for organization "
+"<strong>%(organization_name)s</strong>. Each finding relates to an object. "
+"Click a finding for additional information."
 msgstr ""
 "Una panoramica di tutti i rilevamenti trovati da OpenKAT su %(date)s. Ogni "
 "rilevamento si riferisce a un oggetto. Fai clic su un rilevamento per "
@@ -3762,6 +3811,7 @@ msgid "Set filters"
 msgstr "Imposta filtri"
 
 #: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Clear filters"
 msgstr "Cancella filtri"
 
@@ -3779,7 +3829,7 @@ msgstr "questo campo è obbligatorio"
 
 #: rocky/templates/graph-d3.html
 msgid ""
-"Click a circle top collapse / expand the tree, click the text to view the "
+"Click a circle to collapse / expand the tree, click the text to view the "
 "tree from that OOI and hover over the text to see details."
 msgstr ""
 "Fai clic su un cerchio in alto per chiudere / espandere l'albero, fai clic "
@@ -4167,9 +4217,11 @@ msgid "Currently there are no findings for OOI"
 msgstr "Attualmente non ci sono rilevamenti per OOI"
 
 #: rocky/templates/oois/ooi_list.html
+#, python-format
 msgid ""
-"An overview of your object list. Objects can be added manually or by running "
-"boefjes. </br> Click an object for additional information."
+"An overview of objects found for organization <strong>%(organization_name)s</"
+"strong>. Objects can be added manually or by running Boefjes. Click an "
+"object for additional information."
 msgstr ""
 "Una panoramica dell'elenco degli oggetti. Gli oggetti possono essere "
 "aggiunti manualmente o eseguendo boefjes. </br> Fai clic su un oggetto per "
@@ -4483,6 +4535,10 @@ msgstr "Super utente"
 msgid "Active"
 msgstr "Attivo"
 
+#: rocky/templates/organizations/organization_member_list.html
+msgid "New"
+msgstr ""
+
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
 msgstr "Carica un file CSV con i membri per l'organizzazione"
@@ -4666,6 +4722,18 @@ msgstr "Apri spiegazione"
 #: rocky/templates/partials/form/field_input_help_text.html
 msgid "Close explanation"
 msgstr "Chiudi spiegazione"
+
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "explanation"
+msgstr ""
+
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "Explanation"
+msgstr ""
 
 #: rocky/templates/partials/form/indemnification_add_form.html
 msgid "Here, an indemnification can be given on behalf of your organization"
@@ -4875,6 +4943,10 @@ msgstr "Tipi di stato mostrati"
 msgid "Blocked status"
 msgstr "Stato bloccato"
 
+#: rocky/templates/partials/organization_member_list_filters.html
+msgid "Update List"
+msgstr ""
+
 #: rocky/templates/partials/organization_properties_table.html
 msgid "Organization name"
 msgstr "Nome organizzazione"
@@ -4990,6 +5062,10 @@ msgstr "Profilo"
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
 msgstr "Vai al contenuto"
+
+#: rocky/templates/scan.html
+msgid "Boefjes overview:"
+msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
@@ -5199,6 +5275,43 @@ msgstr "Torna alla sicurezza dell'account"
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid "Generate Tokens"
 msgstr "Genera Token"
+
+#: rocky/templates/two_factor/core/login.html
+msgid "You are logged in."
+msgstr ""
+
+#: rocky/templates/two_factor/core/login.html
+msgid "Two factor authentication is enabled for your account."
+msgstr ""
+
+#: rocky/templates/two_factor/core/login.html
+msgid ""
+"Two factor authentication is not enabled for your account. Enable it to "
+"continue."
+msgstr ""
+
+#: rocky/templates/two_factor/core/login.html
+msgid "Setup two factor authentication"
+msgstr ""
+
+#: rocky/templates/two_factor/core/login.html
+msgid "Credentials"
+msgstr "Credenziali"
+
+#: rocky/templates/two_factor/core/login.html
+msgid ""
+"Use this form for entering backup tokens for logging in. These tokens have "
+"been generated for you to print and keep safe. Please enter one of these "
+"backup tokens to login to your account."
+msgstr ""
+
+#: rocky/templates/two_factor/core/login.html
+msgid "As a last resort, you can use a backup token:"
+msgstr ""
+
+#: rocky/templates/two_factor/core/login.html
+msgid "Use Backup Token"
+msgstr ""
 
 #: rocky/templates/two_factor/core/otp_required.html
 msgid "Permission Denied"
@@ -5585,6 +5698,18 @@ msgstr "Visualizzazione ad albero"
 #: rocky/views/ooi_tree.py
 msgid "Graph Visualisation"
 msgstr "Visualizzazione grafica"
+
+#: rocky/views/ooi_view.py
+msgid "OOI types: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Clearance level: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Clearance type: "
+msgstr ""
 
 #: rocky/views/organization_add.py
 msgid "Setup"

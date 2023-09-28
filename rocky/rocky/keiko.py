@@ -1,14 +1,17 @@
 import re
 import time
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from http import HTTPStatus
 from io import BytesIO
-from typing import Any, BinaryIO, Dict, List, Optional
+from typing import Any, BinaryIO, Dict, Iterable, List, Optional
 
 import requests
 from django.conf import settings
+from django.urls import reverse
+from django.utils import translation
 from requests import HTTPError
 from tools.ooi_helpers import get_ooi_dict
+from tools.view_helpers import get_ooi_url, url_with_querystring
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
@@ -77,6 +80,81 @@ class KeikoClient:
 keiko_client = KeikoClient(settings.KEIKO_API, settings.KEIKO_REPORT_TIMEOUT)
 
 
+class ReportQuery:
+    def to_dict(self) -> Dict:
+        raise NotImplementedError
+
+    def to_url(self) -> str:
+        raise NotImplementedError
+
+
+class FindingReportQuery(ReportQuery):
+    def __init__(
+        self,
+        organization: str,
+        observed_at: date,
+        severities: Iterable[RiskLevelSeverity],
+        language: str = "nl",
+        origin: str = "",
+        exclude_muted: bool = False,
+        only_muted: bool = False,
+    ):
+        self.organization = organization
+        self.observed_at = observed_at
+        self.severities = severities
+        self.language = language
+        self.origin = origin
+        self.exclude_muted = exclude_muted
+        self.only_muted = only_muted
+
+    def to_dict(self) -> Dict:
+        return {
+            "observed_at": str(self.observed_at),
+            "severities": [severity.value for severity in self.severities],
+            "exclude_muted": self.exclude_muted,
+            "only_muted": self.only_muted,
+        }
+
+    def to_url(self) -> str:
+        translation.activate(self.language)
+        url = reverse("finding_list", kwargs={"organization_code": self.organization})
+        translation.deactivate()
+
+        with_querystring = url_with_querystring(
+            url, True, observed_at=self.observed_at, severity=[severity.value for severity in self.severities]
+        )
+
+        return f"{self.origin}{with_querystring}"
+
+
+class OOIReportQuery(ReportQuery):
+    def __init__(
+        self, organization: str, observed_at: date, ooi: OOI, depth: int, language: str = "nl", origin: str = ""
+    ):
+        self.organization = organization
+        self.observed_at = observed_at
+        self.ooi = ooi
+        self.depth = depth
+        self.language = language
+        self.origin = origin
+
+    def to_dict(self) -> Dict:
+        return {
+            "observed_at": str(self.observed_at),
+            "ooi": self.ooi.reference,
+            "depth": self.depth,
+        }
+
+    def to_url(self) -> str:
+        translation.activate(self.language)
+        url = get_ooi_url(
+            "ooi_report", self.ooi.primary_key, self.organization, observed_at=str(self.observed_at), depth=self.depth
+        )
+        translation.deactivate()
+
+        return f"{self.origin}{url}"
+
+
 class ReportsService:
     FILE_NAME_FRIENDLY_DATE_FORMAT = "%Y_%d_%mT%H_%M_%S_%f_%z"
 
@@ -89,12 +167,15 @@ class ReportsService:
         source_type: str,
         source_value: str,
         store: Dict,
+        filters: ReportQuery,
     ) -> BinaryIO:
         report_data = build_findings_list_from_store(store)  # reuse existing dict structure
         report_data["findings_grouped"] = _ooi_field_as_string(report_data["findings_grouped"], store)
         report_data["valid_time"] = str(valid_time)
         report_data["report_source_type"] = source_type
         report_data["report_source_value"] = source_value
+        report_data["filters"] = filters.to_dict()
+        report_data["report_url"] = filters.to_url() if settings.ROCKY_REPORT_PERMALINKS else None
 
         report_id = self.keiko_client.generate_report("bevindingenrapport", report_data, "dutch.hiero.csv")
 
@@ -105,13 +186,14 @@ class ReportsService:
         valid_time: datetime,
         organization_name: str,
         findings_metadata: List[Dict[str, Any]],
+        filters: FindingReportQuery,
     ) -> BinaryIO:
         store = {}
         for item in findings_metadata:
             store[item["finding"].finding.primary_key] = item["finding"].finding
             store[item["finding"].finding_type.primary_key] = item["finding"].finding_type
 
-        return self.get_report(valid_time, "Organisatie", organization_name, store)
+        return self.get_report(valid_time, "Organisatie", organization_name, store, filters)
 
     @classmethod
     def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str):

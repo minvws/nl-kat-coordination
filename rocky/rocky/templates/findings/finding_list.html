@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -10,22 +11,20 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Findings" %}</h1>
+                <h1>{% translate "Findings @ " %}{{ valid_time|date }}</h1>
                 <p>
-                    {% blocktranslate trimmed with observed_at|date as date %}
-                        An overview of all findings OpenKAT found on {{ date }}.
-                        Each finding relates to an object.
-                        Click a finding for additional information.
+                    {% blocktranslate trimmed with organization.name as organization_name %}
+                        An overview of all findings OpenKAT found for organization <strong>{{ organization_name }}</strong>.
+                        Each finding relates to an object. Click a finding for additional information.
                     {% endblocktranslate %}
                 </p>
-                {{ object_type_filters }}
                 {% include "partials/findings_list_toolbar.html" %}
                 {% include "findings/findings_filter.html" %}
 
                 {% translate "Object list" as filter_title %}
                 {% if object_list|length > 1 and perms.tools.can_mute_findings %}
                     <form method="post"
-                          class="inline"
+                          class="inline layout-wide"
                           action="{% url 'finding_mute_bulk' organization.code %}">
                         {% csrf_token %}
                     {% endif %}
@@ -141,5 +140,7 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}

@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load static %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -66,13 +67,16 @@
                                         </td>
                                         <td class="nowrap">
                                             {% if member.user.is_superuser %}
-                                                <span class="active"></span> {% translate "Active" %}
+                                                <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
                                             {% else %}
-                                                <span class="{% if member.blocked %}blocked{% else %}{{ member.status }}{% endif %}"></span>
                                                 {% if member.blocked %}
-                                                    {% translate "Blocked" %}
+                                                    <span class="icon negative">{% translate "Blocked" %}</span>&nbsp;{% translate "Blocked" %}
                                                 {% else %}
-                                                    {{ member.status|title }}
+                                                    {% if member.status == 'active' %}
+                                                        <span class="icon positive">{% translate "Active" %}</span>&nbsp;{% translate "Active" %}
+                                                    {% elif member.status == 'new' %}
+                                                        <span class="icon neutral">{% translate "New" %}</span>&nbsp;{% translate "New" %}
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                         </td>
@@ -126,5 +130,7 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}

@@ -31,12 +31,19 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # dependencies
 ARG ENVIRONMENT
 
+# This works around https://github.com/pypa/pip/issues/6469 by installing the git
+# requirements separately
 COPY rocky/requirements*.txt .
 RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
     && if [ "$ENVIRONMENT" = "dev" ]; \
-    then pip install -r requirements-dev.txt; \
-    else pip install -r requirements.txt; fi
+    then \
+    grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
+    grep git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
+    else \
+    grep -v git+https:// requirements.txt | pip install -r /dev/stdin ;\
+    grep git+https:// requirements.txt | pip install -r /dev/stdin ; \
+    fi
 
 FROM dev
 
@@ -51,7 +58,7 @@ COPY --link --from=node_builder /app/assets/dist assets/dist
 
 # The secret key isn't used by the commands, but Django won't work do anything
 # without it
-RUN export SECRET_KEY="secret" && python manage.py collectstatic -l && python manage.py compilemessages
+RUN export SECRET_KEY="secret" && python manage.py collectstatic -l && python manage.py compress && python manage.py compilemessages
 
 USER rocky
 

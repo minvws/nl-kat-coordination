@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -36,13 +37,21 @@
                                 {% for task in object_list %}
                                     <tr data-task-id="{{ task.id }}">
                                         <td>{{ task.p_item.data.normalizer.id }}</td>
-                                        {% if task.status.value == "completed" %}
-                                            <td class="confirmation">{{ task.status.value|capfirst }}</td>
-                                        {% elif task.status.value == "failed" %}
-                                            <td class="warning">{{ task.status.value|capfirst }}</td>
-                                        {% else %}
-                                            <td>{{ task.status.value|capfirst }}</td>
-                                        {% endif %}
+                                        <td class="nowrap">
+                                            {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                                <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                                <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% elif task.status.value == "cancelled" %}
+                                                <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% elif task.status.value == "failed" %}
+                                                <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% elif task.status.value == "completed" %}
+                                                <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% else %}
+                                                <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                            {% endif %}
+                                        </td>
                                         <td>{{ task.created_at }}</td>
                                         <td>
                                             <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
@@ -79,7 +88,7 @@
                                                     <div class="button-container">
                                                         {% if task.status.value in "completed,failed" %}
                                                             <a class="button"
-                                                               href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                                               href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
                                                             {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
 
                                                         {% else %}
@@ -104,5 +113,7 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/renderNormalizerOutputOOIs.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "js/renderNormalizerOutputOOIs.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}

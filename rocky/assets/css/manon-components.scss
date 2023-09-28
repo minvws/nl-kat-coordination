@@ -1,10 +1,6 @@
 /* Color sets */
-@use "@minvws/manon/colors/critical-informational";
 @use "@minvws/manon/tag-colors-soft";
 @use "@minvws/manon/spot-large";
-
-/* Labels */
-@use "@minvws/manon/critical-informational-labels";
 
 /* States */
 @use "@minvws/manon/disabled";
@@ -90,6 +86,7 @@
 /* Button */
 @use "@minvws/manon/button-base";
 @use "@minvws/manon/button-ghost";
+@use "@minvws/manon/button-destructive";
 @use "@minvws/manon/button-cta";
 @use "@minvws/manon/button-icon";
 @use "@minvws/manon/list-base";
