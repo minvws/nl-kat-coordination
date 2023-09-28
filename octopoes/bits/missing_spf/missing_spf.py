@@ -13,9 +13,9 @@ def run(
     input_ooi: Hostname, additional_oois: List[Union[DNSSPFRecord, NXDOMAIN]], config: Dict[str, str]
 ) -> Iterator[OOI]:
     spf_records = [ooi for ooi in additional_oois if isinstance(ooi, DNSSPFRecord)]
-    nxdomains = [ooi for ooi in additional_oois if isinstance(ooi, NXDOMAIN)]
+    nxdomains = (ooi for ooi in additional_oois if isinstance(ooi, NXDOMAIN))
 
-    if nxdomains:
+    if any(nxdomains):
         return
     # only report finding when there is no SPF record
     if (

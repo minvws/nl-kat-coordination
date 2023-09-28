@@ -13,9 +13,9 @@ def run(
     input_ooi: Hostname, additional_oois: List[Union[DMARCTXTRecord, NXDOMAIN]], config: Dict[str, str]
 ) -> Iterator[OOI]:
     dmarc_records = [ooi for ooi in additional_oois if isinstance(ooi, DMARCTXTRecord)]
-    nxdomains = [ooi for ooi in additional_oois if isinstance(ooi, NXDOMAIN)]
+    nxdomains = (ooi for ooi in additional_oois if isinstance(ooi, NXDOMAIN))
 
-    if nxdomains:
+    if any(nxdomains):
         return
 
     # only report finding when there is no DMARC record
