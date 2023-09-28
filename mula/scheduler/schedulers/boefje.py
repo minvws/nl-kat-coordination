@@ -486,6 +486,41 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
+    def is_task_stalled(self, task: BoefjeTask) -> bool:
+        """Check if the same task is stalled.
+
+        Args:
+            task: The BoefjeTask to check.
+
+        Returns:
+            True if the task is stalled, False otherwise.
+        """
+        task_db = None
+        try:
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
+        except Exception as exc_db:
+            self.logger.warning(
+                "Could not get latest task by hash: %s [organisation_id=%s, scheduler_id=%s]",
+                task.hash,
+                self.organisation.id,
+                self.scheduler_id,
+                exc_info=exc_db,
+            )
+            raise exc_db
+
+        if (
+            task_db is not None
+            and task_db.status == TaskStatus.DISPATCHED
+            and (
+                task_db.modified_at is not None
+                and datetime.now(timezone.utc)
+                > task_db.modified_at + timedelta(seconds=self.ctx.config.pq_grace_period)
+            )
+        ):
+            return True
+
+        return False
+
     def push_task(self, boefje: Plugin, ooi: OOI, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
@@ -513,28 +548,6 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-            is_running = self.is_task_running(task)
-            if is_running:
-                self.logger.debug(
-                    "Task is already running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
-                    task,
-                    self.organisation.id,
-                    self.scheduler_id,
-                    caller,
-                )
-                return
-        except Exception as exc_running:
-            self.logger.warning(
-                "Could not check if task is running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
-                task,
-                self.organisation.id,
-                self.scheduler_id,
-                caller,
-                exc_info=exc_running,
-            )
-            return
-
-        try:
             grace_period_passed = self.has_grace_period_passed(task)
             if not grace_period_passed:
                 self.logger.debug(
@@ -553,6 +566,54 @@ class BoefjeScheduler(Scheduler):
                 self.scheduler_id,
                 caller,
                 exc_info=exc_grace_period,
+            )
+            return
+
+        try:
+            is_stalled = self.is_task_stalled(task)
+            if is_stalled:
+                self.logger.debug(
+                    "Task is stalled: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                    task,
+                    self.organisation.id,
+                    self.scheduler_id,
+                    caller,
+                )
+
+                # Update task in datastore to be failed
+                task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
+                task_db.status = TaskStatus.FAILED
+                self.ctx.datastores.task_store.update_task(task_db)
+        except Exception as exc_stalled:
+            self.logger.warning(
+                "Could not check if task is stalled: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                task,
+                self.organisation.id,
+                self.scheduler_id,
+                caller,
+                exc_info=exc_stalled,
+            )
+            return
+
+        try:
+            is_running = self.is_task_running(task)
+            if is_running:
+                self.logger.debug(
+                    "Task is still running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                    task,
+                    self.organisation.id,
+                    self.scheduler_id,
+                    caller,
+                )
+                return
+        except Exception as exc_running:
+            self.logger.warning(
+                "Could not check if task is running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
+                task,
+                self.organisation.id,
+                self.scheduler_id,
+                caller,
+                exc_info=exc_running,
             )
             return
 
