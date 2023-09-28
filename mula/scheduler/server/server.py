@@ -130,6 +130,20 @@ class Server:
         )
 
         self.api.add_api_route(
+            path="/tasks/stats",
+            endpoint=self.get_task_stats,
+            methods=["GET"],
+            status_code=status.HTTP_200_OK,
+        )
+
+        self.api.add_api_route(
+            path="/tasks/stats/{scheduler_id}",
+            endpoint=self.get_task_stats,
+            methods=["GET"],
+            status_code=status.HTTP_200_OK,
+        )
+
+        self.api.add_api_route(
             path="/tasks/{task_id}",
             endpoint=self.get_task,
             methods=["GET"],
@@ -349,6 +363,18 @@ class Server:
             ) from exc
 
         return updated_task
+
+    def get_task_stats(self, scheduler_id: Optional[str] = None) -> Any:
+        try:
+            stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to get task stats",
+            ) from exc
+
+        return stats
 
     def get_queues(self) -> Any:
         return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
