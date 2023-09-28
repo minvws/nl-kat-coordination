@@ -5123,7 +5123,7 @@ msgstr "Elenco dei compiti per i normalizzatori"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Normalizer"
-msgstr "Normalizzatore"
+msgstr "Normalizer"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Boefje input OOI"
