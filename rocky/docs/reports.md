@@ -18,7 +18,7 @@ The requirements of reports are:
 Front-end flow is being designed.
 
 The backend implementation of reports is not dependent on the flow of generating reports.
-In the backend a report is of one type and has one OOI as scope. When multiple reports for multiple OOIs is generated,
+In the backend a report is of one type and has one OOI as scope. When multiple reports for multiple OOIs are generated,
 this is just a combination of multiple reports combined with a table of contents.
 
 
@@ -40,7 +40,7 @@ filters etc) or using a Path query. These methods are given to the developer as 
 to use a combination of these methods.
 
 ### Generating a report
-After collecting the data (OOIs) and storing them in an OOI store, developers can calculate some aggreatas like averages, traffic lights etc,
+After collecting the data (OOIs) and storing them in an OOI store, developers can calculate some aggregates like averages, traffic lights etc,
 and then generating the HTML for that report.
 
 Automatically, the table of contents should also be generated.
