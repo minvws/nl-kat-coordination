@@ -41,4 +41,4 @@ def test_filter_validator() -> None:
         RawDataFilter()
 
     RawDataFilter(organization="Not None")
-    RawDataFilter(boefje_meta_id="3a9f1b33-f703-4c32-b0ae-44d0473c8aa5")
+    RawDataFilter(boefje_meta_id=uuid.UUID("3a9f1b33-f703-4c32-b0ae-44d0473c8aa5"))
