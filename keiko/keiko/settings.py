@@ -8,7 +8,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    debug: bool = Field(False, description="Enable global debug mode, which increases logging verbosity", validation_alias="DEBUG")
+    debug: bool = Field(
+        False, description="Enable global debug mode, which increases logging verbosity", validation_alias="DEBUG"
+    )
     log_cfg: FilePath = Field("logging.json", description="Path to the logging configuration file")
     templates_folder: DirectoryPath = Field("templates", description="Folder containing the templates")
     glossaries_folder: DirectoryPath = Field("glossaries", description="Folder containing the glossaries")

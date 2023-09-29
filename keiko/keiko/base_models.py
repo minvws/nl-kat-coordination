@@ -1,6 +1,6 @@
 """Base models for keiko."""
 
-from pydantic import ConfigDict, BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from keiko.version import __version__
 
