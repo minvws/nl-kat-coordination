@@ -4,7 +4,7 @@ DNS Report Datamodel
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from keiko.base_models import DataShapeBase
 
@@ -37,6 +37,8 @@ class FindingType(OOI):
     risk_severity: str = "pending"
     Information: Optional[str] = None
     description: Optional[str] = None
+
+    model_config = ConfigDict(coerce_numbers_to_str=True)
 
 
 class FindingOccurrence(BaseModel):
