@@ -1,6 +1,6 @@
 """Base models for keiko."""
 
-from pydantic import BaseModel, Extra
+from pydantic import ConfigDict, BaseModel
 
 from keiko.version import __version__
 
@@ -11,11 +11,7 @@ class DataShapeBase(BaseModel):
     """Base model for data shapes."""
 
     keiko_version: str = __version__
-
-    class Config:
-        """Pydantic config for DataShapeBase."""
-
-        extra = Extra.allow
+    model_config = ConfigDict(extra="allow")
 
 
 class ReportArgumentsBase(BaseModel):
