@@ -1,6 +1,5 @@
 import pytest
 
-from bytes.config import has_pastebin_key  # noqa: F401
 from bytes.database.sql_meta_repository import SQLMetaDataRepository
 from bytes.repositories.meta_repository import RawDataFilter
 from bytes.timestamping.pastebin import PastebinHashRepository
