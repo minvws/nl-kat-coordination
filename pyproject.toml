@@ -105,8 +105,9 @@ sphinx = "<7"
 sphinx_rtd_theme = "1.2.2"
 sphinxcontrib-mermaid = "^0.9.2"
 myst-parser = "^2.0.0"
-settings-doc = "2.0.0"
+settings-doc = "^3.0.0"
 colorama = "0.4.6" # Required on all platforms, not just win32
+pydantic = "^2.4.2"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "3.2.2"
