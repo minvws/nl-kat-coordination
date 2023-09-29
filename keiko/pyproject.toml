@@ -18,6 +18,7 @@ opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
 opentelemetry-instrumentation-fastapi = "^0.40b0"
 requests = "^2.31.0"
 certifi = "^2023.7.22"
+pydantic-settings = "^2.0.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
