@@ -19,7 +19,7 @@ services:
       dockerfile: Dockerfile
       args:
         ENVIRONMENT: dev
-    command: pytest -vv --showlocals tests/integration
+    command: pytest -vv tests/integration
     depends_on:
       - ci_bytes
     env_file:

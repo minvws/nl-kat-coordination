@@ -7,7 +7,7 @@ from bytes.timestamping.pastebin import PastebinHashRepository
 from tests.loading import get_boefje_meta, get_raw_data
 
 
-@pytest.mark.skipIf(not get_settings().pastebin_api_dev_key, reason="Pastebin API key not set")
+@pytest.mark.skipif(get_settings().pastebin_api_dev_key is None, reason="Pastebin API key not set")
 def test_save_raw_data_pastebin(
     meta_repository: SQLMetaDataRepository, pastebin_hash_repository: PastebinHashRepository
 ) -> None:
