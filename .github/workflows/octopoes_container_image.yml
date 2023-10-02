@@ -46,7 +46,7 @@ jobs:
           cp _version.py octopoes/octopoes/version.py
 
       - name: Build container image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827
