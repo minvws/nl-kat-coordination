@@ -53,63 +53,175 @@
             </fieldset>
         </form>
     </div>
-    {% if not task_history %}
-        {% translate "No tasks found for this object." %}
-    {% else %}
-        <table rf-selector="table-scan-history">
-            <thead>
-                <tr>
-                    <th scope="col">{% translate "Object" %}</th>
-                    <th scope="col">{% translate "Plugin" %}</th>
-                    <th scope="col">{% translate "Status" %}</th>
-                    <th scope="col">{% translate "Created date" %}</th>
-                    {# FIXME: implement detail page according to designs #}
-                    {# <th scope="col">{% translate "Scan Details" %}</th> #}
-                </tr>
-            </thead>
-            <tbody>
-                {% for task in task_history %}
+    {% if plugin and plugin.type == "boefje" %}
+        {% if not task_history %}
+            {% translate "No scans found for this object." %}
+        {% else %}
+            <table rf-selector="table-scan-history">
+                <thead>
                     <tr>
-                        <td>
-                            {% if task.type == "boefje" %}
-                                <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code %}">{{ task.p_item.data.input_ooi }}</a>
-                            {% elif task.type == "normalizer" %}
-                                <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
-                            {% else %}
-                                {{ task.id }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if task.type == "boefje" %}
-                                <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
-                            {% elif task.type == "normalizer" %}
-                                <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
-                            {% else %}
-                                {{ task.id }}
-                            {% endif %}
-                        </td>
-                        <td class="nowrap">
-                            {% if task.status.value == "pending" or task.status.value == "queued" %}
-                                <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% elif task.status.value == "running" or task.status.value == "dispatched" %}
-                                <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% elif task.status.value == "cancelled" %}
-                                <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% elif task.status.value == "failed" %}
-                                <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% elif task.status.value == "completed" %}
-                                <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% else %}
-                                <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
-                            {% endif %}
-                        </td>
-                        <td>{{ task.created_at }}</td>
+                        <th scope="col">{% translate "Boefje" %}</th>
+                        <th scope="col">{% translate "Status" %}</th>
+                        <th scope="col">{% translate "Created date" %}</th>
+                        <th scope="col">{% translate "Input Object" %}</th>
                         {# FIXME: implement detail page according to designs #}
-                        {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                        {# <th scope="col">{% translate "Details" %}</th> #}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for task in task_history %}
+                        <tr>
+                            <td>
+                                {% if task.type == "boefje" %}
+                                    <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
+                                {% elif task.type == "normalizer" %}
+                                    <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
+                                {% else %}
+                                    {{ task.id }}
+                                {% endif %}
+                            </td>
+                            <td class="nowrap">
+                                {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                    <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                    <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "cancelled" %}
+                                    <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "failed" %}
+                                    <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "completed" %}
+                                    <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% else %}
+                                    <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>{{ task.created_at }}</td>
+                            <td>
+                                {% if task.type == "boefje" %}
+                                    <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code %}">{{ task.p_item.data.input_ooi }}</a>
+                                {% elif task.type == "normalizer" %}
+                                    <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                                {% else %}
+                                    {{ task.id }}
+                                {% endif %}
+                            </td>
+                            {# FIXME: implement detail page according to designs #}
+                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% elif plugin and plugin.type == "normalizer" %}
+        {% if not task_history %}
+            {% translate "No tasks found for this object." %}
+        {% else %}
+            <table rf-selector="table-scan-history">
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Normalizer" %}</th>
+                        <th scope="col">{% translate "Status" %}</th>
+                        <th scope="col">{% translate "Created date" %}</th>
+                        <th scope="col">{% translate "Boefje" %}</th>
+                        <th scope="col">{% translate "Boefje input OOI" %}</th>
+                        {# FIXME: implement detail page according to designs #}
+                        {# <th scope="col">{% translate "Details" %}</th> #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in task_history %}
+                        <tr>
+                            <td>
+                                <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
+                            </td>
+                            <td class="nowrap">
+                                {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                    <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                    <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "cancelled" %}
+                                    <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "failed" %}
+                                    <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "completed" %}
+                                    <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% else %}
+                                    <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>{{ task.created_at }}</td>
+                            <td>
+                                <a href="{% url "boefje_detail" organization.code task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                            </td>
+                            <td>
+                                <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                            </td>
+                            {# FIXME: implement detail page according to designs #}
+                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% else %}
+        {% if not task_history %}
+            {% translate "No tasks found for this object." %}
+        {% else %}
+            <table rf-selector="table-scan-history">
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Object" %}</th>
+                        <th scope="col">{% translate "Plugin" %}</th>
+                        <th scope="col">{% translate "Status" %}</th>
+                        <th scope="col">{% translate "Created date" %}</th>
+                        {# FIXME: implement detail page according to designs #}
+                        {# <th scope="col">{% translate "Scan Details" %}</th> #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in task_history %}
+                        <tr>
+                            <td>
+                                {% if task.type == "boefje" %}
+                                    <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code %}">{{ task.p_item.data.input_ooi }}</a>
+                                {% elif task.type == "normalizer" %}
+                                    <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                                {% else %}
+                                    {{ task.id }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.type == "boefje" %}
+                                    <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
+                                {% elif task.type == "normalizer" %}
+                                    <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
+                                {% else %}
+                                    {{ task.id }}
+                                {% endif %}
+                            </td>
+                            <td class="nowrap">
+                                {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                    <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                    <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "cancelled" %}
+                                    <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "failed" %}
+                                    <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "completed" %}
+                                    <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% else %}
+                                    <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>{{ task.created_at }}</td>
+                            {# FIXME: implement detail page according to designs #}
+                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     {% endif %}
 </div>
 {% include "partials/list_paginator.html" with page_obj=task_history page_param="task_history_page" %}
