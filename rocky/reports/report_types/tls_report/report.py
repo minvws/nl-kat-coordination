@@ -4,10 +4,13 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
+from octopoes.models.ooi.findings import Finding
 from octopoes.models.ooi.service import IPService, TLSCipher
 from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
+
+CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
 
 
 class TLSReport(Report):
@@ -21,15 +24,17 @@ class TLSReport(Report):
 
     def generate_data(self, input_ooi: str):
         suites = {}
+        findings = []
         ref = Reference.from_str(input_ooi)
-        tree = self.octopoes_api_connector.get_tree(ref, depth=3, types={TLSCipher}).store
+        tree = self.octopoes_api_connector.get_tree(ref, depth=3, types={TLSCipher, Finding}).store
         for pk, ooi in tree.items():
-            logger.error(pk)
-            logger.error(ooi.ooi_type)
             if ooi.ooi_type == "TLSCipher":
                 suites = ooi.suites
+            if ooi.ooi_type == "Finding" and ooi.finding_type.tokenized.id in CIPHER_FINDINGS:
+                findings.append(ooi)
 
         return {
             "input_ooi": input_ooi,
             "suites": suites,
+            "findings": findings,
         }, self.html_template_path
