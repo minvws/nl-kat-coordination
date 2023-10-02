@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get version from release tag or generate one
         run: |
@@ -67,7 +67,7 @@ jobs:
       PGPASSWORD: postgres  # No password prompt
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get version from release tag or generate one
         run: |
