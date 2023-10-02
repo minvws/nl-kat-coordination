@@ -27,8 +27,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 @click.argument("organization")
 @click.argument("bit_id")
 @click.argument("ooi")
-def run_boefje(start_pdb, organization, bit_id, ooi):
-    """Run boefje"""
+def run_bit(start_pdb, organization, bit_id, ooi):
+    """Run bit"""
     settings = Settings()
 
     valid_time = datetime.now(timezone.utc)
@@ -73,4 +73,4 @@ def run_boefje(start_pdb, organization, bit_id, ooi):
 
 
 if __name__ == "__main__":
-    run_boefje()
+    run_bit()
