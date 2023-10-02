@@ -39,7 +39,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@12cce9efe0d49980455aaaca9b071c0befcdd702
+        uses: docker/metadata-action@879dcbb708d40f8b8679d4f7941b938a086e23a7
         with:
           images: |
             ghcr.io/${{ github.repository_owner }}/nl-kat-${{ matrix.dist }}-build-image
