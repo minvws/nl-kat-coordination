@@ -10,11 +10,13 @@
         <section>
             <div>
                 <br>
-                {% for key,value in report_data.items %}
-                    <br>
-                    {% include value.template with data=value.data %}
+                {% for ooi, report in report_data.items %}
+                    {% for report_type,data in report.items %}
+                        <h1>{{ report_type }} for {{ ooi }}</h1>
+                        {% include data.template with data=data.data %}
 
-                    <br>
+                        <br>
+                    {% endfor %}
                 {% endfor %}
             </div>
         </section>

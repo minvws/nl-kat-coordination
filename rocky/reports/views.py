@@ -72,11 +72,12 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
         report_data = {}
         if self.oois_selection and self.report_types_selection:
             for ooi in self.oois_selection:
+                report_data[str(ooi)] = {}
                 for report in self.report_types_selection:
                     report = get_report_by_id(report)
                     if Reference.from_str(ooi).class_type in report.input_ooi_types:
                         data, template = report(self.octopoes_api_connector).generate_data(ooi)
-                        report_data[f"{report.name}|{str(ooi)}"] = {"data": data, "template": template}
+                        report_data[str(ooi)][report.name] = {"data": data, "template": template}
         return report_data
 
     def get_required_optional_plugins(self) -> Dict[str, Plugin]:
