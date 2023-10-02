@@ -1,3 +1,28 @@
-TLS REPORT TEMPLATE PLACEHOLDER
+{% load i18n %}
 
-{{ data.mock_oois }}
+<table>
+  <thead>
+  <tr>
+    <th>{% translate "Protocol" %}</th>
+    <th>{% translate "Name" %}</th>
+    <th>{% translate "Encryption Algorithm" %}</th>
+    <th>{% translate "Bits" %}</th>
+    <th>{% translate "Key Size" %}</th>
+    <th>{% translate "Code" %}</th>
+  </tr>
+  </thead>
+  <tbody>
+{% for protocol, suites in data.suites.items %}
+{% for suite in suites %}
+    <tr>
+      <td> {{ protocol }} </td>
+      <td> {{ suite.cipher_suite_name }} </td>
+      <td> {{ suite.encryption_algorithm }} </td>
+    <td> {{ suite.bits }} </td>
+    <td> {{ suite.key_size }} </td>
+    <td> {{ suite.cipher_suite_code }} </td>
+    </tr>
+{% endfor %}
+{% endfor %}
+  </tbody>
+</table>
