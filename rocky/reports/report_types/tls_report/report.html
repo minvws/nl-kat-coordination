@@ -1,5 +1,6 @@
 {% load i18n %}
 
+<h3>Ciphers</h3>
 <table>
   <thead>
   <tr>
@@ -27,4 +28,7 @@
   </tbody>
 </table>
 
-{{ data.findings }}
+<h3>Finding</h3>
+{% for finding in data.findings %}
+  <p>{{ finding.description }}</p>
+{% endfor %}
