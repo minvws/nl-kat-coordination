@@ -36,6 +36,8 @@ def create_task(p_item: models.PrioritizedItem) -> models.Task:
         status=models.TaskStatus.QUEUED,
     )
 
+
 def compile_query(query):
     from sqlalchemy.dialects import postgresql
+
     return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))

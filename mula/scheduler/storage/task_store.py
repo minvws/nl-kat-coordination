@@ -190,19 +190,21 @@ class TaskStore:
 
     @retry()
     def get_status_count_per_hour(
-        self, scheduler_id: Optional[str] = None,
+        self,
+        scheduler_id: Optional[str] = None,
     ) -> Optional[Dict[str, Dict[str, int]]]:
         with self.dbconn.session.begin() as session:
-            query = session.query(
-                func.DATE_TRUNC('hour', models.TaskDB.modified_at).label('hour'),
-                models.TaskDB.status,
-                func.count(models.TaskDB.id).label('count')
-            ).filter(
-                models.TaskDB.modified_at >= datetime.now(timezone.utc) - timedelta(hours=24),
-            ).group_by(
-                'hour', models.TaskDB.status
-            ).order_by(
-                'hour', models.TaskDB.status
+            query = (
+                session.query(
+                    func.DATE_TRUNC("hour", models.TaskDB.modified_at).label("hour"),
+                    models.TaskDB.status,
+                    func.count(models.TaskDB.id).label("count"),
+                )
+                .filter(
+                    models.TaskDB.modified_at >= datetime.now(timezone.utc) - timedelta(hours=24),
+                )
+                .group_by("hour", models.TaskDB.status)
+                .order_by("hour", models.TaskDB.status)
             )
 
             if scheduler_id is not None:
@@ -214,6 +216,27 @@ class TaskStore:
             for row in results:
                 date, status, task_count = row
                 response.setdefault(date.isoformat(), {}).update({status.value: task_count})
-                response[date.isoformat()].update({'total': response[date.isoformat()].get('total', 0) + task_count})
+                response[date.isoformat()].update({"total": response[date.isoformat()].get("total", 0) + task_count})
+
+            return response
+
+    @retry()
+    def get_status_counts(self, scheduler_id: Optional[str] = None) -> Optional[Dict[str, int]]:
+        with self.dbconn.session.begin() as session:
+            query = (
+                session.query(models.TaskDB.status, func.count(models.TaskDB.id).label("count"))
+                .group_by(models.TaskDB.status)
+                .order_by(models.TaskDB.status)
+            )
+
+            if scheduler_id is not None:
+                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
+
+            results = query.all()
+
+            response = {k.value: 0 for k in models.TaskStatus}
+            for row in results:
+                status, task_count = row
+                response[status.value] = task_count
 
             return response
