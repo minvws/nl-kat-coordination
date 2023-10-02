@@ -52,3 +52,17 @@ def get_plugins_for_report_ids(reports: List[str]) -> Dict[str, List[str]]:
         required_boefjes.update(report.required_boefjes)
         optional_boefjes.update(report.optional_boefjes)
     return {"required": list(required_boefjes), "optional": list(optional_boefjes)}
+
+
+def generate_reports_for_oois(
+    ooi_pks: List[str], report_types: List[str], octopoes_api_connector
+) -> Dict[str, Dict[str, Dict[str, str]]]:
+    report_data = {}
+    for ooi in ooi_pks:
+        report_data[str(ooi)] = {}
+        for report in report_types:
+            report = get_report_by_id(report)
+            if Reference.from_str(ooi).class_type in report.input_ooi_types:
+                data, template = report(octopoes_api_connector).generate_data(ooi)
+                report_data[str(ooi)][report.name] = {"data": data, "template": template}
+    return report_data

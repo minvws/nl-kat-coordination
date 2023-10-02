@@ -9,12 +9,11 @@ from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
-from octopoes.models import Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.helpers import (
+    generate_reports_for_oois,
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
-    get_report_by_id,
     get_report_types_for_oois,
 )
 from rocky.views.mixins import OctopoesView
@@ -71,13 +70,9 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
     def get_reports_data(self) -> Dict[str, Any]:
         report_data = {}
         if self.oois_selection and self.report_types_selection:
-            for ooi in self.oois_selection:
-                report_data[str(ooi)] = {}
-                for report in self.report_types_selection:
-                    report = get_report_by_id(report)
-                    if Reference.from_str(ooi).class_type in report.input_ooi_types:
-                        data, template = report(self.octopoes_api_connector).generate_data(ooi)
-                        report_data[str(ooi)][report.name] = {"data": data, "template": template}
+            report_data = generate_reports_for_oois(
+                self.oois_selection, self.report_types_selection, self.octopoes_api_connector
+            )
         return report_data
 
     def get_required_optional_plugins(self) -> Dict[str, Plugin]:
