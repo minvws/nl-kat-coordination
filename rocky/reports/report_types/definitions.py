@@ -21,7 +21,7 @@ class Report:
         self.octopoes_api_connector = octopoes_api_connector
 
     def generate_data(self, input_ooi: str) -> Tuple[Dict[str, str], str]:
-        return NotImplementedError
+        raise NotImplementedError
 
     def render_report(self, data: Any) -> str:
-        return NotImplementedError
+        raise NotImplementedError
