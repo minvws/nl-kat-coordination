@@ -374,3 +374,31 @@ def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
     assert response.status_code == 302
 
     assert list(request._messages).pop().message == "Boefje '" + plugin["name"] + "' enabled."
+
+
+def test_enable_disable_normalizer(rf, redteam_member, mocker):
+    plugin = get_normalizers_data()[0]
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_response = mocker.MagicMock()
+    mock_requests.Session().get.return_value = mock_response
+    mock_response.json.return_value = plugin
+
+    request = setup_request(
+        rf.post(
+            "plugin_enable_disable",
+        ),
+        redteam_member.user,
+    )
+
+    response = PluginEnableDisableView.as_view()(
+        setup_request(request, redteam_member.user),
+        organization_code=redteam_member.organization.code,
+        plugin_type=plugin["type"],
+        plugin_id=plugin["id"],
+        plugin_state=False,
+    )
+
+    # redirects back to KAT-alogus
+    assert response.status_code == 302
+
+    assert list(request._messages).pop().message == "Normalizer '" + plugin["name"] + "' enabled."
