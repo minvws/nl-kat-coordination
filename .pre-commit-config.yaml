@@ -11,6 +11,11 @@ repos:
   - id: check-json
   - id: check-toml
   - id: debug-statements
+    exclude: |
+      (?x)(
+      ^boefjes/tools |
+      ^octopoes/tools
+      )
   - id: end-of-file-fixer
     exclude: |
       (?x)(
