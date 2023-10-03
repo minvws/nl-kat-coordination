@@ -134,7 +134,7 @@ class BoefjeHandler(Handler):
         boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
         if boefje_resource.oci_image:
             logger.info(
-                "Delegating boefje %s[task_id=%s] to Docker runner with OCI image",
+                "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
                 boefje_meta.boefje.id,
                 str(boefje_meta.id),
                 boefje_resource.oci_image,
