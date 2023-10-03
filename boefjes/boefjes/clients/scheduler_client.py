@@ -26,7 +26,7 @@ class QueuePrioritizedItem(BaseModel):
 
     id: uuid.UUID
     priority: int
-    hash: Optional[str]
+    hash: Optional[str] = None
     data: Union[BoefjeMeta, NormalizerMeta]
 
 

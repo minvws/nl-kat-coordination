@@ -6,7 +6,7 @@ from enum import Enum
 from typing import List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Response
-from pydantic import BaseModel, Extra, Field
+from pydantic import ConfigDict, BaseModel, Field
 from requests import HTTPError
 from uvicorn import Config, Server
 
@@ -52,9 +52,7 @@ class BoefjeInput(BaseModel):
     task_id: str
     output_url: str
     boefje_meta: BoefjeMeta
-
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
 
 class StatusEnum(str, Enum):
@@ -63,14 +61,14 @@ class StatusEnum(str, Enum):
 
 
 class File(BaseModel):
-    name: Optional[str]
+    name: Optional[str] = None
     content: str = Field(..., contentEncoding="base64")
-    tags: Optional[List[str]]
+    tags: Optional[List[str]] = None
 
 
 class BoefjeOutput(BaseModel):
     status: StatusEnum
-    files: Optional[List[File]]
+    files: Optional[List[File]] = None
 
 
 def get_scheduler_client():
