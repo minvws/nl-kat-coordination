@@ -8,7 +8,7 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
-from pydantic import parse_raw_as
+from pydantic import TypeAdapter
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, Task, TaskStatus
@@ -44,7 +44,8 @@ class MockSchedulerClient(SchedulerClientInterface):
 
     def get_queues(self) -> List[Queue]:
         time.sleep(self.sleep_time)
-        return parse_raw_as(List[Queue], self.queue_response)
+        return TypeAdapter(List[Queue]).validate_python(self.queue_response)
+        # return parse_raw_as(List[Queue], self.queue_response)
 
     def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
         time.sleep(self.sleep_time)
