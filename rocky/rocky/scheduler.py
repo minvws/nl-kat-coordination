@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
-from pydantic import ConfigDict, BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from rocky.health import ServiceHealth
 
