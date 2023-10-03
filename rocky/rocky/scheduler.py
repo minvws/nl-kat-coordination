@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 from rocky.health import ServiceHealth
 
@@ -26,26 +26,26 @@ class BoefjeMeta(BaseModel):
 
     id: uuid.UUID
     boefje: Boefje
-    input_ooi: Optional[str]
+    input_ooi: Optional[str] = None
     arguments: Dict[str, Any]
     organization: str
-    started_at: Optional[datetime.datetime]
-    ended_at: Optional[datetime.datetime]
+    started_at: Optional[datetime.datetime] = None
+    ended_at: Optional[datetime.datetime] = None
 
 
 class RawData(BaseModel):
     id: uuid.UUID
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
-    secure_hash: Optional[str]
-    hash_retrieval_link: Optional[str]
+    secure_hash: Optional[str] = None
+    hash_retrieval_link: Optional[str] = None
 
 
 class Normalizer(BaseModel):
     """Normalizer representation."""
 
-    id: Optional[str]
-    name: Optional[str]
+    id: Optional[str] = None
+    name: Optional[str] = None
     version: Optional[str] = Field(default=None)
 
 
@@ -70,7 +70,7 @@ class BoefjeTask(BaseModel):
 
     id: uuid.UUID
     boefje: Boefje
-    input_ooi: Optional[str]
+    input_ooi: Optional[str] = None
     organization: str
 
 
@@ -82,7 +82,7 @@ class QueuePrioritizedItem(BaseModel):
 
     id: uuid.UUID
     priority: int
-    hash: Optional[str]
+    hash: Optional[str] = None
     data: Union[BoefjeTask, NormalizerTask]
 
 
@@ -105,15 +105,13 @@ class Task(BaseModel):
     status: TaskStatus
     created_at: datetime.datetime
     modified_at: datetime.datetime
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PaginatedTasksResponse(BaseModel):
     count: int
-    next: Optional[str]
-    previous: Optional[str]
+    next: Optional[str] = None
+    previous: Optional[str] = None
     results: List[Task]
 
 
