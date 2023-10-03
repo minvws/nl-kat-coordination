@@ -38,6 +38,9 @@ class Plugin(BaseModel):
         plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
         return plugin_dict
 
+    def can_scan(self, member) -> bool:
+        return member.has_perm("tools.can_scan_organization")
+
 
 class Boefje(Plugin):
     scan_level: SCAN_LEVEL
@@ -50,6 +53,9 @@ class Boefje(Plugin):
         boefje_dict = super().dict(*args, **kwargs)
         boefje_dict["consumes"] = {ooi_class.get_ooi_type() for ooi_class in boefje_dict["consumes"]}
         return boefje_dict
+
+    def can_scan(self, member) -> bool:
+        return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value
 
 
 class Normalizer(Plugin):
