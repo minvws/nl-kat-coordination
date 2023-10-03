@@ -78,7 +78,7 @@ services:
       - .env-prod
       - .env
     environment:
-      - BOEFJE_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:nl-kat-coordination}_default
+      - BOEFJE_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
 
   normalizer:
     restart: on-failure
