@@ -4,7 +4,7 @@ from typing import Any, ClassVar, Optional
 import pydantic
 from scheduler import models
 from sqlalchemy.dialects import postgresql
-from sqlalchemy.sql import Query
+from sqlalchemy.orm import Query
 
 
 class TestModel(pydantic.BaseModel):
