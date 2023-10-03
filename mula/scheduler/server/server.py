@@ -364,7 +364,7 @@ class Server:
 
         return updated_task
 
-    def get_task_stats(self, scheduler_id: Optional[str] = None) -> Any:
+    def get_task_stats(self, scheduler_id: Optional[str] = None) -> Optional[Dict[str, Dict[str, int]]]:
         try:
             stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
         except Exception as exc:
