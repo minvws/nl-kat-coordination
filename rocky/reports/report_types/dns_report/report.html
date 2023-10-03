@@ -1,72 +1,81 @@
 {% load i18n %}
 
-<h2>IPV4 addresses</h2>
-
-<ul>
-  {% for ip in data.ipv4 %}
-    <li>{{ ip }}</li>
-  {% endfor %}
-</ul>
-
-<h2>IPV6 addresses</h2>
-
-<ul>
-  {% for ip in data.ipv6 %}
-    <li>{{ ip }}</li>
-  {% endfor %}
-</ul>
-
-{% if data.enough_ipv6_webservers %}
-This means that you have more than one webserver that is reachable over IPv6, which is in compliance to internet.nl standards.
-{% else %}
-This means that you have less than one webserver that is reachable over IPv6, which is not in compliance to internet.nl standards.
+<section>
+    <div>
+        <h2>{% translate "IP address lookup" %}</h2>
+        {% if data.ipv4 %}
+            <p>IPV4</p>
+            <ul>
+                {% for ip in data.ipv4 %}<li>{{ ip }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+        {% if not data.enough_ipv6_webservers %}
+            <div class="warning" role="group" aria-label="{% translate "warning" %}">
+                <span>IPV6 {% translate "Warning" %}:</span>
+                <p>
+                    {% blocktranslate trimmed %}
+                        This means that you have less than one webserver that is reachable over IPv6,
+                        which is <strong>not</strong> in compliance to internet.nl standards.
+                    {% endblocktranslate %}
+                </p>
+            </div>
+        {% else %}
+            <p>IPV6</p>
+            <ul>
+                {% for ip in data.ipv6 %}<li>{{ ip }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</section>
+{% if data.other_records %}
+    <section>
+        <div>
+            <h2>{% translate "Other records found" %}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% translate "Record" %}</th>
+                        <th>{% translate "Value" %}</th>
+                        <th>{% translate "Found by" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ooi in data.other_records %}
+                        <tr>
+                            <td>{{ ooi.human_readable }}</td>
+                            <td>{{ ooi.content }}</td>
+                            <td>{{ ooi.origin }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h2>Security</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% translate "Type" %}</th>
+                        <th>{% translate "Enabled" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>SPF</td>
+                        <td>{{ data.security.spf }}</td>
+                    </tr>
+                    <tr>
+                        <td>DMARC</td>
+                        <td>{{ data.security.dmarc }}</td>
+                    </tr>
+                    <tr>
+                        <td>DKIM</td>
+                        <td>{{ data.security.dkim }}</td>
+                    </tr>
+                    <tr>
+                        <td>DNSSEC</td>
+                        <td>{{ data.security.dnssec }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 {% endif %}
-
-<h2>All other records</h2>
-<table>
-  <thead>
-  <tr>
-    <th>{% translate "OOI" %}</th>
-    <th>{% translate "Value" %}</th>
-    <th>{% translate "Found by" %}</th>
-  </tr>
-  </thead>
-  <tbody>
-  {% for ooi in data.other_records %}
-    <tr>
-      <td> {{ ooi.human_readable }} </td>
-      <td> {{ ooi.content }} </td>
-      <td> {{ ooi.origin }} </td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
-
-<h2>Security</h2>
-<table>
-  <thead>
-  <tr>
-    <th>{% translate "Type" %}</th>
-    <th>{% translate "Enabled" %}</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr>
-    <td>SPF</td>
-    <td>{{ data.security.spf }}</td>
-  </tr>
-  <tr>
-    <td>DMARC</td>
-    <td>{{ data.security.dmarc }}</td>
-  </tr>
-  <tr>
-    <td>DKIM</td>
-    <td>{{ data.security.dkim }}</td>
-  </tr>
-  <tr>
-    <td>DNSSEC</td>
-    <td>{{ data.security.dnssec }}</td>
-  </tr>
-  </tbody>
-
-</table>

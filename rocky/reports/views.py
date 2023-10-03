@@ -2,6 +2,7 @@ from logging import getLogger
 from typing import Any, Dict, List
 
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -55,6 +56,7 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        self.valid_time = self.get_observed_at()
         self.oois_selection = request.GET.getlist("ooi", [])
         self.report_types_selection = request.GET.getlist("report_type", [])
         self.katalogus_client = get_katalogus(self.organization.code)
@@ -90,6 +92,7 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["valid_time"] = self.valid_time
         context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
         context["oois"] = self.get_oois_from_selection()
         context["report_types"] = self.get_report_types_from_oois_selection()
@@ -139,3 +142,6 @@ class ReportView(BaseReportView, TemplateView):
 
     template_name = "report.html"
     current_step = 4
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return super().get(request, *args, **kwargs)

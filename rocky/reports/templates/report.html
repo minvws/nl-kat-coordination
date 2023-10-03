@@ -7,18 +7,18 @@
     {% include "header.html" %}
 
     <main id="main-content" tabindex="-1" class="choose-report">
-        <section>
-            <div>
-                <br>
-                {% for ooi, report in report_data.items %}
-                    {% for report_type,data in report.items %}
-                        <h1>{{ report_type }} for {{ ooi }}</h1>
-                        {% include data.template with data=data.data %}
+        {% include "partials/report_header.html" %}
 
-                        <br>
-                    {% endfor %}
-                {% endfor %}
-            </div>
-        </section>
+        {% for ooi, report in report_data.items %}
+            {% for report_type,data in report.items %}
+                <section>
+                    <div>
+                        <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
+                    </div>
+                </section>
+                {% include data.template with data=data.data %}
+
+            {% endfor %}
+        {% endfor %}
     </main>
 {% endblock content %}
