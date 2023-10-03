@@ -44,7 +44,7 @@ python-libnmap = "0.7.3"
 # required by kat_shodan boefje
 shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
-cryptography = "41.0.3"
+cryptography = "41.0.4"
 # required by kat_webpage_analysis/check_images normalizer
 Pillow = "9.4.0"
 # required by kat_webpage_analysis
