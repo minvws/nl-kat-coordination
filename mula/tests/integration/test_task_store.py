@@ -34,74 +34,46 @@ class TaskStoreTestCase(unittest.TestCase):
 
     def test_get_status_counts(self):
         # Arrange
-        p_items = []
-        for _ in range(10):
-            p_items.append(functions.create_p_item(self.organisation.id, 1))
+        one_hour = datetime.now(timezone.utc) - timedelta(hours=1)
+        four_hours = datetime.now(timezone.utc) - timedelta(hours=4)
+        twenty_three_hours = datetime.now(timezone.utc) - timedelta(hours=23)
+        twenty_five_hours = datetime.now(timezone.utc) - timedelta(hours=25)
 
-        for p_item in p_items[:2]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.QUEUED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=1),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
-
-        for p_item in p_items[2:4]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.COMPLETED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=4),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
-
-        for p_item in p_items[4:6]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.FAILED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=1),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
-
-        for p_item in p_items[6:8]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.DISPATCHED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=25),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
-
-        for p_item in p_items[8:]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.DISPATCHED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=23),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
+        for r, status, modified_at in zip(
+            (
+                range(2),
+                range(2),
+                range(2),
+                range(2),
+                range(2),
+            ),
+            (
+                models.TaskStatus.QUEUED,
+                models.TaskStatus.COMPLETED,
+                models.TaskStatus.FAILED,
+                models.TaskStatus.DISPATCHED,
+                models.TaskStatus.DISPATCHED,
+            ),
+            (
+                one_hour,
+                four_hours,
+                one_hour,
+                twenty_five_hours,
+                twenty_three_hours,
+            ),
+        ):
+            for _ in r:
+                p_item = functions.create_p_item(self.organisation.id, 1)
+                task = models.Task(
+                    id=p_item.id,
+                    hash=p_item.hash,
+                    type=functions.TestModel.type,
+                    scheduler_id=p_item.scheduler_id,
+                    p_item=p_item,
+                    status=status,
+                    modified_at=modified_at,
+                )
+                self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
         results = self.mock_ctx.datastores.task_store.get_status_counts()
@@ -114,74 +86,46 @@ class TaskStoreTestCase(unittest.TestCase):
 
     def test_get_status_count_per_hour(self):
         # Arrange
-        p_items = []
-        for _ in range(10):
-            p_items.append(functions.create_p_item(self.organisation.id, 1))
+        one_hour = datetime.now(timezone.utc) - timedelta(hours=1)
+        four_hours = datetime.now(timezone.utc) - timedelta(hours=4)
+        twenty_three_hours = datetime.now(timezone.utc) - timedelta(hours=23)
+        twenty_five_hours = datetime.now(timezone.utc) - timedelta(hours=25)
 
-        for p_item in p_items[:2]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.QUEUED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=1),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
-
-        for p_item in p_items[2:4]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.COMPLETED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=4),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
-
-        for p_item in p_items[4:6]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.FAILED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=1),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
-
-        for p_item in p_items[6:8]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.DISPATCHED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=25),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
-
-        for p_item in p_items[8:]:
-            task = models.Task(
-                id=p_item.id,
-                hash=p_item.hash,
-                type=functions.TestModel.type,
-                scheduler_id=p_item.scheduler_id,
-                p_item=p_item,
-                status=models.TaskStatus.DISPATCHED,
-                modified_at=datetime.now(timezone.utc) - timedelta(hours=23),
-            )
-
-            self.mock_ctx.datastores.task_store.create_task(task)
+        for r, status, modified_at in zip(
+            (
+                range(2),
+                range(2),
+                range(2),
+                range(2),
+                range(2),
+            ),
+            (
+                models.TaskStatus.QUEUED,
+                models.TaskStatus.COMPLETED,
+                models.TaskStatus.FAILED,
+                models.TaskStatus.DISPATCHED,
+                models.TaskStatus.DISPATCHED,
+            ),
+            (
+                one_hour,
+                four_hours,
+                one_hour,
+                twenty_five_hours,
+                twenty_three_hours,
+            ),
+        ):
+            for _ in r:
+                p_item = functions.create_p_item(self.organisation.id, 1)
+                task = models.Task(
+                    id=p_item.id,
+                    hash=p_item.hash,
+                    type=functions.TestModel.type,
+                    scheduler_id=p_item.scheduler_id,
+                    p_item=p_item,
+                    status=status,
+                    modified_at=modified_at,
+                )
+                self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
         results = self.mock_ctx.datastores.task_store.get_status_count_per_hour()
