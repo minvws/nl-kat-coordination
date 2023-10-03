@@ -50,7 +50,7 @@ Pillow = "9.4.0"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.0.2"
 # required by kat_webpage_analysis (forcediphttpsadapter)
-urllib3 = "^1.26.0"
+urllib3 = "^1.26.17"
 # required by kat_website_software
 python-Wappalyzer = "0.3.1"
 # required by kat_wpscan
