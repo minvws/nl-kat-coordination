@@ -93,7 +93,7 @@ def test_medium_bad_ciphers():
 
     results = list(cipher_classification(cipher, {}, {}))
 
-    assert len(results) == 1
+    assert len(results) == 2
     assert results[0].reference == "KATFindingType|KAT-MEDIUM-BAD-CIPHER"
     finding = results[-1]
     assert isinstance(finding, Finding)
