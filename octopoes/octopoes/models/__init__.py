@@ -15,7 +15,7 @@ from typing import (
     Union,
 )
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 
 class ScanLevel(IntEnum):
@@ -249,11 +249,11 @@ def format_id_short(id_: str) -> str:
     return id_
 
 
-class PrimaryKeyToken(BaseModel):
-    __root__: Dict[str, Union[str, PrimaryKeyToken]]
+class PrimaryKeyToken(RootModel):
+    root: Dict[str, Union[str, PrimaryKeyToken]]
 
-    def __getattr__(self, attr_name: str) -> Union[str, PrimaryKeyToken]:
-        return self.__root__[attr_name]
+    def __getattr__(self, item) -> Union[str, PrimaryKeyToken]:
+        return self.root[item]
 
 
 PrimaryKeyToken.update_forward_refs()
