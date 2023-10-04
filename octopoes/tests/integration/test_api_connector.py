@@ -164,4 +164,4 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     query = "Hostname.<hostname[is DNSMXRecord].mail_hostname.<hostname[is DNSARecord].address.<address[is IPPort]"
     results = octopoes_api_connector.query(query, valid_time)
     assert len(results) == 1
-    assert str(results[0].port) == 443
+    assert str(results[0].port) == "443"
