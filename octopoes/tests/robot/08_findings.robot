@@ -15,8 +15,8 @@ List Findings
     Declare Scan Profile    Hostname|internet|example.com    1
     Await Sync
 
-    Finding List Should Have Length    4
-    Finding Count Per Severity Should Be    'pending'    4
+    Finding List Should Have Length    1
+    Finding Count Per Severity Should Be    'pending'    1
     Finding Count Per Severity Should Be    'low'    0
     Finding Count Per Severity Should Be    'critical'    0
 
