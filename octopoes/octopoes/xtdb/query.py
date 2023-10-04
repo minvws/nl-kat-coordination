@@ -259,7 +259,7 @@ class Query:
 
     def _get_object_alias(self, object_type: Ref) -> str:
         if isinstance(object_type, Aliased):
-            return str(object_type.alias)
+            return "?" + str(object_type.alias)
 
         return object_type.get_object_type()
 

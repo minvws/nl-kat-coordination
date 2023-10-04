@@ -72,9 +72,9 @@ def test_query_simple_filter(xtdb_session: XTDBSession, valid_time: datetime):
         ]
     ]
 
-    query = """{:query {:find [(pull db1ebf3a-3cc1-4e35-8c5f-e8173e55b623 [*])] :where [
-    [ db1ebf3a-3cc1-4e35-8c5f-e8173e55b623 :Network/name "testnetwork" ]
-    [ db1ebf3a-3cc1-4e35-8c5f-e8173e55b623 :object_type "Network" ]]}}"""
+    query = """{:query {:find [(pull ?3b1ebf3a-3cc1-4e35-8c5f-e8173e55b623 [*])] :where [
+    [ ?3b1ebf3a-3cc1-4e35-8c5f-e8173e55b623 :Network/name "testnetwork" ]
+    [ ?3b1ebf3a-3cc1-4e35-8c5f-e8173e55b623 :object_type "Network" ]] limit 50 offset 0}}"""
 
     assert len(xtdb_session.client.query(query)) == 1
 

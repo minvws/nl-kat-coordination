@@ -211,12 +211,12 @@ def test_aliased_query():
     )
 
     expected_query = """{:query {:find [(pull DNSAAAARecord [*])] :where [
-    [ DNSAAAARecord :DNSAAAARecord/hostname 4b4afa7e-5b76-4506-a373-069216b051c2 ]
+    [ DNSAAAARecord :DNSAAAARecord/hostname ?4b4afa7e-5b76-4506-a373-069216b051c2 ]
     [ DNSAAAARecord :object_type "DNSAAAARecord" ]
-    [ DNSNSRecord :DNSNSRecord/hostname 4b4afa7e-5b76-4506-a373-069216b051c2 ]
-    [ DNSNSRecord :DNSNSRecord/name_server_hostname 98076f7a-7606-47ac-85b7-b511ee21ae42 ]
+    [ DNSNSRecord :DNSNSRecord/hostname ?4b4afa7e-5b76-4506-a373-069216b051c2 ]
+    [ DNSNSRecord :DNSNSRecord/name_server_hostname ?98076f7a-7606-47ac-85b7-b511ee21ae42 ]
     [ DNSNSRecord :object_type "DNSNSRecord" ]
-    [ Website :Website/hostname 98076f7a-7606-47ac-85b7-b511ee21ae42 ]
+    [ Website :Website/hostname ?98076f7a-7606-47ac-85b7-b511ee21ae42 ]
     [ Website :Website/primary_key "test_pk" ]
     [ Website :object_type "Website" ]]}}"""
 
@@ -231,13 +231,23 @@ def test_aliased_path_query(mocker):
     query = Query.from_path(path).where(Website, primary_key="test_pk")
 
     expected_query = """{:query {:find [(pull DNSAAAARecord [*])] :where [
-    [ DNSAAAARecord :DNSAAAARecord/hostname 311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
+    [ DNSAAAARecord :DNSAAAARecord/hostname ?311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
     [ DNSAAAARecord :object_type "DNSAAAARecord" ]
     [ DNSNSRecord :DNSNSRecord/hostname Hostname ]
-    [ DNSNSRecord :DNSNSRecord/name_server_hostname 311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
+    [ DNSNSRecord :DNSNSRecord/name_server_hostname ?311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
     [ DNSNSRecord :object_type "DNSNSRecord" ]
     [ Website :Website/hostname Hostname ]
     [ Website :Website/primary_key "test_pk" ]
     [ Website :object_type "Website" ]]}}"""
 
+    assert query.format() == expected_query
+
+
+def test_aliased_query_starting_with_hostname():
+    path = Path.parse(
+        "Hostname.<hostname[is DNSMXRecord].mail_hostname.<hostname[is DNSARecord].address.<address[is IPPort]"
+    )
+    query = Query.from_path(path)
+
+    expected_query = """{:query {:find [(pull DNSAAAARecord [*])] :where ["""
     assert query.format() == expected_query
