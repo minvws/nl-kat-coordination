@@ -223,17 +223,18 @@ def test_aliased_query():
     assert query.format() == expected_query
 
 
-def test_aliased_path_query():
+def test_aliased_path_query(mocker):
     """Traverse the Hostname object twice"""
-    path = Path.parse("Website.hostname.<hostname[is DNSNSRecord].name_server_hostname.<hostname[is DNSAAAARecord]")
 
+    mocker.patch("octopoes.xtdb.query.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
+    path = Path.parse("Website.hostname.<hostname[is DNSNSRecord].name_server_hostname.<hostname[is DNSAAAARecord]")
     query = Query.from_path(path).where(Website, primary_key="test_pk")
 
     expected_query = """{:query {:find [(pull DNSAAAARecord [*])] :where [
-    [ DNSAAAARecord :DNSAAAARecord/hostname 070bb52c-3fa9-4f76-a797-a998b0247770 ]
+    [ DNSAAAARecord :DNSAAAARecord/hostname 311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
     [ DNSAAAARecord :object_type "DNSAAAARecord" ]
     [ DNSNSRecord :DNSNSRecord/hostname Hostname ]
-    [ DNSNSRecord :DNSNSRecord/name_server_hostname 409feda6-ed26-4018-b065-4d77b8ced440 ]
+    [ DNSNSRecord :DNSNSRecord/name_server_hostname 311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
     [ DNSNSRecord :object_type "DNSNSRecord" ]
     [ Website :Website/hostname Hostname ]
     [ Website :Website/primary_key "test_pk" ]

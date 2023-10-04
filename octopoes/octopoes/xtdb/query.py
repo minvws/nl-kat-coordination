@@ -42,7 +42,10 @@ class Aliased:
     """
 
     type: Type[OOI]
-    alias: UUID = field(default_factory=uuid4)
+
+    # The lambda makes it possible to mock the factory more easily, see:
+    # https://stackoverflow.com/questions/61257658/python-dataclasses-mocking-the-default-factory-in-a-frozen-dataclass
+    alias: UUID = field(default_factory=lambda: uuid4())
 
 
 Ref = Union[Type[OOI], Aliased]
