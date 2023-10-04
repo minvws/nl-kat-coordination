@@ -22,7 +22,7 @@ class BackwardsCompatibleEnvSettings(EnvSettingsSource):
     def __call__(self) -> Dict[str, Any]:
         d: Dict[str, Any] = {}
         env_vars = {k.lower(): v for k, v in os.environ.items()}
-        env_prefix = self.settings_cls.model_config.get('env_prefix', '').lower()
+        env_prefix = self.settings_cls.model_config.get("env_prefix", "").lower()
 
         for old_name, new_name in self.backwards_compatibility_mapping.items():
             old_name, new_name = old_name.lower(), new_name.lower()
@@ -67,7 +67,9 @@ class Settings(BaseSettings):
     octopoes_api: AnyHttpUrl = Field(
         ..., examples=["http://localhost:8001"], description="Octopoes API URL", validation_alias="OCTOPOES_API"
     )
-    boefje_api: AnyHttpUrl = Field(..., examples=["http://boefje:8000"], description="Boefje API URL", validation_alias="BOEFJE_API")
+    boefje_api: AnyHttpUrl = Field(
+        ..., examples=["http://boefje:8000"], description="Boefje API URL", validation_alias="BOEFJE_API"
+    )
     # Boefje server settings
     boefje_api_host: str = Field(
         "0.0.0.0",
@@ -78,9 +80,15 @@ class Settings(BaseSettings):
         description="Host port of the Boefje API server",
     )
 
-    bytes_api: AnyHttpUrl = Field(..., examples=["http://localhost:8002"], description="Bytes API URL", validation_alias="BYTES_API")
-    bytes_username: str = Field(..., examples=["test"], description="Bytes JWT login username", validation_alias="BYTES_USERNAME")
-    bytes_password: str = Field(..., examples=["secret"], description="Bytes JWT login password", validation_alias="BYTES_PASSWORD")
+    bytes_api: AnyHttpUrl = Field(
+        ..., examples=["http://localhost:8002"], description="Bytes API URL", validation_alias="BYTES_API"
+    )
+    bytes_username: str = Field(
+        ..., examples=["test"], description="Bytes JWT login username", validation_alias="BYTES_USERNAME"
+    )
+    bytes_password: str = Field(
+        ..., examples=["secret"], description="Bytes JWT login password", validation_alias="BYTES_PASSWORD"
+    )
 
     span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
@@ -92,7 +100,6 @@ class Settings(BaseSettings):
     # TODO[pydantic]: We couldn't refactor this class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
     # class Config:
-    #     env_prefix = "BOEFJES_"
     #
     #     @classmethod
     #     def customise_sources(
@@ -101,8 +108,6 @@ class Settings(BaseSettings):
     #         env_settings: SettingsSourceCallable,
     #         file_secret_settings: SettingsSourceCallable,
     #     ) -> Tuple[SettingsSourceCallable, ...]:
-    #         backwards_compatible_settings = BackwardsCompatibleEnvSettings()
-    #         return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
     @classmethod
     def settings_customise_sources(
@@ -115,6 +120,7 @@ class Settings(BaseSettings):
     ) -> Tuple[PydanticBaseSettingsSource, ...]:
         backwards_compatible_settings = BackwardsCompatibleEnvSettings(settings_cls)
         return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
+
 
 # Do not initialize the settings module when compiling environment docs
 if not os.getenv("DOCS"):

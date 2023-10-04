@@ -1,6 +1,6 @@
+from pydantic_settings import BaseSettings
 
 from boefjes.katalogus.models import EncryptionMiddleware
-from pydantic_settings import BaseSettings
 
 
 class Environment(BaseSettings):

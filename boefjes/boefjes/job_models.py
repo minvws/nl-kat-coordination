@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import StringConstraints, ConfigDict, BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from typing_extensions import Annotated
 
 

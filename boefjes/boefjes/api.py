@@ -6,7 +6,7 @@ from enum import Enum
 from typing import List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Response
-from pydantic import ConfigDict, BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from requests import HTTPError
 from uvicorn import Config, Server
 
