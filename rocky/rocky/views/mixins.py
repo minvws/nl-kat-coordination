@@ -122,9 +122,6 @@ class OctopoesView(OrganizationView):
                 datetime_format = "%Y-%m-%d"
                 return convert_date_to_datetime(datetime.strptime(self.request.GET.get("observed_at"), datetime_format))
             except ValueError:
-                messages.error(
-                    self.request, _("Can not parse observed_at parameter, falling back to showing current object")
-                )
                 return datetime.now(timezone.utc)
 
     def get_depth(self, default_depth=DEPTH_DEFAULT) -> int:

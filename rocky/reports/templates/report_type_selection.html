@@ -26,7 +26,7 @@
                         Selected objects
                     {% endblocktranslate %}
                 </h2>
-                {% include "partials/ooi_selection.html" %}
+                {% include "summary/ooi_selection.html" %}
 
                 <a href="{% url 'report_oois_selection' organization.code %}?{{ request.GET.urlencode }}"
                    class="button ghost">
@@ -42,7 +42,8 @@
                         {% include "partials/report_types_tiles.html" with report_types=report_types %}
 
                     </div>
-                    {% for ooi in oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
+                    {% include "forms/report_form_fields.html" %}
+
                     <button type="submit">
                         {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
                     </button>

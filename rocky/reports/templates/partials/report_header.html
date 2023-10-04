@@ -1,7 +1,11 @@
 {% load i18n %}
+{% load static %}
 
 <section>
     <div>
+        <img width="500"
+             src="{% static 'img/kat_logo.png' %}"
+             alt="{% translate "OpenKAT" %}" />
         <h1>{% translate "Findings Report for organization" %} {{ organization.name }}</h1>
         <p class="emphasized">
             <strong>{% translate "Observed at:" %}</strong> {{ observed_at }}

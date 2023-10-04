@@ -30,26 +30,23 @@
 
                     {% endfor %}
                 </div>
+                {% if plugins.optional %}
+                    <h3>{% translate "Suggested plugins" %}</h3>
+                    <p>
+                        {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
+                    </p>
+                    <div class="column-4 tiles plugins images-cover">
+                        {% for optional_plugin in plugins.optional %}
+                            {% include "partials/plugin_tile.html" with plugin=optional_plugin %}
+
+                        {% endfor %}
+                    </div>
+                {% endif %}
                 <form class="inline"
                       method="get"
                       action="{% url 'report_view' organization.code %}">
-                    {% for ooi in oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
-                    {% for report_type in report_types %}<input type="hidden" name="report_type" value={{ report_type.id }}>{% endfor %}
-                    {% if plugins.optional %}
-                        <h3>{% translate "Suggested plugins" %}</h3>
-                        <p>
-                            {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
-                        </p>
-                        <div class="column-4 tiles plugins images-cover">
-                            {% for optional_plugin in plugins.optional %}
-                                {% include "partials/plugin_tile.html" with plugin=optional_plugin %}
+                    {% include "forms/report_form_fields.html" %}
 
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    {% for required_plugin in plugins.required %}
-                        <input type="hidden" name="plugin" value={{ required_plugin.id }}>
-                    {% endfor %}
                     <button type="submit">
                         {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
                     </button>

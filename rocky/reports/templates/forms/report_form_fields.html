@@ -1,0 +1,19 @@
+<input type="hidden"
+       name="observed_at"
+       value="{{ observed_at|date:"DATE_FORMAT" }}">
+{% if oois %}
+    {% for ooi in oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
+{% endif %}
+{% if report_types %}
+    {% for report_type in report_types %}<input type="hidden" name="report_type" value={{ report_type.id }}>{% endfor %}
+{% endif %}
+{% if plugins.required %}
+    {% for required_plugin in plugins.required %}
+        <input type="hidden" name="plugin" value={{ required_plugin.id }}>
+    {% endfor %}
+{% endif %}
+{% if plugins.optional %}
+    {% for optional_plugin in plugins.optional %}
+        <input type="hidden" name="plugin" value={{ optional_plugin.id }}>
+    {% endfor %}
+{% endif %}
