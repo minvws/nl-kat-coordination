@@ -87,7 +87,7 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["valid_time"] = self.valid_time
+        context["observed_at"] = self.valid_time
         context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
         context["oois"] = self.get_oois_from_selection()
         context["report_types"] = self.get_report_types_from_oois_selection()

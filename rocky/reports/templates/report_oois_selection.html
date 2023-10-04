@@ -54,6 +54,9 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <input type="hidden"
+                       name="observed_at"
+                       value="{{ observed_at|date:"DATE_FORMAT" }}">
                 <button type="submit" class="button">
                     {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
                 </button>
