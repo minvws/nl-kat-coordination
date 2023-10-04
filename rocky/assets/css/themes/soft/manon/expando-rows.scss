@@ -2,4 +2,7 @@
 
 :root {
   --expando-rows-table-cell-background-color: #ffffff;
+  --expando-rows-row-background-color: #eeecf8;
+  --expando-rows-row-font-weight: var(--table-font-weight);
+  --expando-rows-table-cell-after-breakpoint-padding: 1.5rem;
 }
