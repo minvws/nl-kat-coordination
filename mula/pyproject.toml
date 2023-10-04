@@ -24,10 +24,11 @@ uvicorn = "^0.17.1"
 # OpenTelemetry
 opentelemetry-sdk = "^1.19.0"
 opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
-opentelemetry-instrumentation-fastapi = "^0.40b0"
-opentelemetry-instrumentation-psycopg2 = "^0.40b0"
-opentelemetry-instrumentation-requests = "^0.40b0"
+opentelemetry-instrumentation-fastapi = "^0.41b0"
+opentelemetry-instrumentation-psycopg2 = "^0.41b0"
+opentelemetry-instrumentation-requests = "^0.41b0"
 certifi = "^2023.7.22"
+opentelemetry-instrumentation = "^0.41b0"
 
 [tool.poetry.group.dev.dependencies]
 factory_boy = "^3.2.1"

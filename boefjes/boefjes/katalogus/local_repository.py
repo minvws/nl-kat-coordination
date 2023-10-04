@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 class LocalPluginRepository:
     def __init__(self, path: Path):
         self.path = path
+        self._cached_boefjes = None
+        self._cached_normalizers = None
 
     def get_all(self) -> List[PluginType]:
         all_plugins = [self._boefje_to_plugin(boefje) for boefje in self.resolve_boefjes().values()]
@@ -86,6 +88,9 @@ class LocalPluginRepository:
         return boefjes[id_].path / "description.md"
 
     def resolve_boefjes(self) -> Dict[str, BoefjeResource]:
+        if self._cached_boefjes:
+            return self._cached_boefjes
+
         paths_and_packages = self._find_packages_in_path_containing_files([BOEFJE_DEFINITION_FILE, ENTRYPOINT_BOEFJES])
         boefje_resources = []
 
@@ -95,9 +100,14 @@ class LocalPluginRepository:
             except ModuleException as exc:
                 logger.exception(exc)
 
-        return {resource.boefje.id: resource for resource in boefje_resources}
+        self._cached_boefjes = {resource.boefje.id: resource for resource in boefje_resources}
+
+        return self._cached_boefjes
 
     def resolve_normalizers(self) -> Dict[str, NormalizerResource]:
+        if self._cached_normalizers:
+            return self._cached_normalizers
+
         paths_and_packages = self._find_packages_in_path_containing_files(
             [NORMALIZER_DEFINITION_FILE, ENTRYPOINT_NORMALIZERS]
         )
@@ -109,7 +119,9 @@ class LocalPluginRepository:
             except ModuleException as exc:
                 logger.exception(exc)
 
-        return {resource.normalizer.id: resource for resource in normalizer_resources}
+        self._cached_normalizers = {resource.normalizer.id: resource for resource in normalizer_resources}
+
+        return self._cached_normalizers
 
     def _find_packages_in_path_containing_files(self, files: List[str]) -> List[Tuple[Path, str]]:
         prefix = self.create_relative_import_statement_from_cwd(self.path)

@@ -52,9 +52,11 @@ httpx = "^0.23.3"
 # OpenTelemetry
 opentelemetry-sdk = "^1.19.0"
 opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
-opentelemetry-instrumentation-fastapi = "^0.40b0"
-opentelemetry-instrumentation-psycopg2 = "^0.40b0"
-opentelemetry-instrumentation-requests = "^0.40b0"
+opentelemetry-instrumentation-fastapi = "^0.41b0"
+opentelemetry-instrumentation-psycopg2 = "^0.41b0"
+opentelemetry-instrumentation-requests = "^0.41b0"
+opentelemetry-instrumentation = "^0.41b0"
+opentelemetry-instrumentation-dbapi = "^0.41b0"
 
 
 [tool.poetry.group.dev.dependencies]
