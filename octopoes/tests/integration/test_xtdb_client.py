@@ -72,6 +72,12 @@ def test_query_simple_filter(xtdb_session: XTDBSession, valid_time: datetime):
         ]
     ]
 
+    query = """{:query {:find [(pull db1ebf3a-3cc1-4e35-8c5f-e8173e55b623 [*])] :where [
+    [ db1ebf3a-3cc1-4e35-8c5f-e8173e55b623 :Network/name "testnetwork" ]
+    [ db1ebf3a-3cc1-4e35-8c5f-e8173e55b623 :object_type "Network" ]]}}"""
+
+    assert len(xtdb_session.client.query(query)) == 1
+
 
 def test_query_not_empty_on_reference_filter_for_hostname(xtdb_session: XTDBSession, valid_time: datetime):
     network = Network(name="testnetwork")

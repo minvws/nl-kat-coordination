@@ -1,6 +1,7 @@
 import os
 import uuid
 from datetime import datetime
+from ipaddress import ip_address
 from typing import List
 
 import pytest
@@ -9,8 +10,11 @@ from octopoes.api.models import Declaration, Observation
 from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
+from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSMXRecord, DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.network import IPAddressV6, IPPort, Network
+from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.web import Website
 from octopoes.models.origin import OriginType
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 
@@ -76,23 +80,75 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
             valid_time=valid_time,
         )
     )
-    hostnames: List[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
-    task_id = uuid.uuid4()
 
+    # We have: websites[0] -{hostname}-> hostnames[0]
+    #                       <-{hostname}- dns_ns_records[0] -{name_server_hostname}-> hostnames[3]
+    #                       <-{hostname}- dns_aaa_records[0] -> ip_addresses[0]
+
+    hostnames: List[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
+
+    addresses = [IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"))]
+    ports = [IPPort(address=addresses[0].reference, protocol="tcp", port=22)]
+    services = [Service(name="https")]
+    ip_services = [IPService(ip_port=ports[0].reference, service=services[0].reference)]
+
+    dns_ns_records = [
+        DNSNSRecord(hostname=hostnames[i].reference, name_server_hostname=hostnames[3].reference, value="test")
+        for i in range(3)
+    ]
+    dns_aaaa_records = [DNSAAAARecord(hostname=hostnames[3].reference, address=addresses[0].reference, value="test")]
+    dns_mx_records = [DNSMXRecord(hostname=hostnames[1].reference, mail_hostname=hostnames[3].reference, value="test")]
+    sites = [Website(ip_service=ip_services[0].reference, hostname=hostnames[0].reference)]
+
+    all_new_oois = (
+        hostnames
+        + addresses
+        + ports
+        + services
+        + ip_services
+        + dns_ns_records
+        + dns_aaaa_records
+        + dns_mx_records
+        + sites
+    )
     octopoes_api_connector.save_observation(
         Observation(
             method="normalizer_id",
             source=network.reference,
-            task_id=task_id,
+            task_id=uuid.uuid4(),
             valid_time=valid_time,
-            result=hostnames,
+            result=all_new_oois,
         )
     )
 
     octopoes_api_connector.save_many_scan_profiles(
-        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in hostnames + [network]], valid_time
+        [
+            DeclaredScanProfile(
+                reference=ooi.reference,
+                level=ScanLevel.L2,
+            )
+            for ooi in all_new_oois + [network]
+        ],
+        valid_time,
     )
 
+    # Hostname -> Network
     query = "Hostname.network"
     results = octopoes_api_connector.query(query, valid_time)
     assert len(results) == 10
+
+    # Website -> Hostname -> DNSNSRecord -> Hostname -> DNSAAAARecord
+    query = "Website.hostname.<hostname[is DNSNSRecord]"
+    results = octopoes_api_connector.query(query, valid_time)
+    assert len(results) == 1
+
+    # Website -> Hostname -> DNSNSRecord -> Hostname -> DNSAAAARecord
+    query = "Website.hostname.<hostname[is DNSNSRecord].name_server_hostname.<hostname[is DNSAAAARecord]"
+    results = octopoes_api_connector.query(query, valid_time)
+    assert len(results) == 1
+    assert str(results[0].address) == "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"
+
+    # Hostname -> DNSMXRecord -> Hostname -> DNSARecord -> IPAddress -> IPPort
+    query = "Hostname.<hostname[is DNSMXRecord].mail_hostname.<hostname[is DNSARecord]"
+    results = octopoes_api_connector.query(query, valid_time)
+    assert len(results) == 1
