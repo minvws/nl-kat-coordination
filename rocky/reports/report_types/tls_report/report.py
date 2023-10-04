@@ -25,6 +25,7 @@ class TLSReport(Report):
     def generate_data(self, input_ooi: str):
         suites = {}
         findings = []
+        suites_with_findings = []
         ref = Reference.from_str(input_ooi)
         tree = self.octopoes_api_connector.get_tree(ref, depth=3, types={TLSCipher, Finding}).store
         for pk, ooi in tree.items():
@@ -33,8 +34,16 @@ class TLSReport(Report):
             if ooi.ooi_type == "Finding" and ooi.finding_type.tokenized.id in CIPHER_FINDINGS:
                 findings.append(ooi)
 
+        for protocol, cipher_suites in suites.items():
+            for suite in cipher_suites:
+                for finding in findings:
+                    if suite["cipher_suite_name"] in finding.description:
+                        suites_with_findings.append(suite["cipher_suite_name"])
+
+        logger.error(suites_with_findings)
         return {
             "input_ooi": input_ooi,
             "suites": suites,
             "findings": findings,
+            "suites_with_findings": suites_with_findings,
         }, self.html_template_path

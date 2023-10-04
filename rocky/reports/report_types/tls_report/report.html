@@ -10,6 +10,7 @@
             <th>{% translate "Bits" %}</th>
             <th>{% translate "Key Size" %}</th>
             <th>{% translate "Code" %}</th>
+            <th>{% translate "Finding" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -22,6 +23,12 @@
                     <td>{{ suite.bits }}</td>
                     <td>{{ suite.key_size }}</td>
                     <td>{{ suite.cipher_suite_code }}</td>
+
+                      {% if suite.cipher_suite_name in suites_with_findings %}
+                        <td>yes</td>
+                        {% else %}
+                        <td>no</td>
+                      {% endif %}
                 </tr>
             {% endfor %}
         {% endfor %}
@@ -29,3 +36,11 @@
 </table>
 <h3>Finding</h3>
 {% for finding in data.findings %}<p>{{ finding.description }}</p>{% endfor %}
+
+
+<h3>Suites with findings</h3>
+{{ suites_with_findings }}
+
+{% for suite in suites_with_findings %}
+  {{ suite }}
+{% endfor %}
