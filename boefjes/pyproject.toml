@@ -22,9 +22,9 @@ python-dateutil = "^2.8.2"
 tldextract = "^3.4.4"
 opentelemetry-sdk = "^1.19.0"
 opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
-opentelemetry-instrumentation-fastapi = "^0.40b0"
-opentelemetry-instrumentation-psycopg2 = "^0.40b0"
-opentelemetry-instrumentation-requests = "^0.40b0"
+opentelemetry-instrumentation-fastapi = "^0.41b0"
+opentelemetry-instrumentation-psycopg2 = "^0.41b0"
+opentelemetry-instrumentation-requests = "^0.41b0"
 # required by kat_snyk, kat_crt_sh, kat_crt_sh boefjes
 requests = "^2.31.0"
 # required by kat_binaryedge boefje
@@ -57,6 +57,7 @@ python-Wappalyzer = "0.3.1"
 wpscan-out-parse = "1.9.3"
 # required by kat_sec_txt
 sectxt = "0.9.0"
+opentelemetry-instrumentation = "^0.41b0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
