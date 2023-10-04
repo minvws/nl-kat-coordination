@@ -156,7 +156,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert len(results) == 1
     assert str(results[0].address) == "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"
 
-    # Regarding this queries, we test the following relations:
+    # Regarding this query, we test the following relations:
     #         -{mail_hostname}-> hostnames[3] <-{hostname}- dns_a_records[0]
     #         -{address}-> v4_addresses[0] <-{address}- ip_ports[1]
 
@@ -165,3 +165,9 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     results = octopoes_api_connector.query(query, valid_time)
     assert len(results) == 1
     assert str(results[0].port) == "443"
+
+    results = octopoes_api_connector.query(query, valid_time, source=hostnames[0].reference)
+    assert len(results) == 0
+
+    results = octopoes_api_connector.query(query, valid_time, source=hostnames[1].reference)
+    assert len(results) == 1

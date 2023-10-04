@@ -137,15 +137,20 @@ def list_objects(
 @router.get("/query", tags=["Objects"])
 def query(
     path: str,
+    source: Optional[Reference] = None,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     offset: Optional[int] = None,
     limit: Optional[int] = None,
 ):
-    xtdb_query = XTDBQuery.from_path(ObjectPath.parse(path))
+    object_path = ObjectPath.parse(path)
+    xtdb_query = XTDBQuery.from_path(object_path)
 
     if offset is not None and limit is not None:
-        xtdb_query.offset(offset).limit(limit)
+        xtdb_query = xtdb_query.offset(offset).limit(limit)
+
+    if source is not None and object_path.segments:
+        xtdb_query = xtdb_query.where(object_path.segments[0].source_type, primary_key=str(source))
 
     return octopoes.ooi_repository.query(xtdb_query, valid_time)
 

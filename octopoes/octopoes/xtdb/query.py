@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Type, Union
+from typing import List, Optional, Set, Type, Union
 from uuid import UUID, uuid4
 
 from octopoes.models import OOI
