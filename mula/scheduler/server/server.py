@@ -257,6 +257,8 @@ class Server:
         limit: int = 10,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
+        input_ooi: Optional[str] = None,  # FIXME: deprecated
+        plugin_id: Optional[str] = None,  # FIXME: deprecated
         filters: Optional[storage.filters.FilterRequest] = None,
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
@@ -264,6 +266,90 @@ class Server:
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_date must be less than max_date",
             )
+
+        # FIXME: deprecated
+        f_req = filters or storage.filters.FilterRequest(filters={})
+        if input_ooi is not None:
+            if task_type == "boefje":
+                f_ooi = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        )
+                    ]
+                }
+            elif task_type == "normalizer":
+                f_ooi = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        )
+                    ]
+                }
+            else:
+                f_ooi = {
+                    "or": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        ),
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        ),
+                    ]
+                }
+
+            f_req.filters.update(f_ooi)  # type: ignore
+
+        if plugin_id is not None:
+            if task_type == "boefje":
+                f_plugin = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__boefje__id",
+                            operator="eq",
+                            value=plugin_id,
+                        )
+                    ]
+                }
+            elif task_type == "normalizer":
+                f_plugin = storage.filters.Filter(
+                    column="p_item",
+                    field="data__raw_data__boefje_meta__id",
+                    operator="eq",
+                    value=plugin_id,
+                )
+            else:
+                f_plugin = {
+                    "or": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__boefje__id",
+                            operator="eq",
+                            value=plugin_id,
+                        ),
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__id",
+                            operator="eq",
+                            value=plugin_id,
+                        ),
+                    ]
+                }
+
+            f_req.filters.update(f_plugin)  # type: ignore
 
         try:
             results, count = self.ctx.datastores.task_store.get_tasks(
@@ -274,7 +360,7 @@ class Server:
                 limit=limit,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
-                filters=filters,
+                filters=f_req,
             )
         except ValueError as exc:
             raise fastapi.HTTPException(
