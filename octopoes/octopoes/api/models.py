@@ -41,8 +41,8 @@ class Declaration(BaseModel):
 
     ooi: OOI
     valid_time: datetime
-    method: Optional[str]
-    task_id: Optional[uuid.UUID]
+    method: Optional[str] = None
+    task_id: Optional[uuid.UUID] = None
 
 
 class ScanProfileDeclaration(BaseModel):

@@ -6,7 +6,7 @@ from http import HTTPStatus
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 import requests
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from requests import HTTPError, Response
 
 from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
@@ -27,9 +27,7 @@ Operation = Tuple[OperationType, Union[str, Dict[str, Any]], Optional[datetime]]
 
 class Transaction(BaseModel):
     operations: List[Operation] = Field(alias="tx-ops")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class XTDBHTTPSession(requests.Session):
@@ -44,13 +42,13 @@ class XTDBHTTPSession(requests.Session):
 
 
 class XTDBStatus(BaseModel):
-    version: Optional[str]
-    revision: Optional[str]
-    indexVersion: Optional[int]
-    consumerState: Optional[str]
-    kvStore: Optional[str]
-    estimateNumKeys: Optional[int]
-    size: Optional[int]
+    version: Optional[str] = None
+    revision: Optional[str] = None
+    indexVersion: Optional[int] = None
+    consumerState: Optional[str] = None
+    kvStore: Optional[str] = None
+    estimateNumKeys: Optional[int] = None
+    size: Optional[int] = None
 
 
 @lru_cache(maxsize=1)

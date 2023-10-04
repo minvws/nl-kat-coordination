@@ -27,7 +27,7 @@ class BitDefinition(BaseModel):
     module: str
     min_scan_level: int = 1
     default_enabled: bool = True
-    config_ooi_relation_path: Optional[str]
+    config_ooi_relation_path: Optional[str] = None
 
 
 @lru_cache(maxsize=32)

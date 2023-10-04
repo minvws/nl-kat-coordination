@@ -2,11 +2,10 @@ import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Type
 
 from pydantic import AmqpDsn, AnyHttpUrl, DirectoryPath, Field, FilePath, PostgresDsn
-from pydantic.v1.env_settings import SettingsSourceCallable
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource
 
 from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
@@ -17,7 +16,7 @@ if os.getenv("DOCS"):
     BASE_DIR = Path("../../")
 
 
-class BackwardsCompatibleEnvSettings:
+class BackwardsCompatibleEnvSettings(EnvSettingsSource):
     backwards_compatibility_mapping = {
         "SECRET": "BYTES_SECRET",
         "ACCESS_TOKEN_EXPIRE_MINUTES": "BYTES_ACCESS_TOKEN_EXPIRE_MINUTES",
@@ -33,10 +32,10 @@ class BackwardsCompatibleEnvSettings:
         "RFC3161_CERT_FILE": "BYTES_RFC3161_CERT_FILE",
     }
 
-    def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
+    def __call__(self) -> Dict[str, Any]:
         d: Dict[str, Any] = {}
         env_vars = {k.lower(): v for k, v in os.environ.items()}
-        env_prefix = settings.__config__.env_prefix.lower()
+        env_prefix = self.settings_cls.model_config.get("env_prefix", "").lower()
 
         for old_name, new_name in self.backwards_compatibility_mapping.items():
             old_name, new_name = old_name.lower(), new_name.lower()
@@ -136,18 +135,26 @@ class Settings(BaseSettings):
 
     # TODO[pydantic]: We couldn't refactor this class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    class Config:
-        env_prefix = "BYTES_"
-
-        @classmethod
-        def customise_sources(
-            cls,
-            init_settings: SettingsSourceCallable,
-            env_settings: SettingsSourceCallable,
-            file_secret_settings: SettingsSourceCallable,
-        ) -> Tuple[SettingsSourceCallable, ...]:
-            backwards_compatible_settings = BackwardsCompatibleEnvSettings()
-            return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
+    # class Config:
+    #
+    #     @classmethod
+    #     def customise_sources(
+    #         cls,
+    #         init_settings: SettingsSourceCallable,
+    #         env_settings: SettingsSourceCallable,
+    #         file_secret_settings: SettingsSourceCallable,
+    #     ) -> Tuple[SettingsSourceCallable, ...]:
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        backwards_compatible_settings = BackwardsCompatibleEnvSettings(settings_cls)
+        return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
 
 @lru_cache

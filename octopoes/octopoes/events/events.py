@@ -19,7 +19,7 @@ class DBEvent(BaseModel):
     entity_type: str
     operation_type: OperationType
     valid_time: datetime
-    client: Optional[str]
+    client: Optional[str] = None
 
     @property
     def primary_key(self) -> str:
@@ -28,8 +28,8 @@ class DBEvent(BaseModel):
 
 class OOIDBEvent(DBEvent):
     entity_type: Literal["ooi"] = "ooi"
-    old_data: Optional[OOIType]
-    new_data: Optional[OOIType]
+    old_data: Optional[OOIType] = None
+    new_data: Optional[OOIType] = None
 
     @property
     def primary_key(self) -> str:
@@ -38,8 +38,8 @@ class OOIDBEvent(DBEvent):
 
 class OriginDBEvent(DBEvent):
     entity_type: Literal["origin"] = "origin"
-    old_data: Optional[Origin]
-    new_data: Optional[Origin]
+    old_data: Optional[Origin] = None
+    new_data: Optional[Origin] = None
 
     @property
     def primary_key(self) -> str:
@@ -48,8 +48,8 @@ class OriginDBEvent(DBEvent):
 
 class OriginParameterDBEvent(DBEvent):
     entity_type: Literal["origin_parameter"] = "origin_parameter"
-    old_data: Optional[OriginParameter]
-    new_data: Optional[OriginParameter]
+    old_data: Optional[OriginParameter] = None
+    new_data: Optional[OriginParameter] = None
 
     @property
     def primary_key(self) -> str:
@@ -59,8 +59,8 @@ class OriginParameterDBEvent(DBEvent):
 class ScanProfileDBEvent(DBEvent):
     entity_type: Literal["scan_profile"] = "scan_profile"
     reference: Reference
-    old_data: Optional[ScanProfile]
-    new_data: Optional[ScanProfile]
+    old_data: Optional[ScanProfile] = None
+    new_data: Optional[ScanProfile] = None
 
     @property
     def primary_key(self) -> Reference:

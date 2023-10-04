@@ -25,7 +25,7 @@ class AbstractOOI(BaseModel):
 class ScanProfileMutation(BaseModel):
     operation: OperationType
     primary_key: str
-    value: Optional[AbstractOOI]
+    value: Optional[AbstractOOI] = None
 
 
 thread_local = threading.local()
