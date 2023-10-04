@@ -15,30 +15,25 @@ class InvalidPath(ValueError):
     pass
 
 
-class InvalidIndex(IndexError):
-    pass
-
-
-class NoIndexSupplied(IndexError):
-    pass
-
-
 @dataclass
 class Aliased:
     """OOI type wrapper to have control over the query alias used per type. This is necessary to traverse the same
-    OOT type more than once, since by default we assume that for e.g.
+    OOI type more than once, since by default we have that
         >>> Query(DNSAAAARecord)
         >>>     .where(DNSAAAARecord, hostname=Hostname)
+        >>>     .where(Hostname, primary_key="Hostname|internet|test.com")
         >>>     .where(DNSNSRecord, hostname=Hostname)
         >>>     .where(DNSNSRecord, name_server_hostname=Hostname)
-    we want the same Hostname to be both the DNSNSRecord.hostname and DNSNSRecord.name_server_hostname at the same time.
+    needs the same Hostname to be both the DNSNSRecord.hostname and the DNSNSRecord.name_server_hostname.
 
-    If we use
+    But if we use
         >>> hostname = A(Hostname)
         >>> Query(DNSAAAARecord)
         >>>     .where(DNSAAAARecord, hostname=hostname)
-        >>>     .where(DNSNSRecord, hostname=hostname)
-        >>>     .where(DNSNSRecord, name_server_hostname=Hostname)
+        >>>     .where(DNSNSRecord, name_server_hostname=hostname)
+        >>>     .where(DNSNSRecord, hostname=Hostname)
+        >>>     .where(Hostname, primary_key="Hostname|internet|test.com")
+    we will get the DNSAAAARecords of the Hostname of the name server of "test.com".
     """
 
     type: Type[OOI]
@@ -72,8 +67,6 @@ class Query:
     """
 
     result_type: Ref
-
-    _type_alias_mapping: Dict[str, List[str]] = field(default_factory=dict)
 
     _where_clauses: List[str] = field(default_factory=list)
     _find_clauses: List[str] = field(default_factory=list)
