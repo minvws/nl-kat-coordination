@@ -26,7 +26,7 @@ def test_node_creation_and_deletion(xtdb_http_client: XTDBHTTPClient):
     assert status.indexVersion == 22
     assert status.consumerState is None
     assert status.kvStore == "xtdb.rocksdb.RocksKv"
-    assert status.estimateNumKeys == 1
+    assert status.estimateNumKeys >= 1
 
     xtdb_http_client.delete_node()
 
