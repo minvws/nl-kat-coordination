@@ -8,7 +8,6 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from fastapi_utils.timing import add_timing_middleware
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -40,7 +39,6 @@ except FileNotFoundError:
 
 
 app = FastAPI()
-add_timing_middleware(app, record=logger.debug, prefix="app")
 
 # Set up OpenTelemetry instrumentation
 if settings.span_export_grpc_endpoint is not None:
