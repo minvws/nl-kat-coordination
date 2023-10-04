@@ -24,23 +24,18 @@
                     <td>{{ suite.key_size }}</td>
                     <td>{{ suite.cipher_suite_code }}</td>
 
-                      {% if suite.cipher_suite_name in suites_with_findings %}
-                        <td>yes</td>
+                      {% if suite.cipher_suite_name in data.suites_with_findings %}
+                        <td><i class="icon negative"></i> Phase out</td>
                         {% else %}
-                        <td>no</td>
+                        <td><i class="icon positive"></i> Good</td>
                       {% endif %}
                 </tr>
             {% endfor %}
         {% endfor %}
     </tbody>
 </table>
-<h3>Finding</h3>
-{% for finding in data.findings %}<p>{{ finding.description }}</p>{% endfor %}
-
-
-<h3>Suites with findings</h3>
-{{ suites_with_findings }}
-
-{% for suite in suites_with_findings %}
-  {{ suite }}
+<h3>Findings</h3>
+{% for finding in data.findings %}
+  <h3>{{ finding.finding_type.tokenized.id }}</h3>
+  <p>{{ finding.description|linebreaks }}</p>
 {% endfor %}
