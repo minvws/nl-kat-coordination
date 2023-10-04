@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<table>
+    <thead>
+        <tr>
+            <th>{% translate "Service" %}</th>
+            <th>{% translate "Version" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for check in health_checks %}
+            <tr>
+                <td>{{ check.service }}</td>
+                <td>{{ check.version }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
