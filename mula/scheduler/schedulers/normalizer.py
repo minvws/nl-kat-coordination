@@ -4,12 +4,15 @@ from types import SimpleNamespace
 from typing import Callable, Dict, List, Optional
 
 import requests
+from opentelemetry import trace
 
 from scheduler import context, queues, rankers
 from scheduler.connectors import listeners
 from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, RawData, TaskStatus
 
 from .scheduler import Scheduler
+
+tracer = trace.get_tracer(__name__)
 
 
 class NormalizerScheduler(Scheduler):
@@ -76,6 +79,7 @@ class NormalizerScheduler(Scheduler):
             loop=False,
         )
 
+    @tracer.start_as_current_span("normalizer_push_task_for_received_raw_data")
     def push_tasks_for_received_raw_data(self, latest_raw_data: RawData) -> None:
         """Create tasks for the received raw data.
 
@@ -128,6 +132,7 @@ class NormalizerScheduler(Scheduler):
                     self.push_tasks_for_received_raw_data.__name__,
                 )
 
+    @tracer.start_as_current_span("normalizer_push_task")
     def push_task(self, normalizer: Plugin, raw_data: RawData, caller: str = "") -> None:
         """Given a normalizer and raw data, create a task and push it to the
         queue.
@@ -274,6 +279,7 @@ class NormalizerScheduler(Scheduler):
 
         return normalizers
 
+    @tracer.start_as_current_span("normalizer_is_task_allowed_to_run")
     def is_task_allowed_to_run(self, normalizer: Plugin) -> bool:
         """Check if the task is allowed to run.
 
@@ -295,6 +301,7 @@ class NormalizerScheduler(Scheduler):
 
         return True
 
+    @tracer.start_as_current_span("normalizer_is_task_running")
     def is_task_running(self, task: NormalizerTask) -> bool:
         """Check if the same task is already running.
 
