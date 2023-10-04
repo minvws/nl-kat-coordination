@@ -14,10 +14,10 @@
                 <section>
                     <div>
                         <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
+                        {% include data.template with data=data.data %}
+
                     </div>
                 </section>
-                {% include data.template with data=data.data %}
-
             {% endfor %}
         {% endfor %}
     </main>
