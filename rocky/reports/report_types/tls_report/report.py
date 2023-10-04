@@ -40,7 +40,6 @@ class TLSReport(Report):
                     if suite["cipher_suite_name"] in finding.description:
                         suites_with_findings.append(suite["cipher_suite_name"])
 
-        logger.error(suites_with_findings)
         return {
             "input_ooi": input_ooi,
             "suites": suites,
