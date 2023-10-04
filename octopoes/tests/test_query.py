@@ -243,11 +243,20 @@ def test_aliased_path_query(mocker):
     assert query.format() == expected_query
 
 
-def test_aliased_query_starting_with_hostname():
+def test_aliased_query_starting_with_hostname(mocker):
+    mocker.patch("octopoes.xtdb.query.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
     path = Path.parse(
         "Hostname.<hostname[is DNSMXRecord].mail_hostname.<hostname[is DNSARecord].address.<address[is IPPort]"
     )
     query = Query.from_path(path)
 
-    expected_query = """{:query {:find [(pull DNSAAAARecord [*])] :where ["""
+    expected_query = """{:query {:find [(pull IPPort [*])] :where [
+    [ DNSARecord :DNSARecord/address IPAddressV4 ]
+    [ DNSARecord :DNSARecord/hostname ?311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
+    [ DNSARecord :object_type "DNSARecord" ]
+    [ DNSMXRecord :DNSMXRecord/hostname Hostname ]
+    [ DNSMXRecord :DNSMXRecord/mail_hostname ?311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
+    [ DNSMXRecord :object_type "DNSMXRecord" ]
+    [ IPPort :IPPort/address IPAddressV4 ]
+    [ IPPort :object_type "IPPort" ]]}}"""
     assert query.format() == expected_query

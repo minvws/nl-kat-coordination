@@ -105,6 +105,9 @@ class Query:
         for segment in path.segments:
             source_ref = alias_map.get(segment.source_type.get_object_type(), segment.source_type)
 
+            if segment.source_type.get_object_type() not in alias_map:  # Only happens on the first segment
+                alias_map[segment.source_type.get_object_type()] = source_ref
+
             if segment.target_type.get_object_type() not in alias_map:
                 target_ref = segment.target_type
                 alias_map[target_ref.get_object_type()] = target_ref
