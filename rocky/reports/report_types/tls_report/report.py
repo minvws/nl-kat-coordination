@@ -17,7 +17,7 @@ class TLSReport(Report):
     id = "tls-report"
     name = _("TLS Report")
     description: str = _("TLS reports assess the security of data encryption and transmission protocols.")
-    required_boefjes: List = []
+    required_boefjes: List = ["testssl-sh-ciphers"]
     optional_boefjes: List = []
     input_ooi_types = {IPService}
     html_template_path = "tls_report/report.html"
