@@ -215,12 +215,13 @@ class App:
         ).start()
 
         # Start metrics collecting
-        thread.ThreadRunner(
-            name="metrics_collector",
-            target=self.collect_metrics,
-            stop_event=self.stop_event,
-            interval=10,
-        ).start()
+        if self.ctx.config.collect_metrics:
+            thread.ThreadRunner(
+                name="metrics_collector",
+                target=self.collect_metrics,
+                stop_event=self.stop_event,
+                interval=10,
+            ).start()
 
         # API Server
         self.server = server.Server(self.ctx, self.schedulers)
