@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+# Newer versions might not be able to read the celery beat database so we delete
+# it here before restarting octopoes.
+rm -f /tmp/celerybeat-schedule.db
+
 #DEBHELPER#
 #
 chown -R root:kat /etc/kat
