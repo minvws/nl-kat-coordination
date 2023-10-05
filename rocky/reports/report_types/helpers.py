@@ -41,17 +41,24 @@ def get_report_by_id(report_id: str) -> Type[Report]:
     raise ValueError(f"Report with id {report_id} not found")
 
 
-def get_plugins_for_report_ids(reports: List[str]) -> Dict[str, List[str]]:
+def get_reports(report_ids: List[str]) -> List[Report]:
+    return [get_report_by_id(report_id) for report_id in report_ids]
+
+
+def get_plugins_for_report_ids(reports: List[str]) -> Set[str]:
     """
     Get all boefjes that are required and optional for a given list of reports
     """
     required_boefjes = set()
     optional_boefjes = set()
-    for report_id in reports:
-        report = get_report_by_id(report_id)
-        required_boefjes.update(report.required_boefjes)
-        optional_boefjes.update(report.optional_boefjes)
-    return {"required": list(required_boefjes), "optional": list(optional_boefjes)}
+
+    reports = get_reports(reports)
+
+    for report in reports:
+        required_boefjes.update(report.plugins["required"])
+        optional_boefjes.update(report.plugins["optional"])
+
+    return {"required": required_boefjes, "optional": optional_boefjes}
 
 
 def generate_reports_for_oois(

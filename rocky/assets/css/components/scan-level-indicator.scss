@@ -17,6 +17,10 @@ Markup:
   gap: 0.25rem;
   background-color: transparent;
 
+  &.left {
+    padding: 0;
+  }
+
   li {
     display: inline-block;
     width: 1.125rem;

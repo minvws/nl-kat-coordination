@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<section>
+<section class="dividing-line">
     <div>
         <h2>{% translate "Summary" %}</h2>
         <h3>{% translate "Selected OOIs" %}</h3>
@@ -39,10 +39,12 @@
                         <tr>
                             <td>{{ plugin.name }}</td>
                             <td>
-                                {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value %}
+                                {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}
 
                             </td>
-                            <td>{{ plugin.type|title }}</td>
+                            <td>
+                                <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
+                            </td>
                             <td>{{ plugin.description }}</td>
                         </tr>
                     {% endfor %}

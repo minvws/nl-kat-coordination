@@ -12,8 +12,7 @@ class Report:
     id: str
     name: str
     description: str
-    required_boefjes: List
-    optional_boefjes: List
+    plugins: Dict[str, List[str]]
     input_ooi_types: Set[Type[OOI]]
     html_template_path: str = "report.html"
 

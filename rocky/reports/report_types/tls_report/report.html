@@ -4,38 +4,41 @@
 <table>
     <thead>
         <tr>
+            <th>{% translate "Status" %}</th>
             <th>{% translate "Protocol" %}</th>
             <th>{% translate "Name" %}</th>
             <th>{% translate "Encryption Algorithm" %}</th>
             <th>{% translate "Bits" %}</th>
             <th>{% translate "Key Size" %}</th>
             <th>{% translate "Code" %}</th>
-            <th>{% translate "Finding" %}</th>
         </tr>
     </thead>
     <tbody>
         {% for protocol, suites in data.suites.items %}
             {% for suite in suites %}
                 <tr>
+                    <td>
+                        {% if suite.cipher_suite_name in data.suites_with_findings %}
+                            <i class="icon negative"></i> {% translate "Phase out" %}
+                        {% else %}
+                            <i class="icon positive"></i> {% translate "Good" %}
+                        {% endif %}
+                    </td>
                     <td>{{ protocol }}</td>
                     <td>{{ suite.cipher_suite_name }}</td>
                     <td>{{ suite.encryption_algorithm }}</td>
                     <td>{{ suite.bits }}</td>
                     <td>{{ suite.key_size }}</td>
                     <td>{{ suite.cipher_suite_code }}</td>
-
-                      {% if suite.cipher_suite_name in data.suites_with_findings %}
-                        <td><i class="icon negative"></i> Phase out</td>
-                        {% else %}
-                        <td><i class="icon positive"></i> Good</td>
-                      {% endif %}
                 </tr>
             {% endfor %}
         {% endfor %}
     </tbody>
 </table>
-<h3>Findings</h3>
-{% for finding in data.findings %}
-  <h3>{{ finding.finding_type.tokenized.id }}</h3>
-  <p>{{ finding.description|linebreaks }}</p>
-{% endfor %}
+{% if data.findings %}
+    <h3>{% translate "Findings" %}</h3>
+    {% for finding in data.findings %}
+        <h3>{{ finding.finding_type.tokenized.id }}</h3>
+        <p>{{ finding.description|linebreaks }}</p>
+    {% endfor %}
+{% endif %}

@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
@@ -17,17 +16,17 @@ class TLSReport(Report):
     id = "tls-report"
     name = _("TLS Report")
     description: str = _("TLS reports assess the security of data encryption and transmission protocols.")
-    required_boefjes: List = ["testssl-sh-ciphers"]
-    optional_boefjes: List = []
+    plugins = {"required": ["testssl-sh-ciphers"], "optional": []}
     input_ooi_types = {IPService}
     html_template_path = "tls_report/report.html"
+    tree_depth: int = 3
 
     def generate_data(self, input_ooi: str):
         suites = {}
         findings = []
         suites_with_findings = []
         ref = Reference.from_str(input_ooi)
-        tree = self.octopoes_api_connector.get_tree(ref, depth=3, types={TLSCipher, Finding}).store
+        tree = self.octopoes_api_connector.get_tree(ref, depth=self.tree_depth, types={TLSCipher, Finding}).store
         for pk, ooi in tree.items():
             if ooi.ooi_type == "TLSCipher":
                 suites = ooi.suites

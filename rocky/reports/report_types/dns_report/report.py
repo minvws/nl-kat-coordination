@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
@@ -16,8 +15,7 @@ class DNSReport(Report):
     id = "dns-report"
     name = _("DNS Report")
     description = _("DNS reports focus on domain name system configuration and potential weaknesses.")
-    required_boefjes = ["dns-records", "dns-sec"]
-    optional_boefjes: List = []
+    plugins = {"required": ["dns-records", "dns-sec"], "optional": []}
     input_ooi_types = {Hostname}
     html_template_path = "dns_report/report.html"
 

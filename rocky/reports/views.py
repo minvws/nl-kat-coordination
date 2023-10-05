@@ -17,7 +17,6 @@ from reports.report_types.helpers import (
     get_plugins_for_report_ids,
     get_report_types_for_oois,
 )
-from rocky.views.health import flatten_health, get_rocky_health
 from rocky.views.mixins import OctopoesView
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -93,7 +92,6 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
         context["oois"] = self.get_oois_from_selection()
         context["report_types"] = self.get_report_types_from_oois_selection()
         context["plugins"] = self.get_required_optional_plugins()
-        context["report_data"] = self.get_reports_data()
         return context
 
 
@@ -144,6 +142,5 @@ class ReportView(BaseReportView, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        rocky_health = get_rocky_health(self.octopoes_api_connector)
-        context["health_checks"] = flatten_health(rocky_health)
+        context["report_data"] = self.get_reports_data()
         return context
