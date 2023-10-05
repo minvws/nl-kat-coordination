@@ -8,7 +8,7 @@ from http import HTTPStatus
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
 from bits.definitions import BitDefinition
-from pydantic import BaseModel, parse_obj_as
+from pydantic import RootModel, parse_obj_as
 from requests import HTTPError
 
 from octopoes.config.settings import (
@@ -133,18 +133,18 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
 
-class XTDBReferenceNode(BaseModel):
-    __root__: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
+class XTDBReferenceNode(RootModel):
+    root: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
 
     def to_reference_node(self, pk_prefix: str) -> Optional[ReferenceNode]:
-        if not self.__root__:
+        if not self.root:
             return None
         # Apparently relations can be joined to Null values..?!?
-        if pk_prefix not in self.__root__:
+        if pk_prefix not in self.root:
             return None
-        reference = Reference.from_str(self.__root__.pop(pk_prefix))
+        reference = Reference.from_str(self.root.pop(pk_prefix))
         children = {}
-        for name, value in self.__root__.items():
+        for name, value in self.root.items():
             if isinstance(value, XTDBReferenceNode):
                 sub_nodes = [value.to_reference_node(pk_prefix)]
             elif isinstance(value, (List, Set)):
@@ -154,8 +154,6 @@ class XTDBReferenceNode(BaseModel):
                 children[name] = sub_nodes
         return ReferenceNode(reference=reference, children=children)
 
-
-XTDBReferenceNode.update_forward_refs()
 
 entities = {}
 for ooi_type_ in get_concrete_types():
