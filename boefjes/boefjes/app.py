@@ -252,10 +252,11 @@ def _start_working(
 
 
 def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
+    local_repository = get_local_repository()
     if queue is WorkerManager.Queue.BOEFJES:
-        item_handler = BoefjeHandler(LocalBoefjeJobRunner(get_local_repository()), get_local_repository())
+        item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository)
     else:
-        item_handler = NormalizerHandler(LocalNormalizerJobRunner(get_local_repository()))
+        item_handler = NormalizerHandler(LocalNormalizerJobRunner(local_repository))
 
     return SchedulerWorkerManager(
         item_handler,
