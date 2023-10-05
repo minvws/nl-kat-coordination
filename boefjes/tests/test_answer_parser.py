@@ -17,10 +17,10 @@ class AnswerParserNormalizerTest(TestCase):
         meta = NormalizerMeta.parse_raw(get_dummy_data("answer-normalize.json"))
 
         with pytest.raises(ValidationError):
-            raw = '[{"key": 3}]'
+            raw = '[{"key": "test"}]'
             runner.run(meta, bytes(raw, "UTF-8"))
 
-        raw = '{"key": 3}'
+        raw = '{"key": "test"}'
         output = runner.run(meta, bytes(raw, "UTF-8"))
 
         self.assertEqual(1, len(output.observations))

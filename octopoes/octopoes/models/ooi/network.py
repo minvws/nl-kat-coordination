@@ -41,7 +41,7 @@ class IPAddressV4(IPAddress):
     address: IPv4Address
 
     netblock: Optional[Reference] = ReferenceField(
-        "IPV4NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4
+        "IPV4NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
     _reverse_relation_names = {
@@ -55,7 +55,7 @@ class IPAddressV6(IPAddress):
     address: IPv6Address
 
     netblock: Optional[Reference] = ReferenceField(
-        "IPV6NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4
+        "IPV6NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
     _reverse_relation_names = {
@@ -84,7 +84,7 @@ class IPPort(OOI):
     address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
     protocol: Protocol
     port: Annotated[int, Field(gt=0, lt=2**16)]
-    state: Optional[PortState]
+    state: Optional[PortState] = None
 
     _natural_key_attrs = ["address", "protocol", "port"]
     _reverse_relation_names = {"address": "ports"}

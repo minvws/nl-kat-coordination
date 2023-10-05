@@ -144,7 +144,7 @@ class DnsTest(TestCase):
             + [soa_record]
         )
 
-        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("dns-normalize.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)

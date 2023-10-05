@@ -72,9 +72,9 @@ def _serialize_value(value: Any, required: bool) -> Any:
 def serialize_ooi(ooi: OOI):
     serialized_oois = {}
     for key, value in ooi:
-        if key not in ooi.__fields__:
+        if key not in ooi.model_fields:
             continue
-        serialized_oois[key] = _serialize_value(value, ooi.__fields__[key].required)
+        serialized_oois[key] = _serialize_value(value, ooi.model_fields[key].is_required())
     return serialized_oois
 
 

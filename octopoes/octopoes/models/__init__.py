@@ -185,7 +185,6 @@ OOIClassType = TypeVar("OOIClassType")
 
 class Reference(str):
     # def __new__(cls, *args, **kwargs):
-    #     return str.__new__(cls, *args, **kwargs)
 
     @classmethod
     def parse(cls, ref_str: str) -> Tuple[str, str]:
@@ -222,10 +221,7 @@ class Reference(str):
     # def __get_validators__(cls):
     #     yield cls.validate
     @classmethod
-    def __get_pydantic_core_schema__(
-        cls, source_type: Any, handler: GetCoreSchemaHandler
-    ) -> CoreSchema:
-        #     # return core_schema.no_info_after_validator_function(Reference.validate, handler(source_type))
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler: GetCoreSchemaHandler) -> CoreSchema:
         return core_schema.with_info_after_validator_function(cls.validate, core_schema.str_schema())
 
     # @classmethod
@@ -242,7 +238,7 @@ class Reference(str):
         return json_schema
 
     @classmethod
-    def validate(cls, v, info:ValidationInfo):
+    def validate(cls, v, info: ValidationInfo):
         if not isinstance(v, str):
             raise TypeError("string required")
         return cls(str(v))

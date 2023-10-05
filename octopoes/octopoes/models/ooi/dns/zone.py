@@ -80,7 +80,3 @@ class ResolvedHostname(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"{reference.tokenized.hostname.name} -> {reference.tokenized.address.address}"
-
-
-Hostname.update_forward_refs()
-DNSZone.update_forward_refs()

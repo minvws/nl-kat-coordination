@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Tuple
 from unittest import TestCase
 
-from pydantic import AnyUrl
+from pydantic_core import Url
 
 from boefjes.job_models import NormalizerMeta, NormalizerOutput
 from boefjes.katalogus.local_repository import LocalPluginRepository
@@ -130,13 +130,13 @@ darknet,https://openkat.nl/""",
                 "network": Reference("Network|internet"),
                 "object_type": "URL",
                 "primary_key": "URL|internet|https://example.com/",
-                "raw": AnyUrl(
-                    "https://example.com/", scheme="https", host="example.com", tld="com", host_type="domain", path="/"
+                "raw": Url(
+                    "https://example.com/",
                 ),
                 "scan_profile": None,
                 "web_url": None,
             },
-            output.declarations[1].ooi.dict(),
+            output.declarations[1].ooi.model_dump(),
         )
 
         meta, output, runner = self.check_network_created(5)
@@ -146,8 +146,8 @@ darknet,https://openkat.nl/""",
                 "network": Reference("Network|internet"),
                 "object_type": "URL",
                 "primary_key": "URL|internet|https://example.com/",
-                "raw": AnyUrl(
-                    "https://example.com/", scheme="https", host="example.com", tld="com", host_type="domain", path="/"
+                "raw": Url(
+                    "https://example.com/",
                 ),
                 "scan_profile": None,
                 "web_url": None,

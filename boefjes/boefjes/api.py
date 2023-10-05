@@ -4,6 +4,7 @@ import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Optional
+from urllib.parse import urljoin
 
 from fastapi import Depends, FastAPI, HTTPException, Response
 from pydantic import BaseModel, ConfigDict, Field
@@ -101,7 +102,7 @@ async def boefje_input(
 
     boefje_meta = create_boefje_meta(task, local_repository)
 
-    output_url = settings.boefje_api + "/api/v0/tasks/" + task_id
+    output_url = urljoin(str(settings.boefje_api), f"/api/v0/tasks/{task_id}")
     return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=boefje_meta)
 
 

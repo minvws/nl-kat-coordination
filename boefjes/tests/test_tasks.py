@@ -99,12 +99,12 @@ class TaskTest(TestCase):
         NormalizerHandler._parse_ooi(plain_ooi)
 
     def test_parse_normalizer_meta_to_json(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("snyk-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("snyk-normalizer.json"))
         meta.started_at = datetime(10, 10, 10, 10, tzinfo=timezone.utc)
         meta.ended_at = datetime(10, 10, 10, 12, tzinfo=timezone.utc)
 
-        assert "0010-10-10T10:00:00+00:00" in meta.json()
-        assert "0010-10-10T12:00:00+00:00" in meta.json()
+        assert "0010-10-10T10:00:00Z" in meta.model_dump_json()
+        assert "0010-10-10T12:00:00Z" in meta.model_dump_json()
 
     @mock.patch("boefjes.job_handler.get_environment_settings", return_value={})
     @mock.patch("boefjes.job_handler.bytes_api_client")
