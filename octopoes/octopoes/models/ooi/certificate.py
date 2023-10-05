@@ -56,7 +56,7 @@ class SubjectAlternativeNameHostname(SubjectAlternativeName):
     object_type: Literal["SubjectAlternativeNameHostname"] = "SubjectAlternativeNameHostname"
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=1, max_inherit_scan_level=0)
 
-    _natural_key_attrs = SubjectAlternativeName._natural_key_attrs + ["hostname"]
+    _natural_key_attrs = ["certificate", "hostname"]
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
@@ -67,7 +67,7 @@ class SubjectAlternativeNameIP(SubjectAlternativeName):
     object_type: Literal["SubjectAlternativeNameIP"] = "SubjectAlternativeNameIP"
     address: Reference = ReferenceField(IPAddress)
 
-    _natural_key_attrs = SubjectAlternativeName._natural_key_attrs + ["address"]
+    _natural_key_attrs = ["certificate", "address"]
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
@@ -78,7 +78,7 @@ class SubjectAlternativeNameQualifier(SubjectAlternativeName):
     object_type: Literal["SubjectAlternativeNameQualifier"] = "SubjectAlternativeNameQualifier"
     name: str
 
-    _natural_key_attrs = SubjectAlternativeName._natural_key_attrs + ["name"]
+    _natural_key_attrs = ["certificate", "name"]
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:

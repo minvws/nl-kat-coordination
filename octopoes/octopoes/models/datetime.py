@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic.datetime_parse import parse_datetime
+from pydantic.v1.datetime_parse import parse_datetime
 
 
 class TimezoneAwareDatetime(datetime):

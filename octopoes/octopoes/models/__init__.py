@@ -15,7 +15,9 @@ from typing import (
     Union,
 )
 
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel, GetCoreSchemaHandler, GetJsonSchemaHandler, RootModel
+from pydantic_core import CoreSchema, core_schema
+from pydantic_core.core_schema import ValidationInfo
 
 
 class ScanLevel(IntEnum):
@@ -81,8 +83,8 @@ class OOI(BaseModel, abc.ABC):
 
     primary_key: str = ""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, **data):
+        super().__init__(**data)
         self.primary_key = f"{self.get_object_type()}|{self.natural_key}"
 
     def __str__(self):
@@ -182,8 +184,8 @@ OOIClassType = TypeVar("OOIClassType")
 
 
 class Reference(str):
-    def __new__(cls, *args, **kwargs):
-        return str.__new__(cls, *args, **kwargs)
+    # def __new__(cls, *args, **kwargs):
+    #     return str.__new__(cls, *args, **kwargs)
 
     @classmethod
     def parse(cls, ref_str: str) -> Tuple[str, str]:
@@ -214,22 +216,33 @@ class Reference(str):
     def human_readable(self) -> str:
         return self.class_type.format_reference_human_readable(self)
 
+    # @classmethod
+    # # TODO[pydantic]: We couldn't refactor `__get_validators__`, please create the `__get_pydantic_core_schema__` manually.
+    # # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
+    # def __get_validators__(cls):
+    #     yield cls.validate
     @classmethod
-    # TODO[pydantic]: We couldn't refactor `__get_validators__`, please create the `__get_pydantic_core_schema__` manually.
-    # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
-    def __get_validators__(cls):
-        yield cls.validate
+    def __get_pydantic_core_schema__(
+        cls, source_type: Any, handler: GetCoreSchemaHandler
+    ) -> CoreSchema:
+        #     # return core_schema.no_info_after_validator_function(Reference.validate, handler(source_type))
+        return core_schema.with_info_after_validator_function(cls.validate, core_schema.str_schema())
 
-    @classmethod
+    # @classmethod
     # TODO[pydantic]: We couldn't refactor `__modify_schema__`, please create the `__get_pydantic_json_schema__` manually.
     # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(
+    # def __modify_schema__(cls, field_schema):
+    #     field_schema.update(
+    def __get_pydantic_json_schema__(self, core_schema: CoreSchema, handler: GetJsonSchemaHandler):
+        json_schema = handler(core_schema)
+        json_schema.update(
             examples=["Network|internet", "IPAddressV4|internet|1.1.1.1"],
         )
 
+        return json_schema
+
     @classmethod
-    def validate(cls, v):
+    def validate(cls, v, info:ValidationInfo):
         if not isinstance(v, str):
             raise TypeError("string required")
         return cls(str(v))
@@ -284,9 +297,3 @@ def build_token_tree(ooi_class: Type[OOI]) -> Dict:
 
         tokens[attribute] = value
     return tokens
-
-
-DeclaredScanProfile.update_forward_refs()
-InheritedScanProfile.update_forward_refs()
-EmptyScanProfile.update_forward_refs()
-ScanProfileBase.update_forward_refs()

@@ -34,13 +34,13 @@ class RiskLevelSeverity(Enum):
 class FindingType(OOI):
     id: str
 
-    description: Optional[str]
-    source: Optional[AnyUrl]
-    impact: Optional[str]
-    recommendation: Optional[str]
+    description: Optional[str] = None
+    source: Optional[AnyUrl] = None
+    impact: Optional[str] = None
+    recommendation: Optional[str] = None
 
-    risk_score: Optional[float]
-    risk_severity: Optional[RiskLevelSeverity]
+    risk_score: Optional[float] = None
+    risk_severity: Optional[RiskLevelSeverity] = None
 
     _natural_key_attrs = ["id"]
     _traversable = False
@@ -83,9 +83,9 @@ class Finding(OOI):
 
     finding_type: Reference = ReferenceField(FindingType)
     ooi: Reference = ReferenceField(OOI)
-    proof: Optional[str]
-    description: Optional[str]
-    reproduce: Optional[str]
+    proof: Optional[str] = None
+    description: Optional[str] = None
+    reproduce: Optional[str] = None
 
     @property
     def natural_key(self) -> str:

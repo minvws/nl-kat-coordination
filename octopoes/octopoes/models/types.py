@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Dict, Iterator, Set, Type, Union
 
-from pydantic.fields import ModelField
-
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
     SubjectAlternativeNameHostname,
@@ -211,7 +209,7 @@ def type_by_name(type_name: str):
     return next(t for t in ALL_TYPES if t.__name__ == type_name)
 
 
-def related_object_type(field: ModelField) -> Type[OOI]:
+def related_object_type(field) -> Type[OOI]:
     object_type: Union[str, Type[OOI]] = field.field_info.extra["object_type"]
     if isinstance(object_type, str):
         return type_by_name(object_type)
