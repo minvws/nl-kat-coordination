@@ -28,6 +28,8 @@ services:
         condition: service_healthy
       ci_rabbitmq:
         condition: service_healthy
+      ci_bytes:
+        condition: service_started
 
   ci_postgres:
     image: postgres:15
@@ -47,3 +49,20 @@ services:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s
       retries: 4
+
+  ci_bytes:
+    build:
+      context: ..
+      dockerfile: bytes/Dockerfile
+      target: dev
+      args:
+        ENVIRONMENT: dev
+    command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - ../bytes/:/app/bytes
+      - bytes-data:/data
+    
+volumes:
+  bytes-data:
