@@ -77,6 +77,12 @@ class Settings(BaseSettings):
         description="Host port of the Boefje API server",
     )
 
+    boefje_docker_network: str = Field(
+        "bridge",
+        description="Docker network to run Boefjes in",
+        env="BOEFJE_DOCKER_NETWORK",
+    )
+
     bytes_api: AnyHttpUrl = Field(..., example="http://localhost:8002", description="Bytes API URL", env="BYTES_API")
     bytes_username: str = Field(..., example="test", description="Bytes JWT login username", env="BYTES_USERNAME")
     bytes_password: str = Field(..., example="secret", description="Bytes JWT login password", env="BYTES_PASSWORD")
