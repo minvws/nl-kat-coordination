@@ -72,6 +72,7 @@ class Server:
             endpoint=self.root,
             methods=["GET"],
             status_code=status.HTTP_200_OK,
+            description="Root endpoint",
         )
 
         self.api.add_api_route(
@@ -80,6 +81,7 @@ class Server:
             methods=["GET"],
             response_model=models.ServiceHealth,
             status_code=status.HTTP_200_OK,
+            description="Health check endpoint",
         )
 
         self.api.add_api_route(
@@ -87,6 +89,7 @@ class Server:
             endpoint=self.metrics,
             methods=["GET"],
             status_code=status.HTTP_200_OK,
+            description="OpenMetrics compliant metrics endpoint",
         )
 
         self.api.add_api_route(
@@ -95,6 +98,7 @@ class Server:
             methods=["GET"],
             response_model=List[models.Scheduler],
             status_code=status.HTTP_200_OK,
+            description="List all schedulers",
         )
 
         self.api.add_api_route(
@@ -103,6 +107,7 @@ class Server:
             methods=["GET"],
             response_model=models.Scheduler,
             status_code=status.HTTP_200_OK,
+            description="Get a scheduler",
         )
 
         self.api.add_api_route(
@@ -111,6 +116,7 @@ class Server:
             methods=["PATCH"],
             response_model=models.Scheduler,
             status_code=status.HTTP_200_OK,
+            description="Update a scheduler",
         )
 
         self.api.add_api_route(
@@ -119,6 +125,7 @@ class Server:
             methods=["GET"],
             response_model=PaginatedResponse,
             status_code=status.HTTP_200_OK,
+            description="List all tasks for a scheduler",
         )
 
         self.api.add_api_route(
@@ -127,6 +134,7 @@ class Server:
             methods=["GET"],
             response_model=PaginatedResponse,
             status_code=status.HTTP_200_OK,
+            description="List all tasks",
         )
 
         self.api.add_api_route(
@@ -134,6 +142,7 @@ class Server:
             endpoint=self.get_task_stats,
             methods=["GET"],
             status_code=status.HTTP_200_OK,
+            description="Get task status counts for all schedulers in last 24 hours",
         )
 
         self.api.add_api_route(
@@ -141,6 +150,7 @@ class Server:
             endpoint=self.get_task_stats,
             methods=["GET"],
             status_code=status.HTTP_200_OK,
+            description="Get task status counts for a scheduler in last 24 hours",
         )
 
         self.api.add_api_route(
@@ -149,6 +159,7 @@ class Server:
             methods=["GET"],
             response_model=models.Task,
             status_code=status.HTTP_200_OK,
+            description="Get a task",
         )
 
         self.api.add_api_route(
@@ -157,6 +168,7 @@ class Server:
             methods=["PATCH"],
             response_model=models.Task,
             status_code=status.HTTP_200_OK,
+            description="Update a task",
         )
 
         self.api.add_api_route(
@@ -166,6 +178,7 @@ class Server:
             response_model=List[models.Queue],
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
+            description="List all queues",
         )
 
         self.api.add_api_route(
@@ -174,6 +187,7 @@ class Server:
             methods=["GET"],
             response_model=models.Queue,
             status_code=status.HTTP_200_OK,
+            description="Get a queue",
         )
 
         self.api.add_api_route(
@@ -182,6 +196,7 @@ class Server:
             methods=["POST"],
             response_model=Optional[models.PrioritizedItem],
             status_code=status.HTTP_200_OK,
+            description="Pop an item from a queue",
         )
 
         self.api.add_api_route(
@@ -189,6 +204,7 @@ class Server:
             endpoint=self.push_queue,
             methods=["POST"],
             status_code=status.HTTP_201_CREATED,
+            description="Push an item to a queue",
         )
 
     def root(self) -> Any:
