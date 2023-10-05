@@ -25,7 +25,7 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
             # url is not a url but a relative path
             http_url = input_ooi.reference.tokenized.resource.web_url
             # allow for ipaddress http urls
-            netloc = http_url.netloc.name if "name" in http_url.netloc.__root__ else http_url.netloc.address
+            netloc = http_url.netloc.name if "name" in http_url.netloc.root else http_url.netloc.address
             original_url = f"{http_url.scheme}://{netloc}{http_url.path}"
             u = URL(raw=urljoin(original_url, input_ooi.value), network=network.reference)
         yield u

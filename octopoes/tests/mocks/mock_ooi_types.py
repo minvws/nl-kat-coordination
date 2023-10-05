@@ -141,7 +141,7 @@ class MockLabel(OOI):
 
     ooi: Reference = ReferenceField(OOI)
     label_id: str
-    label_text: Optional[str]
+    label_text: Optional[str] = None
 
     @property
     def natural_key(self) -> str:

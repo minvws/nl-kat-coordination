@@ -12,7 +12,7 @@ class DNSRecord(OOI, abc.ABC):
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=2)
     dns_record_type: Literal["A", "AAAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
     value: str
-    ttl: Optional[int]  # todo: validation
+    ttl: Optional[int] = None  # todo: validation
 
     _natural_key_attrs = ["hostname", "value"]
     _reverse_relation_names = {
@@ -106,11 +106,11 @@ class DNSSOARecord(DNSRecord):
     dns_record_type: Literal["SOA"] = "SOA"
 
     soa_hostname: Reference = ReferenceField(Hostname)
-    serial: Optional[int]
-    retry: Optional[int]
-    refresh: Optional[int]
-    expire: Optional[int]
-    minimum: Optional[int]
+    serial: Optional[int] = None
+    retry: Optional[int] = None
+    refresh: Optional[int] = None
+    expire: Optional[int] = None
+    minimum: Optional[int] = None
 
     _reverse_relation_names = {
         "hostname": "dns_soa_records",

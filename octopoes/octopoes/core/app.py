@@ -46,7 +46,7 @@ def close_rabbit_channel(queue_uri: str):
 
 
 def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSession) -> OctopoesService:
-    event_manager = EventManager(client, settings.queue_uri, celery_app, QUEUE_NAME_OCTOPOES)
+    event_manager = EventManager(client, str(settings.queue_uri), celery_app, QUEUE_NAME_OCTOPOES)
 
     ooi_repository = XTDBOOIRepository(event_manager, xtdb_session, settings.xtdb_type)
     origin_repository = XTDBOriginRepository(event_manager, xtdb_session, settings.xtdb_type)

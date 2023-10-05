@@ -18,18 +18,18 @@ class AlgorithmType(Enum):
 class X509Certificate(OOI):
     object_type: Literal["X509Certificate"] = "X509Certificate"
 
-    subject: Optional[str]
-    issuer: Optional[str]
+    subject: Optional[str] = None
+    issuer: Optional[str] = None
     valid_from: str
     valid_until: str
-    pk_algorithm: Optional[str]
-    pk_size: Optional[int]
-    pk_number: Optional[str]
+    pk_algorithm: Optional[str] = None
+    pk_size: Optional[int] = None
+    pk_number: Optional[str] = None
     signed_by: Optional[Reference] = ReferenceField(
         "X509Certificate", max_issue_scan_level=1, max_inherit_scan_level=0, default=None
     )
     serial_number: str
-    expires_in: Optional[timedelta]
+    expires_in: Optional[timedelta] = None
 
     _natural_key_attrs = ["issuer", "serial_number"]
 

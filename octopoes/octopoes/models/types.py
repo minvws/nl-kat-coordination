@@ -210,7 +210,7 @@ def type_by_name(type_name: str):
 
 
 def related_object_type(field) -> Type[OOI]:
-    object_type: Union[str, Type[OOI]] = field.field_info.extra["object_type"]
+    object_type: Union[str, Type[OOI]] = field.json_schema_extra["object_type"]
     if isinstance(object_type, str):
         return type_by_name(object_type)
     return object_type
@@ -218,7 +218,9 @@ def related_object_type(field) -> Type[OOI]:
 
 def get_relations(object_type: Type[OOI]) -> Dict[str, Type[OOI]]:
     return {
-        name: related_object_type(field) for name, field in object_type.__fields__.items() if field.type_ == Reference
+        name: related_object_type(field)
+        for name, field in object_type.model_fields.items()
+        if field.annotation == Reference
     }
 
 

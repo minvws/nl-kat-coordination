@@ -20,6 +20,72 @@ from pydantic_core import CoreSchema, core_schema
 from pydantic_core.core_schema import ValidationInfo
 
 
+class Reference(str):
+    @classmethod
+    def parse(cls, ref_str: str) -> Tuple[str, str]:
+        object_type, *natural_key_parts = ref_str.split("|")
+        return object_type, "|".join(natural_key_parts)
+
+    @property
+    def class_(self) -> str:
+        return self.parse(self)[0]
+
+    @property
+    def natural_key(self) -> str:
+        return self.parse(self)[1]
+
+    @property
+    def class_type(self) -> Type[OOI]:
+        from octopoes.models.types import type_by_name
+
+        object_type, natural_key = self.parse(self)
+        ooi_class = type_by_name(object_type)
+        return ooi_class
+
+    @property
+    def tokenized(self) -> PrimaryKeyToken:
+        return self.class_type.get_tokenized_primary_key(self.natural_key)
+
+    @property
+    def human_readable(self) -> str:
+        return self.class_type.format_reference_human_readable(self)
+
+    # @classmethod
+    # # TODO[pydantic]: We couldn't refactor `__get_validators__`, please create the `__get_pydantic_core_schema__` manually.
+    # # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
+    # def __get_validators__(cls):
+    #     yield cls.validate
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source_type: Any, handler: GetCoreSchemaHandler) -> CoreSchema:
+        return core_schema.with_info_after_validator_function(cls.validate, core_schema.str_schema())
+
+    # @classmethod
+    # TODO[pydantic]: We couldn't refactor `__modify_schema__`, please create the `__get_pydantic_json_schema__` manually.
+    # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
+    # def __modify_schema__(cls, field_schema):
+    #     field_schema.update(
+    def __get_pydantic_json_schema__(self, core_schema: CoreSchema, handler: GetJsonSchemaHandler):
+        json_schema = handler(core_schema)
+        json_schema.update(
+            examples=["Network|internet", "IPAddressV4|internet|1.1.1.1"],
+        )
+
+        return json_schema
+
+    @classmethod
+    def validate(cls, v, info: ValidationInfo):
+        if not isinstance(v, str):
+            raise TypeError("string required")
+        return cls(str(v))
+
+    def __repr__(self):
+        return f"Reference({super().__repr__()})"
+
+    @classmethod
+    def from_str(cls, ref_str: str) -> Reference:
+        return cls(ref_str)
+
+
 class ScanLevel(IntEnum):
     L0 = 0
     L1 = 1
@@ -151,7 +217,7 @@ class OOI(BaseModel, abc.ABC):
 
     @classmethod
     def get_reverse_relation_name(cls, attr: str) -> str:
-        return cls._reverse_relation_names.get(attr, f"{cls.get_object_type()}_{attr}")
+        return cls._reverse_relation_names.default.get(attr, f"{cls.get_object_type()}_{attr}")
 
     @classmethod
     def get_tokenized_primary_key(cls, natural_key: str):
@@ -183,74 +249,6 @@ class OOI(BaseModel, abc.ABC):
 OOIClassType = TypeVar("OOIClassType")
 
 
-class Reference(str):
-    # def __new__(cls, *args, **kwargs):
-
-    @classmethod
-    def parse(cls, ref_str: str) -> Tuple[str, str]:
-        object_type, *natural_key_parts = ref_str.split("|")
-        return object_type, "|".join(natural_key_parts)
-
-    @property
-    def class_(self) -> str:
-        return self.parse(self)[0]
-
-    @property
-    def natural_key(self) -> str:
-        return self.parse(self)[1]
-
-    @property
-    def class_type(self) -> Type[OOI]:
-        from octopoes.models.types import type_by_name
-
-        object_type, natural_key = self.parse(self)
-        ooi_class = type_by_name(object_type)
-        return ooi_class
-
-    @property
-    def tokenized(self) -> PrimaryKeyToken:
-        return self.class_type.get_tokenized_primary_key(self.natural_key)
-
-    @property
-    def human_readable(self) -> str:
-        return self.class_type.format_reference_human_readable(self)
-
-    # @classmethod
-    # # TODO[pydantic]: We couldn't refactor `__get_validators__`, please create the `__get_pydantic_core_schema__` manually.
-    # # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
-    # def __get_validators__(cls):
-    #     yield cls.validate
-    @classmethod
-    def __get_pydantic_core_schema__(cls, source_type: Any, handler: GetCoreSchemaHandler) -> CoreSchema:
-        return core_schema.with_info_after_validator_function(cls.validate, core_schema.str_schema())
-
-    # @classmethod
-    # TODO[pydantic]: We couldn't refactor `__modify_schema__`, please create the `__get_pydantic_json_schema__` manually.
-    # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
-    # def __modify_schema__(cls, field_schema):
-    #     field_schema.update(
-    def __get_pydantic_json_schema__(self, core_schema: CoreSchema, handler: GetJsonSchemaHandler):
-        json_schema = handler(core_schema)
-        json_schema.update(
-            examples=["Network|internet", "IPAddressV4|internet|1.1.1.1"],
-        )
-
-        return json_schema
-
-    @classmethod
-    def validate(cls, v, info: ValidationInfo):
-        if not isinstance(v, str):
-            raise TypeError("string required")
-        return cls(str(v))
-
-    def __repr__(self):
-        return f"Reference({super().__repr__()})"
-
-    @classmethod
-    def from_str(cls, ref_str: str) -> Reference:
-        return cls(ref_str)
-
-
 def format_id_short(id_: str) -> str:
     """Format the id in a short way. > 33 characters, interpolate with ..."""
     if len(id_) > 33:
@@ -278,11 +276,11 @@ def get_leaf_subclasses(cls: Type[OOI]) -> Set[Type[OOI]]:
 def build_token_tree(ooi_class: Type[OOI]) -> Dict:
     tokens = {}
 
-    for attribute in ooi_class._natural_key_attrs:
-        field = ooi_class.__fields__[attribute]
+    for attribute in ooi_class._natural_key_attrs.default:
+        field = ooi_class.model_fields[attribute]
         value = ""
 
-        if field.type_ == Reference:
+        if field.annotation == Reference:
             from octopoes.models.types import related_object_type
 
             related_class = related_object_type(field)
