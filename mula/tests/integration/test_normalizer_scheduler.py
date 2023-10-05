@@ -45,6 +45,7 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.scheduler.stop()
+        models.Base.metadata.drop_all(self.dbconn.engine)
         self.dbconn.engine.dispose()
 
 
