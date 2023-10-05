@@ -8,7 +8,7 @@ from pydantic import parse_obj_as
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import (
     CAPECFindingType,
@@ -253,7 +253,7 @@ def get_or_create_ooi(
         return api_connector.get(ooi.reference, observed_at), False
     except ObjectNotFoundException:
         if observed_at < _now:
-            # don't create an OOI when expected valid_time is in the past
+            # don't create an OOI when expected observed_at is in the past
             raise ValueError(f"OOI not found and unable to create at {observed_at}")
 
         create_ooi(api_connector, bytes_client, ooi, observed_at)
@@ -267,7 +267,21 @@ def create_ooi(
         observed_at = datetime.now(timezone.utc)
 
     task_id = uuid4()
-    declaration = Declaration(ooi=ooi, valid_time=observed_at, task_id=str(task_id))
+    declaration = Declaration(ooi=ooi, observed_at=observed_at, task_id=str(task_id))
     bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))
 
     api_connector.save_declaration(declaration)
+
+
+def delete_oois(
+    api_connector: OctopoesAPIConnector, selected_oois: List[Reference], observed_at: datetime = None
+) -> None:
+    if observed_at is None:
+        observed_at = datetime.now(timezone.utc)
+
+        api_connector.delete_many(selected_oois, observed_at)
+        #     messages.add_message(
+
+        # messages.add_message(
+        #     request,
+        #     messages.SUCCESS,
