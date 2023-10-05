@@ -592,3 +592,10 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         response = self.client.patch("/tasks/123.123", json={"status": "completed"})
         self.assertEqual(400, response.status_code)
         self.assertIn("failed to get task", response.json().get("detail"))
+
+    def test_get_tasks_stats(self):
+        response = self.client.get("/tasks/stats")
+        self.assertEqual(200, response.status_code)
+
+        response = self.client.get(f"/tasks/stats/{self.first_item_api.get('scheduler_id')}")
+        self.assertEqual(200, response.status_code)
