@@ -215,7 +215,9 @@ class TaskStore:
             response: Dict[str, Dict[str, int]] = {}
             for row in results:
                 date, status, task_count = row
-                response.setdefault(date.isoformat(), {k.value: 0 for k in models.TaskStatus}).update({status.value: task_count})
+                response.setdefault(date.isoformat(), {k.value: 0 for k in models.TaskStatus}).update(
+                    {status.value: task_count}
+                )
                 response[date.isoformat()].update({"total": response[date.isoformat()].get("total", 0) + task_count})
 
             return response
