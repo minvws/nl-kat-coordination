@@ -15,7 +15,7 @@ from typing import (
     Union,
 )
 
-from pydantic import BaseModel, GetCoreSchemaHandler, GetJsonSchemaHandler, RootModel
+from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
 from pydantic_core.core_schema import ValidationInfo
 
@@ -50,24 +50,9 @@ class Reference(str):
     def human_readable(self) -> str:
         return self.class_type.format_reference_human_readable(self)
 
-    # @classmethod
-    # # TODO[pydantic]: We couldn't refactor `__get_validators__`, please create the `__get_pydantic_core_schema__` manually.
-    # # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
-    # def __get_validators__(cls):
-    #     yield cls.validate
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler: GetCoreSchemaHandler) -> CoreSchema:
         return core_schema.with_info_after_validator_function(cls.validate, core_schema.str_schema())
-
-    # @classmethod
-    # TODO[pydantic]: We couldn't refactor `__modify_schema__`, please create the `__get_pydantic_json_schema__` manually.
-    # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
-    # def __modify_schema__(cls, field_schema):
-    #     field_schema.update(
-    # @classmethod
-    # def __get_pydantic_json_schema__(cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler):
-    #     json_schema.update(
-    #
 
     @classmethod
     def validate(cls, v, info: ValidationInfo):

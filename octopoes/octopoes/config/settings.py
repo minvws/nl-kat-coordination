@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, Tuple, Type
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath
-from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource
+from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 
 from octopoes.models import ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -80,6 +80,8 @@ class Settings(BaseSettings):
     span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
+
+    model_config = SettingsConfigDict(env_prefix="OCTOPOES_")
 
     # TODO[pydantic]: We couldn't refactor this class, please create the `model_config` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.

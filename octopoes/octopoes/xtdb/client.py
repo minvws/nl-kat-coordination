@@ -82,7 +82,7 @@ class XTDBHTTPClient:
     def status(self) -> XTDBStatus:
         res = self._session.get(f"{self.client_url()}/status")
         self._verify_response(res)
-        return XTDBStatus.parse_obj(res.json())
+        return XTDBStatus.model_validate_json(res.content)
 
     def get_entity(self, entity_id: str, valid_time: Optional[datetime] = None) -> dict:
         if valid_time is None:

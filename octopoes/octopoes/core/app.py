@@ -27,10 +27,10 @@ def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTP
     """
 
     if xtdb_type == XTDBType.XTDB_MULTINODE:
-        return XTDBHTTPClient(f"{base_uri}/_xtdb", client, multinode=True)
+        return XTDBHTTPClient(urljoin(str(base_uri), "/_xtdb"), client, multinode=True)
 
     if client != "_dev":
-        return XTDBHTTPClient(f"{base_uri}/{client}/_{xtdb_type.value}", client)
+        return XTDBHTTPClient(urljoin(str(base_uri), f"/{client}/_{xtdb_type.value}"), client)
 
     return XTDBHTTPClient(urljoin(str(base_uri), f"/_{xtdb_type.value}"), client)
 

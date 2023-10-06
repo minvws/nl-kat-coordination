@@ -197,9 +197,10 @@ def xtdbtype_crux():
     def get_settings_override():
         return Settings(xtdb_type=XTDBType.CRUX)
 
+    overrides = app.dependency_overrides.copy()
     app.dependency_overrides[settings] = get_settings_override
     yield
-    app.dependency_overrides = {}
+    app.dependency_overrides = overrides
 
 
 @pytest.fixture
