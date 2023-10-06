@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urljoin
 
 from amqp import AMQPError
 
@@ -31,7 +32,7 @@ def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTP
     if client != "_dev":
         return XTDBHTTPClient(f"{base_uri}/{client}/_{xtdb_type.value}", client)
 
-    return XTDBHTTPClient(f"{base_uri}/_{xtdb_type.value}", client)
+    return XTDBHTTPClient(urljoin(str(base_uri), f"/_{xtdb_type.value}"), client)
 
 
 def close_rabbit_channel(queue_uri: str):

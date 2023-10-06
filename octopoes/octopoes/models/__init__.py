@@ -64,13 +64,10 @@ class Reference(str):
     # Check https://docs.pydantic.dev/latest/migration/#defining-custom-types for more information.
     # def __modify_schema__(cls, field_schema):
     #     field_schema.update(
-    def __get_pydantic_json_schema__(self, core_schema: CoreSchema, handler: GetJsonSchemaHandler):
-        json_schema = handler(core_schema)
-        json_schema.update(
-            examples=["Network|internet", "IPAddressV4|internet|1.1.1.1"],
-        )
-
-        return json_schema
+    # @classmethod
+    # def __get_pydantic_json_schema__(cls, core_schema: CoreSchema, handler: GetJsonSchemaHandler):
+    #     json_schema.update(
+    #
 
     @classmethod
     def validate(cls, v, info: ValidationInfo):
