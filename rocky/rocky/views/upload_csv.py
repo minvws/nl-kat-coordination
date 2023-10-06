@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from typing import Any, ClassVar, Dict
 from uuid import uuid4
 
-from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -12,15 +11,16 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
-from tools.forms.upload_csv import CSV_ERRORS
-from tools.forms.upload_oois import UploadOOICSVForm
 
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from octopoes.api.models import Declaration
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from octopoes.models.ooi.web import URL
 from rocky.bytes_client import get_bytes_client
+from tools.forms.upload_csv import CSV_ERRORS
+from tools.forms.upload_oois import UploadOOICSVForm
 
 CSV_CRITERIA = [
     _("Add column titles. Followed by each object on a new line."),
@@ -97,7 +97,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     def get_ooi_from_csv(self, ooi_type_name: str, values: Dict[str, str]):
         ooi_type = self.ooi_types[ooi_type_name]["type"]
         ooi_fields = [
-            (field, model_field.type_ == Reference, model_field.required)
+            (field, model_field.annotation == Reference, model_field.is_required())
             for field, model_field in ooi_type.__fields__.items()
             if field not in self.skip_properties
         ]

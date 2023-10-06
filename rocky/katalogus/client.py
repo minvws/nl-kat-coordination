@@ -8,7 +8,7 @@ import requests
 from django.conf import settings
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
@@ -27,7 +27,7 @@ class Plugin(BaseModel):
     created: Optional[str] = None
     description: Optional[str] = None
     environment_keys: List[str] = None
-    related: List[str] = None
+    related: List[str] = Field(default_factory=list)
     enabled: bool
     type: str
     produces: Set[Type[OOI]]
