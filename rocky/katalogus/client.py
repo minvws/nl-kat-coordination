@@ -26,7 +26,7 @@ class Plugin(BaseModel):
     authors: Optional[str] = None
     created: Optional[str] = None
     description: Optional[str] = None
-    environment_keys: List[str] = None
+    environment_keys: Optional[List[str]] = None
     related: List[str] = Field(default_factory=list)
     enabled: bool
     type: str
@@ -34,7 +34,8 @@ class Plugin(BaseModel):
 
     def dict(self, *args, **kwargs):
         """Pydantic does not stringify the OOI classes, but then templates can't render them"""
-        plugin_dict = super().dict(*args, **kwargs)
+        plugin_dict = dict(self)
+        # todo: use field_serializer instead
         plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
         return plugin_dict
 

@@ -7,8 +7,6 @@ from django.utils.translation import gettext_lazy as _
 from pydantic import AnyUrl
 from pydantic.fields import FieldInfo
 
-# from pydantic.fields import SHAPE_LIST, ModelField
-
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.question import Question
