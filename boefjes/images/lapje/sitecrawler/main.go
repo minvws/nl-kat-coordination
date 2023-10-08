@@ -57,17 +57,12 @@ func main() {
 	proxy := exec.Command("mitmdump", "-p", fmt.Sprintf("%d", conf.Port), "-w", network_dumpfile)
 	conf.Logger.Println(proxy.String())
 	go proxy.Run()
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 	defer proxy.Process.Kill()
 
 	// Make sure the mitmproxy certificates are trusted
-	cpCmd := exec.Command("cp", "/root/.mitmproxy/mitmproxy-ca.pem", "/usr/local/share/ca-certificates/mitmproxy-ca.crt")
-	err := cpCmd.Run()
-	if err != nil {
-		panic(err)
-	}
-	updateCmd := exec.Command("update-ca-certificates")
-	err = updateCmd.Run()
+	trustCmd := exec.Command("certutil", "-d", "sql:/root/.pki/nssdb", "-A", "-t", "TC", "-n", "\"mitmproxy\"", "-i", "/root/.mitmproxy/mitmproxy-ca.pem")
+	err := trustCmd.Run()
 	if err != nil {
 		panic(err)
 	}
