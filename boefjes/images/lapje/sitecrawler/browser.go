@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"os/exec"
 	"path"
 	"sync"
 	"time"
@@ -89,6 +90,7 @@ func (c *Crawler) AddBrowser(profiledir string) {
 	ctx, cancel = chromedp.NewContext(ctx)
 	defer cancel()
 	time.Sleep(1 * time.Second)
+
 	if err := chromedp.Run(ctx); err != nil {
 		c.Config.Logger.Println(err.Error())
 		go func() {
@@ -96,6 +98,15 @@ func (c *Crawler) AddBrowser(profiledir string) {
 			c.AddBrowser(profiledir)
 		}()
 		return
+	}
+
+	chromedp.Run(ctx, chromedp.Navigate("https://mitm.it/"))
+	time.Sleep(2 * time.Second)
+	// Make sure the mitmproxy certificates are trusted
+	trustCmd := exec.Command("certutil", "-d", "sql:/root/.pki/nssdb", "-A", "-t", "TC", "-n", "\"mitmproxy\"", "-i", "/root/.mitmproxy/mitmproxy-ca.pem")
+	err := trustCmd.Run()
+	if err != nil {
+		panic(err)
 	}
 
 	var screenshot_data []byte
