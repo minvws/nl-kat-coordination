@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"log"
 	"os"
 	"path"
@@ -40,20 +39,9 @@ func (c *Config) OpenDefaultLogger() (e error) {
 	return c.OpenLogger(path.Join(c.OutputDir, "log.txt"))
 }
 
-func (c *Config) ReadUrls(filename string) (e error) {
+func (c *Config) ReadUrls(url string) (e error) {
+	c.Urls = append(c.Urls, Url{Id: 0, Url: url})
 
-	readFile, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer readFile.Close()
-	fileScanner := bufio.NewScanner(readFile)
-	fileScanner.Split(bufio.ScanLines)
-	id := uint(1)
-	for fileScanner.Scan() {
-		c.Urls = append(c.Urls, Url{Id: id, Url: fileScanner.Text()})
-		id += 1
-	}
-	c.Logger.Println("Read", id-1, "urls from", filename)
+	c.Logger.Println("Crawling", url)
 	return nil
 }

@@ -11,16 +11,16 @@ import (
 
 func main() {
 	proxyPort := flag.Uint("p", 8080, "Port that mitmproxy will listen on.")
-	repeatCrawl := flag.Uint("r", 2, "The number of times to repeat each url.")
-	numTabs := flag.Uint("t", 8, "Number of tabs that will crawl in parallel.")
-	outPath := flag.String("o", "", "Storage location for crawl results.")
-	urlList := flag.String("l", "", "Text file with crawl urls.")
+	repeatCrawl := flag.Uint("r", 3, "The number of times to repeat each url.")
+	numTabs := flag.Uint("t", 1, "Number of tabs that will crawl in parallel.")
+	outPath := flag.String("o", "crawloutput", "Storage location for crawl results.")
+	crawlUrl := flag.String("u", "", "Url to visit")
 	flag.Parse()
 	if len(*outPath) == 0 {
 		panic("Please specify o")
 	}
-	if len(*urlList) == 0 {
-		panic("Please specify l")
+	if len(*crawlUrl) == 0 {
+		panic("Please specify u")
 	}
 
 	// Setup crawl environment
@@ -36,7 +36,6 @@ func main() {
 	conf.ScreenshotDir = path.Join(conf.OutputDir, "screenshots")
 	if _, err := os.Stat(conf.OutputDir); os.IsNotExist(err) {
 		os.MkdirAll(conf.OutputDir, 0755)
-		os.MkdirAll(conf.ProfileDir, 0755)
 		os.MkdirAll(conf.ScreenshotDir, 0755)
 	}
 
@@ -48,7 +47,7 @@ func main() {
 	// Read list of urls to crawl
 
 	conf.Logger.Println("Reading crawl list")
-	if err := conf.ReadUrls(*urlList); err != nil {
+	if err := conf.ReadUrls(*crawlUrl); err != nil {
 		panic(err)
 	}
 
