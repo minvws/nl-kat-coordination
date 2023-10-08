@@ -1,0 +1,8 @@
+{
+    "id": "kat_lapje_normalize",
+    "consumes": [
+        "lapje"
+    ],
+    "produces": [
+    ]
+}
