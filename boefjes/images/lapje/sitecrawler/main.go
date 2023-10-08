@@ -53,19 +53,12 @@ func main() {
 
 	// Start proxy
 	conf.Logger.Println("Starting mitmproxy")
-	network_dumpfile := path.Join(conf.OutputDir, fmt.Sprintf("%s.mproxy", time.Now().Format("2006-01-02_150405")))
+	network_dumpfile := path.Join(conf.OutputDir, "network.mproxy")
 	proxy := exec.Command("mitmdump", "-p", fmt.Sprintf("%d", conf.Port), "-w", network_dumpfile)
 	conf.Logger.Println(proxy.String())
 	go proxy.Run()
 	time.Sleep(5 * time.Second)
 	defer proxy.Process.Kill()
-
-	// Make sure the mitmproxy certificates are trusted
-	trustCmd := exec.Command("certutil", "-d", "sql:/root/.pki/nssdb", "-A", "-t", "TC", "-n", "\"mitmproxy\"", "-i", "/root/.mitmproxy/mitmproxy-ca.pem")
-	err := trustCmd.Run()
-	if err != nil {
-		panic(err)
-	}
 
 	// Start Chrome browser
 	conf.Logger.Println("Starting Chrome browser")
