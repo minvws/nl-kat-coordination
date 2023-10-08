@@ -6,6 +6,8 @@ import docker
 from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
 
+logger = logging.getLogger(__name__)
+
 OCI_IMAGE = "lapje"
 
 
@@ -20,6 +22,8 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     command = f"/usr/local/bin/sitecrawler -o output -u {url}"
 
+    logger.debug("Running container with command %s", command)
+
     client = docker.from_env()
     container = client.containers.run(
         OCI_IMAGE,
@@ -29,7 +33,12 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     container.wait()
 
-    output = get_file_from_container(container, "output/network.mproxy")
+    logfile = get_file_from_container(container, "/app/output/log.txt")
+
+    for line in logfile.decode("utf-8").splitlines():
+        logging.debug("Container output: %s", line)
+
+    output = get_file_from_container(container, "/app/output/network.mproxy")
 
     try:
         container.remove()
