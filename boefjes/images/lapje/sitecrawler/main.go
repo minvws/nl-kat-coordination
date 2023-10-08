@@ -60,6 +60,18 @@ func main() {
 	time.Sleep(2 * time.Second)
 	defer proxy.Process.Kill()
 
+	// Make sure the mitmproxy certificates are trusted
+	cpCmd := exec.Command("cp", "/root/.mitmproxy/mitmproxy-ca.pem", "/usr/local/share/ca-certificates/mitmproxy-ca.crt")
+	err := cpCmd.Run()
+	if err != nil {
+		panic(err)
+	}
+	updateCmd := exec.Command("update-ca-certificates")
+	err = updateCmd.Run()
+	if err != nil {
+		panic(err)
+	}
+
 	// Start Chrome browser
 	conf.Logger.Println("Starting Chrome browser")
 	browser, err := NewCrawler(conf)
