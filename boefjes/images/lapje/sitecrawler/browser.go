@@ -54,7 +54,7 @@ func (c *Crawler) AddBrowser(profiledir string) {
 	options := []chromedp.ExecAllocatorOption{
 		chromedp.NoFirstRun,
 		chromedp.NoDefaultBrowserCheck,
-		//chromedp.Headless,
+		chromedp.Headless,
 
 		chromedp.Flag("disable-background-networking", true),
 		chromedp.Flag("enable-features", "NetworkService,NetworkServiceInProcess"),
