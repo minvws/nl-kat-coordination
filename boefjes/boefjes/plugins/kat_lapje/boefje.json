@@ -1,10 +1,9 @@
 {
-    "id": "lapje",
+    "id": "kat_lapje",
     "name": "Lapje",
     "description": "Run lapje sitecrawler",
     "consumes": [
-        "HostnameHTTPURL",
-        "IPAddressHTTPURL"
+        "HostnameHTTPURL"
     ],
     "produces": [
     ],

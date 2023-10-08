@@ -11,7 +11,12 @@ OCI_IMAGE = "lapje"
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
-    url = input_["url"]
+
+    hostname = input_["netloc"]["name"]
+    path = input_["path"]
+    scheme = input_["scheme"]
+
+    url = f"{scheme}://{hostname}{path}"
 
     command = f"/usr/local/bin/sitecrawler -o output -u {url}"
 
