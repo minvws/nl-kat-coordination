@@ -58,6 +58,7 @@ wpscan-out-parse = "1.9.3"
 # required by kat_sec_txt
 sectxt = "0.9.0"
 opentelemetry-instrumentation = "^0.41b0"
+mitmproxy = {version = "10.1.1", python = ">3.10"}
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
