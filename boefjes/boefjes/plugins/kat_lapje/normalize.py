@@ -5,7 +5,7 @@ from octopoes.models import OOI, Reference
 
 import io
 
-from mitmproxy import io
+import mitmproxy
 from mitmproxy.exceptions import FlowReadException
 
 
@@ -13,7 +13,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     Reference.from_str(boefje_meta.input_ooi)
     flowfile = io.BytesIO(raw)
-    freader = io.FlowReader(flowfile)
+    freader = mitmproxy.io.FlowReader(flowfile)
     data = {}
     try:
         for f in freader.stream():
