@@ -2,8 +2,6 @@ from logging import getLogger
 from typing import Any, Dict, List
 
 from django.contrib import messages
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
@@ -34,7 +32,7 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
                 "text": _("Reports"),
             },
             {
-                "url": reverse("report_type_selection", kwargs=kwargs),
+                "url": reverse("report_types_selection", kwargs=kwargs),
                 "text": _("Choose report types"),
             },
             {
@@ -58,16 +56,15 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
         self.valid_time = self.get_observed_at()
         self.oois_selection = request.GET.getlist("ooi", [])
         self.report_types_selection = request.GET.getlist("report_type", [])
-        self.katalogus_client = get_katalogus(self.organization.code)
 
-    def get_report_types_from_oois_selection(self) -> List[Dict[str, str]]:
+    def get_report_types_from_oois_selection(self, ooi_ids: List[str]) -> List[Dict[str, str]]:
         return [
             {"id": report_type.id, "name": report_type.name, "description": report_type.description}
-            for report_type in get_report_types_for_oois(self.oois_selection)
+            for report_type in get_report_types_for_oois(ooi_ids)
         ]
 
-    def get_oois_from_selection(self):
-        return [self.get_single_ooi(ooi) for ooi in self.oois_selection]
+    def get_oois_from_selection(self, ooi_ids: List[str]):
+        return [self.get_single_ooi(ooi) for ooi in ooi_ids]
 
     def get_reports_data(self) -> Dict[str, Any]:
         report_data = {}
@@ -77,12 +74,11 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
             )
         return report_data
 
-    def get_required_optional_plugins(self) -> Dict[str, Plugin]:
-        if not self.report_types_selection:
-            return {}
-        plugins = get_plugins_for_report_ids(self.report_types_selection)
+    def get_required_optional_plugins(self, report_type_ids: List[str]) -> Dict[str, Plugin]:
+        katalogus_client = get_katalogus(self.organization.code)
+        plugins = get_plugins_for_report_ids(report_type_ids)
         for plugin, value in plugins.items():
-            plugins[plugin] = [self.katalogus_client.get_plugin(plugin_id) for plugin_id in value]
+            plugins[plugin] = [katalogus_client.get_plugin(plugin_id) for plugin_id in value]
         return plugins
 
     def get_context_data(self, **kwargs):
@@ -90,9 +86,7 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
         context["observed_at"] = self.valid_time
         context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
         context["oois_selection"] = self.oois_selection
-        context["oois"] = self.get_oois_from_selection()
-        context["report_types"] = self.get_report_types_from_oois_selection()
-        context["plugins"] = self.get_required_optional_plugins()
+        context["report_types_selection"] = self.report_types_selection
         return context
 
 
@@ -103,26 +97,52 @@ class ReportOOISelectionView(BaseReportView, BaseOOIListView):
 
     template_name = "report_oois_selection.html"
     current_step = 1
-    paginate_by = None
+    paginate_by = 500
 
 
-class ReportTypeSelectionView(BaseReportView, TemplateView):
+class BaseSelectionView(BaseReportView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.oois = self.get_oois_from_selection(self.oois_selection)
+        self.report_types = self.get_report_types_from_oois_selection(self.oois_selection)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["oois"] = self.oois
+        context["report_types"] = self.report_types
+        return context
+
+
+class ReportTypeSelectionView(BaseSelectionView, TemplateView):
     """
     Shows all possible report types from a list of OOIs.
     Chooses report types to generate a report.
     """
 
-    template_name = "report_type_selection.html"
+    template_name = "report_types_selection.html"
     current_step = 2
 
     def get(self, request, *args, **kwargs):
         if not self.oois_selection:
             messages.add_message(self.request, messages.ERROR, _("Select at least one OOI to proceed."))
-            return redirect(reverse("report_oois_selection", kwargs={"organization_code": self.organization.code}))
         return super().get(request, *args, **kwargs)
 
 
-class ReportSetupScanView(BaseReportView, TemplateView):
+class PluginSelectionView(BaseReportView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugins = self.get_required_optional_plugins(self.report_types_selection)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["plugins"] = self.plugins
+        return context
+
+    def are_all_required_plugins_enabled(self):
+        return all([plugin.enabled for plugin in self.plugins["required"]])
+
+
+class ReportSetupScanView(PluginSelectionView, TemplateView):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -130,8 +150,13 @@ class ReportSetupScanView(BaseReportView, TemplateView):
     template_name = "report_setup_scan.html"
     current_step = 3
 
+    def get(self, request, *args, **kwargs):
+        if not self.report_types_selection:
+            messages.add_message(self.request, messages.ERROR, _("Select at least one report type to proceed."))
+        return super().get(request, *args, **kwargs)
 
-class ReportView(BaseReportView, TemplateView):
+
+class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -139,7 +164,13 @@ class ReportView(BaseReportView, TemplateView):
     template_name = "report.html"
     current_step = 4
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def get(self, request, *args, **kwargs):
+        if not self.are_all_required_plugins_enabled():
+            messages.add_message(
+                self.request,
+                messages.WARNING,
+                _("This report may not reveal any data as all the required plugins are not enabled. "),
+            )
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

@@ -23,43 +23,53 @@
                 {% endblocktranslate %}
             </h2>
             <p>{% translate "Select which objects you want to include in your report." %}</p>
-            {% translate "Filter" as filter_title %}
-            {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
+            {% if not object_list %}
+                <p>{% translate "There are no objects found to make a report." %}</p>
+                <div class="button-container">
+                    <a class="button ghost"
+                       href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
+                    <a class="button"
+                       href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
+                </div>
+            {% else %}
+                {% translate "Filter" as filter_title %}
+                {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
 
-            <form method="get"
-                  action="{% url 'report_type_selection' organization.code %}"
-                  class="inline">
-                <table>
-                    <thead>
-                        <th>
-                            <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
-                        </th>
-                        <th>{% translate "Object" %}</th>
-                        <th>{% translate "Type" %}</th>
-                        <th>{% translate "Clearance level" %}</th>
-                    </thead>
-                    <tbody>
-                        {% for object in object_list %}
-                            <tr>
-                                <td>
-                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in oois_selection %}checked{% endif %}>
-                                </td>
-                                <td>{{ object.human_readable }}</td>
-                                <td>{{ object.ooi_type }}</td>
-                                <td>
-                                    {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
+                <form method="get"
+                      action="{% url 'report_types_selection' organization.code %}"
+                      class="inline layout-wide">
+                    <table>
+                        <thead>
+                            <th>
+                                <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                            </th>
+                            <th>{% translate "Object" %}</th>
+                            <th>{% translate "Type" %}</th>
+                            <th>{% translate "Clearance level" %}</th>
+                        </thead>
+                        <tbody>
+                            {% for object in object_list %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in oois_selection %}checked{% endif %}>
+                                    </td>
+                                    <td>{{ object.human_readable }}</td>
+                                    <td>{{ object.ooi_type }}</td>
+                                    <td>
+                                        {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
 
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <button type="submit" class="button">
-                    {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
-                </button>
-            </form>
-            {% include "partials/list_paginator.html" %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button name="btn-setup-report" type="submit" class="button">
+                        {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
+                    </button>
+                </form>
+                {% include "partials/list_paginator.html" %}
 
+            {% endif %}
         </section>
     </main>
 {% endblock content %}

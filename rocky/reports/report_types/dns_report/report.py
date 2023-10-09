@@ -15,7 +15,7 @@ class DNSReport(Report):
     id = "dns-report"
     name = _("DNS Report")
     description = _("DNS reports focus on domain name system configuration and potential weaknesses.")
-    plugins = {"required": ["dns-records", "dns-sec"], "optional": []}
+    plugins = {"required": ["dns-records", "dns-zone"], "optional": ["dns-sec"]}
     input_ooi_types = {Hostname}
     html_template_path = "dns_report/report.html"
 

@@ -11,6 +11,7 @@
         {% include "partials/report_introduction.html" %}
         {% include "summary/report_summary.html" %}
 
+        {{ required_plugins_enabled }}
         {% for ooi, report in report_data.items %}
             {% for report_type,data in report.items %}
                 <section class="dividing-line">
