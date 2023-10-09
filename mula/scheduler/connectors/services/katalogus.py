@@ -137,7 +137,6 @@ class Katalogus(HTTPService):
     @exception_handler
     def get_organisations(self) -> List[Organisation]:
         url = f"{self.host}/v1/organisations"
-        self.logger.info(url)
         response = self.get(url)
         return [Organisation(**organisation) for organisation in response.json().values()]
 
