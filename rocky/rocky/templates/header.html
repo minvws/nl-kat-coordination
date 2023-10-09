@@ -95,11 +95,12 @@
                     {% for breadcrumb in breadcrumbs %}
                         {% if forloop.last %}
                             <li>
-                                <a aria-current="true" href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+                                <a aria-current="true"
+                                   href="{{ breadcrumb.url }}?{{ request.GET.urlencode }}">{{ breadcrumb.text }}</a>
                             </li>
                         {% else %}
                             <li>
-                                <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
+                                <a href="{{ breadcrumb.url }}?{{ request.GET.urlencode }}">{{ breadcrumb.text }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}

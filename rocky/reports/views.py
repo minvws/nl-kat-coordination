@@ -89,6 +89,7 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
         context = super().get_context_data(**kwargs)
         context["observed_at"] = self.valid_time
         context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
+        context["oois_selection"] = self.oois_selection
         context["oois"] = self.get_oois_from_selection()
         context["report_types"] = self.get_report_types_from_oois_selection()
         context["plugins"] = self.get_required_optional_plugins()
@@ -102,6 +103,7 @@ class ReportOOISelectionView(BaseReportView, BaseOOIListView):
 
     template_name = "report_oois_selection.html"
     current_step = 1
+    paginate_by = None
 
 
 class ReportTypeSelectionView(BaseReportView, TemplateView):
