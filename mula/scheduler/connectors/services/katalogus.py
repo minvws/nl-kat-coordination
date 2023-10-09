@@ -118,13 +118,13 @@ class Katalogus(HTTPService):
 
     @exception_handler
     def get_boefjes(self) -> List[Boefje]:
-        url = f"{self.host}/v1/boefjes"
+        url = f"{self.host}/boefjes"
         response = self.get(url)
         return [Boefje(**boefje) for boefje in response.json()]
 
     @exception_handler
     def get_boefje(self, boefje_id: str) -> Boefje:
-        url = f"{self.host}/v1/boefjes/{boefje_id}"
+        url = f"{self.host}/boefjes/{boefje_id}"
         response = self.get(url)
         return Boefje(**response.json())
 
