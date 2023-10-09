@@ -10,7 +10,6 @@ def parse_cipher(cipher: Dict) -> Union[Dict, None]:
     if cipher["id"].startswith("cipher-tls"):
         parts = cipher["finding"].split()
 
-        # if key size is found
         cipher_dict = {
             parts[0]: {  # parts[0] is the protocol
                 "cipher_suite_code": parts[1],
@@ -19,6 +18,7 @@ def parse_cipher(cipher: Dict) -> Union[Dict, None]:
             }
         }
 
+        # if key size is found
         if parts[4].isdigit():
             cipher_dict[parts[0]].update(
                 {
