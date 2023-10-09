@@ -5,19 +5,23 @@
   --table-background-color: #ffffff;
   --table-text-color: var(--application-base-text-color);
   --table-foot-background-color: #f5f5f5;
-  --table-body-head-cell-background-color: var(--application-base-accent-color);
+  --table-text-align: left;
 
   /* Table header */
   --table-head-background-color: #ffffff;
   --table-head-border-width: 0 0 2px 0;
   --table-head-border-style: solid;
-  --table-head-border-color: var(--branding-color-1-darker);
+  --table-head-border-color: var(--kat-purrple-6);
 
   /* Table row */
   --table-row-background-color-striping: transparent;
 
   /* th */
   --table-head-cell-font-size: 1rem;
+
+  /* Table body header */
+  --table-body-head-cell-border-width: 0;
+  --table-body-head-cell-background-color: transparent;
 
   /* Table cell */
   --table-cell-border-width: 0 0 1px 0;
@@ -45,4 +49,26 @@ table td {
 /* Setting the width of table cells with an action button to the possible minimum width */
 table.action-buttons .actions {
   width: 1px;
+
+  a,
+  a.button,
+  button {
+    &.icon::before {
+      font-weight: normal;
+    }
+  }
+}
+
+table thead th:first-child,
+table tbody td:first-child,
+table tfoot th:first-child,
+table tfoot td:first-child {
+  padding-left: 0;
+}
+
+table thead th:last-child,
+table tbody td:last-child,
+table tfoot th:last-child,
+table tfoot td:last-child {
+  padding-right: 0;
 }
