@@ -56,10 +56,10 @@ def _serialize_value(value: Any, required: bool) -> Any:
         return [_serialize_value(item, required) for item in value]
     if isinstance(value, Reference):
         try:
-            return value.tokenized.dict()["__root__"]
-        except IndexError as error:
+            return value.tokenized.root
+        except AttributeError:
             if required:
-                raise error
+                raise
 
             return None
     if isinstance(value, Enum):
@@ -229,7 +229,7 @@ class NormalizerHandler(Handler):
 
     @staticmethod
     def _parse_ooi(result: NormalizerPlainOOI):
-        return parse_obj_as(OOIType, result.dict())
+        return parse_obj_as(OOIType, result.model_dump())
 
 
 def get_octopoes_api_connector(org_code: str):
