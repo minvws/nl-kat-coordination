@@ -103,3 +103,10 @@ class AppContext:
             registry=self.metrics_registry,
             labelnames=["scheduler_id"],
         )
+
+        self.metrics_task_status_counts = Gauge(
+            name="scheduler_task_status_counts",
+            documentation="Number of tasks in each status",
+            registry=self.metrics_registry,
+            labelnames=["scheduler_id", "status"],
+        )

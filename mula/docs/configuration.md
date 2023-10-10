@@ -26,6 +26,11 @@ SCHEDULER_API_PORT=
 # Default: False
 SCHEDULER_DEBUG=
 
+# Boolean that enables/disables the collection of metrics to be used with tools
+# like Prometheus
+# Default: False
+SCHEDULER_COLLECT_METRICS=
+
 # Database connection string
 SCHEDULER_DB_DSN=
 
