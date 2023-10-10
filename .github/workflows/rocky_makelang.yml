@@ -49,8 +49,6 @@ jobs:
           SCHEDULER_API: http://scheduler:8000
           SECRET_KEY: whatever
 
-
-
       - name: Check if at least one source string changed
         run: |
           changed_lines=$(git diff --unified=0 rocky/rocky/locale/django.pot | grep -E -o '^[+-](msgid|msgstr)' | wc -l)
