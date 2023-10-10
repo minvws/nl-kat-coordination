@@ -268,8 +268,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.assertEqual(first_item.data, first_entry.data)
 
     def test_push_maxsize_allowed(self):
-        """When pushing an item to the queue, if the maxsize is reached, the
-        item should be discarded.
+        """When pushing an item to the queue, if the maxsize is not reached, the
+        item should be not discarded.
         """
         # Set maxsize to 0 (unbounded)
         self.pq.maxsize = 0
@@ -296,6 +296,61 @@ class PriorityQueueTestCase(unittest.TestCase):
         # Last item should be the second item
         self.assertEqual(2, second_entry.priority)
         self.assertEqual(second_item.data, second_entry.data)
+
+    def test_push_maxsize_allowed_high_priority(self):
+        """When pushing an item to the queue, if the maxsize is reached,
+        pushing an item with a higher priority should not discard the item.
+        """
+        # Set maxsize to 1
+        self.pq.maxsize = 1
+
+        # Add an item to the queue
+        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=first_item)
+
+        # Add another item to the queue
+        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=second_item)
+
+        # The queue should now have 2 items
+        self.assertEqual(2, self.pq.qsize())
+
+        first_entry = self.pq.peek(0)
+        second_entry = self.pq.peek(1)
+
+        # The item with the highest priority should be the one that was
+        # added first
+        self.assertEqual(1, first_entry.priority)
+        self.assertEqual(first_item.data, first_entry.data)
+
+        # Last item should be the second item
+        self.assertEqual(1, second_entry.priority)
+        self.assertEqual(second_item.data, second_entry.data)
+
+    def test_push_maxsize_not_allowed_low_priority(self):
+        """When pushing an item to the queue, if the maxsize is reached,
+        pushing an item with a lower priority should discard the item.
+        """
+        # Set maxsize to 1
+        self.pq.maxsize = 1
+
+        # Add an item to the queue
+        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=first_item)
+
+        # Add another item to the queue
+        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=2)
+        with self.assertRaises(_queue.Full):
+            self.pq.push(p_item=second_item)
+
+        # The queue should now have 1 item
+        self.assertEqual(1, self.pq.qsize())
+
+        # The item with the highest priority should be the one that was
+        # added first
+        first_entry = self.pq.peek(0)
+        self.assertEqual(1, first_entry.priority)
+        self.assertEqual(first_item.data, first_entry.data)
 
     def test_pop(self):
         """When popping an item it should return the correct item and remove
