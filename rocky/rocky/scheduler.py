@@ -213,13 +213,13 @@ class SchedulerClient:
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
-
+        res_detail = res.json().get("detail")
         if res.status_code == HTTPStatus.TOO_MANY_REQUESTS:
-            raise TooManyRequestsError(res.json().get("detail"))
+            raise TooManyRequestsError(res_detail)
         elif res.status_code == HTTPStatus.BAD_REQUEST:
-            raise BadRequestError(res.json().get("detail"))
+            raise BadRequestError(res_detail)
         elif res.status_code == HTTPStatus.CONFLICT:
-            raise ConflictError(res.json().get("detail"))
+            raise ConflictError(res_detail)
 
         res.raise_for_status()
 

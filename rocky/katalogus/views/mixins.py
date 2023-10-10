@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from requests import HTTPError, RequestException
 from rest_framework.status import HTTP_404_NOT_FOUND
+from tools.view_helpers import schedule_task
 
 from katalogus.client import (
     Boefje as KATalogusBoefje,
@@ -85,6 +86,7 @@ class NormalizerMixin:
         )
 
         item = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
+        schedule_task()
         client.push_task(f"normalizer-{self.organization.code}", item)
 
 
@@ -103,16 +105,7 @@ class BoefjeMixin(OctopoesView):
         )
 
         item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
-        try:
-            client.push_task(f"boefje-{self.organization.code}", item)
-        except Exception as e:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                e,
-            )
-        else:
-            messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
+        schedule_task(self.request, f"boefje-{self.organization.code}", item)
 
     def run_boefje_for_oois(
         self,
