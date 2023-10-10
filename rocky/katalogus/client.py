@@ -38,6 +38,7 @@ class Plugin(BaseModel):
         plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
         return plugin_dict
 
+    @classmethod
     def can_scan(self, member) -> bool:
         return member.has_perm("tools.can_scan_organization")
 
