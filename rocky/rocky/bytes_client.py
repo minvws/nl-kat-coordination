@@ -44,7 +44,7 @@ class BytesClient:
         self.login()
 
         boefje_meta = BoefjeMeta(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             boefje=Boefje(id="manual"),
             input_ooi=None,
             arguments={},

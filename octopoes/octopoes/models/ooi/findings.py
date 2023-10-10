@@ -105,7 +105,7 @@ class MutedFinding(OOI):
     object_type: Literal["MutedFinding"] = "MutedFinding"
 
     finding: Reference = ReferenceField(Finding)
-    reason: Optional[str]
+    reason: Optional[str] = None
 
     _natural_key_attrs = ["finding"]
     _reverse_relation_names = {"finding": "mutes"}

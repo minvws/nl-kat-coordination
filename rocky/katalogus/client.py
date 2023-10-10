@@ -52,6 +52,7 @@ class Boefje(Plugin):
     def dict(self, *args, **kwargs):
         """Pydantic does not stringify the OOI classes, but then templates can't render them"""
         boefje_dict = super().dict(*args, **kwargs)
+        # todo: use `field_serializer` instead
         boefje_dict["consumes"] = {ooi_class.get_ooi_type() for ooi_class in boefje_dict["consumes"]}
         return boefje_dict
 

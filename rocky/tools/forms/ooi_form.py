@@ -85,7 +85,7 @@ def generate_select_ooi_field(
     """Select field will have a list of OOIs"""
     # field is a relation, query all objects, and build select
     default_attrs = default_field_options("", field)
-    is_multiselect = field.shape == SHAPE_LIST
+    is_multiselect = getattr(field.annotation, "__origin__", None) == list
     option_label = default_attrs.get("label", _("option"))
 
     option_text = "-- " + _("Optionally choose a {option_label}").format(option_label=option_label) + " --"
@@ -136,7 +136,7 @@ def generate_url_field(field: FieldInfo) -> forms.fields.Field:
 def default_field_options(name: str, field_info: FieldInfo) -> Dict[str, Union[str, bool]]:
     return {
         "label": name,
-        "required": bool(field_info.is_required()),
+        "required": field_info.is_required(),
     }
 
 

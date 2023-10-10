@@ -39,7 +39,7 @@ class Observation(_BaseObservation):
 class Declaration(BaseModel):
     """Used by Octopoes Connector to describe request body"""
 
-    ooi: OOI
+    ooi: OOIType
     valid_time: datetime
     method: Optional[str] = None
     task_id: Optional[uuid.UUID] = None
