@@ -2,9 +2,10 @@
 {% load static %}
 
 <div role="group" id="plugin_{{ plugin.id|slugify }}">
-    {% if checkbox_field %}
-        <input type="checkbox"
-               name="{{ plugin.type }}"
+    {% if form_id %}
+        <input form="{{ form_id }}"
+               type="checkbox"
+               name="plugin"
                value="{{ plugin.id }}"
                {% if plugin.id in request.GET.urlencode %}checked{% endif %} />
     {% endif %}

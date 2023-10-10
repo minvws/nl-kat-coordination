@@ -8,6 +8,7 @@ from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
+from octopoes.models import OOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.helpers import (
     generate_reports_for_oois,
@@ -90,16 +91,6 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
         return context
 
 
-class ReportOOISelectionView(BaseReportView, BaseOOIListView):
-    """
-    Select OOIs from list to include in report.
-    """
-
-    template_name = "report_oois_selection.html"
-    current_step = 1
-    paginate_by = 500
-
-
 class BaseSelectionView(BaseReportView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -111,6 +102,45 @@ class BaseSelectionView(BaseReportView):
         context["oois"] = self.oois
         context["report_types"] = self.report_types
         return context
+
+
+class PluginSelectionView(BaseReportView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugins = self.get_required_optional_plugins(self.report_types_selection)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["plugins"] = self.plugins
+        return context
+
+    def are_plugins_enabled(self) -> bool:
+        enabled_plugins = []
+        for plugin_key, plugins_to_scan in self.plugins.items():
+            for plugin in plugins_to_scan:
+                enabled_plugins.append(plugin.enabled)
+        return all(enabled_plugins)
+
+    def get_max_scan_level_plugins(self):
+        scan_levels = []
+        for plugin_key, plugins_to_scan in self.plugins.items():
+            for plugin in plugins_to_scan:
+                scan_levels.append(plugin.scan_level.value)
+        return max(scan_levels)
+
+    def oois_not_enough_clearance(self, oois: List[OOI]):
+        plugins_max_scan_level = self.get_max_scan_level_plugins()
+        return all([ooi.scan_profile.level.value >= plugins_max_scan_level for ooi in oois])
+
+
+class ReportOOISelectionView(BaseReportView, BaseOOIListView):
+    """
+    Select OOIs from list to include in report.
+    """
+
+    template_name = "report_oois_selection.html"
+    current_step = 1
+    paginate_by = 500
 
 
 class ReportTypeSelectionView(BaseSelectionView, TemplateView):
@@ -126,20 +156,6 @@ class ReportTypeSelectionView(BaseSelectionView, TemplateView):
         if not self.oois_selection:
             messages.add_message(self.request, messages.ERROR, _("Select at least one OOI to proceed."))
         return super().get(request, *args, **kwargs)
-
-
-class PluginSelectionView(BaseReportView):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.plugins = self.get_required_optional_plugins(self.report_types_selection)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plugins"] = self.plugins
-        return context
-
-    def are_all_required_plugins_enabled(self):
-        return all([plugin.enabled for plugin in self.plugins["required"]])
 
 
 class ReportSetupScanView(PluginSelectionView, TemplateView):
@@ -165,11 +181,17 @@ class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
     current_step = 4
 
     def get(self, request, *args, **kwargs):
-        if not self.are_all_required_plugins_enabled():
+        if not self.are_plugins_enabled():
             messages.add_message(
                 self.request,
                 messages.WARNING,
-                _("This report may not reveal any data as all the required plugins are not enabled. "),
+                _("This report may not show all the data as some plugins are not enabled. "),
+            )
+        if not self.oois_not_enough_clearance(self.oois):
+            messages.add_message(
+                self.request,
+                messages.WARNING,
+                _("Some plugins are not able to scan due that they do not match object's clearance level."),
             )
         return super().get(request, *args, **kwargs)
 

@@ -38,12 +38,13 @@
                         </p>
                         <div class="column-4 tiles plugins images-cover">
                             {% for optional_plugin in plugins.optional %}
-                                {% include "partials/plugin_tile.html" with plugin=optional_plugin checkbox_field="yes" %}
+                                {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
 
                             {% endfor %}
                         </div>
                     {% endif %}
-                    <form class="inline"
+                    <form id="generate_report"
+                          class="inline"
                           method="get"
                           action="{% url 'report_view' organization.code %}">
                         {% include "forms/report_form_fields.html" %}

@@ -6,8 +6,3 @@
         <input type="hidden" name="plugin" value={{ required_plugin.id }}>
     {% endfor %}
 {% endif %}
-{% if plugins.optional %}
-    {% for optional_plugin in plugins.optional %}
-        <input type="hidden" name="plugin" value={{ optional_plugin.id }}>
-    {% endfor %}
-{% endif %}
