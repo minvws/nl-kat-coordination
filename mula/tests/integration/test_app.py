@@ -36,6 +36,8 @@ class AppTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.app.shutdown()
+        models.Base.metadata.drop_all(self.dbconn.engine)
+        self.dbconn.engine.dispose()
 
     def test_monitor_orgs_add(self):
         """Test that when a new organisation is added, a new scheduler is created"""

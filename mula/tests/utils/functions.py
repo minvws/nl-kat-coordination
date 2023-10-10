@@ -3,6 +3,8 @@ from typing import Any, ClassVar, Optional
 
 import pydantic
 from scheduler import models
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.orm import Query
 
 
 class TestModel(pydantic.BaseModel):
@@ -35,3 +37,7 @@ def create_task(p_item: models.PrioritizedItem) -> models.Task:
         p_item=p_item,
         status=models.TaskStatus.QUEUED,
     )
+
+
+def compile_query(query: Query) -> str:
+    return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))

@@ -51,9 +51,12 @@ reportlab = "^3.6.13"
 # OpenTelemetry
 opentelemetry-sdk = "^1.19.0"
 opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
-opentelemetry-instrumentation-django = "^0.40b0"
-opentelemetry-instrumentation-psycopg2 = "^0.40b0"
-opentelemetry-instrumentation-requests = "^0.40b0"
+opentelemetry-instrumentation-django = "^0.41b0"
+opentelemetry-instrumentation-psycopg2 = "^0.41b0"
+opentelemetry-instrumentation-requests = "^0.41b0"
+whitenoise = {extras = ["brotli"], version = "^6.5.0"}
+opentelemetry-instrumentation = "^0.41b0"
+opentelemetry-instrumentation-fastapi = "^0.41b0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -94,7 +97,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
-DJANGO_SETTINGS_MODULE = "rocky.settings"
+DJANGO_SETTINGS_MODULE = "rocky.settings_test"
 
 [tool.coverage.run]
 omit = ["fmea/*"]

@@ -23,7 +23,10 @@
                     {% endblocktranslate %}
                 </p>
                 <p class="de-emphasized">
-                    <strong>{% translate "Currently filtered on:" %}</strong> {{ types_display }}
+                    {% if active_filters %}
+                        <strong>{% translate "Currently filtered on:" %}</strong>
+                        {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value|title }}&nbsp;{% endfor %}
+                    {% endif %}
                 </p>
                 {% include "partials/ooi_list_toolbar.html" %}
 
@@ -73,6 +76,6 @@
 {% block html_at_end_body %}
     {{ block.super }}
     {% compress js %}
-        <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
     {% endcompress %}
 {% endblock html_at_end_body %}
