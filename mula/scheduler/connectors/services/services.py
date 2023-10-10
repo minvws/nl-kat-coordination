@@ -100,9 +100,12 @@ class HTTPService(Connector):
         Returns:
             A request.Response object
         """
+        if headers:
+            self.headers.update(headers)
+
         response = self.session.get(
             url,
-            headers=self.headers.update(headers) if headers else self.headers,
+            headers=self.headers,
             params=params,
             data=payload,
             timeout=self.timeout,
@@ -134,9 +137,12 @@ class HTTPService(Connector):
         Returns:
             A request.Response object
         """
+        if headers:
+            self.headers.update(headers)
+
         response = self.session.post(
             url,
-            headers=self.headers.update(headers) if headers else self.headers,
+            headers=headers,
             params=params,
             data=payload,
             timeout=self.timeout,
