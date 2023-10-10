@@ -301,7 +301,6 @@ pytestdebug.log
 
 # Translations
 *.mo
-*.pot
 
 # Django stuff:
 local_settings.py
