@@ -5,7 +5,6 @@ from scheduler.connectors import services
 
 
 class BytesTestCase(unittest.TestCase):
-
     def setUp(self) -> None:
         self.config = config.settings.Settings()
         self.service_bytes = services.Bytes(
