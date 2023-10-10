@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from tools.forms.ooi import MuteFindingForm
-from tools.ooi_helpers import create_ooi, delete_oois
+from tools.ooi_helpers import create_ooi
 
 from octopoes.models.ooi.findings import MutedFinding
 from rocky.views.mixins import SingleOOIMixin
@@ -45,7 +45,8 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
             messages.add_message(self.request, messages.WARNING, _("Please select at least one finding."))
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
         if unmute:
-            delete_oois(self.octopoes_api_connector, selected_findings)
+            mutes_finding_refs = [MutedFinding(finding=finding) for finding in selected_findings]
+            self.octopoes_api_connector.delete_many(mutes_finding_refs)
         else:
             for finding in selected_findings:
                 ooi = self.ooi_class.parse_obj({"finding": finding, "reason": reason})

@@ -267,21 +267,7 @@ def create_ooi(
         observed_at = datetime.now(timezone.utc)
 
     task_id = uuid4()
-    declaration = Declaration(ooi=ooi, observed_at=observed_at, task_id=str(task_id))
+    declaration = Declaration(ooi=ooi, valid_time=observed_at, task_id=str(task_id))
     bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))
 
     api_connector.save_declaration(declaration)
-
-
-def delete_oois(
-    api_connector: OctopoesAPIConnector, selected_oois: List[Reference], observed_at: datetime = None
-) -> None:
-    if observed_at is None:
-        observed_at = datetime.now(timezone.utc)
-
-        api_connector.delete_many(selected_oois, observed_at)
-        #     messages.add_message(
-
-        # messages.add_message(
-        #     request,
-        #     messages.SUCCESS,
