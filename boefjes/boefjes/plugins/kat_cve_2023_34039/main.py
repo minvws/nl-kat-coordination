@@ -46,11 +46,14 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[str, bytes]]]:
                 "UserKnownHostsFile=/dev/null",
                 "-o",
                 "BatchMode=yes",
+                "exit"
                 "2>/dev/null",
             ]
             try:
                 ssh_command = " ".join(ssh_command)
                 coutput = os.system(ssh_command)
+                if couput not in (0, 32512): # 0, it worked, 32512 `exit` does not exists but we did connect
+                    continue
                 return [
                     (
                         set(),
