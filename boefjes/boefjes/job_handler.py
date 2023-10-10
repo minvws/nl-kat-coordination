@@ -11,6 +11,7 @@ from requests import RequestException
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
+from boefjes.docker_boefjes_runner import DockerBoefjesRunner
 from boefjes.job_models import (
     BoefjeMeta,
     NormalizerMeta,
@@ -127,7 +128,19 @@ class BoefjeHandler(Handler):
         self.local_repository: LocalPluginRepository = local_repository
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
-        logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, boefje_meta.id)
+        logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
+
+        # Check if this boefje is container-native, if so, continue using the Docker boefjes runner
+        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
+        if boefje_resource.oci_image:
+            logger.info(
+                "Delegating boefje %s[task_id=%s] to Docker runner with OCI image [%s]",
+                boefje_meta.boefje.id,
+                str(boefje_meta.id),
+                boefje_resource.oci_image,
+            )
+            docker_runner = DockerBoefjesRunner(boefje_resource, boefje_meta)
+            return docker_runner.run()
 
         if boefje_meta.input_ooi:
             boefje_meta.arguments["input"] = serialize_ooi(
@@ -137,8 +150,6 @@ class BoefjeHandler(Handler):
                 )
             )
 
-        boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
-
         env_keys = boefje_resource.environment_keys
 
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
@@ -146,7 +157,7 @@ class BoefjeHandler(Handler):
 
         mime_types = _collect_default_mime_types(boefje_meta)
 
-        logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+        logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
         boefje_meta.started_at = datetime.now(timezone.utc)
 
@@ -155,13 +166,13 @@ class BoefjeHandler(Handler):
         try:
             boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
         except Exception:
-            logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+            logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
 
             raise
         finally:
             boefje_meta.ended_at = datetime.now(timezone.utc)
-            logger.info("Saving to Bytes for boefje boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+            logger.info("Saving to Bytes for boefje boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
             bytes_api_client.login()
             bytes_api_client.save_boefje_meta(boefje_meta)
@@ -170,7 +181,7 @@ class BoefjeHandler(Handler):
                 for boefje_added_mime_types, output in boefje_results:
                     bytes_api_client.save_raw(boefje_meta.id, output, mime_types.union(boefje_added_mime_types))
 
-            logger.info("Done with boefje for %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
+            logger.info("Done with boefje for %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
 
 class NormalizerHandler(Handler):

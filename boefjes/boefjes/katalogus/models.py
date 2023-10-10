@@ -41,6 +41,7 @@ class Boefje(Plugin):
     produces: List[str] = Field(default_factory=list)
     options: Optional[List[str]] = None
     runnable_hash: Optional[str] = None
+    oci_image: Optional[str] = None
 
 
 class Normalizer(Plugin):

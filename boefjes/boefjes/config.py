@@ -79,7 +79,11 @@ class Settings(BaseSettings):
         8000,
         description="Host port of the Boefje API server",
     )
-
+    boefje_docker_network: str = Field(
+        "bridge",
+        description="Docker network to run Boefjes in",
+        env="BOEFJE_DOCKER_NETWORK",
+    )
     bytes_api: AnyHttpUrl = Field(
         ..., examples=["http://localhost:8002"], description="Bytes API URL", validation_alias="BYTES_API"
     )
