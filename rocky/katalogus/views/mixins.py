@@ -103,7 +103,16 @@ class BoefjeMixin(OctopoesView):
         )
 
         item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
-        client.push_task(f"boefje-{self.organization.code}", item)
+        try:
+            client.push_task(f"boefje-{self.organization.code}", item)
+        except Exception as e:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                e,
+            )
+        else:
+            messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
 
     def run_boefje_for_oois(
         self,
