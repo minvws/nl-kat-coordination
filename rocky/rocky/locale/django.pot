@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-28 13:31+0000\n"
+"POT-Creation-Date: 2023-10-10 11:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1666,10 +1666,6 @@ msgstr ""
 msgid "Session has terminated, please select OOIs again."
 msgstr ""
 
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
-msgid "Scanning successfully scheduled."
-msgstr ""
-
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
 msgstr ""
@@ -1686,6 +1682,10 @@ msgstr ""
 #: katalogus/views/mixins.py
 msgid ""
 "Getting information for plugin {} failed. Please check the KATalogus logs."
+msgstr ""
+
+#: katalogus/views/mixins.py
+msgid "Scanning successfully scheduled."
 msgstr ""
 
 #: katalogus/views/mixins.py
