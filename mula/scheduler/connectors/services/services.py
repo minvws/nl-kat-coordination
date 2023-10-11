@@ -1,6 +1,6 @@
 import logging
 import urllib.parse
-from typing import Any, Dict, Optional
+from typing import Any, Dict, MutableMapping, Optional, Union
 
 import requests
 from requests.adapters import HTTPAdapter, Retry
@@ -147,7 +147,7 @@ class HTTPService(Connector):
         return response
 
     @property
-    def headers(self) -> Dict[str, Any]:
+    def headers(self) -> MutableMapping[str, Union[str, bytes]]:
         return self.session.headers
 
     def _do_checks(self) -> None:
