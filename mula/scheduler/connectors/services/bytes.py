@@ -62,7 +62,6 @@ class Bytes(HTTPService):
         response = self.post(
             url=url,
             payload=self.credentials,
-            headers={"Content-Type": "application/x-www-form-urlendcoded"},
         )
 
         self._verify_response(response)
