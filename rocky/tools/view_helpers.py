@@ -10,7 +10,14 @@ from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models.types import OOI_TYPES
-from rocky.scheduler import BadRequestError, ConflictError, QueuePrioritizedItem, TooManyRequestsError, client
+from rocky.scheduler import (
+    BadRequestError,
+    ConflictError,
+    QueuePrioritizedItem,
+    SchedulerError,
+    TooManyRequestsError,
+    client,
+)
 
 
 def convert_date_to_datetime(d: date) -> datetime:
@@ -161,19 +168,21 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
 def schedule_task(request: HttpRequest, queue_name: str, item: QueuePrioritizedItem) -> None:
     try:
         client.push_task(queue_name, item)
-    except TooManyRequestsError:
-        error_message = _("Task queue is full, please try again later.")
-        messages.add_message(request, messages.ERROR, error_message)
-    except ConflictError:
-        error_message = _("Task already queued.")
-        messages.add_message(request, messages.ERROR, error_message)
-    except BadRequestError:
-        error_message = _("Task is invalid.")
-        messages.add_message(request, messages.ERROR, error_message)
+    except TooManyRequestsError as error:
+        messages.add_message(request, messages.ERROR, error)
+    except ConflictError as error:
+        messages.add_message(request, messages.ERROR, error)
+    except BadRequestError as error:
+        messages.add_message(request, messages.ERROR, error)
+    except SchedulerError as error:
+        messages.add_message(request, messages.ERROR, error)
     else:
-        success_message = (
-            "Your task is scheduled and will soon be started in the background. \n "
-            "Results will be added to the object list when they are in. "
-            "It may take some time, a refresh of the page may be needed to show the results."
+        messages.add_message(
+            request,
+            messages.SUCCESS,
+            _(
+                "Your task is scheduled and will soon be started in the background. \n "
+                "Results will be added to the object list when they are in. "
+                "It may take some time, a refresh of the page may be needed to show the results."
+            ),
         )
-        messages.add_message(request, messages.SUCCESS, success_message)

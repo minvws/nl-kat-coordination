@@ -8,7 +8,9 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from pydantic import BaseModel, Field
+from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
 
@@ -159,15 +161,19 @@ class LazyTaskList:
         return res.results
 
 
-class TooManyRequestsError(Exception):
+class SchedulerError(Exception):
     pass
 
 
-class BadRequestError(Exception):
+class TooManyRequestsError(SchedulerError):
     pass
 
 
-class ConflictError(Exception):
+class BadRequestError(SchedulerError):
+    pass
+
+
+class ConflictError(SchedulerError):
     pass
 
 
@@ -212,16 +218,19 @@ class SchedulerClient:
         return Task.parse_raw(res.content)
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
-        res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
-        res_detail = res.json().get("detail")
-        if res.status_code == HTTPStatus.TOO_MANY_REQUESTS:
-            raise TooManyRequestsError(res_detail)
-        elif res.status_code == HTTPStatus.BAD_REQUEST:
-            raise BadRequestError(res_detail)
-        elif res.status_code == HTTPStatus.CONFLICT:
-            raise ConflictError(res_detail)
-
-        res.raise_for_status()
+        try:
+            res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
+            res.raise_for_status()
+        except HTTPError as http_error:
+            code = http_error.response.status_code
+            if code == HTTPStatus.TOO_MANY_REQUESTS:
+                raise TooManyRequestsError(_("Task queue is full, please try again later."))
+            elif code == HTTPStatus.BAD_REQUEST:
+                raise BadRequestError(_("Task is invalid."))
+            elif code == HTTPStatus.CONFLICT:
+                raise ConflictError(_("Task already queued."))
+            else:
+                raise SchedulerError(_("Connectivity issues with Mula."))
 
     def health(self) -> ServiceHealth:
         health_endpoint = self.session.get(f"{self._base_uri}/health")
