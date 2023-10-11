@@ -42,20 +42,20 @@ class AppContext:
 
         # Services
         katalogus_service = services.Katalogus(
-            host=str(self.config.host_katalogus),
+            host=self._remove_trailing_slash(str(self.config.host_katalogus)),
             source=f"scheduler/{scheduler.__version__}",
             cache_ttl=self.config.katalogus_cache_ttl,
         )
 
         bytes_service = services.Bytes(
-            host=str(self.config.host_bytes),
+            host=self._remove_trailing_slash(str(self.config.host_bytes)),
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
             source=f"scheduler/{scheduler.__version__}",
         )
 
         octopoes_service = services.Octopoes(
-            host=str(self.config.host_octopoes),
+            host=self._remove_trailing_slash(str(self.config.host_octopoes)),
             source=f"scheduler/{scheduler.__version__}",
             orgs=katalogus_service.get_organisations(),
             timeout=self.config.octopoes_request_timeout,
@@ -103,3 +103,9 @@ class AppContext:
             registry=self.metrics_registry,
             labelnames=["scheduler_id"],
         )
+
+    def _remove_trailing_slash(self, url: str) -> str:
+        """Removes trailing slash from url."""
+        if url.endswith("/"):
+            return url[:-1]
+        return url
