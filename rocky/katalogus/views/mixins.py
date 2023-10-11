@@ -28,7 +28,7 @@ from rocky.exceptions import (
     IndemnificationNotPresentException,
     TrustedClearanceLevelTooLowException,
 )
-from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData, client
+from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData
 from rocky.views.mixins import OctopoesView
 
 logger = getLogger(__name__)
@@ -84,11 +84,10 @@ class NormalizerMixin:
         normalizer_task = NormalizerTask(
             id=uuid4(), normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
         )
-
-        item = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
         queue_name = f"normalizer-{self.organization.code}"
+        item = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
 
-        client.push_task(queue_name, item)
+        schedule_task(self.request, queue_name, item)
 
 
 class BoefjeMixin(OctopoesView):
@@ -104,9 +103,10 @@ class BoefjeMixin(OctopoesView):
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
-
+        queue_name = f"boefje-{self.organization.code}"
         item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
-        schedule_task(self.request, f"boefje-{self.organization.code}", item)
+
+        schedule_task(self.request, queue_name, item)
 
     def run_boefje_for_oois(
         self,
