@@ -40,7 +40,14 @@
   }
 }
 
+/* Overrides the default first/last table cell exception */
+.expando-row th,
+.expando-row td {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
 .expanded-row td,
-table tr:first-of-type.expanded-row td {
+tr:first-of-type.expanded-row td {
   border-bottom: 0;
 }

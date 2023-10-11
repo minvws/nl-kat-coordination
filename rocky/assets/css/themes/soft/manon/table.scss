@@ -59,16 +59,13 @@ table.action-buttons .actions {
   }
 }
 
-table thead th:first-child,
-table tbody td:first-child,
-table tfoot th:first-child,
-table tfoot td:first-child {
+/* Aligns the content of the first/last table cell with the beginning/end of the table */
+th:first-child,
+td:first-child {
   padding-left: 0;
 }
 
-table thead th:last-child,
-table tbody td:last-child,
-table tfoot th:last-child,
-table tfoot td:last-child {
+th:last-child,
+td:last-child {
   padding-right: 0;
 }
