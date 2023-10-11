@@ -1,0 +1,13 @@
+{
+    "id": "CVE_2023-44487",
+    "name": "CVE_2023_44487",
+    "description": "Check to see if a webserver is vurnerable to http2 rapid reset attack CVE-2023-44487",
+    "consumes": [
+        "Website"
+    ],
+    "produces": [
+        "Finding",
+        "CVEFindingType"
+    ],
+    "scan_level": 3
+}
