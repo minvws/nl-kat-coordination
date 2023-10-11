@@ -18,7 +18,7 @@ Two brochures or white papers about OpenKAT have been created with a general exp
 - :download:`the 'TL;DR' of 2 pages (English) <pdf/OpenKAT handout_ENG.pdf>`
 - :download:`the extensive brochure on OpenKAT (Dutch) <pdf/introductie OpenKAT V20220621.pdf>`
 
-These, like the information in the high on documentation you are reading now, are aimed at a general understanding of the system. The documentation for each module goes into more detail about how the software itself works.
+These, like the section of the documentation you are reading now, are aimed at a general understanding of the system. The documentation for each module goes into more detail about the software itself.
 
 If, when using OpenKAT, your computer gives a purring sound, it is just a sign of a well functioning instance of this software. Just stay away from the nails while playing.
 
