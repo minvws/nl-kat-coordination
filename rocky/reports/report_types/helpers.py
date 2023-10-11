@@ -1,4 +1,4 @@
-from typing import Dict, List, Set, Type
+from typing import List, Set, Type
 
 from octopoes.models import OOI, Reference
 from reports.report_types.definitions import Report
@@ -59,17 +59,3 @@ def get_plugins_for_report_ids(reports: List[str]) -> Set[str]:
         optional_boefjes.update(report.plugins["optional"])
 
     return {"required": required_boefjes, "optional": optional_boefjes}
-
-
-def generate_reports_for_oois(
-    ooi_pks: List[str], report_types: List[str], octopoes_api_connector
-) -> Dict[str, Dict[str, Dict[str, str]]]:
-    report_data = {}
-    for ooi in ooi_pks:
-        report_data[str(ooi)] = {}
-        for report in report_types:
-            report = get_report_by_id(report)
-            if Reference.from_str(ooi).class_type in report.input_ooi_types:
-                data, template = report(octopoes_api_connector).generate_data(ooi)
-                report_data[str(ooi)][report.name] = {"data": data, "template": template}
-    return report_data

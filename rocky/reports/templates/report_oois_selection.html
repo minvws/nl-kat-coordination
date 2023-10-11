@@ -51,7 +51,7 @@
                             {% for object in object_list %}
                                 <tr>
                                     <td>
-                                        <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in oois_selection %}checked{% endif %}>
+                                        <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois %}checked{% endif %}>
                                     </td>
                                     <td>{{ object.human_readable }}</td>
                                     <td>{{ object.ooi_type }}</td>

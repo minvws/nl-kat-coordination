@@ -11,7 +11,7 @@
             <div>
                 <h1>{% translate "Setup" %}</h1>
                 <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
-                {% if oois_selection and report_types_selection %}
+                {% if selected_oois and selected_report_types %}
                     <a href="{% url 'report_types_selection' organization.code %}?{{ request.GET.urlencode }}"
                        class="button ghost">
                         <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
@@ -49,8 +49,8 @@
                           action="{% url 'report_view' organization.code %}">
                         {% include "forms/report_form_fields.html" %}
 
-                        {% for ooi in oois_selection %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
-                        {% for report_type in report_types_selection %}
+                        {% for ooi in selected_oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
+                        {% for report_type in selected_report_types %}
                             <input type="hidden" name="report_type" value={{ report_type }}>
                         {% endfor %}
                         <button type="submit">

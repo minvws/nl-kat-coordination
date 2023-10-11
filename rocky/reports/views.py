@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Dict, List
 
 from django.contrib import messages
 from django.urls import reverse
@@ -8,12 +8,13 @@ from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
-    generate_reports_for_oois,
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
+    get_report_by_id,
     get_report_types_for_oois,
 )
 from rocky.views.mixins import OctopoesView
@@ -55,25 +56,54 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.valid_time = self.get_observed_at()
-        self.oois_selection = request.GET.getlist("ooi", [])
-        self.report_types_selection = request.GET.getlist("report_type", [])
+        self.selected_oois = request.GET.getlist("ooi", [])
+        self.yielded_report_types = get_report_types_for_oois(self.selected_oois)
+        self.selected_report_types = request.GET.getlist("report_type", [])
 
-    def get_report_types_from_oois_selection(self, ooi_ids: List[str]) -> List[Dict[str, str]]:
+    def get_oois(self) -> List[OOI]:
+        return [self.get_single_ooi(ooi_id) for ooi_id in self.selected_oois]
+
+    def get_report_types_from_choice(self):
+        return [get_report_by_id(report_type) for report_type in self.selected_report_types]
+
+    def get_report_types(self) -> List[Report]:
         return [
             {"id": report_type.id, "name": report_type.name, "description": report_type.description}
-            for report_type in get_report_types_for_oois(ooi_ids)
+            for report_type in self.get_report_types_from_choice()
         ]
 
-    def get_oois_from_selection(self, ooi_ids: List[str]):
-        return [self.get_single_ooi(ooi) for ooi in ooi_ids]
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["observed_at"] = self.valid_time
+        context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
+        context["selected_oois"] = self.selected_oois
+        context["selected_report_types"] = self.selected_report_types
+        return context
 
-    def get_reports_data(self) -> Dict[str, Any]:
-        report_data = {}
-        if self.oois_selection and self.report_types_selection:
-            report_data = generate_reports_for_oois(
-                self.oois_selection, self.report_types_selection, self.octopoes_api_connector
-            )
-        return report_data
+
+class BaseSelectionView(BaseReportView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.oois = self.get_oois()
+        self.report_types_choices = self.get_report_types_from_ooi_selection()
+
+    def get_report_types_from_ooi_selection(self) -> List[Dict[str, str]]:
+        return [
+            {"id": report_type.id, "name": report_type.name, "description": report_type.description}
+            for report_type in self.yielded_report_types
+        ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["oois"] = self.oois
+        context["report_types_choices"] = self.report_types_choices
+        return context
+
+
+class PluginSelectionView(BaseReportView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugins = self.get_required_optional_plugins(self.selected_report_types)
 
     def get_required_optional_plugins(self, report_type_ids: List[str]) -> Dict[str, Plugin]:
         katalogus_client = get_katalogus(self.organization.code)
@@ -84,53 +114,8 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observed_at"] = self.valid_time
-        context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
-        context["oois_selection"] = self.oois_selection
-        context["report_types_selection"] = self.report_types_selection
-        return context
-
-
-class BaseSelectionView(BaseReportView):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.oois = self.get_oois_from_selection(self.oois_selection)
-        self.report_types = self.get_report_types_from_oois_selection(self.oois_selection)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["oois"] = self.oois
-        context["report_types"] = self.report_types
-        return context
-
-
-class PluginSelectionView(BaseReportView):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.plugins = self.get_required_optional_plugins(self.report_types_selection)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
         context["plugins"] = self.plugins
         return context
-
-    def are_plugins_enabled(self) -> bool:
-        enabled_plugins = []
-        for plugin_key, plugins_to_scan in self.plugins.items():
-            for plugin in plugins_to_scan:
-                enabled_plugins.append(plugin.enabled)
-        return all(enabled_plugins)
-
-    def get_max_scan_level_plugins(self):
-        scan_levels = []
-        for plugin_key, plugins_to_scan in self.plugins.items():
-            for plugin in plugins_to_scan:
-                scan_levels.append(plugin.scan_level.value)
-        return max(scan_levels)
-
-    def oois_not_enough_clearance(self, oois: List[OOI]):
-        plugins_max_scan_level = self.get_max_scan_level_plugins()
-        return all([ooi.scan_profile.level.value >= plugins_max_scan_level for ooi in oois])
 
 
 class ReportOOISelectionView(BaseReportView, BaseOOIListView):
@@ -140,7 +125,6 @@ class ReportOOISelectionView(BaseReportView, BaseOOIListView):
 
     template_name = "report_oois_selection.html"
     current_step = 1
-    paginate_by = 500
 
 
 class ReportTypeSelectionView(BaseSelectionView, TemplateView):
@@ -153,7 +137,7 @@ class ReportTypeSelectionView(BaseSelectionView, TemplateView):
     current_step = 2
 
     def get(self, request, *args, **kwargs):
-        if not self.oois_selection:
+        if not self.selected_oois:
             messages.add_message(self.request, messages.ERROR, _("Select at least one OOI to proceed."))
         return super().get(request, *args, **kwargs)
 
@@ -167,7 +151,7 @@ class ReportSetupScanView(PluginSelectionView, TemplateView):
     current_step = 3
 
     def get(self, request, *args, **kwargs):
-        if not self.report_types_selection:
+        if not self.selected_report_types:
             messages.add_message(self.request, messages.ERROR, _("Select at least one report type to proceed."))
         return super().get(request, *args, **kwargs)
 
@@ -185,9 +169,9 @@ class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
             messages.add_message(
                 self.request,
                 messages.WARNING,
-                _("This report may not show all the data as some plugins are not enabled. "),
+                _("This report may not show all the data as some plugins are not enabled."),
             )
-        if not self.oois_not_enough_clearance(self.oois):
+        if not self.oois_not_enough_clearance():
             messages.add_message(
                 self.request,
                 messages.WARNING,
@@ -195,7 +179,28 @@ class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
             )
         return super().get(request, *args, **kwargs)
 
+    def are_plugins_enabled(self) -> bool:
+        enabled_plugins = []
+        for k, plugins in self.plugins.items():
+            for plugin in plugins:
+                enabled_plugins.append(plugin.enabled)
+        return all(enabled_plugins)
+
+    def oois_not_enough_clearance(self):
+        return True
+
+    def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+        report_data = {}
+        for ooi in self.selected_oois:
+            report_data[ooi] = {}
+            for report_type in self.get_report_types_from_choice():
+                if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
+                    data, template = report_type(self.octopoes_api_connector).generate_data(ooi)
+                    report_data[ooi][report_type.name] = {"data": data, "template": template}
+        return report_data
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["report_data"] = self.get_reports_data()
+        context["report_types"] = self.get_report_types()
+        context["report_data"] = self.generate_reports_for_oois()
         return context
