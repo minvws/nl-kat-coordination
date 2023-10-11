@@ -3,10 +3,8 @@
 /* Fonts */
 @import "fonts/fonts";
 
-/* Fonts */
-
 /* Styling sets. E.g color sets */
-@import "manon/kat-purrple";
+@import "colors";
 @import "manon/body-text-set";
 @import "manon/spot-large";
 
@@ -50,15 +48,15 @@
 @import "manon/breadcrumb-bar";
 @import "manon/button-ghost";
 
-/* Ghost button */
+/* Button */
 @import "manon/button-icon";
+@import "manon/button-destructive";
 
 /* Icon button */
 @import "manon/collapsible";
 @import "manon/emphasized";
 @import "manon/expando-rows";
 @import "manon/collapsing-element";
-@import "manon/critical-informational-labels";
 @import "manon/filter";
 @import "manon/header-navigation";
 @import "manon/header-navigation-content-wrapper";
@@ -73,6 +71,7 @@
 @import "manon/form-radio";
 @import "manon/form-help";
 @import "manon/form-inline";
+@import "manon/form-button";
 @import "manon/layout";
 @import "manon/login-meta";
 @import "manon/logo";

@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import PermissionDenied
+from django.urls import resolve
 from katalogus.client import KATalogusClientV1, parse_plugin
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
@@ -117,8 +118,10 @@ def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mock
     mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = get_plugins_data()
 
+    request = rf.get("/en/test/kat-alogus/")
+    request.resolver_match = resolve(request.path)
     response = KATalogusView.as_view()(
-        setup_request(rf.get("katalogus"), client_member.user), organization_code=client_member.organization.code
+        setup_request(request, client_member.user), organization_code=client_member.organization.code
     )
     assert response.status_code == 200
 
@@ -371,3 +374,31 @@ def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
     assert response.status_code == 302
 
     assert list(request._messages).pop().message == "Boefje '" + plugin["name"] + "' enabled."
+
+
+def test_enable_disable_normalizer(rf, redteam_member, mocker):
+    plugin = get_normalizers_data()[0]
+    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_response = mocker.MagicMock()
+    mock_requests.Session().get.return_value = mock_response
+    mock_response.json.return_value = plugin
+
+    request = setup_request(
+        rf.post(
+            "plugin_enable_disable",
+        ),
+        redteam_member.user,
+    )
+
+    response = PluginEnableDisableView.as_view()(
+        setup_request(request, redteam_member.user),
+        organization_code=redteam_member.organization.code,
+        plugin_type=plugin["type"],
+        plugin_id=plugin["id"],
+        plugin_state=False,
+    )
+
+    # redirects back to KAT-alogus
+    assert response.status_code == 302
+
+    assert list(request._messages).pop().message == "Normalizer '" + plugin["name"] + "' enabled."

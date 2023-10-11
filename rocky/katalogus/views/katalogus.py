@@ -18,8 +18,8 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
 
     def get_initial(self) -> Dict[str, Any]:
         initial = super().get_initial()
-        initial["sorting_options"] = self.request.GET.get("sorting_options")
-        initial["filter_options"] = self.request.GET.get("filter_options")
+        initial["sorting_options"] = self.request.GET.get("sorting_options", "a-z")
+        initial["filter_options"] = self.request.GET.get("filter_options", "all")
         return initial
 
     def filter_katalogus(self, queryset):
@@ -54,6 +54,8 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["view_type"] = self.kwargs.get("view_type", "grid")
+        context["url_name"] = self.request.resolver_match.url_name
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
@@ -63,16 +65,14 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
         return context
 
 
-class PluginListView(BaseKATalogusView):
-    def get_queryset(self):
-        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins())
-        return self.filter_katalogus(queryset)
-
-
-class KATalogusView(PluginListView):
+class KATalogusView(BaseKATalogusView):
     """View of all plugins in KAT-alogus"""
 
     template_name = "katalogus.html"
+
+    def get_queryset(self):
+        queryset = self.sort_alphabetic_ascending(self.katalogus_client.get_plugins())
+        return self.filter_katalogus(queryset)
 
 
 class BoefjeListView(BaseKATalogusView):
@@ -97,3 +97,14 @@ class NormalizerListView(BaseKATalogusView):
 
 class AboutPluginsView(OrganizationView, TemplateView):
     template_name = "about_plugins.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["view_type"] = self.kwargs.get("view_type", "grid")
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
+                "text": _("KAT-alogus"),
+            },
+        ]
+        return context
