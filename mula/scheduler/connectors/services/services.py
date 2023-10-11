@@ -36,7 +36,7 @@ class HTTPService(Connector):
     """
 
     name: Optional[str] = None
-    health_endpoint: Optional[str] = "/health"
+    health_endpoint: Optional[str] = "health"
 
     def __init__(self, host: str, source: str, timeout: int = 5, retries: int = 5):
         """Initializer of the HTTPService class. During initialization the

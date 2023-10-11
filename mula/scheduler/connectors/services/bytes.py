@@ -1,7 +1,6 @@
 import typing
 from functools import wraps
 from typing import Any, Callable, Dict, Optional
-from urllib.parse import urljoin
 
 import requests
 from requests.models import HTTPError
@@ -59,7 +58,7 @@ class Bytes(HTTPService):
         response.raise_for_status()
 
     def _get_token(self) -> str:
-        url = urljoin(self.host, "/token")
+        url = f"{self.host}/token"
         response = self.post(
             url=url,
             payload=self.credentials,
@@ -72,7 +71,7 @@ class Bytes(HTTPService):
     @retry_with_login
     @exception_handler
     def get_last_run_boefje(self, boefje_id: str, input_ooi: str, organization_id: str) -> Optional[BoefjeMeta]:
-        url = urljoin(self.host, "/bytes/boefje_meta")
+        url = f"{self.host}/bytes/boefje_meta"
         response = self.get(
             url=url,
             params={
@@ -94,7 +93,7 @@ class Bytes(HTTPService):
     @retry_with_login
     @exception_handler
     def get_last_run_boefje_by_organisation_id(self, organization_id: str) -> Optional[BoefjeMeta]:
-        url = urljoin(self.host, "/bytes/boefje_meta")
+        url = f"{self.host}/bytes/boefje_meta"
         response = self.get(
             url=url,
             params={
