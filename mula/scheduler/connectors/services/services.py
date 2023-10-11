@@ -72,11 +72,6 @@ class HTTPService(Connector):
         self.session.mount("http://", HTTPAdapter(max_retries=max_retries))
         self.session.mount("https://", HTTPAdapter(max_retries=max_retries))
 
-        self.headers: Dict[str, str] = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
-
         if self.source:
             self.headers["User-Agent"] = self.source
 
@@ -86,7 +81,6 @@ class HTTPService(Connector):
         self,
         url: str,
         payload: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, Any]] = None,
         params: Optional[Dict[str, Any]] = None,
     ) -> requests.Response:
         """Execute a HTTP GET request
@@ -100,9 +94,6 @@ class HTTPService(Connector):
         Returns:
             A request.Response object
         """
-        if headers:
-            self.headers.update(headers)
-
         response = self.session.get(
             url,
             headers=self.headers,
@@ -123,7 +114,6 @@ class HTTPService(Connector):
         self,
         url: str,
         payload: Dict[str, Any],
-        headers: Optional[Dict[str, Any]] = None,
         params: Optional[Dict[str, Any]] = None,
     ) -> requests.Response:
         """Execute a HTTP POST request
@@ -137,12 +127,9 @@ class HTTPService(Connector):
         Returns:
             A request.Response object
         """
-        if headers:
-            self.headers.update(headers)
-
         response = self.session.post(
             url,
-            headers=headers,
+            headers=self.headers,
             params=params,
             data=payload,
             timeout=self.timeout,
@@ -158,6 +145,10 @@ class HTTPService(Connector):
         self._verify_response(response)
 
         return response
+
+    @property
+    def headers(self) -> Dict[str, Any]:
+        return self.session.headers
 
     def _do_checks(self) -> None:
         """Do checks whether a host is available and healthy."""
