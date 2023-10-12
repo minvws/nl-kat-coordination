@@ -59,6 +59,11 @@ class Settings(BaseSettings):
         description="Path to the logging configuration file",
     )
 
+    collect_metrics: bool = Field(
+        False,
+        description="Enables/disables the collection of metrics to be used with tools like Prometheus",
+    )
+
     # Server settings
     api_host: str = Field(
         "0.0.0.0",

@@ -45,6 +45,7 @@ class SchedulerTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.scheduler.stop()
+        models.Base.metadata.drop_all(self.dbconn.engine)
         self.dbconn.engine.dispose()
 
     def test_post_push(self):
@@ -52,7 +53,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
-            priority=0,
+            priority=1,
         )
 
         # Act
@@ -73,7 +74,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
-            priority=0,
+            priority=1,
         )
 
         # Act
@@ -105,7 +106,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange: add tasks
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
-            priority=0,
+            priority=1,
         )
         self.scheduler.push_item_to_queue(p_item)
 
@@ -155,7 +156,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange: add tasks
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
-            priority=0,
+            priority=1,
         )
         self.scheduler.push_item_to_queue(p_item)
 
