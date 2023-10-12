@@ -45,10 +45,14 @@ Translations
 
 We currently support the following languages:
 
-- English (default; used in the source code)
-- Dutch (official support)
-- Papiamentu (community support)
-- Italian (community support)
+ ============ ==============================
+  Language     Support
+ ============ ==============================
+  English      Default; used in source code
+  Dutch        Official
+  Papiamentu   Community
+  Italian      Community
+ ============ ==============================
 
 We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
 Community contributions are very welcome and can be made via Weblate's interface.
