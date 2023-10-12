@@ -58,6 +58,8 @@ wpscan-out-parse = "1.9.3"
 # required by kat_sec_txt
 sectxt = "0.9.0"
 opentelemetry-instrumentation = "^0.41b0"
+# required by kat_cve_2023_44487
+h2 = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
