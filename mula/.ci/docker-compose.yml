@@ -30,6 +30,8 @@ services:
         condition: service_healthy
       ci_bytes:
         condition: service_started
+      ci_katalogus:
+        condition: service_started
 
   ci_postgres:
     image: postgres:15
@@ -52,17 +54,39 @@ services:
 
   ci_bytes:
     build:
-      context: ..
-      dockerfile: bytes/Dockerfile
+      context: ../bytes
+      dockerfile: Dockerfile
       target: dev
       args:
         ENVIRONMENT: dev
     command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
+    ports:
+      - "127.0.0.1:8002:8000"
     env_file:
       - .ci/.env.test
     volumes:
       - ../bytes/:/app/bytes
       - bytes-data:/data
+    depends_on:
+      - ci_postgres
+
+  ci_katalogus:
+    build:
+      context: ..
+      dockerfile: boefjes/Dockerfile
+      target: dev
+      args:
+        ENVIRONMENT: dev
+    command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
+    ports:
+      - "127.0.0.1:8003:8000"
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - ../boefjes/:/app/boefjes
+      - ../octopoes/octopoes:/app/boefjes/octopoes
+    depends_on:
+      - ci_postgres
 
 volumes:
   bytes-data:
