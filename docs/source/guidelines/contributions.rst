@@ -77,7 +77,11 @@ Community contributions are very welcome and can be made via Weblate's interface
 This is a great way to help the project forward and doesn't require any technical expertise.
 If you would like to see OpenKAT in another language, let us know!
 
-Updates to the English source strings must be done directly in Rocky's source code.
+Any authenticated Weblate user can edit translation strings directly or make suggestions.
+Any translation updates in Weblate will be automatically submitted as a GitHub PR after 24 hours, which will be reviewed by the development team.
+If you contribute to the translation effort, you will receive a mention in the source code.
+
+Note that editing the English localization requires changing the source string in Django, which must be done through a GitHub PR manually.
 
 Contributor Social Contract
 ===========================
