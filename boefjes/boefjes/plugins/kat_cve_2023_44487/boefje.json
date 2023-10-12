@@ -9,5 +9,6 @@
         "Finding",
         "CVEFindingType"
     ],
-    "scan_level": 3
+    "scan_level": 3,
+    "environment_keys": ["BOEFJE_HTTP_PROXY", "BOEFJE_HTTPS_PROXY"]
 }
