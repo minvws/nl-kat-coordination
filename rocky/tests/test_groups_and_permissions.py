@@ -57,7 +57,7 @@ def test_plugin_settings_list_perms(
     mocker,
     lazy_task_list_with_boefje,
 ):
-    mock_scheduler_client = mocker.patch("katalogus.views.boefje_detail.scheduler")
+    mock_scheduler_client = mocker.patch("katalogus.views.plugin_detail.scheduler")
     mock_scheduler_client.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](count=1, items=[network])
@@ -91,7 +91,7 @@ def test_plugin_settings_list_perms_2(
     mocker,
     lazy_task_list_with_boefje,
 ):
-    mock_scheduler_client = mocker.patch("katalogus.views.boefje_detail.scheduler")
+    mock_scheduler_client = mocker.patch("katalogus.views.plugin_detail.scheduler")
     mock_scheduler_client.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](count=1, items=[network])
