@@ -169,19 +169,18 @@ def schedule_task(request: HttpRequest, queue_name: str, item: QueuePrioritizedI
     try:
         client.push_task(queue_name, item)
     except TooManyRequestsError as error:
-        messages.add_message(request, messages.ERROR, error)
+        messages.error(request, error)
     except ConflictError as error:
-        messages.add_message(request, messages.ERROR, error)
+        messages.error(request, error)
     except BadRequestError as error:
-        messages.add_message(request, messages.ERROR, error)
+        messages.error(request, error)
     except SchedulerError as error:
-        messages.add_message(request, messages.ERROR, error)
+        messages.error(request, error)
     else:
-        messages.add_message(
+        messages.success(
             request,
-            messages.SUCCESS,
             _(
-                "Your task is scheduled and will soon be started in the background. \n "
+                "Your task is scheduled and will soon be started in the background. "
                 "Results will be added to the object list when they are in. "
                 "It may take some time, a refresh of the page may be needed to show the results."
             ),

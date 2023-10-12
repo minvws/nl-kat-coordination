@@ -162,19 +162,22 @@ class LazyTaskList:
 
 
 class SchedulerError(Exception):
-    pass
+    message = _("Connectivity issues with Mula.")
+
+    def __str__(self):
+        return str(self.message)
 
 
 class TooManyRequestsError(SchedulerError):
-    pass
+    message = _("Task queue is full, please try again later.")
 
 
 class BadRequestError(SchedulerError):
-    pass
+    message = _("Task is invalid.")
 
 
 class ConflictError(SchedulerError):
-    pass
+    message = _("Task already queued.")
 
 
 class SchedulerClient:
@@ -224,13 +227,13 @@ class SchedulerClient:
         except HTTPError as http_error:
             code = http_error.response.status_code
             if code == HTTPStatus.TOO_MANY_REQUESTS:
-                raise TooManyRequestsError(_("Task queue is full, please try again later."))
+                raise TooManyRequestsError()
             elif code == HTTPStatus.BAD_REQUEST:
-                raise BadRequestError(_("Task is invalid."))
+                raise BadRequestError()
             elif code == HTTPStatus.CONFLICT:
-                raise ConflictError(_("Task already queued."))
+                raise ConflictError()
             else:
-                raise SchedulerError(_("Connectivity issues with Mula."))
+                raise SchedulerError()
 
     def health(self) -> ServiceHealth:
         health_endpoint = self.session.get(f"{self._base_uri}/health")
