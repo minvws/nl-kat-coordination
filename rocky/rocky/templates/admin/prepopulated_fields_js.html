@@ -1,4 +1,6 @@
 {% load static %}
-
-<script nonce="{{ request.csp_nonce }}" id="django-admin-prepopulated-fields-constants" src="{% static "admin/js/prepopulate_init.js" %}" data-prepopulated-fields="{{ prepopulated_fields_json }}">
+<script nonce="{{ request.csp_nonce }}"
+        id="django-admin-prepopulated-fields-constants"
+        src="{% static "admin/js/prepopulate_init.js" %}"
+        data-prepopulated-fields="{{ prepopulated_fields_json }}">
 </script>
