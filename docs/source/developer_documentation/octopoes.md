@@ -364,12 +364,45 @@ ref.tokenized.address.address # '2001:db8::1'
 ```
 ![KAT Ref Example](img/kat_ref_example.png "KAT Ref Example")
 
+
+
 ## Octopoes API
 
-
-
 ### OctopoesAPIConnector
+
 The OctopoesAPIConnector class provides a python interface for connecting with Octopoes API.
+It provides several methods for doing CRUD operations for the objects/entities.
+
+#### Querying objects
+
+In particular, for querying objects we have:
+
+-  `OctopoesAPIConnector.list()` to filter on OOIs `type`, `scan_level`, `scan_profile_type` and `valid_time`.
+
+This is used for example in the object overview page. Returns a paginated list of OOIs.
+
+-  `OctopoesAPIConnector.get_tree()` to filter out neighbouring OOIs starting from a root OOI (`reference`) in
+   the object graph.
+
+The graph is traversed until a specified `depth` is reached, filtering on `types` and `valid_time`.
+Returns a `ReferenceTree`: a tree-like structure of OOIs representing a subgraph of the objects graph.
+The conversion from graph to tree happens through "unfolding" the graph during traversal and allowing duplication of
+nodes in the tree to avoid cycles. Because of the duplication the structure includes a unique, flattened list of OOIs
+present in the tree, the `ReferenceTree.store`, for convenience. Unsurprisingly, this method is used for rendering
+object-graphs.
+
+-  `OctopoesAPIConnector.list_origins()` to filter on `valid_time`, `source`, `result`, `task_id`and `origin_type`.
+
+Due to the `task_id` filter, this allows users to connect OOIs to the most recent normalizer task
+that found these OOIs. This is used to find the original boefje task and raw data that "proofs" the existence of the
+OOIs. Returns a list of Origins.
+
+-  `OctopoesAPIConnector.list_findings()` to filter Findings on `valid_time`, `severities`, `exclude_muted`,
+   `only_muted`, `offset`, `limit`.
+
+This method offers some Finding-specific filters for convenience on Finding pages.
+Returns a paginated list of Findings.
+
 
 ## Abstract classes / subclassing
 Relationships from an OOI class to another OOI class are inferred through its property types. It is

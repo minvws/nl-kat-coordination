@@ -122,3 +122,9 @@ repos:
   hooks:
   - id: shellcheck
     args: ["-e", "SC1091"]
+
+- repo: https://github.com/scop/pre-commit-shfmt
+  rev: v3.7.0-1
+  hooks:
+  - id: shfmt
+    args: ["-w", "-s", "-i", "4", "-sr"]

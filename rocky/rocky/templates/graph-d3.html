@@ -2,6 +2,7 @@
 
 {% load i18n %}
 {% load static %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -13,7 +14,7 @@
                 {% include "partials/ooi_head.html" with ooi=ooi view="graph" %}
 
                 <p>
-                    {% translate "Click a circle top collapse / expand the tree, click the text to view the tree from that OOI and hover over the text to see details." %}
+                    {% translate "Click a circle to collapse / expand the tree, click the text to view the tree from that OOI and hover over the text to see details." %}
                 </p>
                 {% translate "Tree graph" as filter_title %}
                 {% include "partials/ooi_list_filters.html" with title=filter_title ooi_id=ooi.primary_key %}
@@ -33,8 +34,13 @@
     {{ block.super }}
     {{ ooi_types|json_script:"ooi-types" }}
     {{ tree|json_script:"tree-data" }}
-    <script src="{% static "/js/stringHelpers.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    <script src="{% static "/dist/imports/graph.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    <link href="{% static "/dist/imports/graph.css" %}" rel="stylesheet">
+    {
+    {% compress js %}
+        <script src="{% static "js/stringHelpers.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "dist/imports/graph.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+    {% compress css %}
+        <link href="{% static "dist/imports/graph.css" %}" rel="stylesheet">
+    {% endcompress %}
 {% endblock html_at_end_body %}

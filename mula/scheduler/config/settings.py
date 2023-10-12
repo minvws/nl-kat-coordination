@@ -35,9 +35,7 @@ class BackwardsCompatibleEnvSettings(PydanticBaseSettingsSource):
             if new_name not in env_vars and old_name in env_vars:
                 logging.warning("Deprecation: %s is deprecated, use %s instead", old_name.upper(), new_name.upper())
                 if new_name == "queue_uri":
-                    d["host_mutation"] = env_vars[old_name]
-                    d["host_raw_data"] = env_vars[old_name]
-                    d["host_normalizer_meta"] = env_vars[old_name]
+                    d["QUEUE_URI"] = env_vars[old_name]
                 else:
                     d[new_name[len(env_prefix) :]] = env_vars[old_name]
 
@@ -59,6 +57,11 @@ class Settings(BaseSettings):
     log_cfg: Path = Field(
         BASE_DIR / "logging.json",
         description="Path to the logging configuration file",
+    )
+
+    collect_metrics: bool = Field(
+        False,
+        description="Enables/disables the collection of metrics to be used with tools like Prometheus",
     )
 
     # Server settings

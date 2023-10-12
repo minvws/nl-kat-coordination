@@ -66,6 +66,22 @@ class Settings(BaseSettings):
     octopoes_api: AnyHttpUrl = Field(
         ..., example="http://localhost:8001", description="Octopoes API URL", env="OCTOPOES_API"
     )
+    boefje_api: AnyHttpUrl = Field(..., example="http://boefje:8000", description="Boefje API URL", env="BOEFJE_API")
+    # Boefje server settings
+    boefje_api_host: str = Field(
+        "0.0.0.0",
+        description="Host address of the Boefje API server",
+    )
+    boefje_api_port: int = Field(
+        8000,
+        description="Host port of the Boefje API server",
+    )
+
+    boefje_docker_network: str = Field(
+        "bridge",
+        description="Docker network to run Boefjes in",
+        env="BOEFJE_DOCKER_NETWORK",
+    )
 
     bytes_api: AnyHttpUrl = Field(..., example="http://localhost:8002", description="Bytes API URL", env="BYTES_API")
     bytes_username: str = Field(..., example="test", description="Bytes JWT login username", env="BYTES_USERNAME")

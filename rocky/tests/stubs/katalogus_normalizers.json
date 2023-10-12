@@ -1,0 +1,119 @@
+[
+  {
+    "id": "kat_adr_finding_types_normalize",
+    "repository_id": "LOCAL",
+    "name": "Adr Finding Types Normalize",
+    "version": null,
+    "authors": null,
+    "created": null,
+    "description": null,
+    "environment_keys": [],
+    "related": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "adr-finding-types",
+      "normalizer/kat_adr_finding_types_normalize"
+    ],
+    "produces": [
+      "ADRFindingType"
+    ]
+  },
+  {
+    "id": "adr-validator",
+    "repository_id": "LOCAL",
+    "name": null,
+    "version": null,
+    "authors": null,
+    "created": null,
+    "description": null,
+    "environment_keys": [],
+    "related": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "adr-validator",
+      "normalizer/adr-validator"
+    ],
+    "produces": [
+      "APIDesignRule",
+      "APIDesignRuleResult",
+      "ADRFindingType",
+      "Finding"
+    ]
+  },
+  {
+    "id": "kat_answer_parser",
+    "repository_id": "LOCAL",
+    "name": null,
+    "version": null,
+    "authors": null,
+    "created": null,
+    "description": null,
+    "environment_keys": [],
+    "related": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "answer",
+      "normalizer/kat_answer_parser"
+    ],
+    "produces": [
+      "Config"
+    ]
+  },
+  {
+    "id": "kat_binaryedge_containers",
+    "repository_id": "LOCAL",
+    "name": null,
+    "version": null,
+    "authors": null,
+    "created": null,
+    "description": null,
+    "environment_keys": [],
+    "related": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "binaryedge",
+      "normalizer/kat_binaryedge_containers"
+    ],
+    "produces": [
+      "KATFindingType",
+      "SoftwareInstance",
+      "Service",
+      "IPPort",
+      "Finding",
+      "Software",
+      "IPService",
+      "CVEFindingType"
+    ]
+  },
+  {
+    "id": "kat_binaryedge_databases",
+    "repository_id": "LOCAL",
+    "name": null,
+    "version": null,
+    "authors": null,
+    "created": null,
+    "description": null,
+    "environment_keys": [],
+    "related": null,
+    "enabled": true,
+    "type": "normalizer",
+    "consumes": [
+      "binaryedge",
+      "normalizer/kat_binaryedge_databases"
+    ],
+    "produces": [
+      "KATFindingType",
+      "SoftwareInstance",
+      "Service",
+      "IPPort",
+      "Finding",
+      "Software",
+      "IPService",
+      "CVEFindingType"
+    ]
+  }
+]

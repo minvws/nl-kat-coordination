@@ -1,11 +1,9 @@
 from bits.https_availability.https_availability import run as run_https_availability
 from bits.oois_in_headers.oois_in_headers import run as run_oois_in_headers
 
-from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
-from octopoes.models.ooi.network import IPAddressV4, IPPort, Network
-from octopoes.models.ooi.service import IPService, Service
-from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPHeaderURL, HTTPResource, Website
+from octopoes.models.ooi.network import IPPort
+from octopoes.models.ooi.web import URL, HTTPHeader, HTTPHeaderURL, Website
 
 
 def test_url_extracted_by_oois_in_headers_url():
@@ -24,27 +22,14 @@ def test_url_extracted_by_oois_in_headers_url():
     assert http_header_url.url == url.reference
 
 
-def test_url_extracted_by_oois_in_headers_relative_path():
-    ip_port = IPPort(
-        address=IPAddressV4(address="1.1.1.1", network=Network(name="internet").reference).reference,
-        protocol="tcp",
-        port=443,
-    )
-    ip_service = IPService(ip_port=ip_port.reference, service=Service(name="https").reference)
-    netloc = Hostname(name="www.example.com", network=Network(name="internet").reference)
-    website = Website(ip_service=ip_service.reference, hostname=netloc.reference)
-    web_url = HostnameHTTPURL(
-        netloc=netloc.reference, path="/", scheme="https", network=Network(name="internet").reference, port=443
-    )
-    resource = HTTPResource(website=website.reference, web_url=web_url.reference)
-
-    header = HTTPHeader(resource=resource.reference, key="Location", value="script.php")
+def test_url_extracted_by_oois_in_headers_relative_path(http_resource_https):
+    header = HTTPHeader(resource=http_resource_https.reference, key="Location", value="script.php")
 
     results = list(run_oois_in_headers(header, [], {}))
 
     url = results[0]
     assert isinstance(url, URL)
-    assert url.raw == "https://www.example.com/script.php"
+    assert url.raw == "https://example.com/script.php"
     assert url.network == "Network|internet"
 
     http_header_url = results[1]

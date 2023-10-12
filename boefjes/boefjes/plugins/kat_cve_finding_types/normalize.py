@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 SEVERITY_SCORE_LOOKUP = {
-    RiskLevelSeverity.CRITICAL: 10.0,
-    RiskLevelSeverity.HIGH: 8.9,
-    RiskLevelSeverity.MEDIUM: 6.9,
-    RiskLevelSeverity.LOW: 3.9,
+    RiskLevelSeverity.CRITICAL: 9.0,
+    RiskLevelSeverity.HIGH: 7.0,
+    RiskLevelSeverity.MEDIUM: 4.0,
+    RiskLevelSeverity.LOW: 0.1,
     RiskLevelSeverity.RECOMMENDATION: 0.0,
 }
 

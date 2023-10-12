@@ -20,8 +20,8 @@ fi
 
 # Checking if we don't have too many parameters
 if [ $# -gt 2 ]; then
-	echo "Usage: $0 [openKAT version] [no_super_user]"
-	exit 1
+    echo "Usage: $0 [openKAT version] [no_super_user]"
+    exit 1
 fi
 
 debian_version=$VERSION_ID
@@ -85,7 +85,7 @@ echo "Step 4.2 - Saving Passwords to passwords.txt"
 umask=$(umask)
 umask 0077
 
-cat > passwords.txt <<EOF
+cat > passwords.txt << EOF
 ROCKY_DB_PASSWORD=${ROCKY_DB_PASSWORD}
 KATALOGUSDB_PASSWORD=${KATALOGUSDB_PASSWORD}
 BYTESDB_PASSWORD=${BYTESDB_PASSWORD}
@@ -93,7 +93,7 @@ RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
 MULADB_PASSWORD=${MULADB_PASSWORD}
 EOF
 
- # restore umask
+# restore umask
 umask "${umask}"
 
 # This will prevent "could not change directory" errors due to permissions when
@@ -101,71 +101,71 @@ umask "${umask}"
 pushd /
 
 echo "Step 4.3 - Rocky DB"
-if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q rocky_db ; then
-	echo "Create rocky_db..."
-	sudo -u postgres createdb rocky_db
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q rocky_db; then
+    echo "Create rocky_db..."
+    sudo -u postgres createdb rocky_db
 fi
 
 if [ ! "$(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='rocky'")" ]; then
-	echo "Create rocky user with password ${ROCKY_DB_PASSWORD}..."
-	sudo -u postgres psql -c "CREATE USER rocky WITH PASSWORD '${ROCKY_DB_PASSWORD}';"
+    echo "Create rocky user with password ${ROCKY_DB_PASSWORD}..."
+    sudo -u postgres psql -c "CREATE USER rocky WITH PASSWORD '${ROCKY_DB_PASSWORD}';"
 
-	echo "Grant database rocky_db to rocky user..."
-	sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO rocky;' rocky_db
+    echo "Grant database rocky_db to rocky user..."
+    sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO rocky;' rocky_db
 else
-	echo "Change password rocky user to ${ROCKY_DB_PASSWORD}..."
-	sudo -u postgres psql -c "ALTER USER rocky WITH PASSWORD '${ROCKY_DB_PASSWORD}';"
+    echo "Change password rocky user to ${ROCKY_DB_PASSWORD}..."
+    sudo -u postgres psql -c "ALTER USER rocky WITH PASSWORD '${ROCKY_DB_PASSWORD}';"
 fi
 
 echo "Step 4.4 - KAT-alogus DB"
-if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q katalogus_db ; then
-	echo "Create katalogus_db..."
-	sudo -u postgres createdb katalogus_db
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q katalogus_db; then
+    echo "Create katalogus_db..."
+    sudo -u postgres createdb katalogus_db
 fi
 
 if [ ! "$(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='katalogus'")" ]; then
-	echo "Create katalogus user with password ${KATALOGUSDB_PASSWORD}..."
-	sudo -u postgres psql -c "CREATE USER katalogus WITH PASSWORD '${KATALOGUSDB_PASSWORD}';"
+    echo "Create katalogus user with password ${KATALOGUSDB_PASSWORD}..."
+    sudo -u postgres psql -c "CREATE USER katalogus WITH PASSWORD '${KATALOGUSDB_PASSWORD}';"
 
-	echo "Grant database katalogus_db to katalogus user..."
-	sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO katalogus;' katalogus_db
+    echo "Grant database katalogus_db to katalogus user..."
+    sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO katalogus;' katalogus_db
 else
-	echo "Change password katalogus user to ${KATALOGUSDB_PASSWORD}..."
-	sudo -u postgres psql -c "ALTER USER katalogus WITH PASSWORD '${KATALOGUSDB_PASSWORD}';"
+    echo "Change password katalogus user to ${KATALOGUSDB_PASSWORD}..."
+    sudo -u postgres psql -c "ALTER USER katalogus WITH PASSWORD '${KATALOGUSDB_PASSWORD}';"
 fi
 
 echo "Step 4.5 - Bytes DB"
-if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q bytes_db ; then
-	echo "Create bytes_db..."
-	sudo -u postgres createdb bytes_db
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q bytes_db; then
+    echo "Create bytes_db..."
+    sudo -u postgres createdb bytes_db
 fi
 
 if [ ! "$(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='bytes'")" ]; then
-	echo "Create bytes user with password ${BYTESDB_PASSWORD}..."
-	sudo -u postgres psql -c "CREATE USER bytes WITH PASSWORD '${BYTESDB_PASSWORD}';"
+    echo "Create bytes user with password ${BYTESDB_PASSWORD}..."
+    sudo -u postgres psql -c "CREATE USER bytes WITH PASSWORD '${BYTESDB_PASSWORD}';"
 
-	echo "Grant database bytes_db to bytes user..."
-	sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO bytes;' bytes_db
+    echo "Grant database bytes_db to bytes user..."
+    sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO bytes;' bytes_db
 else
-	echo "Change password bytes user to ${BYTESDB_PASSWORD}..."
-	sudo -u postgres psql -c "ALTER USER bytes WITH PASSWORD '${BYTESDB_PASSWORD}';"
+    echo "Change password bytes user to ${BYTESDB_PASSWORD}..."
+    sudo -u postgres psql -c "ALTER USER bytes WITH PASSWORD '${BYTESDB_PASSWORD}';"
 fi
 
 echo "Step 4.5b - Mula DB"
-if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q mula_db ; then
-	echo "Create mula_db..."
-	sudo -u postgres createdb mula_db
+if ! sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -q mula_db; then
+    echo "Create mula_db..."
+    sudo -u postgres createdb mula_db
 fi
 
 if [ ! "$(sudo -u postgres psql -qtAc "SELECT 1 FROM pg_roles WHERE rolname='mula'")" ]; then
-	echo  "Create mula user with password ${MULADB_PASSWORD}..."
-	sudo -u postgres psql -c "CREATE USER mula WITH PASSWORD '${MULADB_PASSWORD}';"
+    echo "Create mula user with password ${MULADB_PASSWORD}..."
+    sudo -u postgres psql -c "CREATE USER mula WITH PASSWORD '${MULADB_PASSWORD}';"
 
-	echo "Grant database muladb to mula user..."
-	sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO mula;' mula_db
+    echo "Grant database muladb to mula user..."
+    sudo -u postgres psql -c 'GRANT ALL ON SCHEMA public TO mula;' mula_db
 else
-	echo "Change password mula user to ${MULADB_PASSWORD}..."
-	sudo -u postgres psql -c "ALTER USER mula WITH PASSWORD '${MULADB_PASSWORD}';"
+    echo "Change password mula user to ${MULADB_PASSWORD}..."
+    sudo -u postgres psql -c "ALTER USER mula WITH PASSWORD '${MULADB_PASSWORD}';"
 fi
 
 popd
@@ -189,8 +189,7 @@ sudo sed -i "/KATALOGUS_DB_URI=/s/.*/KATALOGUS_DB_URI=postgresql:\/\/katalogus:$
 echo "Step 4.6.5 - Update SCHEDULER_DB_URI in /etc/kat/mula.conf to ${MULADB_PASSWORD}"
 sudo sed -i "/SCHEDULER_DB_URI=/s/.*/SCHEDULER_DB_URI=postgresql:\/\/mula:${MULADB_PASSWORD}@localhost\/mula_db/" /etc/kat/mula.conf
 
-echo "Step 4.6.6 - Update QUEUE_URI in rocky.conf, bytes.conf, boefjes.conf, mula.conf, octopoes.conf to ${RABBITMQ_PASSWORD}"
-sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/rocky.conf
+echo "Step 4.6.6 - Update QUEUE_URI in bytes.conf, boefjes.conf, mula.conf, octopoes.conf to ${RABBITMQ_PASSWORD}"
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/bytes.conf
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/boefjes.conf
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/octopoes.conf
@@ -222,11 +221,11 @@ echo "Step 4.7.5 - Run migrations mula_db..."
 sudo -u kat update-mula-db
 
 if [[ ${2} != "no_super_user" ]]; then
-	echo "Step 5 - Create Superuser & dev account"
-	sudo -u kat rocky-cli createsuperuser
-	sudo -u kat rocky-cli setup_dev_account
+    echo "Step 5 - Create Superuser & dev account"
+    sudo -u kat rocky-cli createsuperuser
+    sudo -u kat rocky-cli setup_dev_account
 else
-	echo "Step 5 - Option no_super_user passed; skipping creating superuser & dev account"
+    echo "Step 5 - Option no_super_user passed; skipping creating superuser & dev account"
 fi
 
 echo "Step 6 - RabbitMQ-server setup"
@@ -262,12 +261,12 @@ echo "Step 6.8 - Restart rabbitmq-server"
 sudo systemctl restart rabbitmq-server
 
 echo "Step 6.9 - Add or change kat user to rabbitmq and set password to ${RABBITMQ_PASSWORD}"
-if ! sudo rabbitmqctl list_users | grep -q kat ; then
-	echo "Create kat user in rabbitmq with password ${RABBITMQ_PASSWORD}"
-	sudo rabbitmqctl add_user kat "${RABBITMQ_PASSWORD}"
+if ! sudo rabbitmqctl list_users | grep -q kat; then
+    echo "Create kat user in rabbitmq with password ${RABBITMQ_PASSWORD}"
+    sudo rabbitmqctl add_user kat "${RABBITMQ_PASSWORD}"
 else
-	echo "Change password for existing kat user to ${RABBITMQ_PASSWORD} to ensure it is set correctly"
-	sudo rabbitmqctl change_password kat "${RABBITMQ_PASSWORD}"
+    echo "Change password for existing kat user to ${RABBITMQ_PASSWORD} to ensure it is set correctly"
+    sudo rabbitmqctl change_password kat "${RABBITMQ_PASSWORD}"
 fi
 
 echo "Step 6.10 - Add vhost kat to rabbitmq"

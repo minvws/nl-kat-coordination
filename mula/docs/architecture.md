@@ -3,28 +3,28 @@
 ## Purpose
 
 The *scheduler* is tasked with populating and maintaining a priority queue of
-items that are ranked, and can be popped off (through api calls).
+items that are ranked, and can be popped off through HTTP API calls.
 The scheduler is designed to be extensible, such that you're able to create
 your own rules for the population, and prioritization of tasks.
 
 The *scheduler* implements a priority queue for prioritization of tasks to be
 performed by the worker(s). In the implementation of the scheduler within KAT
 the scheduler is tasked with populating the priority queue with 'boefje' and
-'normalizer' jobs. The scheduler is responsible for maintaining and updating
-its internal priority queue.
+'normalizer' tasks. Additionally the scheduler is responsible for maintaining
+and updating its internal priority queue.
 
-A priority queue is used, in as such, that it allows us to determine what jobs
-should be checked first, or more regularly. Because of the use of a priority
-queue we can differentiate between jobs that are to be executed first, e.g.
-jobs created by the user get precedence over jobs that are created by the
+A priority queue is used, in as such, that it allows us to determine what tasks
+should be picked up first, or more regularly. Because of the use of a priority
+queue we can differentiate between tasks that are to be executed first, e.g.
+tasks created by the user get precedence over jobs that are created by the
 internal rescheduling processes within the scheduler.
 
-Calculations in order to determine the priority of a job is performed by logic
-that can/will leverage information from multiple (external) sources, called
-`connectors`.
+Calculations in order to determine the priority of a task is performed by the
+`ranker` that leverages information from multiple (external) sources,
+called `connectors`.
 
-In this document we will outline what the scheduler does in the setup within
-KAT and how it is used.
+In this document we will outline how the scheduler operates within KAT, how
+iternal systems function and how external services use it.
 
 ### Architecture / Design
 
@@ -63,10 +63,18 @@ graph TB
     Scheduler--"Pop task of queue"-->TaskRunner
 ```
 
-The `Scheduler` system can run a multitude of `schedulers`. In a KAT
-implementation two schedulers are created per organistaion, a `boefje` and
-`normalizer` scheduler. With their respective priority queues. These queues are
-persisted in a SQL database.
+When we take a closer look at the `scheduler` system itself we can identify
+several components. The 'Scheduler App' directs the creation and maintenance
+of a multitude of schedulers. Typically in a KAT installation 2 scheduler will
+be created per organisation: a boefje scheduler and a normalizer scheduler.
+
+Each scheduler can implement it's own way of populating, and prioritization of
+its queue. The associated queues of a individual scheduler is persisted in
+a SQL database.
+
+#### C3 Component level:
+
+...
 
 ```mermaid
 C4Component
@@ -75,19 +83,21 @@ C4Component
     ContainerDb(db, "Database", "Postgresql Database", "")
 
     Container_Boundary(scheduler_app, "Scheduler App") {
-        Component(boefje_scheduler_a, "Boefje Scheduler Org A", "Scheduler", "Allows users to sign in to the internet banking system")
-        Component(normalizer_scheduler_a, "Normalizer Scheduler Org A", "Scheduler", "Allows users to sign in to the internet banking system")
+        Container_Boundary(organisation_a, "Organisation A") {
+            Component(boefje_scheduler_a, "Boefje Scheduler Org A", "Scheduler", "")
+            Component(normalizer_scheduler_a, "Normalizer Scheduler Org A", "Scheduler", "")
+        }
 
-        Component(boefje_scheduler_b, "Boefje Scheduler Org B", "Scheduler", "Allows users to sign in to the internet banking system")
-        Component(normalizer_scheduler_b, "Normalizer Scheduler Org B", "Scheduler", "Allows users to sign in to the internet banking system")
-
+        Container_Boundary(organisation_b, "Organisation B") {
+            Component(boefje_scheduler_b, "Boefje Scheduler Org B", "Scheduler", "")
+            Component(normalizer_scheduler_b, "Normalizer Scheduler Org B", "Scheduler", "")
+        }
 
         Component(server, "Server", "REST API")
     }
 ```
 
-Let's take a look at the internals of a Boefje and Normalizer scheduler, and
-explore how the data flows.
+A more complete overview of the different components within the scheduler:
 
 ```mermaid
 C4Component
@@ -179,6 +189,63 @@ events within a KAT installation will trigger dataflows in the `Scheduler`.
 With the current implementation of the scheduler we identify the creation of
 two different type of jobs, `boefje` and `normalizer` jobs.
 
+A graphical representation of task creation dataflows:
+
+```mermaid
+flowchart LR
+  rmq_scan_profile([scan profile mutations])
+  rmq_raw_file([raw file received])
+
+  subgraph mula
+    subgraph boefje scheduler organisation 1
+
+      pq_boefjes(priority queue boefjes)
+
+      subgraph threads_boefje["threads"]
+        thread_scan_profile[[scan profile mutations]]
+        thread_enabled_boefjes[[enabled boefjes]]
+        thread_random_objects[[random objects]]
+      end
+
+      ranker_boefje{{ranker}}
+
+    end
+
+    thread_scan_profile-->ranker_boefje
+    thread_enabled_boefjes-->ranker_boefje
+    thread_random_objects-->ranker_boefje
+    ranker_boefje-->pq_boefjes
+
+    subgraph normalizer scheduler organisation 1
+
+      pq_normalizer(priority queue normalizer)
+
+      subgraph threads_normalizer["threads"]
+        thread_raw_file_received[[raw file received]]
+      end
+
+      ranker_normalizer{{ranker}}
+    end
+
+    thread_raw_file_received-->ranker_normalizer
+    ranker_normalizer-->pq_normalizer
+
+    subgraph server
+    end
+
+    pq_boefjes<-->server
+    pq_normalizer<-->server
+  end
+
+  rmq_scan_profile-->thread_scan_profile
+  rmq_raw_file-->thread_raw_file_received
+
+style thread_scan_profile stroke-dasharray: 5 5
+style thread_enabled_boefjes stroke-dasharray: 5 5
+style thread_random_objects stroke-dasharray: 5 5
+style thread_raw_file_received stroke-dasharray: 5 5
+```
+
 ##### Boefje scheduler
 
 For a `boefje` scheduler the following events will trigger a dataflow procedure
@@ -187,7 +254,7 @@ to be executed and subsequently the creation of a `boefje` task.:
 1. scan level mutation of an ooi (object or object-of-interest)
 2. new and/or enabled boefje
 3. rescheduling of ooi's and associated boefjes
-4. scan job creation from octopoes
+4. scan job creation from rocky
 
 **1. Scan level mutation**
 

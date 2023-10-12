@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -15,59 +16,66 @@
                     {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
                 </h1>
                 <p>
-                    {% blocktranslate trimmed %}
-                        An overview of your object list. Objects can be added manually or by running boefjes.
-                    </br>
-                    Click an object for additional information.
-                {% endblocktranslate %}
-            </p>
-            <p class="de-emphasized">
-                <strong>{% translate "Currently filtered on:" %}</strong> {{ types_display }}
-            </p>
-            {% include "partials/ooi_list_toolbar.html" %}
+                    {% blocktranslate trimmed with organization.name as organization_name %}
+                        An overview of objects found for organization <strong>{{ organization_name }}</strong>.
+                        Objects can be added manually or by running Boefjes.
+                        Click an object for additional information.
+                    {% endblocktranslate %}
+                </p>
+                <p class="de-emphasized">
+                    {% if active_filters %}
+                        <strong>{% translate "Currently filtered on:" %}</strong>
+                        {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value|title }}&nbsp;{% endfor %}
+                    {% endif %}
+                </p>
+                {% include "partials/ooi_list_toolbar.html" %}
 
-            {% translate "Filter" as filter_title %}
-            {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
+                {% translate "Filter" as filter_title %}
+                {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
 
-            <p class="de-emphasized">
-                {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
-            </p>
-            <form method="post"
-                  class="inline column"
-                  action="#bulk_clearance_level_submit">
-                {% csrf_token %}
-                <div class="horizontal-scroll">
-                    {% include "partials/form/form_errors.html" with form=select_oois_form %}
+                <p class="de-emphasized">
+                    {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
+                </p>
+                <form method="post"
+                      class="inline column"
+                      action="#bulk_clearance_level_submit">
+                    {% csrf_token %}
+                    <div class="horizontal-scroll">
+                        {% include "partials/form/form_errors.html" with form=select_oois_form %}
 
-                    {% for field in select_oois_form %}{{ field }}{% endfor %}
-                </div>
-                {% if ooi_list %}
-                    <fieldset>
-                        <div class="horizontal-view">
-                            {% if may_update_clearance_level %}
-                                <select id="scan-profiles" name="scan-profile">
-                                    {% for level in scan_levels %}<option value="{{ level }}">{{ level }}</option>{% endfor %}
-                                </select>
-                                <button type="submit"
-                                        class="dropdown-button"
-                                        name="action"
-                                        value="update-scan-profile"
-                                        id="bulk_clearance_level_submit">{% translate "Set clearance level" %}</button>
-                            {% endif %}
-                            {% if perms.tools.can_delete_oois %}
-                                <button type="submit" class="dropdown-button" name="action" value="delete">{% translate "Delete object(s)" %}</button>
-                            {% endif %}
-                        </div>
-                    </fieldset>
-                {% endif %}
-            </form>
-            {% include "partials/list_paginator.html" %}
+                        {% for field in select_oois_form %}{{ field }}{% endfor %}
+                    </div>
+                    {% if ooi_list %}
+                        <fieldset>
+                            <div class="horizontal-view">
+                                {% if may_update_clearance_level %}
+                                    <select id="scan-profiles" name="scan-profile">
+                                        {% for level in scan_levels %}<option value="{{ level }}">{{ level }}</option>{% endfor %}
+                                    </select>
+                                    <button type="submit"
+                                            class="dropdown-button"
+                                            name="action"
+                                            value="update-scan-profile"
+                                            id="bulk_clearance_level_submit">
+                                        {% translate "Set clearance level" %}
+                                    </button>
+                                {% endif %}
+                                {% if perms.tools.can_delete_oois %}
+                                    <button type="submit" class="dropdown-button" name="action" value="delete">{% translate "Delete object(s)" %}</button>
+                                {% endif %}
+                            </div>
+                        </fieldset>
+                    {% endif %}
+                </form>
+                {% include "partials/list_paginator.html" %}
 
-        </div>
-    </section>
-</main>
+            </div>
+        </section>
+    </main>
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}

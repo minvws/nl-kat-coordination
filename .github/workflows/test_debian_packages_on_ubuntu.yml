@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get version from release tag or generate one
         run: |
@@ -67,7 +67,7 @@ jobs:
       PGPASSWORD: postgres  # No password prompt
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Get version from release tag or generate one
         run: |
@@ -181,7 +181,6 @@ jobs:
       - name: Update configs for rabbitmq
         run: |
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/mula.conf
-          sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/rocky.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/bytes.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/boefjes.conf
           sudo sed -i "s/QUEUE_URI=/QUEUE_URI=amqp:\/\/kat:rabbit@localhost:5672\/kat/g" /etc/kat/octopoes.conf

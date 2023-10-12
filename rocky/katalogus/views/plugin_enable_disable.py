@@ -27,7 +27,7 @@ class PluginEnableDisableView(SinglePluginView):
             messages.add_message(
                 self.request,
                 messages.WARNING,
-                _("Boefje '{boefje_name}' disabled.").format(boefje_name=self.plugin.name),
+                _("{} '{}' disabled.").format(self.plugin.type.title(), self.plugin.name),
             )
             return HttpResponseRedirect(request.POST.get("current_url"))
 
@@ -37,9 +37,7 @@ class PluginEnableDisableView(SinglePluginView):
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _("Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?").format(
-                    boefje_name=self.plugin.name
-                ),
+                _("Failed fetching settings for {}. Is the Katalogus up?").format(self.plugin.name),
             )
             return redirect(
                 reverse(
@@ -56,9 +54,7 @@ class PluginEnableDisableView(SinglePluginView):
             messages.add_message(
                 self.request,
                 messages.INFO,
-                _("Before enabling, please set the required settings for boefje '{boefje_name}'.").format(
-                    boefje_name=self.plugin.name
-                ),
+                _("Before enabling, please set the required settings for '{}'.").format(self.plugin.name),
             )
             return redirect(
                 reverse(
@@ -71,9 +67,34 @@ class PluginEnableDisableView(SinglePluginView):
                 )
             )
 
-        self.katalogus_client.enable_boefje(self.plugin)
-        messages.add_message(
-            self.request, messages.SUCCESS, _("Boefje '{boefje_name}' enabled.").format(boefje_name=self.plugin.name)
-        )
+        if self.plugin.can_scan(self.organization_member):
+            self.katalogus_client.enable_boefje(self.plugin)
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                _("{} '{}' enabled.").format(self.plugin.type.title(), self.plugin.name),
+            )
+        else:
+            member_clearance_level_text = (
+                "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
+            ).format(self.organization_member.acknowledged_clearance_level)
+
+            if (
+                self.organization_member.trusted_clearance_level < 0
+                or self.organization_member.acknowledged_clearance_level < 0
+            ):
+                member_clearance_level_text = _(
+                    "Your clearance level is not set. Go to your profile page to see your clearance "
+                    "or contact the administrator to set a clearance level."
+                )
+
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _("To enable {} you need at least a clearance level of L{}. " + member_clearance_level_text).format(
+                    self.plugin.name.title(),
+                    self.plugin.scan_level.value,
+                ),
+            )
 
         return HttpResponseRedirect(request.POST.get("current_url"))

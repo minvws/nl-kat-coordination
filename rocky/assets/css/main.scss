@@ -17,6 +17,7 @@
 @import "vendor_overrides/manon/form-radio";
 @import "vendor_overrides/manon/form-fieldset-required";
 @import "vendor_overrides/manon/link";
+@import "vendor_overrides/manon/table";
 @import "vendor_overrides/manon/tile";
 
 /* Theme */
@@ -35,14 +36,14 @@
 @import "components/fmea";
 @import "components/footer-logo";
 @import "components/footer";
-@import "components/form-inline-column";
+@import "components/form-inline";
 @import "components/form";
 @import "components/header-navigation";
 @import "components/hover-block";
 @import "components/input-link";
 @import "components/language";
 @import "components/layout";
-@import "components/member-states";
+@import "components/table-state-icons";
 @import "components/messages";
 @import "components/notifications";
 @import "components/ooi-summary";
@@ -50,11 +51,11 @@
 @import "components/plugins";
 @import "components/pre";
 @import "components/qr-code";
+@import "components/risk-level-indicator";
 @import "components/scan-level-indicator";
 @import "components/select";
 @import "components/stepper";
 @import "components/table";
-@import "components/tiles";
 @import "components/toolbar";
 @import "components/tree-tables";
 @import "components/user-icon";

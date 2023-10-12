@@ -1,6 +1,7 @@
 import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Literal, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, Extra, Field, constr
 
@@ -13,7 +14,7 @@ class JobException(Exception):
 
 
 class Job(BaseModel):
-    id: str
+    id: UUID
     started_at: Optional[datetime] = Field(default=None)
     ended_at: Optional[datetime] = Field(default=None)
 
@@ -55,7 +56,7 @@ class BoefjeMeta(Job):
 
 
 class RawDataMeta(BaseModel):
-    id: str
+    id: UUID
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
 

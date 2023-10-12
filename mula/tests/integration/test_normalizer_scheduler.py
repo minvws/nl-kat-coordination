@@ -45,6 +45,7 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.scheduler.stop()
+        models.Base.metadata.drop_all(self.dbconn.engine)
         self.dbconn.engine.dispose()
 
 
@@ -203,7 +204,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id.hex,
+            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -231,7 +232,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
 
         # Task should be in datastore
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_push_tasks_for_received_raw_file_no_normalizers_found(self):
@@ -250,7 +251,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id.hex,
+            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -289,7 +290,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id.hex,
+            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -331,7 +332,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id.hex,
+            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -374,7 +375,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id.hex,
+            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -417,7 +418,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id.hex,
+            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -455,7 +456,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
 
         # Task should be in datastore
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
-        self.assertEqual(task_db.id.hex, task_pq.id)
+        self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_push_tasks_for_received_raw_file_error_mimetype(self):
@@ -474,7 +475,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id.hex,
+            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -512,7 +513,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             self.mock_ctx.datastores.task_store.create_task(task)
 
             boefje_meta = BoefjeMetaFactory(
-                id=p_item.id.hex,
+                id=p_item.id,
                 boefje=boefje,
                 input_ooi=ooi.primary_key,
             )

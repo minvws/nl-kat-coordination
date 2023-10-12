@@ -35,7 +35,7 @@ def generate_job_id():
     return str(uuid.uuid4())
 
 
-def url_with_querystring(path, **kwargs) -> str:
+def url_with_querystring(path, doseq=False, **kwargs) -> str:
     parsed_route = urlparse(path)
 
     return str(
@@ -45,7 +45,7 @@ def url_with_querystring(path, **kwargs) -> str:
                 parsed_route.netloc,
                 parsed_route.path,
                 parsed_route.params,
-                urlencode(kwargs),
+                urlencode(kwargs, doseq),
                 parsed_route.fragment,
             )
         )
@@ -126,7 +126,7 @@ class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         breadcrumbs = [
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
-                "text": "Settings",
+                "text": _("Settings"),
             },
         ]
 
@@ -138,7 +138,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         breadcrumbs = [
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
-                "text": "Members",
+                "text": _("Members"),
             },
         ]
 

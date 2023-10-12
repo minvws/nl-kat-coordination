@@ -8,83 +8,32 @@
 
     <main id="main-content" tabindex="-1" class="katalogus">
         <section>
-            <div>
-                <div class="fifty-fifty">
-                    <div>
-                        <h1>{% translate "KAT-alogus" %}</h1>
-                        <p class="emphasized">
-                            {% blocktranslate %}
-                An overview of all available boefjes.
-                Boefjes can be used to scan for vulnerablilities and security issues within specified objects.
-                Each boefje has his own focus area and strengths.
-              {% endblocktranslate %}
-                        </p>
-                    </div>
-                    {% if perms.tools.can_view_katalogus_settings %}
-                        <div class="horizontal-view toolbar">
-                            <a class="button ghost"
-                               href="{% url 'katalogus_settings' organization.code %}">{% translate "KAT-alogus Settings" %}</a>
-                        </div>
-                    {% endif %}
+            {% include "partials/katalogus_header.html" %}
+            {% include "partials/plugins_navigation.html" with active="all" %}
+
+            <div class="fifty-fifty">
+                <div>
+                    <h2>{% translate "All plugins" %}</h2>
+                    <p>
+                        {% blocktranslate trimmed %}
+                            Plugins gather data, objects and insight. Each plugin has its own focus area
+                            and strengths and may be able to work with other plugins to gain even more insights.
+                        {% endblocktranslate %}
+                    </p>
+                    <p class="emphasized">
+                        <strong>{{ object_list|length }}</strong>
+                        {% blocktranslate count counter=object_list|length %}
+                            Plugin available
+                        {% plural %}
+                            Plugins available
+                        {% endblocktranslate %}
+                    </p>
                 </div>
             </div>
-        </section>
-        <section>
-            {% include "partials/katalogus_filter.html" with total_plugins=object_list|length form=form %}
+            {% include "partials/katalogus_filter.html" with form=form %}
+            {% include "partials/katalogus_toolbar.html" %}
+            {% include "partials/plugins.html" %}
 
         </section>
-        {% if view == "table" %}
-            <section>
-                <div>
-                    {% include "partials/katalogus_toolbar.html" with view=view %}
-
-                    <div class="horizontal-scroll">
-                        <table>
-                            <caption>{% translate "Boefjes overview:" %}</caption>
-                            <thead>
-                                <tr>
-                                    <th>{% translate "Boefje name" %}</th>
-                                    <th>{% translate "Boefje description" %}</th>
-                                    <th colspan="2">{% translate "Actions" %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for plugin in object_list %}
-                                    <tr id="plugin_{{ plugin.id|slugify }}">
-                                        <td scope="row">{{ plugin.name }}</td>
-                                        <td>{{ plugin.description }}</td>
-                                        <td>
-                                            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
-
-                                        </td>
-                                        <td>
-                                            <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
-                                               class="nowrap">{% translate "See details" %}</a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-        {% else %}
-            <section>
-                <div>
-                    {% include "partials/katalogus_toolbar.html" with view=view %}
-
-                    <div class="column-4 tiles plugins images-cover">
-                        {% for plugin in object_list %}
-                            {% include "partials/plugin_tile.html" with plugin=plugin %}
-
-                        {% endfor %}
-                    </div>
-                </div>
-            </section>
-        {% endif %}
     </main>
 {% endblock content %}
-{% block html_at_end_body %}
-    {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock html_at_end_body %}

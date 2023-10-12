@@ -17,13 +17,14 @@ class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
+    name: Optional[str] = Field(default=None)
     version: Optional[str] = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):
     """BoefjeMeta is the response object returned by the Bytes API"""
 
-    id: str
+    id: uuid.UUID
     boefje: Boefje
     input_ooi: Optional[str]
     arguments: Dict[str, Any]
@@ -33,7 +34,7 @@ class BoefjeMeta(BaseModel):
 
 
 class RawData(BaseModel):
-    id: str
+    id: uuid.UUID
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
     secure_hash: Optional[str]
@@ -49,7 +50,7 @@ class Normalizer(BaseModel):
 
 
 class NormalizerMeta(BaseModel):
-    id: str
+    id: uuid.UUID
     raw_data: RawData
     normalizer: Normalizer
     started_at: datetime.datetime
@@ -59,7 +60,7 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
-    id: Optional[str]
+    id: uuid.UUID
     normalizer: Normalizer
     raw_data: RawData
 
@@ -67,7 +68,7 @@ class NormalizerTask(BaseModel):
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
-    id: Optional[str]
+    id: uuid.UUID
     boefje: Boefje
     input_ooi: Optional[str]
     organization: str
@@ -97,7 +98,7 @@ class TaskStatus(Enum):
 
 
 class Task(BaseModel):
-    id: str
+    id: uuid.UUID
     scheduler_id: str
     type: str
     p_item: QueuePrioritizedItem
@@ -158,7 +159,15 @@ class LazyTaskList:
         return res.results
 
 
-class TaskAlreadyQueued(Exception):
+class TooManyRequestsError(Exception):
+    pass
+
+
+class BadRequestError(Exception):
+    pass
+
+
+class ConflictError(Exception):
     pass
 
 
@@ -205,8 +214,12 @@ class SchedulerClient:
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
 
-        if res.status_code == HTTPStatus.BAD_REQUEST and res.json().get("detail") == "not allowed":
-            raise TaskAlreadyQueued
+        if res.status_code == HTTPStatus.TOO_MANY_REQUESTS:
+            raise TooManyRequestsError(res.json().get("detail"))
+        elif res.status_code == HTTPStatus.BAD_REQUEST:
+            raise BadRequestError(res.json().get("detail"))
+        elif res.status_code == HTTPStatus.CONFLICT:
+            raise ConflictError(res.json().get("detail"))
 
         res.raise_for_status()
 
