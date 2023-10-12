@@ -68,8 +68,8 @@ def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje)
 
 
 def test_reschedule_task(rf, client_member, mocker, lazy_task_list_with_boefje):
-    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
-    mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+    mock_scheduler_client = mocker.patch("tools.view_helpers.client")
+    mock_scheduler_client.push_task.side_effect = HTTPError
 
     task_id = "e02c18dc-8013-421d-a86d-3a00f6019533"
     request = setup_request(
@@ -90,7 +90,7 @@ def test_reschedule_task(rf, client_member, mocker, lazy_task_list_with_boefje):
 
 
 def test_reschedule_task_already_queued(rf, client_member, mocker, lazy_task_list_with_boefje):
-    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
+    mock_scheduler_client = mocker.patch("tools.view_helpers.client")
     mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
     mock_scheduler_client.push_task.side_effect = ConflictError
 
