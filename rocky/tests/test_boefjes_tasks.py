@@ -83,7 +83,7 @@ def test_reschedule_task(rf, client_member, mocker, lazy_task_list_with_boefje):
 
     assert response.status_code == 302
     assert list(request._messages)[0].message == (
-        "Your task is scheduled and will soon be started in the background. \n "
+        "Your task is scheduled and will soon be started in the background. "
         "Results will be added to the object list when they are in. "
         "It may take some time, a refresh of the page may be needed to show the results."
     )
@@ -105,4 +105,4 @@ def test_reschedule_task_already_queued(rf, client_member, mocker, lazy_task_lis
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 302
-    assert list(request._messages)[0].message == "Task already queued."
+    assert list(request._messages)[0].message == "Task queue is full, please try again later."

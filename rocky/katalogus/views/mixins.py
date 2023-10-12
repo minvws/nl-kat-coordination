@@ -74,7 +74,7 @@ class SinglePluginView(OrganizationView):
         return self.plugin_schema and field in self.plugin_schema.get("required", [])
 
 
-class NormalizerMixin:
+class NormalizerMixin(OctopoesView):
     """
     When a user wants to run a normalizer on a given set of raw data,
     this mixin provides the method to construct the normalizer task for that data and run it.
@@ -82,12 +82,14 @@ class NormalizerMixin:
 
     def run_normalizer(self, normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
         normalizer_task = NormalizerTask(
-            id=uuid4(), normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
+            id=uuid4(),
+            normalizer=Normalizer.parse_obj(normalizer.dict()),
+            raw_data=raw_data,
         )
-        queue_name = f"normalizer-{self.organization.code}"
-        item = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
 
-        schedule_task(self.request, queue_name, item)
+        task = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
+
+        schedule_task(self.request, self.organization.code, task)
 
 
 class BoefjeMixin(OctopoesView):
@@ -103,10 +105,9 @@ class BoefjeMixin(OctopoesView):
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
-        queue_name = f"boefje-{self.organization.code}"
-        item = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
 
-        schedule_task(self.request, queue_name, item)
+        task = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
+        schedule_task(self.request, self.organization.code, task)
 
     def run_boefje_for_oois(
         self,

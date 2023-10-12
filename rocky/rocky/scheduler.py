@@ -65,6 +65,7 @@ class NormalizerTask(BaseModel):
     id: uuid.UUID
     normalizer: Normalizer
     raw_data: RawData
+    type: str = "normalizer"
 
 
 class BoefjeTask(BaseModel):
@@ -74,6 +75,7 @@ class BoefjeTask(BaseModel):
     boefje: Boefje
     input_ooi: Optional[str]
     organization: str
+    type: str = "boefje"
 
 
 class QueuePrioritizedItem(BaseModel):

@@ -95,8 +95,8 @@ class TaskListView(OrganizationView, ListView):
 
             task.p_item.id = new_id
             task.p_item.data.id = new_id
-            queue_name = f"{task.type}-{self.organization.code}"
-            schedule_task(self.request, queue_name, task.p_item)
+
+            schedule_task(self.request, self.organization.code, task.p_item)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

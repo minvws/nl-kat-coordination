@@ -165,16 +165,10 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         ]
 
 
-def schedule_task(request: HttpRequest, queue_name: str, item: QueuePrioritizedItem) -> None:
+def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrioritizedItem) -> None:
     try:
-        client.push_task(queue_name, item)
-    except TooManyRequestsError as error:
-        messages.error(request, error)
-    except ConflictError as error:
-        messages.error(request, error)
-    except BadRequestError as error:
-        messages.error(request, error)
-    except SchedulerError as error:
+        client.push_task(f"{task.data.type}-{organization_code}", task)
+    except (BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
         messages.error(request, error)
     else:
         messages.success(

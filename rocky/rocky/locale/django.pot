@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-10 11:29+0000\n"
+"POT-Creation-Date: 2023-10-12 09:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1685,10 +1685,6 @@ msgid ""
 msgstr ""
 
 #: katalogus/views/mixins.py
-msgid "Scanning successfully scheduled."
-msgstr ""
-
-#: katalogus/views/mixins.py
 #, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s.                             "
@@ -2993,11 +2989,34 @@ msgstr ""
 msgid "Members"
 msgstr ""
 
+#: tools/view_helpers.py
+msgid ""
+"Your task is scheduled and will soon be started in the background. Results "
+"will be added to the object list when they are in. It may take some time, a "
+"refresh of the page may be needed to show the results."
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
 "needs at least a clearance level of L{} in order to do a proper onboarding. "
 "Edit this member and change the clearance level if necessary."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Connectivity issues with Mula."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task queue is full, please try again later."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task is invalid."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task already queued."
 msgstr ""
 
 #: rocky/settings.py
@@ -5216,18 +5235,6 @@ msgstr ""
 
 #: rocky/views/tasks.py
 msgid "Fetching tasks failed: no connection with scheduler"
-msgstr ""
-
-#: rocky/views/tasks.py
-msgid "Task queue is full, please try again later."
-msgstr ""
-
-#: rocky/views/tasks.py
-msgid "Task already queued."
-msgstr ""
-
-#: rocky/views/tasks.py
-msgid "Task is invalid."
 msgstr ""
 
 #: rocky/views/upload_csv.py
