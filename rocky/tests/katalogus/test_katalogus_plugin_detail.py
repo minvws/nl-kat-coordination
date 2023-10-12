@@ -1,4 +1,4 @@
-from katalogus.views.boefje_detail import BoefjeDetailView
+from katalogus.views.plugin_detail import BoefjeDetailView
 from pytest_django.asserts import assertContains
 
 from tests.conftest import setup_request
