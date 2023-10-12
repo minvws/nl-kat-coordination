@@ -8,10 +8,10 @@ Basic vulnerability scanning to see if web servers may be vulnerable to CVE-2023
 This tool checks to see if a website is vulnerable to CVE-2023-44487 completely non-invasively.
 
     The tool checks if a web server accepts HTTP/2 requests without downgrading them
-    If the web server accepts and does not downgrade HTTP/2 requests the tool attempts to open 
+    If the web server accepts and does not downgrade HTTP/2 requests the tool attempts to open
     a connection stream and subsequently reset it.
-    If the web server accepts the creation and resetting of a connection stream then the server 
-    is definitely vulnerable, if it only accepts HTTP/2 requests but the stream connection fails 
+    If the web server accepts the creation and resetting of a connection stream then the server
+    is definitely vulnerable, if it only accepts HTTP/2 requests but the stream connection fails
     it may be vulnerable if the server-side capabilities are enabled.
 
 
