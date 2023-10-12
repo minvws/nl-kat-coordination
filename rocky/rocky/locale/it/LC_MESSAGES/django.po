@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-14 08:52+0000\n"
+"POT-Creation-Date: 2023-10-02 10:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,11 +14,11 @@ msgstr ""
 
 #: account/admin.py
 msgid "Permissions"
-msgstr ""
+msgstr "Permessi"
 
 #: account/admin.py
 msgid "Important dates"
-msgstr ""
+msgstr "Date importanti"
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
@@ -26,97 +26,99 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #: account/forms/account_setup.py
 msgid "This name we will use to communicate with you."
-msgstr ""
+msgstr "Questo nome verrà utilizzato per comunicare con te."
 
 #: account/forms/account_setup.py
 msgid "What do we call you?"
-msgstr ""
+msgstr "Come ti chiamiamo?"
 
 #: account/forms/account_setup.py
 msgid "Email"
-msgstr ""
+msgstr "Email"
 
 #: account/forms/account_setup.py
 msgid "Enter your email address."
-msgstr ""
+msgstr "Inserisci il tuo indirizzo email."
 
 #: account/forms/account_setup.py
 msgid "Password"
-msgstr ""
+msgstr "Password"
 
 #: account/forms/account_setup.py
 msgid "Choose your super secret password"
-msgstr ""
+msgstr "Scegli la tua super segreta password"
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
-msgstr ""
+msgstr "Scegli un'altra email."
 
 #: account/forms/account_setup.py tools/forms/settings.py
 msgid "--- Please select one of the available options ----"
-msgstr ""
+msgstr "--- Per favore seleziona una delle opzioni disponibili ----"
 
 #: account/forms/account_setup.py
 msgid "Account Type"
-msgstr ""
+msgstr "Tipo di account"
 
 #: account/forms/account_setup.py
 msgid "Every member of OpenKAT must be part of an account type."
-msgstr ""
+msgstr "Ogni membro di OpenKAT deve far parte di un tipo di account."
 
 #: account/forms/account_setup.py
 msgid "Please select an account type to proceed."
-msgstr ""
+msgstr "Seleziona un tipo di account per procedere."
 
 #: account/forms/account_setup.py
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
-msgstr ""
+msgstr "Livello di autorizzazione fidato"
 
 #: account/forms/account_setup.py
 msgid "Select a clearance level you trust this member with."
 msgstr ""
+"Seleziona un livello di autorizzazione che ritieni affidabile per questo "
+"membro."
 
 #: account/forms/account_setup.py onboarding/forms.py tools/forms/ooi.py
 msgid "Please select a clearance level to proceed."
-msgstr ""
+msgstr "Seleziona un livello di autorizzazione per procedere."
 
 #: account/forms/account_setup.py
 msgid "The name of the organization."
-msgstr ""
+msgstr "Il nome dell'organizzazione."
 
 #: account/forms/account_setup.py
 msgid "explanation-organization-name"
-msgstr ""
+msgstr "spiegazione-nome-organizzazione"
 
 #: account/forms/account_setup.py
 #, python-brace-format
 msgid "A unique code of {code_length} characters."
-msgstr ""
+msgstr "Un codice unico di {code_length} caratteri."
 
 #: account/forms/account_setup.py
 msgid "explanation-organization-code"
-msgstr ""
+msgstr "spiegazione-codice-organizzazione"
 
 #: account/forms/account_setup.py
 msgid "Organization name is required to proceed."
-msgstr ""
+msgstr "Il nome dell'organizzazione è necessario per procedere."
 
 #: account/forms/account_setup.py
 msgid "Choose another organization."
-msgstr ""
+msgstr "Scegli un'altra organizzazione."
 
 #: account/forms/account_setup.py
 msgid "Organization code is required to proceed."
-msgstr ""
+msgstr "Il codice dell'organizzazione è necessario per procedere."
 
 #: account/forms/account_setup.py
 msgid "Choose another code for your organization."
-msgstr ""
+msgstr "Scegli un altro codice per la tua organizzazione."
 
 #: account/forms/account_setup.py
 msgid ""
@@ -124,6 +126,10 @@ msgid ""
 "have permission to scan these assets. I am aware of the implications a scan "
 "with a higher scan level brings on my systems."
 msgstr ""
+"Dichiaro che OpenKAT può esaminare gli asset della mia organizzazione e che "
+"ho il permesso di esaminare questi asset. Sono consapevole delle "
+"implicazioni che una scansione con un livello di scansione più elevato "
+"comporta per i miei sistemi."
 
 #: account/forms/account_setup.py
 msgid ""
@@ -131,175 +137,188 @@ msgid ""
 "organization. I have the experience and knowledge to know what the "
 "consequences might be and can be held responsible for them."
 msgstr ""
+"Dichiaro di essere autorizzato a fornire questa indennità all'interno della "
+"mia organizzazione. Ho l'esperienza e la conoscenza necessarie per conoscere "
+"quali potrebbero essere le conseguenze e posso essere ritenuto responsabile "
+"per esse."
 
 #: account/forms/account_setup.py
 msgid "Trusted to change Clearance Levels."
-msgstr ""
+msgstr "Autorizzato a modificare i livelli di autorizzazione."
 
 #: account/forms/account_setup.py
 msgid "Acknowledged to change Clearance Levels."
-msgstr ""
+msgstr "Riconosciuto per la modifica dei livelli di autorizzazione."
 
 #: account/forms/account_setup.py
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/views/organization_member_list.py
 msgid "Blocked"
-msgstr ""
+msgstr "Bloccato"
 
 #: account/forms/account_setup.py
 msgid ""
 "Set the members status to blocked, so they don't have access to the "
 "organization anymore."
 msgstr ""
+"Imposta lo stato dei membri come bloccato, in modo che non abbiano più "
+"accesso all'organizzazione."
 
 #: account/forms/account_setup.py
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Accepted clearance level"
-msgstr ""
+msgstr "Livello di autorizzazione accettato"
 
 #: account/forms/account_setup.py
 msgid "Enter tags separated by comma."
-msgstr ""
+msgstr "Inserisci le etichette separate da virgola."
 
 #: account/forms/account_setup.py
 msgid "The two password fields didn’t match."
-msgstr ""
+msgstr "I due campi password non corrispondono."
 
 #: account/forms/account_setup.py
 msgid "New password"
-msgstr ""
+msgstr "Nuova password"
 
 #: account/forms/account_setup.py
 msgid "Enter your new password"
-msgstr ""
+msgstr "Inserisci la tua nuova password"
 
 #: account/forms/account_setup.py
 msgid "New password confirmation"
-msgstr ""
+msgstr "Conferma nuova password"
 
 #: account/forms/account_setup.py
 msgid "Repeat your new password"
-msgstr ""
+msgstr "Ripeti la tua nuova password"
 
 #: account/forms/account_setup.py
 msgid "Confirm your new password"
-msgstr ""
+msgstr "Conferma la tua nuova password"
 
 #: account/forms/login.py
 msgid "Please enter a correct email address and password."
-msgstr ""
+msgstr "Inserisci un indirizzo email e una password corretti."
 
 #: account/forms/login.py
 msgid "This account is inactive."
-msgstr ""
+msgstr "Questo account è inattivo."
 
 #: account/forms/login.py
 msgid "Insert the email you registered with or got at OpenKAT installation."
 msgstr ""
+"Inserisci l'email con cui ti sei registrato o che hai ottenuto durante "
+"l'installazione di OpenKAT."
 
 #: account/forms/organization.py
 msgid "Organization is required."
-msgstr ""
+msgstr "L'organizzazione è richiesta."
 
 #: account/forms/organization.py tools/view_helpers.py
 #: rocky/templates/dashboard_redteam.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/views/organization_add.py
 msgid "Organizations"
-msgstr ""
+msgstr "Organizzazioni"
 
 #: account/forms/organization.py
 msgid "The organization from which to clone settings."
-msgstr ""
+msgstr "L'organizzazione da cui clonare le impostazioni."
 
 #: account/forms/password_reset.py
 msgid "Email address"
-msgstr ""
+msgstr "Indirizzo email"
 
 #: account/forms/password_reset.py
 msgid "A reset link will be sent to this email"
-msgstr ""
+msgstr "Un link di reset verrà inviato a questa email"
 
 #: account/forms/password_reset.py
 msgid "The email address connected to your OpenKAT-account"
-msgstr ""
+msgstr "L'indirizzo email collegato al tuo account OpenKAT"
 
 #: account/forms/token.py
 msgid ""
 "Insert the token generated by the authenticator app to setup the two factor "
 "authentication."
 msgstr ""
+"Inserisci il token generato dall'app di autenticazione per configurare "
+"l'autenticazione a due fattori."
 
 #: account/forms/token.py
 msgid "Insert the token generated by your token authenticator app."
-msgstr ""
+msgstr "Inserisci il token generato dalla tua app di autenticazione a token."
 
 #: account/forms/token.py
 msgid "Backup token"
-msgstr ""
+msgstr "Token di backup"
 
 #: account/models.py
 msgid "The Email must be set"
-msgstr ""
+msgstr "L'indirizzo email deve essere impostato."
 
 #: account/models.py
 msgid "Superuser must have is_staff=True."
-msgstr ""
+msgstr "Il superutente deve avere is_staff=True."
 
 #: account/models.py
 msgid "Superuser must have is_superuser=True."
-msgstr ""
+msgstr "Il superutente deve avere is_superuser=True."
 
 #: account/models.py
 msgid "full name"
-msgstr ""
+msgstr "nome completo"
 
 #: account/models.py
 msgid "email"
-msgstr ""
+msgstr "email"
 
 #: account/models.py
 msgid "staff status"
-msgstr ""
+msgstr "stato dello staff"
 
 #: account/models.py
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
+"Indica se l'utente può effettuare l'accesso a questo sito di amministrazione."
 
 #: account/models.py tools/models.py
 msgid "active"
-msgstr ""
+msgstr "attivo"
 
 #: account/models.py
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Indica se questo utente dovrebbe essere considerato attivo. Deselezionare "
+"questa opzione anziché cancellare gli account."
 
 #: account/models.py
 msgid "date joined"
-msgstr ""
+msgstr "data di registrazione"
 
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
-msgstr ""
+msgstr "Dettagli dell'account"
 
 #: account/templates/account_detail.html account/templates/password_reset.html
 #: account/views/password_reset.py
 msgid "Reset password"
-msgstr ""
+msgstr "Reimposta password"
 
 #: account/templates/account_detail.html
 msgid "Full name"
-msgstr ""
+msgstr "Nome completo"
 
 #: account/templates/account_detail.html
 msgid "E-mail address"
-msgstr ""
+msgstr "Indirizzo email"
 
 #: account/templates/account_detail.html
 msgid "Member type"
-msgstr ""
+msgstr "Tipo di membro"
 
 #: account/templates/account_detail.html
 #: onboarding/templates/account/step_2a_organization_setup.html
@@ -308,15 +327,15 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Organization"
-msgstr ""
+msgstr "Organizzazione"
 
 #: account/templates/account_detail.html
 msgid "Permission to set OOI clearance levels "
-msgstr ""
+msgstr "Autorizzazione per impostare i livelli di autorizzazione OOI"
 
 #: account/templates/account_detail.html
 msgid "OOI clearance"
-msgstr ""
+msgstr "Autorizzazione OOI"
 
 #: account/templates/account_detail.html
 msgid ""
@@ -327,20 +346,28 @@ msgid ""
 "necessary clearance level.\n"
 "                        "
 msgstr ""
+"\n"
+"                            Non hai alcuna autorizzazione per eseguire la "
+"scansione di oggetti.<br>\n"
+"                            Contatta l'amministratore per ottenere il "
+"livello di autorizzazione necessario.\n"
+"                        "
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level "
-msgstr ""
+msgstr "Hai attualmente accettato l'autorizzazione fino al livello "
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI Clearance"
-msgstr ""
+msgstr "Spiegazione Autorizzazione OOI"
 
 #: account/templates/account_detail.html
 msgid ""
 "You can withdraw this at anytime you like, but know that you won't be able "
 "to change clearance levels anymore when you do."
 msgstr ""
+"Puoi ritirare questa autorizzazione in qualsiasi momento, ma sappi che non "
+"sarai più in grado di cambiare i livelli di autorizzazione quando lo farai."
 
 #: account/templates/account_detail.html
 #, python-format
@@ -350,10 +377,14 @@ msgid ""
 "clearance and responsibility\"\n"
 "                    "
 msgstr ""
+"\n"
+"                            \"Ritira l'accettazione del livello di "
+"autorizzazione L%(acl)s e la relativa responsabilità\"\n"
+"                    "
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI clearance"
-msgstr ""
+msgstr "Spiegazione Autorizzazione OOI"
 
 #: account/templates/account_detail.html
 #, python-format
@@ -363,6 +394,10 @@ msgid ""
 "permission. Remember: <strong>with great power comes great responsibility.</"
 "strong>"
 msgstr ""
+"Ti è stata concessa l'autorizzazione per il livello L%(tcl)s dal tuo "
+"amministratore. Prima di poter cambiare i livelli di autorizzazione OOI fino "
+"a questo livello, devi accettare questa autorizzazione. Ricorda: <strong>con "
+"grandi poteri arrivano grandi responsabilità.</strong>"
 
 #: account/templates/account_detail.html
 #, python-format
@@ -372,42 +407,49 @@ msgid ""
 "responsibility\"\n"
 "                    "
 msgstr ""
+"\n"
+"                        \"Accetta l'autorizzazione di livello L%(tcl)s e la "
+"responsabilità\"\n"
+"                    "
 
 #: account/templates/password_reset.html
 msgid "Use the form below to reset your password."
-msgstr ""
+msgstr "Utilizza il modulo sottostante per reimpostare la tua password."
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
 msgid "Back"
-msgstr ""
+msgstr "Indietro"
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
 msgid "Send"
-msgstr ""
+msgstr "Invia"
 
 #: account/templates/password_reset_confirm.html
 msgid "Confirm reset password"
-msgstr ""
+msgstr "Conferma reset password"
 
 #: account/templates/password_reset_confirm.html
 msgid "Use the form below to confirm resetting your password"
 msgstr ""
+"Utilizza il modulo sottostante per confermare il reset della tua password"
 
 #: account/templates/password_reset_confirm.html
 msgid "Confirm password"
-msgstr ""
+msgstr "Conferma password"
 
 #: account/templates/password_reset_confirm.html
 msgid "The link is invalid"
-msgstr ""
+msgstr "Il link non è valido"
 
 #: account/templates/password_reset_confirm.html
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"Il link per il reset della password non era valido, probabilmente perché è "
+"già stato utilizzato. Per favore richiedi un nuovo reset della password."
 
 #: account/templates/password_reset_email.html
 #, python-format
@@ -415,55 +457,57 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Stai ricevendo questa email perché hai richiesto un reset della password per "
+"il tuo account utente su %(site_name)s."
 
 #: account/templates/password_reset_email.html
 #: account/templates/registration_email.html
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Vai alla seguente pagina e scegli una nuova password:"
 
 #: account/templates/password_reset_email.html
 #: account/templates/registration_email.html
 msgid "Sincerely,"
-msgstr ""
+msgstr "Cordiali saluti,"
 
 #: account/templates/password_reset_email.html
 #: account/templates/registration_email.html
 msgid "The OpenKAT team"
-msgstr ""
+msgstr "Il team di OpenKAT"
 
 #: account/templates/password_reset_subject.txt
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
+msgstr "Reset della password su %(site_name)s"
 
 #: account/templates/recover_email.html account/views/recover_email.py
 msgid "Recover email address"
-msgstr ""
+msgstr "Recupera l'indirizzo email"
 
 #: account/templates/recover_email.html
 msgid "Information on how to recover your connected email address"
-msgstr ""
+msgstr "Informazioni su come recuperare il tuo indirizzo email collegato"
 
 #: account/templates/recover_email.html
 msgid "Forgotten email address?"
-msgstr ""
+msgstr "Indirizzo email dimenticato?"
 
 #: account/templates/recover_email.html
 msgid ""
 "If you don’t remember the email address connected to your account, contact: "
-msgstr ""
+msgstr "Se non ricordi l'indirizzo email collegato al tuo account, contatta:"
 
 #: account/templates/recover_email.html
 msgid "Please contact the system administrator."
-msgstr ""
+msgstr "Per favore contatta l'amministratore di sistema."
 
 #: account/templates/recover_email.html
 msgid "Back to Home"
-msgstr ""
+msgstr "Torna alla Home"
 
 #: account/templates/recover_email.html
 msgid "Back to login"
-msgstr ""
+msgstr "Torna al login"
 
 #: account/templates/registration_email.html
 #, python-format
@@ -471,340 +515,372 @@ msgid ""
 "Welcome to OpenKAT. You're receiving this email because you have been added "
 "to organization \"%(organization)s\" at %(site_name)s."
 msgstr ""
+"Benvenuto in OpenKAT. Stai ricevendo questa email perché sei stato aggiunto "
+"all'organizzazione \"%(organization)s\" su %(site_name)s."
 
 #: account/templates/registration_subject.txt
 #, python-format
 msgid "Verify OpenKAT account on %(site_name)s"
-msgstr ""
+msgstr "Verifica l'account OpenKAT su %(site_name)s"
 
 #: account/validators.py
 msgid "Your password must contain at least the following:"
-msgstr ""
+msgstr "La tua password deve contenere almeno quanto segue:"
 
 #: account/validators.py
 msgid " characters"
-msgstr ""
+msgstr " caratteri"
 
 #: account/validators.py
 msgid " digits"
-msgstr ""
+msgstr " cifre"
 
 #: account/validators.py
 msgid " letters"
-msgstr ""
+msgstr " lettere"
 
 #: account/validators.py
 msgid " special characters such as: "
-msgstr ""
+msgstr " caratteri speciali come:"
 
 #: account/validators.py
 msgid " lower case letters"
-msgstr ""
+msgstr " lettere minuscole"
 
 #: account/validators.py
 msgid " upper case letters"
-msgstr ""
+msgstr " lettere maiuscole"
 
 #: account/views/login.py
 msgid "Your session has timed out. Please login again."
-msgstr ""
+msgstr "La tua sessione è scaduta. Effettua nuovamente l'accesso."
 
 #: account/views/login.py rocky/templates/header.html
 msgid "OpenKAT"
-msgstr ""
+msgstr "OpenKAT"
 
 #: account/views/login.py account/views/password_reset.py
 #: account/views/recover_email.py rocky/templates/partials/secondary-menu.html
 #: rocky/templates/two_factor/core/login.html
 msgid "Login"
-msgstr ""
+msgstr "Accesso"
 
 #: account/views/login.py
 msgid "Two factor authentication"
-msgstr ""
+msgstr "Autenticazione a due fattori"
 
 #: account/views/password_reset.py
 msgid "We couldn't send a password reset link. Contact "
 msgstr ""
+"Non siamo riusciti a inviare un link di reset della password. Contatta "
 
 #: account/views/password_reset.py
 msgid ""
 "We couldn't send a password reset link. Contact your system administrator."
 msgstr ""
+"Non siamo riusciti a inviare un link di reset della password. Contatta "
+"l'amministratore di sistema."
 
 #: crisis_room/views.py
 msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
 "more details."
 msgstr ""
+"Impossibile ottenere l'elenco delle scoperte per l'organizzazione {}, "
+"controlla i log del server per ulteriori dettagli."
 
 #: fmea/forms.py
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Failure mode"
-msgstr ""
+msgstr "Modalità di guasto"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
 #: katalogus/templates/plugin_detail.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
-msgstr ""
+msgstr "Descrizione"
 
 #: fmea/forms.py
 msgid "Frequency Level"
-msgstr ""
+msgstr "Livello di Frequenza"
 
 #: fmea/forms.py
 msgid "Detectability Level"
-msgstr ""
+msgstr "Livello di Rilevabilità"
 
 #: fmea/forms.py
 msgid "Effect(s)"
-msgstr ""
+msgstr "Effetto/i"
 
 #: fmea/forms.py
 msgid "Describe in one sentence what type of failure mode you are creating."
-msgstr ""
+msgstr "Descrivi in una frase che tipo di modalità di guasto stai creando."
 
 #: fmea/forms.py
 msgid "Describe the failure mode in details."
-msgstr ""
+msgstr "Descrivi in dettaglio la modalità di guasto."
 
 #: fmea/forms.py
 msgid ""
 "From 1 to 5, how often does this failure mode occurs. 1: Almost unthinkable "
 "and 5: occurs daily."
 msgstr ""
+"Da 1 a 5, quanto spesso si verifica questa modalità di guasto. 1: Quasi "
+"impensabile e 5: si verifica quotidianamente."
 
 #: fmea/forms.py
 msgid ""
 "Is this failure mode easy detectable? Give it a score from 1 to 5. 1: always "
 "detectable and 5: almost undetectable."
 msgstr ""
+"Questa modalità di guasto è facilmente rilevabile? Assegnale un punteggio da "
+"1 a 5. 1: sempre rilevabile e 5: quasi indetectabile."
 
 #: fmea/forms.py
 msgid "Describe the type of failure mode"
-msgstr ""
+msgstr "Descrivi il tipo di modalità di guasto"
 
 #: fmea/forms.py
 msgid "explanation-failure-mode"
-msgstr ""
+msgstr "spiegazione-modalità-di-guasto"
 
 #: fmea/forms.py
 msgid "Describe in more detail what the failure mode is about."
-msgstr ""
+msgstr "Descrivi in dettaglio di cosa si tratta la modalità di guasto."
 
 #: fmea/forms.py
 msgid "explanation-description"
-msgstr ""
+msgstr "spiegazione-descrizione"
 
 #: fmea/forms.py
 msgid "explanation-frequency-level"
-msgstr ""
+msgstr "spiegazione-livello-di-frequenza"
 
 #: fmea/forms.py
 msgid "explanation-detectability_level"
-msgstr ""
+msgstr "spiegazione-livello-di-rilevabilità"
 
 #: fmea/forms.py
 msgid "You must at least set a failure mode."
-msgstr ""
+msgstr "Devi impostare almeno una modalità di guasto."
 
 #: fmea/forms.py
 msgid "Choose a frequency level."
-msgstr ""
+msgstr "Scegli un livello di frequenza."
 
 #: fmea/forms.py
 msgid "Choose a detectability level."
-msgstr ""
+msgstr "Scegli un livello di rilevabilità."
 
 #: fmea/forms.py
 msgid "Choose at least one effect."
-msgstr ""
+msgstr "Scegli almeno un effetto."
 
 #: fmea/forms.py
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
 msgid "Affected Department"
-msgstr ""
+msgstr "Dipartimento Interessato"
 
 #: fmea/forms.py
 msgid "Affected Objects"
-msgstr ""
+msgstr "Oggetti Interessati"
 
 #: fmea/forms.py
 msgid "Choose a failure mode which applies to "
-msgstr ""
+msgstr "Scegli una modalità di guasto applicabile a"
 
 #: fmea/forms.py
 msgid "When this failure mode occurs, which department is affected?"
 msgstr ""
+"Quando questa modalità di guasto si verifica, quale dipartimento è "
+"interessato?"
 
 #: fmea/forms.py
 msgid "Which objects does this failure mode affect when it occurs?"
 msgstr ""
+"Quali oggetti sono interessati da questa modalità di guasto quando si "
+"verifica?"
 
 #: fmea/forms.py
 msgid "explanation-affected-ooi-type"
-msgstr ""
+msgstr "spiegazione-tipo-di-oggetto-interessato"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_effect_detail.html
 msgid "Effect"
-msgstr ""
+msgstr "Effetto"
 
 #: fmea/forms.py
 msgid "Severity Level"
-msgstr ""
+msgstr "Livello di Gravità"
 
 #: fmea/forms.py
 msgid "Name a possible effect of any type of failure mode that can occur."
 msgstr ""
+"Nome di un possibile effetto di qualsiasi tipo di modalità di guasto che può "
+"verificarsi."
 
 #: fmea/forms.py
 msgid ""
 "Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
 msgstr ""
+"Descrivi la gravità di questo effetto, ad esempio 1: non grave e 5: "
+"catastrofico"
 
 #: fmea/forms.py
 msgid "Describe a possible effect for FMEA"
-msgstr ""
+msgstr "Descrivi un possibile effetto per FMEA"
 
 #: fmea/forms.py
 msgid "explanation-effect"
-msgstr ""
+msgstr "spiegazione-effetto"
 
 #: fmea/forms.py
 msgid "explanation-severity-level"
-msgstr ""
+msgstr "spiegazione-livello-di-gravità"
 
 #: fmea/forms.py
 msgid "The effect is required."
-msgstr ""
+msgstr "L'effetto è obbligatorio."
 
 #: fmea/forms.py
 msgid "This effect already exists."
-msgstr ""
+msgstr "Questo effetto esiste già."
 
 #: fmea/forms.py
 msgid "Choose a severity level."
-msgstr ""
+msgstr "Scegli un livello di gravità."
 
 #: fmea/models.py
 msgid "Finances"
-msgstr ""
+msgstr "Finanze"
 
 #: fmea/models.py
 msgid "Marketing"
-msgstr ""
+msgstr "Marketing"
 
 #: fmea/models.py
 msgid "Human Resources"
-msgstr ""
+msgstr "Risorse Umane"
 
 #: fmea/models.py
 msgid "Research & Development"
-msgstr ""
+msgstr "Ricerca & Sviluppo"
 
 #: fmea/models.py
 msgid "Administration"
-msgstr ""
+msgstr "Amministrazione"
 
 #: fmea/models.py rocky/templates/footer.html rocky/templates/health.html
 msgid "Service"
-msgstr ""
+msgstr "Servizio"
 
 #: fmea/models.py
 msgid "Level 1: Not Severe"
-msgstr ""
+msgstr "Livello 1: Non Grave"
 
 #: fmea/models.py
 msgid "Level 2: Harmful"
-msgstr ""
+msgstr "Livello 2: Dannoso"
 
 #: fmea/models.py
 msgid "Level 3: Severe"
-msgstr ""
+msgstr "Livello 3: Grave"
 
 #: fmea/models.py
 msgid "Level 4: Very Harmful"
-msgstr ""
+msgstr "Livello 4: Molto Dannoso"
 
 #: fmea/models.py
 msgid "Level 5: Catastrophic"
-msgstr ""
+msgstr "Livello 5: Catastrofico"
 
 #: fmea/models.py
 msgid "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
 msgstr ""
+"Livello 1: Molto Raro. L'incidente (quasi) non si verifica, quasi "
+"impensabile."
 
 #: fmea/models.py
 msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
 msgstr ""
+"Livello 2: Raro. Gli incidenti si verificano meno di una volta all'anno "
+"(3-5)."
 
 #: fmea/models.py
 msgid "Level 3: Occurs. Incidents occur several times a year."
 msgstr ""
+"Livello 3: Si Verifica. Gli incidenti si verificano diverse volte all'anno."
 
 #: fmea/models.py
 msgid "Level 4: Regularly. Incidents occur weekly."
-msgstr ""
+msgstr "Livello 4: Regolarmente. Gli incidenti si verificano settimanalmente."
 
 #: fmea/models.py
 msgid "Level 5: Frequent. Incidents occur daily."
-msgstr ""
+msgstr "Livello 5: Frequente. Gli incidenti si verificano quotidianamente."
 
 #: fmea/models.py
 msgid ""
 "Level 1: Always Detectable. Incident (almost) never occurs, almost "
 "unthinkable."
 msgstr ""
+"Livello 1: Sempre Rilevabile. L'incidente (quasi) non si verifica, quasi "
+"impensabile."
 
 #: fmea/models.py
 msgid ""
 "Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
 msgstr ""
+"Livello 2: Generalmente Rilevabile. Gli incidenti si verificano meno di una "
+"volta all'anno (3-5)."
 
 #: fmea/models.py
 msgid "Level 3: Detectable. Failure mode is detectable with effort."
-msgstr ""
+msgstr "Livello 3: Rilevabile. La modalità di guasto è rilevabile con sforzo."
 
 #: fmea/models.py
 msgid "Level 4: Poorly Detectable. Detecting the failure mode is difficult."
 msgstr ""
+"Livello 4: Scarsamente Rilevabile. La rilevazione della modalità di guasto è "
+"difficile."
 
 #: fmea/models.py
 msgid ""
 "Level 5: Almost Undetectable. Failure mode detection is very difficult or "
 "nearly impossible."
 msgstr ""
+"Livello 5: Quasi Individuabile. La rilevazione della modalità di guasto è "
+"molto difficile o quasi impossibile."
 
 #: fmea/models.py fmea/templates/fmea/fmea_failure_mode_list.html
 #: fmea/views/view_helpers.py
 msgid "Failure modes"
-msgstr ""
+msgstr "Modalità di Guasto"
 
 #: fmea/models.py fmea/views/view_helpers.py
 msgid "Failure Mode Affected Objects"
-msgstr ""
+msgstr "Oggetti Interessati dalla Modalità di Guasto"
 
 #: fmea/templates/fmea/fmea_department_heatmap.html
 msgid "FMEA Departments Heatmap:"
-msgstr ""
+msgstr "Mappa Termica dei Dipartimenti FMEA:"
 
 #: fmea/templates/fmea/fmea_department_heatmap.html
 msgid "No data to build heatmap"
-msgstr ""
+msgstr "Nessun dato per costruire la mappa termica"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
 msgid "Failure mode affected object table:"
-msgstr ""
+msgstr "Tabella degli oggetti interessati dalla modalità di guasto:"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
 msgid "Affected Object"
-msgstr ""
+msgstr "Oggetto Interessato"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
@@ -819,25 +895,26 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/ooi_edit.py rocky/views/organization_edit.py
 msgid "Edit"
-msgstr ""
+msgstr "Modifica"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
 msgid "Failure mode affected objects cannot be found."
 msgstr ""
+"Gli oggetti interessati dalla modalità di guasto non possono essere trovati."
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
 msgid "Define which objects are affected for a failure mode"
-msgstr ""
+msgstr "Definisci quali oggetti sono interessati da una modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
 msgid "Failure mode affected objects"
-msgstr ""
+msgstr "Oggetti interessati dalla modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
 #: fmea/templates/fmea/fmea_failure_mode_effect_form.html
 #: fmea/templates/fmea/fmea_failure_mode_form.html
 msgid "Save"
-msgstr ""
+msgstr "Salva"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
 #: fmea/templates/fmea/fmea_failure_mode_effect_form.html
@@ -856,75 +933,76 @@ msgstr ""
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Submit"
-msgstr ""
+msgstr "Invia"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "No failure mode yet defined."
-msgstr ""
+msgstr "Nessuna modalità di guasto ancora definita."
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
 msgid "To add affected objects to a failure mode, first create one."
 msgstr ""
+"Per aggiungere oggetti interessati a una modalità di guasto, prima crea una."
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "Create failure mode"
-msgstr ""
+msgstr "Crea modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
 msgid "Failure mode affected objects table:"
-msgstr ""
+msgstr "Tabella degli oggetti interessati alla modalità di guasto:"
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
 msgid "No failure mode affected objects yet defined."
-msgstr ""
+msgstr "Nessun oggetto interessato alla modalità di guasto ancora definito."
 
 #: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
 msgid "Create failure mode Affected Objects"
-msgstr ""
+msgstr "Crea oggetti interessati alla modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_departments.html
 msgid "Departments failure modes"
-msgstr ""
+msgstr "Modalità di guasto dei dipartimenti"
 
 #: fmea/templates/fmea/fmea_failure_mode_departments.html
 msgid "Failure modes and affected departments table:"
-msgstr ""
+msgstr "Tabella delle modalità di guasto e dei dipartimenti interessati:"
 
 #: fmea/templates/fmea/fmea_failure_mode_departments.html
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "Failure Mode"
-msgstr ""
+msgstr "Modalità di Guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_departments.html
 msgid "Affected Departments"
-msgstr ""
+msgstr "Dipartimenti interessati"
 
 #: fmea/templates/fmea/fmea_failure_mode_departments.html
 msgid "Nothing found."
-msgstr ""
+msgstr "Niente trovato."
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Failure mode properties"
-msgstr ""
+msgstr "Proprietà della modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 #: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
 msgid "Properties"
-msgstr ""
+msgstr "Proprietà"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Risk class"
-msgstr ""
+msgstr "Classe di rischio"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Frequency level"
-msgstr ""
+msgstr "Livello di frequenza"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Detectability level"
-msgstr ""
+msgstr "Livello di rilevabilità"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid ""
@@ -941,11 +1019,11 @@ msgstr[1] ""
 #: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
 #: fmea/templates/fmea/fmea_failure_mode_effect_list.html
 msgid "Failure mode effect"
-msgstr ""
+msgstr "Effetto della modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
 msgid "Failure mode effect properties"
-msgstr ""
+msgstr "Proprietà dell'effetto della modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
@@ -955,62 +1033,64 @@ msgstr ""
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Severity"
-msgstr ""
+msgstr "Gravità"
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_form.html
 msgid "FMEA effect and severity"
-msgstr ""
+msgstr "Effetto e gravità FMEA"
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_form.html
 msgid "FMEA effect"
-msgstr ""
+msgstr "Effetto FMEA"
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_list.html
 msgid "Failure mode effects table:"
-msgstr ""
+msgstr "Tabella degli effetti della modalità di guasto:"
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_list.html
 msgid "Severity level"
-msgstr ""
+msgstr "Livello di gravità"
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_list.html
 msgid "No failure mode effect yet defined."
-msgstr ""
+msgstr "Nessun effetto della modalità di guasto ancora definito."
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_list.html
 msgid "Create a failure mode effect"
-msgstr ""
+msgstr "Crea un effetto della modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_form.html
 #: fmea/templates/fmea/fmea_index.html
 msgid "Create a new failure mode"
-msgstr ""
+msgstr "Crea una nuova modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_form.html
 msgid "Failure mode and effects"
-msgstr ""
+msgstr "Modalità di guasto ed effetti"
 
 #: fmea/templates/fmea/fmea_failure_mode_form.html
 msgid "No failure mode effects created."
-msgstr ""
+msgstr "Nessun effetto della modalità di guasto creato."
 
 #: fmea/templates/fmea/fmea_failure_mode_form.html
 msgid ""
 "First create failure mode effects which can be added later to a failure mode."
 msgstr ""
+"Prima crea gli effetti della modalità di guasto che possono essere aggiunti "
+"successivamente a una modalità di guasto."
 
 #: fmea/templates/fmea/fmea_failure_mode_form.html
 #: fmea/templates/fmea/fmea_index.html
 msgid "Create failure mode effects"
-msgstr ""
+msgstr "Crea gli effetti della modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "Failure mode table:"
-msgstr ""
+msgstr "Tabella delle modalità di guasto:"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "Risk Class"
-msgstr ""
+msgstr "Classe di rischio"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
@@ -1019,23 +1099,23 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Details"
-msgstr ""
+msgstr "Dettagli"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "Sluit details"
-msgstr ""
+msgstr "Chiudi dettagli"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "Description:"
-msgstr ""
+msgstr "Descrizione:"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "Frequency level:"
-msgstr ""
+msgstr "Livello di frequenza:"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid "Detectability level:"
-msgstr ""
+msgstr "Livello di rilevabilità:"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
 msgid ""
@@ -1051,53 +1131,53 @@ msgstr[1] ""
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Failure mode report"
-msgstr ""
+msgstr "Report della modalità di guasto"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
 msgid "Summary"
-msgstr ""
+msgstr "Sommario"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Failure mode: "
-msgstr ""
+msgstr "Modalità di guasto:"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Severity: "
-msgstr ""
+msgstr "Gravità:"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Detectability: "
-msgstr ""
+msgstr "Rilevabilità:"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Frequency: "
-msgstr ""
+msgstr "Frequenza:"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Effect: "
-msgstr ""
+msgstr "Effetto:"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Description: "
-msgstr ""
+msgstr "Descrizione:"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Affected Departments: "
-msgstr ""
+msgstr "Dipartimenti interessati:"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Affected OOI's: "
-msgstr ""
+msgstr "OOI interessati:"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 msgid "Report cannot be viewed, failure mode not found."
-msgstr ""
+msgstr "Impossibile visualizzare il rapporto, modalità di guasto non trovata."
 
 #: fmea/templates/fmea/fmea_index.html
 msgid "FMEA introduction"
-msgstr ""
+msgstr "Introduzione all'FMEA"
 
 #: fmea/templates/fmea/fmea_index.html
 msgid ""
@@ -1105,6 +1185,9 @@ msgid ""
 "collecting knowledge about possible points of failure in a design, "
 "manufacturing process, product or service."
 msgstr ""
+"L'FMEA (analisi delle modalità di guasto ed efficacia) è un approccio passo "
+"passo per raccogliere conoscenze sui possibili punti di guasto in un "
+"progetto, processo di produzione, prodotto o servizio."
 
 #: fmea/templates/fmea/fmea_index.html
 msgid ""
@@ -1115,99 +1198,106 @@ msgid ""
 "determining how frequently a failure might occur and identifying which "
 "potential failures should be prioritized."
 msgstr ""
+"La modalità di guasto (FM) si riferisce al modo in cui qualcosa potrebbe "
+"rompersi e include errori potenziali che possono verificarsi, in particolare "
+"errori che possono influenzare un sistema. L'analisi efficace (EA) comporta "
+"la decifrazione delle conseguenze di tali guasti, assicurandosi che tutti i "
+"guasti possano essere rilevati, determinando con quale frequenza un guasto "
+"potrebbe verificarsi e identificando quali guasti potenziali dovrebbero "
+"essere prioritari."
 
 #: fmea/templates/fmea/fmea_index.html
 msgid "Create affected objects of a failure mode"
-msgstr ""
+msgstr "Crea oggetti interessati di una modalità di guasto"
 
 #: fmea/templates/fmea/fmea_index.html
 msgid "View all failure modes"
-msgstr ""
+msgstr "Visualizza tutte le modalità di guasto"
 
 #: fmea/templates/fmea/fmea_index.html
 msgid "View all failure mode effects"
-msgstr ""
+msgstr "Visualizza tutti gli effetti delle modalità di guasto"
 
 #: fmea/templates/fmea/fmea_index.html
 msgid "View all affected objects for a failure modes"
-msgstr ""
+msgstr "Visualizza tutti gli oggetti interessati per una modalità di guasto"
 
 #: fmea/templates/fmea/fmea_index.html fmea/views/fmea_analytics.py
 msgid "Heatmap"
-msgstr ""
+msgstr "Mappa termica"
 
 #: fmea/tools.py
 msgid "--- Select an option ----"
-msgstr ""
+msgstr "--- Seleziona un'opzione ----"
 
 #: fmea/views/fmea_affected_objects.py
 msgid "Failure mode affected objects successfully created."
-msgstr ""
+msgstr "Oggetti interessati dalla modalità di guasto creati con successo."
 
 #: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
 #: fmea/views/fmea_failure_mode_effect.py
 msgid "Create"
-msgstr ""
+msgstr "Crea"
 
 #: fmea/views/fmea_affected_objects.py
 msgid "Treeobjects successfully added."
-msgstr ""
+msgstr "Oggetti dell'albero aggiunti con successo."
 
 #: fmea/views/fmea_affected_objects.py
 msgid "Please select a department or ooi."
-msgstr ""
+msgstr "Si prega di selezionare un dipartimento o un OOI."
 
 #: fmea/views/fmea_analytics.py onboarding/templates/step_4_report.html
 msgid "Report"
-msgstr ""
+msgstr "Report"
 
 #: fmea/views/fmea_failure_mode.py
 msgid "Failure mode successfully created."
-msgstr ""
+msgstr "Modalità di guasto creata con successo."
 
 #: fmea/views/fmea_failure_mode_effect.py
 msgid "Failure mode effect successfully created."
-msgstr ""
+msgstr "Effetto della modalità di guasto creato con successo."
 
 #: fmea/views/view_helpers.py rocky/templates/dashboard_redteam.html
 msgid "FMEA"
-msgstr ""
+msgstr "FMEA"
 
 #: fmea/views/view_helpers.py
 msgid "Failure mode effects"
-msgstr ""
+msgstr "Effetti delle modalità di guasto"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
-msgstr ""
+msgstr "Mostra tutto"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Enabled"
-msgstr ""
+msgstr "Abilitato"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Disabled"
-msgstr ""
+msgstr "Disabilitato"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Enabled-Disabled"
-msgstr ""
+msgstr "Abilitato-Disabilitato"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Disabled-Enabled"
-msgstr ""
+msgstr "Disabilitato-Abilitato"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Filter options"
-msgstr ""
+msgstr "Opzioni di filtro"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Sorting options"
-msgstr ""
+msgstr "Opzioni di ordinamento"
 
 #: katalogus/forms/plugin_settings.py
 msgid "This field is required."
-msgstr ""
+msgstr "Questo campo è obbligatorio."
 
 #: katalogus/templates/about_plugins.html
 #: katalogus/templates/partials/plugins_navigation.html
@@ -1246,7 +1336,7 @@ msgstr ""
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
 msgid "scan level warning"
-msgstr ""
+msgstr "Avviso livello di scansione"
 
 #: katalogus/templates/change_clearance_level.html
 #, python-format
@@ -1254,10 +1344,12 @@ msgid ""
 "%(plugin_name)s will only scan objects with a corresponding clearance level "
 "of <strong>L%(scan_level)s</strong> or higher."
 msgstr ""
+"%(plugin_name)s scannerà solo gli oggetti con un livello di autorizzazione "
+"corrispondente di <strong>L%(scan_level)s</strong> o superiore."
 
 #: katalogus/templates/change_clearance_level.html
 msgid "Scan OOI"
-msgstr ""
+msgstr "Scansione OOI"
 
 #: katalogus/templates/change_clearance_level.html
 #, python-format
@@ -1266,31 +1358,34 @@ msgid ""
 "be advised that by continuing you will declare a level %(scan_level)s on "
 "these objects."
 msgstr ""
+"Gli oggetti seguenti non sono ancora autorizzati per il livello "
+"%(scan_level)s, si prega di notare che continuando si dichiarerà un livello "
+"%(scan_level)s su questi oggetti."
 
 #: katalogus/templates/change_clearance_level.html
 msgid "Selected OOIs:"
-msgstr ""
+msgstr "OOI selezionati:"
 
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/partials/explanations.html
 msgid "OOI"
-msgstr ""
+msgstr "OOI"
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Clearance level"
-msgstr ""
+msgstr "Livello di autorizzazione"
 
 #: katalogus/templates/change_clearance_level.html
 msgid "Are you sure you want to scan anyways?"
-msgstr ""
+msgstr "Sei sicuro/a di voler eseguire la scansione comunque?"
 
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/oois/ooi_detail.html
 msgid "Scan"
-msgstr ""
+msgstr "Scansione"
 
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
@@ -1301,12 +1396,12 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
 #: katalogus/templates/clone_settings.html
 #: katalogus/templates/confirmation_clone_settings.html
 msgid "Clone settings"
-msgstr ""
+msgstr "Clona impostazioni"
 
 #: katalogus/templates/clone_settings.html
 #, python-format
@@ -1318,16 +1413,30 @@ msgid ""
 "disabled plugins.\n"
 "      "
 msgstr ""
+"\n"
+"        Utilizza il modulo sottostante per clonare le impostazioni da "
+"<i>%(current_organization)s</i> all'organizzazione selezionata.\n"
+"        Questo include sia le impostazioni di KAT-alogus che i plugin "
+"abilitati e disabilitati.\n"
+"      "
 
 #: katalogus/templates/confirmation_clone_settings.html
 msgid "Clone"
-msgstr ""
+msgstr "Clona"
 
 #: katalogus/templates/katalogus.html
+#, fuzzy
+#| msgid "Available plugins"
 msgid "All plugins"
-msgstr ""
+msgstr "Plugin disponibili"
 
 #: katalogus/templates/katalogus.html
+#, fuzzy
+#| msgid ""
+#| "\n"
+#| "                            Accept level L%(tcl)s clearance and "
+#| "responsibility\n"
+#| "                        "
 msgid ""
 "\n"
 "                            Plugin available\n"
@@ -1337,75 +1446,91 @@ msgid_plural ""
 "                            Plugins available\n"
 "                        "
 msgstr[0] ""
+"\n"
+"                            Accetta il livello di autorizzazione L%(tcl)s e "
+"la responsabilità\n"
+"                        "
 msgstr[1] ""
+"\n"
+"                            Accetta il livello di autorizzazione L%(tcl)s e "
+"la responsabilità\n"
+"                        "
 
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
-msgstr ""
+msgstr "Impostazioni KAT-alogus"
 
 #: katalogus/templates/katalogus_settings.html
 msgid ""
 "There are currently no settings defined. Add settings at plugin detail page."
 msgstr ""
+"Attualmente non sono definite impostazioni. Aggiungi impostazioni nella "
+"pagina dettagli del plugin."
 
 #: katalogus/templates/katalogus_settings.html
 #: rocky/templates/two_factor/core/otp_required.html
 msgid "Go back"
-msgstr ""
+msgstr "Torna indietro"
 
 #: katalogus/templates/katalogus_settings.html
 msgid "This is an overview of the latest settings of all plugins."
-msgstr ""
+msgstr "Questa è una panoramica delle ultime impostazioni di tutti i plugin."
 
 #: katalogus/templates/katalogus_settings.html
 msgid "Latest plugin settings:"
-msgstr ""
+msgstr "Impostazioni più recenti dei plugin:"
 
 #: katalogus/templates/katalogus_settings.html
 #: rocky/templates/partials/scan_history.html
 msgid "Plugin"
-msgstr ""
+msgstr "Plugin"
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
-msgstr ""
+msgstr "Valore"
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Scan level:"
-msgstr ""
+msgstr "Livello di scansione:"
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Publisher"
-msgstr ""
+msgstr "Editore"
 
 #: katalogus/templates/partials/boefje_tile.html
 #: katalogus/templates/partials/plugin_tile.html
 #: katalogus/templates/partials/plugins.html
 msgid "See details"
-msgstr ""
+msgstr "Vedi dettagli"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
+#, fuzzy
+#| msgid "Enabled"
 msgid "Enable"
-msgstr ""
+msgstr "Abilitato"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 #: rocky/templates/two_factor/profile/disable.html
 msgid "Disable"
-msgstr ""
+msgstr "Disabilita"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "You don't have permission to enable "
-msgstr ""
+msgstr "Non hai il permesso di abilitare "
 
 #: katalogus/templates/partials/katalogus_filter.html
+#, fuzzy
+#| msgid "Filter options"
 msgid "Filter plugins"
-msgstr ""
+msgstr "Opzioni di filtro"
 
 #: katalogus/templates/partials/katalogus_filter.html
+#, fuzzy
+#| msgid "Clear filters"
 msgid "Clear filter"
-msgstr ""
+msgstr "Cancella filtri"
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
@@ -1415,11 +1540,13 @@ msgstr ""
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 msgid "KAT-alogus"
-msgstr ""
+msgstr "KAT-alogus"
 
 #: katalogus/templates/partials/katalogus_header.html
+#, fuzzy
+#| msgid "Available plugins"
 msgid "An overview of all available plugins."
-msgstr ""
+msgstr "Plugin disponibili"
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/templates/plugin_settings_list.html
@@ -1427,22 +1554,22 @@ msgstr ""
 #: rocky/templates/header.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
-msgstr ""
+msgstr "Impostazioni"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Gridview"
-msgstr ""
+msgstr "Vista griglia"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Tableview"
-msgstr ""
+msgstr "Vista tabella"
 
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Object list"
-msgstr ""
+msgstr "Elenco oggetti"
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
@@ -1453,6 +1580,12 @@ msgid ""
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
+"Questo boefje effettuerà la scansione solo degli oggetti con un livello di "
+"autorizzazione corrispondente di <strong>L%(scan_level)s</strong> o "
+"superiore. Non c'è alcuna indennità per questo boefje per la scansione di un "
+"OOI con un livello di autorizzazione inferiore a <strong>L%(scan_level)s</"
+"strong>. Usa il filtro per mostrare gli OOI con un livello di autorizzazione "
+"inferiore."
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid ""
@@ -1462,6 +1595,13 @@ msgid ""
 "else again. This means that all other enabled Boefjes will use this higher "
 "clearance level aswel."
 msgstr ""
+"<span>Avviso livello di scansione:</span>\n"
+"La scansione degli OOI con un livello di autorizzazione inferiore comporterà "
+"un aumento del livello di autorizzazione su quell'OOI da parte di OpenKAT, "
+"non solo per questa scansione ma da ora in poi, finché non verrà impostato "
+"manualmente su qualcos'altro.\n"
+"Questo significa che tutti gli altri Boefjes abilitati utilizzeranno anche "
+"questo livello di autorizzazione più alto."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
@@ -1470,6 +1610,10 @@ msgid ""
 "Add objects with a complying clearance level, or alter the clearance level "
 "of existing objects."
 msgstr ""
+"Attualmente non hai oggetti che soddisfano il livello di scansione di "
+"%(name)s.\n"
+"Aggiungi oggetti con un livello di autorizzazione conforme o modifica il "
+"livello di autorizzazione degli oggetti esistenti."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
@@ -1477,50 +1621,63 @@ msgid ""
 "You currently don't have scannable objects for %(name)s. Add objects to use "
 "this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
+"Attualmente non hai oggetti scansionabili per %(name)s.\n"
+"Aggiungi oggetti per utilizzare questo boefje. Questo boefje è in grado di "
+"eseguire la scansione di oggetti dei seguenti tipi:"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "The form could not be initialized."
-msgstr ""
+msgstr "Il modulo non può essere inizializzato."
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "Required settings"
-msgstr ""
+msgstr "Impostazioni richieste"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 #: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
-msgstr ""
+msgstr "Aggiungi"
 
 #: katalogus/templates/partials/plugins.html
+#, fuzzy
+#| msgid "User overview:"
 msgid "Plugins overview:"
-msgstr ""
+msgstr "Panoramica utente:"
 
 #: katalogus/templates/partials/plugins.html
+#, fuzzy
+#| msgid "Plugin"
 msgid "Plugin name"
-msgstr ""
+msgstr "Plugin"
 
 #: katalogus/templates/partials/plugins.html
+#, fuzzy
+#| msgid "Plugin"
 msgid "Plugin type"
-msgstr ""
+msgstr "Plugin"
 
 #: katalogus/templates/partials/plugins.html
+#, fuzzy
+#| msgid "Description"
 msgid "Plugin description"
-msgstr ""
+msgstr "Descrizione"
 
 #: katalogus/templates/partials/plugins.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
-msgstr ""
+msgstr "Azioni"
 
 #: katalogus/templates/partials/plugins_navigation.html
+#, fuzzy
+#| msgid "Main navigation"
 msgid "Plugins Navigation"
-msgstr ""
+msgstr "Navigazione principale"
 
-#: katalogus/templates/partials/plugins_navigation.html rocky/views/mixins.py
+#: katalogus/templates/partials/plugins_navigation.html
 msgid "All"
-msgstr ""
+msgstr "Tutto"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
@@ -1528,41 +1685,43 @@ msgstr ""
 #: rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
-msgstr ""
+msgstr "Boefjes"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Normalizers"
-msgstr ""
+msgstr "Normalizzatori"
 
 #: katalogus/templates/plugin_detail.html
 msgid "Scan level"
-msgstr ""
+msgstr "Livello di scansione"
 
 #: katalogus/templates/plugin_detail.html
 msgid "Consumes"
-msgstr ""
+msgstr "Consuma"
 
 #: katalogus/templates/plugin_detail.html
 #, python-format
 msgid "%(plugin_name)s is able to scan the following object types:"
 msgstr ""
+"%(plugin_name)s è in grado di eseguire la scansione dei seguenti tipi di "
+"oggetti:"
 
 #: katalogus/templates/plugin_detail.html
 #, python-format
 msgid "%(plugin_name)s does not need any input objects."
-msgstr ""
+msgstr "%(plugin_name)s non ha bisogno di oggetti di input."
 
 #: katalogus/templates/plugin_detail.html
 msgid "Produces"
-msgstr ""
+msgstr "Produzione"
 
 #: katalogus/templates/plugin_detail.html
 #, python-format
 msgid "%(plugin_name)s can produce the following output:"
-msgstr ""
+msgstr "%(plugin_name)s può produrre il seguente output:"
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -1614,73 +1773,77 @@ msgstr[1] ""
 
 #: katalogus/templates/plugin_settings_delete.html
 msgid "Delete settings"
-msgstr ""
+msgstr "Elimina impostazioni"
 
 #: katalogus/templates/plugin_settings_delete.html
 #, python-format
 msgid ""
 "Are you sure you want to delete all settings for the plugin %(plugin_name)s?"
 msgstr ""
+"Sei sicuro di voler eliminare tutte le impostazioni per il plugin "
+"%(plugin_name)s?"
 
 #: katalogus/templates/plugin_settings_delete.html
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/plugin_settings_delete.py rocky/views/ooi_delete.py
 msgid "Delete"
-msgstr ""
+msgstr "Elimina"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid " Details"
-msgstr ""
+msgstr " Dettagli"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
-msgstr ""
+msgstr "Panoramica delle impostazioni:"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Required"
-msgstr ""
+msgstr "Richiesto"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Action"
-msgstr ""
+msgstr "Azione"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Unset"
-msgstr ""
+msgstr "Non impostato"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Yes"
-msgstr ""
+msgstr "Sì"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: katalogus/views/change_clearance_level.py
 msgid "Session has terminated, please select OOIs again."
-msgstr ""
+msgstr "La sessione è terminata, seleziona di nuovo gli OOIs."
 
 #: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
 msgid "Scanning successfully scheduled."
-msgstr ""
+msgstr "Scansione pianificata con successo."
 
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
-msgstr ""
+msgstr "Cambia il livello di autorizzazione"
 
 #: katalogus/views/katalogus_settings.py
 msgid "Settings from {} to {} successfully cloned."
-msgstr ""
+msgstr "Impostazioni da {} a {} clonate con successo."
 
 #: katalogus/views/katalogus_settings.py
 #: katalogus/views/plugin_settings_list.py
 msgid "Failed getting settings for boefje {}"
-msgstr ""
+msgstr "Errore nel recupero delle impostazioni per il boefje {}"
 
 #: katalogus/views/mixins.py
 msgid ""
 "Getting information for plugin {} failed. Please check the KATalogus logs."
 msgstr ""
+"Recuperare le informazioni per il plugin {} è fallito. Controlla i log di "
+"KATalogus."
 
 #: katalogus/views/mixins.py
 #, python-format
@@ -1688,6 +1851,9 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                             "
 "Indemnification not present at organization %s."
 msgstr ""
+"Impossibile aumentare il livello di autorizzazione di %s a "
+"L%s.                             Indennizzo non presente nell'organizzazione "
+"%s."
 
 #: katalogus/views/mixins.py onboarding/views.py rocky/views/scan_profile.py
 #, python-format
@@ -1695,6 +1861,9 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You were trusted a clearance "
 "level of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"Impossibile aumentare il livello di autorizzazione di %s a L%s. Ti è stato "
+"assegnato un livello di autorizzazione di L%s. Contatta il tuo "
+"amministratore per ottenere un livello di autorizzazione più alto."
 
 #: katalogus/views/mixins.py onboarding/views.py
 #, python-format
@@ -1703,20 +1872,30 @@ msgid ""
 "level of L%s. Please accept the clearance level first on your profile page "
 "to proceed."
 msgstr ""
+"Impossibile aumentare il livello di autorizzazione di %s a L%s. Hai "
+"confermato un livello di autorizzazione di L%s. Accetta prima il livello di "
+"autorizzazione nella tua pagina del profilo per procedere."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
 msgstr ""
+"Alcuni OOIs selezionati necessitano di un aumento del livello di "
+"autorizzazione per eseguire scansioni. Non hai il permesso di cambiare il "
+"livello di autorizzazione."
 
 #: katalogus/views/plugin_detail.py
 msgid "Please select an OOI to start scan."
-msgstr ""
+msgstr "Seleziona un OOI per avviare la scansione."
 
 #: katalogus/views/plugin_enable_disable.py
+#, fuzzy
+#| msgid "{} '{}' enabled."
 msgid "{} '{}' disabled."
 msgstr ""
+"Recupero delle impostazioni del boefje {boefje_name} non riuscito. Katalogus "
+"è attivo?"
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "Failed fetching settings for {}. Is the Katalogus up?"
@@ -1729,76 +1908,87 @@ msgstr ""
 #: katalogus/views/plugin_enable_disable.py
 msgid "{} '{}' enabled."
 msgstr ""
+"Recupero delle impostazioni del boefje {boefje_name} non riuscito. Katalogus "
+"è attivo?"
 
 #: katalogus/views/plugin_enable_disable.py
 msgid ""
 "Your clearance level is not set. Go to your profile page to see your "
 "clearance or contact the administrator to set a clearance level."
 msgstr ""
+"Prima di abilitare, impostare le impostazioni richieste per il boefje "
+"'{boefje_name}'."
 
 #: katalogus/views/plugin_enable_disable.py
+#, fuzzy
+#| msgid "You are about to set the clearance level from \\"
 msgid "To enable {} you need at least a clearance level of L{}. "
-msgstr ""
+msgstr "Stai per impostare il livello di autorizzazione da \\"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
-msgstr ""
+msgstr "Tentativo di aggiungere impostazioni a boefje senza schema"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "No changes to the settings added: no form data present"
 msgstr ""
+"Nessuna modifica alle impostazioni aggiunte: nessun dato del modulo presente"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Added settings for '{}'"
-msgstr ""
+msgstr "Impostazioni aggiunte per '{}'"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Failed adding settings"
-msgstr ""
+msgstr "Impossibile aggiungere le impostazioni"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Enabling {} failed"
-msgstr ""
+msgstr "Abilitazione di {} non riuscita"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Boefje '{}' enabled."
-msgstr ""
+msgstr "Boefje '{}' abilitato."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Add settings"
-msgstr ""
+msgstr "Aggiungi impostazioni"
 
 #: katalogus/views/plugin_settings_delete.py
 msgid "Settings for plugin {} successfully deleted."
-msgstr ""
+msgstr "Impostazioni per il plugin {} eliminate con successo."
 
 #: katalogus/views/plugin_settings_delete.py
 msgid "Plugin {} has no settings."
-msgstr ""
+msgstr "Il plugin {} non ha impostazioni."
 
 #: katalogus/views/plugin_settings_delete.py
 msgid ""
 "Failed deleting Settings for plugin {}. Check the Katalogus logs for more "
 "info."
 msgstr ""
+"Eliminazione delle impostazioni del plugin {} non riuscita. Controlla i log "
+"di Katalogus per ulteriori informazioni."
 
 #: onboarding/forms.py tools/forms/ooi.py
 msgid ""
 "Boefjes that has a scan level below or equal to the clearance level, is "
 "permitted to scan an object."
 msgstr ""
+"I Boefjes che hanno un livello di scansione inferiore o uguale al livello di "
+"autorizzazione sono autorizzati a eseguire la scansione di un oggetto."
 
 #: onboarding/forms.py tools/forms/ooi.py
 msgid "explanation-clearance-level"
-msgstr ""
+msgstr "Spiegazione del livello di autorizzazione"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid "Register"
-msgstr ""
+msgstr "Registra"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid "Create a new account for your organization"
-msgstr ""
+msgstr "Crea un nuovo account per la tua organizzazione"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid ""
@@ -1808,16 +1998,22 @@ msgid ""
 "user account that is connected to an already existing organization within "
 "OpenKAT you can ask the admin to create an account for you."
 msgstr ""
+"Tutti gli account utente fanno parte di un'organizzazione. Quindi, se sei "
+"nuovo e la tua azienda è anche nuova in OpenKAT, puoi registrarti qui per "
+"creare un account OpenKAT per la tua azienda, compreso un account "
+"amministratore per te. Se desideri un account utente collegato a "
+"un'organizzazione già esistente in OpenKAT, puoi chiedere all'amministratore "
+"di crearne uno per te."
 
 #: onboarding/templates/account/step_1_registration_intro.html
 #: onboarding/templates/step_1_introduction.html
 msgid "Let's get started"
-msgstr ""
+msgstr "Cominciamo"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 #: onboarding/templates/step_1_introduction.html
 msgid "How does OpenKAT work"
-msgstr ""
+msgstr "Come funziona OpenKAT"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid ""
@@ -1828,6 +2024,13 @@ msgid ""
 "you to through the process. During this introduction you will be guided "
 "through the steps to create a report."
 msgstr ""
+"OpenKAT è in grado di fornire informazioni sui rischi di sicurezza dei tuoi "
+"oggetti online. Ad esempio, i tuoi siti web, i server di posta o i dati "
+"online. OpenKAT utilizza scansioni per individuare e valutare le aree che "
+"potrebbero essere a rischio e ti segnala queste informazioni. Come utente, "
+"decidi quali informazioni desideri e OpenKAT ti guida nel processo. Durante "
+"questa introduzione sarai guidato attraverso i passaggi per creare un "
+"rapporto."
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
@@ -1838,13 +2041,13 @@ msgstr ""
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "OpenKAT setup"
-msgstr ""
+msgstr "Configurazione di OpenKAT"
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 msgid "Organization setup"
-msgstr ""
+msgstr "Configurazione dell'organizzazione"
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 msgid ""
@@ -1852,13 +2055,17 @@ msgid ""
 "within the organization page within OpenKAT when necessary. Adding a new "
 "organization requires a new database."
 msgstr ""
+"Inserisci i seguenti dettagli dell'organizzazione. Questi dettagli possono "
+"essere modificati nella pagina dell'organizzazione in OpenKAT quando "
+"necessario. L'aggiunta di una nuova organizzazione richiede un nuovo "
+"database."
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Organization details"
-msgstr ""
+msgstr "Dettagli dell'organizzazione"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
@@ -1866,37 +2073,40 @@ msgid ""
 "Please enter the following organization details. These details can be edited "
 "within the organization page within OpenKAT when necessary."
 msgstr ""
+"Inserisci i seguenti dettagli dell'organizzazione. Questi dettagli possono "
+"essere modificati nella pagina dell'organizzazione in OpenKAT quando "
+"necessario."
 
 #: onboarding/templates/account/step_2a_organization_update.html
 msgid "Submit changes"
-msgstr ""
+msgstr "Invia modifiche"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Continue"
-msgstr ""
+msgstr "Continua"
 
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 msgid "Indemnification setup"
-msgstr ""
+msgstr "Configurazione dell'indennizzo"
 
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 msgid "Indemnification on the organization is already present."
-msgstr ""
+msgstr "L'indennizzo sull'organizzazione è già presente."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Account setup"
-msgstr ""
+msgstr "Configurazione dell'account"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Accounts"
-msgstr ""
+msgstr "Account"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Organization setup with separate accounts:"
-msgstr ""
+msgstr "Configurazione dell'organizzazione con account separati:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1906,10 +2116,15 @@ msgid ""
 "can choose to create the separate accounts during this introduction or when "
 "you’re ready from the OpenKAT users page."
 msgstr ""
+"In OpenKAT è possibile creare account utente separati con ruoli specifici. "
+"Ognuno con le proprie funzionalità e autorizzazioni. Questo è utile quando "
+"più persone lavoreranno con la stessa configurazione di OpenKAT. Puoi "
+"scegliere di creare gli account separati durante questa introduzione o "
+"quando sei pronto dalla pagina degli utenti di OpenKAT."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Single account setup:"
-msgstr ""
+msgstr "Configurazione dell'account singolo:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1919,29 +2134,36 @@ msgid ""
 "account. You can always add additional user accounts If you’re team expands "
 "in the future."
 msgstr ""
+"In alternativa, è anche possibile eseguire OpenKAT da un singolo account "
+"utente. Questo è utile quando sei l'unico utente nell'account. Sarai in "
+"grado di accedere alle funzionalità dei diversi ruoli dal tuo account. Puoi "
+"sempre aggiungere ulteriori account utente se il tuo team si espande in "
+"futuro."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Create separate accounts"
-msgstr ""
+msgstr "Crea account separati"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Continue with this account, onboard me!"
-msgstr ""
+msgstr "Continua con questo account, accoglimi!"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Users"
-msgstr ""
+msgstr "Utenti"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
 "Within OpenKAT there are three types of user accounts. Each has its own "
 "functions."
 msgstr ""
+"In OpenKAT ci sono tre tipi di account utente. Ciascuno ha le proprie "
+"funzioni."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin"
-msgstr ""
+msgstr "Amministratore"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
@@ -1949,25 +2171,27 @@ msgid ""
 "Each organization must have an admin. The admin can create and manage user "
 "accounts as well as organization details."
 msgstr ""
+"Ogni organizzazione deve avere un amministratore. L'amministratore può "
+"creare e gestire gli account utente e i dettagli dell'organizzazione."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer"
-msgstr ""
+msgstr "Red teamer"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "A red teamer account can run scans and generate reports."
-msgstr ""
+msgstr "Un account red teamer può eseguire scansioni e generare rapporti."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account"
-msgstr ""
+msgstr "Account cliente"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "A client account can access reports."
-msgstr ""
+msgstr "Un account cliente può accedere ai rapporti."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
@@ -1975,55 +2199,61 @@ msgid ""
 "function. This introduction will guide you through the setup of both. After "
 "that you can choose to add a client account as well."
 msgstr ""
+"Ogni organizzazione richiede almeno un account amministratore e un account "
+"red teamer per funzionare. Questa introduzione ti guiderà nella "
+"configurazione di entrambi. Dopo di che, puoi scegliere se aggiungere anche "
+"un account cliente."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Let's add accounts"
-msgstr ""
+msgstr "Aggiungiamo account"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin account setup"
-msgstr ""
+msgstr "Configurazione dell'account amministratore"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin details"
-msgstr ""
+msgstr "Dettagli amministratore"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Go back to previous step"
-msgstr ""
+msgstr "Torna al passaggio precedente"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Skip this step"
-msgstr ""
+msgstr "Salta questo passaggio"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer account setup"
-msgstr ""
+msgstr "Configurazione dell'account red teamer"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer details"
-msgstr ""
+msgstr "Dettagli red teamer"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account setup (optional)"
-msgstr ""
+msgstr "Configurazione dell'account cliente (opzionale)"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid ""
 "A client account can access reports. Adding a client account to the "
 "organization is optional."
 msgstr ""
+"Un account cliente può accedere ai rapporti. Aggiungere un account cliente "
+"all'organizzazione è facoltativo."
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "User details"
-msgstr ""
+msgstr "Dettagli dell'utente"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Finish organization setup"
-msgstr ""
+msgstr "Completa la configurazione dell'organizzazione"
 
 #: onboarding/templates/dns_report.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -2033,11 +2263,11 @@ msgstr ""
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: onboarding/templates/step_4_report.html onboarding/views.py
 msgid "OpenKAT introduction"
-msgstr ""
+msgstr "Introduzione a OpenKAT"
 
 #: onboarding/templates/dns_report.html
 msgid "DNS Report"
-msgstr ""
+msgstr "Rapporto DNS"
 
 #: onboarding/templates/dns_report.html
 #, python-format
@@ -2046,15 +2276,18 @@ msgid ""
 "finding for more detailed information about the issue, its origin, severity "
 "and possible solutions."
 msgstr ""
+"Questi sono i risultati di un'analisi OpenKAT (%(observed_at)s). Fai clic su "
+"un risultato per ulteriori informazioni dettagliate sul problema, la sua "
+"origine, gravità e possibili soluzioni."
 
 #: onboarding/templates/dns_report.html
 msgid "DNS Tree"
-msgstr ""
+msgstr "Albero DNS"
 
 #: onboarding/templates/step_1_introduction.html
 #: rocky/templates/landing_page.html
 msgid "Welcome to OpenKAT"
-msgstr ""
+msgstr "Benvenuti in OpenKAT"
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -2062,12 +2295,18 @@ msgid ""
 "Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
 "and Sport to make your and our world a safer place."
 msgstr ""
+"OpenKAT è lo \"Strumento di Analisi delle Vulnerabilità\" (Vulnerabilities "
+"Analysis Tool). Un progetto open source sviluppato dal Ministero della "
+"Salute, del Benessere e dello Sport per rendere il nostro mondo e il vostro "
+"un luogo più sicuro."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "OpenKAT is able to give insight into security risks on your online objects. "
 "For example, your websites, mailservers or online data."
 msgstr ""
+"OpenKAT è in grado di fornire una visione dei rischi di sicurezza sui tuoi "
+"oggetti online. Ad esempio, i tuoi siti web, server di posta o dati online."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -2077,18 +2316,28 @@ msgid ""
 "you would like to monitor or scan and which insight you would like to "
 "receive."
 msgstr ""
+"OpenKAT utilizza i plugin per individuare e valutare le aree che potrebbero "
+"essere a rischio e ti segnala queste informazioni. Ogni plugin ha le sue "
+"competenze specifiche, che possono essere la scansione, la normalizzazione o "
+"l'analisi dei dati. Come utente, decidi quali aree desideri monitorare o "
+"scansionare e quali informazioni desideri ricevere."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "Within OpenKAT you can view the insights as well as all the data OpenKAT has "
 "found. You can choose to browse through the data or view reports."
 msgstr ""
+"All'interno di OpenKAT puoi visualizzare le informazioni così come tutti i "
+"dati trovati da OpenKAT. Puoi scegliere se sfogliare i dati o visualizzare i "
+"rapporti."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "During this introduction you will be guided through the steps to create a "
 "report."
 msgstr ""
+"Durante questa introduzione sarai guidato attraverso i passaggi per creare "
+"un rapporto."
 
 #: onboarding/templates/step_1_introduction.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -2101,15 +2350,15 @@ msgstr ""
 #: onboarding/templates/step_3f_set_clearance_level.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
-msgstr ""
+msgstr "Salta l'introduzione"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Choose a report - Introduction"
-msgstr ""
+msgstr "Scegli un report - Introduzione"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Reports"
-msgstr ""
+msgstr "Report"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -2118,10 +2367,15 @@ msgid ""
 "vulnerable to. Each report gives a high overview of the state of the object "
 "as well as detailed information on what OpenKAT found and possible solutions."
 msgstr ""
+"I report in OpenKAT contengono una panoramica degli oggetti analizzati, dei "
+"problemi riscontrati al loro interno e dei rischi di sicurezza conosciuti a "
+"cui l'oggetto potrebbe essere vulnerabile. Ogni report fornisce una "
+"panoramica generale dello stato dell'oggetto e informazioni dettagliate su "
+"ciò che OpenKAT ha trovato e soluzioni possibili."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Data"
-msgstr ""
+msgstr "Dati"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -2130,10 +2384,14 @@ msgid ""
 "manage the plugins within your account which let's OpenKAT know which "
 "plugins to run and on which objects or areas."
 msgstr ""
+"OpenKAT può eseguire scansioni e analisi utilizzando plugin. Ogni plugin ha "
+"la sua unica abilità e raccoglierà dati specifici o fornirà informazioni "
+"specifiche. Gestisci i plugin all'interno del tuo account che consentono a "
+"OpenKAT di sapere quali plugin eseguire e su quali oggetti o aree."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Generating a report"
-msgstr ""
+msgstr "Generare un report"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -2142,6 +2400,11 @@ msgid ""
 "needs, as well as asks for permission to run plugins that you haven’t "
 "enabled yet but are needed to collect or analyze the data."
 msgstr ""
+"Quando scegli un tipo di report, OpenKAT ti guiderà attraverso la "
+"configurazione. OpenKAT farà le domande necessarie in base all'input "
+"richiesto dal report, e chiederà l'autorizzazione per eseguire plugin che "
+"non hai ancora abilitato ma che sono necessari per raccogliere o analizzare "
+"i dati."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -2149,10 +2412,13 @@ msgid ""
 "own report by selecting and running plugins on objects of your choice. "
 "OpenKAT will present the results."
 msgstr ""
+"Puoi anche scegliere di visualizzare direttamente i dati raccolti o generare "
+"il tuo report selezionando ed eseguendo plugin sugli oggetti di tua scelta. "
+"OpenKAT ti presenterà i risultati."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Permission"
-msgstr ""
+msgstr "Autorizzazione"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -2160,20 +2426,25 @@ msgid ""
 "community. Before a plugin can run, you need to give it permission by "
 "enabling it."
 msgstr ""
+"I plugin possono essere forniti da OpenKAT, ma possono anche provenire dalla "
+"comunità. Prima che un plugin possa essere eseguito, è necessario "
+"concedergli l'autorizzazione abilitandolo."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
 "When you generate a report. OpenKAT will let you know which plugins it "
 "requires or suggests so you can choose to enable them."
 msgstr ""
+"Quando generi un report, OpenKAT ti indicherà quali plugin sono necessari o "
+"suggeriti in modo da poter scegliere di abilitarli."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Let's choose a report"
-msgstr ""
+msgstr "Scegliamo un report"
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "Choose a report - Type"
-msgstr ""
+msgstr "Scegli un report - Tipo"
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
@@ -2182,30 +2453,36 @@ msgid ""
 "generate a report. Such as a pen-test, a DNS-report or a mail report to give "
 "some examples."
 msgstr ""
+"All'interno di OpenKAT è possibile visualizzare i report per ciascuno dei "
+"tuoi oggetti attuali. Per report specifici, è possibile scegliere uno dei "
+"tipi di report disponibili e generare un report, come un test di "
+"penetrazione, un report DNS o un report di posta, per fare alcuni esempi."
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "For this tutorial we suggest a DNS-report to get you started."
-msgstr ""
+msgstr "Per questo tutorial, ti suggeriamo un report DNS per iniziare."
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
 "When you start to generate this report. OpenKAT will guide you through the "
 "necessary steps."
 msgstr ""
+"Quando inizierai a generare questo report, OpenKAT ti guiderà attraverso i "
+"passaggi necessari."
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "DNS report"
-msgstr ""
+msgstr "Report DNS"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Setup scan"
-msgstr ""
+msgstr "Configura scansione"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Let OpenKAT know what object to scan"
-msgstr ""
+msgstr "Fai sapere a OpenKAT quale oggetto analizzare"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
@@ -2213,10 +2490,13 @@ msgid ""
 "would like to scan and analyze for the DNS-report. So it can tell you which "
 "plugins are available for the chosen object."
 msgstr ""
+"I plugin scansionano e analizzano gli oggetti. OpenKAT ha bisogno di sapere "
+"quali oggetti desideri scansionare e analizzare per il report DNS. In questo "
+"modo ti indicherà quali plugin sono disponibili per l'oggetto scelto."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Understanding objects"
-msgstr ""
+msgstr "Comprensione degli oggetti"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
@@ -2225,45 +2505,56 @@ msgid ""
 "name a few.  While these objects can be related to each other they are all "
 "objects within OpenKAT that can be scanned to gain valuable insight."
 msgstr ""
+"Una vasta gamma di cose può essere un oggetto nell'ambito di OpenKAT. Ad "
+"esempio, un server di posta, un indirizzo IP, un URL, un record DNS, un "
+"hostname o una rete, per citarne alcuni. Sebbene questi oggetti possano "
+"essere correlati tra loro, sono tutti oggetti all'interno di OpenKAT che "
+"possono essere scansionati per ottenere informazioni preziose."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Creating, adding and editing objects"
-msgstr ""
+msgstr "Creazione, aggiunta e modifica di oggetti"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "Within OpenKAT you can view, add and edit objects from the organization’s "
 "object page."
 msgstr ""
+"All'interno di OpenKAT puoi visualizzare, aggiungere e modificare gli "
+"oggetti dalla pagina degli oggetti dell'organizzazione."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "Let’s add an object to scan for the DNS-Report. For this introduction we "
 "suggest adding a URL."
 msgstr ""
+"Aggiungiamo un oggetto da analizzare per il report DNS. Per questa "
+"introduzione, ti suggeriamo di aggiungere un URL."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Add URL"
-msgstr ""
+msgstr "Aggiungi URL"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html onboarding/views.py
 msgid "Creating an object"
-msgstr ""
+msgstr "Creazione di un oggetto"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid "Create your first object, a URL by filling out the form below."
-msgstr ""
+msgstr "Crea il tuo primo oggetto, un URL, compilando il modulo qui sotto."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
 "Additional details and examples can be found by pressing on the help button "
 "next to the input field."
 msgstr ""
+"Ulteriori dettagli ed esempi possono essere trovati premendo il pulsante di "
+"aiuto accanto al campo di input."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid "Dependencies"
-msgstr ""
+msgstr "Dipendenze"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
@@ -2273,6 +2564,11 @@ msgid ""
 "object automatically when possible. By running plugins to collect or extract "
 "this data."
 msgstr ""
+"La maggior parte degli oggetti ha dipendenze dall'esistenza di altri "
+"oggetti. Ad esempio, un URL deve essere collegato a una rete, un hostname, "
+"un fqdn (fully qualified domain name) e un indirizzo IP. OpenKAT raccoglie "
+"automaticamente questi oggetti aggiuntivi quando possibile. Eseguendo plugin "
+"per raccogliere o estrarre questi dati."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
@@ -2280,20 +2576,25 @@ msgid ""
 "list as separate objects. If OpenKAT can’t add them automatically it will "
 "guide you through the process of creating them manually."
 msgstr ""
+"Gli oggetti aggiuntivi creati da OpenKAT verranno aggiunti alla tua lista di "
+"oggetti come oggetti separati. Se OpenKAT non riesce ad aggiungerli "
+"automaticamente, ti guiderà attraverso il processo di creazione manuale."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid "Create object"
-msgstr ""
+msgstr "Crea oggetto"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid ""
 "Based on the url you provided OpenKAT added the necessary additional objects "
 "to create a url object."
 msgstr ""
+"In base all'URL che hai fornito, OpenKAT ha aggiunto gli oggetti aggiuntivi "
+"necessari per creare un oggetto URL."
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -2301,46 +2602,46 @@ msgstr ""
 #: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Path"
-msgstr ""
+msgstr "Percorso"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Hostname"
-msgstr ""
+msgstr "Nome host"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "scheme"
-msgstr ""
+msgstr "Schema"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "DNS Zone"
-msgstr ""
+msgstr "Zona DNS"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Network"
-msgstr ""
+msgstr "Rete"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Start scanning"
-msgstr ""
+msgstr "Inizia la scansione"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
 msgid "OpenKAT Introduction"
-msgstr ""
+msgstr "Introduzione a OpenKAT"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Setup scan - OOI clearance for"
-msgstr ""
+msgstr "Configura scansione - Autorizzazione OOI per"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Introduction"
-msgstr ""
+msgstr "Introduzione"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: rocky/templates/partials/form/indemnification_add_form.html
@@ -2352,10 +2653,17 @@ msgid ""
 "but you probably don’t have the right to do so for objects owned by other "
 "people of companies."
 msgstr ""
+"Alcune scansioni sono leggere, mentre altre possono essere un po' più "
+"aggressive con la loro scansione. OpenKAT ti richiede di impostare un "
+"livello di autorizzazione per ogni oggetto per evitare di eseguire scansioni "
+"aggressive inavvertitamente. Ad esempio, potresti avere il diritto di "
+"eseguire qualsiasi tipo di scansione sul tuo server, ma probabilmente non "
+"hai il diritto di farlo per gli oggetti di proprietà di altre persone o "
+"aziende."
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "How to know required clearance level"
-msgstr ""
+msgstr "Come sapere il livello di autorizzazione richiesto"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
@@ -2365,6 +2673,12 @@ msgid ""
 "notify you before running it. Visually clearance levels and intensity scores "
 "are indicated with little cat paws."
 msgstr ""
+"Ogni plugin che effettua scansioni avrà un punteggio di intensità della "
+"scansione. L'intensità della scansione deve essere uguale o inferiore al "
+"livello di autorizzazione che hai impostato per il tuo oggetto. Se la "
+"scansione ha un livello di intensità troppo elevato, OpenKAT ti avviserà "
+"prima di eseguirlo. Visivamente i livelli di autorizzazione e i punteggi di "
+"intensità sono indicati con delle piccole zampe di gatto."
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
@@ -2372,6 +2686,10 @@ msgid ""
 "level to be run. This means that the scan does not touch the object itself, "
 "but only searches for information about the object."
 msgstr ""
+"Questa scansione ha un punteggio di intensità della scansione pari a 1, "
+"richiedendo un livello di autorizzazione di livello 1 per essere eseguita. "
+"Ciò significa che la scansione non tocca direttamente l'oggetto stesso, ma "
+"cerca solo informazioni sull'oggetto."
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
@@ -2379,6 +2697,9 @@ msgid ""
 "Meaning it requires at least a level 3 clearance level to be set on your "
 "object."
 msgstr ""
+"Un esempio di scansione più aggressiva. Che ha un punteggio di intensità "
+"della scansione pari a 3. Ciò significa che è necessario impostare almeno un "
+"livello di autorizzazione di livello 3 sul tuo oggetto."
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid ""
@@ -2391,10 +2712,18 @@ msgid ""
 "aggressive scans.\n"
 "                "
 msgstr ""
+"\n"
+"                    OpenKAT ha un sistema di autorizzazioni che consente "
+"agli amministratori di\n"
+"                    configurare quali utenti possono impostare un certo "
+"livello di autorizzazione. Ciò garantirà\n"
+"                    che solo gli utenti fidati possano avviare scansioni più "
+"aggressive.\n"
+"                "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Acknowledge clearance level"
-msgstr ""
+msgstr "Conferma il livello di autorizzazione"
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid ""
@@ -2413,10 +2742,24 @@ msgid ""
 "within authorized boundaries.\n"
 "                "
 msgstr ""
+"\n"
+" Prima che un membro ottenga la possibilità di impostare i livelli di "
+"autorizzazione su un oggetto,\n"
+" deve prima riconoscere e accettare il livello di autorizzazione impostato "
+"dagli amministratori.\n"
+" Il livello di scansione massimo consentito per un membro è allineato al "
+"livello di autorizzazione attendibile.\n"
+" Riconoscendo il livello di autorizzazione attendibile, questo membro "
+"accetta formalmente di attenersi a\n"
+" questa autorizzazione e acquisisce la capacità di eseguire scansioni solo "
+"fino a questo livello di autorizzazione attendibile.\n"
+" Questo processo a due fasi garantisce che il membro operi entro i limiti "
+"autorizzati.\n"
+" "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "What is my clearance level?"
-msgstr ""
+msgstr "Qual è il mio livello di autorizzazione?"
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -2433,6 +2776,17 @@ msgid ""
 "higher clearance.\n"
 "                            "
 msgstr ""
+"\n"
+"                                Purtroppo non è possibile continuare con "
+"l'onboarding. </br>\n"
+"                                Il tuo amministratore ti ha assegnato un "
+"livello di autorizzazione di <strong>L%(tcl)s</strong>.</br>\n"
+"                                Hai bisogno almeno di un livello di "
+"autorizzazione di <strong>L%(dns_report_least_clearance_level)s</strong> per "
+"effettuare la scansione di <strong>%(ooi)s</strong></br>\n"
+"                                Contatta il tuo amministratore per ottenere "
+"un livello di autorizzazione più alto.\n"
+"                            "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -2444,6 +2798,12 @@ msgid ""
 "continue.\n"
 "                            "
 msgstr ""
+"\n"
+"                            Il tuo amministratore ti ha affidato un livello "
+"di autorizzazione di <strong>L%(tcl)s</strong>.</br>\n"
+"                            Devi prima accettare questo livello di "
+"autorizzazione per continuare.\n"
+"                            "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -2453,6 +2813,10 @@ msgid ""
 "responsibility\n"
 "                        "
 msgstr ""
+"\n"
+"                            Accetta il livello di autorizzazione L%(tcl)s e "
+"la responsabilità\n"
+"                        "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -2464,6 +2828,12 @@ msgid ""
 "use this clearance level of <strong>L%(acl)s</strong>.\n"
 "                            "
 msgstr ""
+"\n"
+"                            Il tuo amministratore ti ha <strong>affidato</"
+"strong> un livello di autorizzazione di <strong>L%(tcl)s</strong>.</br>\n"
+"                            Hai anche <strong>riconosciuto</strong> di "
+"utilizzare questo livello di autorizzazione di <strong>L%(acl)s</strong>.\n"
+"                            "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
@@ -2471,11 +2841,11 @@ msgstr ""
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level"
-msgstr ""
+msgstr "Imposta il livello di autorizzazione"
 
 #: onboarding/templates/step_3f_set_clearance_level.html
 msgid "Setup scan - Set clearance level for"
-msgstr ""
+msgstr "Configura la scansione - Imposta il livello di autorizzazione per"
 
 #: onboarding/templates/step_3f_set_clearance_level.html
 #, python-format
@@ -2485,14 +2855,19 @@ msgid ""
 "onboarding we will suggest to set the clearance level to "
 "L%(dns_report_least_clearance_level)s."
 msgstr ""
+"Dopo aver creato un nuovo oggetto, OpenKAT ti chiederà di impostare un "
+"livello di autorizzazione. Nella pagina dei dettagli dell'oggetto puoi "
+"sempre modificare il livello di autorizzazione. Per la fase di introduzione, "
+"ti suggeriremo di impostare il livello di autorizzazione a "
+"L%(dns_report_least_clearance_level)s."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Setup scan - Enable plugins"
-msgstr ""
+msgstr "Configura la scansione - Abilita i plugin"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Plugins introduction"
-msgstr ""
+msgstr "Introduzione ai plugin"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2500,25 +2875,33 @@ msgid ""
 "specific skillset that will help to generate your report. There are three "
 "types of plugins."
 msgstr ""
+"OpenKAT utilizza dei plugin per scansionare, verificare e analizzare. "
+"Ciascun plugin porterà con sé un set di competenze specifiche che "
+"contribuirà a generare il tuo rapporto. Ci sono tre tipi di plugin."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
 msgstr ""
+"Scansiona gli oggetti per ottenere dati. Ogni boefje ha un punteggio di "
+"intensità di scansione per evitare scansioni invasive su oggetti per i quali "
+"non hai l'autorizzazione."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Check the data for specific objects and add these object to your object list."
 msgstr ""
+"Controlla i dati per oggetti specifici e aggiungi questi oggetti alla tua "
+"lista di oggetti."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Bits"
-msgstr ""
+msgstr "Bit"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Analyze the available data to come to insights and conclusions."
-msgstr ""
+msgstr "Analizza i dati disponibili per giungere a intuizioni e conclusioni."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2529,18 +2912,25 @@ msgid ""
 "collected by the enabled plugins. Below are the suggested and required "
 "plugins for this report."
 msgstr ""
+"OpenKAT sarà in grado di generare un rapporto completo quando tutti i plugin "
+"richiesti e suggeriti sono abilitati. Se scegli di non concedere "
+"l'autorizzazione a un plugin per eseguire, i dati che il plugin avrebbe "
+"raccolto o prodotto verranno esclusi dal rapporto, che verrà quindi generato "
+"in base ai dati disponibili raccolti dai plugin abilitati. Di seguito sono "
+"elencati i plugin suggeriti e richiesti per questo rapporto."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr ""
+"Impostiamo la tua scansione abilitando i plugin di tua scelta qui sotto."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Suggested plugins"
-msgstr ""
+msgstr "Plugin suggeriti"
 
 #: onboarding/templates/step_4_report.html
 msgid "Boefjes are scanning"
-msgstr ""
+msgstr "Boefjes stanno eseguendo la scansione"
 
 #: onboarding/templates/step_4_report.html
 msgid ""
@@ -2549,12 +2939,18 @@ msgid ""
 "objects found. For the current scan we expect boefjes to take about 3 "
 "minutes."
 msgstr ""
+"Gli boefjes abilitati stanno raccogliendo i dati necessari per generare il "
+"rapporto DNS. Questo potrebbe richiedere del tempo in base al tipo di "
+"scansioni e al numero di oggetti trovati. Per la scansione attuale ci "
+"aspettiamo che gli boefjes impieghino circa 3 minuti."
 
 #: onboarding/templates/step_4_report.html
 msgid ""
 "During this introduction we ask you to wait till the scan is ready. After "
 "which you can view the report."
 msgstr ""
+"Durante questa introduzione ti chiediamo di attendere fino a quando la "
+"scansione sarà pronta. Dopo di che, potrai visualizzare il rapporto."
 
 #: onboarding/templates/step_4_report.html
 msgid ""
@@ -2562,44 +2958,50 @@ msgid ""
 "OpenKAT in the meantime without waiting for scans to finish. When you would "
 "like to see the status of a scan you can open the \"tasks\" page."
 msgstr ""
+"Dopo l'introduzione, i boefjes vengono eseguiti in background. Ciò ti "
+"consente di utilizzare OpenKAT nel frattempo senza dover attendere il "
+"termine delle scansioni. Quando desideri vedere lo stato di una scansione, "
+"puoi aprire la pagina \"compiti\"."
 
 #: onboarding/templates/step_4_report.html
 msgid "Open my DNS-report"
-msgstr ""
+msgstr "Apri il mio report DNS"
 
 #: onboarding/view_helpers.py
 msgid "1: Introduction"
-msgstr ""
+msgstr "1: Introduzione"
 
 #: onboarding/view_helpers.py
 msgid "2: Choose a report"
-msgstr ""
+msgstr "2: Scegli un rapporto"
 
 #: onboarding/view_helpers.py
 msgid "3: Setup scan"
-msgstr ""
+msgstr "3: Imposta la scansione"
 
 #: onboarding/view_helpers.py
 msgid "4: Open report"
-msgstr ""
+msgstr "4: Apri il rapporto"
 
 #: onboarding/view_helpers.py
 msgid "2: Organization setup"
-msgstr ""
+msgstr "2: Impostazione dell'organizzazione"
 
 #: onboarding/view_helpers.py
 msgid "3: Indemnification"
-msgstr ""
+msgstr "3: Indennizzo"
 
 #: onboarding/view_helpers.py
 msgid "4: Account setup"
-msgstr ""
+msgstr "4: Impostazione dell'account"
 
 #: onboarding/views.py
 msgid ""
 "OpenKAT added the following required object to your object list to complete "
 "your request: {}"
 msgstr ""
+"OpenKAT ha aggiunto l'oggetto richiesto seguente alla tua lista di oggetti "
+"per completare la tua richiesta: {}"
 
 #: onboarding/views.py
 #, python-format
@@ -2607,179 +3009,183 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                 "
 "Indemnification not present at organization %s."
 msgstr ""
+"Impossibile aumentare il livello di autorizzazione di %s a "
+"L%s.                 Indennizzo non presente presso l'organizzazione %s."
 
 #: onboarding/views.py
 msgid "Clearance level has been set"
-msgstr ""
+msgstr "Il livello di autorizzazione è stato impostato"
 
 #: onboarding/views.py
 msgid "OpenKAT Setup"
-msgstr ""
+msgstr "Impostazione di OpenKAT"
 
 #: onboarding/views.py
 #, python-brace-format
 msgid "{org_name} successfully created."
-msgstr ""
+msgstr "{org_name} creato con successo."
 
 #: onboarding/views.py
 #, python-brace-format
 msgid "{org_name} successfully updated."
-msgstr ""
+msgstr "{org_name} aggiornato con successo."
 
 #: onboarding/views.py
 #, python-brace-format
 msgid "{name} successfully created."
-msgstr ""
+msgstr "{name} creato con successo."
 
 #: tools/forms/base.py
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: tools/forms/boefje.py
 msgid ""
 "Not all required boefjes are selected. Please select all required boefjes."
 msgstr ""
+"Non sono stati selezionati tutti i boefjes richiesti. Seleziona tutti i "
+"boefjes richiesti."
 
 #: tools/forms/finding_type.py
 msgid "KAT-ID"
-msgstr ""
+msgstr "KAT-ID"
 
 #: tools/forms/finding_type.py
 msgid "Unique ID within OpenKAT, for this type"
-msgstr ""
+msgstr "ID univoco all'interno di OpenKAT, per questo tipo"
 
 #: tools/forms/finding_type.py
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 #: tools/forms/finding_type.py
 msgid "Give the finding type a fitting title"
-msgstr ""
+msgstr "Dai al tipo di rilevamento un titolo appropriato"
 
 #: tools/forms/finding_type.py
 msgid "Describe the finding type"
-msgstr ""
+msgstr "Descrivi il tipo di rilevamento"
 
 #: tools/forms/finding_type.py
 msgid "Risk"
-msgstr ""
+msgstr "Rischio"
 
 #: tools/forms/finding_type.py
 msgid "Solution"
-msgstr ""
+msgstr "Soluzione"
 
 #: tools/forms/finding_type.py
 msgid "How can this be solved?"
-msgstr ""
+msgstr "Come può essere risolto questo problema?"
 
 #: tools/forms/finding_type.py
 msgid "Describe how this type of finding can be solved"
-msgstr ""
+msgstr "Descrivi come questo tipo di rilevamento può essere risolto"
 
 #: tools/forms/finding_type.py
 msgid "References"
-msgstr ""
+msgstr "Riferimenti"
 
 #: tools/forms/finding_type.py
 msgid "Please give some references on the solution"
-msgstr ""
+msgstr "Fornisci alcuni riferimenti sulla soluzione"
 
 #: tools/forms/finding_type.py
 msgid "Please give sources and references on the suggested solution"
-msgstr ""
+msgstr "Fornisci fonti e riferimenti sulla soluzione suggerita"
 
 #: tools/forms/finding_type.py
 msgid "Impact description"
-msgstr ""
+msgstr "Descrizione dell'impatto"
 
 #: tools/forms/finding_type.py
 msgid "Describe the solutions impact"
-msgstr ""
+msgstr "Descrivi l'impatto delle soluzioni"
 
 #: tools/forms/finding_type.py
 msgid "Solution chance"
-msgstr ""
+msgstr "Possibilità di soluzione"
 
 #: tools/forms/finding_type.py
 msgid "Solution impact"
-msgstr ""
+msgstr "Impatto della soluzione"
 
 #: tools/forms/finding_type.py
 msgid "Solution effort"
-msgstr ""
+msgstr "Sforzo richiesto per la soluzione"
 
 #: tools/forms/finding_type.py
 msgid "ID should start with "
-msgstr ""
+msgstr "L'ID deve iniziare con "
 
 #: tools/forms/finding_type.py
 msgid "Finding type already exists"
-msgstr ""
+msgstr "Il tipo di rilevamento esiste già"
 
 #: tools/forms/finding_type.py
 msgid "Click to select one of the available options"
-msgstr ""
+msgstr "Fai clic per selezionare una delle opzioni disponibili"
 
 #: tools/forms/finding_type.py
 msgid "Finding types"
-msgstr ""
+msgstr "Tipi di rilevamento"
 
 #: tools/forms/finding_type.py
 #: rocky/templates/partials/finding_occurrence_definition_list.html
 msgid "Proof"
-msgstr ""
+msgstr "Prova"
 
 #: tools/forms/finding_type.py
 msgid "Provide evidence of your finding"
-msgstr ""
+msgstr "Fornisci evidenza del tuo rilevamento"
 
 #: tools/forms/finding_type.py
 msgid "Describe your finding"
-msgstr ""
+msgstr "Descrivi il tuo rilevamento"
 
 #: tools/forms/finding_type.py
 msgid "Reproduce finding"
-msgstr ""
+msgstr "Riproduci il rilevamento"
 
 #: tools/forms/finding_type.py
 msgid "Please explain how to reproduce your finding"
-msgstr ""
+msgstr "Spiega come riprodurre il tuo rilevamento"
 
 #: tools/forms/finding_type.py
 msgid "Date/Time (UTC)"
-msgstr ""
+msgstr "Data/Ora (UTC)"
 
 #: tools/forms/finding_type.py
 msgid "Doc! I'm from the future, I'm here to take you back!"
-msgstr ""
+msgstr "Dottore! Vengo dal futuro, sono qui per riportarti indietro!"
 
 #: tools/forms/finding_type.py
 msgid "OOI doesn't exist"
-msgstr ""
+msgstr "L'OOI non esiste"
 
 #: tools/forms/findings.py
 msgid "Show non-muted findings"
-msgstr ""
+msgstr "Mostra i rilevamenti non mutati"
 
 #: tools/forms/findings.py
 msgid "Show muted findings"
-msgstr ""
+msgstr "Mostra i rilevamenti mutati"
 
 #: tools/forms/findings.py
 msgid "Show muted and non-muted findings"
-msgstr ""
+msgstr "Mostra i rilevamenti mutati e non mutati"
 
 #: tools/forms/findings.py
 msgid "Filter by severity"
-msgstr ""
+msgstr "Filtra per gravità"
 
 #: tools/forms/findings.py
 msgid "Filter by muted findings"
-msgstr ""
+msgstr "Filtra per rilevamenti mutati"
 
 #: tools/forms/ooi.py
 msgid "Filter types"
-msgstr ""
+msgstr "Filtra per tipi"
 
 #: tools/forms/ooi.py tools/view_helpers.py
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
@@ -2787,96 +3193,107 @@ msgstr ""
 #: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
 #: rocky/views/upload_csv.py rocky/views/upload_raw.py
 msgid "Objects"
-msgstr ""
+msgstr "Oggetti"
 
 #: tools/forms/ooi.py
 msgid "Clearance Level"
-msgstr ""
+msgstr "Livello di autorizzazione"
 
 #: tools/forms/ooi.py
+#, fuzzy
+#| msgid "Show objects that don't meet the Boefjes scan level"
 msgid "Show objects that don't meet the Boefjes scan level."
-msgstr ""
+msgstr "Mostra gli oggetti che non soddisfano il livello di scansione Boefjes"
 
 #: tools/forms/ooi.py
 msgid "Show Boefjes that exceed the objects clearance level."
 msgstr ""
+"Mostra i Boefjes che superano il livello di autorizzazione degli oggetti"
 
 #: tools/forms/ooi_form.py
 msgid "option"
-msgstr ""
+msgstr "opzione"
 
 #: tools/forms/ooi_form.py
 #, python-brace-format
 msgid "Optionally choose a {option_label}"
-msgstr ""
+msgstr "Scegli opzionalmente un {option_label}"
 
 #: tools/forms/ooi_form.py
 #, python-brace-format
 msgid "Please choose a {option_label}"
-msgstr ""
+msgstr "Scegli un {option_label}"
 
 #: tools/forms/ooi_form.py
+#, fuzzy
+#| msgid "Set clearance level"
 msgid "Filter by clearance level"
-msgstr ""
+msgstr "Imposta il livello di autorizzazione"
 
 #: tools/forms/ooi_form.py
+#, fuzzy
+#| msgid "Filter by OOI types"
 msgid "Filter by clearance type"
-msgstr ""
+msgstr "Filtra per tipi di OOI"
+
+#: tools/forms/ooi_form.py
+msgid "Filter by OOI types"
+msgstr "Filtra per tipi di OOI"
 
 #: tools/forms/settings.py
 msgid "--- Show all ----"
-msgstr ""
+msgstr "--- Mostra tutto ----"
 
 #: tools/forms/settings.py
 msgid "recommendation"
-msgstr ""
+msgstr "raccomandazione"
 
 #: tools/forms/settings.py
 msgid "low"
-msgstr ""
+msgstr "basso"
 
 #: tools/forms/settings.py
 msgid "medium"
-msgstr ""
+msgstr "medio"
 
 #: tools/forms/settings.py
 msgid "high"
-msgstr ""
+msgstr "alto"
 
 #: tools/forms/settings.py
 msgid "very high"
-msgstr ""
+msgstr "molto alto"
 
 #: tools/forms/settings.py
 msgid "critical"
-msgstr ""
+msgstr "critico"
 
 #: tools/forms/settings.py
 msgid "quickfix"
-msgstr ""
+msgstr "soluzione rapida"
 
 #: tools/forms/settings.py
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared"
-msgstr ""
+msgstr "Dichiarato"
 
 #: tools/forms/settings.py
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Inherited"
-msgstr ""
+msgstr "Ereditato"
 
 #: tools/forms/settings.py
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Empty"
-msgstr ""
+msgstr "Vuoto"
 
 #: tools/forms/settings.py
 msgid "Add one finding type ID per line."
-msgstr ""
+msgstr "Aggiungi un ID di tipo di rilevamento per riga."
 
 #: tools/forms/settings.py
 msgid "Add the date and time of your finding (UTC)"
-msgstr ""
+msgstr "Aggiungi data e ora del tuo rilevamento (UTC)"
 
 #: tools/forms/settings.py
 msgid ""
@@ -2884,62 +3301,66 @@ msgid ""
 "to see the status of your network through time. Select a datetime to change "
 "the view to represent that moment in time."
 msgstr ""
+"OpenKAT registra un'indicazione temporale con ogni osservazione, quindi è "
+"possibile vedere lo stato della tua rete nel tempo. Seleziona una data/ora "
+"per cambiare la visualizzazione e rappresentare quel momento nel tempo."
 
 #: tools/forms/settings.py
 msgid "Depth of the tree."
-msgstr ""
+msgstr "Profondità dell'albero."
 
 #: tools/forms/upload_csv.py
 msgid "Only CSV file supported"
-msgstr ""
+msgstr "Supportato solo il file CSV"
 
 #: tools/forms/upload_csv.py tools/forms/upload_raw.py
 msgid "File could not be decoded"
-msgstr ""
+msgstr "Impossibile decodificare il file"
 
 #: tools/forms/upload_csv.py
 msgid "No file selected"
-msgstr ""
+msgstr "Nessun file selezionato"
 
 #: tools/forms/upload_csv.py
 msgid "The uploaded file is empty."
-msgstr ""
+msgstr "Il file caricato è vuoto."
 
 #: tools/forms/upload_csv.py
 msgid "The number of columns do not meet the requirements."
-msgstr ""
+msgstr "Il numero di colonne non soddisfa i requisiti."
 
 #: tools/forms/upload_csv.py
 msgid "OOI Type in CSV does not meet the criteria."
-msgstr ""
+msgstr "Il tipo OOI nel CSV non soddisfa i criteri."
 
 #: tools/forms/upload_csv.py
 msgid "An error has occurred during the parsing of the csv file:"
-msgstr ""
+msgstr "Si è verificato un errore durante l'analisi del file CSV:"
 
 #: tools/forms/upload_csv.py
 msgid "Upload CSV file"
-msgstr ""
+msgstr "Carica il file CSV"
 
 #: tools/forms/upload_csv.py
 msgid "Only accepts CSV file."
-msgstr ""
+msgstr "Accetta solo file CSV."
 
 #: tools/forms/upload_oois.py rocky/templates/partials/explanations.html
 msgid "Object Type"
-msgstr ""
+msgstr "Tipo di oggetto"
 
 #: tools/forms/upload_oois.py
 msgid "Choose a type of which objects are added."
-msgstr ""
+msgstr "Scegli un tipo di oggetto da aggiungere."
 
 #: tools/forms/upload_raw.py
 msgid "Organization code(s) for raw does not exist in our database"
 msgstr ""
+"Il codice organizzazione(i) per il file raw non esiste nel nostro database"
 
 #: tools/forms/upload_raw.py
 msgid "Mime types"
-msgstr ""
+msgstr "Tipi MIME"
 
 #: tools/forms/upload_raw.py
 msgid ""
@@ -2949,31 +3370,41 @@ msgid ""
 "the mime type \"boefje/dns-records\" is added, the normalizer expects the "
 "raw file to contain dns scan information.</p>"
 msgstr ""
+"<p>Aggiungi un set di tipi MIME, separati da virgole, ad esempio:</"
+"p><p><i>\"text/html, image/jpeg\"</i> o <i>\"boefje/dns-records\"</i>.</"
+"p><p>I tipi MIME vengono utilizzati per abbinare il Normalizer corretto a un "
+"file raw. Quando viene aggiunto il tipo MIME \"boefje/dns-records\", il "
+"Normalizer si aspetta che il file raw contenga informazioni sulla scansione "
+"DNS.</p>"
 
 #: tools/forms/upload_raw.py rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_raw.html
 msgid "Upload raw file"
-msgstr ""
+msgstr "Carica file raw"
 
 #: tools/models.py
 msgid "The name of the organisation"
-msgstr ""
+msgstr "Il nome dell'organizzazione"
 
 #: tools/models.py
 msgid ""
 "A slug containing only lower-case unicode letters, numbers, hyphens or "
 "underscores that will be used in URLs and paths"
 msgstr ""
+"Uno slug contenente solo lettere minuscole unicode, numeri, trattini o "
+"sottolineature che verrà utilizzato negli URL e nei percorsi"
 
 #: tools/models.py
 msgid ""
 "This organization code is reserved by OpenKAT and cannot be used. Choose "
 "another organization code."
 msgstr ""
+"Questo codice organizzazione è riservato da OpenKAT e non può essere "
+"utilizzato. Scegli un altro codice organizzazione."
 
 #: tools/models.py
 msgid "new"
-msgstr ""
+msgstr "nuovo"
 
 #: tools/view_helpers.py rocky/templates/header.html
 #: rocky/templates/organizations/organization_list.html
@@ -2981,7 +3412,7 @@ msgstr ""
 #: rocky/templates/partials/organization_member_list_filters.html
 #: rocky/views/organization_member_edit.py
 msgid "Members"
-msgstr ""
+msgstr "Membri"
 
 #: rocky/messaging.py
 msgid ""
@@ -2989,194 +3420,204 @@ msgid ""
 "needs at least a clearance level of L{} in order to do a proper onboarding. "
 "Edit this member and change the clearance level if necessary."
 msgstr ""
+"Hai affidato a questo membro un livello di autorizzazione di L{}. Questo "
+"membro necessita almeno di un livello di autorizzazione di L{} per poter "
+"svolgere una corretta integrazione. Modifica questo membro e cambia il "
+"livello di autorizzazione se necessario."
 
 #: rocky/settings.py
 msgid "Blue light"
-msgstr ""
+msgstr "Blu chiaro"
 
 #: rocky/settings.py
 msgid "Blue medium"
-msgstr ""
+msgstr "Blu medio"
 
 #: rocky/settings.py
 msgid "Blue dark"
-msgstr ""
+msgstr "Blu scuro"
 
 #: rocky/settings.py
 msgid "Green light"
-msgstr ""
+msgstr "Verde chiaro"
 
 #: rocky/settings.py
 msgid "Green medium"
-msgstr ""
+msgstr "Verde medio"
 
 #: rocky/settings.py
 msgid "Green dark"
-msgstr ""
+msgstr "Verde scuro"
 
 #: rocky/settings.py
 msgid "Yellow light"
-msgstr ""
+msgstr "Giallo chiaro"
 
 #: rocky/settings.py
 msgid "Yellow medium"
-msgstr ""
+msgstr "Giallo medio"
 
 #: rocky/settings.py
 msgid "Yellow dark"
-msgstr ""
+msgstr "Giallo scuro"
 
 #: rocky/settings.py
 msgid "Orange light"
-msgstr ""
+msgstr "Arancione chiaro"
 
 #: rocky/settings.py
 msgid "Orange medium"
-msgstr ""
+msgstr "Arancione medio"
 
 #: rocky/settings.py
 msgid "Orange dark"
-msgstr ""
+msgstr "Arancione scuro"
 
 #: rocky/settings.py
 msgid "Red light"
-msgstr ""
+msgstr "Rosso chiaro"
 
 #: rocky/settings.py
 msgid "Red medium"
-msgstr ""
+msgstr "Rosso medio"
 
 #: rocky/settings.py
 msgid "Red dark"
-msgstr ""
+msgstr "Rosso scuro"
 
 #: rocky/settings.py
 msgid "Violet light"
-msgstr ""
+msgstr "Viola chiaro"
 
 #: rocky/settings.py
 msgid "Violet medium"
-msgstr ""
+msgstr "Viola medio"
 
 #: rocky/settings.py
 msgid "Violet dark"
-msgstr ""
+msgstr "Viola scuro"
 
 #: rocky/settings.py
 msgid "Plain"
-msgstr ""
+msgstr "Piano"
 
 #: rocky/settings.py
 msgid "Solid"
-msgstr ""
+msgstr "Solido"
 
 #: rocky/settings.py
 msgid "Dashed"
-msgstr ""
+msgstr "Tratteggiato"
 
 #: rocky/settings.py
 msgid "Dotted"
-msgstr ""
+msgstr "Puntinato"
 
 #: rocky/templates/403.html
 msgid "Error code 403: Unauthorized"
-msgstr ""
+msgstr "Codice di errore 403: Non autorizzato"
 
 #: rocky/templates/403.html
 msgid "Your account is not authorized to access this page or organization."
 msgstr ""
+"Il tuo account non è autorizzato ad accedere a questa pagina o "
+"organizzazione."
 
 #: rocky/templates/403.html
 msgid "Please contact your system administrator."
-msgstr ""
+msgstr "Contatta l'amministratore di sistema."
 
 #: rocky/templates/403.html rocky/templates/404.html
 msgid "You may want to go back to the"
-msgstr ""
+msgstr "Potresti voler tornare indietro alla"
 
 #: rocky/templates/403.html rocky/templates/404.html
 #: rocky/templates/crisis_room/crisis_room.html
 msgid "Crisis Room"
-msgstr ""
+msgstr "Crisis Room"
 
 #: rocky/templates/404.html
 msgid "Error code 404: Page not found"
-msgstr ""
+msgstr "Codice di errore 404: Pagina non trovata"
 
 #: rocky/templates/404.html
 msgid ""
 "The page you wanted to see or the file you wanted to view was not found."
 msgstr ""
+"La pagina che volevi vedere o il file che volevi visualizzare non è stato "
+"trovato."
 
 #: rocky/templates/crisis_room/crisis_room.html
 msgid ""
 "An overview of all (critical) findings OpenKAT found. Check the detail "
 "section for additional severity information."
 msgstr ""
+"Una panoramica di tutti i rilevamenti (critici) trovati da OpenKAT. "
+"Controlla la sezione dettagli per ulteriori informazioni sulla gravità."
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Total findings"
-msgstr ""
+msgstr "Totale dei rilevamenti"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Total Findings"
-msgstr ""
+msgstr "Totale dei Rilevamenti"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Close details"
-msgstr ""
+msgstr "Chiudi dettagli"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Open details"
-msgstr ""
+msgstr "Apri dettagli"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid " Finding Details"
-msgstr ""
+msgstr "Dettagli Rilevamento"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Occurrences"
-msgstr ""
+msgstr "Occorrenze"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
 msgid "There were no organizations found for your user account"
-msgstr ""
+msgstr "Non sono state trovate organizzazioni per il tuo account utente"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Top critical organizations"
-msgstr ""
+msgstr "Top delle organizzazioni critiche"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Critical findings"
-msgstr ""
+msgstr "Rilevamenti critici"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Critical Findings"
-msgstr ""
+msgstr "Rilevamenti Critici"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 msgid "Close menu"
-msgstr ""
+msgstr "Chiudi menu"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 msgid "Main navigation"
-msgstr ""
+msgstr "Navigazione principale"
 
 #: rocky/templates/dashboard_client.html
 msgid "Indemnifications"
-msgstr ""
+msgstr "Indennizzi"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
@@ -3187,60 +3628,60 @@ msgstr ""
 #: rocky/views/finding_list.py rocky/views/finding_type_add.py
 #: rocky/views/ooi_view.py
 msgid "Findings"
-msgstr ""
+msgstr "Rilevamenti"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/partials/secondary-menu.html
 msgid "Logout"
-msgstr ""
+msgstr "Logout"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "Welcome"
-msgstr ""
+msgstr "Benvenuto"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "User overview:"
-msgstr ""
+msgstr "Panoramica utente:"
 
 #: rocky/templates/dashboard_redteam.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "warning"
-msgstr ""
+msgstr "avviso"
 
 #: rocky/templates/dashboard_redteam.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Warning"
-msgstr ""
+msgstr "Avviso"
 
 #: rocky/templates/dashboard_redteam.html
 msgid "Organization code missing"
-msgstr ""
+msgstr "Codice organizzazione mancante"
 
 #: rocky/templates/finding_type_add.html
 #: rocky/templates/partials/findings_list_toolbar.html
 #: rocky/views/finding_type_add.py
 msgid "Add finding type"
-msgstr ""
+msgstr "Aggiungi tipo di rilevamento"
 
 #: rocky/templates/finding_type_add.html
 msgid "Finding Type"
-msgstr ""
+msgstr "Tipo di Rilevamento"
 
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_findings.html
 #: rocky/templates/partials/findings_list_toolbar.html
 msgid "Add finding"
-msgstr ""
+msgstr "Aggiungi rilevamento"
 
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Finding"
-msgstr ""
+msgstr "Rilevamento"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Findings @ "
@@ -3253,179 +3694,188 @@ msgid ""
 "<strong>%(organization_name)s</strong>. Each finding relates to an object. "
 "Click a finding for additional information."
 msgstr ""
+"Una panoramica di tutte le scoperte che OpenKAT ha trovato per l'organizzazione "
+"<strong>%(organization_name)s</strong>. Ogni scoperta è relativa a un oggetto. "
+"Clicca su una scoperta per ulteriori informazioni."
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Showing "
-msgstr ""
+msgstr "Visualizzazione "
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/pagination.html
 msgid "of"
-msgstr ""
+msgstr "di"
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "findings"
-msgstr ""
+msgstr "rilevamenti"
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 msgid "Tree"
-msgstr ""
+msgstr "Albero"
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 msgid "Graph"
-msgstr ""
+msgstr "Grafico"
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #, python-format
 msgid "Show details for %(finding)s"
-msgstr ""
+msgstr "Mostra dettagli per %(finding)s"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Finding type:"
-msgstr ""
+msgstr "Tipo di rilevamento:"
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #, python-format
 msgid "Show details for %(finding_type)s"
-msgstr ""
+msgstr "Mostra dettagli per %(finding_type)s"
 
 #: rocky/templates/findings/finding_list.html
 msgid "OOI type:"
-msgstr ""
+msgstr "Tipo di OOI:"
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #, python-format
 msgid "Show %(ooi_type)s objects"
-msgstr ""
+msgstr "Mostra oggetti %(ooi_type)s"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Source OOI:"
-msgstr ""
+msgstr "OOI di origine:"
 
 #: rocky/templates/findings/finding_list.html
 #, python-format
 msgid "Show details for %(ooi)s"
-msgstr ""
+msgstr "Mostra dettagli per %(ooi)s"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Risk score:"
-msgstr ""
+msgstr "Punteggio di rischio:"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Mute findings"
-msgstr ""
+msgstr "Silenzia rilevamenti"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Reason"
-msgstr ""
+msgstr "Motivo"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Mute Findings"
-msgstr ""
+msgstr "Silenzia Rilevamenti"
 
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Set filters"
-msgstr ""
+msgstr "Imposta filtri"
 
 #: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Clear filters"
-msgstr ""
+msgstr "Cancella filtri"
 
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
-msgstr ""
+msgstr "Informativa sulla Privacy"
 
 #: rocky/templates/footer.html rocky/views/health.py
 msgid "Health"
-msgstr ""
+msgstr "Salute"
 
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
-msgstr ""
+msgstr "questo campo è obbligatorio"
 
 #: rocky/templates/graph-d3.html
 msgid ""
 "Click a circle to collapse / expand the tree, click the text to view the "
 "tree from that OOI and hover over the text to see details."
 msgstr ""
+"Fai clic su un cerchio in alto per chiudere / espandere l'albero, fai clic "
+"sul testo per visualizzare l'albero da quell'OOI e posiziona il mouse sul "
+"testo per vedere i dettagli."
 
 #: rocky/templates/graph-d3.html
 msgid "Tree graph"
-msgstr ""
+msgstr "Grafico ad albero"
 
 #: rocky/templates/header.html
 msgid "Menu"
-msgstr ""
+msgstr "Menu"
 
 #: rocky/templates/header.html
 msgid "OpenKAT logo, go to the homepage of OpenKAT"
-msgstr ""
+msgstr "Logo di OpenKAT, vai alla homepage di OpenKAT"
 
 #: rocky/templates/header.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/views/finding_list.py
 msgid "Crisis room"
-msgstr ""
+msgstr "Sala di crisi"
 
 #: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
-msgstr ""
+msgstr "Attività"
 
 #: rocky/templates/header.html
 msgid "Breadcrumbs"
-msgstr ""
+msgstr "Breadcrumb"
 
 #: rocky/templates/health.html
 msgid "Health Checks"
-msgstr ""
+msgstr "Controlli di Salute"
 
 #: rocky/templates/health.html
 msgid "Healthy"
-msgstr ""
+msgstr "Sano"
 
 #: rocky/templates/health.html
 msgid "Version"
-msgstr ""
+msgstr "Versione"
 
 #: rocky/templates/health.html
 msgid "Additional"
-msgstr ""
+msgstr "Aggiuntivo"
 
 #: rocky/templates/indemnification_present.html
 msgid "Indemnification"
-msgstr ""
+msgstr "Indennizzo"
 
 #: rocky/templates/indemnification_present.html
 msgid ""
 "Indemnification on the organization present. You may now add objects and "
 "start scans."
 msgstr ""
+"Indennizzo sull'organizzazione presente. Ora puoi aggiungere oggetti e "
+"iniziare scansioni."
 
 #: rocky/templates/indemnification_present.html
 msgid "Go to"
-msgstr ""
+msgstr "Vai a"
 
 #: rocky/templates/landing_page.html
 msgid "Kwetsbaarheden Analyse Tool"
-msgstr ""
+msgstr "Strumento di Analisi delle Vulnerabilità"
 
 #: rocky/templates/landing_page.html
 msgid "What is OpenKAT?"
-msgstr ""
+msgstr "Cos'è OpenKAT?"
 
 #: rocky/templates/landing_page.html
 msgid ""
@@ -3433,50 +3883,63 @@ msgid ""
 "by the Ministry of Health, Welfare and Sport to make your and our world "
 "safer."
 msgstr ""
+"OpenKAT è uno strumento di analisi delle vulnerabilità. Un progetto Open "
+"Source sviluppato dal Ministero della Salute, del Benessere e dello Sport "
+"per rendere più sicuro il nostro mondo e il tuo."
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT sees"
-msgstr ""
+msgstr "OpenKAT vede"
 
 #: rocky/templates/landing_page.html
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
 "analog). <br> Our motto is therefore: I see, I see, what you do not see."
 msgstr ""
+"Decine di strumenti sono integrati in OpenKAT per visualizzare il mondo "
+"(digitale e analogico). <br> Il nostro motto è quindi: Io vedo, io vedo, ciò "
+"che tu non vedi."
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT knows"
-msgstr ""
+msgstr "OpenKAT sa"
 
 #: rocky/templates/landing_page.html
 msgid ""
 "OpenKAT does not forget (just like that), and can be queried without "
 "scanning again. Also about a historical situation."
 msgstr ""
+"OpenKAT non dimentica (così facilmente) e può essere interrogato senza "
+"eseguire una nuova scansione. Anche per quanto riguarda una situazione "
+"storica."
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT is secure"
-msgstr ""
+msgstr "OpenKAT è sicuro"
 
 #: rocky/templates/landing_page.html
 msgid ""
 "Forensically secured storage of evidence is one of the basic ingredients of "
 "OpenKAT."
 msgstr ""
+"La memorizzazione forense sicura delle prove è uno degli ingredienti di base "
+"di OpenKAT."
 
 #: rocky/templates/landing_page.html
 msgid "OpenKAT is sweet"
-msgstr ""
+msgstr "OpenKAT è sicuro"
 
 #: rocky/templates/landing_page.html
 msgid ""
 "OpenKAT thinks about privacy, and stores what is necessary, within the rules "
 "of your organization and the law."
 msgstr ""
+"OpenKAT pensa alla privacy e conserva ciò che è necessario, nel rispetto "
+"delle regole della tua organizzazione e della legge."
 
 #: rocky/templates/landing_page.html
 msgid "A wide playing field"
-msgstr ""
+msgstr "Un ampio campo di gioco"
 
 #: rocky/templates/landing_page.html
 msgid ""
@@ -3485,10 +3948,15 @@ msgid ""
 "questions. Expected and unexpected changes in the world are made visible, "
 "and where necessary reported or made known directly to the right people."
 msgstr ""
+"OpenKAT crea una copia della realtà attuale mediante gli strumenti "
+"integrati. All'interno di questa copia puoi cercare risposte a innumerevoli "
+"domande di sicurezza e politica. Le modifiche attese e impreviste nel mondo "
+"vengono rese visibili e, se necessario, segnalate o rese note direttamente "
+"alle persone giuste."
 
 #: rocky/templates/legal/privacy_statement.html
 msgid "OpenKAT Privacy Statement"
-msgstr ""
+msgstr "Informativa sulla Privacy di OpenKAT"
 
 #: rocky/templates/legal/privacy_statement.html
 msgid ""
@@ -3498,152 +3966,164 @@ msgid ""
 "(sometimes referred to as \"personal data\", \"personally identifiable "
 "information\" or \"PII\") that has been collected online."
 msgstr ""
+"OpenKAT è dedicato a proteggere la riservatezza e la privacy delle "
+"informazioni affidate a esso. Come parte di questo obbligo fondamentale, "
+"OpenKAT si impegna a proteggere e utilizzare adeguatamente le informazioni "
+"personali (a volte denominate \"dati personali\", \"informazioni "
+"personalmente identificabili\" o \"PII\") raccolte online."
 
 #: rocky/templates/oois/error.html
 msgid "Object List"
-msgstr ""
+msgstr "Elenco Oggetti"
 
 #: rocky/templates/oois/error.html
 msgid "An error occurred. Please contact a system administrator."
-msgstr ""
+msgstr "Si è verificato un errore. Contattare un amministratore di sistema."
 
 #: rocky/templates/oois/ooi_add.html
 #, python-format
 msgid "Add a %(display_type)s"
-msgstr ""
+msgstr "Aggiungi un %(display_type)s"
 
 #: rocky/templates/oois/ooi_add.html
 msgid ""
 "Here you can add the asset of the client. Findings can be added to these in "
 "the findings page."
 msgstr ""
+"Qui è possibile aggiungere l'asset del cliente. I rilevamenti possono essere "
+"aggiunti a questi nella pagina dei rilevamenti."
 
 #: rocky/templates/oois/ooi_add.html
 #, python-format
 msgid "Add %(display_type)s"
-msgstr ""
+msgstr "Aggiungi %(display_type)s"
 
 #: rocky/templates/oois/ooi_add_type_select.html
 msgid "Manual creation"
-msgstr ""
+msgstr "Creazione manuale"
 
 #: rocky/templates/oois/ooi_add_type_select.html
 msgid "Select the type of object you want to create."
-msgstr ""
+msgstr "Seleziona il tipo di oggetto che desideri creare."
 
 #: rocky/templates/oois/ooi_delete.html
 #, python-format
 msgid "Delete %(primary_key)s"
-msgstr ""
+msgstr "Elimina %(primary_key)s"
 
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Are you sure?"
-msgstr ""
+msgstr "Sei sicuro?"
 
 #: rocky/templates/oois/ooi_delete.html
 #, python-format
 msgid "Here you can delete the %(display_type)s."
-msgstr ""
+msgstr "Qui puoi eliminare il %(display_type)s."
 
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Key"
-msgstr ""
+msgstr "Chiave"
 
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/partials/ooi_detail_toolbar.html
 #, python-format
 msgid "Delete %(display_type)s"
-msgstr ""
+msgstr "Elimina %(display_type)s"
 
 #: rocky/templates/oois/ooi_delete.html
 msgid "Deletion not possible for types: KATFindingType and CVEFindingType"
-msgstr ""
+msgstr "Eliminazione non possibile per i tipi: KATFindingType e CVEFindingType"
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "using boefjes"
-msgstr ""
+msgstr "usando boefjes"
 
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/normalizers.html
 msgid "Boefje"
-msgstr ""
+msgstr "Boefje"
 
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
 msgid "Scan profile"
-msgstr ""
+msgstr "Profilo di scansione"
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "There are no boefjes enabled to scan an OOI of type"
 msgstr ""
+"Non ci sono boefjes abilitati a eseguire la scansione di un OOI di tipo"
 
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 msgid "See"
-msgstr ""
+msgstr "Vedi"
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "to find and enable boefjes that can scan within the current level."
 msgstr ""
+"per trovare e abilitare i boefjes che possono eseguire la scansione "
+"all'interno del livello attuale."
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "There are no boefjes available within the current clearance level of"
 msgstr ""
+"Non ci sono boefjes disponibili nel livello di autorizzazione corrente di"
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "Or if you have the authorization, upgrade the clearance level of"
 msgstr ""
+"Oppure, se hai l'autorizzazione, aggiorna il livello di autorizzazione di"
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 msgid "Add related object"
-msgstr ""
+msgstr "Aggiungi oggetto correlato"
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/oois/ooi_detail_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Object details"
-msgstr ""
+msgstr "Dettagli dell'oggetto"
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Object type"
-msgstr ""
+msgstr "Tipo di oggetto"
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Choose an object type to add"
-msgstr ""
+msgstr "Scegli un tipo di oggetto da aggiungere"
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
 msgid "Select an object type to add."
-msgstr ""
+msgstr "Seleziona un tipo di oggetto da aggiungere."
 
 #: rocky/templates/oois/ooi_detail_add_related_object.html
 #: rocky/templates/partials/elements/ooi_add_type_select_form.html
 #: rocky/templates/partials/ooi_list_toolbar.html rocky/views/ooi_add.py
 msgid "Add object"
-msgstr ""
+msgstr "Aggiungi oggetto"
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
 msgid "Overview of findings for "
-msgstr ""
+msgstr "Panoramica dei rilevamenti per "
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
 msgid "Score"
-msgstr ""
+msgstr "Punteggio"
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Finding details"
-msgstr ""
+msgstr "Dettagli del rilevamento"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "Overview of the number of findings and their severity found on"
-msgstr ""
+msgstr "Panoramica del numero di rilevamenti e della loro gravità trovati su"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid ""
@@ -3651,62 +4131,65 @@ msgid ""
 "table shows the number of unique findings found as well as the number of "
 "occurrences."
 msgstr ""
+"I rilevamenti possono verificarsi più volte. Per fornire una migliore "
+"comprensione, la seguente tabella mostra il numero di rilevamenti univoci "
+"trovati e il numero di occorrenze."
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "See finding details"
-msgstr ""
+msgstr "Vedi i dettagli del rilevamento"
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "Total findings:"
-msgstr ""
+msgstr "Rilevamenti totali:"
 
 #: rocky/templates/oois/ooi_detail_origins_declarations.html
 msgid "Declarations"
-msgstr ""
+msgstr "Dichiarazioni"
 
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 msgid "Inferred by"
-msgstr ""
+msgstr "Inferito da"
 
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 msgid "Bit"
-msgstr ""
+msgstr "Bit"
 
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Source"
-msgstr ""
+msgstr "Fonte"
 
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 msgid "Parameters"
-msgstr ""
+msgstr "Parametri"
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "Observed by"
-msgstr ""
+msgstr "Osservato da"
 
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 msgid "Task ID"
-msgstr ""
+msgstr "ID Attività"
 
 #: rocky/templates/oois/ooi_edit.html
 #, python-format
 msgid "Edit %(type)s: %(ooi_human_readable)s"
-msgstr ""
+msgstr "Modifica %(type)s: %(ooi_human_readable)s"
 
 #: rocky/templates/oois/ooi_edit.html
 msgid "Primary key fields cannot be edited."
-msgstr ""
+msgstr "I campi della chiave primaria non possono essere modificati."
 
 #: rocky/templates/oois/ooi_edit.html
 #, python-format
 msgid "Save %(display_type)s"
-msgstr ""
+msgstr "Salva %(display_type)s"
 
 #: rocky/templates/oois/ooi_findings.html
 msgid "Currently there are no findings for OOI"
-msgstr ""
+msgstr "Attualmente non ci sono rilevamenti per OOI"
 
 #: rocky/templates/oois/ooi_list.html
 #, python-format
@@ -3715,89 +4198,100 @@ msgid ""
 "strong>. Objects can be added manually or by running Boefjes. Click an "
 "object for additional information."
 msgstr ""
+"Una panoramica degli oggetti trovati per l'organizzazione <strong>%(organization_name)s</"
+"strong>. Gli oggetti possono essere aggiunti manualmente o tramite l'esecuzione di Boefjes. Clicca su "
+"un oggetto per ulteriori informazioni."
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
-msgstr ""
+msgstr "Attualmente filtrato su:"
 
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
-msgstr ""
+msgstr "Filtro"
 
 #: rocky/templates/oois/ooi_list.html
 #, python-format
 msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
+msgstr "Mostrando %(length)s di %(total)s oggetti"
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
-msgstr ""
+msgstr "Elimina oggetto(i)"
 
 #: rocky/templates/oois/ooi_mute_finding.html
 msgid "Mute finding"
-msgstr ""
+msgstr "Silenzia rilevamento"
 
 #: rocky/templates/oois/ooi_mute_finding.html
 msgid "Give a reason below why you want to mute this finding."
 msgstr ""
+"Fornisci di seguito una ragione per cui desideri silenziare questo "
+"rilevamento."
 
 #: rocky/templates/oois/ooi_mute_finding.html
 msgid "Mute"
-msgstr ""
+msgstr "Silenzia"
 
 #: rocky/templates/oois/ooi_page_tabs.html
 msgid "List of views for OOI"
-msgstr ""
+msgstr "Elenco delle visualizzazioni per OOI"
 
 #: rocky/templates/oois/ooi_page_tabs.html
 msgid "Overview"
-msgstr ""
+msgstr "Panoramica"
 
 #: rocky/templates/oois/ooi_past_due_warning.html
 msgid "This object is past due"
-msgstr ""
+msgstr "Questo oggetto è scaduto"
 
 #: rocky/templates/oois/ooi_past_due_warning.html
 msgid "This object is past due and has been deleted"
-msgstr ""
+msgstr "Questo oggetto è scaduto ed è stato eliminato"
 
 #: rocky/templates/oois/ooi_past_due_warning.html
 msgid ""
 "This object is past due. You are viewing the object state in a past state."
 msgstr ""
+"Questo oggetto è scaduto. Stai visualizzando lo stato dell'oggetto in uno "
+"stato passato."
 
 #: rocky/templates/oois/ooi_past_due_warning.html
 msgid ""
 "You will not be able to add Findings or other OOI's to past due objects."
 msgstr ""
+"Non sarai in grado di aggiungere Rilevamenti o altri OOI agli oggetti "
+"scaduti."
 
 #: rocky/templates/oois/ooi_past_due_warning.html
 #: rocky/templates/partials/hyperlink_ooi_id.html
 #, python-format
 msgid "Show details for %(name)s"
-msgstr ""
+msgstr "Mostra dettagli per %(name)s"
 
 #: rocky/templates/oois/ooi_past_due_warning.html
 msgid "View the current state"
-msgstr ""
+msgstr "Visualizza lo stato attuale"
 
 #: rocky/templates/oois/ooi_past_due_warning.html
 msgid ""
 "You will not be able to add Findings or other OOI's, this object has been "
 "deleted and is no longer available."
 msgstr ""
+"Non sarai in grado di aggiungere Rilevamenti o altri OOI, questo oggetto è "
+"stato eliminato e non è più disponibile."
 
 #: rocky/templates/oois/ooi_report.html
 #: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
-msgstr ""
+msgstr "Scarica PDF"
 
 #: rocky/templates/oois/ooi_report.html
 #, python-format
 msgid "Findings report for %(name)s"
-msgstr ""
+msgstr "Report dei rilevamenti per %(name)s"
 
 #: rocky/templates/oois/ooi_report.html
 #, python-format
@@ -3806,11 +4300,14 @@ msgid ""
 "finding for more detailed information about the issue, its origin, severity "
 "and possible solutions."
 msgstr ""
+"Questi sono i risultati di un'analisi OpenKAT effettuata il %(observed_at)s. "
+"Fai clic su una scoperta per ottenere informazioni più dettagliate "
+"sull'argomento, la sua origine, la gravità e possibili soluzioni."
 
 #: rocky/templates/oois/ooi_report_404.html
 #, python-format
 msgid "A report for %(name)s wasn't found."
-msgstr ""
+msgstr "Non è stato trovato un report per %(name)s."
 
 #: rocky/templates/oois/ooi_report_404.html
 #, python-format
@@ -3818,43 +4315,45 @@ msgid ""
 "Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
 "Try some other dates!"
 msgstr ""
+"Forse non è mai esistito, forse semplicemente non esisteva in data "
+"%(observed_at)s <br> Prova altre date!"
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "Summary for"
-msgstr ""
+msgstr "Sommario per"
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "Below you can see findings that were found for"
-msgstr ""
+msgstr "Di seguito puoi vedere i rilevamenti trovati per"
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "and direct  children of this"
-msgstr ""
+msgstr "e figli diretti di questo"
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "This"
-msgstr ""
+msgstr "Questo"
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "tree view"
-msgstr ""
+msgstr "visualizzazione ad albero"
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "of the"
-msgstr ""
+msgstr "di"
 
 #: rocky/templates/oois/ooi_summary.html
 msgid "shows the same objects."
-msgstr ""
+msgstr "mostra gli stessi oggetti."
 
 #: rocky/templates/oois/ooi_tree.html
 msgid "Object tree"
-msgstr ""
+msgstr "Albero degli oggetti"
 
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "indemnification warning"
-msgstr ""
+msgstr "avviso di indennizzo"
 
 #: rocky/templates/organizations/organization_crisis_room.html
 #, python-format
@@ -3868,84 +4367,94 @@ msgid ""
 "one.\n"
 "                        "
 msgstr ""
+"\n"
+"                            <strong>Avviso:</strong>\n"
+"                            L'indennizzo non è impostato per questa "
+"organizzazione.\n"
+"                            Vai alla <a "
+"href=\"%(organization_settings)s\">pagina delle impostazioni "
+"dell'organizzazione</a> per aggiungerne uno.\n"
+"                        "
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid ""
 "An overview of the top 10 most severe findings OpenKAT found. Check the "
 "detail section for additional severity information."
 msgstr ""
+"Una panoramica dei 10 rilevamenti più gravi che OpenKAT ha trovato. "
+"Controlla la sezione dettagli per ulteriori informazioni sulla gravità."
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Top 10 most severe Findings"
-msgstr ""
+msgstr "Top 10 dei rilevamenti più gravi"
 
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Finding type"
-msgstr ""
+msgstr "Tipo di rilevamento"
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "OOI type"
-msgstr ""
+msgstr "Tipo OOI"
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Source OOI"
-msgstr ""
+msgstr "OOI di origine"
 
 #: rocky/templates/organizations/organization_edit.html
 msgid "Edit organization"
-msgstr ""
+msgstr "Modifica organizzazione"
 
 #: rocky/templates/organizations/organization_edit.html
 msgid "Save organization"
-msgstr ""
+msgstr "Salva organizzazione"
 
 #: rocky/templates/organizations/organization_list.html
 msgid "Add new organization"
-msgstr ""
+msgstr "Aggiungi nuova organizzazione"
 
 #: rocky/templates/organizations/organization_list.html
 msgid "Organization overview:"
-msgstr ""
+msgstr "Panoramica dell'organizzazione:"
 
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Code"
-msgstr ""
+msgstr "Codice"
 
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Tags"
-msgstr ""
+msgstr "Tag"
 
 #: rocky/templates/organizations/organization_member_add.html
 msgid " member account setup"
-msgstr ""
+msgstr " configurazione dell'account del membro"
 
 #: rocky/templates/organizations/organization_member_add.html
 msgid "Member details"
-msgstr ""
+msgstr "Dettagli del membro"
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
 msgid "Member account type setup"
-msgstr ""
+msgstr "Configurazione del tipo di account del membro"
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
 msgid "Choose an account type for this new member."
-msgstr ""
+msgstr "Scegli un tipo di account per questo nuovo membro."
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
 msgid "Account type details"
-msgstr ""
+msgstr "Dettagli del tipo di account"
 
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/views/organization_member_edit.py
 msgid "Edit member"
-msgstr ""
+msgstr "Modifica membro"
 
 #: rocky/templates/organizations/organization_member_edit.html
 msgid "Save member"
-msgstr ""
+msgstr "Salva membro"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
@@ -3954,49 +4463,52 @@ msgid ""
 "                    An overview of \"%(organization_name)s\" its members.\n"
 "                "
 msgstr ""
+"\n"
+"                    Una panoramica dei membri di \"%(organization_name)s\".\n"
+"                "
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Add member(s)"
-msgstr ""
+msgstr "Aggiungi membro(i)"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Manually"
-msgstr ""
+msgstr "Manualmente"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Upload a CSV"
-msgstr ""
+msgstr "Carica un CSV"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
-msgstr ""
+msgstr "Panoramica dei membri:"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "E-mail"
-msgstr ""
+msgstr "E-mail"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Role"
-msgstr ""
+msgstr "Ruolo"
 
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Status"
-msgstr ""
+msgstr "Stato"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Assigned clearance level"
-msgstr ""
+msgstr "Livello di autorizzazione assegnato"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Super user"
-msgstr ""
+msgstr "Super utente"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Active"
-msgstr ""
+msgstr "Attivo"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "New"
@@ -4004,24 +4516,24 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
-msgstr ""
+msgstr "Carica un file CSV con i membri per l'organizzazione"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Download the template"
-msgstr ""
+msgstr "Scarica il modello"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "or create a csv file with the following criteria"
-msgstr ""
+msgstr "oppure crea un file CSV con i seguenti criteri"
 
 #: rocky/templates/organizations/organization_member_upload.html
 #: rocky/templates/upload_csv.html
 msgid "These are the criteria for CSV upload:"
-msgstr ""
+msgstr "Questi sono i criteri per il caricamento del CSV:"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload"
-msgstr ""
+msgstr "Carica"
 
 #: rocky/templates/organizations/organization_settings.html
 #, python-format
@@ -4031,6 +4543,10 @@ msgid ""
 "information and its settings.\n"
 "          "
 msgstr ""
+"\n"
+"            Una panoramica di \"%(organization_name)s\". Questo mostra "
+"informazioni generali e le relative impostazioni.\n"
+"          "
 
 #: rocky/templates/organizations/organization_settings.html
 msgid ""
@@ -4039,37 +4555,37 @@ msgid ""
 "              Indemnification is not set for this organization.\n"
 "            "
 msgstr ""
+"\n"
+"              <strong>Avviso:</strong>\n"
+"              L'indennizzo non è impostato per questa organizzazione.\n"
+"            "
 
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/indemnification_add.py
 msgid "Add indemnification"
-msgstr ""
+msgstr "Aggiungi indennizzo"
 
 #: rocky/templates/organizations/organization_settings.html
 msgid "Rerun all bits"
-msgstr ""
+msgstr "Riavvia tutti i bit"
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 msgid "Observed at"
-msgstr ""
+msgstr "Osservato il"
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 #: rocky/templates/partials/elements/ooi_report_settings.html
 msgid "Show settings"
-msgstr ""
+msgstr "Mostra impostazioni"
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 #: rocky/templates/partials/elements/ooi_report_settings.html
 msgid "Hide settings"
-msgstr ""
+msgstr "Nascondi impostazioni"
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Filter by OOI types"
-msgstr ""
-
-#: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Toggle all"
-msgstr ""
+msgid "Toggle all OOI types"
+msgstr "Filtra per tipi di OOI"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Children"
@@ -4078,116 +4594,119 @@ msgstr ""
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
 msgid "Show details for %(object_id)s, with %(child_count)s children."
-msgstr ""
+msgstr "Mostra dettagli per %(object_id)s, con %(child_count)s figli."
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
 msgid ""
 "Show tree for %(object_id)s with only children of type %(object_ooi_type)s"
 msgstr ""
+"Mostra l'albero per %(object_id)s con solo figli di tipo %(object_ooi_type)s"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
 msgid "Unfold %(object_id)s with %(child_count)s children"
-msgstr ""
+msgstr "Espandi %(object_id)s con %(child_count)s figli"
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
 msgid "go to:"
-msgstr ""
+msgstr "vai a:"
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
 msgid "Go to detailpage"
-msgstr ""
+msgstr "Vai alla pagina dei dettagli"
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
 msgid "detail"
-msgstr ""
+msgstr "dettaglio"
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
 msgid "Go to tree view"
-msgstr ""
+msgstr "Vai alla vista ad albero"
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
 msgid "tree"
-msgstr ""
+msgstr "albero"
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
 msgid "Go to graph view"
-msgstr ""
+msgstr "Vai alla vista grafico"
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
 msgid "graph"
-msgstr ""
+msgstr "grafico"
 
 #: rocky/templates/partials/explanations.html
 msgid "Clearance level inheritance"
-msgstr ""
+msgstr "Eredità del livello di autorizzazione"
 
 #: rocky/templates/partials/explanations.html
 msgid "Origin"
-msgstr ""
+msgstr "Origine"
 
 #: rocky/templates/partials/explanations.html
 msgid "Show clearance level inheritance"
-msgstr ""
+msgstr "Mostra l'eredità del livello di autorizzazione"
 
 #: rocky/templates/partials/finding_occurrence_definition_list.html
 msgid "Reproduction"
-msgstr ""
+msgstr "Riproduzione"
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html
+#, fuzzy
+#| msgid "Please enable plugin to start scanning"
 msgid "Please enable plugin to start scanning."
-msgstr ""
+msgstr "Abilita il plugin per avviare la scansione"
 
 #: rocky/templates/partials/form/field_input.html
 #: rocky/templates/partials/form/field_input_checkbox.html
 #: rocky/templates/partials/form/field_input_radio.html
 msgid "This field is required"
-msgstr ""
+msgstr "Questo campo è obbligatorio"
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Not set"
-msgstr ""
+msgstr "Non impostato"
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Forgot email"
-msgstr ""
+msgstr "Password dimenticata"
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Forgot password"
-msgstr ""
+msgstr "Hai dimenticato la password"
 
 #: rocky/templates/partials/form/field_input_errors.html
 #: rocky/templates/partials/form/form_errors.html
 #: rocky/templates/partials/notifications_block.html
 msgid "error"
-msgstr ""
+msgstr "errore"
 
 #: rocky/templates/partials/form/field_input_errors.html
 #: rocky/templates/partials/form/form_errors.html
 #: rocky/templates/partials/notifications_block.html
 msgid "Error"
-msgstr ""
+msgstr "Errore"
 
 #: rocky/templates/partials/form/field_input_help_text.html
 msgid "Open explanation"
-msgstr ""
+msgstr "Apri spiegazione"
 
 #: rocky/templates/partials/form/field_input_help_text.html
 msgid "Close explanation"
-msgstr ""
+msgstr "Chiudi spiegazione"
 
 #: rocky/templates/partials/form/field_input_help_text.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/two_factor/core/login.html
 msgid "explanation"
-msgstr ""
+msgstr "spiegazione"
 
 #: rocky/templates/partials/form/field_input_help_text.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/two_factor/core/login.html
 msgid "Explanation"
-msgstr ""
+msgstr "Spiegazione"
 
 #: rocky/templates/partials/form/indemnification_add_form.html
 msgid "Here, an indemnification can be given on behalf of your organization"
@@ -4202,7 +4721,7 @@ msgstr ""
 
 #: rocky/templates/partials/form/indemnification_add_form.html
 msgid "Register an indemnification"
-msgstr ""
+msgstr "Registra una indennità"
 
 #: rocky/templates/partials/hyperlink_ooi_type.html
 #, python-format
@@ -4210,8 +4729,10 @@ msgid "Only show objects of type %(type)s"
 msgstr ""
 
 #: rocky/templates/partials/language-switcher.html
+#, fuzzy
+#| msgid "Select organization"
 msgid "Select your language"
-msgstr ""
+msgstr "Seleziona organizzazione"
 
 #: rocky/templates/partials/language-switcher.html
 #, python-format
@@ -4221,191 +4742,198 @@ msgstr ""
 
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
-msgstr ""
+msgstr "Nascondi opzioni di filtro"
 
 #: rocky/templates/partials/list_filters.html
 msgid "Show filter options"
-msgstr ""
+msgstr "Mostra opzioni di filtro"
 
 #: rocky/templates/partials/list_paginator.html
 msgid "List pagination"
-msgstr ""
+msgstr "Paginazione della lista"
 
 #: rocky/templates/partials/list_paginator.html
 msgid "Previous Page"
-msgstr ""
+msgstr "Pagina precedente"
 
 #: rocky/templates/partials/list_paginator.html
 msgid "Previous"
-msgstr ""
+msgstr "Precedente"
 
 #: rocky/templates/partials/list_paginator.html
 msgid "Five Pages Back"
-msgstr ""
+msgstr "Cinque pagine indietro"
 
 #: rocky/templates/partials/list_paginator.html
 #: rocky/templates/partials/pagination.html
 msgid "Page"
-msgstr ""
+msgstr "Pagina"
 
 #: rocky/templates/partials/list_paginator.html
 msgid "Five Pages Forward"
-msgstr ""
+msgstr "Cinque pagine avanti"
 
 #: rocky/templates/partials/list_paginator.html
 msgid "Next Page"
-msgstr ""
+msgstr "Pagina successiva"
 
 #: rocky/templates/partials/list_paginator.html
 msgid "Next"
-msgstr ""
+msgstr "Successivo"
 
 #: rocky/templates/partials/notifications_block.html
 msgid "confirmation"
-msgstr ""
+msgstr "conferma"
 
 #: rocky/templates/partials/notifications_block.html
 msgid "Confirmation"
-msgstr ""
+msgstr "Conferma"
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Related objects"
-msgstr ""
+msgstr "Oggetti correlati"
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "No related objects added to "
-msgstr ""
+msgstr "Nessun oggetto correlato aggiunto a"
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Use the button below to add a related object. "
-msgstr ""
+msgstr "Usa il pulsante sottostante per aggiungere un oggetto correlato. "
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate report"
-msgstr ""
+msgstr "Genera rapporto"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute Finding"
-msgstr ""
+msgstr "Silenzia Rilevazione"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 #, python-format
 msgid "Edit %(display_type)s"
-msgstr ""
+msgstr "Modifica %(display_type)s"
 
 #: rocky/templates/partials/ooi_head.html
 msgid "An overview of"
-msgstr ""
+msgstr "Una panoramica di"
 
 #: rocky/templates/partials/ooi_head.html
 msgid "object type"
-msgstr ""
+msgstr "tipo di oggetto"
 
 #: rocky/templates/partials/ooi_head.html
 msgid ""
 "This shows general information and its related objects. It also gives the "
 "possibility to add additional related objects, or to scan for them."
 msgstr ""
+"Questo mostra informazioni generali e oggetti correlati. Consente anche di "
+"aggiungere oggetti correlati aggiuntivi o di effettuare una scansione per "
+"trovarli."
 
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Scan for objects"
-msgstr ""
+msgstr "Scansione degli oggetti"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_csv.html rocky/views/upload_csv.py
 msgid "Upload CSV"
-msgstr ""
+msgstr "Carica CSV"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Export"
-msgstr ""
+msgstr "Esporta"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Download as JSON"
-msgstr ""
+msgstr "Scarica come JSON"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Download as CSV"
-msgstr ""
+msgstr "Scarica come CSV"
 
 #: rocky/templates/partials/ooi_report_findings_block.html
 #, python-format
 msgid "%(total)s findings on %(name)s"
-msgstr ""
+msgstr "%(total)s rilevazioni su %(name)s"
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #, python-format
 msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
-msgstr ""
+msgstr "Risultati per %(type)s %(name)s il %(observed_at)s:"
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Risk level"
-msgstr ""
+msgstr "Livello di rischio"
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Open finding details"
-msgstr ""
+msgstr "Apri dettagli della rilevazione"
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 #, python-format
 msgid "Details of %(object_id)s"
-msgstr ""
+msgstr "Dettagli di %(object_id)s"
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid ""
 "The severity of this findingtype has not (yet) been determined by the data "
 "source. This situation requires manual investigation of the severity."
 msgstr ""
+"La gravità di questo tipo di scoperta non è ancora stata determinata dalla "
+"fonte dei dati. Questa situazione richiede un'indagine manuale sulla gravità."
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total occurrences"
-msgstr ""
+msgstr "Numero totale di occorrenze"
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Occurrence"
-msgstr ""
+msgstr "Occorrenza"
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Unique"
-msgstr ""
+msgstr "Unico"
 
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
 msgid "Tree - dense view"
-msgstr ""
+msgstr "Albero - vista densa"
 
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
 msgid "Tree - table view"
-msgstr ""
+msgstr "Albero - vista tabella"
 
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Shown status types"
-msgstr ""
+msgstr "Tipi di stato mostrati"
 
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Blocked status"
-msgstr ""
+msgstr "Stato bloccato"
 
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Update List"
-msgstr ""
+msgstr "Aggiorna lista"
 
 #: rocky/templates/partials/organization_properties_table.html
 msgid "Organization name"
-msgstr ""
+msgstr "Nome organizzazione"
 
 #: rocky/templates/partials/organization_properties_table.html
 msgid "Organization code"
-msgstr ""
+msgstr "Codice organizzazione"
 
 #: rocky/templates/partials/organizations_menu_dropdown.html
 msgid "Select organization"
-msgstr ""
+msgstr "Seleziona organizzazione"
 
 #: rocky/templates/partials/organizations_menu_dropdown.html
+#, fuzzy
+#| msgid "My organizations"
 msgid "All organizations"
-msgstr ""
+msgstr "Le mie organizzazioni"
 
 #: rocky/templates/partials/page-meta.html
 msgid "Logged in as"
@@ -4413,103 +4941,105 @@ msgstr ""
 
 #: rocky/templates/partials/pagination.html
 msgid "first"
-msgstr ""
+msgstr "primo"
 
 #: rocky/templates/partials/pagination.html
+#, fuzzy
+#| msgid "Previous"
 msgid "previous"
-msgstr ""
+msgstr "Precedente"
 
 #: rocky/templates/partials/pagination.html
 msgid "next"
-msgstr ""
+msgstr "successivo"
 
 #: rocky/templates/partials/pagination.html
 msgid "last"
-msgstr ""
+msgstr "ultimo"
 
 #: rocky/templates/partials/scan_history.html
 msgid "Scans"
-msgstr ""
+msgstr "Scansioni"
 
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Hide filters"
-msgstr ""
+msgstr "Nascondi filtri"
 
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Show filters"
-msgstr ""
+msgstr "Mostra filtri"
 
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "From"
-msgstr ""
+msgstr "Da"
 
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "To"
-msgstr ""
+msgstr "A"
 
 #: rocky/templates/partials/scan_history.html
 msgid "Select status"
-msgstr ""
+msgstr "Seleziona stato"
 
 #: rocky/templates/partials/scan_history.html
 msgid "Success"
-msgstr ""
+msgstr "Successo"
 
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Failure"
-msgstr ""
+msgstr "Fallimento"
 
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Search"
-msgstr ""
+msgstr "Ricerca"
 
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Search by object name"
-msgstr ""
+msgstr "Cerca per nome oggetto"
 
 #: rocky/templates/partials/scan_history.html
 msgid "No scans found for this object."
-msgstr ""
+msgstr "Nessuna scansione trovata per questo oggetto."
 
 #: rocky/templates/partials/scan_history.html
 msgid "Object"
-msgstr ""
+msgstr "Oggetto"
 
 #: rocky/templates/partials/scan_history.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Created date"
-msgstr ""
+msgstr "Data di creazione"
 
 #: rocky/templates/partials/secondary-menu.html
 msgid "User navigation"
-msgstr ""
+msgstr "Navigazione utente"
 
 #: rocky/templates/partials/secondary-menu.html
 msgid "Close user navigation"
-msgstr ""
+msgstr "Chiudi navigazione utente"
 
 #: rocky/templates/partials/secondary-menu.html
 msgid "My organizations"
-msgstr ""
+msgstr "Le mie organizzazioni"
 
 #: rocky/templates/partials/secondary-menu.html
 msgid "Profile"
-msgstr ""
+msgstr "Profilo"
 
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
-msgstr ""
+msgstr "Vai al contenuto"
 
 #: rocky/templates/scan.html
 msgid "Boefjes overview:"
-msgstr ""
+msgstr "Panoramica dei boefjes:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
@@ -4532,7 +5062,7 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Set clearance level to inherit"
-msgstr ""
+msgstr "Imposta il livello di autorizzazione su eredità"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
@@ -4548,15 +5078,15 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level for:"
-msgstr ""
+msgstr "Imposta il livello di autorizzazione per:"
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Setting the scan level from \\"
-msgstr ""
+msgstr "Impostare il livello di scansione da \\"
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "You are about to set the clearance level from \\"
-msgstr ""
+msgstr "Stai per impostare il livello di autorizzazione da \\"
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Yes, set to inherit"
@@ -4566,104 +5096,106 @@ msgstr ""
 msgid ""
 "An overview of the boefje task, the input OOI and the RAW data it generated."
 msgstr ""
+"Una panoramica del compito del boefje, l'OOI di input e i dati RAW che ha "
+"generato."
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Download meta and raw data"
-msgstr ""
+msgstr "Scarica dati meta e raw"
 
 #: rocky/templates/tasks/boefje_task_detail.html
 msgid "Download meta data"
-msgstr ""
+msgstr "Scarica dati meta"
 
 #: rocky/templates/tasks/boefje_task_detail.html
 msgid "Input object"
-msgstr ""
+msgstr "Oggetto di input"
 
 #: rocky/templates/tasks/boefjes.html
 msgid "There are no tasks for boefjes"
-msgstr ""
+msgstr "Non ci sono compiti per boefjes"
 
 #: rocky/templates/tasks/boefjes.html
 msgid "List of tasks for boefjes"
-msgstr ""
+msgstr "Elenco dei compiti per boefjes"
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "List of tasks for "
-msgstr ""
+msgstr "Elenco dei compiti per"
 
 #: rocky/templates/tasks/boefjes.html
 msgid "Input Object"
-msgstr ""
+msgstr "Oggetto di Input"
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "No input OOI"
-msgstr ""
+msgstr "Nessun OOI di input"
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Reschedule"
-msgstr ""
+msgstr "Ripianifica"
 
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Download task data"
-msgstr ""
+msgstr "Scarica dati del compito"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
-msgstr ""
+msgstr "Non ci sono compiti per i normalizzatori"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "List of tasks for normalizers"
-msgstr ""
+msgstr "Elenco dei compiti per i normalizzatori"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Normalizer"
-msgstr ""
+msgstr "Normalizer"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Boefje input OOI"
-msgstr ""
+msgstr "OOI di input Boefje"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Yielded objects"
-msgstr ""
+msgstr "Oggetti prodotti"
 
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
-msgstr ""
+msgstr "Elenco dei compiti"
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "all"
-msgstr ""
+msgstr "tutto"
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Pending"
-msgstr ""
+msgstr "In attesa"
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Queued"
-msgstr ""
+msgstr "In coda"
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Dispatched"
-msgstr ""
+msgstr "Spedito"
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Completed"
-msgstr ""
+msgstr "Completato"
 
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Log in"
-msgstr ""
+msgstr "Accedi"
 
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Authenticate"
-msgstr ""
+msgstr "Autentica"
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Backup Tokens"
-msgstr ""
+msgstr "Token di Backup"
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid ""
@@ -4672,41 +5204,48 @@ msgid ""
 "you've used up all your backup tokens, you can generate a new set of backup "
 "tokens. Only the backup tokens shown below will be valid."
 msgstr ""
+"I token di backup possono essere utilizzati quando i tuoi numeri di telefono "
+"primari e di backup non sono disponibili. I token di backup di seguito "
+"possono essere utilizzati per la verifica dell'accesso. Se hai esaurito "
+"tutti i tuoi token di backup, puoi generare un nuovo set di token di backup. "
+"Solo i token di backup mostrati di seguito saranno validi."
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid "Print these tokens and keep them somewhere safe."
-msgstr ""
+msgstr "Stampa questi token e conservali in un luogo sicuro."
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid "You don't have any backup codes yet."
-msgstr ""
+msgstr "Non hai ancora codici di backup."
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 #: rocky/templates/two_factor/core/setup_complete.html
 msgid "Back to Account Security"
-msgstr ""
+msgstr "Torna alla sicurezza dell'account"
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid "Generate Tokens"
-msgstr ""
+msgstr "Genera Token"
 
 #: rocky/templates/two_factor/core/login.html
 msgid "You are logged in."
-msgstr ""
+msgstr "Hai effettuato l'accesso."
 
 #: rocky/templates/two_factor/core/login.html
 msgid "Two factor authentication is enabled for your account."
-msgstr ""
+msgstr "L'autenticazione a due fattori è abilitata per il tuo account."
 
 #: rocky/templates/two_factor/core/login.html
 msgid ""
 "Two factor authentication is not enabled for your account. Enable it to "
 "continue."
 msgstr ""
+"L'autenticazione a due fattori non è abilitata per il tuo account. Abilitala "
+"per continuare."
 
 #: rocky/templates/two_factor/core/login.html
 msgid "Setup two factor authentication"
-msgstr ""
+msgstr "Configura l'autenticazione a due fattori"
 
 #: rocky/templates/two_factor/core/login.html
 msgid "Credentials"
@@ -4718,18 +5257,24 @@ msgid ""
 "been generated for you to print and keep safe. Please enter one of these "
 "backup tokens to login to your account."
 msgstr ""
+"Utilizza questo modulo per inserire i token di backup per l'accesso. Questi "
+"token sono stati generati per te per essere stampati e conservati in "
+"sicurezza. Inserisci uno di questi token di backup per accedere al tuo "
+"account."
 
 #: rocky/templates/two_factor/core/login.html
 msgid "As a last resort, you can use a backup token:"
-msgstr ""
+msgstr "Come ultima risorsa, puoi utilizzare un token di backup:"
 
 #: rocky/templates/two_factor/core/login.html
 msgid "Use Backup Token"
-msgstr ""
+msgstr "Utilizza il Token di Backup"
 
 #: rocky/templates/two_factor/core/otp_required.html
+#, fuzzy
+#| msgid "Permission"
 msgid "Permission Denied"
-msgstr ""
+msgstr "Autorizzazione"
 
 #: rocky/templates/two_factor/core/otp_required.html
 msgid ""
@@ -4744,29 +5289,36 @@ msgid ""
 "Two-factor authentication is not enabled for your account. Enable two-factor "
 "authentication for enhanced account security."
 msgstr ""
+"L'autenticazione a due fattori non è abilitata per il tuo account. Abilita "
+"l'autenticazione a due fattori per una maggiore sicurezza dell'account."
 
 #: rocky/templates/two_factor/core/otp_required.html
 #: rocky/templates/two_factor/core/setup.html
 #: rocky/templates/two_factor/core/setup_complete.html
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Enable Two-Factor Authentication"
-msgstr ""
+msgstr "Abilita l'autenticazione a due fattori"
 
 #: rocky/templates/two_factor/core/phone_register.html
 msgid "Add Backup Phone"
-msgstr ""
+msgstr "Aggiungi telefono di backup"
 
 #: rocky/templates/two_factor/core/phone_register.html
 msgid ""
 "You'll be adding a backup phone number to your account. This number will be "
 "used if your primary method of registration is not available."
 msgstr ""
+"Stai aggiungendo un numero di telefono di backup al tuo account. Questo "
+"numero verrà utilizzato se il tuo metodo principale di registrazione non è "
+"disponibile."
 
 #: rocky/templates/two_factor/core/phone_register.html
 msgid ""
 "We've sent a token to your phone number. Please enter the token you've "
 "received."
 msgstr ""
+"Abbiamo inviato un token al tuo numero di telefono. Inserisci il token che "
+"hai ricevuto."
 
 #: rocky/templates/two_factor/core/setup.html
 msgid ""
@@ -4774,14 +5326,18 @@ msgid ""
 "code below or use the setup key. For example, use GoogleAuthenticator. Then, "
 "enter the token generated by the app."
 msgstr ""
+"Per iniziare a utilizzare un generatore di token, utilizza il tuo smartphone "
+"per scansionare il codice QR sottostante o utilizza la chiave di "
+"configurazione. Ad esempio, usa Google Authenticator. Successivamente, "
+"inserisci il token generato dall'app."
 
 #: rocky/templates/two_factor/core/setup.html
 msgid "QR code"
-msgstr ""
+msgstr "Codice QR"
 
 #: rocky/templates/two_factor/core/setup.html
 msgid "Setup key"
-msgstr ""
+msgstr "Chiave di configurazione"
 
 #: rocky/templates/two_factor/core/setup.html
 msgid ""
@@ -4790,172 +5346,191 @@ msgid ""
 "above or you can insert this key using the secret key option of the "
 "authenticator app."
 msgstr ""
+"La chiave segreta è una rappresentazione di 32 caratteri del codice QR. Ci "
+"sono 2 opzioni per configurare l'autenticazione a due fattori. Puoi "
+"scansionare il codice QR sopra o puoi inserire questa chiave utilizzando "
+"l'opzione chiave segreta dell'applicazione autenticatore."
 
 #: rocky/templates/two_factor/core/setup_complete.html
 msgid "Congratulations, you've successfully enabled two-factor authentication."
 msgstr ""
+"Congratulazioni, hai abilitato con successo l'autenticazione a due fattori."
 
 #: rocky/templates/two_factor/core/setup_complete.html
 msgid "Start using OpenKAT"
-msgstr ""
+msgstr "Inizia a utilizzare OpenKAT"
 
 #: rocky/templates/two_factor/core/setup_complete.html
 msgid ""
 "However, it might happen that you don't have access to your primary token "
 "device. To enable account recovery, add a phone number."
 msgstr ""
+"Tuttavia, potrebbe capitare che tu non abbia accesso al tuo dispositivo di "
+"token primario. Per abilitare il recupero dell'account, aggiungi un numero "
+"di telefono."
 
 #: rocky/templates/two_factor/core/setup_complete.html
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Add Phone Number"
-msgstr ""
+msgstr "Aggiungi numero di telefono"
 
 #: rocky/templates/two_factor/profile/disable.html
 msgid "Disable Two-factor Authentication"
-msgstr ""
+msgstr "Disabilita l'autenticazione a due fattori"
 
 #: rocky/templates/two_factor/profile/disable.html
 msgid ""
 "You are about to disable two-factor authentication. This weakens your "
 "account security, are you sure?"
 msgstr ""
+"Stai per disabilitare l'autenticazione a due fattori. Ciò indebolisce la "
+"sicurezza del tuo account, sei sicuro?"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Account Security"
-msgstr ""
+msgstr "Sicurezza dell'account"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Tokens will be generated by your token generator."
-msgstr ""
+msgstr "I token saranno generati dal tuo generatore di token."
 
 #: rocky/templates/two_factor/profile/profile.html
 #, python-format
 msgid "Primary method: %(primary)s"
-msgstr ""
+msgstr "Metodo principale: %(primary)s"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Tokens will be generated by your YubiKey."
-msgstr ""
+msgstr "I token saranno generati dal tuo YubiKey."
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Backup Phone Numbers"
-msgstr ""
+msgstr "Numeri di telefono di backup"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid ""
 "If your primary method is not available, we are able to send backup tokens "
 "to the phone numbers listed below."
 msgstr ""
+"Se il tuo metodo principale non è disponibile, siamo in grado di inviare "
+"token di backup ai numeri di telefono elencati di seguito."
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Unregister"
-msgstr ""
+msgstr "Annulla registrazione"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid ""
 "If you don't have any device with you, you can access your account using "
 "backup tokens."
 msgstr ""
+"Se non hai nessun dispositivo con te, puoi accedere al tuo account "
+"utilizzando i token di backup."
 
 #: rocky/templates/two_factor/profile/profile.html
 #, python-format
 msgid "You have only one backup token remaining."
 msgid_plural "You have %(counter)s backup tokens remaining."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ti rimane solo un token di backup."
+msgstr[1] "Ti rimangono %(counter)s token di backup."
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Show Codes"
-msgstr ""
+msgstr "Mostra codici"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Disable Two-Factor Authentication"
-msgstr ""
+msgstr "Disabilita l'autenticazione a due fattori"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid ""
 "However we strongly discourage you to do so, you can also disable two-factor "
 "authentication for your account."
 msgstr ""
+"Tuttavia, ti sconsigliamo vivamente di farlo, puoi anche disabilitare "
+"L'autenticazione a due fattori per il tuo account."
 
 #: rocky/templates/two_factor/twilio/sms_message.html
 #, python-format
 msgid "Your OTP token is %(token)s"
-msgstr ""
+msgstr "Il tuo token OTP è %(token)s"
 
 #: rocky/templates/upload_csv.html
 msgid "Automate the creation of multiple objects by uploading a CSV file."
-msgstr ""
+msgstr "Automatizza la creazione di oggetti multipli caricando un file CSV."
 
 #: rocky/templates/upload_raw.html
 msgid "Automate the creation of multiple objects by uploading a raw file."
-msgstr ""
+msgstr "Automatizza la creazione di oggetti multipli caricando un file raw."
 
 #: rocky/templates/upload_raw.html rocky/views/upload_raw.py
 msgid "Upload raw"
-msgstr ""
+msgstr "Carica raw"
 
 #: rocky/views/finding_add.py
 msgid "Add Finding"
-msgstr ""
+msgstr "Aggiungi Rilevamento"
 
 #: rocky/views/health.py
 msgid "Could not connect to Bytes. Service is possibly down"
-msgstr ""
+msgstr "Impossibile connettersi a Bytes. Il servizio potrebbe essere giù"
 
 #: rocky/views/health.py
 msgid "Could not connect to Octopoes. Service is possibly down"
-msgstr ""
+msgstr "Impossibile connettersi a Octopoes. Il servizio potrebbe essere giù"
 
 #: rocky/views/health.py
 msgid "Could not connect to Scheduler. Service is possibly down"
-msgstr ""
+msgstr "Impossibile connettersi a Scheduler. Il servizio potrebbe essere giù"
 
 #: rocky/views/health.py
 msgid "Rocky will not function properly. Not all services are healthy."
 msgstr ""
+"Rocky non funzionerà correttamente. Non tutti i servizi sono in salute."
 
 #: rocky/views/health.py
 msgid "Beautified"
-msgstr ""
+msgstr "Migliorato"
 
 #: rocky/views/indemnification_add.py
 msgid "Indemnification successfully set."
-msgstr ""
+msgstr "Indennizzo impostato con successo."
 
 #: rocky/views/mixins.py
 msgid ""
 "Can not parse observed_at parameter, falling back to showing current object"
 msgstr ""
+"Impossibile analizzare il parametro observed_at, tornando all'oggetto "
+"corrente"
 
 #: rocky/views/ooi_add.py
 msgid "Type select"
-msgstr ""
+msgstr "Seleziona il tipo"
 
 #: rocky/views/ooi_add.py
 #, python-format
 msgid "Add %(ooi_type)s"
-msgstr ""
+msgstr "Aggiungi %(ooi_type)s"
 
 #: rocky/views/ooi_detail.py
 msgid "Only Question OOIs can be answered."
-msgstr ""
+msgstr "Solo gli OOI di tipo Domanda possono essere risposti."
 
 #: rocky/views/ooi_detail_related_object.py
 msgid " (as "
-msgstr ""
+msgstr " (come "
 
 #: rocky/views/ooi_findings.py
 msgid "Object findings"
-msgstr ""
+msgstr "Risultati dell'oggetto"
 
 #: rocky/views/ooi_list.py
 msgid "No OOIs selected."
-msgstr ""
+msgstr "Nessun OOI selezionato."
 
 #: rocky/views/ooi_list.py
 msgid "Unknown action."
-msgstr ""
+msgstr "Azione sconosciuta."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -4963,6 +5538,8 @@ msgid ""
 "Could not raise clearance levels to L%s. Indemnification not present at "
 "organization %s."
 msgstr ""
+"Impossibile alzare i livelli di autorizzazione a L%s. L'indennizzo non è "
+"presente nell'organizzazione %s."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -4970,6 +5547,9 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"Impossibile alzare il livello di autorizzazione a L%s. Ti è stata concessa "
+"una autorizzazione di L%s. Contatta il tuo amministratore per ricevere "
+"un'autorizzazione superiore."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -4977,42 +5557,54 @@ msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of L%s. Please accept the clearance level below to proceed."
 msgstr ""
+"Impossibile alzare il livello di autorizzazione a L%s. Hai riconosciuto un "
+"livello di autorizzazione di L%s. Per favore, accetta il livello di "
+"autorizzazione inferiore per proseguire."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
 msgstr ""
+"Si è verificato un errore durante il salvataggio dei livelli di "
+"autorizzazione."
 
 #: rocky/views/ooi_list.py
 msgid "One of the OOI's doesn't exist"
-msgstr ""
+msgstr "Uno degli OOI non esiste"
 
 #: rocky/views/ooi_list.py
 #, python-format
 msgid "Successfully set scan profile to %s for %d oois."
-msgstr ""
+msgstr "Impostato con successo il profilo di scansione su %s per %d OOI."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while setting clearance levels to inherit."
 msgstr ""
+"Si è verificato un errore durante l'impostazione dei livelli di "
+"autorizzazione su eredità."
 
 #: rocky/views/ooi_list.py
 msgid ""
 "An error occurred while setting clearance levels to inherit: one of the OOIs "
 "doesn't exist."
 msgstr ""
+"Si è verificato un errore durante l'impostazione dei livelli di "
+"autorizzazione su eredità: uno degli OOIs non esiste."
 
 #: rocky/views/ooi_list.py
 #, python-format
 msgid "Successfully set %d ooi(s) clearance level to inherit."
 msgstr ""
+"Impostato con successo il livello di autorizzazione ereditato per %d OOI."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while deleting oois."
-msgstr ""
+msgstr "Si è verificato un errore durante l'eliminazione degli OOI."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while deleting oois: one of the OOIs doesn't exist."
 msgstr ""
+"Si è verificato un errore durante l'eliminazione degli OOI: uno degli OOI "
+"non esiste."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -5020,115 +5612,134 @@ msgid ""
 "Successfully deleted %d ooi(s). Note: Bits can recreate objects "
 "automatically."
 msgstr ""
+"Eliminati con successo %d ooi. Nota: Bits può ricreare automaticamente gli "
+"oggetti."
 
 #: rocky/views/ooi_mute.py
 msgid "Please select at least one finding."
-msgstr ""
+msgstr "Seleziona almeno un risultato."
 
 #: rocky/views/ooi_mute.py
 msgid "Finding(s) successfully muted."
-msgstr ""
+msgstr "Risultato/i mutato/i con successo."
 
 #: rocky/views/ooi_report.py
 msgid "You can't generate a report for an OOI on a date in the future."
-msgstr ""
+msgstr "Non è possibile generare un rapporto per un OOI in una data futura."
 
 #: rocky/views/ooi_report.py
 msgid "Findings report"
-msgstr ""
+msgstr "Rapporto dei risultati"
 
 #: rocky/views/ooi_report.py
 msgid "Generating report failed. See Keiko logs for more information."
 msgstr ""
+"Generazione del rapporto fallita. Consulta i log di Keiko per ulteriori "
+"informazioni."
 
 #: rocky/views/ooi_report.py
 msgid "Timeout reached generating report. See Keiko logs for more information."
 msgstr ""
+"Timeout raggiunto durante la generazione del rapporto. Consulta i log di "
+"Keiko per ulteriori informazioni."
 
 #: rocky/views/ooi_tree.py
 msgid "Tree Visualisation"
-msgstr ""
+msgstr "Visualizzazione ad albero"
 
 #: rocky/views/ooi_tree.py
 msgid "Graph Visualisation"
+msgstr "Visualizzazione grafica"
+
+#: rocky/views/ooi_view.py
+msgid "OOI types: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Clearance level: "
+msgstr ""
+
+#: rocky/views/ooi_view.py
+msgid "Clearance type: "
 msgstr ""
 
 #: rocky/views/organization_add.py
 msgid "Setup"
-msgstr ""
+msgstr "Imposta"
 
 #: rocky/views/organization_add.py
 msgid "Organization added successfully."
-msgstr ""
+msgstr "Organizzazione aggiunta con successo."
 
 #: rocky/views/organization_add.py
 msgid "You are not allowed to add organizations."
-msgstr ""
+msgstr "Non hai il permesso di aggiungere organizzazioni."
 
 #: rocky/views/organization_edit.py
 #, python-format
 msgid "Organization %s successfully updated."
-msgstr ""
+msgstr "Organizzazione %s aggiornata con successo."
 
 #: rocky/views/organization_member_add.py rocky/views/upload_csv.py
 msgid "Add column titles. Followed by each object on a new line."
 msgstr ""
+"Aggiungi i titoli delle colonne. Seguiti da ogni oggetto su una nuova linea."
 
 #: rocky/views/organization_member_add.py
 msgid "The columns are: "
-msgstr ""
+msgstr "Le colonne sono: "
 
 #: rocky/views/organization_member_add.py
 msgid "Clearance levels should be between -1 and 4."
-msgstr ""
+msgstr "I livelli di autorizzazione dovrebbero essere compresi tra -1 e 4."
 
 #: rocky/views/organization_member_add.py
 msgid "Account type can be one of: "
-msgstr ""
+msgstr "Il tipo di account può essere uno tra: "
 
 #: rocky/views/organization_member_add.py
 msgid "Add Account Type"
-msgstr ""
+msgstr "Aggiungi tipo di account"
 
 #: rocky/views/organization_member_add.py
 msgid "Member added successfully."
-msgstr ""
+msgstr "Membro aggiunto con successo."
 
 #: rocky/views/organization_member_add.py
 msgid "Add Member"
-msgstr ""
+msgstr "Aggiungi membro"
 
 #: rocky/views/organization_member_add.py
 msgid "The csv file is missing required columns"
-msgstr ""
+msgstr "Il file CSV manca delle colonne obbligatorie"
 
 #: rocky/views/organization_member_add.py
 #, python-brace-format
 msgid "Invalid account type: '{account_type}'"
-msgstr ""
+msgstr "Tipo di account non valido: '{account_type}'"
 
 #: rocky/views/organization_member_add.py
 #, python-brace-format
 msgid "Invalid data for: '{email}'"
-msgstr ""
+msgstr "Dati non validi per: '{email}'"
 
 #: rocky/views/organization_member_add.py
 #, python-brace-format
 msgid "Invalid email address: '{email}'"
-msgstr ""
+msgstr "Indirizzo email non valido: '{email}'"
 
 #: rocky/views/organization_member_add.py
 msgid "Successfully processed users from csv."
-msgstr ""
+msgstr "Utenti elaborati con successo dal CSV."
 
 #: rocky/views/organization_member_add.py
 msgid "Error parsing the csv file. Please verify its contents."
-msgstr ""
+msgstr "Errore nell'analisi del file CSV. Verifica il suo contenuto."
 
 #: rocky/views/organization_member_edit.py
 #, python-format
 msgid "Member %s successfully updated."
-msgstr ""
+msgstr "Membro %s aggiornato con successo."
 
 #: rocky/views/organization_member_edit.py
 #, python-format
@@ -5138,31 +5749,39 @@ msgid ""
 "level L%s. For this reason the acknowledged clearance level has been set at "
 "the same level as trusted clearance level."
 msgstr ""
+"Il livello di autorizzazione fidato aggiornato di L%s è inferiore al livello "
+"di autorizzazione riconosciuto del membro di L%s. Questo membro ha solo "
+"l'autorizzazione per il livello L%s. Per questo motivo, il livello di "
+"autorizzazione riconosciuto è stato impostato allo stesso livello del "
+"livello di autorizzazione fidato."
 
 #: rocky/views/organization_member_edit.py
 msgid ""
 "You have trusted this member with a higher trusted level than member "
 "acknowledged. Member must first accept this level to use it."
 msgstr ""
+"Hai conferito a questo membro un livello di autorizzazione fidato più alto "
+"rispetto a quello riconosciuto dal membro. Il membro deve prima accettare "
+"questo livello per utilizzarlo."
 
 #: rocky/views/organization_member_list.py
 msgid "Not blocked"
-msgstr ""
+msgstr "Non bloccato"
 
 #: rocky/views/organization_member_list.py
 #, python-format
 msgid "Blocked member %s successfully."
-msgstr ""
+msgstr "Membro bloccato %s con successo."
 
 #: rocky/views/organization_member_list.py
 #, python-format
 msgid "Unblocked member %s successfully."
-msgstr ""
+msgstr "Membro sbloccato %s con successo."
 
 #: rocky/views/organization_settings.py
 #, python-brace-format
 msgid "Recalculated {number_of_bits} bits. Duration: {duration}"
-msgstr ""
+msgstr "Ricalcolati {number_of_bits} bit. Durata: {duration}"
 
 #: rocky/views/scan_profile.py
 #, python-format
@@ -5170,6 +5789,9 @@ msgid ""
 "Could not raise clearance level of %s to L%s.                         "
 "Indemnification not present at organization %s."
 msgstr ""
+"Impossibile alzare il livello di autorizzazione di %s a "
+"L%s.                         L'indennizzo non è presente nell'organizzazione "
+"%s."
 
 #: rocky/views/scan_profile.py
 #, python-format
@@ -5177,71 +5799,84 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Please accept the clearance level below to proceed."
 msgstr ""
+"Impossibile alzare il livello di autorizzazione di %s a L%s. Hai "
+"riconosciuto un livello di autorizzazione di L%s. Per favore, accetta il "
+"livello di autorizzazione inferiore per procedere."
 
 #: rocky/views/scan_profile.py
 msgid "Choose a valid level"
-msgstr ""
+msgstr "Scegli un livello valido"
 
 #: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
 msgstr ""
+"Impossibile reimpostare il livello di scansione. Livello di scansione di "
+"{ooi_name} non dichiarato"
 
 #: rocky/views/scan_profile.py
 msgid "Reset"
-msgstr ""
+msgstr "Reimposta"
 
 #: rocky/views/tasks.py
 msgid "Task details not found."
-msgstr ""
+msgstr "Dettagli del compito non trovati."
 
 #: rocky/views/tasks.py
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr ""
+"Recupero dei compiti non riuscito: nessuna connessione con il pianificatore"
 
 #: rocky/views/tasks.py
 msgid "Task queue is full, please try again later."
-msgstr ""
+msgstr "La coda delle attività è piena, ti preghiamo di riprovare più tardi."
 
 #: rocky/views/tasks.py
 msgid "Task already queued."
-msgstr ""
+msgstr "Attività già in coda."
 
 #: rocky/views/tasks.py
 msgid "Task is invalid."
-msgstr ""
+msgstr "L'attività non è valida."
 
 #: rocky/views/upload_csv.py
 msgid ""
 "For URL object type, a column 'raw' with URL values is required, starting "
 "with http:// or https://, optionally a second column 'network' is supported "
 msgstr ""
+"Per il tipo di oggetto URL, è richiesta una colonna 'raw' con valori URL, "
+"iniziando con http:// o https://, facoltativamente è supportata una seconda "
+"colonna 'network'"
 
 #: rocky/views/upload_csv.py
 msgid ""
 "For Hostname object type, a column with 'name' values is required, "
 "optionally a second column 'network' is supported "
 msgstr ""
+"Per il tipo di oggetto Hostname, è richiesta una colonna con valori 'name', "
+"facoltativamente è supportata una seconda colonna 'network'"
 
 #: rocky/views/upload_csv.py
 msgid ""
 "For IPAddressV4 and IPAddressV6 object types, a column of 'address' is "
 "required, optionally a second column 'network' is supported "
 msgstr ""
+"Per i tipi di oggetto IPAddressV4 e IPAddressV6, è richiesta una colonna con "
+"valori 'address', facoltativamente è supportata una seconda colonna 'network'"
 
 #: rocky/views/upload_csv.py
 msgid "Object(s) could not be created for row number(s): "
-msgstr ""
+msgstr "Impossibile creare l'oggetto/i per il/i numero/i di riga: "
 
 #: rocky/views/upload_csv.py
 msgid "Object(s) successfully added."
-msgstr ""
+msgstr "Oggetto/i aggiunto/i con successo."
 
 #: rocky/views/upload_raw.py
 #, python-format
 msgid "Raw file could not be uploaded to Bytes: status code %s"
-msgstr ""
+msgstr "Impossibile caricare il file raw su Bytes: codice di stato %s"
 
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
-msgstr ""
+msgstr "File raw aggiunto con successo."

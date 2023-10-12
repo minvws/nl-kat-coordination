@@ -5,12 +5,10 @@
 
 FILES=$(git diff --name-only)
 for FILE in $FILES; do
-  CONTENT=$(base64 -i "$FILE")
-  SHA=$(git rev-parse "$DESTINATION_BRANCH":"$FILE")
-  gh api --method PUT /repos/:owner/:repo/contents/"$FILE" \
-    --field message="Update $FILE" \
-    --field content="$CONTENT" \
-    --field encoding="base64" \
-    --field branch="$DESTINATION_BRANCH" \
-    --field sha="$SHA"
+    SHA=$(git rev-parse "$DESTINATION_BRANCH":"$FILE")
+    gh api --method PUT /repos/:owner/:repo/contents/"$FILE" \
+        --field message="Update $FILE" \
+        --field content=@<(base64 -i "$FILE") \
+        --field branch="$DESTINATION_BRANCH" \
+        --field sha="$SHA"
 done

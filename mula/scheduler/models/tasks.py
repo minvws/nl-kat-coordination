@@ -69,9 +69,13 @@ class TaskDB(Base):
     __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)
+
     scheduler_id = Column(String)
+
     type = Column(String)
+
     p_item = Column(JSONB, nullable=False)
+
     status = Column(
         Enum(TaskStatus),
         nullable=False,
@@ -83,6 +87,7 @@ class TaskDB(Base):
         nullable=False,
         server_default=func.now(),
     )
+
     modified_at = Column(
         DateTime(timezone=True),
         nullable=False,
