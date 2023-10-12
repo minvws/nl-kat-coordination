@@ -33,19 +33,17 @@ environ.Env.read_env(BASE_DIR / ".env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_URI = env.url("QUEUE_URI", "").geturl()
+OCTOPOES_API = env.url("OCTOPOES_API").geturl()
 
-OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()
+SCHEDULER_API = env.url("SCHEDULER_API").geturl()
 
-SCHEDULER_API = env.url("SCHEDULER_API", "").geturl()
+KATALOGUS_API = env.url("KATALOGUS_API").geturl()
 
-KATALOGUS_API = env.url("KATALOGUS_API", "").geturl()
+BYTES_API = env.url("BYTES_API").geturl()
+BYTES_USERNAME = env("BYTES_USERNAME")
+BYTES_PASSWORD = env("BYTES_PASSWORD")
 
-BYTES_API = env.url("BYTES_API", "").geturl()
-BYTES_USERNAME = env("BYTES_USERNAME", default="")
-BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
-
-KEIKO_API = env.url("KEIKO_API", "").geturl()
+KEIKO_API = env.url("KEIKO_API").geturl()
 # Report generation timeout in seconds
 KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
 ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
