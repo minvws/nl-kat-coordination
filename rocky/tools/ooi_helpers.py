@@ -8,7 +8,7 @@ from pydantic import parse_obj_as
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import (
     CAPECFindingType,
