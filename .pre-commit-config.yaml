@@ -6,6 +6,7 @@ repos:
   - id: mixed-line-ending
     args: ["--fix=lf"]
   - id: detect-private-key
+    exclude: ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
   - id: check-case-conflict
   - id: check-yaml
   - id: check-json
@@ -98,7 +99,8 @@ repos:
       ^rocky/assets/js/vendor |
       ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
       ^rocky/tests/stubs |
-      ^docs/source/_static
+      ^docs/source/_static |
+      ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
       )
 
 - repo: https://github.com/Riverside-Healthcare/djLint
