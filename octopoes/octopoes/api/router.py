@@ -32,11 +32,13 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
+from octopoes.models.path import Path as ObjectPath
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.exceptions import NoMultinode, XTDBException
+from octopoes.xtdb.query import Query as XTDBQuery
 
 logger = getLogger(__name__)
 router = APIRouter(prefix="/{client}")
@@ -130,6 +132,24 @@ def list_objects(
     limit: int = 20,
 ):
     return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
+
+
+@router.get("/query", tags=["Objects"])
+def query(
+    path: str,
+    source: Optional[Reference] = None,
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    offset: int = DEFAULT_OFFSET,
+    limit: int = DEFAULT_LIMIT,
+):
+    object_path = ObjectPath.parse(path)
+    xtdb_query = XTDBQuery.from_path(object_path).offset(offset).limit(limit)
+
+    if source is not None and object_path.segments:
+        xtdb_query = xtdb_query.where(object_path.segments[0].source_type, primary_key=str(source))
+
+    return octopoes.ooi_repository.query(xtdb_query, valid_time)
 
 
 @router.post("/objects/load_bulk", tags=["Objects"])

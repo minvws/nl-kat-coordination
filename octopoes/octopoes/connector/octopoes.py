@@ -232,3 +232,20 @@ class OctopoesAPIConnector:
 
     def recalculate_bits(self) -> int:
         return self.session.post(f"/{self.client}/bits/recalculate").json()
+
+    def query(
+        self,
+        path: str,
+        valid_time: datetime,
+        source: Optional[Reference] = None,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+    ) -> List[OOI]:
+        params = {
+            "path": path,
+            "source": source,
+            "valid_time": valid_time,
+            "offset": offset,
+            "limit": limit,
+        }
+        return [parse_obj_as(OOIType, ooi) for ooi in self.session.get(f"/{self.client}/query", params=params).json()]

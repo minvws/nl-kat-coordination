@@ -1,9 +1,14 @@
+from uuid import UUID
+
 import pytest
 
+from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSNSRecord
+from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.network import IPAddress, IPPort, Network
+from octopoes.models.ooi.web import Website
 from octopoes.models.path import Path
-from octopoes.xtdb.query import InvalidField, Query
+from octopoes.xtdb.query import A, InvalidField, Query
 
 
 def test_basic_field_where_clause():
@@ -190,4 +195,68 @@ def test_create_query_from_path_abstract():
     [ IPPort :IPPort/address IPAddress ]
     [ IPPort :object_type "IPPort" ]]}}"""
 
+    assert query.format() == expected_query
+
+
+def test_aliased_query():
+    h1 = A(Hostname, UUID("4b4afa7e-5b76-4506-a373-069216b051c2"))
+    h2 = A(Hostname, UUID("98076f7a-7606-47ac-85b7-b511ee21ae42"))
+    query = (
+        Query(DNSAAAARecord)
+        .where(DNSAAAARecord, hostname=h1)
+        .where(DNSNSRecord, hostname=h1)
+        .where(DNSNSRecord, name_server_hostname=h2)
+        .where(Website, hostname=h2)
+        .where(Website, primary_key="test_pk")
+    )
+
+    expected_query = """{:query {:find [(pull DNSAAAARecord [*])] :where [
+    [ DNSAAAARecord :DNSAAAARecord/hostname ?4b4afa7e-5b76-4506-a373-069216b051c2 ]
+    [ DNSAAAARecord :object_type "DNSAAAARecord" ]
+    [ DNSNSRecord :DNSNSRecord/hostname ?4b4afa7e-5b76-4506-a373-069216b051c2 ]
+    [ DNSNSRecord :DNSNSRecord/name_server_hostname ?98076f7a-7606-47ac-85b7-b511ee21ae42 ]
+    [ DNSNSRecord :object_type "DNSNSRecord" ]
+    [ Website :Website/hostname ?98076f7a-7606-47ac-85b7-b511ee21ae42 ]
+    [ Website :Website/primary_key "test_pk" ]
+    [ Website :object_type "Website" ]]}}"""
+
+    assert query.format() == expected_query
+
+
+def test_aliased_path_query(mocker):
+    """Traverse the Hostname object twice"""
+
+    mocker.patch("octopoes.xtdb.query.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
+    path = Path.parse("Website.hostname.<hostname[is DNSNSRecord].name_server_hostname.<hostname[is DNSAAAARecord]")
+    query = Query.from_path(path).where(Website, primary_key="test_pk")
+
+    expected_query = """{:query {:find [(pull DNSAAAARecord [*])] :where [
+    [ DNSAAAARecord :DNSAAAARecord/hostname ?311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
+    [ DNSAAAARecord :object_type "DNSAAAARecord" ]
+    [ DNSNSRecord :DNSNSRecord/hostname Hostname ]
+    [ DNSNSRecord :DNSNSRecord/name_server_hostname ?311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
+    [ DNSNSRecord :object_type "DNSNSRecord" ]
+    [ Website :Website/hostname Hostname ]
+    [ Website :Website/primary_key "test_pk" ]
+    [ Website :object_type "Website" ]]}}"""
+
+    assert query.format() == expected_query
+
+
+def test_aliased_query_starting_with_hostname(mocker):
+    mocker.patch("octopoes.xtdb.query.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
+    path = Path.parse(
+        "Hostname.<hostname[is DNSMXRecord].mail_hostname.<hostname[is DNSARecord].address.<address[is IPPort]"
+    )
+    query = Query.from_path(path)
+
+    expected_query = """{:query {:find [(pull IPPort [*])] :where [
+    [ DNSARecord :DNSARecord/address IPAddressV4 ]
+    [ DNSARecord :DNSARecord/hostname ?311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
+    [ DNSARecord :object_type "DNSARecord" ]
+    [ DNSMXRecord :DNSMXRecord/hostname Hostname ]
+    [ DNSMXRecord :DNSMXRecord/mail_hostname ?311d6399-4bb4-4830-b077-661cc3f4f2c1 ]
+    [ DNSMXRecord :object_type "DNSMXRecord" ]
+    [ IPPort :IPPort/address IPAddressV4 ]
+    [ IPPort :object_type "IPPort" ]]}}"""
     assert query.format() == expected_query
