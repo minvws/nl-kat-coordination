@@ -1,6 +1,6 @@
 import pytest
 from account.views import AccountView
-from katalogus.views.boefje_detail import BoefjeDetailView
+from katalogus.views.plugin_detail import BoefjeDetailView
 from pytest_django.asserts import assertContains, assertNotContains
 
 from octopoes.models.pagination import Paginated
