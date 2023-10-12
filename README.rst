@@ -2,6 +2,14 @@
 What is OpenKAT?
 ================
 
+.. image:: https://hosted.weblate.org/widget/openkat/287x66-grey.png
+   :target: https://hosted.weblate.org/engage/openkat/
+   :alt: Translation status (summary)
+
+.. image:: https://hosted.weblate.org/widget/openkat/multi-auto.svg
+   :target: https://hosted.weblate.org/engage/openkat/
+   :alt: Translation status (bar chart)
+
 OpenKAT aims to monitor, record and analyze the status of information systems. The basic premise is that many of the major security incidents are caused by small errors and known vulnerabilities, and that if you can find them in time your systems and infrastructure become a lot more secure.
 
 OpenKAT scans, collects, analyzes and reports in an ongoing process:
@@ -38,13 +46,16 @@ Translations
 We currently support the following languages:
 
 - English (default; used in the source code)
-- Dutch
-- Papiamentu
+- Dutch (official support)
+- Papiamentu (community support)
+- Italian (community support)
 
 We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
 Community contributions are very welcome and can be made via Weblate's interface.
 This is a great way to help the project forward and doesn't require any technical expertise.
 If you would like to see OpenKAT in another language, let us know!
+
+Updates to the English source strings must be modified directly in Rocky's source code.
 
 
 Current release
