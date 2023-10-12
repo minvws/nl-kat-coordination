@@ -1,0 +1,13 @@
+{
+    "id": "CVE-2023-34039",
+    "name": "CVE_2023_34039",
+    "description": "Check to see if known keys are usable on VMware CVE-2023-34039",
+    "consumes": [
+        "IPService"
+    ],
+    "produces": [
+        "Finding",
+        "CVEFindingType"
+    ],
+    "scan_level": 4
+}
