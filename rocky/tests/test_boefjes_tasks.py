@@ -1,9 +1,9 @@
+from http import HTTPStatus
 from unittest.mock import call
 
 from pytest_django.asserts import assertContains
 from requests import HTTPError
 
-from rocky.scheduler import ConflictError
 from rocky.views.tasks import BoefjesTaskListView
 from tests.conftest import setup_request
 
@@ -67,9 +67,11 @@ def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje)
     assertContains(response, "Fetching tasks failed")
 
 
-def test_reschedule_task(rf, client_member, mocker, lazy_task_list_with_boefje):
-    mock_scheduler_client = mocker.patch("tools.view_helpers.client")
-    mock_scheduler_client.push_task.side_effect = HTTPError
+def test_reschedule_task(rf, client_member, mocker, task):
+    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
+    mock_scheduler_client.get_task_details.return_value = task
+    session = mocker.patch("tools.view_helpers.client.session")
+    session.post.return_value = mocker.MagicMock()
 
     task_id = "e02c18dc-8013-421d-a86d-3a00f6019533"
     request = setup_request(
@@ -89,10 +91,15 @@ def test_reschedule_task(rf, client_member, mocker, lazy_task_list_with_boefje):
     )
 
 
-def test_reschedule_task_already_queued(rf, client_member, mocker, lazy_task_list_with_boefje):
-    mock_scheduler_client = mocker.patch("tools.view_helpers.client")
-    mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
-    mock_scheduler_client.push_task.side_effect = ConflictError
+def test_reschedule_task_already_queued(rf, client_member, mocker, task):
+    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
+    mock_scheduler_client.get_task_details.return_value = task
+    session = mocker.patch("tools.view_helpers.client.session")
+    mock_response = mocker.MagicMock()
+    mock_response.status_code = HTTPStatus.TOO_MANY_REQUESTS
+    return_value = mocker.MagicMock()
+    return_value.raise_for_status.side_effect = HTTPError(response=mock_response)
+    session.post.return_value = return_value
 
     task_id = "e02c18dc-8013-421d-a86d-3a00f6019533"
     request = setup_request(

@@ -169,7 +169,7 @@ def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrior
     try:
         client.push_task(f"{task.data.type}-{organization_code}", task)
     except (BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
-        messages.error(request, error)
+        messages.error(request, error.message)
     else:
         messages.success(
             request,
