@@ -140,7 +140,10 @@ class PriorityQueue(abc.ABC):
             if not self._is_valid_item(p_item.data):
                 raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
 
-            if self.full():
+            if not p_item.priority:
+                raise InvalidPrioritizedItemError("PrioritizedItem must have a priority")
+
+            if self.full() and p_item.priority > 1:
                 raise QueueFullError(f"Queue {self.pq_id} is full.")
 
             # We try to get the item from the queue by a specified identifier of
