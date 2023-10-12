@@ -57,7 +57,6 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
             "boefje_detail",
             kwargs={
                 "organization_code": self.organization.code,
-                "plugin_type": self.plugin.type,
                 "plugin_id": self.plugin.id,
             },
         )
