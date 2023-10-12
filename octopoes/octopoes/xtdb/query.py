@@ -259,7 +259,7 @@ class Query:
 
         return object_type.get_object_type()
 
-    def __str__(self, **kwargs) -> str:
+    def __str__(self) -> str:
         return self._compile()
 
     def __eq__(self, other: "Query"):

@@ -140,14 +140,11 @@ def query(
     source: Optional[Reference] = None,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    offset: Optional[int] = None,
-    limit: Optional[int] = None,
+    offset: int = DEFAULT_OFFSET,
+    limit: int = DEFAULT_LIMIT,
 ):
     object_path = ObjectPath.parse(path)
-    xtdb_query = XTDBQuery.from_path(object_path)
-
-    if offset is not None and limit is not None:
-        xtdb_query = xtdb_query.offset(offset).limit(limit)
+    xtdb_query = XTDBQuery.from_path(object_path).offset(offset).limit(limit)
 
     if source is not None and object_path.segments:
         xtdb_query = xtdb_query.where(object_path.segments[0].source_type, primary_key=str(source))
