@@ -17,9 +17,8 @@ from boefjes.job_handler import bytes_api_client
 
 @click.command()
 @click.option("--json", "print_json", is_flag=True, help="Pretty print raw as json")
-@click.argument("organization")
 @click.argument("raw_id")
-def show_raw(print_json, organization, raw_id):
+def show_raw(print_json, raw_id):
     """Show raw file"""
 
     bytes_api_client.login()

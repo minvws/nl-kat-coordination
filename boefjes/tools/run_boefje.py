@@ -21,13 +21,13 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 @click.command()
 @click.option("--pdb", "start_pdb", is_flag=True, help="Start pdb on exceptions")
-@click.argument("organization")
+@click.argument("organization_code")
 @click.argument("boefje_id")
 @click.argument("input_ooi")
-def run_boefje(start_pdb, organization, boefje_id, input_ooi):
+def run_boefje(start_pdb, organization_code, boefje_id, input_ooi):
     """Run boefje"""
 
-    meta = BoefjeMeta(id=uuid.uuid4(), boefje=Boefje(id=boefje_id), organization=organization, input_ooi=input_ooi)
+    meta = BoefjeMeta(id=uuid.uuid4(), boefje=Boefje(id=boefje_id), organization=organization_code, input_ooi=input_ooi)
 
     local_repository = get_local_repository()
 

@@ -24,17 +24,17 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 @click.command()
 @click.option("--pdb", "start_pdb", is_flag=True, help="Start pdb on exceptions")
-@click.argument("organization")
+@click.argument("organization_code")
 @click.argument("bit_id")
 @click.argument("ooi")
-def run_bit(start_pdb, organization, bit_id, ooi):
+def run_bit(start_pdb, organization_code, bit_id, ooi):
     """Run bit"""
     settings = Settings()
 
     valid_time = datetime.now(timezone.utc)
 
-    session = XTDBSession(get_xtdb_client(settings.xtdb_uri, organization, settings.xtdb_type))
-    octopoes_service = bootstrap_octopoes(settings, organization, session)
+    session = XTDBSession(get_xtdb_client(settings.xtdb_uri, organization_code, settings.xtdb_type))
+    octopoes_service = bootstrap_octopoes(settings, organization_code, session)
     ooi_repository = octopoes_service.ooi_repository
     origin_repository = octopoes_service.origin_repository
     origin_parameter_repository = octopoes_service.origin_parameter_repository

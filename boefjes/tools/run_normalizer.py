@@ -21,10 +21,9 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 @click.command()
 @click.option("--pdb", "start_pdb", is_flag=True, help="Start pdb on exceptions")
-@click.argument("organization")
 @click.argument("normalizer_id")
 @click.argument("raw_id")
-def run_normalizer(start_pdb, organization, normalizer_id, raw_id):
+def run_normalizer(start_pdb, normalizer_id, raw_id):
     """Run normalizer"""
 
     bytes_api_client.login()
