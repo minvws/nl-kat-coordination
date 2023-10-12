@@ -43,24 +43,8 @@ The high level documentation on OpenKAT explains the purpose and operation of Op
 Translations
 ============
 
-We currently support the following languages:
-
-============ ==============================
- Language     Support
-============ ==============================
- English      Default; used in source code
- Dutch        Official
- Papiamentu   Community
- Italian      Community
-============ ==============================
-
 We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
-Community contributions are very welcome and can be made via Weblate's interface.
-This is a great way to help the project forward and doesn't require any technical expertise.
-If you would like to see OpenKAT in another language, let us know!
-
-Updates to the English source strings must be modified directly in Rocky's source code.
-
+See `the docs <https://docs.openkat.nl/guidelines/contributions.html#contribute-translations>`_ for more information.
 
 Current release
 ===============

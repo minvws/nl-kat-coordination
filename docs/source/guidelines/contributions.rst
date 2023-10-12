@@ -52,6 +52,33 @@ You could help us out with the following sections:
 
 All documentation should be placed in a repository's ``docs`` folder.
 
+Contribute Translations
+=======================
+
+.. image:: https://hosted.weblate.org/widget/openkat/287x66-white.png
+   :target: https://hosted.weblate.org/engage/openkat/
+   :alt: Translation status (summary)
+
+.. image:: https://hosted.weblate.org/widget/openkat/multi-auto.svg
+   :target: https://hosted.weblate.org/engage/openkat/
+   :alt: Translation status (bar chart)
+
+============ ==============================
+ Language     Support
+============ ==============================
+ English      Default; used in source code
+ Dutch        Official
+ Papiamentu   Community
+ Italian      Community
+============ ==============================
+
+We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
+Community contributions are very welcome and can be made via Weblate's interface.
+This is a great way to help the project forward and doesn't require any technical expertise.
+If you would like to see OpenKAT in another language, let us know!
+
+Updates to the English source strings must be done directly in Rocky's source code.
+
 Contributor Social Contract
 ===========================
 All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :ref:`Project Guidelines`.
