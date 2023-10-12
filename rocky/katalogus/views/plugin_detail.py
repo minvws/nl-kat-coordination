@@ -85,6 +85,22 @@ class NormalizerDetailView(PluginDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
+                "text": _("KAT-alogus"),
+            },
+            {
+                "url": reverse(
+                    "normalizer_detail",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "plugin_id": self.plugin.id,
+                    },
+                ),
+                "text": self.plugin.name,
+            },
+        ]
 
         return context
 
