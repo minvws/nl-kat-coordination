@@ -2,7 +2,7 @@
 What is OpenKAT?
 ================
 
-.. image:: https://hosted.weblate.org/widget/openkat/287x66-grey.png
+.. image:: https://hosted.weblate.org/widget/openkat/287x66-white.png
    :target: https://hosted.weblate.org/engage/openkat/
    :alt: Translation status (summary)
 
