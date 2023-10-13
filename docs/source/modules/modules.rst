@@ -4,7 +4,7 @@ Modules
 
 OpenKAT consists of individual modules, each of which performs a subtask of the system. The modules are specific to OpenKAT. Rocky is the frontend, Mula is the scheduler, Bytes the storage of raw data, Octopoes contains the data model, Keiko is the PDF engine for reports and Boefjes and Whiskers and are separate components stored in the KATalogus. OpenKAT uses Manon for the design in order to easily comply with accessibility and style requirements.
 
-The overarching concept of OpenKAT is explained in the section `how does OpenKAT work <https://docs.openkat.nl/introduction/howdoesitwork.html#how-does-openkat-work>`_. The explanation centers around the image below. All modules of OpenKAT can be found there, expect for our webinterface and styling modules Rocky and Manon. 
+The overarching concept of OpenKAT is explained in the section `how does OpenKAT work <https://docs.openkat.nl/introduction/howdoesitwork.html#how-does-openkat-work>`_. The explanation centers around the image below. All modules of OpenKAT can be found there, expect for our webinterface and styling modules Rocky and Manon.
 
 .. image:: https://docs.openkat.nl/_images/stappenopenkat.png
 
