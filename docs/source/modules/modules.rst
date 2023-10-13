@@ -29,7 +29,7 @@ Octopoes - datamodel
 
 Octopoes contains the data model with object-types and the XTDB with all objects. The documentation accompanying Octopoes covers the technical side of the logic behind OpenKAT and includes extensive information for people who want to work with the data model themselves.
 
-`Octopoes <https://github.com/minvws/nl-kat-coordination/tree/main/octopoes>`_ is the folder containing the source code and documentation of Octopoes. 
+`Octopoes <https://github.com/minvws/nl-kat-coordination/tree/main/octopoes>`_ is the folder containing the source code and documentation of Octopoes.
 
 Bytes - raw data storage
 ========================
