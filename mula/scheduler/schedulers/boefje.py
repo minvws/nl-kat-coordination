@@ -113,7 +113,7 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
-    @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
+    @tracer.start_as_current_span("boefje_push_tasks_for_scan_profile_mutations")
     def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
         """Create tasks for oois that have a scan level change.
 
@@ -193,7 +193,7 @@ class BoefjeScheduler(Scheduler):
                     self.push_tasks_for_scan_profile_mutations.__name__,
                 )
 
-    @tracer.start_as_current_span("push_tasks_for_new_boefjes")
+    @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
     def push_tasks_for_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
@@ -251,7 +251,7 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_new_boefjes.__name__,
                     )
 
-    @tracer.start_as_current_span("push_tasks_for_random_objects")
+    @tracer.start_as_current_span("boefje_push_tasks_for_random_objects")
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random ooi's from octopoes to the queue."""
         if self.queue.full():
@@ -315,6 +315,7 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_random_objects.__name__,
                     )
 
+    @tracer.start_as_current_span("boefje_is_task_allowed_to_run")
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
 
@@ -390,6 +391,7 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
+    @tracer.start_as_current_span("boefje_is_task_running")
     def is_task_running(self, task: BoefjeTask) -> bool:
         """Check if the same task is already running.
 
@@ -482,6 +484,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
+    @tracer.start_as_current_span("boefje_is_task_stalled")
     def is_task_stalled(self, task: BoefjeTask) -> bool:
         """Check if the same task is stalled.
 
@@ -517,6 +520,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
+    @tracer.start_as_current_span("boefje_push_task")
     def push_task(self, boefje: Plugin, ooi: OOI, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
@@ -668,6 +672,7 @@ class BoefjeScheduler(Scheduler):
             caller,
         )
 
+    @tracer.start_as_current_span("boefje_has_grace_period_passed")
     def has_grace_period_passed(self, task: BoefjeTask) -> bool:
         """Check if the grace period has passed for a task in both the
         datastore and bytes.

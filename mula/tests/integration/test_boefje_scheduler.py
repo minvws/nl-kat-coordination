@@ -71,6 +71,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.scheduler.stop()
+        models.Base.metadata.drop_all(self.dbconn.engine)
         self.dbconn.engine.dispose()
 
 
@@ -721,7 +722,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
-            priority=0,
+            priority=1,
             data=task,
         )
 
@@ -784,7 +785,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
-            priority=0,
+            priority=1,
             data=task,
         )
 
@@ -814,7 +815,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
-            priority=0,
+            priority=1,
             data=task,
         )
 
@@ -854,7 +855,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
-            priority=0,
+            priority=1,
             data=task,
         )
         self.scheduler.push_item_to_queue(p_item)

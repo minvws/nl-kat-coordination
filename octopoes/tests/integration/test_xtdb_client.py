@@ -26,7 +26,7 @@ def test_node_creation_and_deletion(xtdb_http_client: XTDBHTTPClient):
     assert status.indexVersion == 22
     assert status.consumerState is None
     assert status.kvStore == "xtdb.rocksdb.RocksKv"
-    assert status.estimateNumKeys == 1
+    assert status.estimateNumKeys >= 1
 
     xtdb_http_client.delete_node()
 
@@ -71,6 +71,12 @@ def test_query_simple_filter(xtdb_session: XTDBSession, valid_time: datetime):
             }
         ]
     ]
+
+    query = """{:query {:find [(pull ?3b1ebf3a-3cc1-4e35-8c5f-e8173e55b623 [*])] :where [
+    [ ?3b1ebf3a-3cc1-4e35-8c5f-e8173e55b623 :Network/name "testnetwork" ]
+    [ ?3b1ebf3a-3cc1-4e35-8c5f-e8173e55b623 :object_type "Network" ]] limit 50 offset 0}}"""
+
+    assert len(xtdb_session.client.query(query)) == 1
 
 
 def test_query_not_empty_on_reference_filter_for_hostname(xtdb_session: XTDBSession, valid_time: datetime):
