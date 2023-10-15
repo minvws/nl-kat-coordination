@@ -13,7 +13,7 @@ if [ "$1" = "configure" ]; then
         # Only configure granian for new installs. Existing installations will
         # switch in the next release.
         mkdir -p /etc/systemd/system/kat-rocky.service.d
-        cat > /etc/systemd/system/kat-rocky.service.d/use-granian.conf <<EOF
+        cat > /etc/systemd/system/kat-rocky.service.d/use-granian.conf << EOF
 # Do not customize this file because it will be automatically removed in the next release
 [Service]
 ExecStart=
