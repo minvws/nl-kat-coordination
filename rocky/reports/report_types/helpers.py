@@ -1,4 +1,4 @@
-from typing import List, Set, Type
+from typing import Dict, List, Set, Type
 
 from octopoes.models import OOI, Reference
 from reports.report_types.definitions import Report
@@ -45,7 +45,7 @@ def get_reports(report_ids: List[str]) -> List[Report]:
     return [get_report_by_id(report_id) for report_id in report_ids]
 
 
-def get_plugins_for_report_ids(reports: List[str]) -> Set[str]:
+def get_plugins_for_report_ids(reports: List[str]) -> Dict[str, Set[str]]:
     """
     Get all boefjes that are required and optional for a given list of reports
     """
