@@ -36,10 +36,9 @@ services:
   ci_postgres:
     image: postgres:15
     healthcheck:
-      test: ["CMD", "pg_isready"]
+      test: ["CMD", "gosu", "postgres", "pg_isready"]
       interval: 10s
-      timeout: 5s
-      retries: 5
+      retries: 10
     env_file:
       - .ci/.env.test
     environment:
