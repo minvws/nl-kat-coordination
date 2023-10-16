@@ -171,12 +171,6 @@ class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
                 messages.WARNING,
                 _("This report may not show all the data as some plugins are not enabled."),
             )
-        if not self.oois_not_enough_clearance():
-            messages.add_message(
-                self.request,
-                messages.WARNING,
-                _("Some plugins are not able to scan due that they do not match object's clearance level."),
-            )
         return super().get(request, *args, **kwargs)
 
     def are_plugins_enabled(self) -> bool:
@@ -185,9 +179,6 @@ class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
             for plugin in plugins:
                 enabled_plugins.append(plugin.enabled)
         return all(enabled_plugins)
-
-    def oois_not_enough_clearance(self):
-        return True
 
     def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         report_data = {}
