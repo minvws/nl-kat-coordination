@@ -29,7 +29,10 @@
 
             {% if plugin.type == "boefje" %}
                 <a class="tile-detail-link"
-                   href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                   href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+            {% else %}
+                <a class="plugin-detail-link"
+                   href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
             {% endif %}
         </div>
     {% endif %}
