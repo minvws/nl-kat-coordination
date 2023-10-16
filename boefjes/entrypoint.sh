@@ -5,20 +5,20 @@ set -e
 shopt -s nocasematch
 
 if [ "$1" = "boefje" ]; then
-  exec python -m boefjes boefje
+    exec python -m boefjes boefje
 elif [ "$1" = "normalizer" ]; then
-  exec python -m boefjes normalizer
+    exec python -m boefjes normalizer
 fi
 
 # The migrations and seed are for the KATalogus. They are not inside the if because this way
 # they can also be run when overruling the default cmd
-if [ "$DATABASE_MIGRATION" = "1" ] || [ "$DATABASE_MIGRATION" = "true" ]; then
-  python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade head
-  python -m boefjes.seed
+if [ "$DATABASE_MIGRATION" = "1" ] || [[ $DATABASE_MIGRATION == "true" ]]; then
+    python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade head
+    python -m boefjes.seed
 fi
 
 if [ "$1" = "katalogus" ]; then
-  exec python -m uvicorn --host 0.0.0.0 boefjes.katalogus.api:app
+    exec python -m uvicorn --host 0.0.0.0 boefjes.katalogus.api:app
 fi
 
 exec "$@"
