@@ -132,6 +132,9 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> List[OOI]:
         raise NotImplementedError
 
+    def query(self, query: Query, valid_time: datetime) -> List[OOI]:
+        raise NotImplementedError
+
 
 class XTDBReferenceNode(BaseModel):
     __root__: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
@@ -622,14 +625,15 @@ class XTDBOOIRepository(OOIRepository):
             .where(Config, bit_id=bit_definition.id)
         )
 
-        configs = [self.deserialize(res[0]) for res in self.session.client.query(str(query), valid_time=valid_time)]
+        configs = self.query(query, valid_time)
 
         return [config for config in configs if isinstance(config, Config)]
 
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> List[OOI]:
         path_start_alias = path.segments[0].source_type
         query = Query.from_path(path).where(path_start_alias, primary_key=ooi.primary_key)
-        return [self.deserialize(row[0]) for row in self.session.client.query(str(query), valid_time=valid_time)]
+
+        return self.query(query, valid_time)
 
     def list_findings(
         self,
@@ -708,3 +712,6 @@ class XTDBOOIRepository(OOIRepository):
             count=count,
             items=findings,
         )
+
+    def query(self, query: Query, valid_time: datetime) -> List[OOI]:
+        return [self.deserialize(row[0]) for row in self.session.client.query(str(query), valid_time=valid_time)]
