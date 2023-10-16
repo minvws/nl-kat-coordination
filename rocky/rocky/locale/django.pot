@@ -1,18 +1,16 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# English-language Django source strings for Rocky
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-12 12:00+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2023-10-12 06:57+0000\n"
+"PO-Revision-Date: n/a\n"
+"Last-Translator: n/a\n"
+"Language-Team: OpenKAT development team\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -3352,6 +3350,10 @@ msgid "Reason"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+msgid "Unmute Findings"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 msgid "Mute Findings"
 msgstr ""
 
@@ -5044,6 +5046,10 @@ msgstr ""
 
 #: rocky/views/ooi_mute.py
 msgid "Please select at least one finding."
+msgstr ""
+
+#: rocky/views/ooi_mute.py
+msgid "Finding(s) successfully unmuted."
 msgstr ""
 
 #: rocky/views/ooi_mute.py
