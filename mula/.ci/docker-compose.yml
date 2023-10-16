@@ -42,6 +42,10 @@ services:
       retries: 5
     env_file:
       - .ci/.env.test
+    environment:
+      APPS: "BYTES KATALOGUS SCHEDULER"
+    volumes:
+      - ../init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
 
   ci_rabbitmq:
     image: "rabbitmq:3.11-management"
