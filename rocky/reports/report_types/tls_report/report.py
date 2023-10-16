@@ -1,4 +1,6 @@
+from datetime import datetime
 from logging import getLogger
+from typing import Type
 
 from django.utils.translation import gettext_lazy as _
 
@@ -21,12 +23,14 @@ class TLSReport(Report):
     html_template_path = "tls_report/report.html"
     tree_depth: int = 3
 
-    def generate_data(self, input_ooi: str):
+    def generate_data(self, input_ooi: str, valid_time: Type[datetime]):
         suites = {}
         findings = []
         suites_with_findings = []
         ref = Reference.from_str(input_ooi)
-        tree = self.octopoes_api_connector.get_tree(ref, depth=self.tree_depth, types={TLSCipher, Finding}).store
+        tree = self.octopoes_api_connector.get_tree(
+            ref, depth=self.tree_depth, types={TLSCipher, Finding}, valid_time=valid_time
+        ).store
         for pk, ooi in tree.items():
             if ooi.ooi_type == "TLSCipher":
                 suites = ooi.suites

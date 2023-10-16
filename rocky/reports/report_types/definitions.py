@@ -1,6 +1,7 @@
+from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple, Type
+from typing import Dict, List, Set, Tuple, Type
 
 from octopoes.models import OOI
 
@@ -19,8 +20,5 @@ class Report:
     def __init__(self, octopoes_api_connector):
         self.octopoes_api_connector = octopoes_api_connector
 
-    def generate_data(self, input_ooi: str) -> Tuple[Dict[str, str], str]:
-        raise NotImplementedError
-
-    def render_report(self, data: Any) -> str:
+    def generate_data(self, input_ooi: str, valid_time: Type[datetime]) -> Tuple[Dict[str, str], str]:
         raise NotImplementedError
