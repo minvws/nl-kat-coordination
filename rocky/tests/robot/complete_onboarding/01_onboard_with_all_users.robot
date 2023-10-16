@@ -13,7 +13,7 @@ I want to add indemnifications
     Fill Text    xpath=//*[@id="id_name"]    Dev Org
     Fill Text    xpath=//*[@id="id_code"]    dev
     Click    "Submit"
-    #Click    xpath=//button[contains(text(),"Submit")]
+    # Click    xpath=//button[contains(text(),"Submit")]
     Check Checkbox    css=#id_may_scan
     Check Checkbox    css=#id_am_authorized
     Click    "Submit"
@@ -76,7 +76,7 @@ I want to enter the Katalogus
 
 I want to see the DnsRecords page in details
     Click    xpath=//a[@href="/en/dev/kat-alogus/plugins/boefje/dns-records/"]
-    Get Title    equal    OpenKAT - plugin_detail
+    Get Title    equal    OpenKAT - boefje_detail
 
 I want to add the badssl.com hostname
     Go to    ${ROOT_URL}/en/dev/objects/add/
@@ -146,4 +146,4 @@ Create A User While Onboarding
     Fill Text    xpath=//*[@id="id_email"]    ${email}
     Fill Text    xpath=//*[@id="id_password"]    ${password}
     Click    "Submit"
-    #Get Text    .confirmation    contains    successfully    error account creation failed
+    # Get Text    .confirmation    contains    successfully    error account creation failed

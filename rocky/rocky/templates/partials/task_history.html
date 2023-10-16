@@ -1,0 +1,227 @@
+{% load i18n %}
+
+<div class="horizontal-scroll">
+    <h2>{% translate "Tasks" %}</h2>
+    <div class="filter">
+        <div>
+            <p>{% translate "Filter" %}</p>
+            <button aria-expanded="false"
+                    data-hide-filters-label="{% translate "Hide filters" %}">{% translate "Show filters" %}</button>
+        </div>
+        <form action="" method="get" novalidate method="get">
+            <fieldset>
+                <label for="task_history_from">{% translate "From" %}</label>
+                <input type="date"
+                       name="task_history_from"
+                       id="task_history-from"
+                       value="{{ request.GET.task_history_from }}">
+            </fieldset>
+            <fieldset>
+                <label for="task_history_to">{% translate "To" %}</label>
+                <input type="date"
+                       name="task_history_to"
+                       id="task_history-to"
+                       value="{{ request.GET.task_history_to }}">
+            </fieldset>
+            <fieldset>
+                <label for="task_history_status">{% translate "Status" %}</label>
+                <select name="task_history_status" id="task_history_status">
+                    <option value="" disabled selected>{% translate "Select status" %}</option>
+                    <option value="completed"
+                            {% if request.GET.task_history_status == "completed" %}selected{% endif %}>
+                        {% translate "Success" %}
+                    </option>
+                    <option value="failed"
+                            {% if request.GET.task_history_status == "failed" %}selected{% endif %}>
+                        {% translate "Failure" %}
+                    </option>
+                </select>
+            </fieldset>
+            <fieldset>
+                <label for="task_history_search">{% translate "Search" %}</label>
+                <input type="text"
+                       name="task_history_search"
+                       id="task_history_search"
+                       value="{{ request.GET.task_history_search }}"
+                       placeholder="{% translate "Search by object name" %}">
+            </fieldset>
+            {% for key, value in request.GET.items %}
+                {% if key not in task_history_form_fields %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
+            {% endfor %}
+            <fieldset>
+                <button type="submit">{% translate "Submit" %}</button>
+            </fieldset>
+        </form>
+    </div>
+    {% if plugin and plugin.type == "boefje" %}
+        {% if not task_history %}
+            {% translate "No scans found for this object." %}
+        {% else %}
+            <table rf-selector="table-scan-history">
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Boefje" %}</th>
+                        <th scope="col">{% translate "Status" %}</th>
+                        <th scope="col">{% translate "Created date" %}</th>
+                        <th scope="col">{% translate "Input Object" %}</th>
+                        {# FIXME: implement detail page according to designs #}
+                        {# <th scope="col">{% translate "Details" %}</th> #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in task_history %}
+                        <tr>
+                            <td>
+                                {% if task.type == "boefje" %}
+                                    <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
+                                {% elif task.type == "normalizer" %}
+                                    <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
+                                {% else %}
+                                    {{ task.id }}
+                                {% endif %}
+                            </td>
+                            <td class="nowrap">
+                                {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                    <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                    <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "cancelled" %}
+                                    <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "failed" %}
+                                    <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "completed" %}
+                                    <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% else %}
+                                    <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>{{ task.created_at }}</td>
+                            <td>
+                                {% if task.type == "boefje" %}
+                                    <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code observed_at=task.created_at|date:'Y-m-d' %}">{{ task.p_item.data.input_ooi }}</a>
+                                {% elif task.type == "normalizer" %}
+                                    <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code observed_at=task.created_at|date:'Y-m-d' %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                                {% else %}
+                                    {{ task.id }}
+                                {% endif %}
+                            </td>
+                            {# FIXME: implement detail page according to designs #}
+                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% elif plugin and plugin.type == "normalizer" %}
+        {% if not task_history %}
+            {% translate "No tasks found for this object." %}
+        {% else %}
+            <table rf-selector="table-scan-history">
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Normalizer" %}</th>
+                        <th scope="col">{% translate "Status" %}</th>
+                        <th scope="col">{% translate "Created date" %}</th>
+                        <th scope="col">{% translate "Boefje" %}</th>
+                        <th scope="col">{% translate "Boefje input OOI" %}</th>
+                        {# FIXME: implement detail page according to designs #}
+                        {# <th scope="col">{% translate "Details" %}</th> #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in task_history %}
+                        <tr>
+                            <td>
+                                <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
+                            </td>
+                            <td class="nowrap">
+                                {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                    <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                    <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "cancelled" %}
+                                    <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "failed" %}
+                                    <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "completed" %}
+                                    <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% else %}
+                                    <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>{{ task.created_at }}</td>
+                            <td>
+                                <a href="{% url "boefje_detail" organization.code task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
+                            </td>
+                            <td>
+                                <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code observed_at=task.created_at|date:'Y-m-d' %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                            </td>
+                            {# FIXME: implement detail page according to designs #}
+                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% else %}
+        {% if not task_history %}
+            {% translate "No tasks found for this object." %}
+        {% else %}
+            <table rf-selector="table-scan-history">
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Object" %}</th>
+                        <th scope="col">{% translate "Plugin" %}</th>
+                        <th scope="col">{% translate "Status" %}</th>
+                        <th scope="col">{% translate "Created date" %}</th>
+                        {# FIXME: implement detail page according to designs #}
+                        {# <th scope="col">{% translate "Scan Details" %}</th> #}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in task_history %}
+                        <tr>
+                            <td>
+                                {% if task.type == "boefje" %}
+                                    <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code %}">{{ task.p_item.data.input_ooi }}</a>
+                                {% elif task.type == "normalizer" %}
+                                    <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                                {% else %}
+                                    {{ task.id }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if task.type == "boefje" %}
+                                    <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
+                                {% elif task.type == "normalizer" %}
+                                    <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
+                                {% else %}
+                                    {{ task.id }}
+                                {% endif %}
+                            </td>
+                            <td class="nowrap">
+                                {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                    <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                    <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "cancelled" %}
+                                    <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "failed" %}
+                                    <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% elif task.status.value == "completed" %}
+                                    <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% else %}
+                                    <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                                {% endif %}
+                            </td>
+                            <td>{{ task.created_at }}</td>
+                            {# FIXME: implement detail page according to designs #}
+                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% endif %}
+</div>
+{% include "partials/list_paginator.html" with page_obj=task_history page_param="task_history_page" %}

@@ -23,7 +23,7 @@
                             {% for boefje in boefjes %}
                                 <tr>
                                     <td>
-                                        <a href="{% url "plugin_detail" organization_code=organization.code plugin_type="boefje" plugin_id=boefje.id %}">{{ boefje.name }}</a>
+                                        <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=boefje.id %}">{{ boefje.name }}</a>
                                     </td>
                                     <td>{{ boefje.description }}</td>
                                     <td>{{ boefje.scan_level.label }}</td>
