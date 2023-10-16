@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from django.contrib import messages
 from django.urls import reverse
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
@@ -28,21 +29,23 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
 
     def build_breadcrumbs(self):
         kwargs = {"organization_code": self.organization.code}
+        selection = "?" + urlencode(self.request.GET, True)
+
         breadcrumbs = [
             {
-                "url": reverse("report_oois_selection", kwargs=kwargs),
+                "url": reverse("report_oois_selection", kwargs=kwargs) + selection,
                 "text": _("Reports"),
             },
             {
-                "url": reverse("report_types_selection", kwargs=kwargs),
+                "url": reverse("report_types_selection", kwargs=kwargs) + selection,
                 "text": _("Choose report types"),
             },
             {
-                "url": reverse("report_setup_scan", kwargs=kwargs),
+                "url": reverse("report_setup_scan", kwargs=kwargs) + selection,
                 "text": _("Set up scan"),
             },
             {
-                "url": reverse("report_view", kwargs=kwargs),
+                "url": reverse("report_view", kwargs=kwargs) + selection,
                 "text": _("View Report"),
             },
         ]
@@ -103,18 +106,24 @@ class BaseSelectionView(BaseReportView):
 class PluginSelectionView(BaseReportView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.plugins = self.get_required_optional_plugins(self.selected_report_types)
+        self.plugin_ids = get_plugins_for_report_ids(self.selected_report_types)
+        self.plugins = self.get_required_optional_plugins(self.plugin_ids)
+        self.selected_optional_plugins = request.GET.getlist("optional_plugin", [])
 
-    def get_required_optional_plugins(self, report_type_ids: List[str]) -> Dict[str, Plugin]:
+    def get_required_optional_plugins(self, plugin_ids: Dict[str, List[str]]) -> Dict[str, Plugin]:
+        plugins = {}
         katalogus_client = get_katalogus(self.organization.code)
-        plugins = get_plugins_for_report_ids(report_type_ids)
-        for plugin, value in plugins.items():
-            plugins[plugin] = [katalogus_client.get_plugin(plugin_id) for plugin_id in value]
+
+        for plugin, plugin_ids in plugin_ids.items():
+            plugins[plugin] = [katalogus_client.get_plugin(plugin_id) for plugin_id in plugin_ids]
+
         return plugins
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugins"] = self.plugins
+        context["required_plugins"] = self.plugins["required"]
+        context["optional_plugins"] = self.plugins["optional"]
+        context["selected_optional_plugins"] = self.selected_optional_plugins
         return context
 
 

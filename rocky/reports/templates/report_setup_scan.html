@@ -26,18 +26,18 @@
                     <h3>{% translate "Required plugins" %}</h3>
                     <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
                     <div class="column-4 tiles plugins images-cover">
-                        {% for required_plugin in plugins.required %}
+                        {% for required_plugin in required_plugins %}
                             {% include "partials/plugin_tile.html" with plugin=required_plugin %}
 
                         {% endfor %}
                     </div>
-                    {% if plugins.optional %}
+                    {% if optional_plugins %}
                         <h3>{% translate "Suggested plugins" %}</h3>
                         <p>
                             {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
                         </p>
                         <div class="column-4 tiles plugins images-cover">
-                            {% for optional_plugin in plugins.optional %}
+                            {% for optional_plugin in optional_plugins %}
                                 {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
 
                             {% endfor %}

@@ -5,9 +5,9 @@
     {% if form_id %}
         <input form="{{ form_id }}"
                type="checkbox"
-               name="plugin"
+               name="optional_plugin"
                value="{{ plugin.id }}"
-               {% if plugin.id in request.GET.urlencode %}checked{% endif %} />
+               {% if plugin.id in selected_optional_plugins %}checked{% endif %} />
     {% endif %}
     <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
          alt="boefje placeholder image" />
@@ -31,7 +31,7 @@
                 <a class="tile-detail-link"
                    href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
             {% else %}
-                <a class="plugin-detail-link"
+                <a class="tile-detail-link"
                    href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
             {% endif %}
         </div>

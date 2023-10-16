@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load report_helpers %}
 
 <header class="test">
     {% include "partials/skip-to-content.html" %}
@@ -50,11 +51,14 @@
                                 <a href="{{ index_url }}"
                                    {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
                             </li>
-                            <li>
-                                {% url "report_oois_selection" organization.code as index_url %}
-                                <a href="{{ index_url }}"
-                                   {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Reports" %}</a>
-                            </li>
+                            {% is_feature_reports as feature_reports %}
+                            {% if feature_reports %}
+                                <li>
+                                    {% url "report_oois_selection" organization.code as index_url %}
+                                    <a href="{{ index_url }}"
+                                       {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Reports" %}</a>
+                                </li>
+                            {% endif %}
                             <li>
                                 {% url "ooi_list" organization.code as index_url %}
                                 <a href="{{ index_url }}"
@@ -95,12 +99,11 @@
                     {% for breadcrumb in breadcrumbs %}
                         {% if forloop.last %}
                             <li>
-                                <a aria-current="true"
-                                   href="{{ breadcrumb.url }}?{{ request.GET.urlencode }}">{{ breadcrumb.text }}</a>
+                                <a aria-current="true" href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
                             </li>
                         {% else %}
                             <li>
-                                <a href="{{ breadcrumb.url }}?{{ request.GET.urlencode }}">{{ breadcrumb.text }}</a>
+                                <a href="{{ breadcrumb.url }}">{{ breadcrumb.text }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}

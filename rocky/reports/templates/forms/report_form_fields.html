@@ -1,8 +1,8 @@
 <input type="hidden"
        name="observed_at"
        value="{{ observed_at|date:"DATE_FORMAT" }}">
-{% if plugins.required %}
-    {% for required_plugin in plugins.required %}
-        <input type="hidden" name="plugin" value={{ required_plugin.id }}>
+{% if required_plugins %}
+    {% for required_plugin in required_plugins %}
+        <input type="hidden" name="required_plugin" value={{ required_plugin.id }}>
     {% endfor %}
 {% endif %}
