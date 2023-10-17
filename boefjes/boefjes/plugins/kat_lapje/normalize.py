@@ -1,31 +1,33 @@
 from typing import Iterable, Union
+from urllib.parse import urlparse
+
+from haralyzer import HarParser
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
-
-import io
-
-import mitmproxy
-from mitmproxy.exceptions import FlowReadException
+from octopoes.models.ooi.web import CrawlInformation
 
 
 def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
     boefje_meta = normalizer_meta.raw_data.boefje_meta
-    Reference.from_str(boefje_meta.input_ooi)
-    flowfile = io.BytesIO(raw)
-    freader = mitmproxy.io.FlowReader(flowfile)
-    data = {}
-    try:
-        for f in freader.stream():
-            if f.type != "http":
-                continue
-        host = f.request.host
-        if not host in data:
-            data[host] = set()
-        for c in f.request.cookies:
-            data[host].add(c)
-            if f.response:
-                for c in f.response.cookies.items():
-                    data[host].add(c[0])
-    except FlowReadException as e:
-        print("Flow file corrupted: {}".format(e))
+    input_ooi = Reference.from_str(boefje_meta.input_ooi)
+
+    har_parser = HarParser.from_string(raw)
+
+    if len(har_parser.pages) != 1:
+        raise Exception("Normalizer assumes there is only one page in the HAR")
+
+    page = har_parser.pages[0]
+
+    hostnames_and_cookies = {}
+
+    for entry in page.entries:
+        parsed_url = urlparse(entry.url)
+        hostname = parsed_url.hostname
+        if hostname not in hostnames_and_cookies:
+            hostnames_and_cookies[hostname] = []
+        for cookie in entry.response.raw_entry["cookies"]:
+            if cookie not in hostnames_and_cookies[hostname]:
+                hostnames_and_cookies[hostname].append(cookie)
+
+    yield CrawlInformation(url=input_ooi, hostnames_and_cookies=hostnames_and_cookies)

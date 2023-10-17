@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io"
 	"log"
 	"os"
 	"path"
@@ -30,8 +31,9 @@ func (c *Config) OpenLogger(filename string) (e error) {
 		return err
 	}
 	//defer logfile.Close()
+	writer := io.MultiWriter(logfile, os.Stdout)
 
-	c.Logger = log.New(logfile, "sitecrawler: ", log.Ldate|log.Ltime|log.Lshortfile)
+	c.Logger = log.New(writer, "sitecrawler: ", log.Ldate|log.Ltime|log.Lshortfile)
 	return nil
 }
 

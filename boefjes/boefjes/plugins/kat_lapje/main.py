@@ -38,11 +38,11 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     for line in logfile.decode("utf-8").splitlines():
         logging.debug("Container output: %s", line)
 
-    output = get_file_from_container(container, "/app/output/network.mproxy")
+    output = get_file_from_container(container, "/app/output/dump.har")
 
     try:
         container.remove()
     except Exception as e:
         logging.warning(e)
 
-    return [(set(), output)]
+    return [(set("har"), output)]

@@ -309,3 +309,18 @@ class SecurityTXT(OOI):
         "url": "security_txt",
         "redirects_to": "is_being_redirected_to_by",
     }
+
+
+class CrawlInformation(OOI):
+    object_type: Literal["CrawlInformation"] = "CrawlInformation"
+
+    url: Reference = ReferenceField("HostnameHTTPURL", max_issue_scan_level=0, max_inherit_scan_level=4)
+    hostnames_and_cookies: Dict
+
+    _natural_key_attrs = ["url"]
+    _reverse_relation_names = {"hostname_http_url": "crawl_information"}
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        t = reference.tokenized
+        return f"CrawlInformation of {format_web_url_token(t.url)}"
