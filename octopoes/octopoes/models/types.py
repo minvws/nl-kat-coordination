@@ -221,6 +221,7 @@ def get_relations(object_type: Type[OOI]) -> Dict[str, Type[OOI]]:
         name: related_object_type(field)
         for name, field in object_type.model_fields.items()
         if field.annotation == Reference
+        or (hasattr(field.annotation, "__args__") and Reference in field.annotation.__args__)
     }
 
 
