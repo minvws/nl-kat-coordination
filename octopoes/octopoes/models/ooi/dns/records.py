@@ -56,7 +56,7 @@ class DNSMXRecord(DNSRecord):
     dns_record_type: Literal["MX"] = "MX"
 
     mail_hostname: Optional[Reference] = ReferenceField(Hostname, default=None)
-    preference: Optional[int]
+    preference: Optional[int] = None
 
     _reverse_relation_names = {
         "hostname": "dns_mx_records",

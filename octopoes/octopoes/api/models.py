@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Annotated
 
 from pydantic import BaseModel, Field
 
@@ -32,7 +32,7 @@ class _BaseObservation(BaseModel):
 class Observation(_BaseObservation):
     """Used by Octopoes Connector to describe request body"""
 
-    result: List[OOI]
+    result: List[OOIType]
     valid_time: datetime
 
 
