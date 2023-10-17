@@ -36,7 +36,7 @@
     <div>
         <ul>
             <li>
-                <a href="{% url "two_factor:login" %}"
+                <a href="{% url "login" %}"
                    {% if "login" in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Login" %}</a>
             </li>
         </ul>

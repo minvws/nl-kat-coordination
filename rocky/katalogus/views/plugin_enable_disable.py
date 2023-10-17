@@ -41,11 +41,10 @@ class PluginEnableDisableView(SinglePluginView):
             )
             return redirect(
                 reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
                         "plugin_id": self.plugin.id,
-                        "plugin_type": self.plugin.type,
                     },
                 )
             )
@@ -67,7 +66,7 @@ class PluginEnableDisableView(SinglePluginView):
                 )
             )
 
-        if self.organization_member.has_clearance(self.plugin.scan_level.value):
+        if self.plugin.can_scan(self.organization_member):
             self.katalogus_client.enable_boefje(self.plugin)
             messages.add_message(
                 self.request,

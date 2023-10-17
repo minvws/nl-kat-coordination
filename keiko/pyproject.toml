@@ -15,9 +15,12 @@ uvicorn = "^0.20.0"
 vulture = "^2.5"
 opentelemetry-sdk = "^1.19.0"
 opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
-opentelemetry-instrumentation-fastapi = "^0.40b0"
+opentelemetry-instrumentation-fastapi = "^0.41b0"
 requests = "^2.31.0"
 certifi = "^2023.7.22"
+opentelemetry-instrumentation = "^0.41b0"
+opentelemetry-instrumentation-requests = "^0.41b0"
+opentelemetry-instrumentation-psycopg2 = "^0.41b0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"

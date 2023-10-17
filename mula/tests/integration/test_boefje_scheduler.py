@@ -71,6 +71,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.scheduler.stop()
+        models.Base.metadata.drop_all(self.dbconn.engine)
         self.dbconn.engine.dispose()
 
 
@@ -334,6 +335,76 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Act
         with self.assertRaises(Exception):
             self.scheduler.is_task_running(task)
+
+    def test_is_task_running_stalled_before_grace_period(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        task = models.BoefjeTask(
+            boefje=BoefjeFactory(),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        task_db = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
+            p_item=p_item,
+            status=models.TaskStatus.DISPATCHED,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+
+        # Mock
+        self.mock_get_latest_task_by_hash.return_value = task_db
+        self.mock_get_last_run_boefje.return_value = None
+
+        # Act
+        self.assertFalse(self.scheduler.is_task_stalled(task))
+
+    def test_is_task_running_stalled_after_grace_period(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        task = models.BoefjeTask(
+            boefje=BoefjeFactory(),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        task_db = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            type="boefje",
+            p_item=p_item,
+            status=models.TaskStatus.DISPATCHED,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
+        )
+
+        # Mock
+        self.mock_get_latest_task_by_hash.return_value = task_db
+        self.mock_get_last_run_boefje.return_value = None
+
+        # Act
+        self.assertTrue(self.scheduler.is_task_stalled(task))
 
     def test_is_task_running_mismatch_before_grace_period(self):
         """When a task has finished according to the datastore, (e.g. failed
@@ -623,6 +694,85 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertIn("Could not add task to queue, queue was full", cm.output[-1])
         self.assertEqual(1, self.scheduler.queue.qsize())
 
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_stalled")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_running")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.has_grace_period_passed")
+    @mock.patch("scheduler.schedulers.BoefjeScheduler.is_item_on_queue_by_hash")
+    @mock.patch("scheduler.context.AppContext.datastores.task_store.get_tasks_by_hash")
+    def test_push_task_stalled(
+        self,
+        mock_get_tasks_by_hash,
+        mock_is_item_on_queue_by_hash,
+        mock_has_grace_period_passed,
+        mock_is_task_allowed_to_run,
+        mock_is_task_running,
+        mock_is_task_stalled,
+    ):
+        """When a task has stalled it should be set to failed."""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = BoefjeFactory()
+
+        task = models.BoefjeTask(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+        p_item = functions.create_p_item(
+            scheduler_id=self.organisation.id,
+            priority=1,
+            data=task,
+        )
+
+        # Act
+        self.scheduler.push_item_to_queue(p_item)
+
+        # Assert: task should be on priority queue
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(task.boefje.id, task_pq.boefje.id)
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Act
+        self.scheduler.pop_item_from_queue()
+
+        # Assert: task should be in datastore, and dispatched
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        # Mocks
+        mock_is_task_allowed_to_run.return_value = True
+        mock_has_grace_period_passed.return_value = True
+        mock_is_task_stalled.return_value = True
+        mock_is_task_running.return_value = False
+        self.mock_get_latest_task_by_hash.return_value = task_db
+        mock_is_item_on_queue_by_hash.return_value = False
+        mock_get_tasks_by_hash.return_value = None
+
+        # Act
+        self.scheduler.push_task(boefje, ooi)
+
+        # Assert: task should be in datastore, and failed
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        self.assertEqual(task_db.id, p_item.id)
+        self.assertEqual(task_db.status, models.TaskStatus.FAILED)
+
+        # Assert: new task should be queued
+        task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
@@ -635,7 +785,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
-            priority=0,
+            priority=1,
             data=task,
         )
 
@@ -665,7 +815,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
-            priority=0,
+            priority=1,
             data=task,
         )
 
@@ -705,7 +855,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         )
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
-            priority=0,
+            priority=1,
             data=task,
         )
         self.scheduler.push_item_to_queue(p_item)
