@@ -1,0 +1,69 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="choose-report">
+        <section>
+            <div>
+                <h1>{% translate "Setup" %}</h1>
+                <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
+                {% if selected_oois and selected_report_types %}
+                    <a href="{% url 'report_types_selection' organization.code %}?{{ request.GET.urlencode }}"
+                       class="button ghost">
+                        <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
+                    </a>
+                    <h2>{% translate "Set up scan" %}</h2>
+                    <p>
+                        <strong>{% translate "KAT will be able to generate a full report when all the required and suggested boefjes are enabled." %}</strong>
+                    </p>
+                    <p>
+                        {% translate "If you choose not to give a plugin permission to run, the data that plugin would collect or produce will be left out of the report which will then be generated based on the available data collected by the enabled plugins." %}
+                    </p>
+                    <h3>{% translate "Required plugins" %}</h3>
+                    <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
+                    <div class="column-4 tiles plugins images-cover">
+                        {% for required_plugin in plugins.required %}
+                            {% include "partials/plugin_tile.html" with plugin=required_plugin %}
+
+                        {% endfor %}
+                    </div>
+                    {% if plugins.optional %}
+                        <h3>{% translate "Suggested plugins" %}</h3>
+                        <p>
+                            {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
+                        </p>
+                        <div class="column-4 tiles plugins images-cover">
+                            {% for optional_plugin in plugins.optional %}
+                                {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
+
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <form id="generate_report"
+                          class="inline"
+                          method="get"
+                          action="{% url 'report_view' organization.code %}">
+                        {% include "forms/report_form_fields.html" %}
+
+                        {% for ooi in selected_oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
+                        {% for report_type in selected_report_types %}
+                            <input type="hidden" name="report_type" value={{ report_type }}>
+                        {% endfor %}
+                        <button type="submit">
+                            {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
+                        </button>
+                    </form>
+                {% else %}
+                    <a class="button ghost"
+                       href="{% url 'report_types_selection' organization.code %}?{{ request.GET.urlencode }}">
+                        <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
+                    </a>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}

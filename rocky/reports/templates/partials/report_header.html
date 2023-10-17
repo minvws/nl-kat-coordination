@@ -1,0 +1,19 @@
+{% load i18n %}
+{% load static %}
+{% load tz %}
+
+{% get_current_timezone as TIME_ZONE %}
+<section class="centered">
+    <div class="centered">
+        <img width="320"
+             src="{% static 'img/kat_logo.png' %}"
+             alt="{% translate "OpenKAT" %}" />
+        <h1>{% translate "Report for organization" %} {{ organization.name }}</h1>
+        <p class="emphasized">
+            <strong>{% translate "Observed at:" %}</strong> {{ observed_at }} {{ TIME_ZONE }}
+        </p>
+        <p>
+            <strong>{% translate "Created by:" %}</strong> {{ organization_member.user.full_name }}
+        </p>
+    </div>
+</section>
