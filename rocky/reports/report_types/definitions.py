@@ -10,7 +10,7 @@ REPORTS_DIR = Path(__file__).parent
 logger = getLogger(__name__)
 
 
-class Plugins(TypedDict):
+class ReportPlugins(TypedDict):
     required: List[str]
     optional: List[str]
 
@@ -19,7 +19,7 @@ class Report(ABC):
     id: str
     name: str
     description: str
-    plugins: Plugins
+    plugins: ReportPlugins
     input_ooi_types: Set[OOIType]
     template_path: str = "report.html"
 
