@@ -193,6 +193,19 @@ def get_raw_by_id(
     return Response(raw_data.value, media_type="application/octet-stream")
 
 
+@router.get("/raw/{raw_id}/meta", tags=[RAW_TAG])
+def get_raw_meta_by_id(
+    raw_id: UUID,
+    meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
+) -> RawDataMeta:
+    try:
+        raw_meta = meta_repository.get_raw_meta_by_id(raw_id)
+    except ObjectNotFoundException as error:
+        raise HTTPException(status_code=404, detail="No raw data found") from error
+
+    return raw_meta
+
+
 @router.get("/raw", response_model=List[RawDataMeta], tags=[RAW_TAG])
 def get_raws(
     organization: Optional[str] = None,

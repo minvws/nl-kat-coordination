@@ -475,9 +475,30 @@ The OOI class tree is traversed 2 levels deep. Bear in mind that both Finding an
 Hence the 1 and 2 levels markers on Finding and Job in the image below.
 ![KAT Query Plan](img/kat_query_plan.png "KAT Query Plan")
 
+## Run bit manually
 
+It is possible to manually run a bit using
 
+```shell
+$ ./tools/run_bit.py ORGANIZATION_CODE BIT_ID OOI
+```
 
+This will execute the bit with debug logging turned on. `run_bit.py` supports
+the `--pdb` option to enter the standard Python Debugger when an exceptions
+happens or breakpoint is triggered.
+
+If you are using the standard docker compose developer setup, you can use
+`docker compose exec` to execute the command in the container:
+
+```shell
+$ docker compose exec octopoes_api ./tools/run_bit.py ORGANIZATION_CODE BIT_ID OOI
+```
+
+Example usage:
+
+```shell
+$ docker compose exec octopoes_api ./tools/run_bit.py ORGANIZATION_CODE BIT_ID OOI
+```
 
 ## Tests
 
