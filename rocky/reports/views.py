@@ -11,7 +11,6 @@ from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
@@ -75,7 +74,7 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
     def get_report_types_from_choice(self):
         return [get_report_by_id(report_type) for report_type in self.selected_report_types]
 
-    def get_report_types(self) -> List[Report]:
+    def get_report_types(self) -> List[ReportType]:
         return [
             {"id": report_type.id, "name": report_type.name, "description": report_type.description}
             for report_type in self.get_report_types_from_choice()

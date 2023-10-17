@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-16 10:17+0000\n"
+"POT-Creation-Date: 2023-10-17 11:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2718,7 +2718,7 @@ msgid "Found by"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Email security measures"
+msgid "Security measures"
 msgstr ""
 
 #: reports/report_types/dns_report/report.py
@@ -2829,18 +2829,18 @@ msgid "Select which objects you want to include in your report."
 msgstr ""
 
 #: reports/templates/report_oois_selection.html
-msgid "There are no objects found to make a report."
-msgstr ""
-
-#: reports/templates/report_oois_selection.html
-msgid "Go to the object page"
-msgstr ""
-
-#: reports/templates/report_oois_selection.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+msgid "No OOIs found."
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/report_oois_selection.html
@@ -2952,6 +2952,10 @@ msgstr ""
 
 #: reports/templates/summary/report_summary.html
 msgid "Selected Plugins for scans"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Plugin options"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
@@ -5220,6 +5224,10 @@ msgstr ""
 
 #: rocky/views/indemnification_add.py
 msgid "Indemnification successfully set."
+msgstr ""
+
+#: rocky/views/mixins.py
+msgid "Can not parse date request, falling back to show current date."
 msgstr ""
 
 #: rocky/views/ooi_add.py
