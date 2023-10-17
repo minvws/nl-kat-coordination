@@ -53,7 +53,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
-            priority=0,
+            priority=1,
         )
 
         # Act
@@ -74,7 +74,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
-            priority=0,
+            priority=1,
         )
 
         # Act
@@ -106,7 +106,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange: add tasks
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
-            priority=0,
+            priority=1,
         )
         self.scheduler.push_item_to_queue(p_item)
 
@@ -156,7 +156,7 @@ class SchedulerTestCase(unittest.TestCase):
         # Arrange: add tasks
         p_item = functions.create_p_item(
             scheduler_id=self.scheduler.scheduler_id,
-            priority=0,
+            priority=1,
         )
         self.scheduler.push_item_to_queue(p_item)
 

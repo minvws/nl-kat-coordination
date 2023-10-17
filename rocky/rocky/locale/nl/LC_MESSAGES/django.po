@@ -1,18 +1,20 @@
+# Brenno de Winter <brenno@dewinter.com>, 2023.
+# Darwinkel <Darwinkel@users.noreply.github.com>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-20 15:20+0000\n"
-"PO-Revision-Date: 2023-08-11 07:29+0000\n"
-"Last-Translator: Patrick <patrick@darwinkel.net>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/nl/>\n"
+"PO-Revision-Date: 2023-10-11 21:00+0000\n"
+"Last-Translator: Darwinkel <Darwinkel@users.noreply.github.com>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.0-dev\n"
+"X-Generator: Weblate 5.1-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -344,10 +346,11 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-"               U heeft geen vrijwaring om objecten te scannen.<br>\n"
+"                            U heeft geen vrijwaring om objecten te "
+"scannen.<br>\n"
 "               Neem contact op met de beheerder om u het nodige vrijwaring "
 "niveau te geven.\n"
-"              "
+"                        "
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level "
@@ -493,7 +496,7 @@ msgid ""
 "If you don’t remember the email address connected to your account, contact: "
 msgstr ""
 "Als u het aan uw account gekoppelde e-mailadres niet meer weet, neem dan "
-"contact op met:"
+"contact op met: "
 
 #: account/templates/recover_email.html
 msgid "Please contact the system administrator."
@@ -594,7 +597,7 @@ msgid "Failure mode"
 msgstr "Foutmodus"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/plugin_detail.html tools/forms/finding_type.py
+#: katalogus/templates/boefje_detail.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
@@ -1524,7 +1527,7 @@ msgstr "Filters wissen"
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
-#: katalogus/views/katalogus_settings.py katalogus/views/plugin_detail.py
+#: katalogus/views/katalogus_settings.py katalogus/views/boefje_detail.py
 #: katalogus/views/plugin_settings_add.py
 #: katalogus/views/plugin_settings_delete.py
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
@@ -1560,13 +1563,7 @@ msgid "Object list"
 msgstr "Objectenlijst"
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, fuzzy, python-format
-#| msgid ""
-#| "This boefje will only scan objects with a corresponding clearance level "
-#| "of <strong>L%(scan_level)s</strong> or higher. There is no "
-#| "indemnification for this boefje to scan an OOI with a lower clearance "
-#| "level than <strong>L%(scan_level)s</strong>. Use the filter to show OOI's "
-#| "with a lower clearance level."
+#, python-format
 msgid ""
 "This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
@@ -1574,9 +1571,9 @@ msgid ""
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
-"Dit boefje scant alleen objecten met een overeenkomstig vrijwaringsniveau "
+"Dit Boefje scant alleen objecten met een overeenkomstig vrijwaringsniveau "
 "van <strong>(%(scan_level)s)</strong> of hoger. Er is geen vrijwaring voor "
-"dit boefje om een OOI met een lager scan level te scannen "
+"dit Boefje om een OOI met een lager scan level te scannen "
 "dan<strong>L%(scan_level)s</strong>. Gebruik het filter om OOI's met een "
 "lagere vrijwaringssniveau."
 
@@ -1707,29 +1704,29 @@ msgstr "Boefjes"
 msgid "Normalizers"
 msgstr "Normalizers"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Scan level"
 msgstr "Vrijwaringsniveau"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Consumes"
 msgstr "Consumeren"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s is able to scan the following object types:"
 msgstr "%(plugin_name)s is in staat om het volgende object types te scannen:"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s does not need any input objects."
 msgstr "%(plugin_name)s heeft geen invoerobjecten nodig."
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 msgid "Produces"
 msgstr "Produceren"
 
-#: katalogus/templates/plugin_detail.html
+#: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s can produce the following output:"
 msgstr "%(plugin_name)s kan het volgende produceren:"
@@ -1856,7 +1853,7 @@ msgstr "Nee"
 msgid "Session has terminated, please select OOIs again."
 msgstr "Sessie is verlopen, selecteer nogmaals OOIs."
 
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
+#: katalogus/views/change_clearance_level.py katalogus/views/boefje_detail.py
 msgid "Scanning successfully scheduled."
 msgstr "Scan met success ingepland."
 
@@ -1910,7 +1907,7 @@ msgstr ""
 "niveau bevestigd van L%s. Accepteer eerst het vrijwaring niveau op uw "
 "profiel pagina om verder te gaan."
 
-#: katalogus/views/plugin_detail.py
+#: katalogus/views/boefje_detail.py
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
@@ -1918,7 +1915,7 @@ msgstr ""
 "Sommige geselecteerde OOI's vereisen een hoger vrijwaring niveau om scans "
 "uit te voeren.U bent niet gemachtigd om het vrijwaring niveau te wijzigen."
 
-#: katalogus/views/plugin_detail.py
+#: katalogus/views/boefje_detail.py
 msgid "Please select an OOI to start scan."
 msgstr "Selecteer een OOI om de scan te starten."
 

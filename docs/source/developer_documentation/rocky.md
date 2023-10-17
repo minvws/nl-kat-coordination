@@ -169,7 +169,7 @@ direction RL
     OctopoesView <|-- OrganizationView
 
     BoefjeMixin <|-- OctopoesView
-    PluginDetailView <|-- BoefjeMixin
+    BoefjeDetailView <|-- BoefjeMixin
     OOIDetailView <|-- BoefjeMixin
     OOIDetailView <|-- OOIRelatedObjectAddView
     OOIDetailView <|-- OOIFindingManager
@@ -247,14 +247,14 @@ direction RL
     SingleSettingView : setting_name
 
     class PluginSettingsDeleteView
-    class PluginDetailView
+    class BoefjeDetailView
 
     KATalogusView  <|--  OrganizationView
     KATalogusView  <|--  FormView
     SinglePluginView  <|--  OrganizationView
     SingleSettingView  <|--  SinglePluginView
-    PluginDetailView  <|--  PluginSettingsListView
-    PluginDetailView  <|--  BoefjeMixin
+    BoefjeDetailView  <|--  PluginSettingsListView
+    BoefjeDetailView  <|--  BoefjeMixin
     PluginEnableDisableView  <|--  SinglePluginView
     PluginSettingsAddView  <|--  FormView
     PluginSettingsAddView  <|--  SinglePluginView
