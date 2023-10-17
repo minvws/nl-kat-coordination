@@ -37,16 +37,23 @@ class MuteFindingsBulkView(OrganizationPermissionRequiredMixin, SingleOOIMixin):
     permission_required = "tools.can_mute_findings"
 
     def post(self, request, *args, **kwargs):
+        unmute = request.POST.get("unmute", None)
         selected_findings = request.POST.getlist("finding", None)
         reason = request.POST.get("reason", None)
 
         if not selected_findings:
             messages.add_message(self.request, messages.WARNING, _("Please select at least one finding."))
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
+        if unmute:
+            mutes_finding_refs = [MutedFinding(finding=finding) for finding in selected_findings]
+            self.octopoes_api_connector.delete_many(mutes_finding_refs)
 
-        for finding in selected_findings:
-            ooi = self.ooi_class.parse_obj({"finding": finding, "reason": reason})
-            create_ooi(self.octopoes_api_connector, self.bytes_client, ooi)
+            messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully unmuted."))
+            return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
+        else:
+            for finding in selected_findings:
+                ooi = self.ooi_class.parse_obj({"finding": finding, "reason": reason})
+                create_ooi(self.octopoes_api_connector, self.bytes_client, ooi)
 
-        messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
-        return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
+            messages.add_message(self.request, messages.SUCCESS, _("Finding(s) successfully muted."))
+            return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))

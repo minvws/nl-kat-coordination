@@ -78,7 +78,7 @@ def test_ooi_detail(
     assertContains(response, "Plugin")
     assertContains(response, "test-boefje")
     assertContains(
-        response, f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">test-boefje</a>'
+        response, f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>'
     )
     assertContains(response, "Status")
     assertContains(response, "Completed")
@@ -184,7 +184,7 @@ def test_ooi_detail_start_scan(
     network,
 ):
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
-    mocker.patch("katalogus.views.mixins.client")
+    mocker.patch("katalogus.views.mixins.schedule_task")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network

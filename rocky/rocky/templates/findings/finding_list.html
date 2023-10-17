@@ -102,20 +102,27 @@
                         </table>
                     </div>
                     {% if object_list|length > 1 and perms.tools.can_mute_findings %}
-                        <fieldset>
-                            <legend>{% translate "Mute findings" %}</legend>
-                            <div>
-                                <label for="id_reason">{% translate "Reason" %}:</label>
+                        {% if not only_muted %}
+                            <fieldset>
+                                <legend>{% translate "Mute findings" %}</legend>
                                 <div>
-                                    <textarea name="reason" cols="5" rows="3" id="id_reason"></textarea>
+                                    <label for="id_reason">{% translate "Reason" %}:</label>
+                                    <div>
+                                        <textarea name="reason" cols="5" rows="3" id="id_reason"></textarea>
+                                    </div>
                                 </div>
-                            </div>
-                        </fieldset>
+                            </fieldset>
+                        {% endif %}
                         <div class="button-container">
-                            <button type="submit">{% translate "Mute Findings" %}</button>
+                            {% if only_muted %}
+                                <button type="submit">{% translate "Unmute Findings" %}</button>
+                                <input type="checkbox" class="hidden" value="true" name="unmute" checked>
+                            {% else %}
+                                <button type="submit">{% translate "Mute Findings" %}</button>
+                            {% endif %}
                         </div>
-                    {% endif %}
-                </form>
+                    </form>
+                {% endif %}
                 {% include "partials/pagination.html" %}
 
             </div>
