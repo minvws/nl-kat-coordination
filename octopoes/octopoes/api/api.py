@@ -111,13 +111,13 @@ def root_health() -> ServiceHealth:
 
 @app.on_event("shutdown")
 def close_rabbit_mq_connection():
-    close_rabbit_channel(settings.queue_uri)
+    close_rabbit_channel(str(settings.queue_uri))
 
 
 @app.on_event("startup")
 def create_rabbit_mq_connection():
     try:
-        get_rabbit_channel(settings.queue_uri)
+        get_rabbit_channel(str(settings.queue_uri))
     except (AMQPConnectionWorkflowFailed, socket.gaierror):
         logger.exception("Unable to connect RabbitMQ on startup")
 
