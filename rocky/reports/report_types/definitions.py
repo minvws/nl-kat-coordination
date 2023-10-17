@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Set, TypedDict
 
 from octopoes.models.types import OOIType
 
@@ -10,11 +10,16 @@ REPORTS_DIR = Path(__file__).parent
 logger = getLogger(__name__)
 
 
+class Plugins(TypedDict):
+    required: List[str]
+    optional: List[str]
+
+
 class Report(ABC):
     id: str
     name: str
     description: str
-    plugins: Dict[str, List[str]]  # TODO: type dict
+    plugins: Plugins
     input_ooi_types: Set[OOIType]
     template_path: str = "report.html"
 
