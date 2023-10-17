@@ -8,9 +8,8 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
-from pydantic import BaseModel, ConfigDict, Field
 from django.utils.translation import gettext_lazy as _
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
