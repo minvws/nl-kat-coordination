@@ -50,10 +50,9 @@ def test_plugin_settings_delete(
 
     assert response.status_code == 302
     assert response.headers["Location"] == reverse(
-        "plugin_detail",
+        "boefje_detail",
         kwargs={
             "organization_code": superuser_member.organization.code,
-            "plugin_type": "boefje",
             "plugin_id": "test-boefje",
         },
     )
@@ -83,10 +82,9 @@ def test_plugin_settings_delete_failed(
 
     assert response.status_code == 302
     assert response.headers["Location"] == reverse(
-        "plugin_detail",
+        "boefje_detail",
         kwargs={
             "organization_code": superuser_member.organization.code,
-            "plugin_type": "boefje",
             "plugin_id": "test-boefje",
         },
     )
@@ -119,10 +117,9 @@ def test_plugin_settings_delete_no_settings_present(
 
     assert response.status_code == 302
     assert response.headers["Location"] == reverse(
-        "plugin_detail",
+        "boefje_detail",
         kwargs={
             "organization_code": superuser_member.organization.code,
-            "plugin_type": "boefje",
             "plugin_id": "test-boefje",
         },
     )
