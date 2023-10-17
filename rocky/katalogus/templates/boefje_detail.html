@@ -1,0 +1,91 @@
+{% extends "layouts/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content">
+        <section>
+            <div class="two-thirds-one-third">
+                <div>
+                    <h1>{{ plugin.name }}</h1>
+                    <div class="horizontal-view scan-intensity">
+                        <span class="de-emphasized">{% translate "Scan level" %}</span>
+                        {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
+
+                    </div>
+                    <p>
+                        <strong>{% translate "Description" %}</strong>
+                    </p>
+                    <p>{{ plugin.description }}</p>
+                    <div class="horizontal-view">
+                        {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
+
+                    </div>
+                </div>
+                <div class="image-square">
+                    <div class="image-container">
+                        <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
+                             alt="boefje placeholder image" />
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% if perms.tools.can_view_katalogus_settings %}
+            {% include "plugin_settings_list.html" with object_list=object_list plugin=plugin %}
+
+        {% endif %}
+        <section>
+            <div>
+                <h2>{% translate "Consumes" %}</h2>
+                {% if plugin.consumes %}
+                    <p>
+                        {% blocktranslate trimmed with plugin_name=plugin.name %}
+                            {{ plugin_name }} is able to scan the following object types:
+                        {% endblocktranslate %}
+                    </p>
+                    <p>
+                        {% for ooi in plugin.consumes %}
+                            <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
+                            {% if ooi != plugin.consumes|last %}-{% endif %}
+                        {% endfor %}
+                    </p>
+                {% else %}
+                    {% blocktranslate trimmed with plugin_name=plugin.name %}
+                        {{ plugin_name }} does not need any input objects.
+                    {% endblocktranslate %}
+                {% endif %}
+                <h2>{% translate "Produces" %}</h2>
+                <p>
+                    {% blocktranslate trimmed with plugin_name=plugin.name %}
+                        {{ plugin_name }} can produce the following output:
+                    {% endblocktranslate %}
+                </p>
+                <p>
+                    {% for ooi in plugin.produces %}
+                        <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
+                        {% if ooi != plugin.produces|last %}-{% endif %}
+                    {% endfor %}
+                </p>
+                <p>
+                    {% include "partials/task_history.html" %}
+
+                </p>
+            </div>
+        </section>
+        {% if perms.tools.can_scan_organization %}
+            {% include "partials/objects_to_scan.html" with plugin=plugin %}
+
+        {% endif %}
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    {% compress js %}
+        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}
