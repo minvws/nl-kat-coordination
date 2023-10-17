@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Type
+from typing import Any, Dict
 
 from django.utils.translation import gettext_lazy as _
 
@@ -12,6 +12,7 @@ from reports.report_types.definitions import Report
 logger = getLogger(__name__)
 
 CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
+TREE_DEPTH = 3
 
 
 class TLSReport(Report):
@@ -20,16 +21,15 @@ class TLSReport(Report):
     description: str = _("TLS reports assess the security of data encryption and transmission protocols.")
     plugins = {"required": ["testssl-sh-ciphers"], "optional": []}
     input_ooi_types = {IPService}
-    html_template_path = "tls_report/report.html"
-    tree_depth: int = 3
+    template_path = "tls_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: Type[datetime]):
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
         suites = {}
         findings = []
         suites_with_findings = []
         ref = Reference.from_str(input_ooi)
         tree = self.octopoes_api_connector.get_tree(
-            ref, depth=self.tree_depth, types={TLSCipher, Finding}, valid_time=valid_time
+            ref, depth=TREE_DEPTH, types={TLSCipher, Finding}, valid_time=valid_time
         ).store
         for pk, ooi in tree.items():
             if ooi.ooi_type == "TLSCipher":
@@ -48,4 +48,4 @@ class TLSReport(Report):
             "suites": suites,
             "findings": findings,
             "suites_with_findings": suites_with_findings,
-        }, self.html_template_path
+        }

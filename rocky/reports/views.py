@@ -189,9 +189,9 @@ class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
             report_data[ooi] = {}
             for report_type in self.get_report_types_from_choice():
                 if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
-                    data, template = report_type(self.octopoes_api_connector).generate_data(
-                        ooi, valid_time=self.valid_time
-                    )
+                    report = report_type(self.octopoes_api_connector)
+                    data = report.generate_data(ooi, valid_time=self.valid_time)
+                    template = report.template_path
                     report_data[ooi][report_type.name] = {"data": data, "template": template}
         return report_data
 
