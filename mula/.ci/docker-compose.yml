@@ -24,14 +24,10 @@ services:
     env_file:
       - .ci/.env.test
     depends_on:
-      ci_postgres:
-        condition: service_healthy
-      ci_rabbitmq:
-        condition: service_healthy
-      ci_bytes:
-        condition: service_started
-      ci_katalogus:
-        condition: service_started
+      - ci_postgres
+      - ci_bytes
+      - ci_katalogus
+      - ci_rabbitmq
 
   ci_postgres:
     image: postgres:15

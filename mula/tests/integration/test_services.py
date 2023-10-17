@@ -5,7 +5,7 @@ from scheduler import config
 from scheduler.connectors import services
 from scheduler.utils import remove_trailing_slash
 
-from tests.factories import OrganisationFactory
+from tests.factories import OrganisationFactory, PluginFactory
 
 
 class BytesTestCase(unittest.TestCase):
@@ -41,7 +41,7 @@ class KatalogusTestCase(unittest.TestCase):
         self.service_katalogus = services.Katalogus(
             host=remove_trailing_slash(str(self.config.host_katalogus)),
             source="scheduler_test",
-            cache_ttl=self.config.katalogus_cache_ttl,
+            cache_ttl=12345,
         )
 
     def tearDown(self) -> None:
@@ -60,6 +60,7 @@ class KatalogusTestCase(unittest.TestCase):
         mock_get_organisations.return_value = [
              OrganisationFactory(id="org-1"),
              OrganisationFactory(id="org-2"),
+             OrganisationFactory(id="org-3"),
         ]
 
         # Act
@@ -81,11 +82,57 @@ class KatalogusTestCase(unittest.TestCase):
         self.assertEqual(len(self.service_katalogus.organisations_plugin_cache), 0)
         self.assertIsNone(self.service_katalogus.organisations_plugin_cache.get("org-1"))
 
-    def test_flush_organisations_boefje_type_cache(self):
-        pass
+    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    def test_flush_organisations_boefje_type_cache(self, mock_get_organisations, mock_get_plugins_by_organisation):
+        # Mock
+        mock_get_organisations.return_value = [
+            OrganisationFactory(id="org-1"),
+            OrganisationFactory(id="org-2"),
+        ]
 
-    def test_flsuh_organisations_normalizer_type_cache(self):
-        pass
+        mock_get_plugins_by_organisation.return_value = [
+            PluginFactory(id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]),
+            PluginFactory(id="plugin-2", type="boefje", enabled=True, consumes=["Hostname"]),
+        ]
+
+        # Act
+        self.service_katalogus.flush_organisations_boefje_type_cache()
+
+        # Assert
+        self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache), 2)
+        self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-1"))
+        self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-1").get("Hostname"))
+        self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache.get("org-1").get("Hostname")), 2)
+        self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-2"))
+        self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-2").get("Hostname"))
+        self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache.get("org-2").get("Hostname")), 2)
+
+    @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
+    @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
+    def test_flush_organisations_normalizer_type_cache(self, mock_get_organisations, mock_get_plugins_by_organisation):
+        # Mock
+        mock_get_organisations.return_value = [
+            OrganisationFactory(id="org-1"),
+            OrganisationFactory(id="org-2"),
+        ]
+
+        mock_get_plugins_by_organisation.return_value = [
+            PluginFactory(id="plugin-1", type="normalizer", enabled=True, consumes=["Hostname"]),
+            PluginFactory(id="plugin-2", type="normalizer", enabled=True, consumes=["Hostname"]),
+        ]
+
+        # Act
+        self.service_katalogus.flush_organisations_normalizer_type_cache()
+
+        # Assert
+        self.assertEqual(len(self.service_katalogus.organisations_normalizer_type_cache), 2)
+        self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-1"))
+        self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname"))
+        self.assertEqual(len(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname")), 2)
+        self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-2"))
+        self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname"))
+        self.assertEqual(len(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname")), 2)
 
     def test_get_plugins_by_org_id(self):
         pass
