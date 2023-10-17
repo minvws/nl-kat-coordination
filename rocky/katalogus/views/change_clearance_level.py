@@ -38,7 +38,7 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
             return self.get(request, *args, **kwargs)
 
         self.run_boefje_for_oois(boefje=self.plugin, oois=self.oois)
-        messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
+
         del request.session["selected_oois"]  # delete session
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 

@@ -65,13 +65,6 @@ class OOIDetailView(
                 boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
                 ooi = self.get_single_ooi(pk=ooi_id)
                 self.run_boefje_for_oois(boefje, [ooi])
-
-                success_message = (
-                    "Your scan is running successfully in the background. \n "
-                    "Results will be added to the object list when they are in. "
-                    "It may take some time, a refresh of the page may be needed to show the results."
-                )
-                messages.add_message(self.request, messages.SUCCESS, _(success_message))
                 return redirect("task_list", organization_code=self.organization.code)
 
             if action == PageActions.SUBMIT_ANSWER.value:
