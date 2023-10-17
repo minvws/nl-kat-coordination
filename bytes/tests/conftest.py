@@ -23,10 +23,11 @@ from tests.client import BytesAPIClient
 
 @pytest.fixture
 def settings(tmpdir):
+    env_path = Path(__file__).parent.parent / ".ci" / ".env.test"
     try:
         return Settings(data_dir=Path(tmpdir))
     except ValidationError:  # test is probably being run outside the container setup
-        with (Path(__file__).parent.parent / ".ci" / ".env.test").open() as f:
+        with env_path.open() as f:
             lines = [
                 line.strip().split("=")
                 for line in f.readlines()
@@ -36,7 +37,7 @@ def settings(tmpdir):
             for key, val in lines:
                 os.environ[key] = val
 
-        return Settings(data_dir=Path(tmpdir), _env_file=Path(__file__).parent.parent / ".ci" / ".env.test")
+        return Settings(data_dir=Path(tmpdir), _env_file=env_path)
 
 
 @pytest.fixture

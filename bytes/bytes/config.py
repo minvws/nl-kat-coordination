@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Type
 
 from pydantic import AmqpDsn, AnyHttpUrl, DirectoryPath, Field, FilePath, PostgresDsn
-from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource
+from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 
 from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
@@ -133,17 +133,8 @@ class Settings(BaseSettings):
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
-    # TODO[pydantic]: We couldn't refactor this class, please create the `model_config` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-config for more information.
-    # class Config:
-    #
-    #     @classmethod
-    #     def customise_sources(
-    #         cls,
-    #         init_settings: SettingsSourceCallable,
-    #         env_settings: SettingsSourceCallable,
-    #         file_secret_settings: SettingsSourceCallable,
-    #     ) -> Tuple[SettingsSourceCallable, ...]:
+    model_config = SettingsConfigDict(env_prefix="BYTES_")
+
     @classmethod
     def settings_customise_sources(
         cls,
