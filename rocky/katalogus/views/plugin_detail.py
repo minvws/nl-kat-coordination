@@ -165,7 +165,6 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
                     boefje=boefje,
                     oois=oois_with_clearance_level,
                 )
-                messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
 
             if oois_without_clearance_level:
                 if not self.organization_member.has_perm("tools.can_set_clearance_level"):
