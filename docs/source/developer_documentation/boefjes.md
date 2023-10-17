@@ -182,11 +182,47 @@ The job file for a DNS scan might look like this:
 
 If the tool runs smoothly, the data can be accessed using the Bytes API (see Bytes documentation).
 
-### Running a tool or normalizer directly using a job file
+### Manually running a boefje or normalizer
 
-It's also possible to run the job runner for a json file containing a job:
-- `python -m run --job tests/examples/my-boefje-job.json boefje` or
-- `python -m run --job tests/examples/my-normalizer-job.json normalizer`
+It is possible to manually run a boefje using
+
+```shell
+$ ./tools/run_boefje.py ORGANIZATION_CODE BOEFJE_ID INPUT_OOI
+```
+
+This will execute the boefje with debug logging turned on. It will log the raw
+file id in the output, which can be viewed using `show_raw`:
+
+```shell
+$ ./tools/show_raw.py RAW_ID
+```
+
+There is also a `--json` option to parse the raw file as JSON and pretty print
+it. The normalizer is run using:
+
+```shell
+$ ./tools/run_normalizer.py NORMALIZER_ID RAW_ID
+```
+
+Both `run_boefje.py` and `run_normalizer.py` support the `--pdb` option to enter
+the standard Python Debugger when an exceptions happens or breakpoint is
+triggered.
+
+If you are using the standard docker compose developer setup, you can use
+`docker compose exec` to execute the commands in the container. The boefje and
+normalizer containers use the same images and settings, so you can use both:
+
+```shell
+$ docker compose exec boefje ./tools/run_boefje.py ORGANIZATION_CODE BOEFJE_ID INPUT_OOI
+```
+
+For example:
+
+```shell
+$ docker compose exec boefje ./tools/run_boefje.py myorganization dns-records "Hostname|internet|example.com"
+$ docker compose exec boefje ./tools/show_raw.py --json 794986d7-cf39-4a2c-8bdf-17ae58f361ea
+$ docker compose exec boefje ./tools/run_normalizer.py kat_dns_normalize 794986d7-cf39-4a2c-8bdf-17ae58f361ea
+```
 
 
 ### Boefje and normalizer structure
