@@ -1,10 +1,10 @@
 import uuid
 from datetime import datetime
-from typing import Any, List, Optional, Annotated
+from typing import Any, List, Optional
 
 from pydantic import BaseModel, Field
 
-from octopoes.models import OOI, Reference
+from octopoes.models import Reference
 from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.types import OOIType
 
