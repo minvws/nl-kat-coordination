@@ -11,6 +11,9 @@ RUN yarn --ignore-engines && yarn build
 
 FROM python:$PYTHON_VERSION-bookworm AS dev
 
+ENV GRANIAN_WORKERS=2
+ENV GRANIAN_THREADS=4
+
 ARG USER_UID=1000
 ARG USER_GID=1000
 
