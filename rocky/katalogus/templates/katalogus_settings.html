@@ -31,7 +31,7 @@
                                 {% for setting in settings %}
                                     <tr>
                                         <td>
-                                            <a href="{% url "plugin_detail" organization_code=organization.code plugin_type=plugin_type plugin_id=setting.plugin_id %}">{{ setting.plugin_name }}</a>
+                                            <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=setting.plugin_id %}">{{ setting.plugin_name }}</a>
                                         </td>
                                         <td>{{ setting.name }}</td>
                                         <td>{{ setting.value }}</td>

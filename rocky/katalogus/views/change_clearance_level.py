@@ -23,11 +23,10 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
             messages.add_message(self.request, messages.ERROR, _("Session has terminated, please select OOIs again."))
             return redirect(
                 reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
                         "plugin_id": kwargs["plugin_id"],
-                        "plugin_type": kwargs["plugin_type"],
                     },
                 )
             )
@@ -57,10 +56,9 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
             },
             {
                 "url": reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin.type,
                         "plugin_id": self.plugin.id,
                     },
                 ),
