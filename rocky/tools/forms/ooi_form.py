@@ -146,6 +146,7 @@ class ClearanceFilterForm(BaseRockyForm):
         widget=CheckboxGroup(choices=SCAN_LEVEL.choices),
         required=False,
     )
+
     clearance_type = forms.CharField(
         label=_("Filter by clearance type"),
         widget=CheckboxGroup(choices=CLEARANCE_TYPE_CHOICES),
