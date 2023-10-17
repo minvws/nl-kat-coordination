@@ -17,6 +17,7 @@ from octopoes.config.settings import Settings
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.origin import Origin, OriginParameter, OriginType
+from octopoes.models.path import Path as OctopoesPath
 from octopoes.xtdb.client import XTDBSession
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -56,7 +57,7 @@ def run_bit(start_pdb, organization_code, bit_id, ooi):
             origin_repository.save(bit_instance, valid_time)
 
         for param_def in bit_definition.parameters:
-            path = Path.parse(f"{param_def.ooi_type.get_object_type()}.{param_def.relation_path}").reverse()
+            path = OctopoesPath.parse(f"{param_def.ooi_type.get_object_type()}.{param_def.relation_path}").reverse()
 
             param_oois = ooi_repository.list_related(ooi, path, valid_time=valid_time)
             for param_ooi in param_oois:
