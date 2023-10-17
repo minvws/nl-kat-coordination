@@ -494,6 +494,12 @@ If you are using the standard docker compose developer setup, you can use
 $ docker compose exec octopoes_api ./tools/run_bit.py ORGANIZATION_CODE BIT_ID OOI
 ```
 
+Example usage:
+
+```shell
+$ docker compose exec octopoes_api ./tools/run_bit.py ORGANIZATION_CODE BIT_ID OOI
+```
+
 ## Tests
 
 The unit tests `octopoes/tests` are run using

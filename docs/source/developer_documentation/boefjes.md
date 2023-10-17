@@ -209,11 +209,21 @@ the standard Python Debugger when an exceptions happens or breakpoint is
 triggered.
 
 If you are using the standard docker compose developer setup, you can use
-`docker compose exec` to execute the commands in the container:
+`docker compose exec` to execute the commands in the container. The boefje and
+normalizer containers use the same images and settings, so you can use both:
 
 ```shell
 $ docker compose exec boefje ./tools/run_boefje.py ORGANIZATION_CODE BOEFJE_ID INPUT_OOI
 ```
+
+For example:
+
+```shell
+$ docker compose exec boefje ./tools/run_boefje.py myorganization dns-records "Hostname|internet|example.com"
+$ docker compose exec boefje ./tools/show_raw.py --json 794986d7-cf39-4a2c-8bdf-17ae58f361ea
+$ docker compose exec boefje ./tools/run_normalizer.py kat_dns_normalize 794986d7-cf39-4a2c-8bdf-17ae58f361ea
+```
+
 
 ### Boefje and normalizer structure
 
