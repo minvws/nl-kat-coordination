@@ -2,13 +2,6 @@
 {% load static %}
 
 <div role="group" id="plugin_{{ plugin.id|slugify }}">
-    {% if form_id %}
-        <input form="{{ form_id }}"
-               type="checkbox"
-               name="optional_plugin"
-               value="{{ plugin.id }}"
-               {% if plugin.id in selected_optional_plugins %}checked{% endif %} />
-    {% endif %}
     <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
          alt="boefje placeholder image" />
     <p class="tile-title">

@@ -27,6 +27,7 @@
         <table>
             <thead>
                 <tr>
+                    <th>{% translate "Plugin options" %}</th>
                     <th>{% translate "Plugin name" %}</th>
                     <th>{% translate "Plugin scan level" %}</th>
                     <th>{% translate "Plugin type" %}</th>
@@ -37,6 +38,7 @@
                 {% for option, plugins in plugins.items %}
                     {% for plugin in plugins %}
                         <tr>
+                            <td>{{ option }}</td>
                             <td>{{ plugin.name }}</td>
                             <td>
                                 {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}

@@ -13,7 +13,7 @@
             <div>
                 <h1>
                     {% translate "Object list" %} @
-                    {% if observed_at %}{{ observed_at|date:'DATE_FORMAT' }}{% endif %}
+                    {% if observed_at %}{{ observed_at|date }}{% endif %}
                 </h1>
                 <p>
                     {% blocktranslate trimmed with organization.name as organization_name %}

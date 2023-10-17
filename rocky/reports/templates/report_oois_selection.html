@@ -23,8 +23,11 @@
                 {% endblocktranslate %}
             </h2>
             <p>{% translate "Select which objects you want to include in your report." %}</p>
+            {% translate "Filter" as filter_title %}
+            {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
+
             {% if not object_list %}
-                <p>{% translate "There are no objects found to make a report." %}</p>
+                <p>{% translate "No OOIs found." %}</p>
                 <div class="button-container">
                     <a class="button ghost"
                        href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
@@ -32,9 +35,6 @@
                        href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
                 </div>
             {% else %}
-                {% translate "Filter" as filter_title %}
-                {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
-
                 <form method="get"
                       action="{% url 'report_types_selection' organization.code %}"
                       class="inline layout-wide">
@@ -63,6 +63,8 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    {% include "forms/report_form_fields.html" %}
+
                     <button type="submit" class="button">
                         {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
                     </button>
