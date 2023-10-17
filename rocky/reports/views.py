@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Dict, List, Set
+from typing import Dict, List, Set, TypedDict
 
 from django.contrib import messages
 from django.urls import reverse
@@ -22,6 +22,12 @@ from rocky.views.mixins import OctopoesView
 from rocky.views.ooi_view import BaseOOIListView
 
 logger = getLogger(__name__)
+
+
+class ReportType(TypedDict):
+    id: str
+    name: str
+    description: str
 
 
 class ReportBreadcrumbs(BreadcrumbsMixin):
@@ -90,7 +96,7 @@ class BaseSelectionView(BaseReportView):
         self.oois = self.get_oois()
         self.report_types_choices = self.get_report_types_from_ooi_selection()
 
-    def get_report_types_from_ooi_selection(self) -> List[Dict[str, str]]:
+    def get_report_types_from_ooi_selection(self) -> List[ReportType]:
         return [
             {"id": report_type.id, "name": report_type.name, "description": report_type.description}
             for report_type in self.yielded_report_types
