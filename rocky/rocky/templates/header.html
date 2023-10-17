@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load report_tags %}
 
 <header class="test">
     {% include "partials/skip-to-content.html" %}
@@ -50,6 +51,13 @@
                                 <a href="{{ index_url }}"
                                    {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Findings" %}</a>
                             </li>
+                            {% if feature_reports %}
+                                <li>
+                                    {% url "report_oois_selection" organization.code as index_url %}
+                                    <a href="{{ index_url }}"
+                                       {% if index_url in request.path|urlencode %}aria-current="page"{% endif %}>{% translate "Reports" %}</a>
+                                </li>
+                            {% endif %}
                             <li>
                                 {% url "ooi_list" organization.code as index_url %}
                                 <a href="{{ index_url }}"
