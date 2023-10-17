@@ -34,7 +34,7 @@
                             <tr>
                                 <th>{% translate "Severity" %}</th>
                                 <th>{% translate "Finding" %}</th>
-                                <th>{% translate "Details" %}</th>
+                                <th class="visually-hidden">{% translate "Details" %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,29 +59,15 @@
                                     </tr>
                                     <tr class="expando-row">
                                         <td colspan="6">
-                                            <table>
-                                                <tr>
-                                                    <td>{% translate "Finding type" %}:</td>
-                                                    <td>
-                                                        <a href="{% ooi_url "ooi_detail" ft.primary_key organization.code query=mandatory_fields %}"
-                                                           title="{% blocktranslate trimmed with finding_type=ft.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ ft.human_readable }}</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>{% translate "OOI type" %}:</td>
-                                                    <td>
-                                                        <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi.object_type }}"
-                                                           title="{% blocktranslate trimmed with ooi_type=ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ ooi.object_type }}</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>{% translate "Source OOI" %}:</td>
-                                                    <td>
-                                                        <a href="{% ooi_url "ooi_detail" ooi.primary_key organization.code query=mandatory_fields %}"
-                                                           title="{% blocktranslate trimmed with finding=ooi.human_readable %} Show details for {{ finding }} {% endblocktranslate %}">{{ ooi.human_readable }}</a>
-                                                    </td>
-                                                </tr>
-                                            </table>
+                                            <h3 class="heading-normal">{% translate "Finding type" %}:</h3>
+                                            <a href="{% ooi_url "ooi_detail" ft.primary_key organization.code query=mandatory_fields %}"
+                                               title="{% blocktranslate trimmed with finding_type=ft.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ ft.human_readable }}</a>
+                                            <h3 class="heading-normal">{% translate "OOI type" %}:</h3>
+                                            <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi.object_type }}"
+                                               title="{% blocktranslate trimmed with ooi_type=ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ ooi.object_type }}</a>
+                                            <h3 class="heading-normal">{% translate "Source OOI" %}:</h3>
+                                            <a href="{% ooi_url "ooi_detail" ooi.primary_key organization.code query=mandatory_fields %}"
+                                               title="{% blocktranslate trimmed with finding=ooi.human_readable %} Show details for {{ finding }} {% endblocktranslate %}">{{ ooi.human_readable }}</a>
                                         </td>
                                     </tr>
                                 {% endwith %}
