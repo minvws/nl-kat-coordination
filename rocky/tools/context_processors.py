@@ -8,7 +8,7 @@ def feature_flags(request):
     context = {}
     for name in dir(settings):
         if name.startswith("FEATURE_"):
-            context[name.lower()] = getattr(settings, name)
+            context[name] = getattr(settings, name)
     return context
 
 
