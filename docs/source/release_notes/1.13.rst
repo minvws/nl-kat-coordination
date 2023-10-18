@@ -43,7 +43,7 @@ New Features
  * Tabs have new a visual styling.
  * Descructive button styling has been added.
  * The risk level indicator also have new improved styling.
- * The color scheme used in OpenKAT as been updated.
+ * The color scheme used in OpenKAT has been updated.
  * New design of expanding rows.
  * OpenKAT has been translated to Italian.
  * The scheduler has more metrics available about task status.
