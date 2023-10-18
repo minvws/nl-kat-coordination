@@ -11,8 +11,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
+from tools.view_helpers import schedule_task
 
-from rocky.scheduler import BadRequestError, ConflictError, TooManyRequestsError, client
+from rocky.scheduler import client
 
 TASK_LIMIT = 50
 
@@ -95,27 +96,7 @@ class TaskListView(OrganizationView, ListView):
             task.p_item.id = new_id
             task.p_item.data.id = new_id
 
-            try:
-                client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
-            except TooManyRequestsError:
-                error_message = _("Task queue is full, please try again later.")
-                messages.add_message(self.request, messages.ERROR, error_message)
-                return
-            except ConflictError:
-                error_message = _("Task already queued.")
-                messages.add_message(self.request, messages.ERROR, error_message)
-                return
-            except BadRequestError:
-                error_message = _("Task is invalid.")
-                messages.add_message(self.request, messages.ERROR, error_message)
-                return
-
-            success_message = (
-                "Your task is scheduled and will soon be started in the background. \n "
-                "Results will be added to the object list when they are in. "
-                "It may take some time, a refresh of the page may be needed to show the results."
-            )
-            messages.add_message(self.request, messages.SUCCESS, success_message)
+            schedule_task(self.request, self.organization.code, task.p_item)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -34,7 +34,7 @@ class LocalPluginRepository:
 
         return all_plugins
 
-    def by_id(self, plugin_id: str) -> Optional[PluginType]:
+    def by_id(self, plugin_id: str) -> PluginType:
         boefjes = self.resolve_boefjes()
 
         if plugin_id in boefjes:
@@ -44,6 +44,8 @@ class LocalPluginRepository:
 
         if plugin_id in normalizers:
             return self._normalizer_to_plugin(normalizers[plugin_id])
+
+        raise Exception(f"Can't find plugin {plugin_id}")
 
     def schema(self, id_: str) -> Optional[Dict]:
         boefjes = self.resolve_boefjes()
