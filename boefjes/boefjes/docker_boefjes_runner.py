@@ -19,9 +19,9 @@ class DockerBoefjesRunner:
         self.boefje_resource = boefje_resource
         self.boefje_meta = boefje_meta
         self.docker_client = docker.from_env()
-        self.scheduler_client = SchedulerAPIClient(settings.scheduler_api)
+        self.scheduler_client = SchedulerAPIClient(str(settings.scheduler_api).rstrip("/"))
         self.bytes_api_client = BytesAPIClient(
-            settings.bytes_api,
+            str(settings.bytes_api).rstrip("/"),
             username=settings.bytes_username,
             password=settings.bytes_password,
         )

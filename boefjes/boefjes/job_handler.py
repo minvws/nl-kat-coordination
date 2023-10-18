@@ -27,7 +27,7 @@ from octopoes.models.types import OOIType
 
 logger = logging.getLogger(__name__)
 bytes_api_client = BytesAPIClient(
-    settings.bytes_api,
+    str(settings.bytes_api).rstrip("/"),
     username=settings.bytes_username,
     password=settings.bytes_password,
 )
@@ -233,4 +233,4 @@ class NormalizerHandler(Handler):
 
 
 def get_octopoes_api_connector(org_code: str):
-    return OctopoesAPIConnector(settings.octopoes_api, org_code)
+    return OctopoesAPIConnector(str(settings.octopoes_api).rstrip("/"), org_code)
