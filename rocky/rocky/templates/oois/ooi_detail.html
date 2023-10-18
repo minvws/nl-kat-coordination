@@ -31,7 +31,7 @@
                 {% include "oois/ooi_detail_origins_observations.html" %}
                 {% include "oois/ooi_detail_origins_inference.html" %}
                 {% include "partials/ooi_detail_related_object.html" with query=mandatory_fields ooi_past_due=ooi_past_due related=related ooi=ooi %}
-                {% include "partials/scan_history.html" %}
+                {% include "partials/task_history.html" %}
 
             </div>
             <div>
@@ -77,7 +77,7 @@
                                 {% for boefje in boefjes %}
                                     <tr>
                                         <td>
-                                            <a href="{% url "plugin_detail" organization_code=organization.code plugin_type="boefje" plugin_id=boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
+                                            <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
                                         </td>
                                         <td>{{ boefje.description }}</td>
                                         <td>

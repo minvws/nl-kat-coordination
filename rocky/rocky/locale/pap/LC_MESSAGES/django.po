@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-20 15:20+0000\n"
+"POT-Creation-Date: 2023-10-12 09:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -585,7 +585,8 @@ msgid "Failure mode"
 msgstr "Failure mode"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/plugin_detail.html tools/forms/finding_type.py
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
@@ -904,7 +905,7 @@ msgstr "Warda"
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 #: rocky/templates/partials/elements/ooi_report_settings.html
 #: rocky/templates/partials/form/indemnification_add_form.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Submit"
 msgstr "Abdiká"
@@ -1322,6 +1323,37 @@ msgstr ""
 "Bits ta reglanan di negoshi ku ta buska bista den e dataset aktual i ta "
 "buska bista spesífiko i trese konklushonnan."
 
+#: katalogus/templates/boefje_detail.html
+msgid "Scan level"
+msgstr "Nivél di skan"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+msgid "Consumes"
+msgstr "Ta konsumí"
+
+#: katalogus/templates/boefje_detail.html
+#, python-format
+msgid "%(plugin_name)s is able to scan the following object types:"
+msgstr "%(plugin_name)s ta dispuesto di skan e siguinte tipo di ophetonan:"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s does not need any input objects."
+msgstr "%(plugin_name)s no ta nesesitá ningun ophetonan di entrada."
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+msgid "Produces"
+msgstr "Ta Produsí"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s can produce the following output:"
+msgstr "%(plugin_name)s por produsi lo sigiente:"
+
 #: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
 msgid "available"
 msgstr "disponibel"
@@ -1464,7 +1496,7 @@ msgid "Latest plugin settings:"
 msgstr "Reciente plugin settings:"
 
 #: katalogus/templates/katalogus_settings.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 msgid "Plugin"
 msgstr "Plugin"
 
@@ -1473,6 +1505,11 @@ msgstr "Plugin"
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr "Balor"
+
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s is able to process the following mime types:"
+msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Scan level:"
@@ -1694,33 +1731,6 @@ msgstr "Boefjes"
 msgid "Normalizers"
 msgstr "Normalizers"
 
-#: katalogus/templates/plugin_detail.html
-msgid "Scan level"
-msgstr "Nivél di skan"
-
-#: katalogus/templates/plugin_detail.html
-msgid "Consumes"
-msgstr "Ta konsumí"
-
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s is able to scan the following object types:"
-msgstr "%(plugin_name)s ta dispuesto di skan e siguinte tipo di ophetonan:"
-
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s does not need any input objects."
-msgstr "%(plugin_name)s no ta nesesitá ningun ophetonan di entrada."
-
-#: katalogus/templates/plugin_detail.html
-msgid "Produces"
-msgstr "Ta Produsí"
-
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s can produce the following output:"
-msgstr "%(plugin_name)s por produsi lo sigiente:"
-
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
@@ -1840,10 +1850,6 @@ msgstr "Nò"
 #: katalogus/views/change_clearance_level.py
 msgid "Session has terminated, please select OOIs again."
 msgstr "Seshon a wòrdu tèrminá. Por fabor selekta OOIs dinobo."
-
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
-msgid "Scanning successfully scheduled."
-msgstr "Skèn a start ku èxito."
 
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
@@ -3394,6 +3400,13 @@ msgstr "nobo"
 msgid "Members"
 msgstr "Miembronan"
 
+#: tools/view_helpers.py
+msgid ""
+"Your task is scheduled and will soon be started in the background. Results "
+"will be added to the object list when they are in. It may take some time, a "
+"refresh of the page may be needed to show the results."
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -3404,6 +3417,22 @@ msgstr ""
 "mester tin almenos un nivel di autorisashon di L{} pa por hasi un adaptashon "
 "adekuá.\n"
 "Editá e miembro aki i kambia e nivel di autorisashon si ta nesesario."
+
+#: rocky/scheduler.py
+msgid "Connectivity issues with Mula."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task queue is full, please try again later."
+msgstr "Lista di trabou ta yen, por fabor purba atrobe mas laat."
+
+#: rocky/scheduler.py
+msgid "Task is invalid."
+msgstr "Tarea ta inbalido"
+
+#: rocky/scheduler.py
+msgid "Task already queued."
+msgstr "Tarea ta pone kla kaba."
 
 #: rocky/settings.py
 msgid "Blue light"
@@ -3759,6 +3788,10 @@ msgid "Reason"
 msgstr "Motibu"
 
 #: rocky/templates/findings/finding_list.html
+msgid "Unmute Findings"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 msgid "Mute Findings"
 msgstr "Muta Diskubrimentu"
 
@@ -3811,7 +3844,8 @@ msgstr "KAT logo, bai na e homepage di OpenKAT"
 msgid "Crisis room"
 msgstr "Sala di krísis"
 
-#: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
+#: rocky/templates/header.html rocky/templates/partials/task_history.html
+#: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr "Enkargonan"
 
@@ -4023,8 +4057,8 @@ msgstr "uzando boefjes"
 
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/normalizers.html
+#: rocky/templates/partials/task_history.html rocky/templates/scan.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Boefje"
 msgstr "Boefje"
 
@@ -4186,7 +4220,7 @@ msgid "Currently filtered on:"
 msgstr "Aktuálmente filtrá riba:"
 
 #: rocky/templates/oois/ooi_list.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
 msgstr "Filtrá"
@@ -4465,7 +4499,7 @@ msgid "Role"
 msgstr "Rol"
 
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Status"
@@ -4927,66 +4961,6 @@ msgstr "siguinte"
 msgid "last"
 msgstr "ultimo"
 
-#: rocky/templates/partials/scan_history.html
-msgid "Scans"
-msgstr "Skènnan"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Hide filters"
-msgstr "Skonde filters"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Show filters"
-msgstr "Mustra filters"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "From"
-msgstr "Di"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "To"
-msgstr "Pa"
-
-#: rocky/templates/partials/scan_history.html
-msgid "Select status"
-msgstr "Selektá status"
-
-#: rocky/templates/partials/scan_history.html
-msgid "Success"
-msgstr "Èxito"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Failure"
-msgstr "Failure"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Search"
-msgstr "Buska"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Search by object name"
-msgstr "Buska riba nómber di opheto"
-
-#: rocky/templates/partials/scan_history.html
-msgid "No scans found for this object."
-msgstr "Ningun skan enkontra pa e opheto."
-
-#: rocky/templates/partials/scan_history.html
-msgid "Object"
-msgstr "Opheto"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Created date"
-msgstr "Fecha kreá"
-
 #: rocky/templates/partials/secondary-menu.html
 msgid "User navigation"
 msgstr "Navegashon di usario"
@@ -5006,6 +4980,81 @@ msgstr "Perfil"
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
 msgstr "Bai na e kontenido"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Hide filters"
+msgstr "Skonde filters"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Show filters"
+msgstr "Mustra filters"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "From"
+msgstr "Di"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "To"
+msgstr "Pa"
+
+#: rocky/templates/partials/task_history.html
+msgid "Select status"
+msgstr "Selektá status"
+
+#: rocky/templates/partials/task_history.html
+msgid "Success"
+msgstr "Èxito"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Failure"
+msgstr "Failure"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Search"
+msgstr "Buska"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Search by object name"
+msgstr "Buska riba nómber di opheto"
+
+#: rocky/templates/partials/task_history.html
+msgid "No scans found for this object."
+msgstr "Ningun skan enkontra pa e opheto."
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Created date"
+msgstr "Fecha kreá"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefjes.html
+msgid "Input Object"
+msgstr "Opheto di entrada"
+
+#: rocky/templates/partials/task_history.html
+msgid "No tasks found for this object."
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Normalizer"
+msgstr "Normalizer"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Boefje input OOI"
+msgstr "Opheto di Entrada \"Boefje\""
+
+#: rocky/templates/partials/task_history.html
+msgid "Object"
+msgstr "Opheto"
 
 #: rocky/templates/scan.html
 msgid "Boefjes overview:"
@@ -5116,10 +5165,6 @@ msgstr "Lista di tareanan pa boefjes"
 msgid "List of tasks for "
 msgstr "Lista di tareanan pa "
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Input Object"
-msgstr "Opheto di entrada"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "No input OOI"
 msgstr "No tin entrada OOI"
@@ -5139,14 +5184,6 @@ msgstr "No tin tareanan pa normalizers"
 #: rocky/templates/tasks/normalizers.html
 msgid "List of tasks for normalizers"
 msgstr "Lista di tareanan pa normalizers"
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Normalizer"
-msgstr "Normalizer"
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Boefje input OOI"
-msgstr "Opheto di Entrada \"Boefje\""
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Yielded objects"
@@ -5602,6 +5639,10 @@ msgid "Please select at least one finding."
 msgstr "Por fabor, selektá al menos un diskubrimentu."
 
 #: rocky/views/ooi_mute.py
+msgid "Finding(s) successfully unmuted."
+msgstr ""
+
+#: rocky/views/ooi_mute.py
 msgid "Finding(s) successfully muted."
 msgstr "Diskubrimentu(nan) mutá ku éksito."
 
@@ -5801,18 +5842,6 @@ msgstr "Detayes di tarea no por wordu haña."
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "No por haña tarea: no tin konekshon ku scheduler"
 
-#: rocky/views/tasks.py
-msgid "Task queue is full, please try again later."
-msgstr "Lista di trabou ta yen, por fabor purba atrobe mas laat."
-
-#: rocky/views/tasks.py
-msgid "Task already queued."
-msgstr "Tarea ta pone kla kaba."
-
-#: rocky/views/tasks.py
-msgid "Task is invalid."
-msgstr "Tarea ta inbalido"
-
 #: rocky/views/upload_csv.py
 msgid ""
 "For URL object type, a column 'raw' with URL values is required, starting "
@@ -5853,3 +5882,9 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "Scanning successfully scheduled."
+#~ msgstr "Skèn a start ku èxito."
+
+#~ msgid "Scans"
+#~ msgstr "Skènnan"

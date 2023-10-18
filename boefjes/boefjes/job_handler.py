@@ -172,14 +172,19 @@ class BoefjeHandler(Handler):
             raise
         finally:
             boefje_meta.ended_at = datetime.now(timezone.utc)
-            logger.info("Saving to Bytes for boefje boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
+            logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
             bytes_api_client.login()
             bytes_api_client.save_boefje_meta(boefje_meta)
 
             if boefje_results:
                 for boefje_added_mime_types, output in boefje_results:
-                    bytes_api_client.save_raw(boefje_meta.id, output, mime_types.union(boefje_added_mime_types))
+                    raw_file_id = bytes_api_client.save_raw(
+                        boefje_meta.id, output, mime_types.union(boefje_added_mime_types)
+                    )
+                    logger.debug(
+                        "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
+                    )
 
             logger.info("Done with boefje for %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 

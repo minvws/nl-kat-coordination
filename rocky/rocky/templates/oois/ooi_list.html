@@ -37,7 +37,7 @@
                     {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
                 </p>
                 <form method="post"
-                      class="inline column"
+                      class="inline layout-wide"
                       action="#bulk_clearance_level_submit">
                     {% csrf_token %}
                     <div class="horizontal-scroll">

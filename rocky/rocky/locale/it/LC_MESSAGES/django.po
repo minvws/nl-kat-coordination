@@ -3,11 +3,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-02 10:11+0000\n"
+"POT-Creation-Date: 2023-10-12 09:36+0000\n"
 "PO-Revision-Date: 2023-10-11 21:00+0000\n"
 "Last-Translator: Brenno de Winter <brenno@dewinter.com>\n"
-"Language-Team: Italian <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/it/>\n"
+"Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -600,7 +600,8 @@ msgid "Failure mode"
 msgstr "Modalità di guasto"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/plugin_detail.html tools/forms/finding_type.py
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
@@ -933,7 +934,7 @@ msgstr "Salva"
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 #: rocky/templates/partials/elements/ooi_report_settings.html
 #: rocky/templates/partials/form/indemnification_add_form.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Submit"
 msgstr "Invia"
@@ -1353,6 +1354,39 @@ msgstr ""
 "I bit sono regole aziendali che cercano informazioni all'interno del set di "
 "dati corrente, cercano informazioni specifiche e traggono conclusioni."
 
+#: katalogus/templates/boefje_detail.html
+msgid "Scan level"
+msgstr "Livello di scansione"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+msgid "Consumes"
+msgstr "Consuma"
+
+#: katalogus/templates/boefje_detail.html
+#, python-format
+msgid "%(plugin_name)s is able to scan the following object types:"
+msgstr ""
+"%(plugin_name)s è in grado di eseguire la scansione dei seguenti tipi di "
+"oggetti:"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s does not need any input objects."
+msgstr "%(plugin_name)s non ha bisogno di oggetti di input."
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+msgid "Produces"
+msgstr "Produzione"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s can produce the following output:"
+msgstr "%(plugin_name)s può produrre il seguente output:"
+
 #: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
 msgid "available"
 msgstr "disponibile"
@@ -1505,7 +1539,7 @@ msgid "Latest plugin settings:"
 msgstr "Impostazioni più recenti dei plugin:"
 
 #: katalogus/templates/katalogus_settings.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 msgid "Plugin"
 msgstr "Plugin"
 
@@ -1514,6 +1548,11 @@ msgstr "Plugin"
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr "Valore"
+
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s is able to process the following mime types:"
+msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Scan level:"
@@ -1718,35 +1757,6 @@ msgstr "Boefjes"
 msgid "Normalizers"
 msgstr "Normalizzatori"
 
-#: katalogus/templates/plugin_detail.html
-msgid "Scan level"
-msgstr "Livello di scansione"
-
-#: katalogus/templates/plugin_detail.html
-msgid "Consumes"
-msgstr "Consuma"
-
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s is able to scan the following object types:"
-msgstr ""
-"%(plugin_name)s è in grado di eseguire la scansione dei seguenti tipi di "
-"oggetti:"
-
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s does not need any input objects."
-msgstr "%(plugin_name)s non ha bisogno di oggetti di input."
-
-#: katalogus/templates/plugin_detail.html
-msgid "Produces"
-msgstr "Produzione"
-
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s can produce the following output:"
-msgstr "%(plugin_name)s può produrre il seguente output:"
-
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
@@ -1868,10 +1878,6 @@ msgstr "No"
 #: katalogus/views/change_clearance_level.py
 msgid "Session has terminated, please select OOIs again."
 msgstr "La sessione è terminata, seleziona di nuovo gli OOIs."
-
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
-msgid "Scanning successfully scheduled."
-msgstr "Scansione pianificata con successo."
 
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
@@ -3463,6 +3469,13 @@ msgstr "nuovo"
 msgid "Members"
 msgstr "Membri"
 
+#: tools/view_helpers.py
+msgid ""
+"Your task is scheduled and will soon be started in the background. Results "
+"will be added to the object list when they are in. It may take some time, a "
+"refresh of the page may be needed to show the results."
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -3473,6 +3486,22 @@ msgstr ""
 "membro necessita almeno di un livello di autorizzazione di L{} per poter "
 "svolgere una corretta integrazione. Modifica questo membro e cambia il "
 "livello di autorizzazione se necessario."
+
+#: rocky/scheduler.py
+msgid "Connectivity issues with Mula."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task queue is full, please try again later."
+msgstr "La coda delle attività è piena, ti preghiamo di riprovare più tardi."
+
+#: rocky/scheduler.py
+msgid "Task is invalid."
+msgstr "L'attività non è valida."
+
+#: rocky/scheduler.py
+msgid "Task already queued."
+msgstr "Attività già in coda."
 
 #: rocky/settings.py
 msgid "Blue light"
@@ -3743,9 +3772,9 @@ msgid ""
 "<strong>%(organization_name)s</strong>. Each finding relates to an object. "
 "Click a finding for additional information."
 msgstr ""
-"Una panoramica di tutte le scoperte che OpenKAT ha trovato per l'organizzazione "
-"<strong>%(organization_name)s</strong>. Ogni scoperta è relativa a un oggetto. "
-"Clicca su una scoperta per ulteriori informazioni."
+"Una panoramica di tutte le scoperte che OpenKAT ha trovato per "
+"l'organizzazione <strong>%(organization_name)s</strong>. Ogni scoperta è "
+"relativa a un oggetto. Clicca su una scoperta per ulteriori informazioni."
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -3825,6 +3854,10 @@ msgid "Reason"
 msgstr "Motivo"
 
 #: rocky/templates/findings/finding_list.html
+msgid "Unmute Findings"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 msgid "Mute Findings"
 msgstr "Silenzia Rilevamenti"
 
@@ -3878,7 +3911,8 @@ msgstr "Logo di OpenKAT, vai alla homepage di OpenKAT"
 msgid "Crisis room"
 msgstr "Sala di crisi"
 
-#: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
+#: rocky/templates/header.html rocky/templates/partials/task_history.html
+#: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr "Attività"
 
@@ -4091,8 +4125,8 @@ msgstr "usando boefjes"
 
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/normalizers.html
+#: rocky/templates/partials/task_history.html rocky/templates/scan.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Boefje"
 msgstr "Boefje"
 
@@ -4247,16 +4281,17 @@ msgid ""
 "strong>. Objects can be added manually or by running Boefjes. Click an "
 "object for additional information."
 msgstr ""
-"Una panoramica degli oggetti trovati per l'organizzazione <strong>%(organization_name)s</"
-"strong>. Gli oggetti possono essere aggiunti manualmente o tramite l'esecuzione di Boefjes. Clicca su "
-"un oggetto per ulteriori informazioni."
+"Una panoramica degli oggetti trovati per l'organizzazione "
+"<strong>%(organization_name)s</strong>. Gli oggetti possono essere aggiunti "
+"manualmente o tramite l'esecuzione di Boefjes. Clicca su un oggetto per "
+"ulteriori informazioni."
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
 msgstr "Attualmente filtrato su:"
 
 #: rocky/templates/oois/ooi_list.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
 msgstr "Filtro"
@@ -4541,7 +4576,7 @@ msgid "Role"
 msgstr "Ruolo"
 
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Status"
@@ -5012,66 +5047,6 @@ msgstr "successivo"
 msgid "last"
 msgstr "ultimo"
 
-#: rocky/templates/partials/scan_history.html
-msgid "Scans"
-msgstr "Scansioni"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Hide filters"
-msgstr "Nascondi filtri"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Show filters"
-msgstr "Mostra filtri"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "From"
-msgstr "Da"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "To"
-msgstr "A"
-
-#: rocky/templates/partials/scan_history.html
-msgid "Select status"
-msgstr "Seleziona stato"
-
-#: rocky/templates/partials/scan_history.html
-msgid "Success"
-msgstr "Successo"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Failure"
-msgstr "Fallimento"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Search"
-msgstr "Ricerca"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Search by object name"
-msgstr "Cerca per nome oggetto"
-
-#: rocky/templates/partials/scan_history.html
-msgid "No scans found for this object."
-msgstr "Nessuna scansione trovata per questo oggetto."
-
-#: rocky/templates/partials/scan_history.html
-msgid "Object"
-msgstr "Oggetto"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Created date"
-msgstr "Data di creazione"
-
 #: rocky/templates/partials/secondary-menu.html
 msgid "User navigation"
 msgstr "Navigazione utente"
@@ -5091,6 +5066,81 @@ msgstr "Profilo"
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
 msgstr "Vai al contenuto"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Hide filters"
+msgstr "Nascondi filtri"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Show filters"
+msgstr "Mostra filtri"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "From"
+msgstr "Da"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "To"
+msgstr "A"
+
+#: rocky/templates/partials/task_history.html
+msgid "Select status"
+msgstr "Seleziona stato"
+
+#: rocky/templates/partials/task_history.html
+msgid "Success"
+msgstr "Successo"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Failure"
+msgstr "Fallimento"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Search"
+msgstr "Ricerca"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Search by object name"
+msgstr "Cerca per nome oggetto"
+
+#: rocky/templates/partials/task_history.html
+msgid "No scans found for this object."
+msgstr "Nessuna scansione trovata per questo oggetto."
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Created date"
+msgstr "Data di creazione"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefjes.html
+msgid "Input Object"
+msgstr "Oggetto di Input"
+
+#: rocky/templates/partials/task_history.html
+msgid "No tasks found for this object."
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Normalizer"
+msgstr "Normalizer"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Boefje input OOI"
+msgstr "OOI di input Boefje"
+
+#: rocky/templates/partials/task_history.html
+msgid "Object"
+msgstr "Oggetto"
 
 #: rocky/templates/scan.html
 msgid "Boefjes overview:"
@@ -5202,10 +5252,6 @@ msgstr "Elenco dei compiti per boefjes"
 msgid "List of tasks for "
 msgstr "Elenco dei compiti per"
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Input Object"
-msgstr "Oggetto di Input"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "No input OOI"
 msgstr "Nessun OOI di input"
@@ -5225,14 +5271,6 @@ msgstr "Non ci sono compiti per i normalizzatori"
 #: rocky/templates/tasks/normalizers.html
 msgid "List of tasks for normalizers"
 msgstr "Elenco dei compiti per i normalizzatori"
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Normalizer"
-msgstr "Normalizer"
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Boefje input OOI"
-msgstr "OOI di input Boefje"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Yielded objects"
@@ -5701,6 +5739,10 @@ msgid "Please select at least one finding."
 msgstr "Seleziona almeno un risultato."
 
 #: rocky/views/ooi_mute.py
+msgid "Finding(s) successfully unmuted."
+msgstr ""
+
+#: rocky/views/ooi_mute.py
 msgid "Finding(s) successfully muted."
 msgstr "Risultato/i mutato/i con successo."
 
@@ -5908,18 +5950,6 @@ msgid "Fetching tasks failed: no connection with scheduler"
 msgstr ""
 "Recupero dei compiti non riuscito: nessuna connessione con il pianificatore"
 
-#: rocky/views/tasks.py
-msgid "Task queue is full, please try again later."
-msgstr "La coda delle attività è piena, ti preghiamo di riprovare più tardi."
-
-#: rocky/views/tasks.py
-msgid "Task already queued."
-msgstr "Attività già in coda."
-
-#: rocky/views/tasks.py
-msgid "Task is invalid."
-msgstr "L'attività non è valida."
-
 #: rocky/views/upload_csv.py
 msgid ""
 "For URL object type, a column 'raw' with URL values is required, starting "
@@ -5961,3 +5991,9 @@ msgstr "Impossibile caricare il file raw su Bytes: codice di stato %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "File raw aggiunto con successo."
+
+#~ msgid "Scanning successfully scheduled."
+#~ msgstr "Scansione pianificata con successo."
+
+#~ msgid "Scans"
+#~ msgstr "Scansioni"
