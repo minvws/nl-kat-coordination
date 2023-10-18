@@ -309,21 +309,22 @@ Configure reverse proxy
 
 OpenKAT listens on 127.0.0.1 port 8000 by default. We recommend that you access
 OpenKAT through a reverse proxy. If you already have a reverse proxy on a
-different host then you need to change ``GRANIAN_HOST`` to be able to access
-OpenKAT from the reverse proxy:
+different host then you need to change ``GRANIAN_HOST`` in rocky.conf to be able
+to access OpenKAT from the reverse proxy:
 
 .. code-block:: sh
 
     GRANIAN_HOST=0.0.0.0
 
 If you want to use https between the reverse proxy and OpenKAT you can do that
-by setting also setting GRANIAN_PORT and GRANIAN_OPTIONS:
+by setting also setting GRANIAN_PORT, :
 
 .. code-block:: sh
 
     GRANIAN_HOST=0.0.0.0
     GRANIAN_PORT=8443
-    GRANIAN_OPTIONS=--ssl-keyfile /path/to/key --ssl-certificate /path/to/cert
+    GRANIAN_SSL_KEYFILE=/path/to/key
+    GRANIAN_SSL_CERTIFICATE=/path/to/cert
 
 See also the `Granian documentation
 <https://github.com/emmett-framework/granian/blob/master/README.md>`_ for more
