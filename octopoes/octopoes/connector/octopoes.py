@@ -96,7 +96,7 @@ class OctopoesAPIConnector:
     ) -> Paginated[OOIType]:
         params = {
             "types": [t.__name__ for t in types],
-            "valid_time": valid_time,
+            "valid_time": valid_time.isoformat(),
             "offset": offset,
             "limit": limit,
             "scan_level": {s.value for s in scan_level},
