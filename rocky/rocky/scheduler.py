@@ -8,9 +8,11 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
+from django.contrib import messages
+from django.http import Http404, HttpRequest
 from django.utils.translation import gettext_lazy as _
 from pydantic import BaseModel, Field
-from requests.exceptions import HTTPError
+from requests.exceptions import ConnectionError, HTTPError
 
 from rocky.health import ServiceHealth
 
@@ -182,6 +184,10 @@ class ConflictError(SchedulerError):
     message = _("Task already queued.")
 
 
+class TaskNotFoundError(SchedulerError):
+    message = _("Task could not be found.")
+
+
 class SchedulerClient:
     def __init__(self, base_uri: str):
         self.session = requests.Session()
@@ -191,8 +197,11 @@ class SchedulerClient:
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
-        res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
-        return PaginatedTasksResponse.parse_raw(res.text)
+        try:
+            res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
+            return PaginatedTasksResponse.parse_raw(res.text)
+        except ConnectionError:
+            raise SchedulerError()
 
     def get_lazy_task_list(
         self,
@@ -205,22 +214,30 @@ class SchedulerClient:
         plugin_id: Optional[str] = None,
         boefje_name: Optional[str] = None,
     ) -> LazyTaskList:
-        return LazyTaskList(
-            self,
-            scheduler_id=scheduler_id,
-            type=task_type,
-            status=status,
-            min_created_at=min_created_at,
-            max_created_at=max_created_at,
-            input_ooi=input_ooi,
-            plugin_id=plugin_id,
-            boefje_name=boefje_name,
-        )
+        try:
+            return LazyTaskList(
+                self,
+                scheduler_id=scheduler_id,
+                type=task_type,
+                status=status,
+                min_created_at=min_created_at,
+                max_created_at=max_created_at,
+                input_ooi=input_ooi,
+                plugin_id=plugin_id,
+                boefje_name=boefje_name,
+            )
+        except ConnectionError:
+            raise SchedulerError()
 
-    def get_task_details(self, task_id) -> Task:
-        res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
-        res.raise_for_status()
-        return Task.parse_raw(res.content)
+    def get_task_details(self, task_id) -> Task | None:
+        try:
+            res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
+            res.raise_for_status()
+            return Task.parse_raw(res.content)
+        except HTTPError:
+            raise Http404()
+        except ConnectionError:
+            raise SchedulerError()
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         try:
@@ -244,3 +261,46 @@ class SchedulerClient:
 
 
 client = SchedulerClient(settings.SCHEDULER_API)
+
+
+def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrioritizedItem) -> None:
+    plugin_name = ""
+    input_ooi = ""
+    if task.data.type == "boefje":
+        plugin_name = task.data.boefje.name
+        input_ooi = task.data.input_ooi
+    if task.data.type == "normalizer":
+        plugin_name = task.data.normalizer.id  # name not set yet, is None for name
+        input_ooi = task.data.raw_data.boefje_meta.input_ooi
+    try:
+        client.push_task(f"{task.data.type}-{organization_code}", task)
+    except (BadRequestError, TooManyRequestsError, ConflictError) as task_error:
+        error_message = task_error.message + _(" Scheduling {} {} with input object {} failed.").format(
+            task.data.type.title(), plugin_name, input_ooi
+        )
+        messages.error(request, error_message)
+    except SchedulerError as error:
+        messages.error(request, error.message)
+    else:
+        messages.success(
+            request,
+            _(
+                "Task '{} {} with input object {}' is scheduled and will soon be started in the background. "
+                "Results will be added to the object list when they are in. "
+                "It may take some time, a refresh of the page may be needed to show the results."
+            ).format(task.data.type.title(), plugin_name, input_ooi),
+        )
+
+
+def get_list_of_tasks_lazy(request: HttpRequest, **params) -> LazyTaskList | None:
+    try:
+        return client.get_lazy_task_list(**params)
+    except SchedulerError as error:
+        return messages.error(request, error.message)
+
+
+def get_details_of_task(request: HttpRequest, task_id: str | None) -> Task | None:
+    try:
+        return client.get_task_details(task_id)
+    except (BadRequestError, TaskNotFoundError, SchedulerError) as error:
+        messages.error(request, error.message)

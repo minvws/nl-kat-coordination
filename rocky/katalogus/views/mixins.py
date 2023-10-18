@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from requests import HTTPError, RequestException
 from rest_framework.status import HTTP_404_NOT_FOUND
-from tools.view_helpers import schedule_task
 
 from katalogus.client import (
     Boefje as KATalogusBoefje,
@@ -28,7 +27,7 @@ from rocky.exceptions import (
     IndemnificationNotPresentException,
     TrustedClearanceLevelTooLowException,
 )
-from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData
+from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData, schedule_task
 from rocky.views.mixins import OctopoesView
 
 logger = getLogger(__name__)
