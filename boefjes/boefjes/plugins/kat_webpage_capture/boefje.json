@@ -14,6 +14,5 @@
         "application/json",
         "application/localstorage+json"
     ],
-    "environment_keys": [],
     "scan_level": 2
 }
