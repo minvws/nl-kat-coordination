@@ -39,7 +39,7 @@ class OOIDetailView(
 ):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
-    scan_history_limit = 10
+    task_history_limit = 10
 
     def post(self, request, *args, **kwargs):
         if not self.indemnification_present:
@@ -65,13 +65,6 @@ class OOIDetailView(
                 boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
                 ooi = self.get_single_ooi(pk=ooi_id)
                 self.run_boefje_for_oois(boefje, [ooi])
-
-                success_message = (
-                    "Your scan is running successfully in the background. \n "
-                    "Results will be added to the object list when they are in. "
-                    "It may take some time, a refresh of the page may be needed to show the results."
-                )
-                messages.add_message(self.request, messages.SUCCESS, _(success_message))
                 return redirect("task_list", organization_code=self.organization.code)
 
             if action == PageActions.SUBMIT_ANSWER.value:
@@ -111,28 +104,28 @@ class OOIDetailView(
     def get_organization_indemnification(self):
         return Indemnification.objects.filter(organization=self.organization).exists()
 
-    def get_scan_history(self) -> Page:
+    def get_task_history(self) -> Page:
         scheduler_id = f"boefje-{self.organization.code}"
 
         # FIXME: in context of ooi detail is doesn't make sense to search
         # for an object name, so we search on plugin id
-        plugin_id = self.request.GET.get("scan_history_search")
+        plugin_id = self.request.GET.get("task_history_search")
 
-        page = int(self.request.GET.get("scan_history_page", 1))
+        page = int(self.request.GET.get("task_history_page", 1))
 
-        status = self.request.GET.get("scan_history_status")
+        status = self.request.GET.get("task_history_status")
 
-        if self.request.GET.get("scan_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+        if self.request.GET.get("task_history_from"):
+            min_created_at = datetime.strptime(self.request.GET.get("task_history_from"), "%Y-%m-%d")
         else:
             min_created_at = None
 
-        if self.request.GET.get("scan_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
+        if self.request.GET.get("task_history_to"):
+            max_created_at = datetime.strptime(self.request.GET.get("task_history_to"), "%Y-%m-%d")
         else:
             max_created_at = None
 
-        scan_history = scheduler.client.get_lazy_task_list(
+        task_history = scheduler.client.get_lazy_task_list(
             scheduler_id=scheduler_id,
             status=status,
             min_created_at=min_created_at,
@@ -142,7 +135,7 @@ class OOIDetailView(
             plugin_id=plugin_id,
         )
 
-        return Paginator(scan_history, self.scan_history_limit).page(page)
+        return Paginator(task_history, self.task_history_limit).page(page)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -202,13 +195,13 @@ class OOIDetailView(
 
         context["possible_boefjes_filter_form"] = filter_form
         context["organization_indemnification"] = self.get_organization_indemnification()
-        context["scan_history"] = self.get_scan_history()
-        context["scan_history_form_fields"] = [
-            "scan_history_from",
-            "scan_history_to",
-            "scan_history_status",
-            "scan_history_search",
-            "scan_history_page",
+        context["task_history"] = self.get_task_history()
+        context["task_history_form_fields"] = [
+            "task_history_from",
+            "task_history_to",
+            "task_history_status",
+            "task_history_search",
+            "task_history_page",
         ]
         if self.request.GET.get("show_clearance_level_inheritance"):
             clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)

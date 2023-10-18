@@ -189,8 +189,7 @@ sudo sed -i "/KATALOGUS_DB_URI=/s/.*/KATALOGUS_DB_URI=postgresql:\/\/katalogus:$
 echo "Step 4.6.5 - Update SCHEDULER_DB_URI in /etc/kat/mula.conf to ${MULADB_PASSWORD}"
 sudo sed -i "/SCHEDULER_DB_URI=/s/.*/SCHEDULER_DB_URI=postgresql:\/\/mula:${MULADB_PASSWORD}@localhost\/mula_db/" /etc/kat/mula.conf
 
-echo "Step 4.6.6 - Update QUEUE_URI in rocky.conf, bytes.conf, boefjes.conf, mula.conf, octopoes.conf to ${RABBITMQ_PASSWORD}"
-sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/rocky.conf
+echo "Step 4.6.6 - Update QUEUE_URI in bytes.conf, boefjes.conf, mula.conf, octopoes.conf to ${RABBITMQ_PASSWORD}"
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/bytes.conf
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/boefjes.conf
 sudo sed -i "/QUEUE_URI=/s/.*/QUEUE_URI=amqp:\/\/kat:${RABBITMQ_PASSWORD}@127.0.0.1:5672\/kat/" /etc/kat/octopoes.conf

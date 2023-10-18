@@ -169,6 +169,7 @@ class App:
                 additions,
             )
 
+    @tracer.start_as_current_span("collect_metrics")
     def collect_metrics(self) -> None:
         """Collect application metrics
 

@@ -1,5 +1,4 @@
 from typing import Dict, List
-from urllib.parse import urljoin
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import Boefje, Organisation, Plugin
@@ -119,30 +118,30 @@ class Katalogus(HTTPService):
 
     @exception_handler
     def get_boefjes(self) -> List[Boefje]:
-        url = urljoin(self.host, "/boefjes")
+        url = f"{self.host}/boefjes"
         response = self.get(url)
         return [Boefje(**boefje) for boefje in response.json()]
 
     @exception_handler
     def get_boefje(self, boefje_id: str) -> Boefje:
-        url = urljoin(self.host, f"/boefjes/{boefje_id}")
+        url = f"{self.host}/boefjes/{boefje_id}"
         response = self.get(url)
         return Boefje(**response.json())
 
     @exception_handler
     def get_organisation(self, organisation_id) -> Organisation:
-        url = urljoin(self.host, f"/v1/organisations/{organisation_id}")
+        url = f"{self.host}/v1/organisations/{organisation_id}"
         response = self.get(url)
         return Organisation(**response.json())
 
     @exception_handler
     def get_organisations(self) -> List[Organisation]:
-        url = urljoin(self.host, "/v1/organisations")
+        url = f"{self.host}/v1/organisations"
         response = self.get(url)
         return [Organisation(**organisation) for organisation in response.json().values()]
 
     def get_plugins_by_organisation(self, organisation_id: str) -> List[Plugin]:
-        url = urljoin(self.host, f"/v1/organisations/{organisation_id}/plugins")
+        url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
         response = self.get(url)
         return [Plugin(**plugin) for plugin in response.json()]
 
