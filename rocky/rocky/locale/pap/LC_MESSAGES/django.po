@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-12 15:49+0000\n"
+"POT-Creation-Date: 2023-10-18 14:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1863,10 +1863,6 @@ msgstr "Nò"
 msgid "Session has terminated, please select OOIs again."
 msgstr "Seshon a wòrdu tèrminá. Por fabor selekta OOIs dinobo."
 
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
-msgid "Scanning successfully scheduled."
-msgstr "Skèn a start ku èxito."
-
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
 msgstr "Kambia nivél di autorisashon"
@@ -1951,7 +1947,8 @@ msgid ""
 "clearance or contact the administrator to set a clearance level."
 msgstr ""
 "Bo nivel di autorisashon no ta establésí. Bai na bo página di perfil pa wak "
-"bo autorisashon òf kontakta e administradó pa establésí un nivel di autorisashon."
+"bo autorisashon òf kontakta e administradó pa establésí un nivel di "
+"autorisashon."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "To enable {} you need at least a clearance level of L{}. "
@@ -3407,6 +3404,13 @@ msgstr "nobo"
 msgid "Members"
 msgstr "Miembronan"
 
+#: tools/view_helpers.py
+msgid ""
+"Your task is scheduled and will soon be started in the background. Results "
+"will be added to the object list when they are in. It may take some time, a "
+"refresh of the page may be needed to show the results."
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -3417,6 +3421,22 @@ msgstr ""
 "mester tin almenos un nivel di autorisashon di L{} pa por hasi un adaptashon "
 "adekuá.\n"
 "Editá e miembro aki i kambia e nivel di autorisashon si ta nesesario."
+
+#: rocky/scheduler.py
+msgid "Connectivity issues with Mula."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task queue is full, please try again later."
+msgstr "Lista di trabou ta yen, por fabor purba atrobe mas laat."
+
+#: rocky/scheduler.py
+msgid "Task is invalid."
+msgstr "Tarea ta inbalido"
+
+#: rocky/scheduler.py
+msgid "Task already queued."
+msgstr "Tarea ta pone kla kaba."
 
 #: rocky/settings.py
 msgid "Blue light"
@@ -5744,18 +5764,6 @@ msgstr "Detayes di tarea no por wordu haña."
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "No por haña tarea: no tin konekshon ku scheduler"
 
-#: rocky/views/tasks.py
-msgid "Task queue is full, please try again later."
-msgstr "Lista di trabou ta yen, por fabor purba atrobe mas laat."
-
-#: rocky/views/tasks.py
-msgid "Task already queued."
-msgstr "Tarea ta pone kla kaba."
-
-#: rocky/views/tasks.py
-msgid "Task is invalid."
-msgstr "Tarea ta inbalido"
-
 #: rocky/views/upload_csv.py
 msgid ""
 "For URL object type, a column 'raw' with URL values is required, starting "
@@ -5796,3 +5804,6 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "Scanning successfully scheduled."
+#~ msgstr "Skèn a start ku èxito."

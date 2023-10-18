@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-12 15:49+0000\n"
+"POT-Creation-Date: 2023-10-18 14:11+0000\n"
 "PO-Revision-Date: 2023-08-11 07:29+0000\n"
 "Last-Translator: Patrick <patrick@darwinkel.net>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -1878,10 +1878,6 @@ msgstr "Nee"
 msgid "Session has terminated, please select OOIs again."
 msgstr "Sessie is verlopen, selecteer nogmaals OOIs."
 
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
-msgid "Scanning successfully scheduled."
-msgstr "Scan met success ingepland."
-
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
 msgstr "Wijzig vrijwaringsniveau"
@@ -1966,7 +1962,8 @@ msgid ""
 "clearance or contact the administrator to set a clearance level."
 msgstr ""
 "Uw vrijwaring niveau is niet ingesteld. Ga naar uw profielpagina om uw "
-"vrijwaring te controleren of neem contact op met de beheerder om een vrijwaring niveau in te stellen."
+"vrijwaring te controleren of neem contact op met de beheerder om een "
+"vrijwaring niveau in te stellen."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "To enable {} you need at least a clearance level of L{}. "
@@ -3412,6 +3409,13 @@ msgstr "nieuw"
 msgid "Members"
 msgstr "Leden"
 
+#: tools/view_helpers.py
+msgid ""
+"Your task is scheduled and will soon be started in the background. Results "
+"will be added to the object list when they are in. It may take some time, a "
+"refresh of the page may be needed to show the results."
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -3421,6 +3425,22 @@ msgstr ""
 "Je hebt dit lid vertrouwd met een vrijwaring niveau van L{}. Dit lid heeft "
 "minimaal een vrijwaring niveau van L{} nodig om een correcte onboarding uit "
 "te voeren. Bewerk dit lid en wijzig indien nodig het vrijwaring niveau."
+
+#: rocky/scheduler.py
+msgid "Connectivity issues with Mula."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task queue is full, please try again later."
+msgstr "Wachtrij is vol, probeer het later opnieuw"
+
+#: rocky/scheduler.py
+msgid "Task is invalid."
+msgstr "Taak is ongeldig"
+
+#: rocky/scheduler.py
+msgid "Task already queued."
+msgstr "Taak al in de wachtrij"
 
 #: rocky/settings.py
 msgid "Blue light"
@@ -5759,18 +5779,6 @@ msgstr "Taakdetails niet gevonden."
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "Ophalen van taken mislukt: geen verbinding met scheduler"
 
-#: rocky/views/tasks.py
-msgid "Task queue is full, please try again later."
-msgstr "Wachtrij is vol, probeer het later opnieuw"
-
-#: rocky/views/tasks.py
-msgid "Task already queued."
-msgstr "Taak al in de wachtrij"
-
-#: rocky/views/tasks.py
-msgid "Task is invalid."
-msgstr "Taak is ongeldig"
-
 #: rocky/views/upload_csv.py
 msgid ""
 "For URL object type, a column 'raw' with URL values is required, starting "
@@ -5812,3 +5820,250 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#, fuzzy
+#~| msgid "option"
+#~ msgid "Options"
+#~ msgstr "optie"
+
+#, fuzzy
+#~| msgid "Required"
+#~ msgid "required"
+#~ msgstr "Verplicht"
+
+#, fuzzy, python-brace-format
+#~| msgid "Invalid email address: '{email}'"
+#~ msgid "Invalid value: {message}"
+#~ msgstr "Ongeldig e-mailadres: '{email}'"
+
+#, fuzzy
+#~| msgid "Sorting options"
+#~ msgid "Missing option"
+#~ msgstr "Sorteer-opties"
+
+#, fuzzy
+#~| msgid "New password confirmation"
+#~ msgid "Repeat for confirmation"
+#~ msgstr "Nieuw wachtwoord bevestiginging"
+
+#, fuzzy
+#~| msgid "Profile"
+#~ msgid "file"
+#~ msgstr "Profiel"
+
+#, fuzzy
+#~| msgid "Indemnification"
+#~ msgid "Syndication"
+#~ msgstr "Vrijwaring"
+
+#, fuzzy
+#~| msgid "Choose a valid level"
+#~ msgid "Enter a valid value."
+#~ msgstr "Kies een geldig niveau"
+
+#, fuzzy
+#~| msgid "Enter your email address."
+#~ msgid "Enter a valid email address."
+#~ msgstr "Voer uw e-mailadres in."
+
+#, fuzzy
+#~| msgid "Enter your email address."
+#~ msgid "Enter a valid IPv4 address."
+#~ msgstr "Voer uw e-mailadres in."
+
+#, fuzzy
+#~| msgid "Enter your email address."
+#~ msgid "Enter a valid IPv6 address."
+#~ msgstr "Voer uw e-mailadres in."
+
+#, fuzzy
+#~| msgid "Enter your email address."
+#~ msgid "Enter a valid IPv4 or IPv6 address."
+#~ msgstr "Voer uw e-mailadres in."
+
+#, fuzzy
+#~| msgid "Enter tags separated by comma."
+#~ msgid "Enter only digits separated by commas."
+#~ msgstr "Voer labels in, gescheiden door komma's."
+
+#, fuzzy
+#~| msgid "Primary key fields cannot be edited."
+#~ msgid "This field cannot be null."
+#~ msgstr "Primaire sleutelvelden kunnen niet worden bewerkt."
+
+#, fuzzy
+#~| msgid "Primary key fields cannot be edited."
+#~ msgid "This field cannot be blank."
+#~ msgstr "Primaire sleutelvelden kunnen niet worden bewerkt."
+
+#, fuzzy, python-format
+#~| msgid "Delete %(display_type)s"
+#~ msgid "Field of type: %(field_type)s"
+#~ msgstr "Verwijder %(display_type)s"
+
+#, fuzzy
+#~| msgid "Declarations"
+#~ msgid "Duration"
+#~ msgstr "Declaraties"
+
+#, fuzzy
+#~| msgid "Email address"
+#~ msgid "IPv4 address"
+#~ msgstr "E-mailadres"
+
+#, fuzzy
+#~| msgid "Email address"
+#~ msgid "IP address"
+#~ msgstr "E-mailadres"
+
+#, fuzzy
+#~| msgid "Add object"
+#~ msgid "A JSON object"
+#~ msgstr "Voeg object toe"
+
+#, fuzzy
+#~| msgid "Manual creation"
+#~ msgid "Many-to-many relationship"
+#~ msgstr "Handmatig toevoegen"
+
+#, fuzzy
+#~| msgid "No file selected"
+#~ msgid "No file was submitted."
+#~ msgstr "Geen bestand geselecteerd"
+
+#, fuzzy
+#~| msgid "The uploaded file is empty."
+#~ msgid "The submitted file is empty."
+#~ msgstr "Het bestand is leeg"
+
+#, fuzzy, python-format
+#~| msgid "Please select at least one finding."
+#~ msgid "Please submit at least %(num)d form."
+#~ msgid_plural "Please submit at least %(num)d forms."
+#~ msgstr[0] "Selecteer ten minste één bevinding."
+#~ msgstr[1] "Selecteer ten minste één bevinding."
+
+#, fuzzy
+#~| msgid "Unknown action."
+#~ msgid "Unknown"
+#~ msgstr "Ongeldige actie."
+
+#, fuzzy
+#~| msgid "Status"
+#~ msgid "Sat"
+#~ msgstr "Status"
+
+#, fuzzy
+#~| msgid "Manually"
+#~ msgid "January"
+#~ msgstr "Handmatig"
+
+#, fuzzy
+#~| msgid "Search"
+#~ msgid "March"
+#~ msgstr "Zoeken"
+
+#, fuzzy
+#~| msgid "Save member"
+#~ msgid "September"
+#~ msgstr "Lid opslaan"
+
+#, fuzzy
+#~| msgid "Members"
+#~ msgid "November"
+#~ msgstr "Leden"
+
+#, fuzzy
+#~| msgid "Members"
+#~ msgid "December"
+#~ msgstr "Leden"
+
+#, fuzzy
+#~| msgid "Summary"
+#~ msgid "mar"
+#~ msgstr "Samenvatting"
+
+#, fuzzy
+#~| msgid "Summary"
+#~ msgid "may"
+#~ msgstr "Samenvatting"
+
+#, fuzzy
+#~| msgid "Search"
+#~ msgctxt "abbrev. month"
+#~ msgid "March"
+#~ msgstr "Zoeken"
+
+#, fuzzy
+#~| msgid "Manually"
+#~ msgctxt "alt. month"
+#~ msgid "January"
+#~ msgstr "Handmatig"
+
+#, fuzzy
+#~| msgid "Search"
+#~ msgctxt "alt. month"
+#~ msgid "March"
+#~ msgstr "Zoeken"
+
+#, fuzzy
+#~| msgid "Save member"
+#~ msgctxt "alt. month"
+#~ msgid "September"
+#~ msgstr "Lid opslaan"
+
+#, fuzzy
+#~| msgid "Members"
+#~ msgctxt "alt. month"
+#~ msgid "November"
+#~ msgstr "Leden"
+
+#, fuzzy
+#~| msgid "Members"
+#~ msgctxt "alt. month"
+#~ msgid "December"
+#~ msgstr "Leden"
+
+#, fuzzy, python-format
+#~| msgid "%(plugin_name)s is able to scan the following object types:"
+#~ msgid "%(plugin_name)s is able to process the following mime types:"
+#~ msgstr ""
+#~ "%(plugin_name)s is in staat om het volgende object types te scannen:"
+
+#, fuzzy
+#~| msgid "Reports"
+#~ msgid "Report types"
+#~ msgstr "Rapporten"
+
+#, fuzzy
+#~| msgid "DNS Report"
+#~ msgid "TLS Report"
+#~ msgstr "DNS Rapport"
+
+#, fuzzy
+#~| msgid "Choose a report - Type"
+#~ msgid "Choose report types"
+#~ msgstr "Kies een rapportage - Type"
+
+#, fuzzy
+#~| msgid "Setup scan"
+#~ msgid "Set up scan"
+#~ msgstr "Scan instellingen"
+
+#, fuzzy
+#~| msgid "Report"
+#~ msgid "View Report"
+#~ msgstr "Rapport"
+
+#, fuzzy
+#~| msgid "Please select a clearance level to proceed."
+#~ msgid "Select at least one OOI to proceed."
+#~ msgstr "Kies een vrijwaringsniveau om verder te gaan."
+
+#, fuzzy
+#~| msgid "Please select an account type to proceed."
+#~ msgid "Select at least one report type to proceed."
+#~ msgstr "Selecteer een account type om door te gaan."
+
+#~ msgid "Scanning successfully scheduled."
+#~ msgstr "Scan met success ingepland."
