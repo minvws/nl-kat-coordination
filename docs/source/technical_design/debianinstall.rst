@@ -317,7 +317,8 @@ to access OpenKAT from the reverse proxy:
     GRANIAN_HOST=0.0.0.0
 
 If you want to use https between the reverse proxy and OpenKAT you can do that
-by setting also setting GRANIAN_PORT, :
+by setting also setting ``GRANIAN_PORT``, ``GRANIAN_SSL_KEYFILE`` and
+``GRANIAN_SSL_CERTIFICATE`` in rocky.conf:
 
 .. code-block:: sh
 
