@@ -14,7 +14,6 @@ from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
 from boefjes.config import settings
 from boefjes.job_handler import (
-    _collect_default_mime_types,
     _find_ooi_in_past,
     get_environment_settings,
     get_octopoes_api_connector,
@@ -22,6 +21,7 @@ from boefjes.job_handler import (
 )
 from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.plugins.models import _collect_default_mime_types
 from octopoes.models import Reference
 
 app = FastAPI(title="Boefje API")
@@ -128,7 +128,7 @@ async def boefje_output(
     bytes_client.save_boefje_meta(boefje_meta)
 
     if boefje_output.files:
-        mime_types = _collect_default_mime_types(task.p_item.data)
+        mime_types = _collect_default_mime_types(task.p_item.data.boefje)
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes
