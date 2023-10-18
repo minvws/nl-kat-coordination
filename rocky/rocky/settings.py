@@ -192,6 +192,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "tools.context_processors.feature_flags",
                 "tools.context_processors.languages",
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
