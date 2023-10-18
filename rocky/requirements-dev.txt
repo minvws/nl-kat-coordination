@@ -148,7 +148,7 @@ typing-extensions==4.7.1 ; python_version >= "3.8" and python_version < "4.0"
 tzdata==2023.3 ; python_version >= "3.8" and python_version < "4.0" and (sys_platform == "win32" or platform_system == "Windows")
 tzlocal==5.0.1 ; python_version >= "3.8" and python_version < "4.0"
 uritools==4.0.1 ; python_version >= "3.8" and python_version < "4.0"
-urllib3==2.0.4 ; python_version >= "3.8" and python_version < "4.0"
+urllib3==2.0.7 ; python_version >= "3.8" and python_version < "4.0"
 uwsgi==2.0.22 ; python_version >= "3.8" and python_version < "4.0"
 vulture==2.9.1 ; python_version >= "3.8" and python_version < "4.0"
 wcwidth==0.2.6 ; python_version >= "3.8" and python_version < "4.0"
