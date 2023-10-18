@@ -48,7 +48,6 @@ If you want to switch to Granian you can create the directory
     [Service]
     ExecStart=
     ExecStart=/opt/venvs/kat-rocky/bin/granian --interface wsgi rocky.wsgi:application
-    ExecStart=/opt/venvs/kat-rocky/bin/granian --workers \$GRANIAN_WORKERS --threads \$GRANIAN_THREADS --host \$GRANIAN_HOST --port \$GRANIAN_PORT --interface wsgi \$GRANIAN_OPTIONS rocky.wsgi:application
     Type=simple
 
 This file is also used by the packagings scripts in new installations to have
