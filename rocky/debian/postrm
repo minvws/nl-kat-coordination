@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+if [ "$1" = "purge" ]; then
+    rm -f /etc/systemd/system/kat-rocky.service.d/use-granian.conf
+    rmdir --ignore-fail-on-non-empty /etc/systemd/system/kat-rocky.service.d
+fi
+
+#DEBHELPER#

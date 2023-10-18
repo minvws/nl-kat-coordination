@@ -6,4 +6,10 @@
   /* Item */
   --description-list-item-padding: 0.75rem 0.75rem 0.75rem 0;
   --description-list-item-odd-background-color: transparent;
+  --description-list-item-title-padding: 0.5rem 0;
+  --description-list-item-data-padding: 0.5rem 0;
+}
+
+main section form dl div {
+  flex-direction: row;
 }

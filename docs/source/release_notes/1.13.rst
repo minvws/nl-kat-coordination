@@ -1,0 +1,66 @@
+============
+OpenKAT 1.13
+============
+
+We are replacing the uWSGI server in rocky with Granian. uWSGI doesn't seem to
+be well maintained anymore and we run into a bug that exists for a long time and
+doesn't get fixed. Granian is new application server that is better maintained
+and also has good performance. Granian is also written in Rust instead of C so
+should also have better security.
+
+If you have made any configuration changes or are using rocky on port 8443 you
+need to make sure to configure Granian correctly as it will listen on 127.0.0.1
+port 8000 by default. To not break anything in 1.13 we will support using both
+uWSGI and Granian with uWSGI still being used when upgrading from earlier
+versions. In 1.14 we will switch to using Granian and in 1.15 we will remove
+uWSGI. In new installation the Debian packages will already use Granian by
+default.
+
+New Features
+============
+
+
+Bug fixes
+=========
+
+
+Upgrading
+=========
+
+The normal instructions for upgrading :ref:`Debian packages<Upgrading Debian>`
+or upgrading :ref:`containers <Upgrading_Containers>` should be followed.
+
+Containers
+----------
+
+If you are using the container images you can switch to granian by setting the
+`USE_GRANIAN` env variable to `1` or `true`.
+
+Debian packages
+---------------
+
+If you want to switch to Granian you can create the directory
+``/etc/systemd/system/kat-rocky.service.d`` and creat the file
+``/etc/systemd/system/kat-rocky.service.d/use-granian.conf`` with the following contents:
+
+.. code-block:: systemd
+
+    [Service]
+    ExecStart=
+    ExecStart=/opt/venvs/kat-rocky/bin/granian --interface wsgi rocky.wsgi:application
+    Type=simple
+
+This file is also used by the packagings scripts in new installations to have
+those installations use Granian by default. Do not put any other configuration
+in this file because it will be automatically removed when upgrading to 1.14.
+
+If you were previously accessing OpenKAT using https on port 8443 you need to
+change the configuration as described on the :ref:`Debian installation
+page<Configure reverse proxy>`.
+
+
+Full Changelog
+==============
+
+The full changelog can be found on `Github
+<https://github.com/minvws/nl-kat-coordination/releases/tag/v1.13.0>`_.

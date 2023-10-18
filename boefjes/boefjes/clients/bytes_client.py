@@ -2,13 +2,14 @@ import logging
 import typing
 from functools import wraps
 from typing import Any, Callable, Dict, Set, Union
+from uuid import UUID
 
 import requests
 from requests.adapters import HTTPAdapter
 from requests.models import HTTPError
 
 from boefjes.clients.scheduler_client import LogRetry
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
 logger = logging.getLogger(__name__)
@@ -103,10 +104,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Set[str] = None) -> None:
-        if not mime_types:
-            mime_types = set()
-
+    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Set[str] = frozenset()) -> UUID:
         headers = {"content-type": "application/octet-stream"}
         headers.update(self.headers)
 
@@ -119,9 +117,18 @@ class BytesAPIClient:
 
         self._verify_response(response)
 
+        return UUID(response.json()["id"])
+
     @retry_with_login
     def get_raw(self, raw_data_id: str) -> bytes:
         response = self._session.get(f"/bytes/raw/{raw_data_id}", headers=self.headers)
         self._verify_response(response)
 
         return response.content
+
+    @retry_with_login
+    def get_raw_meta(self, raw_data_id: str) -> RawDataMeta:
+        response = self._session.get(f"/bytes/raw/{raw_data_id}/meta", headers=self.headers)
+        self._verify_response(response)
+
+        return RawDataMeta.parse_obj(response.json())

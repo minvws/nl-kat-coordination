@@ -194,4 +194,5 @@ urlpatterns += i18n_patterns(
     ),
     path("<organization_code>/bytes/<boefje_meta_id>/raw", BytesRawView.as_view(), name="bytes_raw"),
     path("<organization_code>/kat-alogus/", include("katalogus.urls"), name="katalogus"),
+    path("<organization_code>/reports/", include("reports.urls"), name="reports"),
 )

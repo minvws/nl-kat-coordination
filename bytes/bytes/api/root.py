@@ -33,10 +33,13 @@ ServiceHealth.update_forward_refs()
 
 
 def validation_exception_handler(_: Request, exc: Union[RequestValidationError, ValidationError]) -> JSONResponse:
-    logger.info(exc.json())
-    logger.debug(exc.__traceback__)
-
-    return JSONResponse({"errors": exc.errors()}, status_code=HTTP_422_UNPROCESSABLE_ENTITY)
+    logger.critical(exc)
+    return JSONResponse(
+        {
+            "value": str(exc),
+        },
+        HTTP_422_UNPROCESSABLE_ENTITY,
+    )
 
 
 @router.get("/", include_in_schema=False)
