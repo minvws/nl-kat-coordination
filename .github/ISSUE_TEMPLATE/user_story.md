@@ -1,6 +1,6 @@
 ---
 name: User story
-about: Create a feature request that is phrased as a user story
+about: Create a task that is phrased as a user story
 title: ''
 labels: ''
 assignees: ''
