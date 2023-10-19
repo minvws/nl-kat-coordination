@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-17 13:44+0000\n"
+"POT-Creation-Date: 2023-10-19 11:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,6 +28,7 @@ msgstr ""
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/crawl_report/report.html
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -1416,6 +1417,7 @@ msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/crawl_report/report.html
 #: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
@@ -2339,10 +2341,12 @@ msgid "Type"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/report_types/crawl_report/report.html
 msgid "Path"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/report_types/crawl_report/report.html
 msgid "Hostname"
 msgstr ""
 
@@ -2675,6 +2679,35 @@ msgstr ""
 
 #: reports/forms.py
 msgid "Report types"
+msgstr ""
+
+#: reports/report_types/crawl_report/report.html
+msgid "Domain"
+msgstr ""
+
+#: reports/report_types/crawl_report/report.html
+msgid "Secure"
+msgstr ""
+
+#: reports/report_types/crawl_report/report.html
+msgid "SameSite"
+msgstr ""
+
+#: reports/report_types/crawl_report/report.html
+msgid "httpOnly"
+msgstr ""
+
+#: reports/report_types/crawl_report/report.html
+msgid "No crawl information found for this URL"
+msgstr ""
+
+#: reports/report_types/crawl_report/report.py
+msgid "Crawl report"
+msgstr ""
+
+#: reports/report_types/crawl_report/report.py
+msgid ""
+"Crawl reports show the hostname and cookies gathered when crawling a URL."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
