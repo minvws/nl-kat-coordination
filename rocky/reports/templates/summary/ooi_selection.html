@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<table>
+    <thead>
+        <tr>
+            <th>{% translate "Object" %}</th>
+            <th>{% translate "Type" %}</th>
+            <th>{% translate "Clearance level" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ooi in oois %}
+            <tr>
+                <td>{{ ooi.primary_key }}</td>
+                <td>{{ ooi.object_type }}</td>
+                <td>
+                    {% include "partials/scan_level_indicator.html" with value=ooi.scan_profile.level.value custom_class="left" %}
+
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

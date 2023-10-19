@@ -47,6 +47,7 @@ KEIKO_API = env.url("KEIKO_API").geturl()
 # Report generation timeout in seconds
 KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
 ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
+FEATURE_REPORTS = env.bool("FEATURE_REPORTS", False)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
@@ -150,6 +151,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "tagulous",
     "compressor",
+    "reports",
     # "drf_standardized_errors",
 ]
 
@@ -182,7 +184,7 @@ ROOT_URLCONF = "rocky.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "rocky/templates"],
+        "DIRS": [BASE_DIR / "rocky/templates", BASE_DIR / "reports/report_types"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -190,6 +192,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "tools.context_processors.feature_flags",
                 "tools.context_processors.languages",
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",

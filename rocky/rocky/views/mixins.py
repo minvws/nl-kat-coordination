@@ -111,20 +111,19 @@ class OctopoesView(OrganizationView):
         raise exception
 
     def get_observed_at(self) -> datetime:
-        if "observed_at" not in self.request.GET:
+        observed_at = self.request.GET.get("observed_at", None)
+        if not observed_at:
             return datetime.now(timezone.utc)
 
         try:
             datetime_format = "%Y-%m-%dT%H:%M:%S"
-            return convert_date_to_datetime(datetime.strptime(self.request.GET.get("observed_at"), datetime_format))
+            return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
         except ValueError:
             try:
                 datetime_format = "%Y-%m-%d"
-                return convert_date_to_datetime(datetime.strptime(self.request.GET.get("observed_at"), datetime_format))
+                return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
             except ValueError:
-                messages.error(
-                    self.request, _("Can not parse observed_at parameter, falling back to showing current object")
-                )
+                messages.error(self.request, _("Can not parse date, falling back to show current date."))
                 return datetime.now(timezone.utc)
 
     def get_depth(self, default_depth=DEPTH_DEFAULT) -> int:

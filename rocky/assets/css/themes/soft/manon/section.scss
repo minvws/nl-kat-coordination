@@ -25,4 +25,8 @@ body>main>section {
         padding-right: var(--page-whitespace-right-grid-xxl);
         padding-left: var(--page-whitespace-left-grid-xxl);
     }
+
+    &.dividing-line {
+        border-top: 1px solid #cccccc;
+    }
 }
