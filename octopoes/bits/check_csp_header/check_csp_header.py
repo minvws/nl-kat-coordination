@@ -1,3 +1,4 @@
+import ipaddress
 import re
 from typing import Dict, Iterator, List
 
@@ -5,6 +6,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import HTTPHeader
 
+NON_DECIMAL_FILTER = re.compile(r'[^\d.]+')
 
 def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     header = input_ooi
@@ -15,9 +17,6 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
 
     if "http://" in header.value:
         findings.append("Http should not be used in the CSP settings of an HTTP Header.")
-
-    if "127.0.0.1" in header.value:
-        findings.append("127.0.0.1 should not be used in the CSP settings of an HTTP Header.")
 
     # checks for a wildcard in domains in the header
     # 1: one or more non-whitespace
@@ -59,7 +58,15 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
             findings.append(
                 "'Data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
             )
-
+        if policy[1].strip() == "*":
+            findings.append(
+                "a wilcard source should not be used in the value of any type in the CSP settings."
+            )
+        for source in policy[1:]:         
+            if not _ip_valid(source):
+                findings.append(
+                    "Private, local, reserved, multicast or loopback addresses should not be allo in the CSP settings."
+                )
     if findings:
         description: str = "List of CSP findings:"
         for index, finding in enumerate(findings):
@@ -70,6 +77,23 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
             kat_id="KAT-CSP-VULNERABILITIES",
             description=description,
         )
+
+
+def _ip_valid(source: str) -> bool:
+    "Check if there are IP's in this source, return False if the address found was to be non global. Ignores non ips"
+    ip = non_decimal.sub("", source)
+    if ip:
+        try:
+            ip = ipaddress.ip_address(ip)
+            if (ip.is_private or 
+                ip.is_loopback or
+                ip.is_link_local or
+                ip.is_multicast or 
+                ip.is_reserved):
+                return False
+        except ValueError:
+            pass
+     return True
 
 
 def _create_kat_finding(header: Reference, kat_id: str, description: str) -> Iterator[OOI]:
