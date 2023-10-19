@@ -82,6 +82,7 @@ Any translation updates in Weblate will be automatically submitted as a GitHub P
 If you contribute to the translation effort, you will receive a mention in the source code.
 
 Note that editing the English localization requires changing the source string in Django, which must be done through a GitHub PR manually.
+In addition, take care not to edit the ``.po`` files through GitHub, as this may cause merge conflicts when Weblate has pending translations.
 
 Contributor Social Contract
 ===========================
