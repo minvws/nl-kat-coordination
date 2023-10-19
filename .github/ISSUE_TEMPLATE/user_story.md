@@ -1,13 +1,12 @@
 ---
 name: User story
-about: Suggest an idea for this project, through a user story
+about: Create a feature request that is phrased as a user story
 title: ''
-labels: 'design frontend ui/ux'
-assignees: 'underdarknl HeleenSG'
+labels: ''
+assignees: ''
 ---
 
 ## User Story
-
 As a [type of user],
 I want [some goal or desired outcome],
 so that [some reason or benefit].
