@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="choose-report">
+        {% include "partials/report_header.html" %}
+        {% include "partials/report_introduction.html" %}
+        {% include "summary/report_summary.html" %}
+
+        {% for ooi, report in report_data.items %}
+            {% for report_type,data in report.items %}
+                <section class="dividing-line">
+                    <div>
+                        <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
+                        {% include data.template with data=data.data %}
+
+                    </div>
+                </section>
+            {% endfor %}
+        {% endfor %}
+    </main>
+{% endblock content %}

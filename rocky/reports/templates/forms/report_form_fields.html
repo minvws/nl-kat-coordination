@@ -1,0 +1,8 @@
+<input type="hidden"
+       name="observed_at"
+       value="{{ observed_at|date:"Y-m-d" }}">
+{% if plugins.required %}
+    {% for required_plugin in plugins.required %}
+        <input type="hidden" name="plugin" value={{ required_plugin.id }}>
+    {% endfor %}
+{% endif %}
