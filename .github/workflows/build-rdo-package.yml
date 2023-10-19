@@ -8,6 +8,7 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
 
 env:
   PKGDIR: /home/runner/work/nl-kat-coordination
@@ -86,7 +87,7 @@ jobs:
         run: python3.8 -m venv /var/www/html/.venv
 
       - name: Rocky Install requirements
-        run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
+        run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
 
       - name: Rocky Create rocky_venv tarball
         run: tar -zcvf ${{ env.PKGDIR }}/rocky_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
