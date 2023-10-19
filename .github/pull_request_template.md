@@ -9,6 +9,9 @@ Closes ...
 ### Proof
 _Please add some proof of your working change here, unless this is not required (e.g. this PR is trivial)._
 
+### Video demo
+_Please create a short screen recording to show off the new functionality, if there are interesting new features for end-users._
+
 ---
 
 ### Code Checklist
