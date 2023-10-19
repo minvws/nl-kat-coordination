@@ -169,18 +169,27 @@ class App:
                 additions,
             )
 
+    @tracer.start_as_current_span("collect_metrics")
     def collect_metrics(self) -> None:
         """Collect application metrics
 
         This method that allows to collect metrics throughout the application.
         """
-        # Collect metrics from the schedulers
         for s in self.schedulers.values():
             self.ctx.metrics_qsize.labels(
                 scheduler_id=s.scheduler_id,
             ).set(
                 s.queue.qsize(),
             )
+
+            status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
+            for status, count in status_counts.items():
+                self.ctx.metrics_task_status_counts.labels(
+                    scheduler_id=s.scheduler_id,
+                    status=status,
+                ).set(
+                    count,
+                )
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the
@@ -207,12 +216,13 @@ class App:
         ).start()
 
         # Start metrics collecting
-        thread.ThreadRunner(
-            name="metrics_collector",
-            target=self.collect_metrics,
-            stop_event=self.stop_event,
-            interval=1,
-        ).start()
+        if self.ctx.config.collect_metrics:
+            thread.ThreadRunner(
+                name="metrics_collector",
+                target=self.collect_metrics,
+                stop_event=self.stop_event,
+                interval=10,
+            ).start()
 
         # API Server
         self.server = server.Server(self.ctx, self.schedulers)

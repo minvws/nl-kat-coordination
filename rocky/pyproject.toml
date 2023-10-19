@@ -57,6 +57,7 @@ opentelemetry-instrumentation-requests = "^0.41b0"
 whitenoise = {extras = ["brotli"], version = "^6.5.0"}
 opentelemetry-instrumentation = "^0.41b0"
 opentelemetry-instrumentation-fastapi = "^0.41b0"
+granian = "^0.7.0"
 
 
 [tool.poetry.group.dev.dependencies]

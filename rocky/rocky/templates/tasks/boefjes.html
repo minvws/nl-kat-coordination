@@ -28,14 +28,14 @@
                                     <th scope="col">{% translate "Status" %}</th>
                                     <th scope="col">{% translate "Created date" %}</th>
                                     <th scope="col">{% translate "Input Object" %}</th>
-                                    <th scope="col">{% translate "Details" %}</th>
+                                    <th scope="col" class="visually-hidden">{% translate "Details" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for task in object_list %}
                                     <tr id="{{ task.id }}">
                                         <td>
-                                            <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.boefje.id %}">
+                                            <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=task.p_item.data.boefje.id %}">
                                                 {% if not task.p_item.data.boefje.name %}
                                                     {{ task.p_item.data.boefje.id }}
                                                 {% else %}
