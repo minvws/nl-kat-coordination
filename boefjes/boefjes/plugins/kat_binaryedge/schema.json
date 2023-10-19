@@ -6,7 +6,8 @@
       "title": "BINARYEDGE_API",
       "maxLength": 128,
       "type": "string",
-      "description": "A BinaryEdge API key (see https://docs.binaryedge.io/api-v2/)."
+      "description": "A BinaryEdge API key (see https://docs.binaryedge.io/api-v2/).",
+      "hide_value_in_interface": true
     }
   },
   "required": [

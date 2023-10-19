@@ -34,4 +34,12 @@ class PluginSettingsListView(SinglePluginView, ListView):
         settings = self.katalogus_client.get_plugin_settings(plugin_id=self.plugin.id)
         props = self.plugin_schema["properties"]
 
-        return [{"name": prop, "value": settings.get(prop), "required": self.is_required_field(prop)} for prop in props]
+        return [
+            {
+                "name": prop,
+                "value": settings.get(prop),
+                "required": self.is_required_field(prop),
+                "hide_value_in_interface": self.is_secret_field(fields=props[prop]),
+            }
+            for prop in props
+        ]

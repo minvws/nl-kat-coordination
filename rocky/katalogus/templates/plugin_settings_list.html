@@ -25,7 +25,7 @@
                                     {% with sname=setting.name.lower %}
                                         {% if setting.value is None %}
                                             {% translate "Unset" %}
-                                        {% elif "token" in sname or "key" in sname or "api" in sname or "secret" in sname %}
+                                        {% elif setting.hide_value_in_interface %}
                                             •••••••••••••
                                         {% else %}
                                             {{ setting.value }}

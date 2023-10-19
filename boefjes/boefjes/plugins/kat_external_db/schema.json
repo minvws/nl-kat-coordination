@@ -12,7 +12,8 @@
             "title": "DB_ACCESS_TOKEN",
             "maxLength": 2048,
             "type": "string",
-            "description": "Access token (API KEY) for external DB. Defaults to empty string."
+            "description": "Access token (API KEY) for external DB. Defaults to empty string.",
+            "hide_value_in_interface": true
         },
         "DB_ORGANIZATION_IDENTIFIER": {
             "title": "DB_ORGANIZATION_IDENTIFIER",

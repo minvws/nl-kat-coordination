@@ -6,7 +6,8 @@
       "title": "WordPress Vulnerability Database API token",
       "maxLength": 128,
       "type": "string",
-      "description": "An optional WordPress Vulnerability Database API token to retrieve WordPress vulnerability data in real time. See https://wpscan.com/api and https://github.com/wpscanteam/wpscan/wiki/WPScan-User-Documentation#optional-wordpress-vulnerability-database-api for more information."
+      "description": "An optional WordPress Vulnerability Database API token to retrieve WordPress vulnerability data in real time. See https://wpscan.com/api and https://github.com/wpscanteam/wpscan/wiki/WPScan-User-Documentation#optional-wordpress-vulnerability-database-api for more information.",
+      "hide_value_in_interface": true
     }
   },
   "required": []

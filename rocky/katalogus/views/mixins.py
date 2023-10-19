@@ -73,6 +73,10 @@ class SinglePluginView(OrganizationView):
     def is_required_field(self, field: str) -> bool:
         return self.plugin_schema and field in self.plugin_schema.get("required", [])
 
+    def is_secret_field(self, fields: dict) -> bool:
+        """Check whether this field should be secret, defaults to False."""
+        return fields.get("hide_value_in_interface", False)
+
 
 class NormalizerMixin(OctopoesView):
     """

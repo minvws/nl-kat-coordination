@@ -6,7 +6,8 @@
       "title": "SHODAN_API",
       "maxLength": 128,
       "type": "string",
-      "description": "A Shodan API key (see https://developer.shodan.io/api/requirements)."
+      "description": "A Shodan API key (see https://developer.shodan.io/api/requirements).",
+      "hide_value_in_interface": true
     }
   },
   "required": [

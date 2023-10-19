@@ -12,7 +12,8 @@
             "title": "CENSYS_API_SECRET",
             "maxLength": 128,
             "type": "string",
-            "description": "A Censys API secret."
+            "description": "A Censys API secret.",
+            "hide_value_in_interface": true
         }
     },
     "required": [
