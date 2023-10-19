@@ -143,7 +143,7 @@ class NormalizerScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
         """
         task = NormalizerTask(
-            normalizer=Normalizer(id=normalizer.id),
+            normalizer=Normalizer.parse_obj(normalizer.dict()),
             raw_data=raw_data,
         )
 

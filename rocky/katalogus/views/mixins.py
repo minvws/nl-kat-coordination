@@ -80,11 +80,9 @@ class NormalizerMixin(OctopoesView):
     this mixin provides the method to construct the normalizer task for that data and run it.
     """
 
-    def run_normalizer(self, normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
+    def run_normalizer(self, katalogus_normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
         normalizer_task = NormalizerTask(
-            id=uuid4(),
-            normalizer=Normalizer.parse_obj(normalizer.dict()),
-            raw_data=raw_data,
+            id=uuid4().hex, normalizer=Normalizer.parse_obj(katalogus_normalizer.dict()), raw_data=raw_data
         )
 
         task = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
