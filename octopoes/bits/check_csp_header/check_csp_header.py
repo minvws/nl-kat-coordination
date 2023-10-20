@@ -6,7 +6,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import HTTPHeader
 
-NON_DECIMAL_FILTER = re.compile(r'[^\d.]+')
+NON_DECIMAL_FILTER = re.compile(r"[^\d.]+")
 
 
 def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
@@ -61,14 +61,14 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
             )
         if policy[1].strip() == "*":
             findings.append("A wildcard source should not be used in the value of any type in the CSP settings.")
-        if policy[1].strip() in ("http:" "https:"):
+        if policy[1].strip() in ("http:", "https:"):
             findings.append(
                 "a blanket protocol source should not be used in the value of any type in the CSP settings."
             )
         for source in policy[1:]:
             if not _ip_valid(source):
                 findings.append(
-                    "Private, local, reserved, multicast or loopback addresses should not be allowed in the CSP settings."
+                    "Private, local, reserved, multicast, loopback ips should not be allowed in the CSP settings."
                 )
     if findings:
         description: str = "List of CSP findings:"
@@ -84,7 +84,7 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
 
 def _ip_valid(source: str) -> bool:
     "Check if there are IP's in this source, return False if the address found was to be non global. Ignores non ips"
-    ip = non_decimal.sub("", source)
+    ip = NON_DECIMAL_FILTER.sub("", source)
     if ip:
         try:
             ip = ipaddress.ip_address(ip)
