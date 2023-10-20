@@ -17,7 +17,7 @@ if [ "$1" = "configure" ]; then
 # Do not customize this file because it will be automatically removed in the next release
 [Service]
 ExecStart=
-ExecStart=/opt/venvs/kat-rocky/bin/granian --workers \$GRANIAN_WORKERS --threads \$GRANIAN_THREADS --host \$GRANIAN_HOST --port \$GRANIAN_PORT --interface wsgi \$GRANIAN_OPTIONS rocky.wsgi:application
+ExecStart=/opt/venvs/kat-rocky/bin/granian --interface wsgi rocky.wsgi:application
 Type=simple
 EOF
     fi

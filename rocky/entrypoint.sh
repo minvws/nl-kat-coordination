@@ -9,7 +9,7 @@ if [ "$DATABASE_MIGRATION" = "1" ] || [[ $DATABASE_MIGRATION == "true" ]]; then
 fi
 
 if [ "$1" == "uwsgi" ] && { [ "$USE_GRANIAN" = "1" ] || [[ $USE_GRANIAN == "true" ]]; }; then
-    exec granian --workers "$GRANIAN_WORKERS" --threads "$GRANIAN_THREADS" --interface wsgi rocky.wsgi:application --host 0.0.0.0
+    exec granian --interface wsgi rocky.wsgi:application --host 0.0.0.0
 else
     exec "$@"
 fi
