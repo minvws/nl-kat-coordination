@@ -8,6 +8,7 @@ from octopoes.models.types import HTTPHeader
 
 NON_DECIMAL_FILTER = re.compile(r'[^\d.]+')
 
+
 def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "content-security-policy":
@@ -59,13 +60,11 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
                 "'Data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
             )
         if policy[1].strip() == "*":
-            findings.append(
-                "a wildcard source should not be used in the value of any type in the CSP settings."
-            )
+            findings.append("A wildcard source should not be used in the value of any type in the CSP settings.")
         if policy[1].strip() in ("http:" "https:"):
             findings.append(
                 "a blanket protocol source should not be used in the value of any type in the CSP settings."
-            )            
+            )
         for source in policy[1:]:
             if not _ip_valid(source):
                 findings.append(
@@ -89,11 +88,7 @@ def _ip_valid(source: str) -> bool:
     if ip:
         try:
             ip = ipaddress.ip_address(ip)
-            if (ip.is_private or
-                ip.is_loopback or
-                ip.is_link_local or
-                ip.is_multicast or
-                ip.is_reserved):
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_reserved:
                 return False
         except ValueError:
             pass
