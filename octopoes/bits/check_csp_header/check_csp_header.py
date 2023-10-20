@@ -60,12 +60,16 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
             )
         if policy[1].strip() == "*":
             findings.append(
-                "a wilcard source should not be used in the value of any type in the CSP settings."
+                "a wildcard source should not be used in the value of any type in the CSP settings."
             )
-        for source in policy[1:]:         
+        if policy[1].strip() in ("http:" "https:"):
+            findings.append(
+                "a blanket protocol source should not be used in the value of any type in the CSP settings."
+            )            
+        for source in policy[1:]:
             if not _ip_valid(source):
                 findings.append(
-                    "Private, local, reserved, multicast or loopback addresses should not be allo in the CSP settings."
+                    "Private, local, reserved, multicast or loopback addresses should not be allowed in the CSP settings."
                 )
     if findings:
         description: str = "List of CSP findings:"
@@ -85,15 +89,15 @@ def _ip_valid(source: str) -> bool:
     if ip:
         try:
             ip = ipaddress.ip_address(ip)
-            if (ip.is_private or 
+            if (ip.is_private or
                 ip.is_loopback or
                 ip.is_link_local or
-                ip.is_multicast or 
+                ip.is_multicast or
                 ip.is_reserved):
                 return False
         except ValueError:
             pass
-     return True
+    return True
 
 
 def _create_kat_finding(header: Reference, kat_id: str, description: str) -> Iterator[OOI]:
