@@ -1,9 +1,9 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_urls static %}
+{% load i18n admin_urls static media_with_nonce %}
 
 {% block extrahead %}
     {{ block.super }}
-    {{ media }}
+    {% media_with_nonce %}
     <script nonce="{{ request.csp_nonce }}" src="{% static 'admin/js/cancel.js' %}" async></script>
 {% endblock %}
 
