@@ -1,4 +1,4 @@
-from ipaddress import ip_address, IPv4Address
+from ipaddress import IPv4Address, ip_address
 from typing import Dict, Iterator, List
 
 from octopoes.models import OOI
@@ -48,4 +48,3 @@ def run(url: URL, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI
                 yield ip
                 yield ip_url
                 yield original_url
-
