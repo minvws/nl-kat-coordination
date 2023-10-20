@@ -107,10 +107,18 @@ repos:
   rev: v1.32.1
   hooks:
   - id: djlint-reformat-django
-    files: '^rocky/.*/templates/.*$'
+    files: |
+      (?x)(
+      ^rocky/.*/templates/.*$ |
+      ^rocky/reports/report_types/.*/.*\.html
+      )
 
   - id: djlint-django
-    files: '^rocky/.*/templates/.*$'
+    files: |
+      (?x)(
+      ^rocky/.*/templates/.*$ |
+      ^rocky/reports/report_types/.*/.*\.html
+      )
 
 - repo: https://github.com/thibaudcolas/pre-commit-stylelint
   rev: v15.10.1
