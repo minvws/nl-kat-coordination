@@ -2,7 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Literal, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing_extensions import Annotated
 
 from octopoes.models import Reference, ScanProfile
 from octopoes.models.origin import Origin, OriginParameter
@@ -67,4 +68,6 @@ class ScanProfileDBEvent(DBEvent):
         return self.reference
 
 
-EVENT_TYPE = Union[OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent]
+DBEventType = Annotated[
+    Union[OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent], Field(discriminator="entity_type")
+]

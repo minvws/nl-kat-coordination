@@ -38,6 +38,7 @@ from octopoes.models.ooi.findings import (
     CVEFindingType,
     CWEFindingType,
     Finding,
+    FindingType,
     KATFindingType,
     MutedFinding,
     RetireJSFindingType,
@@ -46,6 +47,7 @@ from octopoes.models.ooi.findings import (
 from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
     AutonomousSystem,
+    IPAddress,
     IPAddressV4,
     IPAddressV6,
     IPPort,
@@ -92,6 +94,7 @@ DnsRecordType = Union[
     NXDOMAIN,
 ]
 FindingTypeType = Union[
+    FindingType,
     ADRFindingType,
     KATFindingType,
     CVEFindingType,
@@ -102,6 +105,7 @@ FindingTypeType = Union[
 ]
 NetworkType = Union[
     Network,
+    IPAddress,
     IPAddressV4,
     IPAddressV6,
     AutonomousSystem,
