@@ -8,6 +8,7 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
 
 env:
   PKGDIR: /home/runner/work/nl-kat-coordination
@@ -86,7 +87,7 @@ jobs:
         run: python3.8 -m venv /var/www/html/.venv
 
       - name: Rocky Install requirements
-        run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
+        run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
 
       - name: Rocky Create rocky_venv tarball
         run: tar -zcvf ${{ env.PKGDIR }}/rocky_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
@@ -111,13 +112,18 @@ jobs:
         shell: bash --login {0}
         working-directory: ./rocky
 
-      - name: Rocky Collectstatic
-        run: SECRET_KEY="whatever" /var/www/html/.venv/bin/python3.8 manage.py collectstatic
-        working-directory: ./rocky
-
       - name: Rocky Compilemessages
-        run: SECRET_KEY="whatever" /var/www/html/.venv/bin/python3.8 manage.py compilemessages
+        run: /var/www/html/.venv/bin/python3.8 manage.py collectstatic && /var/www/html/.venv/bin/python3.8 manage.py compress && /var/www/html/.venv/bin/python3.8 manage.py compilemessages
         working-directory: ./rocky
+        env:
+          BYTES_API: http://bytes:8000
+          BYTES_PASSWORD: password
+          BYTES_USERNAME: username
+          KATALOGUS_API: http://katalogus:8000
+          KEIKO_API: http://keiko:8000
+          OCTOPOES_API: http://octopoes_api:80
+          SCHEDULER_API: http://scheduler:8000
+          SECRET_KEY: whatever
 
       - name: Rocky Create rocky release
         run: tar -cvzf ${{ env.PKGDIR }}/rocky_${{ env.RELEASE_VERSION }}.tar.gz --exclude node_modules --exclude rocky_venv* --exclude=.git* --exclude .parcel-cache --exclude Dockerfile .
