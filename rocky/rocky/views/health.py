@@ -2,6 +2,7 @@ import logging
 from typing import List
 
 from account.mixins import OrganizationView
+from django.contrib import messages
 from django.http import JsonResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -13,7 +14,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.bytes_client import get_bytes_client
 from rocky.health import ServiceHealth
 from rocky.keiko import keiko_client
-from rocky.scheduler import get_scheduler_client
+from rocky.scheduler import SchedulerError, get_scheduler_client
 from rocky.version import __version__
 
 logger = logging.getLogger(__name__)
@@ -62,6 +63,8 @@ def get_scheduler_health() -> ServiceHealth:
             healthy=False,
             additional=_("Could not connect to Scheduler. Service is possibly down"),
         )
+    except ConnectionError:
+        raise SchedulerError()
     return scheduler_health
 
 
@@ -120,6 +123,10 @@ class HealthChecks(OrganizationView, TemplateView):
                 "text": _("Beautified"),
             },
         ]
-        rocky_health = get_rocky_health(self.octopoes_api_connector)
-        context["health_checks"] = flatten_health(rocky_health)
+        try:
+            rocky_health = get_rocky_health(self.octopoes_api_connector)
+            context["health_checks"] = flatten_health(rocky_health)
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
+
         return context
