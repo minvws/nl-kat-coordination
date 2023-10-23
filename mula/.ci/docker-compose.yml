@@ -25,7 +25,6 @@ services:
       - .ci/.env.test
     depends_on:
       - ci_postgres
-      - ci_octopoes
       - ci_bytes
       - ci_katalogus
       - ci_rabbitmq
@@ -90,33 +89,5 @@ services:
       ci_postgres:
         condition: service_healthy
 
-  ci_octopoes:
-    build:
-      context: ../octopoes/
-      target: dev
-      args:
-        ENVIRONMENT: dev
-    ports:
-      - "127.0.0.1:8001:80"
-    env_file:
-      - .ci/.env.test
-    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
-    volumes:
-      - ../octopoes:/app/octopoes
-    depends_on:
-      ci_crux:
-        condition: service_started
-      ci_rabbitmq:
-        condition: service_healthy
-
-  ci_crux:
-    image: "ghcr.io/dekkers/xtdb-http-multinode:main"
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:3000:3000"
-    volumes:
-      - xtdb-data:/var/lib/xtdb
-
 volumes:
   bytes-data:
-  xtdb-data:
