@@ -82,3 +82,6 @@ class MetaDataRepository:
 
     def get_raw_file_count_per_organization(self) -> Dict[str, int]:
         raise NotImplementedError()
+
+    def get_raw_meta_by_id(self, raw_id: UUID) -> RawDataMeta:
+        raise NotImplementedError()

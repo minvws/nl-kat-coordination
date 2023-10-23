@@ -1,0 +1,57 @@
+{% load i18n %}
+
+<section class="dividing-line">
+    <div>
+        <h2>{% translate "Summary" %}</h2>
+        <h3>{% translate "Selected OOIs" %}</h3>
+        {% include "summary/ooi_selection.html" %}
+
+        <h3>{% translate "Selected Report Types" %}</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Report type" %}</th>
+                    <th>{% translate "Description" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report_type in report_types %}
+                    <tr>
+                        <td>{{ report_type.name }}</td>
+                        <td>{{ report_type.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>{% translate "Selected Plugins for scans" %}</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Plugin options" %}</th>
+                    <th>{% translate "Plugin name" %}</th>
+                    <th>{% translate "Plugin scan level" %}</th>
+                    <th>{% translate "Plugin type" %}</th>
+                    <th>{% translate "Plugin description" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for option, plugins in plugins.items %}
+                    {% for plugin in plugins %}
+                        <tr>
+                            <td>{{ option }}</td>
+                            <td>{{ plugin.name }}</td>
+                            <td>
+                                {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}
+
+                            </td>
+                            <td>
+                                <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
+                            </td>
+                            <td>{{ plugin.description }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
