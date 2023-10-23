@@ -141,10 +141,14 @@ class KatalogusTestCase(unittest.TestCase):
         self.assertEqual(len(self.service_katalogus.organisations_normalizer_type_cache), 2)
         self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-1"))
         self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname"))
-        self.assertEqual(len(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname")), 2)
+        self.assertEqual(
+            len(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname")), 2
+        )
         self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-2"))
         self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname"))
-        self.assertEqual(len(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname")), 2)
+        self.assertEqual(
+            len(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname")), 2
+        )
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
     def test_get_new_boefjes_by_org_id(self, mock_get_plugins_by_organisation):
@@ -161,7 +165,6 @@ class KatalogusTestCase(unittest.TestCase):
                 PluginFactory(id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]),
                 PluginFactory(id="plugin-4", type="normalizer", enabled=True, consumes=["Hostname"]),
                 PluginFactory(id="plugin-5", type="boefje", enabled=True, consumes=["Hostname"]),
-
             ],
         ]
 
