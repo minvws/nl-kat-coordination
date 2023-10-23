@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-17 13:44+0000\n"
+"POT-Creation-Date: 2023-10-23 15:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3330,13 +3330,6 @@ msgstr ""
 msgid "Members"
 msgstr ""
 
-#: tools/view_helpers.py
-msgid ""
-"Your task is scheduled and will soon be started in the background. Results "
-"will be added to the object list when they are in. It may take some time, a "
-"refresh of the page may be needed to show the results."
-msgstr ""
-
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -3358,6 +3351,22 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task already queued."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task could not be found."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid " Scheduling {} {} with input object {} failed."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid ""
+"Task '{} {} with input object {}' is scheduled and will soon be started in "
+"the background. Results will be added to the object list when they are in. "
+"It may take some time, a refresh of the page may be needed to show the "
+"results."
 msgstr ""
 
 #: rocky/settings.py
@@ -5522,14 +5531,6 @@ msgstr ""
 
 #: rocky/views/scan_profile.py
 msgid "Reset"
-msgstr ""
-
-#: rocky/views/tasks.py
-msgid "Task details not found."
-msgstr ""
-
-#: rocky/views/tasks.py
-msgid "Fetching tasks failed: no connection with scheduler"
 msgstr ""
 
 #: rocky/views/upload_csv.py
