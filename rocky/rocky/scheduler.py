@@ -255,12 +255,21 @@ class SchedulerClient:
                 raise SchedulerError()
 
     def health(self) -> ServiceHealth:
-        health_endpoint = self.session.get(f"{self._base_uri}/health")
-        health_endpoint.raise_for_status()
-        return ServiceHealth.parse_raw(health_endpoint.content)
+        try:
+            health_endpoint = self.session.get(f"{self._base_uri}/health")
+            health_endpoint.raise_for_status()
+            return ServiceHealth.parse_raw(health_endpoint.content)
+        except ConnectionError:
+            raise SchedulerError()
 
 
-client = SchedulerClient(settings.SCHEDULER_API)
+def get_scheduler_client():
+    try:
+        client = SchedulerClient(settings.SCHEDULER_API)
+        client.health()
+        return client
+    except ConnectionError:
+        raise SchedulerError()
 
 
 def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrioritizedItem) -> None:
@@ -273,7 +282,7 @@ def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrior
         plugin_name = task.data.normalizer.id  # name not set yet, is None for name
         input_ooi = task.data.raw_data.boefje_meta.input_ooi
     try:
-        client.push_task(f"{task.data.type}-{organization_code}", task)
+        get_scheduler_client().push_task(f"{task.data.type}-{organization_code}", task)
     except (BadRequestError, TooManyRequestsError, ConflictError) as task_error:
         error_message = task_error.message + _(" Scheduling {} {} with input object {} failed.").format(
             task.data.type.title(), plugin_name, input_ooi
@@ -294,13 +303,14 @@ def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrior
 
 def get_list_of_tasks_lazy(request: HttpRequest, **params) -> LazyTaskList | None:
     try:
-        return client.get_lazy_task_list(**params)
+        return get_scheduler_client().get_lazy_task_list(**params)
     except SchedulerError as error:
-        return messages.error(request, error.message)
+        messages.error(request, error.message)
+        return []
 
 
 def get_details_of_task(request: HttpRequest, task_id: str | None) -> Task | None:
     try:
-        return client.get_task_details(task_id)
+        return get_scheduler_client().get_task_details(task_id)
     except (BadRequestError, TaskNotFoundError, SchedulerError) as error:
         messages.error(request, error.message)

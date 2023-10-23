@@ -39,7 +39,6 @@ class TaskListView(OrganizationView, ListView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-
         self.scheduler_id = self.plugin_type + "-" + self.organization.code
         self.task_type = self.request.GET.get("type", self.plugin_type)
         self.status = self.request.GET.get("scan_history_status", None)

@@ -4,14 +4,14 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 
-from rocky.scheduler import client
+from rocky.scheduler import get_scheduler_client
 from rocky.views.mixins import OctopoesView
 
 
 class TaskDetailView(OctopoesView, TemplateView):
     @staticmethod
     def get_task(task_id):
-        return client.get_task_details(task_id)
+        return get_scheduler_client().get_task_details(task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

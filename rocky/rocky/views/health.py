@@ -13,7 +13,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.bytes_client import get_bytes_client
 from rocky.health import ServiceHealth
 from rocky.keiko import keiko_client
-from rocky.scheduler import client
+from rocky.scheduler import get_scheduler_client
 from rocky.version import __version__
 
 logger = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ def get_octopoes_health(octopoes_api_connector: OctopoesAPIConnector) -> Service
 
 def get_scheduler_health() -> ServiceHealth:
     try:
-        scheduler_health = client.health()
+        scheduler_health = get_scheduler_client().health()
     except RequestException as ex:
         logger.exception(ex)
         scheduler_health = ServiceHealth(

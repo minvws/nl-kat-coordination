@@ -21,7 +21,7 @@ from tools.ooi_helpers import format_display
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
-from rocky import scheduler
+from rocky.scheduler import get_list_of_tasks_lazy
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
 
@@ -125,7 +125,8 @@ class OOIDetailView(
         else:
             max_created_at = None
 
-        task_history = scheduler.client.get_lazy_task_list(
+        task_history = get_list_of_tasks_lazy(
+            self.request,
             scheduler_id=scheduler_id,
             status=status,
             min_created_at=min_created_at,

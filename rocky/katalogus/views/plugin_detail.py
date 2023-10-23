@@ -16,7 +16,7 @@ from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.plugin_settings_list import PluginSettingsListView
-from rocky import scheduler
+from rocky.scheduler import get_list_of_tasks_lazy
 
 logger = getLogger(__name__)
 
@@ -52,7 +52,8 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
 
         page = int(self.request.GET.get("task_history_page", 1))
 
-        task_history = scheduler.client.get_lazy_task_list(
+        task_history = get_list_of_tasks_lazy(
+            self.request,
             scheduler_id=scheduler_id,
             task_type=plugin_type,
             plugin_id=plugin_id,
