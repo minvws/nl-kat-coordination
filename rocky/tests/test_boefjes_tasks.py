@@ -1,9 +1,12 @@
 from http import HTTPStatus
 from unittest.mock import call
 
+import pytest
+from django.http.response import Http404
 from pytest_django.asserts import assertContains
 from requests import HTTPError
 
+from rocky.views.bytes_raw import BytesRawView
 from rocky.views.tasks import BoefjesTaskListView
 from tests.conftest import setup_request
 
@@ -89,6 +92,34 @@ def test_reschedule_task(rf, client_member, mocker, task):
         "Results will be added to the object list when they are in. "
         "It may take some time, a refresh of the page may be needed to show the results."
     )
+
+
+def test_reschedule_task_from_other_org(rf, client_member, client_member_b, mocker, task):
+    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
+    mock_scheduler_client.get_task_details.return_value = task
+    mocker.patch("tools.view_helpers.client.session")
+    mocker.MagicMock()
+
+    request = setup_request(
+        rf.post(
+            f"/en/{client_member.organization.code}/tasks/boefjes/?task_id={task.id}",
+            data={"action": "reschedule_task"},
+        ),
+        client_member_b.user,
+    )
+    with pytest.raises(Http404):
+        BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+
+
+def test_download_task_other_org(rf, client_member, client_member_b, mocker, task):
+    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
+    mock_scheduler_client.get_task_details.return_value = task
+    mocker.patch("tools.view_helpers.client.session")
+    mocker.MagicMock()
+
+    request = setup_request(rf.get("bytes_raw"), client_member.user)
+    with pytest.raises(Http404):
+        BytesRawView.as_view()(request, organization_code=client_member_b.organization.code, boefje_meta_id=task.id)
 
 
 def test_reschedule_task_already_queued(rf, client_member, mocker, task):
