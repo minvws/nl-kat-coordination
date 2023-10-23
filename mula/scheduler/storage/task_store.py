@@ -67,12 +67,13 @@ class TaskStore:
             return task
 
     @retry()
-    def get_tasks_by_hash(self, task_hash: str) -> Optional[List[models.Task]]:
+    def get_tasks_by_hash(self, task_hash: str, limit: int = 10) -> Optional[List[models.Task]]:
         with self.dbconn.session.begin() as session:
             tasks_orm = (
                 session.query(models.TaskDB)
                 .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
                 .order_by(models.TaskDB.created_at.desc())
+                .limit(limit)
                 .all()
             )
 
