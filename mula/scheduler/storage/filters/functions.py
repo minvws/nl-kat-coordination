@@ -7,7 +7,7 @@ from .filters import FilterRequest
 from .operators import FILTER_OPERATORS
 
 
-def apply_filter(entity, query: Query, filter_request: FilterRequest):
+def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
     """Apply the filter criteria to a SQLAlchemy query.
 
     Args:

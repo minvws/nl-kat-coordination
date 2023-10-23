@@ -1,3 +1,8 @@
+from typing import List, Union
+
+from sqlalchemy.sql.elements import BinaryExpression
+
+
 class Comparator:
     # Comparison operators and their corresponding functions
     OPERATORS = {
@@ -41,11 +46,29 @@ class Comparator:
     }
 
     def __init__(self, operator: str):
+        """Initialise the Comparator class.
+
+        Args:
+            operator: The operator to use when comparing two values.
+        """
         if operator not in self.OPERATORS:
             raise ValueError(f"Operator {operator} not supported")
 
         self.operator = operator
-        self.operator_func = self.OPERATORS.get(operator)
+        self.operator_func = self.OPERATORS.get(operator, lambda x, y: x == y)
 
-    def compare(self, x, y):
-        return self.operator_func(x, y)
+    def compare(
+        self,
+        x: BinaryExpression,
+        y: Union[str, int, float, bool, None, List[str], List[int], List[float], List[bool], List[None]],
+    ) -> BinaryExpression:
+        """Compare two values using the operator specified in the constructor.
+
+        Args:
+            x: The left hand side value, e.g. the SQLAlchemy BinaryExpression.
+            y: The right hand side value, e.g. the value to compare against.
+
+        Returns:
+            A SQLAlchemy BinaryExpression with the operator applied.
+        """
+        return self.operator_func(x, y)  # type: ignore
