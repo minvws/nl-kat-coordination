@@ -39,7 +39,7 @@ class PluginSettingsListView(SinglePluginView, ListView):
                 "name": prop,
                 "value": settings.get(prop),
                 "required": self.is_required_field(prop),
-                "hide_value_in_interface": self.is_secret_field(fields=props[prop]),
+                "secret": self.is_secret_field(prop),
             }
             for prop in props
         ]

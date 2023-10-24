@@ -25,6 +25,7 @@ class PluginSchemaForm(forms.Form):
         for field_name, field_props in self.plugin_schema["properties"].items():
             kwargs = {
                 "required": "required" in self.plugin_schema and field_name in self.plugin_schema["required"],
+                "secret": "secret" in self.plugin_schema and field_name in self.plugin_schema["secret"],
                 "label": field_props.get("title", field_name),
                 "help_text": _(field_props.get("description", "")),
                 "error_messages": self.error_messages,

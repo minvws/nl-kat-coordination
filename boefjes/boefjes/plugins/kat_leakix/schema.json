@@ -6,11 +6,13 @@
       "title": "LEAKIX_API",
       "maxLength": 128,
       "type": "string",
-      "description": "A LeakIX API key (see https://leakix.net/api-documentation).",
-      "hide_value_in_interface": true
+      "description": "A LeakIX API key (see https://leakix.net/api-documentation)."
     }
   },
   "required": [
+    "LEAKIX_API"
+  ],
+  "secret": [
     "LEAKIX_API"
   ]
 }
