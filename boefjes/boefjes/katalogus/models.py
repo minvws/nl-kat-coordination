@@ -39,7 +39,7 @@ class Boefje(Plugin):
     scan_level: int = 1
     consumes: Set[str] = Field(default_factory=set)
     produces: List[str] = Field(default_factory=list)
-    mime_types: List[str] = Field(default_factory=list)
+    mime_types: Set[str] = Field(default_factory=set)
     options: Optional[List[str]]
     runnable_hash: Optional[str]
     oci_image: Optional[str]
