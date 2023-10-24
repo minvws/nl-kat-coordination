@@ -19,7 +19,7 @@ class BytesAPISession(requests.Session):
     def __init__(self, base_url: str):
         super().__init__()
 
-        self._base_url = base_url
+        self._base_url = base_url.rstrip("/")
         self.headers["User-Agent"] = f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"
 
     def request(self, method: str, url: Union[str, bytes], **kwargs) -> requests.Response:  # type: ignore

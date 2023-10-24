@@ -27,7 +27,7 @@ from octopoes.models.types import OOIType
 
 logger = logging.getLogger(__name__)
 bytes_api_client = BytesAPIClient(
-    str(settings.bytes_api).rstrip("/"),
+    str(settings.bytes_api),
     username=settings.bytes_username,
     password=settings.bytes_password,
 )
