@@ -136,7 +136,7 @@ class BoefjeRanker(Ranker):
 
         self.logger.info("score: %s", score)
 
-        return int(math.ceil(score))
+        return int(math.ceil(max(score, 1)))
 
 
 class BoefjeRankerTimeBased(Ranker):
