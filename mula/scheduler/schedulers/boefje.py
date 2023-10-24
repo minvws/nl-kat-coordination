@@ -626,7 +626,6 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        self.ctx.datastores.task_store.get_tasks_by_hash(task.hash)
         score = self.ranker.rank(task)
 
         # We need to create a PrioritizedItem for this task, to push

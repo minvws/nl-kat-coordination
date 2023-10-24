@@ -1,3 +1,4 @@
+import math
 import random
 import statistics
 from datetime import datetime, timedelta, timezone
@@ -85,9 +86,6 @@ class BoefjeRanker(Ranker):
             self.logger.info(prior_task.p_item.priority)
 
         if not any([freq_duration, freq_objects, freq_findings, freq_priorities]):
-            """
-            return int(3 + (max_priority - 3) * (1 - time_since_grace_period / max_days_in_seconds))
-            """
             return -1
 
         max_duration: int = max(freq_duration)
@@ -138,7 +136,7 @@ class BoefjeRanker(Ranker):
 
         self.logger.info("score: %s", score)
 
-        return int(score)
+        return int(math.ceil(score))
 
 
 class BoefjeRankerTimeBased(Ranker):
