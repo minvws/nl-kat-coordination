@@ -73,7 +73,7 @@ class BoefjeOutput(BaseModel):
 
 
 def get_scheduler_client():
-    return SchedulerAPIClient(str(settings.scheduler_api).rstrip("/"))
+    return SchedulerAPIClient(str(settings.scheduler_api))
 
 
 def get_bytes_client():

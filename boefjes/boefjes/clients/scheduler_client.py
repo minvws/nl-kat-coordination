@@ -80,7 +80,7 @@ class LogRetry(Retry):
 
 class SchedulerAPIClient(SchedulerClientInterface):
     def __init__(self, base_url: str):
-        self.base_url = base_url
+        self.base_url = base_url.rstrip("/")
         self._session = requests.Session()
 
         max_retries = LogRetry(skip_log=True, total=6, backoff_factor=1)
