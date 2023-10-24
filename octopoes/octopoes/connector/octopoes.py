@@ -75,7 +75,7 @@ class OctopoesAPIConnector:
     """
 
     def __init__(self, base_uri: str, client: str):
-        self.base_uri = base_uri
+        self.base_uri = base_uri.rstrip("/")
         self.client = client
         self.session = OctopoesAPISession(base_uri)
 

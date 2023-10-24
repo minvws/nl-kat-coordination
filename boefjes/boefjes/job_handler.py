@@ -238,4 +238,4 @@ class NormalizerHandler(Handler):
 
 
 def get_octopoes_api_connector(org_code: str):
-    return OctopoesAPIConnector(str(settings.octopoes_api).rstrip("/"), org_code)
+    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)

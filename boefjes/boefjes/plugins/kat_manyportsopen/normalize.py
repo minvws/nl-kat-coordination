@@ -13,7 +13,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     ooi = Reference.from_str(boefje_meta.input_ooi)
 
-    connector = OctopoesAPIConnector(str(settings.octopoes_api).rstrip("/"), boefje_meta.organization)
+    connector = OctopoesAPIConnector(str(settings.octopoes_api), boefje_meta.organization)
 
     # Get current ports
     try:
