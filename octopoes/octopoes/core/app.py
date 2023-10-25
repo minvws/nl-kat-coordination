@@ -1,5 +1,4 @@
 import logging
-from urllib.parse import urljoin
 
 from amqp import AMQPError
 
@@ -26,13 +25,14 @@ def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTP
     front. This code can be removed once we no longer support that setup.
     """
 
+    base_uri = base_uri.rstrip("/")
+
     if xtdb_type == XTDBType.XTDB_MULTINODE:
-        return XTDBHTTPClient(urljoin(str(base_uri), "/_xtdb"), client, multinode=True)
-
+        return XTDBHTTPClient(f"{base_uri}/_xtdb", client, multinode=True)
     if client != "_dev":
-        return XTDBHTTPClient(urljoin(str(base_uri), f"/{client}/_{xtdb_type.value}"), client)
+        return XTDBHTTPClient(f"{base_uri}/{client}/_{xtdb_type.value}", client)
 
-    return XTDBHTTPClient(urljoin(str(base_uri), f"/_{xtdb_type.value}"), client)
+    return XTDBHTTPClient(f"{base_uri}/_{xtdb_type.value}", client)
 
 
 def close_rabbit_channel(queue_uri: str):
@@ -43,7 +43,6 @@ def close_rabbit_channel(queue_uri: str):
         logger.info("Closed connection to RabbitMQ")
     except AMQPError:
         logger.exception("Unable to close rabbit")
-        pass
 
 
 def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSession) -> OctopoesService:

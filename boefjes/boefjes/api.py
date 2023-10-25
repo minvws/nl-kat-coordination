@@ -102,7 +102,7 @@ async def boefje_input(
 
     boefje_meta = create_boefje_meta(task, local_repository)
 
-    output_url = urljoin(str(settings.boefje_api), f"/api/v0/tasks/{task_id}")
+    output_url = str(settings.boefje_api).rstrip("/") + f"/api/v0/tasks/{task_id}"
     return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=boefje_meta)
 
 

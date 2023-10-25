@@ -60,7 +60,7 @@ class XTDBHTTPClient:
     def __init__(self, base_url, client: str, multinode=False):
         self._client = client
         self._is_multinode = multinode
-        self._session = get_xtdb_http_session(base_url)
+        self._session = get_xtdb_http_session(base_url.rstrip("/"))
 
     @staticmethod
     def _verify_response(response: Response) -> None:

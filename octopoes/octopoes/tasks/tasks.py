@@ -48,7 +48,7 @@ def handle_event(event: Dict):
     try:
         parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
 
-        session = XTDBSession(get_xtdb_client(settings.xtdb_uri, parsed_event.client, settings.xtdb_type))
+        session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), parsed_event.client, settings.xtdb_type))
         bootstrap_octopoes(settings, parsed_event.client, session).process_event(parsed_event)
         session.commit()
     except Exception:
@@ -72,7 +72,7 @@ def schedule_scan_profile_recalculations():
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def recalculate_scan_profiles(org: str, *args, **kwargs):
-    session = XTDBSession(get_xtdb_client(settings.xtdb_uri, org, settings.xtdb_type))
+    session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org, settings.xtdb_type))
     octopoes = bootstrap_octopoes(settings, org, session)
 
     timer = timeit.default_timer()

@@ -81,7 +81,7 @@ def settings() -> Settings:
 def xtdb_session(
     client: str = Depends(extract_client), settings_: Settings = Depends(settings)
 ) -> Generator[XTDBSession, None, None]:
-    yield XTDBSession(get_xtdb_client(settings_.xtdb_uri, client, settings_.xtdb_type))
+    yield XTDBSession(get_xtdb_client(str(settings_.xtdb_uri), client, settings_.xtdb_type))
 
 
 def octopoes_service(

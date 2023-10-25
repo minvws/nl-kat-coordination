@@ -220,7 +220,7 @@ def bit_runner(mocker) -> BitRunner:
 
 @pytest.fixture
 def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
-    client = get_xtdb_client(app_settings.xtdb_uri, "test", app_settings.xtdb_type)
+    client = get_xtdb_client(str(app_settings.xtdb_uri), "test", app_settings.xtdb_type)
     client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return client
