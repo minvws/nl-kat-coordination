@@ -94,8 +94,7 @@ class BytesAPIClient:
         response = self._session.get(f"/bytes/boefje_meta/{boefje_meta_id}", headers=self.headers)
         self._verify_response(response)
 
-        boefje_meta_json = response.json()
-        return BoefjeMeta.parse_obj(boefje_meta_json)
+        return BoefjeMeta.model_validate_json(response.content)
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
@@ -131,4 +130,4 @@ class BytesAPIClient:
         response = self._session.get(f"/bytes/raw/{raw_data_id}/meta", headers=self.headers)
         self._verify_response(response)
 
-        return RawDataMeta.parse_obj(response.json())
+        return RawDataMeta.model_validate_json(response.content)

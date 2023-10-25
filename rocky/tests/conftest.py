@@ -15,6 +15,7 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
+from requests import Response
 from tools.models import (
     GROUP_ADMIN,
     GROUP_CLIENT,
@@ -320,7 +321,7 @@ def lazy_task_list_empty() -> MagicMock:
 
 @pytest.fixture
 def task() -> Task:
-    return Task.parse_obj(
+    return Task.model_validate(
         {
             "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
             "hash": "19ed51514b37d42f79c5e95469956b05",
@@ -525,8 +526,8 @@ def mock_mixins_katalogus(mocker):
 @pytest.fixture
 def mock_scheduler_client_task_list(mocker):
     mock_scheduler_client_session = mocker.patch("rocky.scheduler.client.session")
-    scheduler_return_value = mocker.MagicMock()
-    scheduler_return_value.text = json.dumps(
+    response = Response()
+    response._content = json.dumps(
         {
             "count": 1,
             "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
@@ -559,6 +560,6 @@ def mock_scheduler_client_task_list(mocker):
         }
     )
 
-    mock_scheduler_client_session.get.return_value = scheduler_return_value
+    mock_scheduler_client_session.get.return_value = response
 
     return mock_scheduler_client_session

@@ -5,7 +5,7 @@ from enum import Enum
 from typing import List, Optional, Union
 
 import requests
-from pydantic import BaseModel, parse_obj_as
+from pydantic import BaseModel, TypeAdapter
 from requests.adapters import HTTPAdapter, Retry
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
@@ -95,13 +95,13 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response = self._session.get(f"{self.base_url}/queues")
         self._verify_response(response)
 
-        return parse_obj_as(List[Queue], response.json())
+        return TypeAdapter(List[Queue]).validate_json(response.content)
 
     def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
         response = self._session.post(f"{self.base_url}/queues/{queue}/pop")
         self._verify_response(response)
 
-        return parse_obj_as(Optional[QueuePrioritizedItem], response.json())
+        return TypeAdapter(Optional[QueuePrioritizedItem]).validate_json(response.content)
 
     def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
         response = self._session.post(f"{self.base_url}/queues/{queue_id}/push", data=p_item.json())
@@ -115,4 +115,4 @@ class SchedulerAPIClient(SchedulerClientInterface):
         response = self._session.get(f"{self.base_url}/tasks/{task_id}")
         self._verify_response(response)
 
-        return parse_obj_as(Task, response.json())
+        return Task.model_validate_json(response.content)
