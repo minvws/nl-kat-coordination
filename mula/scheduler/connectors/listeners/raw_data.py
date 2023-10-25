@@ -39,7 +39,7 @@ class RawData(RabbitMQ):
         body: A bytes object representing the body of the message.
         """
         # Convert body into a RawDataReceivedEvent
-        model = RawDataReceivedEvent.parse_raw(body)
+        model = RawDataReceivedEvent.model_validate_json(body)
 
         # Call the function
         self.func(model)

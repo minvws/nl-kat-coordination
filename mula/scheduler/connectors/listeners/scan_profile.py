@@ -40,7 +40,7 @@ class ScanProfileMutation(RabbitMQ):
         body: A bytes object representing the body of the message.
         """
         # Convert body into a ScanProfileMutationModel
-        model = ScanProfileMutationModel.parse_raw(body)
+        model = ScanProfileMutationModel.model_validate_json(body)
 
         # Call the function
         self.func(model)

@@ -138,7 +138,7 @@ class TaskTest(TestCase):
         }
 
     def test_exception_raised_unsupported_return_type_normalizer(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("dns-normalize.json"))
         meta.raw_data.boefje_meta.input_ooi = None
         meta.normalizer.id = "dummy_bad_normalizer_return_type"
 
@@ -149,7 +149,7 @@ class TaskTest(TestCase):
             runner.run(meta, b"123")
 
     def test_exception_raised_invalid_return_value(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("dns-normalize.json"))
         meta.raw_data.boefje_meta.input_ooi = None
         meta.normalizer.id = "dummy_bad_normalizer_dict_structure"
 

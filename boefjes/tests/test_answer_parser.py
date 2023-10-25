@@ -14,7 +14,7 @@ class AnswerParserNormalizerTest(TestCase):
     def test_config_yielded(self):
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
-        meta = NormalizerMeta.parse_raw(get_dummy_data("answer-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("answer-normalize.json"))
 
         with pytest.raises(ValidationError):
             raw = '[{"key": "test"}]'

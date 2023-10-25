@@ -190,7 +190,7 @@ class SchedulerClient:
         **kwargs,
     ) -> PaginatedTasksResponse:
         res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
-        return PaginatedTasksResponse.parse_raw(res.text)
+        return PaginatedTasksResponse.model_validate_json(res.content)
 
     def get_lazy_task_list(
         self,
@@ -218,7 +218,7 @@ class SchedulerClient:
     def get_task_details(self, task_id) -> Task:
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
         res.raise_for_status()
-        return Task.parse_raw(res.content)
+        return Task.model_validate_json(res.content)
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         try:
@@ -238,7 +238,7 @@ class SchedulerClient:
     def health(self) -> ServiceHealth:
         health_endpoint = self.session.get(f"{self._base_uri}/health")
         health_endpoint.raise_for_status()
-        return ServiceHealth.parse_raw(health_endpoint.content)
+        return ServiceHealth.model_validate_json(health_endpoint.content)
 
 
 client = SchedulerClient(settings.SCHEDULER_API)

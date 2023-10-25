@@ -42,7 +42,7 @@ darknet,https://openkat.nl/""",
     ]
 
     def test_parse_manual_declarations(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("manual-ooi.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("manual-ooi.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
@@ -156,7 +156,7 @@ darknet,https://openkat.nl/""",
         )
 
     def check_network_created(self, csv_idx: int) -> Tuple[NormalizerMeta, NormalizerOutput, LocalNormalizerJobRunner]:
-        meta = NormalizerMeta.parse_raw(get_dummy_data("manual-csv.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("manual-csv.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
         output = runner.run(meta, self.CSV_EXAMPLES[csv_idx])
