@@ -4,8 +4,6 @@ from datetime import timezone
 from typing import Any, Dict, Optional
 from uuid import UUID
 
-from pydantic import AwareDatetime
-
 from bytes.config import BASE_DIR
 from bytes.models import (
     Boefje,
