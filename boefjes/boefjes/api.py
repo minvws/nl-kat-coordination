@@ -4,7 +4,6 @@ import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Optional
-from urllib.parse import urljoin
 
 from fastapi import Depends, FastAPI, HTTPException, Response
 from pydantic import BaseModel, ConfigDict, Field

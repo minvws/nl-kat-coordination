@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any, List, Optional
 
-from pydantic import BaseModel, Field, AwareDatetime
+from pydantic import AwareDatetime, BaseModel, Field
 
 from octopoes.models import Reference
 from octopoes.models.types import OOIType

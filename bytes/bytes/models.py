@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Any, Dict, List, NewType, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, AwareDatetime
+from pydantic import AwareDatetime, BaseModel, Field
 from pydantic.v1.datetime_parse import parse_datetime
 
 RetrievalLink = NewType("RetrievalLink", str)
