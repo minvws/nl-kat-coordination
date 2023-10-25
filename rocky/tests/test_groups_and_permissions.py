@@ -52,13 +52,13 @@ def test_plugin_settings_list_perms(
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
+    mock_scheduler,
     mock_organization_view_octopoes,
     network,
     mocker,
     lazy_task_list_with_boefje,
 ):
-    mock_scheduler_client = mocker.patch("katalogus.views.plugin_detail.scheduler")
-    mock_scheduler_client.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+    mock_scheduler.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](count=1, items=[network])
     mock_mixins_katalogus().get_plugin.return_value = plugin_details
@@ -86,13 +86,13 @@ def test_plugin_settings_list_perms_2(
     mock_mixins_katalogus,
     plugin_details,
     plugin_schema,
+    mock_scheduler,
     mock_organization_view_octopoes,
     network,
     mocker,
     lazy_task_list_with_boefje,
 ):
-    mock_scheduler_client = mocker.patch("katalogus.views.plugin_detail.scheduler")
-    mock_scheduler_client.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
+    mock_scheduler.client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     mock_organization_view_octopoes().list.return_value = Paginated[OOIType](count=1, items=[network])
     mock_mixins_katalogus().get_plugin.return_value = plugin_details

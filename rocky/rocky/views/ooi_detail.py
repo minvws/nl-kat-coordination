@@ -21,9 +21,9 @@ from tools.ooi_helpers import format_display
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
-from rocky.scheduler import get_list_of_tasks_lazy
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
+from rocky.views.scheduler import get_list_of_tasks_lazy
 
 
 class PageActions(Enum):
@@ -31,12 +31,7 @@ class PageActions(Enum):
     SUBMIT_ANSWER = "submit_answer"
 
 
-class OOIDetailView(
-    BoefjeMixin,
-    OOIRelatedObjectAddView,
-    OOIFindingManager,
-    BaseOOIDetailView,
-):
+class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, BaseOOIDetailView):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
     task_history_limit = 10

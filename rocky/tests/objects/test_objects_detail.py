@@ -180,11 +180,11 @@ def test_ooi_detail_start_scan(
     rf,
     client_member,
     mock_organization_view_octopoes,
+    mock_scheduler,
     mocker,
     network,
 ):
     mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
-    mocker.patch("rocky.scheduler.schedule_task")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network

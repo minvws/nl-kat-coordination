@@ -498,7 +498,7 @@ def setup_request(request, user):
 
 @pytest.fixture
 def mock_scheduler(mocker):
-    return mocker.patch("rocky.views.ooi_detail.scheduler.client")
+    return mocker.patch("rocky.views.scheduler.get_scheduler")()
 
 
 def get_stub_path(file_name: str) -> Path:
@@ -524,7 +524,7 @@ def mock_mixins_katalogus(mocker):
 
 @pytest.fixture
 def mock_scheduler_client_task_list(mocker):
-    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client.session")
+    mock_scheduler_client_session = mocker.patch("rocky.scheduler.get_scheduler")().session
     scheduler_return_value = mocker.MagicMock()
     scheduler_return_value.text = json.dumps(
         {

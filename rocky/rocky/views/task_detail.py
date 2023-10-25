@@ -4,20 +4,16 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 
-from rocky.scheduler import get_scheduler_client
 from rocky.views.mixins import OctopoesView
+from rocky.views.scheduler import get_details_of_task
 
 
 class TaskDetailView(OctopoesView, TemplateView):
-    @staticmethod
-    def get_task(task_id):
-        return get_scheduler_client().get_task_details(task_id)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["task_id"] = kwargs["task_id"]
-        context["task"] = self.get_task(context["task_id"])
+        context["task"] = get_details_of_task(self.request, context["task_id"])
         return context
 
 
@@ -58,7 +54,7 @@ class NormalizerTaskJSONView(NormalizerMixin, TaskDetailView):
 
     def get(self, request, *args, **kwargs):
         task_id = kwargs["task_id"]
-        task = self.get_task(task_id)
+        task = get_details_of_task(request, task_id)
         return JsonResponse(
             {
                 "oois": self.get_output_oois(task),

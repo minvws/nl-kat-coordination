@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 
-from rocky.scheduler import get_details_of_task, get_list_of_tasks_lazy, schedule_task
+from rocky.views.scheduler import get_details_of_task, get_list_of_tasks_lazy, schedule_task
 
 TASK_LIMIT = 50
 
@@ -36,9 +36,11 @@ class DownloadTaskDetail(OrganizationView):
 
 class TaskListView(OrganizationView, ListView):
     paginate_by = 20
+    object_list = []
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+
         self.scheduler_id = self.plugin_type + "-" + self.organization.code
         self.task_type = self.request.GET.get("type", self.plugin_type)
         self.status = self.request.GET.get("scan_history_status", None)

@@ -27,8 +27,9 @@ from rocky.exceptions import (
     IndemnificationNotPresentException,
     TrustedClearanceLevelTooLowException,
 )
-from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData, schedule_task
+from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, QueuePrioritizedItem, RawData
 from rocky.views.mixins import OctopoesView
+from rocky.views.scheduler import schedule_task
 
 logger = getLogger(__name__)
 

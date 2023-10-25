@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 import uuid
 from enum import Enum
 from http import HTTPStatus
@@ -8,13 +9,13 @@ from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
-from django.contrib import messages
-from django.http import Http404, HttpRequest
 from django.utils.translation import gettext_lazy as _
 from pydantic import BaseModel, Field
 from requests.exceptions import ConnectionError, HTTPError
 
 from rocky.health import ServiceHealth
+
+logger = logging.getLogger(__name__)
 
 
 class Boefje(BaseModel):
@@ -166,7 +167,7 @@ class LazyTaskList:
 
 
 class SchedulerError(Exception):
-    message = _("Connectivity issues with Mula.")
+    message = _("Could not connect to Scheduler. Service is possibly down.")
 
     def __str__(self):
         return str(self.message)
@@ -192,6 +193,7 @@ class SchedulerClient:
     def __init__(self, base_uri: str):
         self.session = requests.Session()
         self._base_uri = base_uri
+        self.is_alive()
 
     def list_tasks(
         self,
@@ -229,13 +231,13 @@ class SchedulerClient:
         except ConnectionError:
             raise SchedulerError()
 
-    def get_task_details(self, task_id) -> Task | None:
+    def get_task_details(self, task_id) -> Task:
         try:
             res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
             res.raise_for_status()
             return Task.parse_raw(res.content)
         except HTTPError:
-            raise Http404()
+            raise TaskNotFoundError()
         except ConnectionError:
             raise SchedulerError()
 
@@ -254,63 +256,18 @@ class SchedulerClient:
             else:
                 raise SchedulerError()
 
-    def health(self) -> ServiceHealth:
+    def is_alive(self) -> None:
         try:
-            health_endpoint = self.session.get(f"{self._base_uri}/health")
-            health_endpoint.raise_for_status()
-            return ServiceHealth.parse_raw(health_endpoint.content)
+            request = self.session.get(f"{self._base_uri}")
+            request.raise_for_status()
         except ConnectionError:
             raise SchedulerError()
 
-
-def get_scheduler_client():
-    try:
-        client = SchedulerClient(settings.SCHEDULER_API)
-        client.health()
-        return client
-    except ConnectionError:
-        raise SchedulerError()
+    def health(self) -> ServiceHealth:
+        health_endpoint = self.session.get(f"{self._base_uri}/health")
+        health_endpoint.raise_for_status()
+        return ServiceHealth.parse_raw(health_endpoint.content)
 
 
-def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrioritizedItem) -> None:
-    plugin_name = ""
-    input_ooi = ""
-    if task.data.type == "boefje":
-        plugin_name = task.data.boefje.name
-        input_ooi = task.data.input_ooi
-    if task.data.type == "normalizer":
-        plugin_name = task.data.normalizer.id  # name not set yet, is None for name
-        input_ooi = task.data.raw_data.boefje_meta.input_ooi
-    try:
-        get_scheduler_client().push_task(f"{task.data.type}-{organization_code}", task)
-    except (BadRequestError, TooManyRequestsError, ConflictError) as task_error:
-        error_message = task_error.message + _(" Scheduling {} {} with input object {} failed.").format(
-            task.data.type.title(), plugin_name, input_ooi
-        )
-        messages.error(request, error_message)
-    except SchedulerError as error:
-        messages.error(request, error.message)
-    else:
-        messages.success(
-            request,
-            _(
-                "Task '{} {} with input object {}' is scheduled and will soon be started in the background. "
-                "Results will be added to the object list when they are in. "
-                "It may take some time, a refresh of the page may be needed to show the results."
-            ).format(task.data.type.title(), plugin_name, input_ooi),
-        )
-
-
-def get_list_of_tasks_lazy(request: HttpRequest, **params) -> LazyTaskList | None:
-    try:
-        return get_scheduler_client().get_lazy_task_list(**params)
-    except SchedulerError as error:
-        messages.error(request, error.message)
-        return []
-
-
-def get_details_of_task(request: HttpRequest, task_id: str | None) -> Task | None:
-    try:
-        return get_scheduler_client().get_task_details(task_id)
-    except (BadRequestError, TaskNotFoundError, SchedulerError) as error:
-        messages.error(request, error.message)
+def get_scheduler() -> SchedulerClient:
+    return SchedulerClient(settings.SCHEDULER_API)

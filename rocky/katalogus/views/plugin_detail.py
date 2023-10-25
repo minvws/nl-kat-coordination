@@ -16,7 +16,7 @@ from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.plugin_settings_list import PluginSettingsListView
-from rocky.scheduler import get_list_of_tasks_lazy
+from rocky.views.scheduler import get_list_of_tasks_lazy
 
 logger = getLogger(__name__)
 
