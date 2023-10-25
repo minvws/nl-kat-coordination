@@ -33,7 +33,7 @@ services:
     image: postgres:15
     healthcheck:
       test: ["CMD", "gosu", "postgres", "pg_isready"]
-      interval: 10s
+      interval: 3s
       retries: 10
     env_file:
       - .ci/.env.test

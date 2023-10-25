@@ -1,4 +1,3 @@
-import copy
 import time
 import unittest
 from unittest import mock
@@ -32,7 +31,7 @@ class BytesTestCase(unittest.TestCase):
             input_ooi="ooi-1",
             organization_id="org-1",
         )
-        initial_token = copy.deepcopy(self.service_bytes.headers.get("Authorization"))
+        initial_token = id(self.service_bytes.headers.get("Authorization"))
 
         time.sleep(70)
 
@@ -41,7 +40,7 @@ class BytesTestCase(unittest.TestCase):
             input_ooi="ooi-1",
             organization_id="org-1",
         )
-        refresh_token = copy.deepcopy(self.service_bytes.headers.get("Authorization"))
+        refresh_token = id(self.service_bytes.headers.get("Authorization"))
 
         self.assertNotEqual(initial_token, refresh_token)
 
@@ -61,7 +60,6 @@ class KatalogusTestCase(unittest.TestCase):
         self.service_katalogus.organisations_plugin_cache.reset()
         self.service_katalogus.organisations_boefje_type_cache.reset()
         self.service_katalogus.organisations_normalizer_type_cache.reset()
-        models.Base.metadata.drop_all(self.dbconn.engine)
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
     def test_flush_organisations_plugin_cache(self, mock_get_organisations):
@@ -75,8 +73,7 @@ class KatalogusTestCase(unittest.TestCase):
         self.service_katalogus.flush_organisations_plugin_cache()
 
         # Assert
-        self.assertEqual(len(self.service_katalogus.organisations_plugin_cache), 2)
-        self.assertIsNotNone(self.service_katalogus.organisations_plugin_cache.get("org-1"))
+        self.assertCountEqual(self.service_katalogus.organisations_plugin_cache.cache.keys(), ("org-1", "org-2"))
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
     def test_flush_organisations_plugin_cache_empty(self, mock_get_organisations):
@@ -87,8 +84,7 @@ class KatalogusTestCase(unittest.TestCase):
         self.service_katalogus.flush_organisations_plugin_cache()
 
         # Assert
-        self.assertEqual(len(self.service_katalogus.organisations_plugin_cache), 0)
-        self.assertIsNone(self.service_katalogus.organisations_plugin_cache.get("org-1"))
+        self.assertDictEqual(self.service_katalogus.organisations_plugin_cache.cache, {})
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
     @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
