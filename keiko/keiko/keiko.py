@@ -183,7 +183,7 @@ def generate_report(
             )
 
             json_output_file_path = output_file.with_suffix(".keiko.json")
-            json_output_file_path.write_text(report_data.model_dump_json())
+            json_output_file_path.write_text(report_data.model_dump_json(indent=4))
 
         # run pdflatex
         cmd = [

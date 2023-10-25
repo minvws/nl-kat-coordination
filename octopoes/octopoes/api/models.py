@@ -2,10 +2,9 @@ import uuid
 from datetime import datetime
 from typing import Any, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, AwareDatetime
 
 from octopoes.models import Reference
-from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.types import OOIType
 
 
@@ -24,7 +23,7 @@ class _BaseObservation(BaseModel):
     method: str
     source: Reference
     result: List[OOIType]
-    valid_time: TimezoneAwareDatetime
+    valid_time: AwareDatetime
     task_id: uuid.UUID
 
 
@@ -56,13 +55,13 @@ class ValidatedObservation(_BaseObservation):
     """Used by Octopoes API to validate and parse correctly"""
 
     result: List[OOIType]
-    valid_time: TimezoneAwareDatetime
+    valid_time: AwareDatetime
 
 
 class ValidatedDeclaration(BaseModel):
     """Used by Octopoes API to validate and parse correctly"""
 
     ooi: OOIType
-    valid_time: TimezoneAwareDatetime
+    valid_time: AwareDatetime
     method: Optional[str] = "manual"
     task_id: Optional[uuid.UUID] = Field(default_factory=lambda: uuid.uuid4())

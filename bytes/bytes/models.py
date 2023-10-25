@@ -5,9 +5,8 @@ from enum import Enum
 from typing import Any, Dict, List, NewType, Optional
 from uuid import UUID
 
-from pydantic import AfterValidator, BaseModel, Field
+from pydantic import BaseModel, Field, AwareDatetime
 from pydantic.v1.datetime_parse import parse_datetime
-from typing_extensions import Annotated
 
 RetrievalLink = NewType("RetrievalLink", str)
 SecureHash = NewType("SecureHash", str)
@@ -36,17 +35,14 @@ def _validate_timezone_aware_datetime(value: datetime) -> datetime:
     return parsed
 
 
-TimezoneAwareDatetime = Annotated[datetime, AfterValidator(_validate_timezone_aware_datetime)]
-
-
 class MimeType(BaseModel):
     value: str
 
 
 class Job(BaseModel):
     id: UUID
-    started_at: TimezoneAwareDatetime
-    ended_at: TimezoneAwareDatetime
+    started_at: AwareDatetime
+    ended_at: AwareDatetime
 
 
 class Boefje(BaseModel):

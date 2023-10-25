@@ -1,14 +1,16 @@
 from datetime import timezone
 from unittest import TestCase
 
-from bytes.models import HashingAlgorithm, TimezoneAwareDatetime
+from pydantic import AwareDatetime
+
+from bytes.models import HashingAlgorithm
 from bytes.timestamping.hashing import hash_data
 from tests.loading import get_raw_data
 
 
 class HashTests(TestCase):
     def test_hash_same_data(self) -> None:
-        dt = TimezoneAwareDatetime(year=2022, month=1, day=1, hour=0, minute=0, second=0, tzinfo=timezone.utc)
+        dt = AwareDatetime(year=2022, month=1, day=1, hour=0, minute=0, second=0, tzinfo=timezone.utc)
 
         secure_hash = hash_data(data=get_raw_data(), datetime=dt)
 
@@ -27,7 +29,7 @@ class HashTests(TestCase):
         )
 
     def test_hash_sha224(self) -> None:
-        dt = TimezoneAwareDatetime(year=2022, month=1, day=1, hour=0, minute=0, second=0, tzinfo=timezone.utc)
+        dt = AwareDatetime(year=2022, month=1, day=1, hour=0, minute=0, second=0, tzinfo=timezone.utc)
 
         secure_hash = hash_data(data=get_raw_data(), datetime=dt, hash_algo=HashingAlgorithm.SHA224)
 
