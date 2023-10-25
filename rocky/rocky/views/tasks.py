@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 from account.mixins import OrganizationView
 from django.http import FileResponse, HttpResponse
@@ -15,7 +16,7 @@ from rocky.views.scheduler import get_details_of_task, get_list_of_tasks_lazy, s
 TASK_LIMIT = 50
 
 
-def get_date_time(date: str | None) -> datetime | None:
+def get_date_time(date: Optional[str] = None) -> Optional[datetime]:
     if date:
         return datetime.strptime(date, "%Y-%m-%d")
 
