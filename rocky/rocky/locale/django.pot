@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-23 15:13+0000\n"
+"POT-Creation-Date: 2023-10-25 14:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3338,7 +3338,7 @@ msgid ""
 msgstr ""
 
 #: rocky/scheduler.py
-msgid "Connectivity issues with Mula."
+msgid "Could not connect to Scheduler. Service is possibly down."
 msgstr ""
 
 #: rocky/scheduler.py
@@ -3355,18 +3355,6 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task could not be found."
-msgstr ""
-
-#: rocky/scheduler.py
-msgid " Scheduling {} {} with input object {} failed."
-msgstr ""
-
-#: rocky/scheduler.py
-msgid ""
-"Task '{} {} with input object {}' is scheduled and will soon be started in "
-"the background. Results will be added to the object list when they are in. "
-"It may take some time, a refresh of the page may be needed to show the "
-"results."
 msgstr ""
 
 #: rocky/settings.py
@@ -5531,6 +5519,26 @@ msgstr ""
 
 #: rocky/views/scan_profile.py
 msgid "Reset"
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid "'Plugin not found'"
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid "'OOI not found'"
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid "Scheduling {} {} with input object {} failed. "
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid ""
+"Task of {} {} with input object {} is scheduled and will soon be started in "
+"the background. Results will be added to the object list when they are in. "
+"It may take some time, a refresh of the page may be needed to show the "
+"results."
 msgstr ""
 
 #: rocky/views/upload_csv.py
