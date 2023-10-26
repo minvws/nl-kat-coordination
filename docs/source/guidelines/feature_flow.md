@@ -81,3 +81,11 @@ Ideally we would follow the following QA procedure on each of these environments
 
 #### Checking Performance
 - [ ] Verify that there is no significant performance regression
+
+---
+
+## Tips and tricks for pull request QA testing
+- Feel free to deviate from the checklist: testing things that are not obviously related to the PR is a good way to find bugs.
+- Thoroughness is key: embrace the "hacker mindset" and try to break (new) functionality by providing unexpected input, and attempt to perform unauthorized actions.
+- Try to break the UI: try resizing the window, using zoom functionality, and test multiple browsers.
+- Always remember that you are taking on the role of a user that is probably not as familiar with the application as you are: everything you encounter should feel intuitive and easy to use.
