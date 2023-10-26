@@ -27,6 +27,28 @@ def test_plugin_settings_add_view(
     assertContains(response, "Add settings and enable boefje")
 
 
+def test_plugin_settings_add_view_no_required(
+    rf,
+    superuser_member,
+    mock_mixins_katalogus,
+    plugin_details,
+    plugin_schema_no_required,
+):
+    mock_mixins_katalogus().get_plugin.return_value = plugin_details
+    mock_mixins_katalogus().get_plugin_schema.return_value = plugin_schema_no_required
+
+    request = setup_request(rf.get("plugin_settings_add"), superuser_member.user)
+    response = PluginSettingsAddView.as_view()(
+        request, organization_code=superuser_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
+    )
+
+    assertContains(response, "TestBoefje")
+    assertContains(response, "Add setting")
+    assertContains(response, "TEST_PROPERTY")
+    assertContains(response, "TEST_PROPERTY2")
+    assertContains(response, "Add settings and enable boefje")
+
+
 def test_plugin_settings_add(
     rf,
     superuser_member,
@@ -37,6 +59,27 @@ def test_plugin_settings_add(
     mock_katalogus = mock_mixins_katalogus()
     mock_katalogus.get_plugin.return_value = plugin_details
     mock_katalogus.get_plugin_schema.return_value = plugin_schema
+    mock_katalogus.get_plugin_settings.return_value = {"TEST_PROPERTY": "abc"}
+
+    request = setup_request(rf.post("plugin_settings_add", data={"TEST_PROPERTY": "123"}), superuser_member.user)
+    response = PluginSettingsAddView.as_view()(
+        request, organization_code=superuser_member.organization.code, plugin_type="boefje", plugin_id="test-plugin"
+    )
+
+    assert response.status_code == 302
+    assert list(request._messages).pop().message == "Added settings for 'TestBoefje'"
+
+
+def test_plugin_settings_add_no_required(
+    rf,
+    superuser_member,
+    mock_mixins_katalogus,
+    plugin_details,
+    plugin_schema_no_required,
+):
+    mock_katalogus = mock_mixins_katalogus()
+    mock_katalogus.get_plugin.return_value = plugin_details
+    mock_katalogus.get_plugin_schema.return_value = plugin_schema_no_required
     mock_katalogus.get_plugin_settings.return_value = {"TEST_PROPERTY": "abc"}
 
     request = setup_request(rf.post("plugin_settings_add", data={"TEST_PROPERTY": "123"}), superuser_member.user)
