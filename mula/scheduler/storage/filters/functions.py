@@ -1,8 +1,10 @@
+import sqlalchemy
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.elements import BinaryExpression
 
 from .casting import cast_expression
 from .comparison import Comparator
+from .errors import FilterError, MismatchedTypeError, UnsupportedTypeError
 from .filters import FilterRequest
 from .operators import FILTER_OPERATORS
 
@@ -47,11 +49,18 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
 
             # Cast the expression to the correct type based on the filter value
             if isinstance(entity_attr, BinaryExpression):
-                entity_attr = cast_expression(entity_attr, filter_)
+                try:
+                    entity_attr = cast_expression(entity_attr, filter_)
+                except (UnsupportedTypeError, MismatchedTypeError) as exc:
+                    raise FilterError(f"Invalid filter value: {filter_.value} (error: {exc})")
 
             # Based on the operator in the filter request we apply the correct
             # comparator function to the expression.
-            expression = Comparator(filter_.operator).compare(entity_attr, filter_.value)
+            try:
+                expression = Comparator(filter_.operator).compare(entity_attr, filter_.value)
+            except sqlalchemy.exc.ArgumentError as exc:
+                raise FilterError(f"Invalid filter value: {filter_.value} (sql error: {exc})")
+
             expressions.append(expression)
 
         # Apply the filter operation to the query

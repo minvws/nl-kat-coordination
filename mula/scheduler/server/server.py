@@ -381,6 +381,8 @@ class Server:
 
             f_req.filters.update(f_plugin)  # type: ignore
 
+        self.logger.info(f"FILTER_REQUEST: {f_req}")
+
         try:
             results, count = self.ctx.datastores.task_store.get_tasks(
                 scheduler_id=scheduler_id,
@@ -392,6 +394,11 @@ class Server:
                 max_created_at=max_created_at,
                 filters=f_req,
             )
+        except storage.filters.errors.FilterError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,

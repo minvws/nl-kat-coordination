@@ -113,6 +113,46 @@ class FilteringTestCase(unittest.TestCase):
         results = filtered_query.all()
         self.assertEqual(len(results), 3)
 
+    # TODO
+    def test_apply_filter_mismatch(self):
+        filter_request = FilterRequest(
+            filters=[
+                Filter(column="name", operator="eq", value=False),
+            ]
+        )
+
+        query = session.query(TestModel)
+        apply_filter(TestModel, query, filter_request)
+        """
+        with self.assertRaises(errors.MismatchedTypeError):
+            apply_filter(TestModel, query, filter_request)
+        """
+
+    # TODO
+    def test_apply_filter_json_mismatch(self):
+        filter_request = FilterRequest(
+            filters=[
+                Filter(column="data", field="foo", operator="eq", value=False),
+            ]
+        )
+
+        query = session.query(TestModel)
+        filtered_query = apply_filter(TestModel, query, filter_request)
+
+        results = filtered_query.all()
+        self.assertEqual(len(results), 0)
+
+    # TODO
+    def test_apply_filter_mismatch_is_not(self):
+        filter_request = FilterRequest(
+            filters=[
+                Filter(column="name", operator="is_not", value=False),
+            ]
+        )
+
+        query = session.query(TestModel)
+        apply_filter(TestModel, query, filter_request)
+
     def test_apply_filter_or(self):
         filter_request = FilterRequest(
             filters={
