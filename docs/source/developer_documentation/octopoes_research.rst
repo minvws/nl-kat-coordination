@@ -136,88 +136,162 @@ IPv4Address(x) ^ Port(y) ^ RelationState("open", x, y) Finding(Severity 1, Reaso
 The premises (knowledge base and rules) form the mathematical proof for the existence of the consequence
 
 Reasoning
+^^^^^^^^^
+
 In this simple example, the logical consequence of this rule is not a premise for another rule. Therefore, the derived knowledge (presence of a high vulnerability) is a first-order derivative from the knowledge base. It gets more complicated though, when derived consequences can be a premise for another rule. Recursion of inference can start to occur, resulting in a process which is called inference chaining.
+
+Reasoning, and logic in general, is a whole field in mathematics and philosophy. As for Octopoes, it seems that it should resemble a deductive, classical logic computational framework.
+
+Consistency
+^^^^^^^^^^^
+When a logical system is in the picture, it should be noted that a world of intricacies arises. Logical consistency is a primary example. It is possible that rules contradict themselves or each other, causing paradoxes. The simplest paradox is the liar paradox and can be described as x =not(x) .
+
+Such a simple rule is relatively easy to detect. However, in a more complex ruleset, a paradox might arise from a looping logical chain where the consequence disproves the premise, causing the total knowledge to be inconsistent. Depending on the chosen rule language, it might be possible to detect such logical inconsistencies early by introspecting the rules (a.k.a. stratification).
+
+Logical programming
+^^^^^^^^^^^^^^^^^^^
+
+As we are dealing with computational logic, which has been a field of study since the 1950’s, there is a ton of research to build upon. In mathematics, there are plenty of algebraic logics, of which some have been translated into the computational field, like the logic programming languages Prolog and Datalog.
+
+It is however also possible to define rules in a Turing complete language like Python, when it is hooked into the reasoning engine. The logic programming paradigm of choice does have implications, as described below.
+
+Regarding Octopoes, a decision should be made which logic programming paradigms are the most suitable for this project.
+
+Note: perhaps there are alternative logic programming methodologies (Python libraries?) that are currently unexplored by us which give us the best of both worlds?
+
+Computing inferences and materialization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+At any time in the lifecycle of a logical reasoning engine, assuming both a valid knowledge base {a, b, c, d} and valid ruleset {rules}, there is an implicit derived set of knowledge {a, b, c, d, e, f, g}.
+
+There are different ways of computationally generating proof for a consequence. There are algorithms available using forward-chaining, backward-chaining and a mix of both.
+
+An algorithm can attempt to formally verify a statement when asked by using these chaining methods. Another approach is to continuously compute all logical consequences, resulting in full materialization of the derived knowledge set. An industry example of this approach (materialization-based reasoning) is RDFox.
+
+
+What knowledge can we actually infer from our objects?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Currently, Octopoes records more or less literally what Boefjes and Bits find: a combination of an object and the state of an object (e.g. port 80 was found to be open by nmap a day ago).
+
+However, this little piece of information actually contains more knowledge than would appear at a first glance. For example, we can also infer that:
+
+we know that nmap has successfully;
+we know that a Boefje has run a day ago;
+we know that port 80 is NOT not open
+Although nmap only uses a limited set of states for each port, for some objects the logical inverse of a state could be very large. For example, if you know that the domain openkat.nl has a SOA record (primary nameserver) pointing at 8.8.8.8, you also know that it does not have a primary nameserver at 1.1.1.1, 2.2.2.2, or any other address in the complete IPv4 space. (Note: the DNS specification technically allows this, even though it does not make sense semantically. This serves as an example.)
+we know that we cannot make claims about port 443 based on this knowledge alone
+
+
+How to model the difference between knowing, not knowing, and knowing what you don't know?
+
+Knowing things
+^^^^^^^^^^^^^^
+
+In principle, this is the "default" that we model in Octopoes: we have objects, states of objects, and rules to infer knowledge about those objects and states. These may then result in findings and conclusions. This is reasonably straightforward, provided the rules are correct.
+
+Not knowing things
+^^^^^^^^^^^^^^^^^^
+
+…in a closed world:
+When dealing with closed-world assumptions, there exist by definition a finite number of objects and states. When you know the state of an object, you know with certainty that it does not occupy any of the other states. Therefore: given that the world is closed and finite, it is possible to exhaustively reason about the states of all objects that you have no explicit knowledge about. In other words: the ability to reason and know things about the world is complete.
+(If the object is not in the known set, it does therefore not exist at all).
+
+…in an open world:
+However, Octopoes deals with an open-world. There is inherent uncertainty in observations, and about how many and which objects and states actually exist. The observer does by definition not know the state of all things. It is reasonable to assume that our domain model is not completely exhaustive. If there is no explicit knowledge available about any given object, it cannot be conclusively determined that the object therefore does not exist, or the state that it occupies.
+
+Knowing that you don't know things
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To recap: in a closed world, there are no things that you don't know about.
+Consequence: all conclusions drawn about the world are authoritative.
+
+In an open world, you know that there are (probably) things you don't know about. Consequence: conclusions drawn about the world are not authoritative, and may be wrong.
+
+A practical example for Octopoes that arises is the following: if we know that a certain object has DNS records, but are not able to scan it for some reason, we cannot conclude anything about e.g. whether it misses SPF or DMARC entries. If this is not properly modeled, it may result in wrong conclusions, such as:
+
+
+A finding that SPF or DMARC does not exist
+This cannot be concluded as we have no concrete evidence for it nor against it, nor can we conclusively reason about this, as we are dealing with an open-world.
+
+
+No finding about the existence of SPF or DMARC
+This is correct, but doesn't tell us anything about the state of security or compliance of the object. If it is missing or faulty and should be there, we cannot say that the object is secure. However, if we consider all objects without explicit SPF or DMARC to be noncompliant, we do not account for edge-cases and situations where they may in fact not be required.
+
+
+A finding that we have insufficient information about the state of SPF or DMARC
+This is correct, but problematic when used as a general approach. There are, in our open-world, an infinite number of states and objects that we have no information about. Do we then create findings for all of these possible gaps of knowledge?
+
 
 
 Part II - Working towards a solution
 ====================================
 
+Stages of data processing
+-------------------------
 
-See :ref:`Development` for our code style, coding conventions, and overall workflow.
+In this part, architectural considerations are documented. A proposal for the primary dataflow is drawn below.
 
-- Fork the right repository in GitHub
-- Create a new branch from either ``main`` or a release tag. Note that ``main`` changes rapidly, and as such may not be a suitable basis for your work.
-    - This branch should be in the following format:
-    - ``[feature|enhancement|bug|hotfix]/random-cat-popup-on-screen``
-- Commit and push the code
-    - Make sure the code is linted, formatted and has correct typing
-    - The code must pass ``pre-commit`` locally
-- Submit Pull Request
-    - Make sure your code is tested and the PR has a good title and description
-    - Use the PR template
-    - Let your code be reviewed
-    - You might have to update your PR after remarks and submit rework for approval
+Data model / domain of discourse
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To start off, it seems imperative that some sort of data model is central in Octopoes’ architecture. To be able to recognize entities, to reason about them and to provide introspection, a domain of discourse must be known. Validation at this stage is questionable, this must perhaps take place in the bits/rules
+
+Upfront DDL?
+^^^^^^^^^^^^
+At the bare minimum, to make sure that incoming data about the world is resolved into claims about entities, entity recognition must be possible. It must be known somewhere that IPv4Address 1.1.1.1 in the output of BoefjeX is the same entity as IPv4Address 1.1.1.1 in the output of BoefjeY.
+
+An architectural choice lies in the rest of the schema definition (DDL). Do we enforce a strict data model upfront and validate incoming data against it? Or is the data model the result of introspection of FactSpace?
+
+Entity ID
+^^^^^^^^^
+
+Thought: are Entity IDs generated, or a hash of their identifying (natural key) attributes?
+
+Generated IDs result into more lookups when ingesting incoming data. This however can be sped up with a cache like Redis or the like.
+
+Natural key hashes result into less lookups, but it makes migrations more painful in some situations.
+
+ClaimSpace
+----------
+
+Plugin output = Claim Set
+
+Claim can be:
+Entity exists
+Entity does not exist (note: this is not supported in Octopoes v2)
+Entity has attribute, with value x
+
+The Claim Set of a plugin-OOI combination replaces the previous Claim Set of the same combination.
+
+FactSpace
+---------
+The stage where claims are consolidated into (assumed) facts.
+
+Inference
+---------
+
+One of the powerful intended features of KAT is that a rule can create/modify data, which could then trigger another rule to create/modify even more data. This allows data to pass through multiple layers of rule-based processing.
+
+Rule execution is triggered through the definition of a rule’s input. To allow expressiveness, a rule’s input is defined as a pattern. The rule should be applied to each occurrence of said pattern. The diagram below is an example of a rule (bit) which triggers on a pattern, and produces new nodes in the graph. Note that the output changes the graph itself, which means that pattern matching will have to be redone for the entire graph.
+
+The simplest patterns could e.g. be a class of entities, resulting in rule execution for each entity in the class. More complex patterns could be a subset of a class of entities that conform to a certain condition, defined by a - possibly relational - query. Rule execution in this case, should only happen if an entity exists in the defined subset.
 
 
-Contribute Documentation
-========================
+Handling updates / incoming data
+--------------------------------
+When assuming the rules are not paradoxical, the complete set of knowledge equals the explicit knowledge plus the implicit knowledge obtained by the reasoner. As such, this complete set of knowledge can be considered a pure derivative of the knowledge base.
 
-Contributing to the documentation benefits everyone who uses OpenKAT.
-We encourage you to help us improve the documentation, and you don't have to be an expert using OpenKAT to do so.
-There are many sections that are better off written by non-experts.
-If something in the docs doesn't make sense to you, updating the relevant section might be a great way to ensure it will help the next person.
-You're welcome to propose edits to almost every text, including comments and docstrings in the code, this documentation, and other files.
+In database terminology, the equivalent would be a view. Octopoes chooses to fully compute and store the implicit knowledge, gained by executing all rules on the base data. Effectively resulting in a materialized view. For all intents and purposes, Octopoes considers all inferred knowledge to be a cached overlay atop the observed and declared data points.
 
-You could help us out with the following sections:
+When changes in the base data (Claims or rules) are received there are several possible approaches of recomputing the materialized view.
 
-- Code documentation
-- Tutorials
-- Translations
-- This document
+Batch processing
+^^^^^^^^^^^^^^^^
+One way could be to remove all derived data points from the graph and recompute the complete materialized graph from scratch. This could be considered a batch-based approach. It could be worth investigating this rather simple approach. However, it is likely resulting in redundant re-computes of the same data causing it to be computationally costly. Overall, this will probably create a bottleneck with slow throughput, slowing down the complete feedback loop significantly.
 
-All documentation should be placed in a repository's ``docs`` folder.
+Above does not even take into account that because of the cyclic data flow from base to the final derivative, even one recompute of the materialized view could be quite costly. (Bits result into Claims, causing the claims to be recomputed, causing new bits, causing new Claims, etc).
 
-Contribute Translations
-=======================
+Incremental processing / streaming
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+A less computationally expensive approach could be adoption of the novel paradigm called timely dataflow. This approach allows for efficient incremental materialized view updates by constraining recompute of derived data.
 
-.. image:: https://hosted.weblate.org/widget/openkat/287x66-white.png
-   :target: https://hosted.weblate.org/engage/openkat/
-   :alt: Translation status (summary)
-
-.. image:: https://hosted.weblate.org/widget/openkat/multi-auto.svg
-   :target: https://hosted.weblate.org/engage/openkat/
-   :alt: Translation status (bar chart)
-
-============ ==============================
- Language     Support
-============ ==============================
- English      Default; used in source code
- Dutch        Official
- Papiamentu   Community
- Italian      Community
-============ ==============================
-
-We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
-Community contributions are very welcome and can be made via Weblate's interface.
-This is a great way to help the project forward and doesn't require any technical expertise.
-If you would like to see OpenKAT in another language, let us know!
-
-Any authenticated Weblate user can edit translation strings directly or make suggestions.
-Any translation updates in Weblate will be automatically submitted as a GitHub PR after 24 hours, which will be reviewed by the development team.
-If you contribute to the translation effort, you will receive a mention in the source code.
-
-Note that editing the English localization requires changing the source string in Django, which must be done through a GitHub PR manually.
-
-Contributor Social Contract
-===========================
-All contributors (including, but not limited to, developers and issue reporters) promise to do their best to adhere to the guidelines in :ref:`Project Guidelines`.
-Everyone is encouraged to politely and constructively point out guidelines violations to others.
-Actively enforcing these guidelines makes that the entire project benefits in quality control.
-
-Code of Conduct
-===============
-See the `Code of Conduct of the Ministry of Health, Welfare, and Sport <https://github.com/minvws/.github/blob/main/CODE_OF_CONDUCT.md>`_.
-
-Security
-========
-See the `Responsible Disclosure Statement of the Ministry of Health, Welfare, and Sport <https://github.com/minvws/.github/blob/main/SECURITY.md>`_.
+Due to time constraints the exact internal workings remain unknown to us for now. But looked at at a glance, this stream processing technique seems to trade space-complexity to reduce the time-complexity. It is currently unclear to us what the impact of the intended recursive rule-processing might be on the complexity, but it seems to be able to handle recursion fine.
