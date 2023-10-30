@@ -70,16 +70,20 @@ class RabbitMQ(Listener):
 
         self.dsn = dsn
         self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
+        self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
+        self.channel = self.connection.channel()
+        self.is_running = True
 
     def dispatch(self, channel, delivery_tag, body: bytes) -> None:
         """Dispatch a message without a return value"""
         raise NotImplementedError
 
-    def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
-        while True:
-            self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
-            self.channel = self.connection.channel()
+    def reconnect(self) -> None:
+        self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
+        self.channel = self.connection.channel()
 
+    def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
+        while self.is_running:
             try:
                 self.channel.queue_declare(queue=queue, durable=durable)
             except pika.exceptions.ChannelClosedByBroker as exc:
@@ -101,7 +105,7 @@ class RabbitMQ(Listener):
             except pika.exceptions.ConnectionClosedByBroker:
                 # Recover from server-initiated connection closure, this also
                 # includes when node is stopped cleanly
-                continue
+                self.reconnect()
             except pika.exceptions.AMQPChannelError as exc:
                 # Do not recover on channel errors
                 self.logger.error("AMQPChannelError: %s", exc)
@@ -109,7 +113,7 @@ class RabbitMQ(Listener):
             except pika.exceptions.AMQPConnectionError as exc:
                 # Recover on all other connection errors
                 self.logger.warning("RabbitMQ connection was closed, re-establishing connection: %s", exc)
-                continue
+                self.reconnect()
 
     def get(self, queue: str) -> Optional[Dict[str, object]]:
         method, properties, body = self.channel.basic_get(queue)
@@ -160,6 +164,7 @@ class RabbitMQ(Listener):
 
         self.connection.add_callback_threadsafe(self._close_callback)
         self.executor.shutdown()
+        self.is_running = False
 
         self.logger.debug("RabbitMQ connection closed")
 
