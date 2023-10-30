@@ -1,3 +1,4 @@
+import functools
 from typing import Callable
 
 from scheduler.models import ScanProfileMutation as ScanProfileMutationModel
@@ -34,7 +35,7 @@ class ScanProfileMutation(RabbitMQ):
         """Listen to the messaging queue."""
         self.basic_consume(self.queue, True, self.prefetch_count)
 
-    def dispatch(self, body: bytes) -> None:
+    def dispatch(self, channel, delivery_tag, body: bytes) -> None:
         """Dispatch the message to the function.
 
         body: A bytes object representing the body of the message.
@@ -44,3 +45,6 @@ class ScanProfileMutation(RabbitMQ):
 
         # Call the function
         self.func(model)
+
+        # Acknowledge the message
+        self.connection.add_callback_threadsafe(functools.partial(self.ack_message, channel, delivery_tag))

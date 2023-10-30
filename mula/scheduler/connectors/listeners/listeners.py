@@ -1,6 +1,7 @@
 import json
 import logging
 import urllib.parse
+from concurrent import futures
 from typing import Dict, Optional
 
 import pika
@@ -37,6 +38,14 @@ class RabbitMQ(Listener):
     channel and procedure that needs to be dispatched when receiving messages
     from a RabbitMQ queue.
 
+    To combat potential dropping of AMQP/stream connections due to AMQP heartbeat
+    timeouts, due to long running tasks, we will delegate processing of the
+    incoming message to another thread, while the connection adapter’s thread
+    continues to service its I/O loop’s message pump, permitting AMQP heartbeats
+    and other I/O to be serviced in a timely fashion.
+
+    Source: https://pika.readthedocs.io/en/stable/modules/adapters/index.html#requesting-message-acknowledgements-from-another-thread
+
     Attributes:
         dsn:
             A string defining the data source name of the RabbitMQ host to
@@ -60,8 +69,9 @@ class RabbitMQ(Listener):
 
         self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
         self.channel = self.connection.channel()
+        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
 
-    def dispatch(self, body: bytes) -> None:
+    def dispatch(self, channel, delivery_tag, body: bytes) -> None:
         """Dispatch a message without a return value"""
         raise NotImplementedError
 
@@ -79,6 +89,7 @@ class RabbitMQ(Listener):
                 self.channel.queue_declare(queue=queue, durable=durable)
             else:
                 raise
+
         self.channel.basic_qos(prefetch_count=prefetch_count)
         self.channel.basic_consume(queue, on_message_callback=self.callback)
         self.channel.start_consuming()
@@ -94,6 +105,13 @@ class RabbitMQ(Listener):
 
         return response
 
+    def ack_message(self, channel, delivery_tag):
+        if channel.is_open:
+            channel.basic_ack(delivery_tag)
+        else:
+            # Channel is already closed, so we can't ack this message
+            self.logger.debug("Channel already closed, cannot ack message!")
+
     def callback(
         self,
         channel: pika.channel.Channel,
@@ -105,10 +123,7 @@ class RabbitMQ(Listener):
         queue.
         """
         self.logger.debug("Received message on queue %s, message: %r", method.routing_key, body)
-
-        self.dispatch(body)
-
-        channel.basic_ack(method.delivery_tag)
+        self.executor.submit(self.dispatch, channel, method.delivery_tag, body)
 
     def is_healthy(self) -> bool:
         """Check if the RabbitMQ connection is healthy"""
@@ -127,6 +142,7 @@ class RabbitMQ(Listener):
         self.logger.debug("Stopping RabbitMQ connection")
 
         self.connection.add_callback_threadsafe(self._close_callback)
+        self.executor.shutdown()
 
         self.logger.debug("RabbitMQ connection closed")
 
