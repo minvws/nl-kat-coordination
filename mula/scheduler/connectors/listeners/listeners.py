@@ -54,6 +54,8 @@ class RabbitMQ(Listener):
             A pika.BlockingConnection instance.
         channel:
             A pika.BlockingConnection.channel instance.
+        executor:
+            A concurrent.futures.ThreadPoolExecutor instance.
     """
 
     def __init__(self, dsn: str):
@@ -65,10 +67,8 @@ class RabbitMQ(Listener):
                 connect to.
         """
         super().__init__()
-        self.dsn = dsn
 
-        self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
-        self.channel = self.connection.channel()
+        self.dsn = dsn
         self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
 
     def dispatch(self, channel, delivery_tag, body: bytes) -> None:
@@ -76,23 +76,40 @@ class RabbitMQ(Listener):
         raise NotImplementedError
 
     def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
-        try:
-            self.channel.queue_declare(queue=queue, durable=durable)
-        except pika.exceptions.ChannelClosedByBroker as exc:
-            if "inequivalent arg 'durable'" in exc.reply_text:
-                # Queue changed from non-durable to durable. Given that
-                # previously they weren't durable and contents would also be
-                # lost if RabbitMQ restarted, we will just delete the queue and
-                # recreate it to provide for a smooth upgrade.
-                self.channel = self.connection.channel()
-                self.channel.queue_delete(queue=queue)
-                self.channel.queue_declare(queue=queue, durable=durable)
-            else:
-                raise
+        while True:
+            self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
+            self.channel = self.connection.channel()
 
-        self.channel.basic_qos(prefetch_count=prefetch_count)
-        self.channel.basic_consume(queue, on_message_callback=self.callback)
-        self.channel.start_consuming()
+            try:
+                self.channel.queue_declare(queue=queue, durable=durable)
+            except pika.exceptions.ChannelClosedByBroker as exc:
+                if "inequivalent arg 'durable'" in exc.reply_text:
+                    # Queue changed from non-durable to durable. Given that
+                    # previously they weren't durable and contents would also be
+                    # lost if RabbitMQ restarted, we will just delete the queue and
+                    # recreate it to provide for a smooth upgrade.
+                    self.channel = self.connection.channel()
+                    self.channel.queue_delete(queue=queue)
+                    self.channel.queue_declare(queue=queue, durable=durable)
+                else:
+                    raise
+
+            try:
+                self.channel.basic_qos(prefetch_count=prefetch_count)
+                self.channel.basic_consume(queue, on_message_callback=self.callback)
+                self.channel.start_consuming()
+            except pika.exceptions.ConnectionClosedByBroker:
+                # Recover from server-initiated connection closure, this also
+                # includes when node is stopped cleanly
+                continue
+            except pika.exceptions.AMQPChannelError as exc:
+                # Do not recover on channel errors
+                self.logger.error("AMQPChannelError: %s", exc)
+                raise exc
+            except pika.exceptions.AMQPConnectionError as exc:
+                # Recover on all other connection errors
+                self.logger.warning("RabbitMQ connection was closed, re-establishing connection: %s", exc)
+                continue
 
     def get(self, queue: str) -> Optional[Dict[str, object]]:
         method, properties, body = self.channel.basic_get(queue)
