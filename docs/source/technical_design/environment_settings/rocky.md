@@ -9,7 +9,6 @@ The following places contain more information about which settings Rocky support
 - [Django docs about settings](https://docs.djangoproject.com/en/4.2/topics/settings/)
 - [Django complete settings reference](https://docs.djangoproject.com/en/4.2/ref/settings/)
 
+## Email Settings
 
-## Email Forwarding
-
-In [rocky/rocky/settings.py](https://github.com/minvws/nl-kat-coordination/blob/main/rocky/rocky/settings.py#L102-L122) you have the ability to define email settings for your OpenKAT installation. Most settings are by default resolved from the environment variables. Any errors will be written to Rocky's email logs as configured in the settings file.
+Using the environment variables as defined in [rocky/rocky/settings.py](https://github.com/minvws/nl-kat-coordination/blob/main/rocky/rocky/settings.py#L102-L122) you have the ability to define email settings for your OpenKAT installation. These are the Django email settings, see the [django documentation](https://docs.djangoproject.com/en/4.2/topics/email/#smtp-backend) for more information.
