@@ -3,9 +3,8 @@ from enum import Enum
 from importlib import import_module
 from inspect import isfunction, signature
 from pathlib import Path
-from typing import Protocol, Set
+from typing import Protocol
 
-from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.models import Boefje, Normalizer
 
 BOEFJES_DIR = Path(__file__).parent
@@ -85,18 +84,6 @@ def get_runnable_hash(path: Path) -> str:
                     folder_hash.update(chunk)
 
     return folder_hash.hexdigest()
-
-
-def _default_meta_mime_types(boefje_meta: BoefjeMeta) -> Set[str]:
-    mime_types = _default_mime_types(boefje_meta.boefje)
-    mime_types.add(f"boefje/{boefje_meta.boefje.id}-{boefje_meta.parameterized_arguments_hash}")
-
-    if boefje_meta.boefje.version is not None:
-        mime_types = mime_types.add(
-            f"boefje/{boefje_meta.boefje.id}-{boefje_meta.parameterized_arguments_hash}-{boefje_meta.boefje.version}",
-        )
-
-    return mime_types
 
 
 def _default_mime_types(boefje: Boefje):

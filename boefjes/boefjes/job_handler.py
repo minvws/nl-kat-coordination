@@ -18,7 +18,7 @@ from boefjes.job_models import (
     NormalizerPlainOOI,
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.plugins.models import _default_meta_mime_types
+from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -134,7 +134,7 @@ class BoefjeHandler(Handler):
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
         boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
 
-        mime_types = _default_meta_mime_types(boefje_meta)
+        mime_types = _default_mime_types(boefje_meta.boefje)
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
