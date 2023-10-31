@@ -27,8 +27,8 @@ class WappalizerNormalizerTest(TestCase):
         output = [x for x in run(get_normalizer_meta(boefje_meta), get_dummy_data("raw/wappalizer_redirected.json"))]
 
         self.assertEqual(2, len(output))
-        self.assertEqual("URL||https://mid.url/", str(output[0]))
-        self.assertEqual("URL||https://redirected.url/", str(output[1]))
+        self.assertEqual("URL|internet|https://mid.url/", str(output[0]))
+        self.assertEqual("URL|internet|https://redirected.url/", str(output[1]))
 
     def test_yield_software_when_not_redirected(self):
         input_ooi = parse_obj_as(

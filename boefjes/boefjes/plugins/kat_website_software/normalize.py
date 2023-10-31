@@ -3,6 +3,7 @@ from typing import Iterable, Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
+from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL
 
@@ -27,7 +28,9 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
         results["urls"].pop(url)
 
         for redirected_url in results["urls"]:
-            yield URL(network=hostname_reference.tokenized.netloc.network.name, raw=redirected_url)
+            yield URL(
+                network=Network(name=hostname_reference.tokenized.netloc.network.name).reference, raw=redirected_url
+            )
 
         return
 
