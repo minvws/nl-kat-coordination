@@ -1,6 +1,5 @@
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from typing import Dict, List
 
 from account.models import KATUser
@@ -11,11 +10,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.forms.base import ObservedAtForm
 from tools.models import Organization
-from tools.view_helpers import BreadcrumbsMixin, convert_date_to_datetime
+from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.findings import RiskLevelSeverity
+from rocky.views.mixins import ObservedAtMixin
 from rocky.views.ooi_view import ConnectorFormMixin
 
 logger = logging.getLogger(__name__)
@@ -40,15 +40,12 @@ class OrganizationFindingCountPerSeverity:
             return 0
 
 
-class CrisisRoomBreadcrumbsMixin(BreadcrumbsMixin):
+class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, TemplateView):
+    template_name = "crisis_room/crisis_room.html"
+    connector_form_class = ObservedAtForm
     breadcrumbs = [
         {"url": "", "text": "Crisis Room"},
     ]
-
-
-class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateView):
-    template_name = "crisis_room/crisis_room.html"
-    connector_form_class = ObservedAtForm
 
     def sort_by_total(
         self, finding_counts: List[OrganizationFindingCountPerSeverity]
@@ -76,16 +73,6 @@ class CrisisRoomView(CrisisRoomBreadcrumbsMixin, ConnectorFormMixin, TemplateVie
             )
             logger.exception("Failed to get list of findings for organization %s", organization.code)
             return {}
-
-    def get_observed_at(self) -> datetime:
-        if "observed_at" not in self.request.GET:
-            return datetime.now(timezone.utc)
-
-        try:
-            datetime_format = "%Y-%m-%d"
-            return convert_date_to_datetime(datetime.strptime(self.request.GET.get("observed_at"), datetime_format))
-        except ValueError:
-            return datetime.now(timezone.utc)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
