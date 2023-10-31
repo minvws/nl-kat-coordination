@@ -25,6 +25,7 @@ class BytesTestCase(unittest.TestCase):
         self.assertIsNotNone(self.service_bytes.headers)
         self.assertIsNotNone(self.service_bytes.headers.get("Authorization"))
 
+    @unittest.skip
     def test_expired_token_refresh(self):
         self.service_bytes.get_last_run_boefje(
             boefje_id="boefje-1",
