@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from typing import ClassVar, List, Optional
 
 import mmh3
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Column, DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.schema import Index
@@ -21,22 +21,40 @@ from .raw_data import RawData
 
 
 class TaskStatus(str, enum.Enum):
-    """Status of a task."""
-
+    # Task has been created but not yet queued
     PENDING = "pending"
+
+    # Task has been pushed onto queue and is ready to be picked up
     QUEUED = "queued"
+
+    # Task has been picked up by a worker
     DISPATCHED = "dispatched"
+
+    # Task has been picked up by a worker, and the worker indicates that it is
+    # running.
     RUNNING = "running"
+
+    # Task has been completed
     COMPLETED = "completed"
+
+    # Task has failed
     FAILED = "failed"
+
+    # Task has been cancelled
     CANCELLED = "cancelled"
 
 
 class Task(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
+
     scheduler_id: str
+
     type: str
+
     p_item: PrioritizedItem
+
     status: TaskStatus
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -46,19 +64,18 @@ class Task(BaseModel):
     def __repr__(self):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
-    class Config:
-        orm_mode = True
 
-
-class TaskORM(Base):
-    """A SQLAlchemy datastore model representation of a Task"""
-
+class TaskDB(Base):
     __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)
+
     scheduler_id = Column(String)
+
     type = Column(String)
+
     p_item = Column(JSONB, nullable=False)
+
     status = Column(
         Enum(TaskStatus),
         nullable=False,
@@ -70,6 +87,7 @@ class TaskORM(Base):
         nullable=False,
         server_default=func.now(),
     )
+
     modified_at = Column(
         DateTime(timezone=True),
         nullable=False,
@@ -91,7 +109,7 @@ class NormalizerTask(BaseModel):
 
     type: ClassVar[str] = "normalizer"
 
-    id: str = Field(default_factory=lambda: uuid.uuid4().hex)
+    id: uuid.UUID = Field(default_factory=lambda: uuid.uuid4())
     normalizer: Normalizer
     raw_data: RawData
 
@@ -110,7 +128,7 @@ class BoefjeTask(BaseModel):
 
     type: ClassVar[str] = "boefje"
 
-    id: str = Field(default_factory=lambda: uuid.uuid4().hex)
+    id: uuid.UUID = Field(default_factory=lambda: uuid.uuid4())
     boefje: Boefje
     input_ooi: Optional[str]
     organization: str

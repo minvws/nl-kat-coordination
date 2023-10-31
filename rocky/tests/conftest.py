@@ -7,9 +7,11 @@ from typing import Dict
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
@@ -27,8 +29,22 @@ from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSever
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
+LANG_LIST = [code for code, _ in settings.LANGUAGES]
+
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+@pytest.fixture(params=LANG_LIST)
+def current_language(request):
+    return request.param
+
+
+@pytest.fixture
+def language(current_language):
+    activate(current_language)
+    yield current_language
+    deactivate()
 
 
 def create_user(django_user_model, email, password, name, device_name, superuser=False):
@@ -303,55 +319,58 @@ def lazy_task_list_empty() -> MagicMock:
 
 
 @pytest.fixture
-def lazy_task_list_with_boefje() -> MagicMock:
-    mock = MagicMock()
-    mock.__getitem__.return_value = [
-        Task.parse_obj(
-            {
+def task() -> Task:
+    return Task.parse_obj(
+        {
+            "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
+            "hash": "19ed51514b37d42f79c5e95469956b05",
+            "scheduler_id": "boefje-test",
+            "type": "boefje",
+            "p_item": {
                 "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
                 "hash": "19ed51514b37d42f79c5e95469956b05",
-                "scheduler_id": "boefje-test",
-                "type": "boefje",
-                "p_item": {
-                    "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
-                    "hash": "19ed51514b37d42f79c5e95469956b05",
-                    "priority": 1,
-                    "data": {
-                        "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
-                        "boefje": {
-                            "id": "test-boefje",
-                            "name": "TestBoefje",
-                            "description": "Fetch the DNS record(s) of a hostname",
-                            "repository_id": None,
-                            "version": None,
-                            "scan_level": 1,
-                            "consumes": ["Hostname"],
-                            "produces": [
-                                "DNSNSRecord",
-                                "DNSARecord",
-                                "DNSCNAMERecord",
-                                "DNSMXRecord",
-                                "DNSZone",
-                                "Hostname",
-                                "DNSAAAARecord",
-                                "IPAddressV4",
-                                "DNSSOARecord",
-                                "DNSTXTRecord",
-                                "IPAddressV6",
-                                "Network",
-                                "NXDOMAIN",
-                            ],
-                        },
-                        "input_ooi": "Hostname|internet|mispo.es",
-                        "organization": "_dev",
+                "priority": 1,
+                "data": {
+                    "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
+                    "boefje": {
+                        "id": "test-boefje",
+                        "name": "TestBoefje",
+                        "description": "Fetch the DNS record(s) of a hostname",
+                        "repository_id": None,
+                        "version": None,
+                        "scan_level": 1,
+                        "consumes": ["Hostname"],
+                        "produces": [
+                            "DNSNSRecord",
+                            "DNSARecord",
+                            "DNSCNAMERecord",
+                            "DNSMXRecord",
+                            "DNSZone",
+                            "Hostname",
+                            "DNSAAAARecord",
+                            "IPAddressV4",
+                            "DNSSOARecord",
+                            "DNSTXTRecord",
+                            "IPAddressV6",
+                            "Network",
+                            "NXDOMAIN",
+                        ],
                     },
+                    "input_ooi": "Hostname|internet|mispo.es",
+                    "organization": "_dev",
                 },
-                "status": "completed",
-                "created_at": "2022-08-09 11:53:41.378292",
-                "modified_at": "2022-08-09 11:54:21.002838",
-            }
-        )
-    ]
+            },
+            "status": "completed",
+            "created_at": "2022-08-09 11:53:41.378292",
+            "modified_at": "2022-08-09 11:54:21.002838",
+        }
+    )
+
+
+@pytest.fixture
+def lazy_task_list_with_boefje(task) -> MagicMock:
+    mock = MagicMock()
+    mock.__getitem__.return_value = [task]
     mock.count.return_value = 1
     return mock
 
@@ -443,6 +462,29 @@ def plugin_schema():
     }
 
 
+@pytest.fixture
+def plugin_schema_no_required():
+    return {
+        "title": "Arguments",
+        "type": "object",
+        "properties": {
+            "TEST_PROPERTY": {
+                "title": "TEST_PROPERTY",
+                "maxLength": 128,
+                "type": "string",
+                "description": "Test description",
+            },
+            "TEST_PROPERTY2": {
+                "title": "TEST_PROPERTY2",
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 200,
+                "description": "Test description2",
+            },
+        },
+    }
+
+
 def setup_request(request, user):
     request = SessionMiddleware(lambda r: r)(request)
     request.session[DEVICE_ID_SESSION_KEY] = user.staticdevice_set.get().persistent_id
@@ -465,6 +507,14 @@ def get_stub_path(file_name: str) -> Path:
 
 def get_boefjes_data() -> Dict:
     return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
+
+
+def get_normalizers_data() -> Dict:
+    return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
+
+
+def get_plugins_data() -> Dict:
+    return get_boefjes_data() + get_normalizers_data()
 
 
 @pytest.fixture()

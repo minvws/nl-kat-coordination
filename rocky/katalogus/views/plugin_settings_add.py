@@ -72,10 +72,9 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
             },
             {
                 "url": reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin.type,
                         "plugin_id": self.plugin.id,
                     },
                 ),
@@ -100,10 +99,9 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
 
     def get_success_url(self):
         return reverse(
-            "plugin_detail",
+            "boefje_detail",
             kwargs={
                 "organization_code": self.organization.code,
-                "plugin_type": self.plugin.type,
                 "plugin_id": self.plugin.id,
             },
         )

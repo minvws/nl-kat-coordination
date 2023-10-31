@@ -2,12 +2,12 @@
 
 {% with id=widget.attrs.id %}
     <div class="horizontal-view-group"
-         {% if id %} id="{{ id }}"{% endif %}
-         {% if widget.attrs.class %} class="checkbox-group {{ widget.attrs.class }}"{% endif %}>
+         {% if id %}id="{{ id }}"{% endif %}
+         {% if widget.attrs.class %}class="checkbox-group {{ widget.attrs.class }}"{% endif %}>
         {% for group, options, index in widget.optgroups %}
             {% if group %}
                 {{ group }}
-                <div {% if id %} id="{{ id }}_{{ index }}"{% endif %}>
+                <div {% if id %}id="{{ id }}_{{ index }}"{% endif %}>
                 {% endif %}
                 {% for option in options %}
                     <div>
@@ -16,6 +16,6 @@
                     </div>
                 {% endfor %}
                 {% if group %}</div>{% endif %}
-            {% endfor %}
-        </div>
-    {% endwith %}
+        {% endfor %}
+    </div>
+{% endwith %}

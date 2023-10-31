@@ -54,10 +54,9 @@ export_migrations:
 	python manage.py export_migrations accounts 0001
 
 languages:
-	# Extracts strings to .po files which should be translated
-	for LANG in nl pap ; do \
-		python manage.py makemessages -i "venv/*" -i "build/*" -i "octopoes/*" -i "node_modules/*" --verbosity 2 --add-location file --locale $$LANG ; \
-	done
+	# Extracts strings to `.pot` file which should be translated
+  # Note that the creation of `.po` files is delegated to another tool (Weblate)
+	python manage.py makemessages -i "venv/*" -i "build/*" -i "octopoes/*" -i "node_modules/*" --verbosity 2 --add-location file -a --keep-pot
 
 lang: languages
 

@@ -87,6 +87,8 @@ services:
     depends_on:
       - rabbitmq
       - bytes
+    ports:
+      - "127.0.0.1:8006:8000"
     build:
       context: .
       dockerfile: boefjes/Dockerfile
@@ -103,6 +105,8 @@ services:
     env_file:
       - .env-defaults
       - .env
+    environment:
+      - BOEFJE_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
 
   normalizer:
     restart: unless-stopped

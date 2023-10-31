@@ -4,10 +4,20 @@ from typing import List, TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from account.mixins import OrganizationView
+from django.contrib import messages
+from django.http import HttpRequest
 from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models.types import OOI_TYPES
+from rocky.scheduler import (
+    BadRequestError,
+    ConflictError,
+    QueuePrioritizedItem,
+    SchedulerError,
+    TooManyRequestsError,
+    client,
+)
 
 
 def convert_date_to_datetime(d: date) -> datetime:
@@ -35,7 +45,7 @@ def generate_job_id():
     return str(uuid.uuid4())
 
 
-def url_with_querystring(path, **kwargs) -> str:
+def url_with_querystring(path, doseq=False, **kwargs) -> str:
     parsed_route = urlparse(path)
 
     return str(
@@ -45,7 +55,7 @@ def url_with_querystring(path, **kwargs) -> str:
                 parsed_route.netloc,
                 parsed_route.path,
                 parsed_route.params,
-                urlencode(kwargs),
+                urlencode(kwargs, doseq),
                 parsed_route.fragment,
             )
         )
@@ -53,7 +63,8 @@ def url_with_querystring(path, **kwargs) -> str:
 
 
 def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
-    kwargs["ooi_id"] = ooi_id
+    if ooi_id:
+        kwargs["ooi_id"] = ooi_id
 
     if "query" in kwargs:
         kwargs["query"] = {key: value for key, value in kwargs["query"] if key not in kwargs}
@@ -125,7 +136,7 @@ class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         breadcrumbs = [
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
-                "text": "Settings",
+                "text": _("Settings"),
             },
         ]
 
@@ -137,7 +148,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         breadcrumbs = [
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
-                "text": "Members",
+                "text": _("Members"),
             },
         ]
 
@@ -152,3 +163,19 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
                 "text": _("Objects"),
             }
         ]
+
+
+def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrioritizedItem) -> None:
+    try:
+        client.push_task(f"{task.data.type}-{organization_code}", task)
+    except (BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
+        messages.error(request, error.message)
+    else:
+        messages.success(
+            request,
+            _(
+                "Your task is scheduled and will soon be started in the background. "
+                "Results will be added to the object list when they are in. "
+                "It may take some time, a refresh of the page may be needed to show the results."
+            ),
+        )

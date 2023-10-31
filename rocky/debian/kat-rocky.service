@@ -1,0 +1,21 @@
+[Unit]
+Description=kat-rocky daemon
+After=network.target
+
+[Service]
+User=kat
+Group=kat
+SyslogIdentifier=kat-rocky
+WorkingDirectory=/opt/venvs/kat-rocky/
+EnvironmentFile=/usr/lib/kat/rocky.defaults
+EnvironmentFile=/etc/kat/rocky.conf
+ExecStart=/opt/venvs/kat-rocky/bin/uwsgi --ini /etc/kat/rocky.uwsgi.ini
+Restart=on-failure
+RestartSec=3s
+KillSignal=SIGQUIT
+KillMode=mixed
+Type=notify
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target

@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
+from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
 from octopoes.models.persistence import ReferenceField
 
 
@@ -138,3 +138,20 @@ class NXDOMAIN(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"NXDOMAIN response on {reference.tokenized.hostname.name}"
+
+
+class DNSPTRRecord(DNSRecord):
+    object_type: Literal["DNSPTRRecord"] = "DNSPTRRecord"
+    dns_record_type: Literal["PTR"] = "PTR"
+    address: Optional[Reference] = ReferenceField(IPAddress)
+
+    _natural_key_attrs = ["hostname", "address"]
+
+    _reverse_relation_names = {
+        "hostname": "dns_ptr_records",
+        "address": "ptr_record_ip",
+    }
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"{reference.tokenized.address.address} -> {reference.tokenized.hostname.name}"

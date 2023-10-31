@@ -1,9 +1,10 @@
 import unittest
+from types import SimpleNamespace
 from unittest import mock
 
 import scheduler
 from fastapi.testclient import TestClient
-from scheduler import config, models, repositories, server
+from scheduler import config, models, server, storage
 
 from tests.factories import OrganisationFactory
 from tests.mocks import MockKatalogusService
@@ -11,22 +12,20 @@ from tests.mocks import MockKatalogusService
 
 class AppTestCase(unittest.TestCase):
     def setUp(self):
-        cfg = config.settings.Settings()
-
+        # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = cfg
-
-        # Datastore
-        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy(cfg.db_uri)
-        models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
-
-        self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
-        self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
-
-        # Application context
-        self.mock_ctx.pq_store = self.pq_store
-        self.mock_ctx.task_store = self.task_store
+        self.mock_ctx.config = config.settings.Settings()
         self.mock_ctx.services.katalogus = MockKatalogusService()
+
+        # Database
+        self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        models.Base.metadata.create_all(self.dbconn.engine)
+        self.mock_ctx.datastores = SimpleNamespace(
+            **{
+                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+            }
+        )
 
         # App
         self.app = scheduler.App(self.mock_ctx)
@@ -37,6 +36,8 @@ class AppTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.app.shutdown()
+        models.Base.metadata.drop_all(self.dbconn.engine)
+        self.dbconn.engine.dispose()
 
     def test_monitor_orgs_add(self):
         """Test that when a new organisation is added, a new scheduler is created"""

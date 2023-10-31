@@ -19,9 +19,9 @@ Make sure `pdflatex` is installed and added to `$PATH`, because Keiko invokes
 _Recommended LateX distro for report developers: [MikTex](https://docs.miktex.org/manual/installing.html)_
 
 ## File system permissions
-Keiko needs to be able to write to the `reports` directory. The location of this folder is configurable with the
-environment variable `KEIKO_REPORTS_FOLDER`. If you are running Keiko as a non-root user, make sure that this directory
-is writable by the user.
+Keiko needs to be able to write to the `reports` directory, which should be created before running Keiko.
+The location of this folder is configurable with the environment variable `KEIKO_REPORTS_FOLDER`.
+If you are running Keiko as a non-root user, make sure that this directory is writable by the user.
 
 Keiko creates a temporary directory for each report, which is deleted after the report is compiled. This directory is
 created with Python's [tempfile module](https://docs.python.org/3/library/tempfile.html). This should by default work
@@ -40,25 +40,9 @@ template directory.
 After submitting the report request, the report id is immediately returned, while asynchronous processing of the LateX
 template is started. After the report is generated, the PDF is available at `/reports/<id>.keiko.pdf`.
 
-## Environment variables
-See available environment variables at [.env-dist](.env-dist)
-
-The `templates`, `glossaries` and `assets` folders should for now point to the corresponding folders in the repository.
-Example with environment variables, assuming that the keiko code lives in `/app/keiko`:
-```bash
-export KEIKO_TEMPLATES_FOLDER=/app/keiko/templates
-export KEIKO_ASSETS_FOLDER=/app/keiko/assets
-export KEIKO_GLOSSARIES_FOLDER=/app/keiko/glossaries
-export KEIKO_REPORT_FOLDER=/var/keiko/reports
-uvicorn keiko.app:api --port 8005
-```
-
 ## Logging
 Keiko logging can be configured through by supplying a `logging.json`, relative to the current working directory of the
 process. See [logging.json](logging.json) for an example.
-
-Debug logging can be enabled by setting the environment variable `KEIKO_DEBUG` to `true`. This sets all loggers to
-`DEBUG`.
 
 ## Building a new template
 Create a new directory in the `templates` directory, with the following files:

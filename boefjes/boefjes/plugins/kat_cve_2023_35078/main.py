@@ -18,6 +18,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[str, bytes]]]:
     response = requests.get(full_url, verify=False, allow_redirects=False)
 
     if response.status_code == 200:
-        return [({response.headers.get("content-type")}, response.content)]
+        return [(set(), response.content)]
     else:
         return [(set(), "Ivanti Endpoint Manager Mobile (EPMM), formerly MobileIron Core not found")]

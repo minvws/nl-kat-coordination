@@ -1,3 +1,6 @@
+# You should use this file in the following manner:
+# `docker compose --env-file .env-prod -f docker-compose.release-example.yml`
+
 version: "3.9"
 
 services:
@@ -12,6 +15,7 @@ services:
       interval: 5s
       retries: 10
     env_file:
+      - .env-prod
       - .env
 
   postgres:
@@ -23,6 +27,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
     env_file:
+      - .env-prod
       - .env
     environment:
       APPS: "ROCKY BYTES KATALOGUS SCHEDULER"
@@ -44,6 +49,7 @@ services:
     image: "ghcr.io/minvws/nl-kat-octopoes:${KAT_VERSION}"
     command: web
     env_file:
+      - .env-prod
       - .env
 
   octopoes_api_worker:
@@ -54,6 +60,7 @@ services:
     image: "ghcr.io/minvws/nl-kat-octopoes:${KAT_VERSION}"
     command: worker-beat
     env_file:
+      - .env-prod
       - .env
 
   boefje:
@@ -68,7 +75,10 @@ services:
       replicas: 1
     command: boefje
     env_file:
+      - .env-prod
       - .env
+    environment:
+      - BOEFJE_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
 
   normalizer:
     restart: on-failure
@@ -80,6 +90,7 @@ services:
       replicas: 1
     command: normalizer
     env_file:
+      - .env-prod
       - .env
 
   rocky:
@@ -96,6 +107,7 @@ services:
       - "127.0.0.1:8000:8000"
     image: "ghcr.io/minvws/nl-kat-rocky:${KAT_VERSION}"
     env_file:
+      - .env-prod
       - .env
     environment:
       - DATABASE_MIGRATION=true
@@ -108,6 +120,7 @@ services:
       - "127.0.0.1:8002:8000"
     image: "ghcr.io/minvws/nl-kat-bytes:${KAT_VERSION}"
     env_file:
+      - .env-prod
       - .env
     environment:
       - BYTES_DATA_DIR=/data
@@ -123,6 +136,7 @@ services:
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
+      - .env-prod
       - .env
     environment:
       - DATABASE_MIGRATION=true
@@ -133,6 +147,7 @@ services:
     ports:
       - "127.0.0.1:8004:8000"
     env_file:
+      - .env-prod
       - .env
     depends_on:
       - postgres
@@ -147,6 +162,7 @@ services:
     ports:
       - "127.0.0.1:8005:8000"
     env_file:
+      - .env-prod
       - .env
 
 volumes:

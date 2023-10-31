@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional
 
 import pydantic
 
-from scheduler import models, repositories
+from scheduler import models, storage
 
 from .errors import (
     InvalidPrioritizedItemError,
@@ -51,7 +51,7 @@ class PriorityQueue(abc.ABC):
         pq_id: str,
         maxsize: int,
         item_type: Any,
-        pq_store: repositories.stores.PriorityQueueStorer,
+        pq_store: storage.PriorityQueueStore,
         allow_replace: bool = False,
         allow_updates: bool = False,
         allow_priority_updates: bool = False,
@@ -87,7 +87,7 @@ class PriorityQueue(abc.ABC):
         self.allow_replace: bool = allow_replace
         self.allow_updates: bool = allow_updates
         self.allow_priority_updates: bool = allow_priority_updates
-        self.pq_store: repositories.stores.PriorityQueueStorer = pq_store
+        self.pq_store: storage.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
     def pop(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
@@ -140,7 +140,10 @@ class PriorityQueue(abc.ABC):
             if not self._is_valid_item(p_item.data):
                 raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
 
-            if self.full():
+            if not p_item.priority:
+                raise InvalidPrioritizedItemError("PrioritizedItem must have a priority")
+
+            if self.full() and p_item.priority > 1:
                 raise QueueFullError(f"Queue {self.pq_id} is full.")
 
             # We try to get the item from the queue by a specified identifier of
@@ -149,26 +152,43 @@ class PriorityQueue(abc.ABC):
             # and we might need to update that.
             item_on_queue = self.get_p_item_by_identifier(p_item)
 
-            item_changed = item_on_queue and p_item.data != item_on_queue.data  # FIXM: checking json/dicts here
+            # Item on queue and data changed
+            item_changed = item_on_queue and p_item.data != item_on_queue.data
 
+            # Item on queue and priority changed
             priority_changed = item_on_queue and p_item.priority != item_on_queue.priority
 
             allowed = any(
                 (
                     item_on_queue and self.allow_replace,
-                    self.allow_updates and item_changed and item_on_queue,
-                    self.allow_priority_updates and priority_changed and item_on_queue,
+                    item_on_queue and self.allow_updates and item_changed,
+                    item_on_queue and self.allow_priority_updates and priority_changed,
                     not item_on_queue,
                 )
             )
 
             if not allowed:
-                raise NotAllowedError(
-                    f"[item_on_queue={item_on_queue}, item_changed={item_changed}, "
-                    f" priority_changed={priority_changed}, "
-                    f"allow_replace={self.allow_replace}, allow_updates={self.allow_updates}, "
-                    f"allow_priority_updates={self.allow_priority_updates}]"
-                )
+                message = f"Item {p_item} already on queue {self.pq_id}."
+
+                if item_on_queue and not self.allow_replace:
+                    message = (
+                        "Item already on queue, we're not allowed to replace the item that is already on the queue."
+                    )
+
+                if item_on_queue and item_changed and not self.allow_updates:
+                    message = (
+                        "Item already on queue, and item changed, we're not "
+                        "allowed to update the item that is already on the queue."
+                    )
+
+                if item_on_queue and priority_changed and not self.allow_priority_updates:
+                    message = (
+                        "Item already on queue, and priority changed, "
+                        "we're not allowed to update the priority of the item "
+                        "that is already on the queue."
+                    )
+
+                raise NotAllowedError(message)
 
             # If already on queue update the item, else create a new one
             item_db = None
@@ -205,7 +225,7 @@ class PriorityQueue(abc.ABC):
         Returns:
             The item that was removed from the queue.
         """
-        self.pq_store.remove(self.pq_id, str(p_item.id))
+        self.pq_store.remove(self.pq_id, p_item.id)
 
     def clear(self) -> None:
         """Clear the queue."""
@@ -278,7 +298,7 @@ class PriorityQueue(abc.ABC):
             A boolean, True if the item is valid, False otherwise.
         """
         try:
-            self.item_type.parse_obj(item)
+            self.item_type.model_validate(item)
         except pydantic.ValidationError:
             return False
 

@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, IPvAnyAddress, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, FilePath, IPvAnyAddress, PostgresDsn
 from pydantic.env_settings import SettingsSourceCallable
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
@@ -36,7 +36,7 @@ class BackwardsCompatibleEnvSettings:
 
 
 class Settings(BaseSettings):
-    log_cfg: Path = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
+    log_cfg: FilePath = Field(BASE_DIR / "logging.json", description="Path to the logging configuration file")
 
     # Worker configuration
     pool_size: int = Field(2, description="Number of workers to run per queue")
@@ -65,6 +65,22 @@ class Settings(BaseSettings):
     )
     octopoes_api: AnyHttpUrl = Field(
         ..., example="http://localhost:8001", description="Octopoes API URL", env="OCTOPOES_API"
+    )
+    boefje_api: AnyHttpUrl = Field(..., example="http://boefje:8000", description="Boefje API URL", env="BOEFJE_API")
+    # Boefje server settings
+    boefje_api_host: str = Field(
+        "0.0.0.0",
+        description="Host address of the Boefje API server",
+    )
+    boefje_api_port: int = Field(
+        8000,
+        description="Host port of the Boefje API server",
+    )
+
+    boefje_docker_network: str = Field(
+        "bridge",
+        description="Docker network to run Boefjes in",
+        env="BOEFJE_DOCKER_NETWORK",
     )
 
     bytes_api: AnyHttpUrl = Field(..., example="http://localhost:8002", description="Bytes API URL", env="BYTES_API")

@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.version }}
         uses: actions/setup-python@v4
@@ -44,6 +44,11 @@ jobs:
         run: pip install -r requirements-dev.txt
         working-directory: ./keiko
 
+      - name: Create writeable directory for reports (edge case for GitHub Actions)
+        run: mkdir -p /tmp/keiko/reports && chmod -R 700 /tmp/keiko/reports
+
       - name: Run unit tests
         run: make test
         working-directory: ./keiko
+        env:
+          KEIKO_REPORTS_FOLDER: /tmp/keiko/reports

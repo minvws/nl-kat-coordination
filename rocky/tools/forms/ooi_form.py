@@ -1,6 +1,6 @@
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, List, Optional, Type, Union
+from typing import Dict, Optional, Type, Union
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -10,7 +10,7 @@ from pydantic.fields import SHAPE_LIST, ModelField
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.question import Question
-from octopoes.models.types import get_relations
+from octopoes.models.types import get_collapsed_types, get_relations
 from tools.forms.base import BaseRockyForm, CheckboxGroup
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
@@ -142,18 +142,27 @@ def default_field_options(field: ModelField) -> Dict[str, Union[str, bool]]:
 
 class ClearanceFilterForm(BaseRockyForm):
     clearance_level = forms.CharField(
-        label="Filter by clearance level",
-        widget=CheckboxGroup(toggle_all_button=True, choices=SCAN_LEVEL.choices),
+        label=_("Filter by clearance level"),
+        widget=CheckboxGroup(choices=SCAN_LEVEL.choices),
         required=False,
     )
 
     clearance_type = forms.CharField(
-        label="Filter by clearance type",
-        widget=CheckboxGroup(toggle_all_button=True, choices=CLEARANCE_TYPE_CHOICES),
+        label=_("Filter by clearance type"),
+        widget=CheckboxGroup(choices=CLEARANCE_TYPE_CHOICES),
         required=False,
     )
 
-    def __init__(self, clearance_level: List[str], selected_clearance_types: List[str], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["clearance_level"].initial = clearance_level
-        self.fields["clearance_type"].initial = selected_clearance_types
+
+SORTED_OOI_TYPES = sorted([ooi_class.get_ooi_type() for ooi_class in get_collapsed_types()])
+
+OOI_TYPE_CHOICES = ((ooi_type, ooi_type) for ooi_type in SORTED_OOI_TYPES)
+
+
+class OOITypeMultiCheckboxForm(BaseRockyForm):
+    ooi_type = forms.MultipleChoiceField(
+        label=_("Filter by OOI types"),
+        required=False,
+        choices=OOI_TYPE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+    )

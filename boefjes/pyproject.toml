@@ -22,9 +22,9 @@ python-dateutil = "^2.8.2"
 tldextract = "^3.4.4"
 opentelemetry-sdk = "^1.19.0"
 opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
-opentelemetry-instrumentation-fastapi = "^0.40b0"
-opentelemetry-instrumentation-psycopg2 = "^0.40b0"
-opentelemetry-instrumentation-requests = "^0.40b0"
+opentelemetry-instrumentation-fastapi = "^0.41b0"
+opentelemetry-instrumentation-psycopg2 = "^0.41b0"
+opentelemetry-instrumentation-requests = "^0.41b0"
 # required by kat_snyk, kat_crt_sh, kat_crt_sh boefjes
 requests = "^2.31.0"
 # required by kat_binaryedge boefje
@@ -44,9 +44,9 @@ python-libnmap = "0.7.3"
 # required by kat_shodan boefje
 shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
-cryptography = "41.0.3"
+cryptography = "41.0.4"
 # required by kat_webpage_analysis/check_images normalizer
-Pillow = "9.4.0"
+Pillow = "^10.0.1"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.0.2"
 # required by kat_webpage_analysis (forcediphttpsadapter)
@@ -57,6 +57,7 @@ python-Wappalyzer = "0.3.1"
 wpscan-out-parse = "1.9.3"
 # required by kat_sec_txt
 sectxt = "0.9.0"
+opentelemetry-instrumentation = "^0.41b0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.2.2"
@@ -78,8 +79,9 @@ line-length = 120
 
 [tool.pytest.ini_options]
 env = [
-    "KATALOGUS_DB_URI=postgresql://placeholder@host:5432/katalogus",
+    "KATALOGUS_DB_URI=postgresql://postgres:postgres@ci_katalogus-db:5432/ci_katalogus",
     "QUEUE_URI=amqp://placeholder",
+    "BOEFJE_API=http://placeholder:8006",
     "KATALOGUS_API=http://placeholder:8000",
     "OCTOPOES_API=http://placeholder:8001",
     "SCHEDULER_API=http://placeholder:8002",

@@ -39,7 +39,8 @@ class Connector:
             A boolean
         """
         try:
-            response = requests.get(f"{host}{health_endpoint}", timeout=5)
+            url = f"{host}/{health_endpoint}"
+            response = requests.get(url, timeout=5)
             healthy = response.json().get("healthy")
             return healthy
         except requests.exceptions.RequestException as exc:

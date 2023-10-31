@@ -5,11 +5,9 @@ import time
 import unittest
 import uuid
 from typing import Optional
+from unittest import mock
 
-from scheduler import config, models, queues
-from scheduler.models import Base
-from scheduler.repositories import sqlalchemy
-from sqlalchemy.orm import sessionmaker
+from scheduler import config, models, queues, storage
 
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
@@ -18,10 +16,10 @@ from tests.utils import functions
 class PriorityQueueTestCase(unittest.TestCase):
     def setUp(self) -> None:
         cfg = config.settings.Settings()
-        self.datastore = sqlalchemy.SQLAlchemy(cfg.db_uri)
-        Base.metadata.create_all(self.datastore.engine)
+        self.dbconn = storage.DBConn(str(cfg.db_uri))
+        models.Base.metadata.create_all(self.dbconn.engine)
 
-        self.pq_store = sqlalchemy.PriorityQueueStore(datastore=self.datastore)
+        self.pq_store = storage.PriorityQueueStore(self.dbconn)
 
         self.pq = mock_queue.MockPriorityQueue(
             pq_id="test",
@@ -33,15 +31,7 @@ class PriorityQueueTestCase(unittest.TestCase):
         self._check_queue_empty()
 
     def tearDown(self) -> None:
-        session = sessionmaker(bind=self.datastore.engine)()
-
-        for table in Base.metadata.tables:
-            session.execute(f"DELETE FROM {table}")
-
-        session.commit()
-        session.close()
-
-        del self.pq
+        models.Base.metadata.drop_all(self.dbconn.engine)
 
     def _check_queue_empty(self):
         self.assertEqual(0, self.pq.qsize())
@@ -52,13 +42,45 @@ class PriorityQueueTestCase(unittest.TestCase):
         item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
         self.pq.push(p_item=item)
 
+        item_db = self.pq_store.get(self.pq.pq_id, item.id)
+        self.assertIsNotNone(item_db)
+        self.assertEqual(item.id, item_db.id)
+
         self.assertEqual(1, self.pq.qsize())
+
+    @mock.patch("scheduler.storage.PriorityQueueStore.push")
+    def test_push_item_not_found_in_db(self, mock_push):
+        """When adding an item to the priority queue, but the item is not
+        found in the database, the item shouldn't be added.
+        """
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+
+        mock_push.return_value = None
+
+        with self.assertRaises(queues.errors.PrioritizedItemNotFoundError):
+            self.pq.push(p_item=item)
+
+        self.assertEqual(0, self.pq.qsize())
+        item_db = self.pq_store.get(self.pq.pq_id, item.id)
+        self.assertIsNone(item_db)
 
     def test_push_incorrect_p_item_type(self):
         """When pushing an item that is not of the correct type, the item
         shouldn't be pushed.
         """
         p_item = {"priority": 1, "data": functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)}
+
+        with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
+            self.pq.push(p_item=p_item)
+
+        self.assertEqual(0, self.pq.qsize())
+
+    def test_push_invalid_p_item(self):
+        """When pushing an item that can not be validated, the item shouldn't
+        be pushed.
+        """
+        p_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        p_item.data = {"invalid": "data"}
 
         with self.assertRaises(queues.errors.InvalidPrioritizedItemError):
             self.pq.push(p_item=p_item)
@@ -246,8 +268,8 @@ class PriorityQueueTestCase(unittest.TestCase):
         self.assertEqual(first_item.data, first_entry.data)
 
     def test_push_maxsize_allowed(self):
-        """When pushing an item to the queue, if the maxsize is reached, the
-        item should be discarded.
+        """When pushing an item to the queue, if the maxsize is not reached, the
+        item should be not discarded.
         """
         # Set maxsize to 0 (unbounded)
         self.pq.maxsize = 0
@@ -274,6 +296,61 @@ class PriorityQueueTestCase(unittest.TestCase):
         # Last item should be the second item
         self.assertEqual(2, second_entry.priority)
         self.assertEqual(second_item.data, second_entry.data)
+
+    def test_push_maxsize_allowed_high_priority(self):
+        """When pushing an item to the queue, if the maxsize is reached,
+        pushing an item with a higher priority should not discard the item.
+        """
+        # Set maxsize to 1
+        self.pq.maxsize = 1
+
+        # Add an item to the queue
+        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=first_item)
+
+        # Add another item to the queue
+        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=second_item)
+
+        # The queue should now have 2 items
+        self.assertEqual(2, self.pq.qsize())
+
+        first_entry = self.pq.peek(0)
+        second_entry = self.pq.peek(1)
+
+        # The item with the highest priority should be the one that was
+        # added first
+        self.assertEqual(1, first_entry.priority)
+        self.assertEqual(first_item.data, first_entry.data)
+
+        # Last item should be the second item
+        self.assertEqual(1, second_entry.priority)
+        self.assertEqual(second_item.data, second_entry.data)
+
+    def test_push_maxsize_not_allowed_low_priority(self):
+        """When pushing an item to the queue, if the maxsize is reached,
+        pushing an item with a lower priority should discard the item.
+        """
+        # Set maxsize to 1
+        self.pq.maxsize = 1
+
+        # Add an item to the queue
+        first_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=first_item)
+
+        # Add another item to the queue
+        second_item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=2)
+        with self.assertRaises(_queue.Full):
+            self.pq.push(p_item=second_item)
+
+        # The queue should now have 1 item
+        self.assertEqual(1, self.pq.qsize())
+
+        # The item with the highest priority should be the one that was
+        # added first
+        first_entry = self.pq.peek(0)
+        self.assertEqual(1, first_entry.priority)
+        self.assertEqual(first_item.data, first_entry.data)
 
     def test_pop(self):
         """When popping an item it should return the correct item and remove
@@ -415,3 +492,24 @@ class PriorityQueueTestCase(unittest.TestCase):
         # Pop the item
         popped_item = self.pq.pop()
         self.assertEqual(first_item.priority, popped_item.priority)
+
+    def test_is_item_on_queue(self):
+        """When checking if an item is on the queue, it should return True if
+        the item is on the queue, and False if it isn't.
+        """
+        # Add an item to the queue
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+        self.pq.push(p_item=item)
+
+        # Check if the item is on the queue
+        self.assertTrue(self.pq.is_item_on_queue(item))
+
+    def test_is_item_not_on_queue(self):
+        """When checking if an item is on the queue, it should return True if
+        the item is on the queue, and False if it isn't.
+        """
+        # Add an item to the queue
+        item = functions.create_p_item(scheduler_id=self.pq.pq_id, priority=1)
+
+        # Check if the item is on the queue
+        self.assertFalse(self.pq.is_item_on_queue(item))

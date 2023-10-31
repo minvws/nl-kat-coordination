@@ -28,11 +28,17 @@ override_dh_virtualenv:
 	cd /octopoes && /usr/bin/python3 setup.py bdist_wheel
 	$(DH_VENV_DIR)/bin/python -m pip install /octopoes/dist/octopoes*.whl
 
-	# remove pip to prevent mutation of venv
+# remove pip to prevent mutation of venv
 	$(DH_VENV_DIR)/bin/python -m pip uninstall --yes pip
 
 override_dh_gencontrol:
 	dh_gencontrol -- -Vpython=`py3versions -d`
 
 execute_after_dh_install:
-	sed -i s/python3.9/`py3versions -d`/ debian/kat-boefjes/usr/lib/systemd/system/*.service
+	dh_installsysusers
+
+override_dh_installsystemd:
+	dh_installsystemd --name=kat-boefjes
+	dh_installsystemd --name=kat-normalizers
+	dh_installsystemd --name=kat-katalogus
+	sed -i s/python3.9/`py3versions -d`/ debian/kat-boefjes/lib/systemd/system/*.service

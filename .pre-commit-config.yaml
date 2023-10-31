@@ -1,113 +1,143 @@
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
-    hooks:
-      - id: trailing-whitespace
-      - id: mixed-line-ending
-        args: ["--fix=lf"]
-      - id: detect-private-key
-      - id: check-case-conflict
-      - id: check-yaml
-      - id: check-json
-      - id: check-toml
-      - id: debug-statements
-      - id: end-of-file-fixer
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: trailing-whitespace
+  - id: mixed-line-ending
+    args: ["--fix=lf"]
+  - id: detect-private-key
+    exclude: ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
+  - id: check-case-conflict
+  - id: check-yaml
+  - id: check-json
+  - id: check-toml
+  - id: debug-statements
+    exclude: |
+      (?x)(
+      ^boefjes/tools |
+      ^octopoes/tools
+      )
+  - id: end-of-file-fixer
+    exclude: |
+      (?x)(
+      ^boefjes/tests/examples/rdns-nxdomain.txt$
+      )
 
-  - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.12.2
-    hooks:
-      - id: validate-pyproject
-        files: pyproject.toml$
 
-  - repo: https://github.com/rstcheck/rstcheck
-    rev: v6.1.2
-    hooks:
-      - id: rstcheck
-        # https://github.com/rstcheck/rstcheck-core/issues/4
-        args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid"]
-        additional_dependencies: ["rstcheck[sphinx]"]
+- repo: https://github.com/abravalheri/validate-pyproject
+  rev: v0.12.2
+  hooks:
+  - id: validate-pyproject
+    files: pyproject.toml$
 
-  - repo: https://github.com/MarketSquare/robotframework-tidy
-    rev: "4.1.0"
-    hooks:
-      - id: robotidy
+- repo: https://github.com/rstcheck/rstcheck
+  rev: v6.1.2
+  hooks:
+  - id: rstcheck
+    # https://github.com/rstcheck/rstcheck-core/issues/4
+    args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid"]
+    additional_dependencies: ["rstcheck[sphinx]"]
 
-  - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.7
-    hooks:
-      - id: vulture
-        exclude: |
-          /tests/
+- repo: https://github.com/MarketSquare/robotframework-tidy
+  rev: "4.1.0"
+  hooks:
+  - id: robotidy
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.263'
-    hooks:
-      - id: ruff
+- repo: https://github.com/jendrikseipp/vulture
+  rev: v2.7
+  hooks:
+  - id: vulture
+    exclude: |
+      /tests/
 
-  - repo: https://github.com/psf/black
-    rev: "23.3.0"
-    hooks:
-      - id: black
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: 'v0.0.263'
+  hooks:
+  - id: ruff
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.2.0
-    hooks:
-      - id: mypy
-        additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'pydantic', 'pynacl']
-        exclude: |
-          (?x)(
-          ^boefjes/ |
-          ^keiko/templates |
-          ^mula/whitelist\.py$ |
-          ^octopoes/ |
-          ^rocky/ |
-          /tests/ |
-          docs/source/conf\.py$ |
-          setup\.py$
-          )
+- repo: https://github.com/psf/black
+  rev: "23.3.0"
+  hooks:
+  - id: black
 
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.4
-    hooks:
-      - id: codespell
-        additional_dependencies: ['tomli']
-        args: [-L, lama]
-        exclude: |
-          (?x)(
-          \.po$ |
-          \.xml$ |
-          poetry.lock$ |
-          pyproject.toml$ |
-          requirements-.*.txt$ |
-          retirejs.json$ |
-          ^boefjes/boefjes/plugins/kat_fierce/lists |
-          ^boefjes/tests/examples |
-          ^keiko/glossaries |
-          ^keiko/templates/.*/template.tex$ |
-          ^rocky/assets/js/vendor |
-          ^rocky/assets/src/bundles/app/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
-          ^rocky/tests/stubs |
-          ^docs/source/_static
-          )
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.2.0
+  hooks:
+  - id: mypy
+    additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'pydantic', 'pynacl']
+    exclude: |
+      (?x)(
+      ^boefjes/ |
+      ^keiko/templates |
+      ^mula/whitelist\.py$ |
+      ^octopoes/ |
+      ^rocky/ |
+      /tests/ |
+      docs/source/conf\.py$ |
+      setup\.py$
+      )
 
-  - repo: https://github.com/Riverside-Healthcare/djLint
-    rev: v1.19.16
-    hooks:
-      - id: djlint-django
-        files: '^rocky/.*/templates/.*$'
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.2.4
+  hooks:
+  - id: codespell
+    additional_dependencies: ['tomli']
+    args: [-L, lama]
+    exclude: |
+      (?x)(
+      \.po$ |
+      \.xml$ |
+      poetry.lock$ |
+      pyproject.toml$ |
+      requirements-.*.txt$ |
+      retirejs.json$ |
+      ^boefjes/boefjes/plugins/kat_fierce/lists |
+      ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
+      ^boefjes/tests/examples |
+      ^keiko/glossaries |
+      ^keiko/templates/.*/template.tex$ |
+      ^rocky/assets/js/vendor |
+      ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
+      ^rocky/tests/stubs |
+      ^docs/source/_static |
+      ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
+      )
 
-  # - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-  #   rev: v15.4.0
-  #   hooks:
-  #     - id: stylelint
-  #       args: [--fix]
-  #       additional_dependencies:
-  #              - stylelint@15.4.0
-  #              - stylelint-config-standard-scss@8.0.0
-  #       files:  "^(rocky\/assets\/src\/|docs\/source\/).*.(css|scss|sass)$"
+- repo: https://github.com/Riverside-Healthcare/djLint
+  rev: v1.32.1
+  hooks:
+  - id: djlint-reformat-django
+    files: |
+      (?x)(
+      ^rocky/.*/templates/.*$ |
+      ^rocky/reports/report_types/.*/.*\.html
+      )
 
-  - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.9.0.5
-    hooks:
-      - id: shellcheck
-        args: ["-e", "SC1091"]
+  - id: djlint-django
+    files: |
+      (?x)(
+      ^rocky/.*/templates/.*$ |
+      ^rocky/reports/report_types/.*/.*\.html
+      )
+
+- repo: https://github.com/thibaudcolas/pre-commit-stylelint
+  rev: v15.10.1
+  hooks:
+    - id: stylelint
+      args: [ --fix ]
+      additional_dependencies:
+        - stylelint@15.10.1
+        - stylelint-config-standard-scss@10.0.0
+      files: "^(rocky\/assets\/css\/|docs\/source\/).*.(css|scss|sass)$"
+
+- repo: https://github.com/shellcheck-py/shellcheck-py
+  rev: v0.9.0.5
+  hooks:
+  - id: shellcheck
+    args: ["-e", "SC1091"]
+
+- repo: https://github.com/scop/pre-commit-shfmt
+  rev: v3.7.0-1
+  hooks:
+  - id: shfmt
+    args: ["-w", "-s", "-i", "4", "-sr"]

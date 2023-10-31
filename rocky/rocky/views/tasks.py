@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
+from tools.view_helpers import schedule_task
 
 from rocky.scheduler import client
 
@@ -84,25 +85,18 @@ class TaskListView(OrganizationView, ListView):
 
         return redirect(request.path)
 
-    def handle_page_action(self, action: str):
+    def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
             task = client.get_task_details(task_id)
 
             # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-            new_id = uuid.uuid4().hex
+            new_id = uuid.uuid4()
 
             task.p_item.id = new_id
             task.p_item.data.id = new_id
 
-            client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
-
-            success_message = (
-                "Your task is scheduled and will soon be started in the background. \n "
-                "Results will be added to the object list when they are in. "
-                "It may take some time, a refresh of the page may be needed to show the results."
-            )
-            messages.add_message(self.request, messages.SUCCESS, success_message)
+            schedule_task(self.request, self.organization.code, task.p_item)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

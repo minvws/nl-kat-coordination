@@ -38,9 +38,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
                 # Not a valid IP address, so don't try to hack it into the URL
                 pass
             else:
-                if addr.version == 6:
-                    # IPv6 addresses need to be wrapped in brackets
-                    url_parts = url_parts._replace(netloc=f"[{ip}]")
+                url_parts = url_parts._replace(netloc=f"[{ip}]") if addr.version == 6 else url_parts._replace(netloc=ip)
 
             uri = urlunsplit(
                 [

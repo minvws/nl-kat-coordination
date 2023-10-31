@@ -1,10 +1,12 @@
+# Brenno de Winter <brenno@dewinter.com>, 2023.
+# Darwinkel <Darwinkel@users.noreply.github.com>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-16 10:16+0000\n"
-"PO-Revision-Date: 2023-08-11 07:29+0000\n"
-"Last-Translator: Patrick <patrick@darwinkel.net>\n"
+"POT-Creation-Date: 2023-10-17 13:44+0000\n"
+"PO-Revision-Date: 2023-10-11 21:00+0000\n"
+"Last-Translator: Darwinkel <Darwinkel@users.noreply.github.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/nl/>\n"
 "Language: nl\n"
@@ -12,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.0-dev\n"
+"X-Generator: Weblate 5.1-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -24,6 +26,7 @@ msgstr "Belangrijke data"
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -64,11 +67,11 @@ msgstr "--- Selecteer één van de beschikbare opties ---"
 
 #: account/forms/account_setup.py
 msgid "Account Type"
-msgstr "Account Type"
+msgstr "Accounttype"
 
 #: account/forms/account_setup.py
 msgid "Every member of OpenKAT must be part of an account type."
-msgstr "Elke gebruiker van OpenKAT moet deel uitmaken van een account type."
+msgstr "Elke gebruiker van OpenKAT moet deel uitmaken van een acounttype."
 
 #: account/forms/account_setup.py
 msgid "Please select an account type to proceed."
@@ -77,7 +80,7 @@ msgstr "Selecteer een account type om door te gaan."
 #: account/forms/account_setup.py
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
-msgstr "Toegewezen vrijwaring niveau"
+msgstr "Zet vrijwaringsniveau"
 
 #: account/forms/account_setup.py
 msgid "Select a clearance level you trust this member with."
@@ -250,7 +253,7 @@ msgstr "Plaats het token dat door uw token authenticator app is gegenereerd."
 
 #: account/forms/token.py
 msgid "Backup token"
-msgstr "Backup tokens"
+msgstr "Backup token"
 
 #: account/models.py
 msgid "The Email must be set"
@@ -296,7 +299,7 @@ msgstr ""
 msgid "date joined"
 msgstr "startdatum"
 
-#: account/templates/account_detail.html
+#: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr "Account gegevens"
 
@@ -344,10 +347,11 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-"               U heeft geen vrijwaring om objecten te scannen.<br>\n"
+"                            U heeft geen vrijwaring om objecten te scannen."
+"<br>\n"
 "               Neem contact op met de beheerder om u het nodige vrijwaring "
 "niveau te geven.\n"
-"              "
+"                        "
 
 #: account/templates/account_detail.html
 msgid "You have currently accepted clearance up to level "
@@ -407,73 +411,6 @@ msgstr ""
 "                        \"Accepteer vrijwaring niveau L%(tcl)s en "
 "verantwoordelijkheid\"\n"
 "                    "
-
-#: account/templates/login.html rocky/templates/two_factor/core/login.html
-msgid "You are logged in."
-msgstr "U bent ingelogd."
-
-#: account/templates/login.html rocky/templates/two_factor/core/login.html
-msgid "Two factor authentication is enabled for your account."
-msgstr "Tweetrapsverificatie is ingeschakeld voor uw account."
-
-#: account/templates/login.html rocky/templates/two_factor/core/login.html
-msgid ""
-"Two factor authentication is not enabled for your account. Enable it to "
-"continue."
-msgstr ""
-"Tweetrapsverificatie is niet ingeschakeld voor uw account. Schakel in om "
-"door te gaan."
-
-#: account/templates/login.html rocky/templates/two_factor/core/login.html
-msgid "Setup two factor authentication"
-msgstr "Tweetrapsverificatie instellen"
-
-#: account/templates/login.html account/views/login.py
-#: account/views/password_reset.py account/views/recover_email.py
-#: rocky/templates/partials/secondary-menu.html
-#: rocky/templates/two_factor/core/login.html
-msgid "Login"
-msgstr "Inloggen"
-
-#: account/templates/login.html rocky/templates/two_factor/core/login.html
-msgid "Credentials"
-msgstr "Gebruikersgegevens"
-
-#: account/templates/login.html
-#: rocky/templates/partials/form/field_input_help_text.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/two_factor/core/login.html
-msgid "explanation"
-msgstr "toelichting"
-
-#: account/templates/login.html
-#: rocky/templates/partials/form/field_input_help_text.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/two_factor/core/login.html
-msgid "Explanation"
-msgstr "Toelichting"
-
-#: account/templates/login.html
-msgid "Please enter the token generated by your token generator."
-msgstr "Voer het token in dat door uw tokengenerator is gegenereerd."
-
-#: account/templates/login.html rocky/templates/two_factor/core/login.html
-msgid ""
-"Use this form for entering backup tokens for logging in. These tokens have "
-"been generated for you to print and keep safe. Please enter one of these "
-"backup tokens to login to your account."
-msgstr ""
-"Gebruik dit formulier voor het invoeren van back-up tokens om in te loggen. "
-"Deze tokens zijn gegenereerd voor u om af te drukken en veilig te bewaren. "
-"Voer een van deze back-up tokens in om in te loggen op uw account."
-
-#: account/templates/login.html rocky/templates/two_factor/core/login.html
-msgid "As a last resort, you can use a backup token:"
-msgstr "Of gebruik een backupcode:"
-
-#: account/templates/login.html rocky/templates/two_factor/core/login.html
-msgid "Use Backup Token"
-msgstr "Back-up Token gebruiken"
 
 #: account/templates/password_reset.html
 msgid "Use the form below to reset your password."
@@ -560,7 +497,7 @@ msgid ""
 "If you don’t remember the email address connected to your account, contact: "
 msgstr ""
 "Als u het aan uw account gekoppelde e-mailadres niet meer weet, neem dan "
-"contact op met:"
+"contact op met: "
 
 #: account/templates/recover_email.html
 msgid "Please contact the system administrator."
@@ -620,9 +557,16 @@ msgstr " hoofdletters"
 msgid "Your session has timed out. Please login again."
 msgstr "Uw sessie is verlopen. Gelieve opnieuw in te loggen."
 
-#: account/views/login.py rocky/templates/header.html
+#: account/views/login.py reports/templates/partials/report_header.html
+#: rocky/templates/header.html
 msgid "OpenKAT"
 msgstr "OpenKAT"
+
+#: account/views/login.py account/views/password_reset.py
+#: account/views/recover_email.py rocky/templates/partials/secondary-menu.html
+#: rocky/templates/two_factor/core/login.html
+msgid "Login"
+msgstr "Inloggen"
 
 #: account/views/login.py
 msgid "Two factor authentication"
@@ -655,7 +599,9 @@ msgid "Failure mode"
 msgstr "Foutmodus"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/plugin_detail.html tools/forms/finding_type.py
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
@@ -802,7 +748,7 @@ msgstr "Dit effect bestaat al."
 
 #: fmea/forms.py
 msgid "Choose a severity level."
-msgstr "Kies een scan niveau"
+msgstr "Kies een scanniveau"
 
 #: fmea/models.py
 msgid "Finances"
@@ -824,7 +770,8 @@ msgstr "Onderzoek & Ontwikkeling"
 msgid "Administration"
 msgstr "Vrijwaring"
 
-#: fmea/models.py rocky/templates/footer.html rocky/templates/health.html
+#: fmea/models.py reports/templates/summary/service_health.html
+#: rocky/templates/footer.html rocky/templates/health.html
 msgid "Service"
 msgstr "Dienst"
 
@@ -976,7 +923,7 @@ msgstr "Opslaan"
 #: rocky/templates/partials/elements/ooi_detail_settings.html
 #: rocky/templates/partials/elements/ooi_report_settings.html
 #: rocky/templates/partials/form/indemnification_add_form.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Submit"
 msgstr "Indienen"
@@ -1041,7 +988,7 @@ msgstr "Eigenschappen"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Risk class"
-msgstr "Risico niveau"
+msgstr "Risiconiveau"
 
 #: fmea/templates/fmea/fmea_failure_mode_detail.html
 msgid "Frequency level"
@@ -1193,6 +1140,7 @@ msgid "Failure mode report"
 msgstr "Foutmodus rapport"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
+#: reports/templates/summary/report_summary.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
 msgid "Summary"
@@ -1330,6 +1278,7 @@ msgid "Show all"
 msgstr "Toon alles"
 
 #: katalogus/forms/katalogus_filter.py
+#: reports/report_types/dns_report/report.html
 msgid "Enabled"
 msgstr "Ingeschakeld"
 
@@ -1356,6 +1305,80 @@ msgstr "Sorteer-opties"
 #: katalogus/forms/plugin_settings.py
 msgid "This field is required."
 msgstr "Dit veld is verplicht."
+
+#: katalogus/templates/about_plugins.html
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "About plugins"
+msgstr "Over plug-ins"
+
+#: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
+msgid ""
+"Plugins gather data, objects and insight. Each plugin has its own focus area "
+"and strengths and may be able to work with other plugins to gain even more "
+"insights."
+msgstr ""
+"Plug-ins verzamelen gegevens, objecten en inzichten. Elke plug-in heeft zijn "
+"eigen focusgebied en sterke punten en kan mogelijk samenwerken met andere "
+"plug-ins om nog meer inzichten te krijgen."
+
+#: katalogus/templates/about_plugins.html katalogus/templates/boefjes.html
+msgid ""
+"Boefjes gather factual information, such as by calling an external scanning "
+"tool like nmap or using a database like shodan."
+msgstr ""
+"Boefjes verzamelen feitelijke informatie, bijvoorbeeld door een externe scan "
+"tool zoals nmap te gebruiken of het gebruik van een database zoals shodan."
+
+#: katalogus/templates/about_plugins.html katalogus/templates/normalizers.html
+msgid ""
+"Normalizers analyze the information and turn it into objects for the data "
+"model in Octopoes."
+msgstr ""
+"Normalizers analyseren de informatie en zetten deze om in objecten voor de "
+"data model in Octopoes."
+
+#: katalogus/templates/about_plugins.html
+msgid ""
+"Bits are business rules that look for insight within the current dataset and "
+"search for specific insight and draw conclusions."
+msgstr ""
+"Bits zijn bedrijfsregels die zoeken naar inzichten binnen de huidige "
+"dataset. Ze zoeken naar specifiek inzichten en maken daarvan conclusies."
+
+#: katalogus/templates/boefje_detail.html
+msgid "Scan level"
+msgstr "Vrijwaringsniveau"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+msgid "Consumes"
+msgstr "Consumeren"
+
+#: katalogus/templates/boefje_detail.html
+#, python-format
+msgid "%(plugin_name)s is able to scan the following object types:"
+msgstr "%(plugin_name)s is in staat om het volgende object types te scannen:"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s does not need any input objects."
+msgstr "%(plugin_name)s heeft geen invoerobjecten nodig."
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+msgid "Produces"
+msgstr "Produceren"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s can produce the following output:"
+msgstr "%(plugin_name)s kan het volgende produceren:"
+
+#: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
+msgid "available"
+msgstr "beschikbaar"
 
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
@@ -1396,7 +1419,9 @@ msgid "OOI"
 msgstr "OOI"
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: reports/templates/report_oois_selection.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Clearance level"
@@ -1448,58 +1473,31 @@ msgstr ""
 msgid "Clone"
 msgstr "Klonen"
 
-#: katalogus/templates/katalogus.html katalogus/views/change_clearance_level.py
-#: katalogus/views/katalogus.py katalogus/views/katalogus_settings.py
-#: katalogus/views/plugin_detail.py katalogus/views/plugin_settings_add.py
-#: katalogus/views/plugin_settings_delete.py
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-msgid "KAT-alogus"
-msgstr "KAT-alogus"
+#: katalogus/templates/katalogus.html
+msgid "All plugins"
+msgstr "Alle plug-ins"
 
 #: katalogus/templates/katalogus.html
 msgid ""
 "\n"
-"                An overview of all available boefjes.\n"
-"                Boefjes can be used to scan for vulnerablilities and "
-"security issues within specified objects.\n"
-"                Each boefje has his own focus area and strengths.\n"
-"              "
-msgstr ""
+"                            Plugin available\n"
+"                        "
+msgid_plural ""
 "\n"
-"                Een overzicht van alle beschikbare boefjes.\n"
-"                Boefjes kunnen worden gebruikt om te scannen op "
-"kwetsbaarheden en beveiligingsproblemen binnen gespecificeerde objecten.\n"
-"                Elk boefje heeft zijn eigen toepassing.\n"
-"              "
+"                            Plugins available\n"
+"                        "
+msgstr[0] ""
+"\n"
+"                        Plug-in beschikbaar\n"
+"                        "
+msgstr[1] ""
+"\n"
+"                        Plug-ins beschikbaar\n"
+"                      "
 
-#: katalogus/templates/katalogus.html
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
 msgstr "KAT-alogus Instellingen"
-
-#: katalogus/templates/katalogus.html rocky/templates/scan.html
-msgid "Boefjes overview:"
-msgstr "Boefjes-overzicht:"
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje name"
-msgstr "Naam boefje"
-
-#: katalogus/templates/katalogus.html
-msgid "Boefje description"
-msgstr "Omschrijving boefje"
-
-#: katalogus/templates/katalogus.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Actions"
-msgstr "Acties"
-
-#: katalogus/templates/katalogus.html
-#: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-msgid "See details"
-msgstr "Zie details"
 
 #: katalogus/templates/katalogus_settings.html
 msgid ""
@@ -1509,6 +1507,8 @@ msgstr ""
 "detailpagina."
 
 #: katalogus/templates/katalogus_settings.html
+#: reports/templates/report_setup_scan.html
+#: reports/templates/report_types_selection.html
 #: rocky/templates/two_factor/core/otp_required.html
 msgid "Go back"
 msgstr "Ga terug"
@@ -1522,25 +1522,35 @@ msgid "Latest plugin settings:"
 msgstr "Laatste plugin instellingen:"
 
 #: katalogus/templates/katalogus_settings.html
-#: rocky/templates/partials/scan_history.html
+#: rocky/templates/partials/task_history.html
 msgid "Plugin"
 msgstr "Plugin"
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr "Waarde"
 
+#: katalogus/templates/normalizer_detail.html
+#, python-format
+msgid "%(plugin_name)s is able to process the following mime types:"
+msgstr ""
+
 #: katalogus/templates/partials/boefje_tile.html
-#: katalogus/templates/partials/plugin_tile.html
-#: onboarding/templates/partials/boefje_tile_static.html
 msgid "Scan level:"
 msgstr "Vrijwaringsniveau:"
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Publisher"
 msgstr "Uitgever"
+
+#: katalogus/templates/partials/boefje_tile.html
+#: katalogus/templates/partials/plugin_tile.html
+#: katalogus/templates/partials/plugins.html
+msgid "See details"
+msgstr "Zie details"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "Enable"
@@ -1556,14 +1566,34 @@ msgid "You don't have permission to enable "
 msgstr "U heeft geen toestemming om in te schakelen"
 
 #: katalogus/templates/partials/katalogus_filter.html
-msgid "Available plugins"
-msgstr "Beschikbare plug-ins"
+msgid "Filter plugins"
+msgstr "Filter plug-ins"
 
 #: katalogus/templates/partials/katalogus_filter.html
-#: rocky/templates/partials/ooi_type_filters.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Update List"
-msgstr "Lijst updaten"
+msgid "Clear filter"
+msgstr "Filters wissen"
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
+#: katalogus/views/katalogus_settings.py katalogus/views/plugin_detail.py
+#: katalogus/views/plugin_settings_add.py
+#: katalogus/views/plugin_settings_delete.py
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+msgid "KAT-alogus"
+msgstr "KAT-alogus"
+
+#: katalogus/templates/partials/katalogus_header.html
+msgid "An overview of all available plugins."
+msgstr "Een overzicht van alle beschikbare plug-ins."
+
+#: katalogus/templates/partials/katalogus_header.html
+#: katalogus/templates/plugin_settings_list.html
+#: katalogus/views/katalogus_settings.py tools/view_helpers.py
+#: rocky/templates/header.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Settings"
+msgstr "Instellingen"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Gridview"
@@ -1583,29 +1613,36 @@ msgstr "Objectenlijst"
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
 msgid ""
-"This boefje will only scan objects with a corresponding clearance level of "
+"This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
-"this boefje to scan an OOI with a lower clearance level than "
+"this Boefje to scan an OOI with a lower clearance level than "
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
-"Dit boefje scant alleen objecten met een overeenkomstig vrijwaringsniveau "
+"Dit Boefje scant alleen objecten met een overeenkomstig vrijwaringsniveau "
 "van <strong>(%(scan_level)s)</strong> of hoger. Er is geen vrijwaring voor "
-"dit boefje om een OOI met een lager scan level te scannen "
+"dit Boefje om een OOI met een lager scan level te scannen "
 "dan<strong>L%(scan_level)s</strong>. Gebruik het filter om OOI's met een "
 "lagere vrijwaringssniveau."
 
 #: katalogus/templates/partials/objects_to_scan.html
+#, fuzzy
+#| msgid ""
+#| "\n"
+#| "          <span>Warning scan level:</span>\n"
+#| "          Scanning OOI's with a lower clearance level will result in "
+#| "OpenKAT increasing the clearance level on that OOI,\n"
+#| "          not only for this scan but from now on out, until it manually "
+#| "gets set to something else again.\n"
+#| "          This means that all other enabled Boefjes will use this higher "
+#| "clearance level aswel.\n"
+#| "        "
 msgid ""
-"\n"
-"          <span>Warning scan level:</span>\n"
-"          Scanning OOI's with a lower clearance level will result in OpenKAT "
-"increasing the clearance level on that OOI,\n"
-"          not only for this scan but from now on out, until it manually gets "
-"set to something else again.\n"
-"          This means that all other enabled Boefjes will use this higher "
-"clearance level aswel.\n"
-"        "
+"<span>Warning scan level:</span> Scanning OOI's with a lower clearance level "
+"will result in OpenKAT increasing the clearance level on that OOI, not only "
+"for this scan but from now on out, until it manually gets set to something "
+"else again. This means that all other enabled Boefjes will use this higher "
+"clearance level aswel."
 msgstr ""
 "\n"
 "         <span>Waarschuwingsscanniveau:</span>\n"
@@ -1618,14 +1655,18 @@ msgstr ""
 "        "
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "          You currently don't have any objects that meet the scan level "
+#| "of %(name)s.\n"
+#| "          Add objects with a complying clearance level, or alter the "
+#| "clearance level of existing objects.\n"
+#| "        "
 msgid ""
-"\n"
-"          You currently don't have any objects that meet the scan level of "
-"%(name)s.\n"
-"          Add objects with a complying clearance level, or alter the "
-"clearance level of existing objects.\n"
-"        "
+"You currently don't have any objects that meet the scan level of %(name)s. "
+"Add objects with a complying clearance level, or alter the clearance level "
+"of existing objects."
 msgstr ""
 "\n"
 "              U heeft momenteel geen objecten die voldoen aan het scanniveau "
@@ -1635,13 +1676,16 @@ msgstr ""
 "            "
 
 #: katalogus/templates/partials/objects_to_scan.html
-#, python-format
+#, fuzzy, python-format
+#| msgid ""
+#| "\n"
+#| "          You currently don't have scannable objects for %(name)s.\n"
+#| "          Add objects to use this boefje. This boefje is able to scan "
+#| "objects of the following types:\n"
+#| "        "
 msgid ""
-"\n"
-"          You currently don't have scannable objects for %(name)s.\n"
-"          Add objects to use this boefje. This boefje is able to scan "
-"objects of the following types:\n"
-"        "
+"You currently don't have scannable objects for %(name)s. Add objects to use "
+"this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
 "\n"
 "              U heeft momenteel geen scanbare objecten voor %(name)s. \n"
@@ -1664,36 +1708,52 @@ msgstr "Verplichte instellingen"
 msgid "Add"
 msgstr "Toevoegen"
 
-#: katalogus/templates/partials/plugin_tile.html
-msgid "Publisher:"
-msgstr "Uitgever:"
+#: katalogus/templates/partials/plugins.html
+msgid "Plugins overview:"
+msgstr "Overzicht plug-ins:"
 
-#: katalogus/templates/plugin_detail.html
-msgid "Scan level"
-msgstr "Vrijwaringsniveau"
+#: katalogus/templates/partials/plugins.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin name"
+msgstr "Plug-in naam"
 
-#: katalogus/templates/plugin_detail.html
-msgid "Consumes"
-msgstr "Consumeren"
+#: katalogus/templates/partials/plugins.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin type"
+msgstr "Plug-in type"
 
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s is able to scan the following object types:"
-msgstr "%(plugin_name)s is in staat om het volgende object types te scannen:"
+#: katalogus/templates/partials/plugins.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin description"
+msgstr "Plug-in beschrijving"
 
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s does not need any input objects."
-msgstr "%(plugin_name)s heeft geen invoerobjecten nodig."
+#: katalogus/templates/partials/plugins.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Actions"
+msgstr "Acties"
 
-#: katalogus/templates/plugin_detail.html
-msgid "Produces"
-msgstr "Produceren"
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "Plugins Navigation"
+msgstr "Plug-ins navigatie"
 
-#: katalogus/templates/plugin_detail.html
-#, python-format
-msgid "%(plugin_name)s can produce the following output:"
-msgstr "%(plugin_name)s kan het volgende produceren:"
+#: katalogus/templates/partials/plugins_navigation.html
+msgid "All"
+msgstr "Alle"
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: tools/forms/boefje.py rocky/templates/scan.html
+#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Boefjes"
+msgstr "Boefjes"
+
+#: katalogus/templates/partials/plugins_navigation.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/partials/tab_navigation.html
+msgid "Normalizers"
+msgstr "Normalizers"
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -1790,12 +1850,6 @@ msgid " Details"
 msgstr " Details"
 
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/katalogus_settings.py rocky/templates/header.html
-#: rocky/templates/organizations/organization_settings.html
-msgid "Settings"
-msgstr "Instellingen"
-
-#: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
 msgstr "Overzicht van instellingen:"
 
@@ -1812,10 +1866,12 @@ msgid "Unset"
 msgstr "Leeg"
 
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 msgid "Yes"
 msgstr "Ja"
 
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 msgid "No"
 msgstr "Nee"
 
@@ -1823,19 +1879,9 @@ msgstr "Nee"
 msgid "Session has terminated, please select OOIs again."
 msgstr "Sessie is verlopen, selecteer nogmaals OOIs."
 
-#: katalogus/views/change_clearance_level.py katalogus/views/plugin_detail.py
-msgid "Scanning successfully scheduled."
-msgstr "Scan met success ingepland."
-
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
 msgstr "Wijzig vrijwaringsniveau"
-
-#: katalogus/views/katalogus.py
-msgid "Loading plugins in KATalogus failed. Please check the KATalogus logs."
-msgstr ""
-"Het laden van plug-ins in KATalogus is mislukt. Controleer de KATalogus-"
-"logboeken."
 
 #: katalogus/views/katalogus_settings.py
 msgid "Settings from {} to {} successfully cloned."
@@ -1862,15 +1908,26 @@ msgstr ""
 "Kon vrijwaring niveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
 "bij organisatie %s."
 
-#: katalogus/views/mixins.py rocky/views/scan_profile.py
+#: katalogus/views/mixins.py onboarding/views.py rocky/views/scan_profile.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You were trusted a clearance "
+"level of L%s. Contact your administrator to receive a higher clearance."
+msgstr ""
+"Kan vrijwaring niveau van %s niet verhogen naar L%s. U bent een vrijwaring "
+"niveau toevertrouwd van L%s. Neem contact op met uw beheerder om uw "
+"vrijwaring niveau te verhogen."
+
+#: katalogus/views/mixins.py onboarding/views.py
 #, python-format
 msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Contact your administrator to receive a higher clearance."
+"level of L%s. Please accept the clearance level first on your profile page "
+"to proceed."
 msgstr ""
 "Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een vrijwaring "
-"niveau bevestigd van L%s. Neem contact op met uw beheerder om je vrijwaring "
-"niveau te verhogen."
+"niveau bevestigd van L%s. Accepteer eerst het vrijwaring niveau op uw "
+"profiel pagina om verder te gaan."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -1885,29 +1942,34 @@ msgid "Please select an OOI to start scan."
 msgstr "Selecteer een OOI om de scan te starten."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' disabled."
-msgstr "Boefje '{boefje_name}' uitgezet."
+msgid "{} '{}' disabled."
+msgstr "{} '{}' uitgezet."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Failed fetching settings for boefje {boefje_name}. Is the Katalogus up?"
-msgstr ""
-"Ophalen van instellingen voor boefje {boefje_name} mislukt. Is de Katalogus "
-"actief?"
+msgid "Failed fetching settings for {}. Is the Katalogus up?"
+msgstr "Ophalen van instellingen {} mislukt. Is de Katalogus actief?"
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
+msgid "Before enabling, please set the required settings for '{}'."
+msgstr "Stel vóór het inschakelen de vereiste instellingen in voor '{}'."
+
+#: katalogus/views/plugin_enable_disable.py
+msgid "{} '{}' enabled."
+msgstr "{} '{}' aangezet."
+
+#: katalogus/views/plugin_enable_disable.py
 msgid ""
-"Before enabling, please set the required settings for boefje '{boefje_name}'."
+"Your clearance level is not set. Go to your profile page to see your "
+"clearance or contact the administrator to set a clearance level."
 msgstr ""
-"Voordat je '{boefje_name}' inschakeld, zet alsjeblieft de verplichte "
-"instellingen."
+"Uw vrijwaring niveau is niet ingesteld. Ga naar uw profielpagina om uw "
+"vrijwaring te controleren of neem contact op met de beheerder om een "
+"vrijwaring niveau in te stellen."
 
 #: katalogus/views/plugin_enable_disable.py
-#, python-brace-format
-msgid "Boefje '{boefje_name}' enabled."
-msgstr "Boefje '{boefje_name}' aangezet."
+msgid "To enable {} you need at least a clearance level of L{}. "
+msgstr ""
+"Om {} in te schakelen heeft u minimaal een vrijwaring niveau van L{} nodig."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
@@ -2243,6 +2305,7 @@ msgid "OpenKAT introduction"
 msgstr "OpenKAT introductie"
 
 #: onboarding/templates/dns_report.html
+#: reports/report_types/dns_report/report.py
 msgid "DNS Report"
 msgstr "DNS Rapport"
 
@@ -2330,6 +2393,8 @@ msgid "Choose a report - Introduction"
 msgstr "Kies een rapportage - Introductie"
 
 #: onboarding/templates/step_2a_choose_report_info.html
+#: reports/templates/report_oois_selection.html reports/views.py
+#: rocky/templates/header.html
 msgid "Reports"
 msgstr "Rapporten"
 
@@ -2552,6 +2617,7 @@ msgstr ""
 "maken."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
+#: reports/templates/report_oois_selection.html
 msgid "Create object"
 msgstr "Maak object aan"
 
@@ -2567,7 +2633,10 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html tools/forms/ooi.py
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/report_types/dns_report/report.html
+#: reports/templates/report_oois_selection.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -2611,6 +2680,7 @@ msgid "Setup scan - OOI clearance for"
 msgstr "Opzet scan - OOI vrijwaring voor"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
+#: reports/templates/partials/report_introduction.html
 msgid "Introduction"
 msgstr "Introductie"
 
@@ -2836,25 +2906,12 @@ msgstr ""
 "genereren van uw rapport. Er zijn drie soorten plugins."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: tools/forms/boefje.py rocky/templates/scan.html
-#: rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Boefjes"
-msgstr "Boefjes"
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
 msgstr ""
 "Scan objecten voor data. Elke boefje heeft een vrijwaringsniveau om te "
 "zorgen dat objecten niet te agressief worden gescant."
-
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/tab_navigation.html
-msgid "Normalizers"
-msgstr "Normalizers"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2864,6 +2921,7 @@ msgstr ""
 "lijst."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: reports/report_types/tls_report/report.html
 msgid "Bits"
 msgstr "Bits"
 
@@ -2889,6 +2947,7 @@ msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr "Start met het aanzetten van boefjes."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: reports/templates/report_setup_scan.html
 msgid "Suggested plugins"
 msgstr "Aangeraden boefjes"
 
@@ -2973,15 +3032,6 @@ msgstr ""
 "aanwezig bij organisatie %s."
 
 #: onboarding/views.py
-msgid ""
-"Could not raise clearance level of {} to L{}. You acknowledged a clearance "
-"level of L{}. Contact your administrator to receive a higher clearance."
-msgstr ""
-"Het was niet mogelijk om het vrijwaring niveau van {} te verhogen naar L{}. "
-"Je hebt een vrijwaring niveau van L{} erkend. Neem contact op met je "
-"beheerder om een hoger vrijwaring niveau te verkrijgen."
-
-#: onboarding/views.py
 msgid "Clearance level has been set"
 msgstr "Vrijwaring niveau is gezet"
 
@@ -3003,6 +3053,315 @@ msgstr "{org_name} succesvol bijgewerkt."
 #, python-brace-format
 msgid "{name} successfully created."
 msgstr "{name} succesvol aangemaakt."
+
+#: reports/forms.py tools/forms/ooi_form.py
+msgid "Filter by OOI types"
+msgstr "Filter op OOI-types"
+
+#: reports/forms.py
+msgid "Report types"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "IP address lookup"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "warning"
+msgstr "waarschuwing"
+
+#: reports/report_types/dns_report/report.html
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Warning"
+msgstr "Waarschuwing"
+
+#: reports/report_types/dns_report/report.html
+msgid ""
+"You have less than one webserver that is reachable over IPv6, which is "
+"<strong>not</strong> in compliance to internet.nl standards."
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Other records found"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Record"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Found by"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Security measures"
+msgstr ""
+
+#: reports/report_types/dns_report/report.py
+msgid ""
+"DNS reports focus on domain name system configuration and potential "
+"weaknesses."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Status"
+msgstr "Status"
+
+#: reports/report_types/tls_report/report.html
+msgid "Protocol"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Encryption Algorithm"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Key Size"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Code"
+msgstr "Code"
+
+#: reports/report_types/tls_report/report.html
+msgid "Phase out"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Good"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "No ciphers found for this IPService"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
+msgstr "Bevindingen"
+
+#: reports/report_types/tls_report/report.py
+msgid "TLS Report"
+msgstr ""
+
+#: reports/report_types/tls_report/report.py
+msgid ""
+"TLS reports assess the security of data encryption and transmission "
+"protocols."
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Report for organization"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Observed at:"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Created by:"
+msgstr ""
+
+#: reports/templates/partials/report_introduction.html
+msgid ""
+"Through a systematic examination of the network's infrastructure, the scan "
+"has identified potential security weaknesses and points of exposure. "
+"Additionally, the report offers actionable recommendations and prioritizes "
+"remediation steps to fortify the network's defenses against potential "
+"threats. This invaluable assessment serves as a roadmap for enhancing "
+"network security, ensuring the confidentiality, integrity, and availability "
+"of critical data and resources."
+msgstr ""
+
+#: reports/templates/report.html
+msgid "for"
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Overview of reports"
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Select OOI"
+msgid_plural "Select OOIs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Select which objects you want to include in your report."
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+#: rocky/templates/oois/ooi_list.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Filter"
+msgstr "Filter"
+
+#: reports/templates/report_oois_selection.html
+msgid "No OOIs found."
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Go to the object page"
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+#: reports/templates/summary/ooi_selection.html
+#: rocky/templates/partials/task_history.html
+msgid "Object"
+msgstr "Object"
+
+#: reports/templates/report_oois_selection.html
+msgid "Setup report"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html rocky/views/organization_add.py
+msgid "Setup"
+msgstr "Instellingen"
+
+#: reports/templates/report_setup_scan.html
+msgid "Set up the required plugins for this report."
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+#: reports/templates/report_types_selection.html
+msgid "Change selection"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html reports/views.py
+msgid "Set up scan"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid ""
+"KAT will be able to generate a full report when all the required and "
+"suggested boefjes are enabled."
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid ""
+"If you choose not to give a plugin permission to run, the data that plugin "
+"would collect or produce will be left out of the report which will then be "
+"generated based on the available data collected by the enabled plugins."
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid "Required plugins"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid "This report type requires the following plugins to be enabled:"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid ""
+"This report requires at least one of the following plugins to be enabled to "
+"generate the report:"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate report"
+msgstr "Rapport Genereren"
+
+#: reports/templates/report_types_selection.html reports/views.py
+msgid "Choose report types"
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid ""
+"Various types of reports, such as DNS reports and TLS reports, are essential "
+"for identifying vulnerabilities in different aspects of a system's security. "
+"DNS reports focus on domain name system configuration and potential "
+"weaknesses, while TLS reports assess the security of data encryption and "
+"transmission protocols, helping organizations pinpoint areas where security "
+"improvements are needed."
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid "Selected object"
+msgid_plural "Selected objects"
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_types_selection.html
+msgid "Available report types"
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid "All report types that are available for your selection."
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid "Toggle all report types"
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid "Continue with selection"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Selected OOIs"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Selected Report Types"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Report type"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Selected Plugins for scans"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Plugin options"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Plugin scan level"
+msgstr ""
+
+#: reports/templates/summary/service_health.html rocky/templates/health.html
+msgid "Version"
+msgstr "Versie"
+
+#: reports/views.py
+msgid "View Report"
+msgstr ""
+
+#: reports/views.py
+msgid "Select at least one OOI to proceed."
+msgstr ""
+
+#: reports/views.py
+msgid "Select at least one report type to proceed."
+msgstr ""
+
+#: reports/views.py
+msgid "This report may not show all the data as some plugins are not enabled."
+msgstr ""
 
 #: tools/forms/base.py
 msgid "Date"
@@ -3142,7 +3501,7 @@ msgstr "Laat gedempte bevindingen zien"
 
 #: tools/forms/findings.py
 msgid "Show muted and non-muted findings"
-msgstr ""
+msgstr "Toon gedempte en niet-gedempte bevindingen"
 
 #: tools/forms/findings.py
 msgid "Filter by severity"
@@ -3154,7 +3513,7 @@ msgstr "Gedempte bevindingen uitsluiten"
 
 #: tools/forms/ooi.py
 msgid "Filter types"
-msgstr "Filter types"
+msgstr "Filtertypes"
 
 #: tools/forms/ooi.py tools/view_helpers.py
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
@@ -3169,11 +3528,15 @@ msgid "Clearance Level"
 msgstr "Vrijwaringsniveau"
 
 #: tools/forms/ooi.py
-msgid "Show objects that don't meet the Boefjes scan level"
+#, fuzzy
+#| msgid "Show objects that don't meet the Boefjes scan level"
+msgid "Show objects that don't meet the Boefjes scan level."
 msgstr "Toon objecten die niet overeenkomen met het scanniveau van de Boefjes"
 
 #: tools/forms/ooi.py
-msgid "Show Boefjes that exceed the objects clearance level"
+#, fuzzy
+#| msgid "Show Boefjes that exceed the objects clearance level"
+msgid "Show Boefjes that exceed the objects clearance level."
 msgstr "Toon Boefjes die het vrijwaring niveau van OOI's overschrijden"
 
 #: tools/forms/ooi_form.py
@@ -3189,6 +3552,14 @@ msgstr "Kies optioneel een {option_label}"
 #, python-brace-format
 msgid "Please choose a {option_label}"
 msgstr "Selecteer een {option_label}"
+
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance level"
+msgstr "Filter op vrijwaring niveau"
+
+#: tools/forms/ooi_form.py
+msgid "Filter by clearance type"
+msgstr "Filter op vrijwaringstype"
 
 #: tools/forms/settings.py
 msgid "--- Show all ----"
@@ -3354,6 +3725,21 @@ msgstr ""
 msgid "new"
 msgstr "nieuw"
 
+#: tools/view_helpers.py rocky/templates/header.html
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/partials/organization_member_list_filters.html
+#: rocky/views/organization_member_edit.py
+msgid "Members"
+msgstr "Leden"
+
+#: tools/view_helpers.py
+msgid ""
+"Your task is scheduled and will soon be started in the background. Results "
+"will be added to the object list when they are in. It may take some time, a "
+"refresh of the page may be needed to show the results."
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -3363,6 +3749,22 @@ msgstr ""
 "Je hebt dit lid vertrouwd met een vrijwaring niveau van L{}. Dit lid heeft "
 "minimaal een vrijwaring niveau van L{} nodig om een correcte onboarding uit "
 "te voeren. Bewerk dit lid en wijzig indien nodig het vrijwaring niveau."
+
+#: rocky/scheduler.py
+msgid "Connectivity issues with Mula."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task queue is full, please try again later."
+msgstr "Wachtrij is vol, probeer het later opnieuw"
+
+#: rocky/scheduler.py
+msgid "Task is invalid."
+msgstr "Taak is ongeldig"
+
+#: rocky/scheduler.py
+msgid "Task already queued."
+msgstr "Taak al in de wachtrij"
 
 #: rocky/settings.py
 msgid "Blue light"
@@ -3560,17 +3962,6 @@ msgid "Indemnifications"
 msgstr "Vrijwaringen"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/findings/finding_list.html rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr "Bevindingen"
-
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/partials/secondary-menu.html
 msgid "Logout"
 msgstr "Uitloggen"
@@ -3582,18 +3973,6 @@ msgstr "Welkom"
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "User overview:"
 msgstr "Gebruikersoverzicht:"
-
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "warning"
-msgstr "waarschuwing"
-
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
-msgstr "Waarschuwing"
 
 #: rocky/templates/dashboard_redteam.html
 msgid "Organization code missing"
@@ -3624,10 +4003,20 @@ msgid "Finding"
 msgstr "Bevinding"
 
 #: rocky/templates/findings/finding_list.html
-#, python-format
+#, fuzzy
+#| msgid "Findings"
+msgid "Findings @ "
+msgstr "Bevindingen"
+
+#: rocky/templates/findings/finding_list.html
+#, fuzzy, python-format
+#| msgid ""
+#| "An overview of all findings OpenKAT found on %(date)s. Each finding "
+#| "relates to an object. Click a finding for additional information."
 msgid ""
-"An overview of all findings OpenKAT found on %(date)s. Each finding relates "
-"to an object. Click a finding for additional information."
+"An overview of all findings OpenKAT found for organization "
+"<strong>%(organization_name)s</strong>. Each finding relates to an object. "
+"Click a finding for additional information."
 msgstr ""
 "Een overzicht van alle bevindingen die OpenKAT heeft gevonden op %(date)s. "
 "Elke bevinding heeft betrekking op een object. Klik op een bevinding voor "
@@ -3711,6 +4100,10 @@ msgid "Reason"
 msgstr "Reden"
 
 #: rocky/templates/findings/finding_list.html
+msgid "Unmute Findings"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 msgid "Mute Findings"
 msgstr "Bevindingen dempen"
 
@@ -3721,6 +4114,7 @@ msgid "Set filters"
 msgstr "Selecteer filters"
 
 #: rocky/templates/findings/findings_filter.html
+#: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Clear filters"
 msgstr "Filters wissen"
 
@@ -3738,7 +4132,7 @@ msgstr "Dit veld is verplicht"
 
 #: rocky/templates/graph-d3.html
 msgid ""
-"Click a circle top collapse / expand the tree, click the text to view the "
+"Click a circle to collapse / expand the tree, click the text to view the "
 "tree from that OOI and hover over the text to see details."
 msgstr ""
 "Klik op een cirkel om de boom in of uit te klappen, klik op de tekst om de "
@@ -3762,16 +4156,10 @@ msgstr "OpenKAT logo, ga naar de homepage van OpenKAT"
 msgid "Crisis room"
 msgstr "Crisis Room"
 
-#: rocky/templates/header.html rocky/views/task_detail.py rocky/views/tasks.py
+#: rocky/templates/header.html rocky/templates/partials/task_history.html
+#: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr "Taken"
-
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/organization_member_list_filters.html
-msgid "Members"
-msgstr "Leden"
 
 #: rocky/templates/header.html
 msgid "Breadcrumbs"
@@ -3784,10 +4172,6 @@ msgstr "Gezondheidchecks"
 #: rocky/templates/health.html
 msgid "Healthy"
 msgstr "Gezond"
-
-#: rocky/templates/health.html
-msgid "Version"
-msgstr "Versie"
 
 #: rocky/templates/health.html
 msgid "Additional"
@@ -3834,10 +4218,10 @@ msgstr "OpenKAT ziet"
 #: rocky/templates/landing_page.html
 msgid ""
 "Dozens of tools are integrated in OpenKAT to view the world (digital and "
-"analog). <br>Our motto is therefore: I see, I see, what you do not see."
+"analog). <br> Our motto is therefore: I see, I see, what you do not see."
 msgstr ""
-"In OpenKAT zijn tientallen hulpmiddelen geïntegreerd om de wereld (digitaal "
-"en analoog) te bekijken. <br>Het motto is dan ook: Ik zie, ik zie, wat jij "
+"In OpenKAT zijn tientallen tools geïntegreerd om de wereld te bekijken "
+"(digitaal en analoog). <br> Ons motto is dan ook: ik zie, ik zie, wat jij "
 "niet ziet."
 
 #: rocky/templates/landing_page.html
@@ -3953,7 +4337,7 @@ msgstr "Weet u het zeker?"
 #: rocky/templates/oois/ooi_delete.html
 #, python-format
 msgid "Here you can delete the %(display_type)s."
-msgstr "Hier kunt u de  %(display_type)s verwijderen."
+msgstr "Hier kunt u de %(display_type)s verwijderen."
 
 #: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -3976,8 +4360,8 @@ msgstr "met boefjes"
 
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
-#: rocky/templates/tasks/normalizers.html
+#: rocky/templates/partials/task_history.html rocky/templates/scan.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Boefje"
 msgstr "Boefje"
 
@@ -4124,22 +4508,22 @@ msgid "Currently there are no findings for OOI"
 msgstr "Er zijn geen bevindingen voor het object"
 
 #: rocky/templates/oois/ooi_list.html
+#, fuzzy, python-format
+#| msgid ""
+#| "An overview of your object list. Objects can be added manually or by "
+#| "running boefjes. </br> Click an object for additional information."
 msgid ""
-"An overview of your object list. Objects can be added manually or by running "
-"boefjes.</br> Click an object for additional information."
+"An overview of objects found for organization <strong>%(organization_name)s</"
+"strong>. Objects can be added manually or by running Boefjes. Click an "
+"object for additional information."
 msgstr ""
-"Een overzicht van uw objectenlijst. Objecten kunnen handmatig of door "
-"Boefjes toegevoegd worden. Klik op een object voor meer informatie."
+"Een overzicht van uw objectenlijst. Objecten kunnen handmatig worden "
+"toegevoegd of door het uitvoeren van boefjes.</br> Klik op een object voor "
+"meer informatie."
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
 msgstr "Momenteel gefilterd op:"
-
-#: rocky/templates/oois/ooi_list.html
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Filter"
-msgstr "Filter"
 
 #: rocky/templates/oois/ooi_list.html
 #, python-format
@@ -4235,7 +4619,7 @@ msgstr "Kan rapport voor %(name)s niet vinden."
 #: rocky/templates/oois/ooi_report_404.html
 #, python-format
 msgid ""
-"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s<br> "
+"Perhaps it never was, perhaps it just didn't exist on %(observed_at)s <br> "
 "Try some other dates!"
 msgstr ""
 "Misschien heeft het nooit bestaan, misschien alleen niet op "
@@ -4342,11 +4726,6 @@ msgstr "Organisatie-overzicht:"
 
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
-msgid "Code"
-msgstr "Code"
-
-#: rocky/templates/organizations/organization_list.html
-#: rocky/templates/organizations/organization_settings.html
 msgid "Tags"
 msgstr "Labels"
 
@@ -4416,13 +4795,6 @@ msgid "Role"
 msgstr "Rol"
 
 #: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Status"
-msgstr "Status"
-
-#: rocky/templates/organizations/organization_member_list.html
 msgid "Assigned clearance level"
 msgstr "Toegewezen vrijwaringsniveau"
 
@@ -4433,6 +4805,10 @@ msgstr "Super gebruiker"
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Active"
 msgstr "Actief"
+
+#: rocky/templates/organizations/organization_member_list.html
+msgid "New"
+msgstr "Nieuw"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
@@ -4504,13 +4880,12 @@ msgid "Hide settings"
 msgstr "Verberg instellingen"
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
-msgid "Filter by OOI types"
-msgstr "Filter op OOI-types"
+msgid "Toggle all OOI types"
+msgstr "Schakel alle OOI-typen"
 
-#: rocky/templates/partials/elements/ooi_list_settings_form.html
-#: rocky/templates/partials/ooi_type_filters.html
-msgid "Toggle all"
-msgstr "Alles (de-)selecteren"
+#: rocky/templates/partials/elements/ooi_tree_condensed_table.html
+msgid "Children"
+msgstr "Kinderen"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
@@ -4575,7 +4950,9 @@ msgid "Reproduction"
 msgstr "Reproductie"
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html
-msgid "Please enable plugin to start scanning"
+#, fuzzy
+#| msgid "Please enable plugin to start scanning"
+msgid "Please enable plugin to start scanning."
 msgstr "Alsjeblieft schakel plugin in om scanning te starten"
 
 #: rocky/templates/partials/form/field_input.html
@@ -4616,6 +4993,18 @@ msgstr "Open toelichting"
 msgid "Close explanation"
 msgstr "Sluit toelichting"
 
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "explanation"
+msgstr "toelichting"
+
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "Explanation"
+msgstr "Toelichting"
+
 #: rocky/templates/partials/form/indemnification_add_form.html
 msgid "Here, an indemnification can be given on behalf of your organization"
 msgstr "Geef hier een vrijwaring namens uw organisatie."
@@ -4642,6 +5031,12 @@ msgstr "Toon alleen objecten van type %(type)s"
 #: rocky/templates/partials/language-switcher.html
 msgid "Select your language"
 msgstr "Selecteer je taal"
+
+#: rocky/templates/partials/language-switcher.html
+#, python-format
+msgid ""
+"Current language is %(current_language)s. Choose your preferred language."
+msgstr "De huidige taal is %(current_language)s. Kies de taal van uw voorkeur."
 
 #: rocky/templates/partials/list_filters.html
 msgid "Hide filter options"
@@ -4703,10 +5098,6 @@ msgstr "Geen gerelateerde objecten toegevoegd aan "
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Use the button below to add a related object. "
 msgstr "Voeg een gerelateerd object toe"
-
-#: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate report"
-msgstr "Rapport Genereren"
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute Finding"
@@ -4808,18 +5199,6 @@ msgstr "Boom - compacte weergave"
 msgid "Tree - table view"
 msgstr "Boom - tabelweergave"
 
-#: rocky/templates/partials/ooi_type_filters.html
-msgid "Shown types"
-msgstr "Getoonde typen"
-
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Quickly filter by type"
-msgstr "Snel filteren op type"
-
-#: rocky/templates/partials/ooi_type_filters_linklist.html
-msgid "Filter by"
-msgstr "Filteren op"
-
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Shown status types"
 msgstr "Getoonde typen"
@@ -4827,6 +5206,10 @@ msgstr "Getoonde typen"
 #: rocky/templates/partials/organization_member_list_filters.html
 msgid "Blocked status"
 msgstr "Geblokkeerde status"
+
+#: rocky/templates/partials/organization_member_list_filters.html
+msgid "Update List"
+msgstr "Lijst updaten"
 
 #: rocky/templates/partials/organization_properties_table.html
 msgid "Organization name"
@@ -4864,66 +5247,6 @@ msgstr "volgende"
 msgid "last"
 msgstr "laatste"
 
-#: rocky/templates/partials/scan_history.html
-msgid "Scans"
-msgstr "Scans"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Hide filters"
-msgstr "Verberg filters"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Show filters"
-msgstr "Toon filters"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "From"
-msgstr "Van"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "To"
-msgstr "Aan"
-
-#: rocky/templates/partials/scan_history.html
-msgid "Select status"
-msgstr "Selecteer status"
-
-#: rocky/templates/partials/scan_history.html
-msgid "Success"
-msgstr "Gelukt"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Failure"
-msgstr "Foutmodus"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Search"
-msgstr "Zoeken"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Search by object name"
-msgstr "Zoeken op objectnaam"
-
-#: rocky/templates/partials/scan_history.html
-msgid "No scans found for this object."
-msgstr "Geen scans gevonden voor dit object."
-
-#: rocky/templates/partials/scan_history.html
-msgid "Object"
-msgstr "Object"
-
-#: rocky/templates/partials/scan_history.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Created date"
-msgstr "Datum toegevoegd"
-
 #: rocky/templates/partials/secondary-menu.html
 msgid "User navigation"
 msgstr "Gebruikersnavigatie"
@@ -4943,6 +5266,81 @@ msgstr "Profiel"
 #: rocky/templates/partials/skip-to-content.html
 msgid "Go to content"
 msgstr "Ga direct naar de inhoud"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Hide filters"
+msgstr "Verberg filters"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Show filters"
+msgstr "Toon filters"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "From"
+msgstr "Van"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "To"
+msgstr "Aan"
+
+#: rocky/templates/partials/task_history.html
+msgid "Select status"
+msgstr "Selecteer status"
+
+#: rocky/templates/partials/task_history.html
+msgid "Success"
+msgstr "Gelukt"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Failure"
+msgstr "Foutmodus"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Search"
+msgstr "Zoeken"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Search by object name"
+msgstr "Zoeken op objectnaam"
+
+#: rocky/templates/partials/task_history.html
+msgid "No scans found for this object."
+msgstr "Geen scans gevonden voor dit object."
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Created date"
+msgstr "Datum toegevoegd"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefjes.html
+msgid "Input Object"
+msgstr "Inputobject"
+
+#: rocky/templates/partials/task_history.html
+msgid "No tasks found for this object."
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Normalizer"
+msgstr "Normalizer"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/normalizers.html
+msgid "Boefje input OOI"
+msgstr "Boefje input OOI"
+
+#: rocky/templates/scan.html
+msgid "Boefjes overview:"
+msgstr "Boefjes-overzicht:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
@@ -5021,6 +5419,8 @@ msgstr "Ja, stel in"
 msgid ""
 "An overview of the boefje task, the input OOI and the RAW data it generated."
 msgstr ""
+"Een overzicht van de boefje-taak, de invoer OOI en de RAW-gegevens die het "
+"heeft gegenereerd."
 
 #: rocky/templates/tasks/boefje_task_detail.html
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
@@ -5047,21 +5447,17 @@ msgstr "Takenlijst van boefjes"
 msgid "List of tasks for "
 msgstr "Lijst van taken voor "
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Input Object"
-msgstr "Inputobject"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "No input OOI"
 msgstr "Geen input object"
 
-#: rocky/templates/tasks/boefjes.html
-msgid "Download task data"
-msgstr "Download taakgegevens"
-
 #: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
 msgid "Reschedule"
 msgstr "Opnieuw plannen"
+
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+msgid "Download task data"
+msgstr "Download taakgegevens"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
@@ -5070,14 +5466,6 @@ msgstr "Er zijn geen taken voor normalizers"
 #: rocky/templates/tasks/normalizers.html
 msgid "List of tasks for normalizers"
 msgstr "Lijst van taken voor normalizers"
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Normalizer"
-msgstr "Normalizer"
-
-#: rocky/templates/tasks/normalizers.html
-msgid "Boefje input OOI"
-msgstr "Boefje input OOI"
 
 #: rocky/templates/tasks/normalizers.html
 msgid "Yielded objects"
@@ -5149,6 +5537,48 @@ msgstr "Terug naar Accountbeveiliging"
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid "Generate Tokens"
 msgstr "Tokens Genereren"
+
+#: rocky/templates/two_factor/core/login.html
+msgid "You are logged in."
+msgstr "U bent ingelogd."
+
+#: rocky/templates/two_factor/core/login.html
+msgid "Two factor authentication is enabled for your account."
+msgstr "Tweetrapsverificatie is ingeschakeld voor uw account."
+
+#: rocky/templates/two_factor/core/login.html
+msgid ""
+"Two factor authentication is not enabled for your account. Enable it to "
+"continue."
+msgstr ""
+"Tweetrapsverificatie is niet ingeschakeld voor uw account. Schakel in om "
+"door te gaan."
+
+#: rocky/templates/two_factor/core/login.html
+msgid "Setup two factor authentication"
+msgstr "Tweetrapsverificatie instellen"
+
+#: rocky/templates/two_factor/core/login.html
+msgid "Credentials"
+msgstr "Gebruikersgegevens"
+
+#: rocky/templates/two_factor/core/login.html
+msgid ""
+"Use this form for entering backup tokens for logging in. These tokens have "
+"been generated for you to print and keep safe. Please enter one of these "
+"backup tokens to login to your account."
+msgstr ""
+"Gebruik dit formulier voor het invoeren van back-up tokens om in te loggen. "
+"Deze tokens zijn gegenereerd voor u om af te drukken en veilig te bewaren. "
+"Voer een van deze back-up tokens in om in te loggen op uw account."
+
+#: rocky/templates/two_factor/core/login.html
+msgid "As a last resort, you can use a backup token:"
+msgstr "Of gebruik een backupcode:"
+
+#: rocky/templates/two_factor/core/login.html
+msgid "Use Backup Token"
+msgstr "Back-up Token gebruiken"
 
 #: rocky/templates/two_factor/core/otp_required.html
 msgid "Permission Denied"
@@ -5376,13 +5806,8 @@ msgid "Indemnification successfully set."
 msgstr "Vrijwaringsniveau ingesteld."
 
 #: rocky/views/mixins.py
-msgid ""
-"Can not parse observed_at parameter, falling back to showing current object"
+msgid "Can not parse date, falling back to show current date."
 msgstr ""
-
-#: rocky/views/mixins.py
-msgid "All"
-msgstr "Alle"
 
 #: rocky/views/ooi_add.py
 msgid "Type select"
@@ -5425,12 +5850,22 @@ msgstr ""
 #: rocky/views/ooi_list.py
 #, python-format
 msgid ""
-"Could not raise clearance level to L%s. You acknowledged a clearance level "
+"Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"Kan vrijwaring niveau niet verhogen naar L%s. U bent een vrijwaring niveau "
+"toevertrouwd van L%s. Neem contact op met uw beheerder om een ​​hogere "
+"vrijwaring te krijgen."
+
+#: rocky/views/ooi_list.py
+#, python-format
+msgid ""
+"Could not raise clearance level to L%s. You acknowledged a clearance level "
+"of L%s. Please accept the clearance level below to proceed."
+msgstr ""
 "Kan vrijwaring niveau niet verhogen naar L%s. U hebt een vrijwaring niveau "
-"bevestigd van L%s. Neem contact op met uw beheerder om een ​​hogere vrijwaring "
-"te krijgen."
+"bevestigd van L%s. Accepteer het vrijwaring niveau onderaan de pagina om "
+"verder te gaan."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -5488,6 +5923,10 @@ msgid "Please select at least one finding."
 msgstr "Selecteer ten minste één bevinding."
 
 #: rocky/views/ooi_mute.py
+msgid "Finding(s) successfully unmuted."
+msgstr ""
+
+#: rocky/views/ooi_mute.py
 msgid "Finding(s) successfully muted."
 msgstr "Bevinding(en) succesvol gedempt."
 
@@ -5519,9 +5958,17 @@ msgstr "Boom"
 msgid "Graph Visualisation"
 msgstr "Graaf"
 
-#: rocky/views/organization_add.py
-msgid "Setup"
-msgstr "Instellingen"
+#: rocky/views/ooi_view.py
+msgid "OOI types: "
+msgstr "OOI-typen: "
+
+#: rocky/views/ooi_view.py
+msgid "Clearance level: "
+msgstr "Vrijwaring niveau: "
+
+#: rocky/views/ooi_view.py
+msgid "Clearance type: "
+msgstr "Vrijwaring-type: "
 
 #: rocky/views/organization_add.py
 msgid "Organization added successfully."
@@ -5646,6 +6093,16 @@ msgstr ""
 "bij organisatie %s."
 
 #: rocky/views/scan_profile.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
+"level of L%s. Please accept the clearance level below to proceed."
+msgstr ""
+"Kan vrijwaring niveau van %s niet verhogen naar L%s. U hebt een vrijwaring "
+"niveau bevestigd van L%s. Accepteer het vrijwaring niveau onderaan de pagina "
+"om verder te gaan."
+
+#: rocky/views/scan_profile.py
 msgid "Choose a valid level"
 msgstr "Kies een geldig niveau"
 
@@ -5709,3 +6166,16 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#~ msgid ""
+#~ "Can not parse observed_at parameter, falling back to showing current "
+#~ "object"
+#~ msgstr ""
+#~ "Kan de parameter observed_at niet ontleden, terugvallen op het weergeven "
+#~ "van het huidige object"
+
+#~ msgid "Scanning successfully scheduled."
+#~ msgstr "Scan met success ingepland."
+
+#~ msgid "Scans"
+#~ msgstr "Scans"

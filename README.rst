@@ -2,6 +2,14 @@
 What is OpenKAT?
 ================
 
+.. image:: https://hosted.weblate.org/widget/openkat/287x66-white.png
+   :target: https://hosted.weblate.org/engage/openkat/
+   :alt: Translation status (summary)
+
+.. image:: https://hosted.weblate.org/widget/openkat/multi-auto.svg
+   :target: https://hosted.weblate.org/engage/openkat/
+   :alt: Translation status (bar chart)
+
 OpenKAT aims to monitor, record and analyze the status of information systems. The basic premise is that many of the major security incidents are caused by small errors and known vulnerabilities, and that if you can find them in time your systems and infrastructure become a lot more secure.
 
 OpenKAT scans, collects, analyzes and reports in an ongoing process:
@@ -31,6 +39,12 @@ The high level documentation on OpenKAT explains the purpose and operation of Op
 
 - `the 'TL;DR' of 2 pages (English) <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/introduction/pdf/OpenKAT%20handout_ENG.pdf>`_
 - `the extensive brochure on OpenKAT (Dutch) <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/introduction/pdf/introductie%20OpenKAT%20V20220621.pdf>`_
+
+Translations
+============
+
+We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
+See `the docs <https://docs.openkat.nl/guidelines/contributions.html#contribute-translations>`_ for more information.
 
 Current release
 ===============

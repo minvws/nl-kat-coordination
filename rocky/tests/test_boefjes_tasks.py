@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from unittest.mock import call
 
 from pytest_django.asserts import assertContains
@@ -64,3 +65,51 @@ def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje)
 
     assertContains(response, "error")
     assertContains(response, "Fetching tasks failed")
+
+
+def test_reschedule_task(rf, client_member, mocker, task):
+    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
+    mock_scheduler_client.get_task_details.return_value = task
+    session = mocker.patch("tools.view_helpers.client.session")
+    session.post.return_value = mocker.MagicMock()
+
+    task_id = "e02c18dc-8013-421d-a86d-3a00f6019533"
+    request = setup_request(
+        rf.post(
+            f"/en/{client_member.organization.code}/tasks/boefjes/?task_id={task_id}",
+            data={"action": "reschedule_task"},
+        ),
+        client_member.user,
+    )
+    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+    assert list(request._messages)[0].message == (
+        "Your task is scheduled and will soon be started in the background. "
+        "Results will be added to the object list when they are in. "
+        "It may take some time, a refresh of the page may be needed to show the results."
+    )
+
+
+def test_reschedule_task_already_queued(rf, client_member, mocker, task):
+    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
+    mock_scheduler_client.get_task_details.return_value = task
+    session = mocker.patch("tools.view_helpers.client.session")
+    mock_response = mocker.MagicMock()
+    mock_response.status_code = HTTPStatus.TOO_MANY_REQUESTS
+    return_value = mocker.MagicMock()
+    return_value.raise_for_status.side_effect = HTTPError(response=mock_response)
+    session.post.return_value = return_value
+
+    task_id = "e02c18dc-8013-421d-a86d-3a00f6019533"
+    request = setup_request(
+        rf.post(
+            f"/en/{client_member.organization.code}/tasks/boefjes/?task_id={task_id}",
+            data={"action": "reschedule_task"},
+        ),
+        client_member.user,
+    )
+    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+    assert list(request._messages)[0].message == "Task queue is full, please try again later."

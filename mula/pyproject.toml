@@ -8,26 +8,27 @@ license = "EUPL"
 [tool.poetry.dependencies]
 python = "^3.8"
 alembic = "^1.8.1"
-celery = "^5.2.7"
 fastapi = "^0.101.0"
 mmh3 = "^4.0.0"
 pika = "^1.2.0"
 prometheus-client = "^0.16.0"
-psycopg2 = "^2.9.6"
-pydantic = "^1.10.9"
+psycopg2 = "^2.9.7"
+pydantic = "^2.1.1"
+pydantic-settings= "^2.0.2"
 python-dotenv = "^1.0.0"
 requests = "^2.31.0"
-sqlalchemy = "^1.4.48"
+sqlalchemy = "^2.0.19"
 typing-extensions = "^4.5.0"
 uvicorn = "^0.17.1"
 
 # OpenTelemetry
 opentelemetry-sdk = "^1.19.0"
 opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
-opentelemetry-instrumentation-fastapi = "^0.40b0"
-opentelemetry-instrumentation-psycopg2 = "^0.40b0"
-opentelemetry-instrumentation-requests = "^0.40b0"
+opentelemetry-instrumentation-fastapi = "^0.41b0"
+opentelemetry-instrumentation-psycopg2 = "^0.41b0"
+opentelemetry-instrumentation-requests = "^0.41b0"
 certifi = "^2023.7.22"
+opentelemetry-instrumentation = "^0.41b0"
 
 [tool.poetry.group.dev.dependencies]
 factory_boy = "^3.2.1"
@@ -46,7 +47,12 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.coverage.run]
 omit = [
-    "scheduler/alembic/*"
+    "scheduler/alembic/*",
+    "scheduler/config/*",
+    "scheduler/context/*",
+    "scheduler/models/*",
+    "scheduler/utils/*",
+    "scheduler/__main__.py",
 ]
 
 [tool.black]

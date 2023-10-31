@@ -19,6 +19,7 @@ from octopoes.models.ooi.dns.records import (
     DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
+    DNSPTRRecord,
     DNSSOARecord,
     DNSTXTRecord,
 )
@@ -69,6 +70,7 @@ from octopoes.models.ooi.web import (
     HTTPResource,
     ImageMetadata,
     IPAddressHTTPURL,
+    SecurityTXT,
     Website,
 )
 
@@ -85,6 +87,7 @@ DnsRecordType = Union[
     DNSTXTRecord,
     DNSMXRecord,
     DNSNSRecord,
+    DNSPTRRecord,
     DNSSOARecord,
     DNSCNAMERecord,
     ResolvedHostname,
@@ -123,6 +126,7 @@ WebType = Union[
     RESTAPI,
     APIDesignRule,
     APIDesignRuleResult,
+    SecurityTXT,
 ]
 EmailSecurityType = Union[
     DNSSPFRecord,
