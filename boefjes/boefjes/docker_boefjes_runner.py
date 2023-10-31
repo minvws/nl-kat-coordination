@@ -33,7 +33,7 @@ class DockerBoefjesRunner:
         # local import to prevent circular dependency
         import boefjes.plugins.models
 
-        stderr_mime_types = boefjes.plugins.models._default_mime_types(self.boefje_meta.boefje)
+        stderr_mime_types = boefjes.plugins.models._default_meta_mime_types(self.boefje_meta)
 
         task_id = str(self.boefje_meta.id)
         self.scheduler_client.patch_task(task_id, TaskStatus.RUNNING)

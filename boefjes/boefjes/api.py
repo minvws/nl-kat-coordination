@@ -21,7 +21,7 @@ from boefjes.job_handler import (
 )
 from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
-from boefjes.plugins.models import _default_mime_types
+from boefjes.plugins.models import _default_meta_mime_types
 from octopoes.models import Reference
 
 app = FastAPI(title="Boefje API")
@@ -128,7 +128,7 @@ async def boefje_output(
     bytes_client.save_boefje_meta(boefje_meta)
 
     if boefje_output.files:
-        mime_types = _default_mime_types(task.p_item.data.boefje)
+        mime_types = _default_meta_mime_types(task.p_item.data)
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes
