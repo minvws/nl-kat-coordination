@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-12 09:36+0000\n"
+"POT-Creation-Date: 2023-10-17 13:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,7 @@ msgstr "Fechanan importante"
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -544,7 +545,8 @@ msgstr " lèternan kapital"
 msgid "Your session has timed out. Please login again."
 msgstr "Bo seshon a tèrminá. Por fabor log in dinobo."
 
-#: account/views/login.py rocky/templates/header.html
+#: account/views/login.py reports/templates/partials/report_header.html
+#: rocky/templates/header.html
 msgid "OpenKAT"
 msgstr "OpenKAT"
 
@@ -586,7 +588,8 @@ msgstr "Failure mode"
 
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
 #: katalogus/templates/boefje_detail.html
-#: katalogus/templates/normalizer_detail.html tools/forms/finding_type.py
+#: katalogus/templates/normalizer_detail.html
+#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
@@ -757,7 +760,8 @@ msgstr "Research & Development"
 msgid "Administration"
 msgstr "Indemnizashon"
 
-#: fmea/models.py rocky/templates/footer.html rocky/templates/health.html
+#: fmea/models.py reports/templates/summary/service_health.html
+#: rocky/templates/footer.html rocky/templates/health.html
 msgid "Service"
 msgstr "Sèrvicio"
 
@@ -1120,6 +1124,7 @@ msgid "Failure mode report"
 msgstr "No por decodifica e archivo"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
+#: reports/templates/summary/report_summary.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
 msgid "Summary"
@@ -1257,6 +1262,7 @@ msgid "Show all"
 msgstr "Mustra tur"
 
 #: katalogus/forms/katalogus_filter.py
+#: reports/report_types/dns_report/report.html
 msgid "Enabled"
 msgstr "Aktivá"
 
@@ -1397,7 +1403,9 @@ msgid "OOI"
 msgstr "OOI"
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
-#: tools/forms/ooi.py rocky/templates/oois/ooi_page_tabs.html
+#: reports/templates/report_oois_selection.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Clearance level"
@@ -1483,6 +1491,8 @@ msgstr ""
 "di plugin."
 
 #: katalogus/templates/katalogus_settings.html
+#: reports/templates/report_setup_scan.html
+#: reports/templates/report_types_selection.html
 #: rocky/templates/two_factor/core/otp_required.html
 msgid "Go back"
 msgstr "Bai bèk"
@@ -1502,6 +1512,7 @@ msgstr "Plugin"
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr "Balor"
@@ -1692,14 +1703,17 @@ msgid "Plugins overview:"
 msgstr "Resumen di Plug-innan:"
 
 #: katalogus/templates/partials/plugins.html
+#: reports/templates/summary/report_summary.html
 msgid "Plugin name"
 msgstr "Nombre di Plug-in"
 
 #: katalogus/templates/partials/plugins.html
+#: reports/templates/summary/report_summary.html
 msgid "Plugin type"
 msgstr "Tipo di Plug-in"
 
 #: katalogus/templates/partials/plugins.html
+#: reports/templates/summary/report_summary.html
 msgid "Plugin description"
 msgstr "Deskripshon di Plug-in"
 
@@ -1840,10 +1854,12 @@ msgid "Unset"
 msgstr "Bashi"
 
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 msgid "Yes"
 msgstr "Si"
 
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 msgid "No"
 msgstr "Nò"
 
@@ -2277,6 +2293,7 @@ msgid "OpenKAT introduction"
 msgstr "OpenKAT introdukshon"
 
 #: onboarding/templates/dns_report.html
+#: reports/report_types/dns_report/report.py
 msgid "DNS Report"
 msgstr "DNS Rapòrt"
 
@@ -2366,6 +2383,8 @@ msgid "Choose a report - Introduction"
 msgstr "Skohé un rapòrt - Introduskhon"
 
 #: onboarding/templates/step_2a_choose_report_info.html
+#: reports/templates/report_oois_selection.html reports/views.py
+#: rocky/templates/header.html
 msgid "Reports"
 msgstr "Rapport"
 
@@ -2585,6 +2604,7 @@ msgstr ""
 "ta guia'bu dor di e processo pa kreanan manualmente."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
+#: reports/templates/report_oois_selection.html
 msgid "Create object"
 msgstr "Krea opheto"
 
@@ -2600,7 +2620,10 @@ msgstr ""
 msgid "URL"
 msgstr "URL"
 
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html tools/forms/ooi.py
+#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/report_types/dns_report/report.html
+#: reports/templates/report_oois_selection.html
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -2644,6 +2667,7 @@ msgid "Setup scan - OOI clearance for"
 msgstr "Sètup skan- OOI autorisashon pa"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
+#: reports/templates/partials/report_introduction.html
 msgid "Introduction"
 msgstr "Introdukshon"
 
@@ -2891,6 +2915,7 @@ msgstr ""
 "opheto."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: reports/report_types/tls_report/report.html
 msgid "Bits"
 msgstr "Bits"
 
@@ -2918,6 +2943,7 @@ msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr "Laga nos ban setup e skan dor di aktivá e plugins di bo eskoho abou."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: reports/templates/report_setup_scan.html
 msgid "Suggested plugins"
 msgstr "Plugins sugerí"
 
@@ -3026,6 +3052,315 @@ msgstr "{org_name} a wòrdu kambia ku èksito."
 #, python-brace-format
 msgid "{name} successfully created."
 msgstr "{name} a wòrdu krea ku èksito."
+
+#: reports/forms.py tools/forms/ooi_form.py
+msgid "Filter by OOI types"
+msgstr "Filtra pa tiponan di OOI"
+
+#: reports/forms.py
+msgid "Report types"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "IP address lookup"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "warning"
+msgstr "advertensia"
+
+#: reports/report_types/dns_report/report.html
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Warning"
+msgstr "Advertensia"
+
+#: reports/report_types/dns_report/report.html
+msgid ""
+"You have less than one webserver that is reachable over IPv6, which is "
+"<strong>not</strong> in compliance to internet.nl standards."
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Other records found"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Record"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Found by"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Security measures"
+msgstr ""
+
+#: reports/report_types/dns_report/report.py
+msgid ""
+"DNS reports focus on domain name system configuration and potential "
+"weaknesses."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Status"
+msgstr "Estádo"
+
+#: reports/report_types/tls_report/report.html
+msgid "Protocol"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Encryption Algorithm"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Key Size"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+#: rocky/templates/organizations/organization_list.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Code"
+msgstr "Código"
+
+#: reports/report_types/tls_report/report.html
+msgid "Phase out"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Good"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "No ciphers found for this IPService"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
+msgstr "Diskubrimentu"
+
+#: reports/report_types/tls_report/report.py
+msgid "TLS Report"
+msgstr ""
+
+#: reports/report_types/tls_report/report.py
+msgid ""
+"TLS reports assess the security of data encryption and transmission "
+"protocols."
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Report for organization"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Observed at:"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid "Created by:"
+msgstr ""
+
+#: reports/templates/partials/report_introduction.html
+msgid ""
+"Through a systematic examination of the network's infrastructure, the scan "
+"has identified potential security weaknesses and points of exposure. "
+"Additionally, the report offers actionable recommendations and prioritizes "
+"remediation steps to fortify the network's defenses against potential "
+"threats. This invaluable assessment serves as a roadmap for enhancing "
+"network security, ensuring the confidentiality, integrity, and availability "
+"of critical data and resources."
+msgstr ""
+
+#: reports/templates/report.html
+msgid "for"
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Overview of reports"
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Select OOI"
+msgid_plural "Select OOIs"
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Select which objects you want to include in your report."
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+#: rocky/templates/oois/ooi_list.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Filter"
+msgstr "Filtrá"
+
+#: reports/templates/report_oois_selection.html
+msgid "No OOIs found."
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+msgid "Go to the object page"
+msgstr ""
+
+#: reports/templates/report_oois_selection.html
+#: reports/templates/summary/ooi_selection.html
+#: rocky/templates/partials/task_history.html
+msgid "Object"
+msgstr "Opheto"
+
+#: reports/templates/report_oois_selection.html
+msgid "Setup report"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html rocky/views/organization_add.py
+msgid "Setup"
+msgstr "Setup"
+
+#: reports/templates/report_setup_scan.html
+msgid "Set up the required plugins for this report."
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+#: reports/templates/report_types_selection.html
+msgid "Change selection"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html reports/views.py
+msgid "Set up scan"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid ""
+"KAT will be able to generate a full report when all the required and "
+"suggested boefjes are enabled."
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid ""
+"If you choose not to give a plugin permission to run, the data that plugin "
+"would collect or produce will be left out of the report which will then be "
+"generated based on the available data collected by the enabled plugins."
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid "Required plugins"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid "This report type requires the following plugins to be enabled:"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+msgid ""
+"This report requires at least one of the following plugins to be enabled to "
+"generate the report:"
+msgstr ""
+
+#: reports/templates/report_setup_scan.html
+#: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate report"
+msgstr "Generá rapòrt"
+
+#: reports/templates/report_types_selection.html reports/views.py
+msgid "Choose report types"
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid ""
+"Various types of reports, such as DNS reports and TLS reports, are essential "
+"for identifying vulnerabilities in different aspects of a system's security. "
+"DNS reports focus on domain name system configuration and potential "
+"weaknesses, while TLS reports assess the security of data encryption and "
+"transmission protocols, helping organizations pinpoint areas where security "
+"improvements are needed."
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid "Selected object"
+msgid_plural "Selected objects"
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/templates/report_types_selection.html
+msgid "Available report types"
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid "All report types that are available for your selection."
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid "Toggle all report types"
+msgstr ""
+
+#: reports/templates/report_types_selection.html
+msgid "Continue with selection"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Selected OOIs"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Selected Report Types"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Report type"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Selected Plugins for scans"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Plugin options"
+msgstr ""
+
+#: reports/templates/summary/report_summary.html
+msgid "Plugin scan level"
+msgstr ""
+
+#: reports/templates/summary/service_health.html rocky/templates/health.html
+msgid "Version"
+msgstr "Vershon"
+
+#: reports/views.py
+msgid "View Report"
+msgstr ""
+
+#: reports/views.py
+msgid "Select at least one OOI to proceed."
+msgstr ""
+
+#: reports/views.py
+msgid "Select at least one report type to proceed."
+msgstr ""
+
+#: reports/views.py
+msgid "This report may not show all the data as some plugins are not enabled."
+msgstr ""
 
 #: tools/forms/base.py
 msgid "Date"
@@ -3223,10 +3558,6 @@ msgstr "Filtra pa nivel di autorisashon"
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance type"
 msgstr "Filtra pa tipo autorisashon"
-
-#: tools/forms/ooi_form.py
-msgid "Filter by OOI types"
-msgstr "Filtra pa tiponan di OOI"
 
 #: tools/forms/settings.py
 msgid "--- Show all ----"
@@ -3627,17 +3958,6 @@ msgid "Indemnifications"
 msgstr "Indemnizashon"
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr "Diskubrimentu"
-
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/partials/secondary-menu.html
 msgid "Logout"
 msgstr "Logout"
@@ -3649,18 +3969,6 @@ msgstr "Bon Biní"
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "User overview:"
 msgstr "Resúmen di kliente:"
-
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "warning"
-msgstr "advertensia"
-
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
-msgstr "Advertensia"
 
 #: rocky/templates/dashboard_redteam.html
 msgid "Organization code missing"
@@ -3860,10 +4168,6 @@ msgstr "Checknan di salubridat"
 #: rocky/templates/health.html
 msgid "Healthy"
 msgstr "Salú"
-
-#: rocky/templates/health.html
-msgid "Version"
-msgstr "Vershon"
 
 #: rocky/templates/health.html
 msgid "Additional"
@@ -4220,12 +4524,6 @@ msgid "Currently filtered on:"
 msgstr "Aktuálmente filtrá riba:"
 
 #: rocky/templates/oois/ooi_list.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Filter"
-msgstr "Filtrá"
-
-#: rocky/templates/oois/ooi_list.html
 #, python-format
 msgid "Showing %(length)s of %(total)s objects"
 msgstr "Mustrando %(length)s di %(total)s ophetonan"
@@ -4426,11 +4724,6 @@ msgstr "Resúmen di organisashon:"
 
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
-msgid "Code"
-msgstr "Código"
-
-#: rocky/templates/organizations/organization_list.html
-#: rocky/templates/organizations/organization_settings.html
 msgid "Tags"
 msgstr "Labelnan"
 
@@ -4497,13 +4790,6 @@ msgstr "E-korreo"
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Role"
 msgstr "Rol"
-
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Status"
-msgstr "Estádo"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Assigned clearance level"
@@ -4811,10 +5097,6 @@ msgid "Use the button below to add a related object. "
 msgstr "Huza e botón abou pa añadi un opheto relatá. "
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
-msgid "Generate report"
-msgstr "Generá rapòrt"
-
-#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute Finding"
 msgstr "Muta diskubrimentu"
 
@@ -5051,10 +5333,6 @@ msgstr "Normalizer"
 #: rocky/templates/tasks/normalizers.html
 msgid "Boefje input OOI"
 msgstr "Opheto di Entrada \"Boefje\""
-
-#: rocky/templates/partials/task_history.html
-msgid "Object"
-msgstr "Opheto"
 
 #: rocky/templates/scan.html
 msgid "Boefjes overview:"
@@ -5521,10 +5799,8 @@ msgid "Indemnification successfully set."
 msgstr "Indemnizashon pone ku èxito."
 
 #: rocky/views/mixins.py
-msgid ""
-"Can not parse observed_at parameter, falling back to showing current object"
+msgid "Can not parse date, falling back to show current date."
 msgstr ""
-"No por parse e parametro observed_at, regresando na munstra e opheto aktual"
 
 #: rocky/views/ooi_add.py
 msgid "Type select"
@@ -5683,10 +5959,6 @@ msgstr "Nivél di autorisashon: "
 #: rocky/views/ooi_view.py
 msgid "Clearance type: "
 msgstr "Tipo di autorisashon: "
-
-#: rocky/views/organization_add.py
-msgid "Setup"
-msgstr "Setup"
 
 #: rocky/views/organization_add.py
 msgid "Organization added successfully."
@@ -5882,6 +6154,13 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid ""
+#~ "Can not parse observed_at parameter, falling back to showing current "
+#~ "object"
+#~ msgstr ""
+#~ "No por parse e parametro observed_at, regresando na munstra e opheto "
+#~ "aktual"
 
 #~ msgid "Scanning successfully scheduled."
 #~ msgstr "Skèn a start ku èxito."
