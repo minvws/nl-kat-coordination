@@ -103,6 +103,18 @@ class Settings(BaseSettings):
     )
 
     # External services settings
+    ext_svc_pool_maxsize: int = Field(
+        42,
+        description="The maximum number of connections to save in the pool for "
+        "a given http host service",
+    )
+
+    ext_svc_pool_connections: int = Field(
+        42,
+        description="The maximum number of connections to allow to a single "
+        "host for a given http host service",
+    )
+
     host_katalogus: AnyHttpUrl = Field(
         ...,
         example="http://localhost:8003",

@@ -44,8 +44,8 @@ class HTTPService(Connector):
         source: str,
         timeout: int = 5,
         retries: int = 5,
-        pool_maxsize: int = 40,
-        pool_connections: int = 40,
+        pool_maxsize: int = 42,
+        pool_connections: int = 42,
     ):
         """Initializer of the HTTPService class. During initialization the
         host will be checked if it is available and healthy.

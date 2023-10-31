@@ -18,9 +18,11 @@ class Octopoes(HTTPService):
         source: str,
         orgs: List[Organisation],
         timeout: int = 10,
+        pool_maxsize: int = 42,
+        pool_connections: int = 42,
     ):
         self.orgs: List[Organisation] = orgs
-        super().__init__(host, source, timeout)
+        super().__init__(host, source, timeout, pool_maxsize, pool_connections)
 
     @exception_handler
     def get_objects_by_object_types(
