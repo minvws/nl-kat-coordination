@@ -65,12 +65,12 @@
                         <th scope="col">{% translate "Created date" %}</th>
                         <th scope="col">{% translate "Input Object" %}</th>
                         {# FIXME: implement detail page according to designs #}
-                        {# <th scope="col">{% translate "Details" %}</th> #}
+                        <th scope="col">{% translate "Details" %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for task in task_history %}
-                        <tr>
+                        <tr data-task-id="{{ task.id }}">
                             <td>
                                 {% if task.type == "boefje" %}
                                     <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
@@ -106,7 +106,32 @@
                                 {% endif %}
                             </td>
                             {# FIXME: implement detail page according to designs #}
-                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                            <td>
+                                <button type="button"
+                                        class="expando-button normalizer-list-table-row"
+                                        data-icon-open-class="icon ti-chevron-down"
+                                        data-icon-close-class="icon ti-chevron-up"
+                                        data-close-label="{% translate "Close details" %}">
+                                    {% translate "Open details" %}
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="expando-row">
+                            <td colspan="7">
+                                <section>
+                                    <div class="button-container">
+                                        {% if task.status.value in "completed,failed" %}
+                                            <a class="button"
+                                               href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                            {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+
+                                        {% else %}
+                                            <a class="button"
+                                               href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download task data" %}</a>
+                                        {% endif %}
+                                    </div>
+                                </section>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -125,12 +150,12 @@
                         <th scope="col">{% translate "Boefje" %}</th>
                         <th scope="col">{% translate "Boefje input OOI" %}</th>
                         {# FIXME: implement detail page according to designs #}
-                        {# <th scope="col">{% translate "Details" %}</th> #}
+                        <th scope="col">{% translate "Details" %}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for task in task_history %}
-                        <tr>
+                        <tr data-task-id="{{ task.id }}">
                             <td>
                                 <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
                             </td>
@@ -157,7 +182,40 @@
                                 <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code observed_at=task.created_at|date:'Y-m-d' %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
                             </td>
                             {# FIXME: implement detail page according to designs #}
-                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                            <td>
+                                <button type="button"
+                                        class="expando-button normalizer-list-table-row"
+                                        data-icon-open-class="icon ti-chevron-down"
+                                        data-icon-close-class="icon ti-chevron-up"
+                                        data-close-label="{% translate "Close details" %}">
+                                    {% translate "Open details" %}
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="expando-row">
+                            <td colspan="7">
+                                <section>
+                                    <div id="yielded-objects-{{ task.id }}">
+                                        <h2>{% translate "Yielded objects" %}</h2>
+                                    </div>
+                                </section>
+                                <br>
+                                <section>
+                                    <div>
+                                        <div class="button-container">
+                                            {% if task.status.value in "completed,failed" %}
+                                                <a class="button"
+                                                   href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                                {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+
+                                            {% else %}
+                                                <a class="button"
+                                                   href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download task data" %}</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </section>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -175,12 +233,12 @@
                         <th scope="col">{% translate "Status" %}</th>
                         <th scope="col">{% translate "Created date" %}</th>
                         {# FIXME: implement detail page according to designs #}
-                        {# <th scope="col">{% translate "Scan Details" %}</th> #}
+                        {% comment %} <th scope="col">{% translate "Scan Details" %}</th> {% endcomment %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for task in task_history %}
-                        <tr>
+                        <tr data-task-id="{{ task.id }}">
                             <td>
                                 {% if task.type == "boefje" %}
                                     <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code %}">{{ task.p_item.data.input_ooi }}</a>
@@ -216,7 +274,11 @@
                             </td>
                             <td>{{ task.created_at }}</td>
                             {# FIXME: implement detail page according to designs #}
-                            {# <td><a href="">{% translate "View Details" %}</a></td> #}
+                            {% comment %} <td>
+                              <button type="button" class="expando-button normalizer-list-table-row" data-icon-open-class="icon ti-chevron-down" data-icon-close-class="icon ti-chevron-up" data-close-label="{% translate "Close details" %}">
+                              {% translate "Open details" %}
+                            </button>
+                            </td> {% endcomment %}
                         </tr>
                     {% endfor %}
                 </tbody>
