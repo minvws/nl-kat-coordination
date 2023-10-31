@@ -3,7 +3,6 @@ from typing import List, Set, Type
 
 from account.mixins import OrganizationView
 from django.contrib import messages
-from django.core.exceptions import BadRequest
 from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -33,7 +32,7 @@ from rocky.keiko import (
     keiko_client,
 )
 from rocky.views.finding_list import generate_findings_metadata
-from rocky.views.mixins import FindingList, OctopoesView, SeveritiesMixin, SingleOOITreeMixin
+from rocky.views.mixins import FindingList, OctopoesView, OOIAttributeError, SeveritiesMixin, SingleOOITreeMixin
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
@@ -41,22 +40,21 @@ class OOIReportView(BaseOOIDetailView):
     template_name = "oois/ooi_report.html"
     connector_form_class = OOIReportSettingsForm
 
-    def dispatch(self, request, *args, **kwargs):
-        if "ooi_id" not in request.GET:
-            raise BadRequest("Missing ooi_id parameter")
-        ooi_id = request.GET["ooi_id"]
+    def get(self, request, *args, **kwargs):
+        self.check_report_params()
+        self.depth = self.get_depth()
+        return super().get(request, *args, **kwargs)
 
+    def check_report_params(self):
+        try:
+            self.ooi = self.get_ooi()
+        except OOIAttributeError as error:
+            messages.error(self.request, error)
         if self.get_observed_at() > convert_date_to_datetime(datetime.now(timezone.utc)):
             messages.error(
-                request,
+                self.request,
                 _("You can't generate a report for an OOI on a date in the future."),
             )
-            return redirect(get_ooi_url("ooi_detail", ooi_id, self.organization.code))
-        return super().dispatch(request, *args, **kwargs)
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.depth = self.get_depth()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
