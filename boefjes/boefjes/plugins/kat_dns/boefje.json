@@ -20,6 +20,5 @@
         "IPAddressV4",
         "DNSZone"
     ],
-    "environment_keys": [],
     "scan_level": 1
 }

@@ -28,9 +28,4 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     output = run_adr_validator(url)
 
-    return [
-        (
-            set(),
-            output,
-        ),
-    ]
+    return [(set(), output)]
