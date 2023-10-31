@@ -458,6 +458,7 @@ class BaseReportView(BaseOOIDetailView):
         context = super().get_context_data(**kwargs)
         context["findings_list"] = self.get_findings_list()
         context["tree"] = self.get_filtered_tree(self.get_tree_dict())
+
         return context
 
 
