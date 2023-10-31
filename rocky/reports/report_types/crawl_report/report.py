@@ -17,7 +17,7 @@ class CrawlReport(Report):
     id = "crawl-report"
     name = _("Crawl report")
     description: str = _("Crawl reports show the hostname and cookies gathered when crawling a URL.")
-    plugins = {"required": ["kat_lapje"], "optional": []}
+    plugins = {"required": ["kat_chrome_mitmproxy", "kat_har_normalizer"], "optional": []}
     input_ooi_types = {HostnameHTTPURL}
     template_path = "crawl_report/report.html"
 

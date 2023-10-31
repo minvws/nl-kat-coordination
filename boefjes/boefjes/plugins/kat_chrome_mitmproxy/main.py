@@ -8,7 +8,7 @@ from boefjes.plugins.helpers import get_file_from_container
 
 logger = logging.getLogger(__name__)
 
-OCI_IMAGE = "lapje"
+OCI_IMAGE = "ghcr.io/minvws/nl-kat-chrome-crawler-mitmproxy:latest"
 
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
@@ -45,4 +45,4 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     except Exception as e:
         logging.warning(e)
 
-    return [(set("har"), output)]
+    return [(set(["har"]), output)]

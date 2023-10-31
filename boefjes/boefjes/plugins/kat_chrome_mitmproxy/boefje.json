@@ -1,0 +1,11 @@
+{
+    "id": "kat_chrome_mitmproxy",
+    "name": "Chrome mitmproxy crawler",
+    "description": "Crawls website using chrome and mitmproxy",
+    "consumes": [
+        "HostnameHTTPURL"
+    ],
+    "produces": [
+    ],
+    "scan_level": 2
+}
