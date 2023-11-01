@@ -52,9 +52,10 @@ class AppContext:
         bytes_service = services.Bytes(
             host=self._remove_trailing_slash(str(self.config.host_bytes)),
             user=self.config.host_bytes_user,
+            password=self.config.host_bytes_password,
+            timeout=self.config.host_bytes_request_timeout,
             pool_maxsize=self.config.ext_svc_pool_maxsize,
             pool_connections=self.config.ext_svc_pool_connections,
-            password=self.config.host_bytes_password,
             source=f"scheduler/{scheduler.__version__}",
         )
 

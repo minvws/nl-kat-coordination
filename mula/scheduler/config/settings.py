@@ -143,6 +143,11 @@ class Settings(BaseSettings):
         description="Bytes JWT login password",
     )
 
+    host_bytes_request_timeout: int = Field(
+        10,
+        description="The timeout in seconds for the requests to the bytes api",
+    )
+
     host_octopoes: AnyHttpUrl = Field(
         ...,
         example="http://localhost:8001",
