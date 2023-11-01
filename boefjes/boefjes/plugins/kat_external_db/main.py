@@ -11,7 +11,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     """Fetch external database response."""
     api_format = getenv(
         "DB_ENDPOINT_FORMAT",
-        "{DB_URL}/api/v1/participants/assets/{DB_ORGANIZATION_IDENTIFIER}?access_token={DB_ACCESS_TOKEN}",
+        "{DB_URL}/api/v1/organizations/assets/{DB_ORGANIZATION_IDENTIFIER}?access_token={DB_ACCESS_TOKEN}",
     )
     request_timeout = 100
 
