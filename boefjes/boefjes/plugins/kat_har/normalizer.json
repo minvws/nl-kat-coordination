@@ -1,0 +1,10 @@
+{
+    "id": "kat_har_normalizer",
+    "name": "HTTP Archive (HAR) normalizer",
+    "consumes": [
+        "har"
+    ],
+    "produces": [
+        "CrawlInformation"
+    ]
+}

@@ -63,6 +63,7 @@ from octopoes.models.ooi.web import (
     URL,
     APIDesignRule,
     APIDesignRuleResult,
+    CrawlInformation,
     HostnameHTTPURL,
     HTTPHeader,
     HTTPHeaderHostname,
@@ -127,6 +128,7 @@ WebType = Union[
     APIDesignRule,
     APIDesignRuleResult,
     SecurityTXT,
+    CrawlInformation,
 ]
 EmailSecurityType = Union[
     DNSSPFRecord,

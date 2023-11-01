@@ -1,0 +1,52 @@
+{% load i18n %}
+
+<h3>Crawl information</h3>
+{% if data.hostnames_and_cookies %}
+    <div class="horizontal-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Hostname" %}</th>
+                    <th>{% translate "Path" %}</th>
+                    <th>{% translate "Name" %}</th>
+                    <th>{% translate "Value" %}</th>
+                    <th>{% translate "Domain" %}</th>
+                    <th>{% translate "Secure" %}</th>
+                    <th>{% translate "SameSite" %}</th>
+                    <th>{% translate "httpOnly" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hostname, cookies in data.hostnames_and_cookies.items %}
+                    {% if cookies %}
+                        {% for cookie in cookies %}
+                            <tr>
+                                <td>{{ hostname }}</td>
+                                <td>{{ cookie.path }}</td>
+                                <td>{{ cookie.name }}</td>
+                                <td>{{ cookie.value }}</td>
+                                <td>{{ cookie.domain }}</td>
+                                <td>{{ cookie.secure }}</td>
+                                <td>{{ cookie.sameSite }}</td>
+                                <td>{{ cookie.httpOnly }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td>{{ hostname }}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>{% translate "No crawl information found for this URL" %}</p>
+{% endif %}
