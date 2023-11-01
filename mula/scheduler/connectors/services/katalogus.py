@@ -12,7 +12,15 @@ class Katalogus(HTTPService):
 
     name = "katalogus"
 
-    def __init__(self, host: str, source: str, timeout: int = 5, cache_ttl: int = 30, pool_maxsize: int = 42, pool_connections: int = 42):
+    def __init__(
+        self,
+        host: str,
+        source: str,
+        timeout: int = 5,
+        cache_ttl: int = 30,
+        pool_maxsize: int = 42,
+        pool_connections: int = 42,
+    ):
         super().__init__(host, source, timeout, pool_maxsize, pool_connections)
 
         # For every organisation we cache its plugins, it references the
