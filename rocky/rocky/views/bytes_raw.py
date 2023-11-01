@@ -8,6 +8,8 @@ from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import FileResponse, Http404
 from django.shortcuts import redirect
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from rocky.bytes_client import get_bytes_client
 
@@ -22,19 +24,24 @@ class BytesRawView(OrganizationView):
             boefje_meta_id = kwargs["boefje_meta_id"]
             raw_metas = client.get_raw_metas(boefje_meta_id)
 
-            raws = {raw_meta["id"]: client.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
+            raws = {
+                raw_meta["id"]: client.get_raw(raw_meta["id"])
+                for raw_meta in raw_metas
+                if raw_meta["boefje_meta"]["organization"] == self.organization.code
+            }
+            if not raws:
+                raise Http404
 
             return FileResponse(
                 zip_data(raws, raw_metas),
                 filename=f"{boefje_meta_id}.zip",
             )
         except Http404 as e:
-            msg = "Getting raw data failed."
+            msg = _("Getting raw data failed.")
             logger.error(msg)
             logger.error(e)
             messages.add_message(request, messages.ERROR, msg)
-
-            return redirect(request.META["HTTP_REFERER"])
+            return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
 def zip_data(raws: Dict[str, bytes], raw_metas: List[Dict]) -> BytesIO:
