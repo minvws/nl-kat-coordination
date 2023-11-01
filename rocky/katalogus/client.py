@@ -200,19 +200,16 @@ def parse_boefje(boefje: Dict) -> Boefje:
 
 
 def parse_normalizer(normalizer: Dict) -> Normalizer:
-    # TODO: give normalizers a proper name in backend
-    name = normalizer["id"].replace("_", " ").replace("kat ", "").title()
-
     consumes = set(normalizer["consumes"])
     produces = set()
     with contextlib.suppress(StopIteration):
-        consumes.add(f"normalizer/{name.lower()}")
+        consumes.add(f"normalizer/{normalizer.get('name') or normalizer['id']}")
         produces.add(type_by_name(normalizer["produces"]))
 
     return Normalizer(
         id=normalizer["id"],
         repository_id=normalizer["repository_id"],
-        name=name or normalizer["id"],
+        name=normalizer.get("name") or normalizer["id"],
         description=normalizer["description"],
         enabled=normalizer["enabled"],
         type=normalizer["type"],
