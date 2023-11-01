@@ -3,7 +3,7 @@ from boefjes.plugins.kat_rdns.normalize import run
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import DNSPTRRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 rdns_meta = NormalizerMeta(
     id="3fad4212-3647-4a28-b82a-fcd397762ccf",
