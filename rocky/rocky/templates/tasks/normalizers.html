@@ -36,16 +36,7 @@
                             <tbody>
                                 {% for task in object_list %}
                                     <tr data-task-id="{{ task.id }}">
-                                        <td>
-                                            <a href="{% url 'normalizer_detail' organization_code=organization.code plugin_id=task.p_item.data.normalizer.id %}">
-                                                {{ task.p_item.data.normalizer.name }}
-                                                {% comment %} {% if task.p_item.data.normalizer.name %}
-                                                {{ task.p_item.data.normalizer.name }}
-                                            {% else %}
-                                                {{ task.p_item.data.normalizer.id }}
-                                                {% endif %} {% endcomment %}
-                                            </a>
-                                        </td>
+                                        <td>{{ task.p_item.data.normalizer.id }}</td>
                                         <td class="nowrap">
                                             {% if task.status.value == "pending" or task.status.value == "queued" %}
                                                 <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
