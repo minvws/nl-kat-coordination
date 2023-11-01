@@ -170,7 +170,7 @@ def test_filter_raw_on_organization(meta_repository: SQLMetaDataRepository) -> N
     assert len(meta_repository.get_raw(query_filter)) == 1
 
     query_filter.organization = "test2"
-    assert len(meta_repository.get_raw(query_filter)) == 1
+    assert len(meta_repository.get_raw(query_filter)) == 0
 
 
 def test_filter_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:
