@@ -13,8 +13,8 @@ if [ "$1" = "configure" ]; then
 
     # Delete file and directory that was added in 1.13 to use granian only on
     # new installs.
-    rm -f /etc/systemd/system/kat-rocky.service.d/use-granian.conf
     if [ -d /etc/systemd/system/kat-rocky.service.d ]; then
+        rm -f /etc/systemd/system/kat-rocky.service.d/use-granian.conf
         rmdir --ignore-fail-on-non-empty /etc/systemd/system/kat-rocky.service.d
     fi
 fi
