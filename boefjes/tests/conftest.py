@@ -15,7 +15,7 @@ from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, Schedu
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, WorkerManager
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class MockSchedulerClient(SchedulerClientInterface):

@@ -3,7 +3,7 @@ from pathlib import Path
 import boefjes.api
 from boefjes.clients.scheduler_client import TaskStatus
 from tests.conftest import MockSchedulerClient
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 def _mocked_scheduler_client(tmp_path: Path):
