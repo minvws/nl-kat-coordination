@@ -51,13 +51,13 @@ class Bytes(HTTPService):
         super().__init__(host=host, source=source, timeout=timeout)
 
     def login(self) -> None:
-        self.headers.update({"Authorization": f"bearer {self._get_token()}"})
+        self.headers.update({"Authorization": f"bearer {self.get_token()}"})
 
     @staticmethod
     def _verify_response(response: requests.Response) -> None:
         response.raise_for_status()
 
-    def _get_token(self) -> str:
+    def get_token(self) -> str:
         url = f"{self.host}/token"
         response = self.post(
             url=url,

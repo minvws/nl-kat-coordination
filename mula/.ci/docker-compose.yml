@@ -24,20 +24,23 @@ services:
     env_file:
       - .ci/.env.test
     depends_on:
-      ci_postgres:
-        condition: service_healthy
-      ci_rabbitmq:
-        condition: service_healthy
+      - ci_postgres
+      - ci_bytes
+      - ci_katalogus
+      - ci_rabbitmq
 
   ci_postgres:
     image: postgres:15
     healthcheck:
-      test: ["CMD", "pg_isready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "gosu", "postgres", "pg_isready"]
+      interval: 3s
+      retries: 10
     env_file:
       - .ci/.env.test
+    environment:
+      APPS: "BYTES KATALOGUS SCHEDULER"
+    volumes:
+      - ../init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
 
   ci_rabbitmq:
     image: "rabbitmq:3.11-management"
@@ -47,3 +50,44 @@ services:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s
       retries: 4
+
+  ci_bytes:
+    build:
+      context: ../bytes
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        ENVIRONMENT: dev
+    command: uvicorn bytes.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/bytes/bytes
+    ports:
+      - "127.0.0.1:8002:8000"
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - ../bytes/:/app/bytes
+      - bytes-data:/data
+    depends_on:
+      ci_postgres:
+        condition: service_healthy
+
+  ci_katalogus:
+    build:
+      context: ..
+      dockerfile: boefjes/Dockerfile
+      target: dev
+      args:
+        ENVIRONMENT: dev
+    command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0
+    ports:
+      - "127.0.0.1:8003:8000"
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - ../boefjes/:/app/boefjes
+      - ../octopoes/octopoes:/app/boefjes/octopoes
+    depends_on:
+      ci_postgres:
+        condition: service_healthy
+
+volumes:
+  bytes-data:

@@ -12,6 +12,5 @@
         "DNSAAAARecord",
         "IPAddressV4"
     ],
-    "environment_keys": [],
     "scan_level": 3
 }

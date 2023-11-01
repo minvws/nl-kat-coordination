@@ -177,6 +177,14 @@ class SQLMetaDataRepository(MetaDataRepository):
         boefje_meta = to_boefje_meta(raw_in_db.boefje_meta)
         return self.raw_repository.get_raw(raw_in_db.id, boefje_meta)
 
+    def get_raw_meta_by_id(self, raw_id: uuid.UUID) -> RawDataMeta:
+        raw_in_db: Optional[RawFileInDB] = self.session.get(RawFileInDB, str(raw_id))
+
+        if raw_in_db is None:
+            raise ObjectNotFoundException(RawFileInDB, id=str(raw_id))
+
+        return to_raw_meta(raw_in_db)
+
     def has_raw(self, boefje_meta: BoefjeMeta, mime_types: List[MimeType]) -> bool:
         query = self.session.query(RawFileInDB).filter(RawFileInDB.boefje_meta_id == str(boefje_meta.id))
 

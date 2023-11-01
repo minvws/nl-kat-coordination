@@ -5,13 +5,4 @@ dl {
   dd {
     white-space: initial;
   }
-
-  /* Add option to style borders */
-  > div {
-    border-bottom: 1px solid #d4d4d4;
-  }
-}
-
-section dl div {
-  display: grid;
 }

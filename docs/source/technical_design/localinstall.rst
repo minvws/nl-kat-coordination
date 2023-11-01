@@ -84,7 +84,7 @@ Then OpenKAT is built, including all the parts such as Octopoes and Rocky.
 Front end
 *********
 
-Find the frontend of your OpenKAT install at port 8000 (http) or 8443 (https) of your localhost and follow the 'onboarding flow' to test your setup and start using your development setup of OpenKAT.
+Find the frontend of your OpenKAT install at port 8000 (http) of your localhost and follow the 'onboarding flow' to test your setup and start using your development setup of OpenKAT.
 
 By default a superuser account is created with email address ``superuser@localhost``. The password can be found as ``DJANGO_SUPERUSER_PASSWORD`` in the .env file.
 
