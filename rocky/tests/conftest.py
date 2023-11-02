@@ -407,7 +407,7 @@ def bytes_get_raw():
     "|---. (DNSKEY keytag: 46780 alg: 8 flags: 256)\\n                    "
     b"|---. (DNSKEY keytag: 20326 alg: 8 flags: 257)\\n;; Chase successful\\n"
 
-    return {"85c01c8c-c0bf-4fe8-bda5-abdf2d03117c": byte_string}
+    return byte_string.encode()
 
 
 @pytest.fixture

@@ -11,21 +11,18 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from rocky.bytes_client import get_bytes_client
-
 logger = logging.getLogger(__name__)
 
 
 class BytesRawView(OrganizationView):
     def get(self, request, **kwargs):
         try:
-            client = get_bytes_client(self.organization.code)
-            client.login()
+            self.bytes_client.login()
             boefje_meta_id = kwargs["boefje_meta_id"]
-            raw_metas = client.get_raw_metas(boefje_meta_id)
+            raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id)
 
             raws = {
-                raw_meta["id"]: client.get_raw(raw_meta["id"])
+                raw_meta["id"]: self.bytes_client.get_raw(raw_meta["id"])
                 for raw_meta in raw_metas
                 if raw_meta["boefje_meta"]["organization"] == self.organization.code
             }

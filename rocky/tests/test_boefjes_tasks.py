@@ -144,7 +144,10 @@ def test_download_task_other_org_from_other_org_url(
         )
 
 
-def test_download_task_other_org(rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw):
+def test_download_task_same_org(rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw):
+    mock_bytes_client().get_raw.return_value = bytes_get_raw
+    mock_bytes_client().get_raw_metas.return_value = bytes_raw_metas
+
     request = setup_request(rf.get("bytes_raw"), client_member.user)
 
     response = BytesRawView.as_view()(
@@ -154,3 +157,21 @@ def test_download_task_other_org(rf, client_member, mock_bytes_client, bytes_raw
     )
 
     assert response.status_code == 200
+
+
+def test_download_task_forbidden(rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw):
+    bytes_raw_metas[0]["boefje_meta"]["organization"] = "not_client_org"
+
+    mock_bytes_client().get_raw.return_value = bytes_get_raw
+    mock_bytes_client().get_raw_metas.return_value = bytes_raw_metas
+
+    request = setup_request(rf.get("bytes_raw"), client_member.user)
+
+    response = BytesRawView.as_view()(
+        request,
+        organization_code=client_member.organization.code,
+        boefje_meta_id=bytes_raw_metas[0]["id"],
+    )
+
+    assert response.status_code == 302
+    assert list(request._messages)[0].message == "Getting raw data failed."
