@@ -29,5 +29,8 @@
     },
     "required": [
         "DB_URL"
+    ],
+    "secret": [
+      "DB_ACCESS_TOKEN"
     ]
 }
