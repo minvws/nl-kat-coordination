@@ -11,5 +11,8 @@
   },
   "required": [
     "BINARYEDGE_API"
+  ],
+  "secret": [
+    "BINARYEDGE_API"
   ]
 }
