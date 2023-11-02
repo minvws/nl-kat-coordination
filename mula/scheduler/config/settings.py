@@ -91,11 +91,6 @@ class Settings(BaseSettings):
         description="The timeout in seconds for the requests to the octopoes api",
     )
 
-    octopoes_pool_maxsize: int = Field(
-        10,
-        description="The maximum number of connections to the octopoes api",
-    )
-
     octopoes_pool_connections: int = Field(
         10,
         description="The maximum number of connections to save in the pool for the octopoes api",
@@ -111,11 +106,6 @@ class Settings(BaseSettings):
         description="The timeout in seconds for the requests to the katalogus api",
     )
 
-    katalogus_pool_maxsize: int = Field(
-        10,
-        description="The maximum number of connections to save in the pool for the katalogus api",
-    )
-
     katalogus_pool_connections: int = Field(
         10,
         description="The maximum number of connections to save in the pool for the katalogus api",
@@ -124,11 +114,6 @@ class Settings(BaseSettings):
     bytes_request_timeout: int = Field(
         10,
         description="The timeout in seconds for the requests to the bytes api",
-    )
-
-    bytes_pool_maxsize: int = Field(
-        10,
-        description="The maximum number of connections to save in the pool for the bytes api",
     )
 
     bytes_pool_connections: int = Field(

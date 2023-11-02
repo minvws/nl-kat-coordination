@@ -13,9 +13,9 @@ class Katalogus(HTTPService):
     name = "katalogus"
 
     def __init__(
-        self, host: str, source: str, timeout: int, pool_maxsize: int, pool_connections: int, cache_ttl: int = 30
+        self, host: str, source: str, timeout: int, pool_connections: int, cache_ttl: int = 30
     ):
-        super().__init__(host, source, timeout, pool_maxsize, pool_connections)
+        super().__init__(host, source, timeout, pool_connections)
 
         # For every organisation we cache its plugins, it references the
         # plugin-id as key and the plugin as value.

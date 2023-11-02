@@ -43,7 +43,6 @@ class HTTPService(Connector):
         host: str,
         source: str,
         timeout: int = 10,
-        pool_maxsize: int = 10,
         pool_connections: int = 10,
         retries: int = 5,
     ):
@@ -59,10 +58,8 @@ class HTTPService(Connector):
                 from where the requests came from.
             timeout:
                 An integer defining the timeout of requests.
-            pool_maxsize:
-                The maximum number of connections to save in the pool.
             pool_connections:
-                The maximum number of connections to allow to a single host.
+                The number of connections kept alive in the pool.
             retries:
                 An integer defining the number of retries to make before
                 giving up.
@@ -74,7 +71,6 @@ class HTTPService(Connector):
         self.host: str = host
         self.timeout: int = timeout
         self.retries: int = retries
-        self.pool_maxsize: int = pool_maxsize
         self.pool_connections: int = pool_connections
         self.source: str = source
 
@@ -88,13 +84,13 @@ class HTTPService(Connector):
         self.session.mount(
             "http://",
             HTTPAdapter(
-                max_retries=max_retries, pool_maxsize=self.pool_maxsize, pool_connections=self.pool_connections
+                max_retries=max_retries, pool_connections=self.pool_connections
             ),
         )
         self.session.mount(
             "https://",
             HTTPAdapter(
-                max_retries=max_retries, pool_maxsize=self.pool_maxsize, pool_connections=self.pool_connections
+                max_retries=max_retries, pool_connections=self.pool_connections
             ),
         )
 

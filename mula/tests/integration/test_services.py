@@ -17,7 +17,6 @@ class BytesTestCase(unittest.TestCase):
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
             timeout=self.config.bytes_request_timeout,
-            pool_maxsize=self.config.bytes_pool_maxsize,
             pool_connections=self.config.bytes_pool_connections,
             source="scheduler_test",
         )
@@ -58,7 +57,6 @@ class KatalogusTestCase(unittest.TestCase):
             host=remove_trailing_slash(str(self.config.host_katalogus)),
             source="scheduler_test",
             timeout=self.config.katalogus_request_timeout,
-            pool_maxsize=self.config.katalogus_pool_maxsize,
             pool_connections=self.config.katalogus_pool_connections,
             cache_ttl=12345,
         )

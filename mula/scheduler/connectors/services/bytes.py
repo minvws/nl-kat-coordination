@@ -35,7 +35,7 @@ class Bytes(HTTPService):
     name = "bytes"
 
     def __init__(
-        self, host: str, source: str, user: str, password: str, timeout: int, pool_maxsize: int, pool_connections: int
+        self, host: str, source: str, user: str, password: str, timeout: int, pool_connections: int
     ):
         """Initialize the Bytes service.
 
@@ -53,7 +53,7 @@ class Bytes(HTTPService):
 
         self.lock: threading.Lock = threading.Lock()
 
-        super().__init__(host, source, timeout, pool_maxsize, pool_connections)
+        super().__init__(host, source, timeout, pool_connections)
 
     def login(self) -> None:
         with self.lock:

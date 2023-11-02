@@ -46,7 +46,6 @@ class AppContext:
             host=remove_trailing_slash(str(self.config.host_katalogus)),
             source=f"scheduler/{scheduler.__version__}",
             timeout=self.config.katalogus_request_timeout,
-            pool_maxsize=self.config.katalogus_pool_maxsize,
             pool_connections=self.config.katalogus_pool_connections,
             cache_ttl=self.config.katalogus_cache_ttl,
         )
@@ -57,7 +56,6 @@ class AppContext:
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
             timeout=self.config.bytes_request_timeout,
-            pool_maxsize=self.config.bytes_pool_maxsize,
             pool_connections=self.config.bytes_pool_connections,
         )
 
@@ -65,7 +63,6 @@ class AppContext:
             host=remove_trailing_slash(str(self.config.host_octopoes)),
             source=f"scheduler/{scheduler.__version__}",
             timeout=self.config.octopoes_request_timeout,
-            pool_maxsize=self.config.octopoes_pool_maxsize,
             pool_connections=self.config.octopoes_pool_connections,
             orgs=katalogus_service.get_organisations(),
         )
