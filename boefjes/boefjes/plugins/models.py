@@ -87,7 +87,7 @@ def get_runnable_hash(path: Path) -> str:
 
 
 def _default_mime_types(boefje: Boefje):
-    mime_types = {boefje.id, f"boefje/{boefje.id}"}
+    mime_types = {f"boefje/{boefje.id}"}
 
     if boefje.version is not None:
         mime_types = mime_types.union({f"boefje/{boefje.id}-{boefje.version}"})

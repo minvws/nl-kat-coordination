@@ -5,6 +5,7 @@ WITH filtered AS (
     ) m
 
     WHERE m.mime_type NOT LIKE concat('boefje/', m.boefje_id, '-%')
+    AND m.mime_type != m.boefje_id
     GROUP BY m.id
 )
 UPDATE raw_file r SET mime_types = filtered.mime_types FROM filtered WHERE r.id = filtered.id;

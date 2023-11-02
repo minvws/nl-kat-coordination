@@ -132,7 +132,6 @@ class TaskTest(TestCase):
         assert "JobRuntimeError: Boefje failed" in raw_call_args[0][1]
         assert raw_call_args[0][2] == {
             "error/boefje",
-            "dummy_boefje_runtime_exception",
             "boefje/dummy_boefje_runtime_exception",
         }
 
