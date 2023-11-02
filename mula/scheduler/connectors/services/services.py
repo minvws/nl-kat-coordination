@@ -83,15 +83,11 @@ class HTTPService(Connector):
         # Mount the HTTPAdapter to the session
         self.session.mount(
             "http://",
-            HTTPAdapter(
-                max_retries=max_retries, pool_connections=self.pool_connections
-            ),
+            HTTPAdapter(max_retries=max_retries, pool_connections=self.pool_connections),
         )
         self.session.mount(
             "https://",
-            HTTPAdapter(
-                max_retries=max_retries, pool_connections=self.pool_connections
-            ),
+            HTTPAdapter(max_retries=max_retries, pool_connections=self.pool_connections),
         )
 
         if self.source:

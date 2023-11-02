@@ -34,9 +34,7 @@ class Bytes(HTTPService):
 
     name = "bytes"
 
-    def __init__(
-        self, host: str, source: str, user: str, password: str, timeout: int, pool_connections: int
-    ):
+    def __init__(self, host: str, source: str, user: str, password: str, timeout: int, pool_connections: int):
         """Initialize the Bytes service.
 
         Args:
