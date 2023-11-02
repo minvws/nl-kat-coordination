@@ -62,7 +62,6 @@ class Bytes(HTTPService):
         response.raise_for_status()
 
     def _get_token(self) -> str:
-        self.logger.info(20 * "LOGIN")
         url = f"{self.host}/token"
         response = self.post(
             url=url,

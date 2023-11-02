@@ -122,6 +122,11 @@ class Settings(BaseSettings):
         description="Katalogus API URL",
     )
 
+    host_katalogus_request_timeout: int = Field(
+        10,
+        description="The timeout in seconds for the requests to the katalogus api",
+    )
+
     host_bytes: AnyHttpUrl = Field(
         ...,
         example="http://localhost:8004",
@@ -153,6 +158,11 @@ class Settings(BaseSettings):
         example="http://localhost:8001",
         alias="OCTOPOES_API",
         description="Octopoes API URL",
+    )
+
+    host_octopoes_request_timeout: int = Field(
+        10,
+        description="The timeout in seconds for the requests to the octopoes api",
     )
 
     host_mutation: AmqpDsn = Field(

@@ -44,6 +44,7 @@ class AppContext:
         katalogus_service = services.Katalogus(
             host=self._remove_trailing_slash(str(self.config.host_katalogus)),
             source=f"scheduler/{scheduler.__version__}",
+            timeout=self.config.host_katalogus_request_timeout,
             pool_maxsize=self.config.ext_svc_pool_maxsize,
             pool_connections=self.config.ext_svc_pool_connections,
             cache_ttl=self.config.katalogus_cache_ttl,
@@ -62,10 +63,10 @@ class AppContext:
         octopoes_service = services.Octopoes(
             host=self._remove_trailing_slash(str(self.config.host_octopoes)),
             source=f"scheduler/{scheduler.__version__}",
+            timeout=self.config.host_octopoes_request_timeout,
             pool_maxsize=self.config.ext_svc_pool_maxsize,
             pool_connections=self.config.ext_svc_pool_connections,
             orgs=katalogus_service.get_organisations(),
-            timeout=self.config.octopoes_request_timeout,
         )
 
         # Register external services, SimpleNamespace allows us to use dot

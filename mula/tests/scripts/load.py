@@ -14,7 +14,7 @@ SCHEDULER_API = "http://localhost:8004"
 def run():
     # Create organisations
     orgs: List[Dict[str, Any]] = []
-    for n in range(1, 10):
+    for n in range(1, 50):
         org = {
             "id": f"org-{n}",
             "name": f"Organisation {n}",

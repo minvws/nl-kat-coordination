@@ -96,78 +96,79 @@ class App:
         """Monitor the organisations from the Katalogus service, and add/remove
         organisations from the schedulers.
         """
-        current_schedulers = self.schedulers.copy()
+        with self.lock:
+            current_schedulers = self.schedulers.copy()
 
-        # We make a difference between the organisation id's that are used
-        # by the schedulers, and the organisation id's that are in the
-        # Katalogus service. We will add/remove schedulers based on the
-        # difference between these two sets.
-        scheduler_orgs: Set[str] = {
-            s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
-        }
-        katalogus_orgs: Set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
+            # We make a difference between the organisation id's that are used
+            # by the schedulers, and the organisation id's that are in the
+            # Katalogus service. We will add/remove schedulers based on the
+            # difference between these two sets.
+            scheduler_orgs: Set[str] = {
+                s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
+            }
+            katalogus_orgs: Set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
-        additions = katalogus_orgs.difference(scheduler_orgs)
-        self.logger.debug("Organisations to add: %s", len(additions))
+            additions = katalogus_orgs.difference(scheduler_orgs)
+            self.logger.debug("Organisations to add: %s", len(additions))
 
-        removals = scheduler_orgs.difference(katalogus_orgs)
-        self.logger.debug("Organisations to remove: %s", len(removals))
+            removals = scheduler_orgs.difference(katalogus_orgs)
+            self.logger.debug("Organisations to remove: %s", len(removals))
 
-        # We need to get scheduler ids of the schedulers that are associated
-        # with the removed organisations
-        removal_scheduler_ids: Set[str] = {
-            s.scheduler_id
-            for s in current_schedulers.values()
-            if hasattr(s, "organisation") and s.organisation.id in removals
-        }
+            # We need to get scheduler ids of the schedulers that are associated
+            # with the removed organisations
+            removal_scheduler_ids: Set[str] = {
+                s.scheduler_id
+                for s in current_schedulers.values()
+                if hasattr(s, "organisation") and s.organisation.id in removals
+            }
 
-        # Remove schedulers for removed organisations
-        for scheduler_id in removal_scheduler_ids:
-            if scheduler_id not in self.schedulers:
-                continue
+            # Remove schedulers for removed organisations
+            for scheduler_id in removal_scheduler_ids:
+                if scheduler_id not in self.schedulers:
+                    continue
 
-            self.schedulers[scheduler_id].stop()
+                self.schedulers[scheduler_id].stop()
 
-        if removals:
-            self.logger.info(
-                "Removed %s organisations from scheduler [org_ids=%s]",
-                len(removals),
-                removals,
-            )
+            if removals:
+                self.logger.info(
+                    "Removed %s organisations from scheduler [org_ids=%s]",
+                    len(removals),
+                    removals,
+                )
 
-        # Add schedulers for organisation
-        for org_id in additions:
-            org = self.ctx.services.katalogus.get_organisation(org_id)
+            # Add schedulers for organisation
+            for org_id in additions:
+                org = self.ctx.services.katalogus.get_organisation(org_id)
 
-            scheduler_normalizer = schedulers.NormalizerScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"normalizer-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
-            )
+                scheduler_normalizer = schedulers.NormalizerScheduler(
+                    ctx=self.ctx,
+                    scheduler_id=f"normalizer-{org.id}",
+                    organisation=org,
+                    callback=self.remove_scheduler,
+                )
 
-            self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
-            scheduler_normalizer.run()
+                self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
+                scheduler_normalizer.run()
 
-            scheduler_boefje = schedulers.BoefjeScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"boefje-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
-            )
+                scheduler_boefje = schedulers.BoefjeScheduler(
+                    ctx=self.ctx,
+                    scheduler_id=f"boefje-{org.id}",
+                    organisation=org,
+                    callback=self.remove_scheduler,
+                )
 
-            self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
-            scheduler_boefje.run()
+                self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
+                scheduler_boefje.run()
 
-        if additions:
-            # Flush katalogus caches when new organisations are added
-            self.ctx.services.katalogus.flush_caches()
+            if additions:
+                # Flush katalogus caches when new organisations are added
+                self.ctx.services.katalogus.flush_caches()
 
-            self.logger.info(
-                "Added %s organisations to scheduler [org_ids=%s]",
-                len(additions),
-                additions,
-            )
+                self.logger.info(
+                    "Added %s organisations to scheduler [org_ids=%s]",
+                    len(additions),
+                    additions,
+                )
 
     @tracer.start_as_current_span("collect_metrics")
     def collect_metrics(self) -> None:
@@ -175,21 +176,22 @@ class App:
 
         This method that allows to collect metrics throughout the application.
         """
-        for s in self.schedulers.values():
-            self.ctx.metrics_qsize.labels(
-                scheduler_id=s.scheduler_id,
-            ).set(
-                s.queue.qsize(),
-            )
-
-            status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
-            for status, count in status_counts.items():
-                self.ctx.metrics_task_status_counts.labels(
+        with self.lock:
+            for s in self.schedulers.copy().values():
+                self.ctx.metrics_qsize.labels(
                     scheduler_id=s.scheduler_id,
-                    status=status,
                 ).set(
-                    count,
+                    s.queue.qsize(),
                 )
+
+                status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
+                for status, count in status_counts.items():
+                    self.ctx.metrics_task_status_counts.labels(
+                        scheduler_id=s.scheduler_id,
+                        status=status,
+                    ).set(
+                        count,
+                    )
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the

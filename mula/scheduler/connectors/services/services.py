@@ -42,7 +42,7 @@ class HTTPService(Connector):
         self,
         host: str,
         source: str,
-        timeout: int = 5,
+        timeout: int = 10,
         retries: int = 5,
         pool_maxsize: int = 42,
         pool_connections: int = 42,
