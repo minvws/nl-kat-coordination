@@ -38,7 +38,15 @@ class HTTPService(Connector):
     name: Optional[str] = None
     health_endpoint: Optional[str] = "health"
 
-    def __init__(self, host: str, source: str, timeout: int = 5, retries: int = 5):
+    def __init__(
+        self,
+        host: str,
+        source: str,
+        timeout: int = 10,
+        pool_maxsize: int = 10,
+        pool_connections: int = 10,
+        retries: int = 5,
+    ):
         """Initializer of the HTTPService class. During initialization the
         host will be checked if it is available and healthy.
 
@@ -51,6 +59,10 @@ class HTTPService(Connector):
                 from where the requests came from.
             timeout:
                 An integer defining the timeout of requests.
+            pool_maxsize:
+                The maximum number of connections to save in the pool.
+            pool_connections:
+                The maximum number of connections to allow to a single host.
             retries:
                 An integer defining the number of retries to make before
                 giving up.
@@ -61,7 +73,9 @@ class HTTPService(Connector):
         self.session: requests.Session = requests.Session()
         self.host: str = host
         self.timeout: int = timeout
-        self.retries = retries
+        self.retries: int = retries
+        self.pool_maxsize: int = pool_maxsize
+        self.pool_connections: int = pool_connections
         self.source: str = source
 
         max_retries = Retry(
@@ -69,8 +83,20 @@ class HTTPService(Connector):
             backoff_factor=0.1,
             status_forcelist=[500, 502, 503, 504],
         )
-        self.session.mount("http://", HTTPAdapter(max_retries=max_retries))
-        self.session.mount("https://", HTTPAdapter(max_retries=max_retries))
+
+        # Mount the HTTPAdapter to the session
+        self.session.mount(
+            "http://",
+            HTTPAdapter(
+                max_retries=max_retries, pool_maxsize=self.pool_maxsize, pool_connections=self.pool_connections
+            ),
+        )
+        self.session.mount(
+            "https://",
+            HTTPAdapter(
+                max_retries=max_retries, pool_maxsize=self.pool_maxsize, pool_connections=self.pool_connections
+            ),
+        )
 
         if self.source:
             self.headers["User-Agent"] = self.source
