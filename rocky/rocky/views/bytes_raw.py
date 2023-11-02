@@ -29,6 +29,7 @@ class BytesRawView(OrganizationView):
                 for raw_meta in raw_metas
                 if raw_meta["boefje_meta"]["organization"] == self.organization.code
             }
+
             if not raws:
                 raise Http404
 
