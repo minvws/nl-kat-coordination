@@ -47,7 +47,7 @@ class Normalizer(BaseModel):
     """Normalizer representation."""
 
     id: Optional[str]
-    name: Optional[str]
+    name: Optional[str] = Field(default=None)
     version: Optional[str] = Field(default=None)
 
 
