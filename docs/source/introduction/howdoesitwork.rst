@@ -18,9 +18,9 @@ OpenKAT uses a configurable data model. All information is translated into objec
 Basic concepts
 ==============
 
-Central to OpenKAT are objects and the data model. Objects are created by collecting and analyzing information. The objects found are analyzed using business rules, leading to findings that are included as objects in the data model.
+Central to OpenKAT are objects and the data model. Objects (or 'Objects Of Interest, OOI') are created by collecting and analyzing information. The objects found are analyzed using business rules, leading to findings that are included as objects in the data model.
 
-The data model helps in the search for more information, through the logical coherence of objects. When an object is found, OpenKAT automatically checks whether related objects are also present. Based on this, it searches for information again, completing the circle.
+The data model helps in the search for more information, through the logical coherence of objects. Object types are defined in the datamodel. When an object is found, OpenKAT automatically checks whether related objects are also present. Based on this, it searches for information again, completing the circle.
 
 Objects, the data model and recursivity
 ***************************************
@@ -102,16 +102,5 @@ Reports can be created in a couple of ways. In the standard installation of Open
 - missing headers
 - SSL problems and certificates
 - SPF and mail configuration
-
-Specific reports:
-
-- DNS reporting
-- Internet.com (partial)
-- SSL report with certificates
-
-GraphQL:
-
-- Simple input for queries
-- Build complex queries yourself
 
 OpenKAT can generate reports in a number of formats, including LaTeX and PDF. An API is also available that can interface with other systems.

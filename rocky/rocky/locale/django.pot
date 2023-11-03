@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-17 13:44+0000\n"
+"POT-Creation-Date: 2023-10-20 15:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1654,7 +1654,8 @@ msgstr ""
 
 #: katalogus/templates/plugin_settings_delete.html
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/plugin_settings_delete.py rocky/views/ooi_delete.py
+#: katalogus/views/plugin_settings_delete.py
+#: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
 msgstr ""
 
@@ -2825,7 +2826,7 @@ msgid "Select which objects you want to include in your report."
 msgstr ""
 
 #: reports/templates/report_oois_selection.html
-#: rocky/templates/oois/ooi_list.html
+#: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
@@ -3129,6 +3130,8 @@ msgid "Filter types"
 msgstr ""
 
 #: tools/forms/ooi.py tools/view_helpers.py
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html rocky/templates/indemnification_present.html
 #: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
@@ -3478,6 +3481,119 @@ msgid ""
 "The page you wanted to see or the file you wanted to view was not found."
 msgstr ""
 
+#: rocky/templates/admin/base.html
+msgid "Skip to main content"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "Welcome,"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "View site"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "Documentation"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "Change password"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "Log out"
+msgstr ""
+
+#: rocky/templates/admin/base.html rocky/templates/header.html
+msgid "Breadcrumbs"
+msgstr ""
+
+#: rocky/templates/admin/base.html rocky/templates/admin/change_form.html
+#: rocky/templates/admin/change_list.html
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+msgid "Home"
+msgstr ""
+
+#: rocky/templates/admin/change_form.html
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+#: rocky/templates/admin/change_form.html
+#: rocky/templates/admin/change_list.html
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Clear all filters"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+msgid "Yes, I’m sure"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+msgid "No, take me back"
+msgstr ""
+
+#: rocky/templates/admin/delete_selected_confirmation.html
+msgid "Delete multiple objects"
+msgstr ""
+
+#: rocky/templates/admin/delete_selected_confirmation.html
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#: rocky/templates/admin/delete_selected_confirmation.html
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#: rocky/templates/admin/delete_selected_confirmation.html
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+#: rocky/templates/admin/popup_response.html
+msgid "Popup closing…"
+msgstr ""
+
 #: rocky/templates/crisis_room/crisis_room.html
 msgid ""
 "An overview of all (critical) findings OpenKAT found. Check the detail "
@@ -3736,10 +3852,6 @@ msgstr ""
 #: rocky/templates/header.html rocky/templates/partials/task_history.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
-msgstr ""
-
-#: rocky/templates/header.html
-msgid "Breadcrumbs"
 msgstr ""
 
 #: rocky/templates/health.html
