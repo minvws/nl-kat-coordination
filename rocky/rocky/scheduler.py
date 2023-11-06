@@ -11,7 +11,7 @@ import requests
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from pydantic import BaseModel, Field
-from requests.exceptions import ConnectionError, HTTPError
+from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
 
@@ -189,12 +189,26 @@ class TaskNotFoundError(SchedulerError):
     message = _("Task could not be found.")
 
 
-class SchedulerClient:
+class SchedulerSession(requests.Session):
     def __init__(self, base_uri: str):
-        self.session = requests.Session()
+        super().__init__()
+        self.session = self
         self._base_uri = base_uri
-        self.is_alive()
 
+        try:
+            self.session.get(f"{self._base_uri}/health")
+        except (
+            requests.ConnectionError,
+            requests.RequestException,
+            requests.TooManyRedirects,
+            requests.ConnectTimeout,
+            requests.ReadTimeout,
+            requests.Timeout,
+        ) as error:
+            raise SchedulerError(error)
+
+
+class SchedulerClient(SchedulerSession):
     def list_tasks(
         self,
         **kwargs,
@@ -202,8 +216,8 @@ class SchedulerClient:
         try:
             res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
             return PaginatedTasksResponse.parse_raw(res.text)
-        except ConnectionError:
-            raise SchedulerError()
+        except HTTPError:
+            raise TaskNotFoundError()
 
     def get_lazy_task_list(
         self,
@@ -216,20 +230,17 @@ class SchedulerClient:
         plugin_id: Optional[str] = None,
         boefje_name: Optional[str] = None,
     ) -> LazyTaskList:
-        try:
-            return LazyTaskList(
-                self,
-                scheduler_id=scheduler_id,
-                type=task_type,
-                status=status,
-                min_created_at=min_created_at,
-                max_created_at=max_created_at,
-                input_ooi=input_ooi,
-                plugin_id=plugin_id,
-                boefje_name=boefje_name,
-            )
-        except ConnectionError:
-            raise SchedulerError()
+        return LazyTaskList(
+            self,
+            scheduler_id=scheduler_id,
+            type=task_type,
+            status=status,
+            min_created_at=min_created_at,
+            max_created_at=max_created_at,
+            input_ooi=input_ooi,
+            plugin_id=plugin_id,
+            boefje_name=boefje_name,
+        )
 
     def get_task_details(self, task_id) -> Task:
         try:
@@ -238,8 +249,6 @@ class SchedulerClient:
             return Task.parse_raw(res.content)
         except HTTPError:
             raise TaskNotFoundError()
-        except ConnectionError:
-            raise SchedulerError()
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         try:
@@ -253,15 +262,6 @@ class SchedulerClient:
                 raise BadRequestError()
             elif code == HTTPStatus.CONFLICT:
                 raise ConflictError()
-            else:
-                raise SchedulerError()
-
-    def is_alive(self) -> None:
-        try:
-            request = self.session.get(f"{self._base_uri}")
-            request.raise_for_status()
-        except ConnectionError:
-            raise SchedulerError()
 
     def health(self) -> ServiceHealth:
         health_endpoint = self.session.get(f"{self._base_uri}/health")
