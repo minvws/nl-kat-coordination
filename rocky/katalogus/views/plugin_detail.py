@@ -179,55 +179,55 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
         if action == PageActions.RESCHEDULE_TASK.value:
             self.handle_page_action(action)
             return redirect(request.path)
-        else:
-            """Start scanning oois at plugin detail page."""
-            if not self.indemnification_present:
-                return self.get(request, *args, **kwargs)
 
-            if "boefje_id" not in request.POST:
-                raise BadRequest("No boefje_id provided")
-
-            selected_oois = request.POST.getlist("ooi")
-            plugin_id = request.POST["boefje_id"]
-            if selected_oois and plugin_id:
-                oois = self.get_oois(selected_oois)
-                boefje = self.katalogus_client.get_plugin(plugin_id)
-
-                oois_with_clearance_level = oois["oois_with_clearance"]
-                oois_without_clearance_level = oois["oois_without_clearance"]
-
-                if oois_with_clearance_level:
-                    self.run_boefje_for_oois(
-                        boefje=boefje,
-                        oois=oois_with_clearance_level,
-                    )
-
-                if oois_without_clearance_level:
-                    if not self.organization_member.has_perm("tools.can_set_clearance_level"):
-                        messages.add_message(
-                            self.request,
-                            messages.ERROR,
-                            _(
-                                "Some selected OOIs needs an increase of clearance level to perform scans."
-                                " You do not have the permission to change clearance level."
-                            ),
-                        )
-                    else:
-                        request.session["selected_oois"] = oois_without_clearance_level
-                        return redirect(
-                            reverse(
-                                "change_clearance_level",
-                                kwargs={
-                                    "organization_code": self.organization.code,
-                                    "plugin_id": plugin_id,
-                                    "scan_level": self.plugin.scan_level.value,
-                                },
-                            )
-                        )
-                return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
-
-            messages.add_message(self.request, messages.ERROR, _("Please select an OOI to start scan."))
+        """Start scanning oois at plugin detail page."""
+        if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
+
+        if "boefje_id" not in request.POST:
+            raise BadRequest("No boefje_id provided")
+
+        selected_oois = request.POST.getlist("ooi")
+        plugin_id = request.POST["boefje_id"]
+        if selected_oois and plugin_id:
+            oois = self.get_oois(selected_oois)
+            boefje = self.katalogus_client.get_plugin(plugin_id)
+
+            oois_with_clearance_level = oois["oois_with_clearance"]
+            oois_without_clearance_level = oois["oois_without_clearance"]
+
+            if oois_with_clearance_level:
+                self.run_boefje_for_oois(
+                    boefje=boefje,
+                    oois=oois_with_clearance_level,
+                )
+
+            if oois_without_clearance_level:
+                if not self.organization_member.has_perm("tools.can_set_clearance_level"):
+                    messages.add_message(
+                        self.request,
+                        messages.ERROR,
+                        _(
+                            "Some selected OOIs needs an increase of clearance level to perform scans."
+                            " You do not have the permission to change clearance level."
+                        ),
+                    )
+                else:
+                    request.session["selected_oois"] = oois_without_clearance_level
+                    return redirect(
+                        reverse(
+                            "change_clearance_level",
+                            kwargs={
+                                "organization_code": self.organization.code,
+                                "plugin_id": plugin_id,
+                                "scan_level": self.plugin.scan_level.value,
+                            },
+                        )
+                    )
+            return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
+
+        messages.add_message(self.request, messages.ERROR, _("Please select an OOI to start scan."))
+        return self.get(request, *args, **kwargs)
 
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
