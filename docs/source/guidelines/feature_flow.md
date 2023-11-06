@@ -81,3 +81,19 @@ Ideally we would follow the following QA procedure on each of these environments
 
 #### Checking Performance
 - [ ] Verify that there is no significant performance regression
+
+---
+
+## Tips and tricks for pull request QA testing
+
+### Think outside the box
+- Feel free to deviate from the checklist: testing things that are not obviously related to the PR is a good way to find bugs.
+- Thoroughness is key: embrace the "hacker mindset" and try to break (new) functionality by providing unexpected input, and attempt to perform unauthorized actions.
+- Try to break the UI: try resizing the window, using zoom functionality, and test multiple browsers.
+- Always remember that you are taking on the role of a user that is probably not as familiar with the application as you are: everything you encounter should feel intuitive and easy to use. Lack of intuitiveness deserves a QA comment.
+
+### Be pragmatic but versatile
+- Features updating the data model should usually be backward compatible, so we should not run `make reset` upon every review. Switch tactics with respect to updating your local environment regularly.
+- Small documentation changes do not require rebuilding and restarting all services to performa a QA review.
+- Properly gauge the impact of a feature: API changes in the KATalogus, for example, can affect Rocky, Mula and Octopoes, but never Bytes (in the current setup).
+- Changes that hit the core of every service (package updates) require performing the extended QA checklist.
