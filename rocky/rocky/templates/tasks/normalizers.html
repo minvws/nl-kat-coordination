@@ -21,7 +21,9 @@
                 {% else %}
                     <p class="emphasized">{% translate "List of tasks for normalizers" %}</p>
                     <div class="horizontal-scroll">
-                        <table rf-selector="table-normalizers">
+                        {% include "tasks/partials/normalizer_task_history.html" with task_history=object_list %}
+
+                        {% comment %} <table rf-selector="table-normalizers">
                             <caption>{% translate "List of tasks for " %}{{ organization.name }}</caption>
                             <thead>
                                 <tr>
@@ -66,11 +68,7 @@
                                             <td>{% translate "No input OOI" %}</td>
                                         {% endif %}
                                         <td class="actions action-buttons">
-                                            <button type="button"
-                                                    class="expando-button normalizer-list-table-row"
-                                                    data-icon-open-class="icon ti-chevron-down"
-                                                    data-icon-close-class="icon ti-chevron-up"
-                                                    data-close-label="{% translate "Close details" %}">
+                                            <button type="button" class="expando-button normalizer-list-table-row" data-icon-open-class="icon ti-chevron-down" data-icon-close-class="icon ti-chevron-up" data-close-label="{% translate "Close details" %}">
                                                 {% translate "Open details" %}
                                             </button>
                                         </td>
@@ -87,13 +85,11 @@
                                                 <div>
                                                     <div class="button-container">
                                                         {% if task.status.value in "completed,failed" %}
-                                                            <a class="button"
-                                                               href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                                            <a class="button" href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.p_item.data.raw_data.boefje_meta.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
                                                             {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
 
                                                         {% else %}
-                                                            <a class="button"
-                                                               href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download task data" %}</a>
+                                                            <a class="button" href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download task data" %}</a>
                                                         {% endif %}
                                                     </div>
                                                 </div>
@@ -102,7 +98,7 @@
                                     </tr>
                                 {% endfor %}
                             </tbody>
-                        </table>
+                        </table> {% endcomment %}
                     </div>
                     {% include "partials/list_paginator.html" %}
 
