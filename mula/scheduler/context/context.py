@@ -45,16 +45,12 @@ class AppContext:
         katalogus_service = services.Katalogus(
             host=remove_trailing_slash(str(self.config.host_katalogus)),
             source=f"scheduler/{scheduler.__version__}",
-            pool_maxsize=self.config.ext_svc_pool_maxsize,
-            pool_connections=self.config.ext_svc_pool_connections,
             cache_ttl=self.config.katalogus_cache_ttl,
         )
 
         bytes_service = services.Bytes(
             host=remove_trailing_slash(str(self.config.host_bytes)),
             user=self.config.host_bytes_user,
-            pool_maxsize=self.config.ext_svc_pool_maxsize,
-            pool_connections=self.config.ext_svc_pool_connections,
             password=self.config.host_bytes_password,
             source=f"scheduler/{scheduler.__version__}",
         )
@@ -62,8 +58,6 @@ class AppContext:
         octopoes_service = services.Octopoes(
             host=remove_trailing_slash(str(self.config.host_octopoes)),
             source=f"scheduler/{scheduler.__version__}",
-            pool_maxsize=self.config.ext_svc_pool_maxsize,
-            pool_connections=self.config.ext_svc_pool_connections,
             orgs=katalogus_service.get_organisations(),
             timeout=self.config.octopoes_request_timeout,
         )

@@ -33,16 +33,7 @@ class Bytes(HTTPService):
 
     name = "bytes"
 
-    def __init__(
-        self,
-        host: str,
-        source: str,
-        user: str,
-        password: str,
-        timeout: int = 5,
-        pool_maxsize: int = 42,
-        pool_connections: int = 42,
-    ):
+    def __init__(self, host: str, source: str, user: str, password: str, timeout: int = 5):
         """Initialize the Bytes service.
 
         Args:
@@ -57,9 +48,7 @@ class Bytes(HTTPService):
             "password": password,
         }
 
-        super().__init__(
-            host=host, source=source, timeout=timeout, pool_maxsize=pool_maxsize, pool_connections=pool_connections
-        )
+        super().__init__(host=host, source=source, timeout=timeout)
 
     def login(self) -> None:
         self.headers.update({"Authorization": f"bearer {self.get_token()}"})
