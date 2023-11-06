@@ -1,10 +1,8 @@
-from http import HTTPStatus
 from unittest.mock import call
 
 from pytest_django.asserts import assertContains
-from requests.exceptions import HTTPError
 
-from rocky.scheduler import SchedulerError
+from rocky.scheduler import SchedulerError, TooManyRequestsError
 from rocky.views.tasks import BoefjesTaskListView
 from tests.conftest import setup_request
 
@@ -66,7 +64,7 @@ def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje)
     assertContains(response, "Could not connect to Scheduler. Service is possibly down.")
 
 
-def test_reschedule_task(rf, client_member, mock_scheduler, mocker, task):
+def test_reschedule_task(rf, client_member, mock_scheduler, task):
     mock_scheduler.get_task_details.return_value = task
 
     request = setup_request(
@@ -93,14 +91,8 @@ def test_reschedule_task(rf, client_member, mock_scheduler, mocker, task):
 
 
 def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocker, task):
-    mock_scheduler_client = mocker.patch("rocky.views.scheduler.get_scheduler")()
-    mock_scheduler_client.get_task_details.return_value = task
-    session = mocker.patch("rocky.scheduler.get_scheduler")().session
-    mock_response = mocker.MagicMock()
-    mock_response.status_code = HTTPStatus.TOO_MANY_REQUESTS
-    return_value = mocker.MagicMock()
-    return_value.raise_for_status.side_effect = HTTPError(response=mock_response)
-    session.post.return_value = return_value
+    mock_scheduler.get_task_details.return_value = task
+    mock_scheduler.push_task.side_effect = TooManyRequestsError
 
     request = setup_request(
         rf.post(
@@ -109,7 +101,11 @@ def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocke
         ),
         client_member.user,
     )
-    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+
+    response = BoefjesTaskListView.as_view()(
+        request,
+        organization_code=client_member.organization.code,
+    )
 
     assert response.status_code == 302
 
