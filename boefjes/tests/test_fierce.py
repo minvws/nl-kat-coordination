@@ -5,7 +5,7 @@ from boefjes.plugins.kat_fierce.normalize import run
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 def test_fierce():

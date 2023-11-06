@@ -462,6 +462,29 @@ def plugin_schema():
     }
 
 
+@pytest.fixture
+def plugin_schema_no_required():
+    return {
+        "title": "Arguments",
+        "type": "object",
+        "properties": {
+            "TEST_PROPERTY": {
+                "title": "TEST_PROPERTY",
+                "maxLength": 128,
+                "type": "string",
+                "description": "Test description",
+            },
+            "TEST_PROPERTY2": {
+                "title": "TEST_PROPERTY2",
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 200,
+                "description": "Test description2",
+            },
+        },
+    }
+
+
 def setup_request(request, user):
     request = SessionMiddleware(lambda r: r)(request)
     request.session[DEVICE_ID_SESSION_KEY] = user.staticdevice_set.get().persistent_id

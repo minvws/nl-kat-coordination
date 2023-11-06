@@ -20,7 +20,7 @@ from boefjes.job_models import (
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class TaskTest(TestCase):

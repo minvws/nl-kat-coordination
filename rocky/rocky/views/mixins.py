@@ -54,7 +54,28 @@ class OOIAttributeError(AttributeError):
     pass
 
 
-class OctopoesView(OrganizationView):
+class ObservedAtMixin:
+    def get_observed_at(self) -> datetime:
+        observed_at = self.request.GET.get("observed_at", None)
+        if not observed_at:
+            return datetime.now(timezone.utc)
+
+        try:
+            datetime_format = "%Y-%m-%d"
+            return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
+        except ValueError:
+            try:
+                ret = datetime.fromisoformat(observed_at)
+                if not ret.tzinfo:
+                    ret = ret.replace(tzinfo=timezone.utc)
+
+                return ret
+            except ValueError:
+                messages.error(self.request, _("Can not parse date, falling back to show current date."))
+                return datetime.now(timezone.utc)
+
+
+class OctopoesView(ObservedAtMixin, OrganizationView):
     def get_single_ooi(self, pk: str, observed_at: Optional[datetime] = None) -> OOI:
         try:
             ref = Reference.from_str(pk)
@@ -109,22 +130,6 @@ class OctopoesView(OrganizationView):
             raise Http404("OOI not found")
 
         raise exception
-
-    def get_observed_at(self) -> datetime:
-        observed_at = self.request.GET.get("observed_at", None)
-        if not observed_at:
-            return datetime.now(timezone.utc)
-
-        try:
-            datetime_format = "%Y-%m-%dT%H:%M:%S"
-            return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
-        except ValueError:
-            try:
-                datetime_format = "%Y-%m-%d"
-                return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
-            except ValueError:
-                messages.error(self.request, _("Can not parse date, falling back to show current date."))
-                return datetime.now(timezone.utc)
 
     def get_depth(self, default_depth=DEPTH_DEFAULT) -> int:
         try:
