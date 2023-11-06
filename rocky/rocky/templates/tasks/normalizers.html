@@ -58,7 +58,7 @@
                                         </td>
                                         {% if task.p_item.data.raw_data.boefje_meta.input_ooi %}
                                             <td>
-                                                <a href="{% ooi_url "ooi_detail" ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code %}">
+                                                <a href="{% ooi_url "ooi_detail" ooi_id=task.p_item.data.raw_data.boefje_meta.input_ooi organization_code=organization.code observed_at=task.created_at|date:'c' %}">
                                                     {{ task.p_item.data.raw_data.boefje_meta.input_ooi }}
                                                 </a>
                                             </td>
