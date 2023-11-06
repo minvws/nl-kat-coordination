@@ -381,8 +381,6 @@ class Server:
 
             f_req.filters.update(f_plugin)  # type: ignore
 
-        self.logger.info(f"FILTER_REQUEST: {f_req}")
-
         try:
             results, count = self.ctx.datastores.task_store.get_tasks(
                 scheduler_id=scheduler_id,

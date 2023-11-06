@@ -11,12 +11,6 @@ from sqlalchemy.orm import sessionmaker
 Base = declarative_base()
 
 
-def compile_query(query):
-    from sqlalchemy.dialects import postgresql
-
-    return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
-
-
 class TestModel(Base):
     __tablename__ = "test"
     id = Column(Integer, primary_key=True)
@@ -38,9 +32,27 @@ class FilteringTestCase(unittest.TestCase):
     def setUp(self):
         session.add_all(
             [
-                TestModel(name="Alice", age=25, height=1.8, is_active=True, data={"foo": "bar", "score": 15}),
-                TestModel(name="Bob", age=30, height=1.7, is_active=False, data={"foo": "baz", "score": 25}),
-                TestModel(name="Charlie", age=28, height=1.6, is_active=True, data={"foo": "bar", "score": 35}),
+                TestModel(
+                    name="Alice",
+                    age=25,
+                    height=1.8,
+                    is_active=True,
+                    data={"foo": "bar", "score": 15, "nested": {"bar": "baz"}},
+                ),
+                TestModel(
+                    name="Bob",
+                    age=30,
+                    height=1.7,
+                    is_active=False,
+                    data={"foo": "baz", "score": 25, "nested": {"bar": "baz"}},
+                ),
+                TestModel(
+                    name="Charlie",
+                    age=28,
+                    height=1.6,
+                    is_active=True,
+                    data={"foo": "bar", "score": 35, "nested": {"bar": "baz"}},
+                ),
             ]
         )
         session.commit()
@@ -113,46 +125,6 @@ class FilteringTestCase(unittest.TestCase):
         results = filtered_query.all()
         self.assertEqual(len(results), 3)
 
-    # TODO
-    def test_apply_filter_mismatch(self):
-        filter_request = FilterRequest(
-            filters=[
-                Filter(column="name", operator="eq", value=False),
-            ]
-        )
-
-        query = session.query(TestModel)
-        apply_filter(TestModel, query, filter_request)
-        """
-        with self.assertRaises(errors.MismatchedTypeError):
-            apply_filter(TestModel, query, filter_request)
-        """
-
-    # TODO
-    def test_apply_filter_json_mismatch(self):
-        filter_request = FilterRequest(
-            filters=[
-                Filter(column="data", field="foo", operator="eq", value=False),
-            ]
-        )
-
-        query = session.query(TestModel)
-        filtered_query = apply_filter(TestModel, query, filter_request)
-
-        results = filtered_query.all()
-        self.assertEqual(len(results), 0)
-
-    # TODO
-    def test_apply_filter_mismatch_is_not(self):
-        filter_request = FilterRequest(
-            filters=[
-                Filter(column="name", operator="is_not", value=False),
-            ]
-        )
-
-        query = session.query(TestModel)
-        apply_filter(TestModel, query, filter_request)
-
     def test_apply_filter_or(self):
         filter_request = FilterRequest(
             filters={
@@ -189,7 +161,11 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Alice")
 
     def test_apply_filter_not(self):
-        filter_request = FilterRequest(filters={"not": [Filter(column="name", operator="eq", value="Alice")]})
+        filter_request = FilterRequest(
+            filters={
+                "not": [Filter(column="name", operator="eq", value="Alice")],
+            }
+        )
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)

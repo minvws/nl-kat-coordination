@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 
-from sqlalchemy import func
+from sqlalchemy import exc, func
 
 from scheduler import models
 
@@ -48,8 +48,11 @@ class TaskStore:
             if filters is not None:
                 query = apply_filter(models.TaskDB, query, filters)
 
-            count = query.count()
-            tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
+            try:
+                count = query.count()
+                tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
+            except exc.ProgrammingError as e:
+                raise ValueError(f"Invalid filter: {e}") from e
 
             tasks = [models.Task.model_validate(task_orm) for task_orm in tasks_orm]
 
