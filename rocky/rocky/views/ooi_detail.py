@@ -90,7 +90,6 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
         # self.ooi is already the current state of the OOI
         if self.get_observed_at().date() == datetime.utcnow().date():
             return self.ooi
-
         try:
             return self.get_ooi(pk=self.get_ooi_id(), observed_at=datetime.now(timezone.utc))
         except Http404:
