@@ -2,14 +2,6 @@
 What is OpenKAT?
 ================
 
-.. image:: https://hosted.weblate.org/widget/openkat/287x66-white.png
-   :target: https://hosted.weblate.org/engage/openkat/
-   :alt: Translation status (summary)
-
-.. image:: https://hosted.weblate.org/widget/openkat/multi-auto.svg
-   :target: https://hosted.weblate.org/engage/openkat/
-   :alt: Translation status (bar chart)
-
 OpenKAT aims to monitor, record and analyze the status of information systems. The basic premise is that many of the major security incidents are caused by small errors and known vulnerabilities, and that if you can find them in time your systems and infrastructure become a lot more secure.
 
 OpenKAT scans, collects, analyzes and reports in an ongoing process:
@@ -42,6 +34,13 @@ The high level documentation on OpenKAT explains the purpose and operation of Op
 
 Translations
 ============
+.. image:: https://hosted.weblate.org/widget/openkat/287x66-white.png
+   :target: https://hosted.weblate.org/engage/openkat/
+   :alt: Translation status (summary)
+
+.. image:: https://hosted.weblate.org/widget/openkat/multi-auto.svg
+   :target: https://hosted.weblate.org/engage/openkat/
+   :alt: Translation status (bar chart)
 
 We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
 See `the docs <https://docs.openkat.nl/guidelines/contributions.html#contribute-translations>`_ for more information.
