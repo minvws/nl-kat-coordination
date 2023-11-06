@@ -1,7 +1,7 @@
 import csv
-import datetime
 import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List
 
 import requests
@@ -63,7 +63,7 @@ def run():
             print("Enabled boefje ", boefje_id)
 
     declarations: List[Dict[str, Any]] = []
-    with open("data.csv", newline="") as csv_file:
+    with Path.open("data.csv", newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=",", quotechar='"')
         for row in csv_reader:
             name = row["name"]
