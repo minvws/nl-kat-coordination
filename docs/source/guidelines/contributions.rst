@@ -92,7 +92,7 @@ You can add a new language to OpenKAT by following these steps:
     Alternatively: create a new ``rocky/rocky/locale/$LANGUAGE_CODE/LC_MESSAGES/django.po`` file directly in the repository.
     You can use ``rocky/rocky/locale/django.pot`` as a template.
 2. Add the language code to the ``LANGUAGES`` list in ``rocky/rocky/settings.py``
-    Note that languages not supported by Django require that you also add a custom dictionary entry in ``EXTRA_LANG_INFO``
+    Note that languages not supported by Django require that you also add a custom dictionary entry in ``EXTRA_LANG_INFO``.
 
 The new language should be automatically picked up by both Weblate and Django.
 
