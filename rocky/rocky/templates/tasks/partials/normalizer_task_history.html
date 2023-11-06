@@ -40,7 +40,7 @@
                         <a href="{% url "boefje_detail" organization.code task.p_item.data.raw_data.boefje_meta.boefje.id %}">{{ task.p_item.data.raw_data.boefje_meta.boefje.id }}</a>
                     </td>
                     <td>
-                        <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code observed_at=task.created_at|date:'Y-m-d' %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                        <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
                     </td>
                     {# FIXME: implement detail page according to designs #}
                     <td>

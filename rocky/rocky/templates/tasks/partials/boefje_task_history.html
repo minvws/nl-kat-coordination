@@ -17,13 +17,7 @@
             {% for task in task_history %}
                 <tr data-task-id="{{ task.id }}">
                     <td>
-                        {% if task.type == "boefje" %}
-                            <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
-                        {% elif task.type == "normalizer" %}
-                            <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
-                        {% else %}
-                            {{ task.id }}
-                        {% endif %}
+                        <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
                     </td>
                     <td class="nowrap">
                         {% if task.status.value == "pending" or task.status.value == "queued" %}
@@ -42,13 +36,7 @@
                     </td>
                     <td>{{ task.created_at }}</td>
                     <td>
-                        {% if task.type == "boefje" %}
-                            <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code observed_at=task.created_at|date:'Y-m-d' %}">{{ task.p_item.data.input_ooi }}</a>
-                        {% elif task.type == "normalizer" %}
-                            <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code observed_at=task.created_at|date:'Y-m-d' %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
-                        {% else %}
-                            {{ task.id }}
-                        {% endif %}
+                        <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.p_item.data.input_ooi }}</a>
                     </td>
                     {# FIXME: implement detail page according to designs #}
                     <td>
