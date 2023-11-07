@@ -1,10 +1,8 @@
 from typing import List
 
-from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
-from requests import HTTPError
 from tools.forms.ooi import OoiTreeSettingsForm
-from tools.ooi_helpers import create_object_tree_item_from_ref, filter_ooi_tree, get_ooi_types_from_tree, hydrate_tree
+from tools.ooi_helpers import create_object_tree_item_from_ref, filter_ooi_tree, get_ooi_types_from_tree
 from tools.view_helpers import Breadcrumb, get_ooi_url
 
 from rocky.views.ooi_view import BaseOOIDetailView
@@ -14,27 +12,20 @@ class OOITreeView(BaseOOIDetailView):
     template_name = "oois/ooi_tree.html"
     connector_form_class = OoiTreeSettingsForm
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.ooi_id = self.request.GET.get("ooi_id", "")
-        self.observed_at = self.get_observed_at()
-        self.depth = self.get_depth()
-        self.filtered_types = self.request.GET.getlist("ooi_type", [])
-        self.view = self.request.GET.get("view", "condensed")
+    def get_tree_dict(self):
+        return create_object_tree_item_from_ref(self.tree.root, self.tree.store)
 
-        try:
-            self.tree = self.get_ooi_tree(self.ooi_id, self.depth, self.observed_at)
-            self.tree_objects = create_object_tree_item_from_ref(self.tree.root, self.tree.store)
-            self.ooi_types = get_ooi_types_from_tree(self.tree_objects, False)
-            self.filtered_tree_objects = filter_ooi_tree(self.tree_objects, self.filtered_types)
-            self.hydrated_tree = hydrate_tree(self.filtered_tree_objects, self.organization.code)
-        except HTTPError:
-            messages.error(request, _("We could not process your request."))
+    def get_filtered_tree(self, tree_dict):
+        filtered_types = self.request.GET.getlist("ooi_type", [])
+        return filter_ooi_tree(tree_dict, filtered_types)
 
     def get_connector_form_kwargs(self):
+        tree_dict = self.get_tree_dict()
+        ooi_types = get_ooi_types_from_tree(tree_dict, False)
+
         kwargs = {
-            "initial": {"ooi_type": self.ooi_types},
-            "ooi_types": self.ooi_types,
+            "initial": {"ooi_type": ooi_types},
+            "ooi_types": ooi_types,
         }
 
         if "observed_at" in self.request.GET:
@@ -55,8 +46,8 @@ class OOITreeView(BaseOOIDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["tree"] = self.filtered_tree_objects
-        context["tree_view"] = self.view
+        context["tree"] = self.get_filtered_tree(self.get_tree_dict())
+        context["tree_view"] = self.request.GET.get("view", "condensed")
         context["observed_at_form"] = self.get_connector_form()
 
         return context
@@ -75,13 +66,36 @@ class OOISummaryView(OOITreeView):
 class OOIGraphView(OOITreeView):
     template_name = "graph-d3.html"
 
+    def get_filtered_tree(self, tree_dict):
+        filtered_tree = super().get_filtered_tree(tree_dict)
+        return hydrate_tree(filtered_tree, self.organization.code)
+
     def get_last_breadcrumb(self):
         return {
             "url": get_ooi_url("ooi_graph", self.ooi.primary_key, self.organization.code),
             "text": _("Graph Visualisation"),
         }
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["tree"] = self.hydrated_tree
-        return context
+
+def hydrate_tree(tree, organization_code: str):
+    return hydrate_branch(tree, organization_code)
+
+
+def hydrate_branch(branch, organization_code: str):
+    branch["name"] = branch["tree_meta"]["location"] + "-" + branch["ooi_type"]
+    branch["overlay_data"] = {"Type": branch["ooi_type"]}
+    if branch["ooi_type"] == "Finding":
+        branch["overlay_data"]["Description"] = branch["description"]
+        branch["overlay_data"]["Proof"] = branch["proof"]
+    elif branch["ooi_type"] == "IpPort":
+        branch["overlay_data"]["Port"] = str(branch["port"])
+        branch["overlay_data"]["Protocol"] = branch["protocol"]
+        branch["overlay_data"]["State"] = branch["state"]
+
+    branch["display_name"] = branch["human_readable"]
+    branch["graph_url"] = get_ooi_url("ooi_graph", branch["id"], organization_code=organization_code)
+
+    if branch.get("children"):
+        branch["children"] = [hydrate_branch(child, organization_code) for child in branch["children"]]
+
+    return branch

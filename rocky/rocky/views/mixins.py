@@ -303,11 +303,9 @@ class SingleOOIMixin(OctopoesView):
     ooi: OOI
     tree: ReferenceTree
 
-    def get_ooi_id(self) -> Optional[str]:
-        ooi_id = self.request.GET.get("ooi_id", None)
-        if not ooi_id:
-            raise OOIAttributeError(_("OOI primary key missing"))
-        return ooi_id
+    def get_ooi_id(self) -> str:
+        if "ooi_id" not in self.request.GET:
+            raise OOIAttributeError("OOI primary key missing")
 
     def get_ooi(self, pk: Optional[str] = None, observed_at: Optional[datetime] = None) -> OOI:
         if pk is None:

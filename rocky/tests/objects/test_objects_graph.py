@@ -36,6 +36,6 @@ def test_ooi_graph(rf, client_member, mock_organization_view_octopoes):
     response = OOIGraphView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().get_tree.call_count == 2
+    assert mock_organization_view_octopoes().get_tree.call_count == 1
     assertContains(response, "testnetwork")
     assertContains(response, "KAT-000")

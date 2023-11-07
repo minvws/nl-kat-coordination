@@ -1,7 +1,6 @@
 from time import sleep
 from typing import Dict, List, Set, Type
 
-from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -20,7 +19,6 @@ from octopoes.models.types import get_collapsed_types
 from rocky.views.mixins import (
     ConnectorFormMixin,
     MultipleOOIMixin,
-    OOIAttributeError,
     OOIList,
     SingleOOIMixin,
     SingleOOITreeMixin,
@@ -80,12 +78,10 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
 
 
 class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
-        try:
-            self.ooi = self.get_ooi()
-        except OOIAttributeError as error:
-            messages.error(request, error)
-        return super().get(request, *args, **kwargs)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.ooi_id = self.request.GET.get("ooi_id", "")
+        self.ooi = self.get_ooi(pk=self.ooi_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
