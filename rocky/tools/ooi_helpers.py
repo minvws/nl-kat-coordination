@@ -24,7 +24,6 @@ from octopoes.models.tree import ReferenceNode
 from octopoes.models.types import OOI_TYPES, get_relations
 from rocky.bytes_client import BytesClient
 from tools.models import OOIInformation
-from tools.view_helpers import get_ooi_url
 
 User = get_user_model()
 
@@ -272,27 +271,3 @@ def create_ooi(
     bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))
 
     api_connector.save_declaration(declaration)
-
-
-def hydrate_branch(branch, organization_code: str):
-    branch["name"] = branch["tree_meta"]["location"] + "-" + branch["ooi_type"]
-    branch["overlay_data"] = {"Type": branch["ooi_type"]}
-    if branch["ooi_type"] == "Finding":
-        branch["overlay_data"]["Description"] = branch["description"]
-        branch["overlay_data"]["Proof"] = branch["proof"]
-    elif branch["ooi_type"] == "IpPort":
-        branch["overlay_data"]["Port"] = str(branch["port"])
-        branch["overlay_data"]["Protocol"] = branch["protocol"]
-        branch["overlay_data"]["State"] = branch["state"]
-
-    branch["display_name"] = branch["human_readable"]
-    branch["graph_url"] = get_ooi_url("ooi_graph", branch["id"], organization_code=organization_code)
-
-    if branch.get("children"):
-        branch["children"] = [hydrate_branch(child, organization_code) for child in branch["children"]]
-
-    return branch
-
-
-def hydrate_tree(tree, organization_code: str):
-    return hydrate_branch(tree, organization_code)

@@ -43,7 +43,7 @@ class OOIReportView(BaseOOIDetailView):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if self.get_observed_at() > convert_date_to_datetime(datetime.now(timezone.utc)):
             messages.error(
-                self.request,
+                request,
                 _("You can't generate a report for an OOI on a date in the future."),
             )
         return super().get(request, *args, **kwargs)
@@ -66,11 +66,10 @@ class OOIReportPDFView(SingleOOITreeMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.api_connector = self.octopoes_api_connector
+        self.ooi = self.get_ooi()
         self.depth = self.get_depth()
 
     def get(self, request, *args, **kwargs):
-        self.setup(request, *args, **kwargs)
-        self.ooi = self.get_ooi()
         valid_time = self.get_observed_at()
         reports_service = ReportsService(keiko_client)
 

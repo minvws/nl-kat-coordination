@@ -307,6 +307,8 @@ class SingleOOIMixin(OctopoesView):
         if "ooi_id" not in self.request.GET:
             raise OOIAttributeError("OOI primary key missing")
 
+        return self.request.GET["ooi_id"]
+
     def get_ooi(self, pk: Optional[str] = None, observed_at: Optional[datetime] = None) -> OOI:
         if pk is None:
             pk = self.get_ooi_id()
@@ -348,8 +350,11 @@ class SingleOOIMixin(OctopoesView):
 
 
 class SingleOOITreeMixin(SingleOOIMixin):
-    depth: int = 2
     tree: ReferenceTree
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.depth = self.get_depth()
 
     def get_ooi(self, pk: str = None, observed_at: Optional[datetime] = None) -> OOI:
         if pk is None:
@@ -358,14 +363,10 @@ class SingleOOITreeMixin(SingleOOIMixin):
         if observed_at is None:
             observed_at = self.get_observed_at()
 
-        if self.depth == 1:
-            return self.get_single_ooi(pk, observed_at)
-
         return self.get_object_from_tree(pk, observed_at)
 
     def get_object_from_tree(self, pk: str, observed_at: Optional[datetime] = None) -> OOI:
         self.tree = self.get_ooi_tree(pk, self.depth, observed_at)
-
         return self.tree.store[str(self.tree.root.reference)]
 
 
