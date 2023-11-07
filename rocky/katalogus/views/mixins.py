@@ -87,9 +87,7 @@ class NormalizerMixin(OctopoesView):
 
     def run_normalizer(self, normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
         normalizer_task = NormalizerTask(
-            id=uuid4(),
-            normalizer=Normalizer.parse_obj(normalizer.dict()),
-            raw_data=raw_data,
+            id=uuid4(), normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
         )
 
         task = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
