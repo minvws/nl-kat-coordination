@@ -63,41 +63,36 @@ class OOIReportView(BaseOOIDetailView):
 
 
 class OOIReportPDFView(SingleOOITreeMixin):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.api_connector = self.octopoes_api_connector
-        self.ooi = self.get_ooi()
-        self.depth = self.get_depth()
-
     def get(self, request, *args, **kwargs):
         valid_time = self.get_observed_at()
+        ooi = self.get_ooi()
         reports_service = ReportsService(keiko_client)
 
         try:
             report = reports_service.get_report(
                 valid_time,
-                self.ooi.object_type,
-                self.ooi.human_readable,
+                ooi.object_type,
+                ooi.human_readable,
                 self.tree.store,
                 OOIReportQuery(
                     self.organization.code,
                     valid_time.date(),
-                    self.ooi,
+                    ooi,
                     self.depth,
                     origin=f"{request.scheme}://{request.get_host()}",
                 ),
             )
         except GeneratingReportFailed:
             messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+            return redirect(get_ooi_url("ooi_report", ooi.primary_key, self.organization.code))
         except ReportNotFoundException:
             messages.error(self.request, _("Timeout reached generating report. See Keiko logs for more information."))
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+            return redirect(get_ooi_url("ooi_report", ooi.primary_key, self.organization.code))
 
         return FileResponse(
             report,
             as_attachment=True,
-            filename=ReportsService.ooi_report_file_name(valid_time, self.organization.code, self.ooi.primary_key),
+            filename=ReportsService.ooi_report_file_name(valid_time, self.organization.code, ooi.primary_key),
         )
 
 
