@@ -297,7 +297,8 @@ class Server:
                 detail="min_date must be less than max_date",
             )
 
-        # FIXME: deprecated
+        # FIXME: deprecated; backwards compatibility for rocky that uses the
+        # input_ooi and plugin_id parameters.
         f_req = filters or storage.filters.FilterRequest(filters={})
         if input_ooi is not None:
             if task_type == "boefje":
