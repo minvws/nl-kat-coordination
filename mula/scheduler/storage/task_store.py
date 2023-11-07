@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 
-from sqlalchemy import func
+from sqlalchemy import exc, func
 
 from scheduler import models
 
+from .filters import FilterRequest, apply_filter
 from .storage import DBConn, retry
 
 
@@ -22,12 +23,12 @@ class TaskStore:
         status: Optional[str] = None,
         min_created_at: Optional[datetime] = None,
         max_created_at: Optional[datetime] = None,
-        filters: Optional[List[models.Filter]] = None,
+        filters: Optional[FilterRequest] = None,
+        offset: int = 0,
+        limit: int = 100,
     ) -> Tuple[List[models.Task], int]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.TaskDB).filter(
-                models.TaskDB.scheduler_id == scheduler_id,
-            )
+            query = session.query(models.TaskDB)
 
             if scheduler_id is not None:
                 query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
@@ -45,11 +46,13 @@ class TaskStore:
                 query = query.filter(models.TaskDB.created_at <= max_created_at)
 
             if filters is not None:
-                for f in filters:
-                    query.filter(models.TaskDB.p_item[f.get_field()].astext == f.value)
+                query = apply_filter(models.TaskDB, query, filters)
 
-            count = query.count()
-            tasks_orm = query.all()
+            try:
+                count = query.count()
+                tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
+            except exc.ProgrammingError as e:
+                raise ValueError(f"Invalid filter: {e}") from e
 
             tasks = [models.Task.model_validate(task_orm) for task_orm in tasks_orm]
 
@@ -121,72 +124,6 @@ class TaskStore:
             session.query(models.TaskDB).filter(
                 models.TaskDB.scheduler_id == scheduler_id, models.TaskDB.id.in_(task_ids)
             ).update({"status": models.TaskStatus.CANCELLED.name})
-
-    @retry()
-    def api_list_tasks(
-        self,
-        scheduler_id: Optional[str],
-        task_type: Optional[str],
-        status: Optional[str],
-        min_created_at: Optional[datetime],
-        max_created_at: Optional[datetime],
-        input_ooi: Optional[str],
-        plugin_id: Optional[str],
-        offset: int = 0,
-        limit: int = 100,
-    ) -> Tuple[List[models.Task], int]:
-        with self.dbconn.session.begin() as session:
-            query = session.query(models.TaskDB)
-
-            if scheduler_id is not None:
-                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
-
-            if task_type is not None:
-                query = query.filter(models.TaskDB.type == task_type)
-
-            if status is not None:
-                query = query.filter(models.TaskDB.status == models.TaskStatus(status).name)
-
-            if min_created_at is not None:
-                query = query.filter(models.TaskDB.created_at >= min_created_at)
-
-            if max_created_at is not None:
-                query = query.filter(models.TaskDB.created_at <= max_created_at)
-
-            if input_ooi is not None:
-                if type == "boefje":
-                    query = query.filter(models.TaskDB.p_item[["data", "input_ooi"]].as_string() == input_ooi)
-                elif type == "normalizer":
-                    query = query.filter(
-                        models.TaskDB.p_item[["data", "raw_data", "boefje_meta", "input_ooi"]].as_string() == input_ooi
-                    )
-                else:
-                    query = query.filter(
-                        (models.TaskDB.p_item[["data", "input_ooi"]].as_string() == input_ooi)
-                        | (
-                            models.TaskDB.p_item[["data", "raw_data", "boefje_meta", "input_ooi"]].as_string()
-                            == input_ooi
-                        )
-                    )
-
-            if plugin_id is not None:
-                if type == "boefje":
-                    query = query.filter(models.TaskDB.p_item[["data", "boefje", "id"]].as_string() == plugin_id)
-                elif type == "normalizer":
-                    query = query.filter(models.TaskDB.p_item[["data", "normalizer", "id"]].as_string() == plugin_id)
-                else:
-                    query = query.filter(
-                        (models.TaskDB.p_item[["data", "boefje", "id"]].as_string() == plugin_id)
-                        | (models.TaskDB.p_item[["data", "normalizer", "id"]].as_string() == plugin_id)
-                    )
-
-            count = query.count()
-
-            tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
-
-            tasks = [models.Task.model_validate(task_orm) for task_orm in tasks_orm]
-
-            return tasks, count
 
     @retry()
     def get_status_count_per_hour(
