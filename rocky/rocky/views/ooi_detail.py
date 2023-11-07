@@ -108,7 +108,7 @@ class OOIDetailView(
 
         # FIXME: in context of ooi detail is doesn't make sense to search
         # for an object name, so we search on plugin id
-        plugin_id = self.request.GET.get("task_history_search")
+        plugin_id = self.request.GET.get("task_history_search") or None
 
         page = int(self.request.GET.get("task_history_page", 1))
 
