@@ -6,7 +6,7 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from scheduler import connectors, context, models, queues, utils
+from scheduler import connectors, context, models, queues, storage, utils
 from scheduler.utils import thread
 
 
@@ -132,11 +132,13 @@ class Scheduler(abc.ABC):
 
         return None
 
-    def pop_item_from_queue(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
+    def pop_item_from_queue(
+        self, filters: Optional[storage.filters.FilterRequest] = None
+    ) -> Optional[models.PrioritizedItem]:
         """Pop an item from the queue.
 
         Args:
-            filters: A list of filters to apply to get a filtered set of
+            filters: A FilterRequest instance to filter the
             prioritized items from the queue.
 
         Returns:

@@ -1,4 +1,6 @@
+import uuid
 from datetime import datetime
+from enum import Enum
 from logging import getLogger
 from typing import Any, Dict, List
 
@@ -12,13 +14,19 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
+from tools.view_helpers import schedule_task
 
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky import scheduler
+from rocky.scheduler import client
 
 logger = getLogger(__name__)
+
+
+class PageActions(Enum):
+    RESCHEDULE_TASK = "reschedule_task"
 
 
 class PluginCoverImgView(OrganizationView):
@@ -63,6 +71,28 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
         )
 
         return Paginator(task_history, self.task_history_limit).page(page)
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST["action"]
+
+        if action:
+            self.handle_page_action(action)
+            return redirect(request.path)
+        else:
+            return self.get(request, *args, **kwargs)
+
+    def handle_page_action(self, action: str) -> None:
+        if action == PageActions.RESCHEDULE_TASK.value:
+            task_id = self.request.POST.get("task_id")
+            task = client.get_task_details(task_id)
+
+            # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
+            new_id = uuid.uuid4()
+
+            task.p_item.id = new_id
+            task.p_item.data.id = new_id
+
+            schedule_task(self.request, self.organization.code, task.p_item)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -144,6 +174,12 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
         return context
 
     def post(self, request, *args, **kwargs):
+        action = request.POST["action"]
+
+        if action == PageActions.RESCHEDULE_TASK.value:
+            self.handle_page_action(action)
+            return redirect(request.path)
+
         """Start scanning oois at plugin detail page."""
         if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
