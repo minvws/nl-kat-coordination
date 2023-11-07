@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar, List, Optional
 
 import pydantic
 from scheduler import models
@@ -11,7 +11,15 @@ class TestModel(pydantic.BaseModel):
     type: ClassVar[str] = "test-model"
     id: str
     name: str
+    count: int = 0
+    categories: List[str] = None
     child: Any = None
+
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+
+        if self.categories is None:
+            self.categories = []
 
 
 def create_p_item(scheduler_id: str, priority: int, data: Optional[TestModel] = None) -> models.PrioritizedItem:
