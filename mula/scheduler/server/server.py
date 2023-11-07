@@ -15,7 +15,7 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from scheduler import context, models, queues, schedulers, version
+from scheduler import context, models, queues, schedulers, storage, version
 from scheduler.config import settings
 
 from .pagination import PaginatedResponse, paginate
@@ -131,7 +131,7 @@ class Server:
         self.api.add_api_route(
             path="/tasks",
             endpoint=self.list_tasks,
-            methods=["GET"],
+            methods=["GET", "POST"],
             response_model=PaginatedResponse,
             status_code=status.HTTP_200_OK,
             description="List all tasks",
@@ -287,8 +287,9 @@ class Server:
         limit: int = 10,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
-        input_ooi: Optional[str] = None,
-        plugin_id: Optional[str] = None,
+        input_ooi: Optional[str] = None,  # FIXME: deprecated
+        plugin_id: Optional[str] = None,  # FIXME: deprecated
+        filters: Optional[storage.filters.FilterRequest] = None,
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
@@ -296,8 +297,93 @@ class Server:
                 detail="min_date must be less than max_date",
             )
 
+        # FIXME: deprecated; backwards compatibility for rocky that uses the
+        # input_ooi and plugin_id parameters.
+        f_req = filters or storage.filters.FilterRequest(filters={})
+        if input_ooi is not None:
+            if task_type == "boefje":
+                f_ooi = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        )
+                    ]
+                }
+            elif task_type == "normalizer":
+                f_ooi = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        )
+                    ]
+                }
+            else:
+                f_ooi = {
+                    "or": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        ),
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        ),
+                    ]
+                }
+
+            f_req.filters.update(f_ooi)  # type: ignore
+
+        if plugin_id is not None:
+            if task_type == "boefje":
+                f_plugin = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__boefje__id",
+                            operator="eq",
+                            value=plugin_id,
+                        )
+                    ]
+                }
+            elif task_type == "normalizer":
+                f_plugin = storage.filters.Filter(
+                    column="p_item",
+                    field="data__raw_data__boefje_meta__id",
+                    operator="eq",
+                    value=plugin_id,
+                )
+            else:
+                f_plugin = {
+                    "or": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__boefje__id",
+                            operator="eq",
+                            value=plugin_id,
+                        ),
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__id",
+                            operator="eq",
+                            value=plugin_id,
+                        ),
+                    ]
+                }
+
+            f_req.filters.update(f_plugin)  # type: ignore
+
         try:
-            results, count = self.ctx.datastores.task_store.api_list_tasks(
+            results, count = self.ctx.datastores.task_store.get_tasks(
                 scheduler_id=scheduler_id,
                 task_type=task_type,
                 status=status,
@@ -305,9 +391,13 @@ class Server:
                 limit=limit,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
-                input_ooi=input_ooi,
-                plugin_id=plugin_id,
+                filters=f_req,
             )
+        except storage.filters.errors.FilterError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -412,7 +502,7 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str, filters: Optional[List[models.Filter]] = None) -> Any:
+    def pop_queue(self, queue_id: str, filters: Optional[storage.filters.FilterRequest] = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(

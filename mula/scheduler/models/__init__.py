@@ -1,7 +1,6 @@
 from .base import Base
 from .boefje import Boefje, BoefjeMeta
 from .events import RawData, RawDataReceivedEvent
-from .filter import Filter
 from .health import ServiceHealth
 from .normalizer import Normalizer
 from .ooi import OOI, MutationOperationType, ScanProfile, ScanProfileMutation
