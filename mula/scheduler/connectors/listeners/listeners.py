@@ -6,6 +6,7 @@ from concurrent import futures
 from typing import Callable, Dict, Optional
 
 import pika
+from retry import retry
 
 from ..connector import Connector  # noqa: TID252
 
@@ -57,8 +58,6 @@ class RabbitMQ(Listener):
             A pika.BlockingConnection.channel instance.
         executor:
             A concurrent.futures.ThreadPoolExecutor instance.
-        is_connected:
-            A boolean indicating if the RabbitMQ connection is established.
     """
 
     def __init__(self, dsn: str, queue: str, func: Callable, durable: bool = True, prefetch_count: int = 1) -> None:
@@ -76,12 +75,10 @@ class RabbitMQ(Listener):
         self.durable: bool = durable
         self.prefetch_count: int = prefetch_count
         self.func: Callable = func
-        self.is_connected: bool = False
 
         self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
         self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
         self.channel = self.connection.channel()
-        self.is_connected = True
 
     def listen(self) -> None:
         self.basic_consume(self.queue, self.durable, self.prefetch_count)
@@ -93,44 +90,33 @@ class RabbitMQ(Listener):
         # Acknowledge the message
         self.connection.add_callback_threadsafe(functools.partial(self.ack_message, channel, delivery_tag))
 
-    def reconnect(self) -> None:
-        self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
-        self.channel = self.connection.channel()
-        self.is_connected = True
-
+    @retry((pika.exceptions.AMQPConnectionError, pika.exceptions.ConnectionClosedByBroker), delay=5, jitter=(1, 3), tries=5)
     def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
-        while self.is_connected:
-            try:
+        try:
+            if self.connection.is_closed:
+                self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
+                self.channel = self.connection.channel()
+            self.channel.queue_declare(queue=queue, durable=durable)
+        except pika.exceptions.ChannelClosedByBroker as exc:
+            if "inequivalent arg 'durable'" in exc.reply_text:
+                # Queue changed from non-durable to durable. Given that
+                # previously they weren't durable and contents would also be
+                # lost if RabbitMQ restarted, we will just delete the queue and
+                # recreate it to provide for a smooth upgrade.
+                self.channel = self.connection.channel()
+                self.channel.queue_delete(queue=queue)
                 self.channel.queue_declare(queue=queue, durable=durable)
-            except pika.exceptions.ChannelClosedByBroker as exc:
-                if "inequivalent arg 'durable'" in exc.reply_text:
-                    # Queue changed from non-durable to durable. Given that
-                    # previously they weren't durable and contents would also be
-                    # lost if RabbitMQ restarted, we will just delete the queue and
-                    # recreate it to provide for a smooth upgrade.
-                    self.channel = self.connection.channel()
-                    self.channel.queue_delete(queue=queue)
-                    self.channel.queue_declare(queue=queue, durable=durable)
-                else:
-                    raise
+            else:
+                raise
 
-            try:
-                self.channel.basic_qos(prefetch_count=prefetch_count)
-                self.channel.basic_consume(queue, on_message_callback=self.callback)
-                self.channel.start_consuming()
-            except pika.exceptions.ConnectionClosedByBroker:
-                # Recover from server-initiated connection closure, this also
-                # includes when node is stopped cleanly
-                self.reconnect()
-            except pika.exceptions.AMQPChannelError as exc:
-                # Do not recover on channel errors
-                self.logger.error("AMQPChannelError: %s", exc)
-                self.is_connected = False
-                raise exc
-            except pika.exceptions.AMQPConnectionError as exc:
-                # Recover on all other connection errors
-                self.logger.warning("RabbitMQ connection was closed, re-establishing connection: %s", exc)
-                self.reconnect()
+        try:
+            self.channel.basic_qos(prefetch_count=prefetch_count)
+            self.channel.basic_consume(queue, on_message_callback=self.callback)
+            self.channel.start_consuming()
+        except pika.exceptions.AMQPChannelError as exc:
+            # Do not recover on channel errors
+            self.logger.error("AMQPChannelError: %s", exc)
+            raise exc
 
     def get(self, queue: str) -> Optional[Dict[str, object]]:
         method, properties, body = self.channel.basic_get(queue)
@@ -179,9 +165,8 @@ class RabbitMQ(Listener):
     def stop(self) -> None:
         self.logger.debug("Stopping RabbitMQ connection")
 
-        self.connection.add_callback_threadsafe(self._close_callback)
         self.executor.shutdown()
-        self.is_connected = False
+        self.connection.add_callback_threadsafe(self._close_callback)
 
         self.logger.debug("RabbitMQ connection closed")
 

@@ -1023,7 +1023,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).json()
+        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
@@ -1045,7 +1045,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
     def test_push_tasks_for_scan_profile_mutations_value_empty(self):
         """When the value of a mutation is empty it should not push any tasks"""
         # Arrange
-        mutation = models.ScanProfileMutation(operation="create", primary_key="123", value=None).json()
+        mutation = models.ScanProfileMutation(operation="create", primary_key="123", value=None).model_dump_json()
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation)
@@ -1058,7 +1058,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).json()
+        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = []
@@ -1075,7 +1075,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).json()
+        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
@@ -1093,7 +1093,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).json()
+        mutation = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
@@ -1111,8 +1111,8 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
-        mutation1 = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).json()
-        mutation2 = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).json()
+        mutation1 = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).model_dump_json()
+        mutation2 = models.ScanProfileMutation(operation="create", primary_key=ooi.primary_key, value=ooi).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
@@ -1143,7 +1143,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.DELETE,
             primary_key=ooi.primary_key,
             value=ooi,
-        ).json()
+        ).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
@@ -1167,19 +1167,19 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.CREATE,
             primary_key=ooi.primary_key,
             value=ooi,
-        ).json()
+        ).model_dump_json()
 
         mutation2 = models.ScanProfileMutation(
             operation=models.MutationOperationType.CREATE,
             primary_key=ooi.primary_key,
             value=ooi,
-        ).json()
+        ).model_dump_json()
 
         models.ScanProfileMutation(
             operation=models.MutationOperationType.CREATE,
             primary_key=ooi.primary_key,
             value=ooi,
-        ).json()
+        ).model_dump_json()
 
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
@@ -1199,7 +1199,7 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
             operation=models.MutationOperationType.DELETE,
             primary_key=ooi.primary_key,
             value=ooi,
-        ).json()
+        ).model_dump_json()
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation2)
