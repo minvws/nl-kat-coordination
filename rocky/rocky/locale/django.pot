@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-06 13:48+0000\n"
+"POT-Creation-Date: 2023-11-07 20:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1028,6 +1028,7 @@ msgstr ""
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Details"
@@ -3613,6 +3614,7 @@ msgstr ""
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Close details"
@@ -3621,6 +3623,7 @@ msgstr ""
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Open details"
@@ -3854,6 +3857,8 @@ msgid "Crisis room"
 msgstr ""
 
 #: rocky/templates/header.html rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr ""
@@ -4941,6 +4946,30 @@ msgstr ""
 msgid "Created date"
 msgstr ""
 
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Yielded objects"
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefje_task_detail.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Download meta and raw data"
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Reschedule"
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Download task data"
+msgstr ""
+
 #: rocky/templates/scan.html
 msgid "Boefjes overview:"
 msgstr ""
@@ -5002,12 +5031,6 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/tasks/boefje_task_detail.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Download meta and raw data"
-msgstr ""
-
-#: rocky/templates/tasks/boefje_task_detail.html
 msgid "Download meta data"
 msgstr ""
 
@@ -5039,26 +5062,12 @@ msgstr ""
 msgid "Input Object"
 msgstr ""
 
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Reschedule"
-msgstr ""
-
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Download task data"
-msgstr ""
-
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Normalizer"
 msgstr ""
 
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Boefje input OOI"
-msgstr ""
-
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Yielded objects"
 msgstr ""
 
 #: rocky/templates/tasks/partials/tab_navigation.html
