@@ -6,8 +6,8 @@ _Please add a link to the issue after "Closes". If there is no issue for this PR
 
 Closes ...
 
-### Proof
-_Please add some proof of your working change here, unless this is not required (e.g. this PR is trivial)._
+### Demo
+_Please add some proof in the form of screenshots or screen recordings to show (off) new functionality, if there are interesting new features for end-users._
 
 ---
 
