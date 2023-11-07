@@ -90,7 +90,9 @@ class RabbitMQ(Listener):
         # Acknowledge the message
         self.connection.add_callback_threadsafe(functools.partial(self.ack_message, channel, delivery_tag))
 
-    @retry((pika.exceptions.AMQPConnectionError, pika.exceptions.ConnectionClosedByBroker), delay=5, jitter=(1, 3), tries=5)
+    @retry(
+        (pika.exceptions.AMQPConnectionError, pika.exceptions.ConnectionClosedByBroker), delay=5, jitter=(1, 3), tries=5
+    )
     def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
         try:
             if self.connection.is_closed:
