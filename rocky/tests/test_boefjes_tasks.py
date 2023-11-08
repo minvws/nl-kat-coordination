@@ -2,7 +2,7 @@ from http import HTTPStatus
 from unittest.mock import call
 
 import pytest
-from django.http.response import Http404
+from django.http import Http404
 from pytest_django.asserts import assertContains
 from requests import HTTPError
 
@@ -159,11 +159,8 @@ def test_download_task_same_org(rf, client_member, mock_bytes_client, bytes_raw_
     assert response.status_code == 200
 
 
-def test_download_task_forbidden(rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw):
-    bytes_raw_metas[0]["boefje_meta"]["organization"] = "not_client_org"
-
-    mock_bytes_client().get_raw.return_value = bytes_get_raw
-    mock_bytes_client().get_raw_metas.return_value = bytes_raw_metas
+def test_download_task_forbidden(rf, client_member, mock_bytes_client, bytes_raw_metas):
+    mock_bytes_client().get_raw_metas.side_effect = Http404
 
     request = setup_request(rf.get("bytes_raw"), client_member.user)
 

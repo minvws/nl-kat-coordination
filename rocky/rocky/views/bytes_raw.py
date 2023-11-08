@@ -19,16 +19,8 @@ class BytesRawView(OrganizationView):
         try:
             self.bytes_client.login()
             boefje_meta_id = kwargs["boefje_meta_id"]
-            raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id)
-
-            raws = {
-                raw_meta["id"]: self.bytes_client.get_raw(raw_meta["id"])
-                for raw_meta in raw_metas
-                if raw_meta["boefje_meta"]["organization"] == self.organization.code
-            }
-
-            if not raws:
-                raise Http404
+            raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id, self.organization.code)
+            raws = {raw_meta["id"]: self.bytes_client.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
 
             return FileResponse(
                 zip_data(raws, raw_metas),
