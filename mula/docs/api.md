@@ -1,0 +1,182 @@
+API
+===
+
+[open api spec](openapi.json)
+
+[http://localhost:8004/docs](http://localhost:8004/docs)
+
+
+Filtering
+---------
+
+For the endpoints `/tasks` and `/queues/{queue_id}/pop` additional payload
+filters can be specified. An example:
+
+```json
+POST /tasks
+
+{
+    "filters": [
+        {
+            "column": "status",
+            "operator": "eq",
+            "value": "completed"
+        }
+    ]
+}
+```
+
+`column` specifies the column/field of the model to filter on.
+
+`operator` specifies the type of operation to apply.
+
+`value` specifies the value to filter on.
+
+### Chaining
+
+Filters can be chained using the `and`, `or` and `not`, and defaults to `and`:
+
+```json
+POST /tasks
+
+{
+    "filters": [
+        {
+            "column": "type",
+            "operator": "eq",
+            "value": "boefje"
+        },
+        {
+            "column": "status",
+            "operator": "eq",
+            "value": "completed"
+        }
+    ]
+}
+```
+
+Is the same as:
+
+
+```json
+POST /tasks
+
+{
+    "filters": {
+        "and": [
+            {
+                "column": "type",
+                "operator": "eq",
+                "value": "boefje"
+            },
+            {
+                "column": "status",
+                "operator": "eq",
+                "value": "completed"
+            }
+        ]
+    }
+}
+```
+
+`or`:
+
+```json
+POST /tasks
+
+{
+    "filters": {
+        "or": [
+            {
+                "column": "status",
+                "operator": "eq",
+                "value": "completed"
+            },
+            {
+                "column": "status",
+                "operator": "eq",
+                "value": "failed"
+            }
+        ]
+    }
+}
+```
+
+`not`:
+
+```json
+POST /tasks
+
+{
+    "filters": {
+        "not": [
+            {
+                "column": "status",
+                "operator": "eq",
+                "value": "completed"
+            }
+        ]
+    }
+}
+```
+
+### Nested fields
+
+Querying on nested field is also possible. Note that both the `Task`, and
+`PrioritizedItem` model have both a `JSONB` column. To query nested field in
+these `JSONB` columns you can use the `__` (double under, dunder) separators,
+to specify what nested field.
+
+
+Example:
+
+```json
+POST /tasks
+
+{
+    "filters": [
+        {
+            "column": "p_item",
+            "field": "data__input_ooi",
+            "operator": "like",
+            "value": "%internet%"
+        },
+        {
+            "column": "p_item",
+            "field": "data__boefje__id",
+            "operator": "eq",
+            "value": "dns-zone"
+        }
+    ]
+}
+```
+
+Operators
+---------
+
+| Operator      | Explanation | Example |
+|---------------|-------------|---------|
+| `==`, `eq`    |             |         |
+| `!=`, `ne`    |             |         |
+| `is`          |             |         | 
+| `is_not`      |             |         | 
+| `is_null`     |             |         | 
+| `is_not_null` |             |         | 
+| `>`, `gt`     |             |         | 
+| `<`, `lt`     |             |         |
+| `>=`, `gte`   |             |         |
+| `<=`, `lte`   |             |         |
+| `like`        |             |         |
+| `not_like`    |             |         |
+| `ilike`       |             |         |
+| `not_ilike`   |             |         |
+| `in`          |             |         |
+| `not_in`      |             |         |
+| `contains`    |             |         |
+| `any`         |             |         |
+| `match`       |             |         |
+| `starts_with` |             |         |
+| `@>`          | Contains, used to check if one JSON or arrray value contains another JSON or array value |         |
+| `<@`          | Is contained by, it checks if one JSON or array value is contained by another JSON or arrray value |         |
+| `@?`          | Exists, used to check if a key exists in a JSON object |         |
+| `@@`          | Full text search, performs postgresql full text searching using queries (requires `tsvector`) |         |
