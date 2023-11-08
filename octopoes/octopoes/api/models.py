@@ -13,7 +13,7 @@ class ServiceHealth(BaseModel):
     healthy: bool = False
     version: Optional[str] = None
     additional: Any = None
-    results: List["ServiceHealth"] = []
+    results: List["ServiceHealth"] = Field(default_factory=list)
 
 
 ServiceHealth.update_forward_refs()
