@@ -1,9 +1,9 @@
 import hashlib
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Dict, List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints
 from typing_extensions import Annotated
 
 
@@ -16,8 +16,8 @@ class JobException(Exception):
 
 class Job(BaseModel):
     id: UUID
-    started_at: Optional[datetime] = Field(default=None)
-    ended_at: Optional[datetime] = Field(default=None)
+    started_at: Optional[AwareDatetime] = Field(default=None)
+    ended_at: Optional[AwareDatetime] = Field(default=None)
 
     @property
     def runtime(self) -> Optional[timedelta]:
