@@ -89,11 +89,14 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
     alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
     alembic.config.main(argv=alembicArgs)
 
-    yield BytesAPIClient(
+    client = BytesAPIClient(
         "http://ci_bytes:8000",
         settings.username,
         settings.password,
     )
+    client.login()
+
+    yield client
 
     sessionmaker(bind=get_engine(str(settings.db_uri)), autocommit=True)().execute(
         ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])

@@ -10,7 +10,7 @@ from octopoes.models.types import (
     Finding,
     Software,
 )
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class SnykTest(TestCase):

@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<form method="post" class="inline column">
+<form method="post" class="inline layout-wide">
     <input type="hidden" name="action" value="{{ action }}">
     {% csrf_token %}
     {% if checkbox_group_table_form %}

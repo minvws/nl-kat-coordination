@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_testssl_sh_ciphers.normalize import run
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class TestsslSh(TestCase):

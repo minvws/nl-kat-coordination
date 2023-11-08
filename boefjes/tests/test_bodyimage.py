@@ -8,7 +8,7 @@ from requests.models import CaseInsensitiveDict, Response
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class WebsiteAnalysisTest(TestCase):

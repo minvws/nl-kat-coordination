@@ -83,7 +83,7 @@ class Octopoes(HTTPService):
     def is_healthy(self) -> bool:
         healthy = True
         for org in self.orgs:
-            if not self.is_host_healthy(self.host, f"/{org.id}{self.health_endpoint}"):
+            if not self.is_host_healthy(self.host, f"{org.id}/health"):
                 return False
 
         return healthy

@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Type
 from uuid import UUID
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataMeta
 
@@ -32,13 +32,6 @@ class RawDataFilter(BaseModel):
     mime_types: List[MimeType] = Field(default_factory=list)
     limit: int = 1
     offset: int = 0
-
-    @model_validator(mode="after")
-    def either_organization_or_boefje_meta_id(self):
-        if self.organization or self.boefje_meta_id:
-            return self
-
-        raise ValueError("boefje_meta_id and organization cannot both be None.")
 
 
 class MetaDataRepository:

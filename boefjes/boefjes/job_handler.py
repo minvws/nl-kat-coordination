@@ -3,7 +3,7 @@ import os
 import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -18,6 +18,7 @@ from boefjes.job_models import (
     NormalizerPlainOOI,
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.plugins.models import _default_meta_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -99,28 +100,6 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
         logger.exception("Error getting environment settings")
         raise
 
-    return {}
-
-
-def _collect_default_mime_types(boefje_meta: BoefjeMeta) -> Set[str]:
-    boefje_id = boefje_meta.boefje.id
-
-    mime_types = {
-        boefje_id,
-        f"boefje/{boefje_id}",
-        f"boefje/{boefje_id}-{boefje_meta.parameterized_arguments_hash}",
-    }
-
-    if boefje_meta.boefje.version is not None:
-        mime_types = mime_types.union(
-            {
-                f"boefje/{boefje_id}-{boefje_meta.boefje.version}",
-                f"boefje/{boefje_id}-{boefje_meta.parameterized_arguments_hash}-{boefje_meta.boefje.version}",
-            }
-        )
-
-    return mime_types
-
 
 class BoefjeHandler(Handler):
     def __init__(self, job_runner, local_repository: LocalPluginRepository):
@@ -155,7 +134,7 @@ class BoefjeHandler(Handler):
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
         boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
 
-        mime_types = _collect_default_mime_types(boefje_meta)
+        mime_types = _default_meta_mime_types(boefje_meta)
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 

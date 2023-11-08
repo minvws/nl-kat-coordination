@@ -21,7 +21,7 @@ from octopoes.models.ooi.dns.records import (
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class DnsTest(TestCase):

@@ -7,7 +7,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class SecurityTXTTest(TestCase):

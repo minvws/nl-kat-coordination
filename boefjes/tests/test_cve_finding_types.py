@@ -6,7 +6,7 @@ from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.types import (
     CVEFindingType,
 )
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class CVETest(TestCase):
