@@ -40,7 +40,6 @@ psutil = "^5.9.5"
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
 httpx = "^0.23.3"
-types-retry = "^0.9.9.4"
 uvicorn = "^0.17.1"
 
 [build-system]

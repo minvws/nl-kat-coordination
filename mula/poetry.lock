@@ -1864,17 +1864,6 @@ files = [
 ]
 
 [[package]]
-name = "types-retry"
-version = "0.9.9.4"
-description = "Typing stubs for retry"
-optional = false
-python-versions = "*"
-files = [
-    {file = "types-retry-0.9.9.4.tar.gz", hash = "sha256:e4731dc684b56b875d9746459ad665d3bc281a56b530acdf1c97730167799941"},
-    {file = "types_retry-0.9.9.4-py3-none-any.whl", hash = "sha256:f29760a9fe8b1fefe253e5fe6be7e4c0eba243932c600e0eccffb42a21d17765"},
-]
-
-[[package]]
 name = "typing-extensions"
 version = "4.8.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -2023,4 +2012,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "e8d1c4716c68b02edd2c3fb7563c7198ee2cc3c97af7725d2013c7e6572e5c02"
+content-hash = "368b363b028fe53ac732e478c2574dbd8dbfc1c4beb9fe743e9c2de7dba80c3f"
