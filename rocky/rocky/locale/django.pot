@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-31 16:30+0000\n"
+"POT-Creation-Date: 2023-11-08 09:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3855,6 +3855,8 @@ msgid "Crisis room"
 msgstr ""
 
 #: rocky/templates/header.html rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr ""
@@ -5361,10 +5363,6 @@ msgstr ""
 msgid "Can not parse date, falling back to show current date."
 msgstr ""
 
-#: rocky/views/mixins.py
-msgid "OOI primary key missing"
-msgstr ""
-
 #: rocky/views/ooi_add.py
 msgid "Type select"
 msgstr ""
@@ -5484,10 +5482,6 @@ msgstr ""
 
 #: rocky/views/ooi_report.py
 msgid "Timeout reached generating report. See Keiko logs for more information."
-msgstr ""
-
-#: rocky/views/ooi_tree.py
-msgid "We could not process your request."
 msgstr ""
 
 #: rocky/views/ooi_tree.py
