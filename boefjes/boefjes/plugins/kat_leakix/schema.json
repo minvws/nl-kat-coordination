@@ -11,5 +11,8 @@
   },
   "required": [
     "LEAKIX_API"
+  ],
+  "secret": [
+    "LEAKIX_API"
   ]
 }

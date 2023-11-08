@@ -3,6 +3,7 @@ from uuid import UUID
 
 from scheduler import models
 
+from .filters import FilterRequest, apply_filter
 from .storage import DBConn, retry
 
 
@@ -13,15 +14,14 @@ class PriorityQueueStore:
         self.dbconn = dbconn
 
     @retry()
-    def pop(self, scheduler_id: str, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
+    def pop(self, scheduler_id: str, filters: Optional[FilterRequest] = None) -> Optional[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemDB).filter(
                 models.PrioritizedItemDB.scheduler_id == scheduler_id
             )
 
             if filters is not None:
-                for f in filters:
-                    query = query.filter(models.PrioritizedItemDB.data[f.get_field()].as_string() == f.value)
+                query = apply_filter(models.PrioritizedItemDB, query, filters)
 
             item_orm = query.first()
 
@@ -115,7 +115,7 @@ class PriorityQueueStore:
     def get_items(
         self,
         scheduler_id: str,
-        filters: Optional[List[models.Filter]] = None,
+        filters: Optional[FilterRequest],
     ) -> Tuple[List[models.PrioritizedItem], int]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemDB).filter(
@@ -123,8 +123,7 @@ class PriorityQueueStore:
             )
 
             if filters is not None:
-                for f in filters:
-                    query = query.filter(models.PrioritizedItemDB.data[f.get_field()].astext == f.value)
+                query = apply_filter(models.PrioritizedItemDB, query, filters)
 
             count = query.count()
             items_orm = query.all()

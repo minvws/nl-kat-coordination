@@ -5,7 +5,7 @@ from boefjes.job_models import NormalizerMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
 from octopoes.models.ooi.monitoring import Application
-from tests.test_snyk import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class CalvinTest(TestCase):

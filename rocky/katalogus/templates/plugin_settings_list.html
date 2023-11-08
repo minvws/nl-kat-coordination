@@ -24,6 +24,8 @@
                                 <td>
                                     {% if setting.value is None %}
                                         {% translate "Unset" %}
+                                    {% elif setting.secret %}
+                                        •••••••••••••
                                     {% else %}
                                         {{ setting.value }}
                                     {% endif %}
