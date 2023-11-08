@@ -41,7 +41,8 @@ def get_bytes_health() -> ServiceHealth:
 
 def get_octopoes_health(octopoes_api_connector: OctopoesAPIConnector) -> ServiceHealth:
     try:
-        octopoes_health = octopoes_api_connector.health()
+        # we need to make sure we're using Rocky's ServiceHealth model, not Octopoes' model
+        octopoes_health = ServiceHealth.model_validate(octopoes_api_connector.health().model_dump())
     except RequestException as ex:
         logger.exception(ex)
         octopoes_health = ServiceHealth(

@@ -80,10 +80,10 @@ class OctopoesAPIConnector:
         self.session = OctopoesAPISession(base_uri)
 
     def root_health(self) -> ServiceHealth:
-        return ServiceHealth.parse_obj(self.session.get("/health").json())
+        return ServiceHealth.model_validate_json(self.session.get("/health").content)
 
     def health(self) -> ServiceHealth:
-        return ServiceHealth.parse_obj(self.session.get(f"/{self.client}/health").json())
+        return ServiceHealth.model_validate_json(self.session.get(f"/{self.client}/health").content)
 
     def list(
         self,
