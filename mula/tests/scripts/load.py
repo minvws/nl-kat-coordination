@@ -97,7 +97,7 @@ def run():
                 print(resp_octopoes_decl.text)
                 raise e
 
-            print(f"Org {org.get('id')} created declaration ", declaration)
+            print("Org", org.get("id"), "created declaration ", declaration)
 
             resp_octopoes_scan_profile = requests.put(
                 url=f"{OCTOPOES_API}/{org.get('id')}/scan_profiles",
