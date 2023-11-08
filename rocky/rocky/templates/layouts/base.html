@@ -3,7 +3,8 @@
 {% load i18n %}
 
 {% get_current_language as LANGUAGE_CODE %}
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="{{ LANGUAGE_CODE }}"
+      data-organization-code="{{ organization.code }}">
     {% block head %}
         {% include "head.html" %}
 
