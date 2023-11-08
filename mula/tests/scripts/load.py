@@ -112,7 +112,7 @@ def run():
             try:
                 resp_octopoes_scan_profile.raise_for_status()
             except requests.exceptions.HTTPError as e:
-                print("Error creating scan profile ", declaration.get("ooi").get("scan_profile"))
+                print("Error creating scan profile", declaration.get("ooi").get("scan_profile"))
                 print(resp_octopoes_scan_profile.text)
                 raise e
 
