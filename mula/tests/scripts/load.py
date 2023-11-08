@@ -28,10 +28,10 @@ def run():
 
         try:
             resp_katalogus.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError:
             if resp_katalogus.status_code != 404:
                 print("Error creating organisation ", org)
-                raise e
+                raise
 
             if resp_katalogus.status_code == 404:
                 print("Organisation already exists in katalogus", org)
@@ -40,14 +40,14 @@ def run():
             requests.post(
                 url=f"{OCTOPOES_API}/{org.get('id')}/node/",
             )
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError:
             print("Error creating organisation ", org)
-            raise e
+            raise
 
         print("Created organisation ", org)
 
         # Enable boefjes for organisation
-        boefjes = ["dns-records", "dns-sec", "dns-zone"]
+        boefjes = ("dns-records", "dns-sec", "dns-zone")
         for boefje_id in boefjes:
             resp_enable_boefje = requests.patch(
                 url=f"{KATALOGUS_API}/v1/organisations/{org.get('id')}/repositories/LOCAL/plugins/{boefje_id}",
@@ -56,9 +56,9 @@ def run():
 
             try:
                 resp_enable_boefje.raise_for_status()
-            except requests.exceptions.HTTPError as e:
+            except requests.exceptions.HTTPError:
                 print("Error enabling boefje ", boefje_id)
-                raise e
+                raise
 
             print("Enabled boefje ", boefje_id)
 
@@ -67,7 +67,7 @@ def run():
         csv_reader = csv.DictReader(csv_file, delimiter=",", quotechar='"')
         for row in csv_reader:
             name = row["name"]
-            decl = {
+            declaration = {
                 "ooi": {
                     "object_type": "Hostname",
                     "primary_key": f"Hostname|internet|{name}",
@@ -84,7 +84,7 @@ def run():
                 "method": None,
                 "task_id": str(uuid.uuid4()),
             }
-            declarations.append(decl)
+            declarations.append(declaration)
 
     for org in orgs:
         for declaration in declarations:
@@ -92,10 +92,10 @@ def run():
 
             try:
                 resp_octopoes_decl.raise_for_status()
-            except requests.exceptions.HTTPError as e:
+            except requests.exceptions.HTTPError:
                 print("Error creating declaration ", declaration)
                 print(resp_octopoes_decl.text)
-                raise e
+                raise
 
             print("Org", org.get("id"), "created declaration ", declaration)
 
@@ -111,12 +111,12 @@ def run():
 
             try:
                 resp_octopoes_scan_profile.raise_for_status()
-            except requests.exceptions.HTTPError as e:
+            except requests.exceptions.HTTPError:
                 print("Error creating scan profile", declaration.get("ooi").get("scan_profile"))
                 print(resp_octopoes_scan_profile.text)
-                raise e
+                raise
 
-            print(f"Org {org.get('id')} created scan profile ", declaration.get("ooi").get("scan_profile"))
+            print("Org {org.get('id')} created scan profile", declaration.get("ooi").get("scan_profile"))
 
 
 if __name__ == "__main__":

@@ -81,14 +81,9 @@ class HTTPService(Connector):
         )
 
         # Mount the HTTPAdapter to the session
-        self.session.mount(
-            "http://",
-            HTTPAdapter(max_retries=max_retries, pool_connections=self.pool_connections),
-        )
-        self.session.mount(
-            "https://",
-            HTTPAdapter(max_retries=max_retries, pool_connections=self.pool_connections),
-        )
+        http_adapter = HTTPAdapter(max_retries=max_retries, pool_connections=self.pool_connections)
+        self.session.mount("http://", http_adapter)
+        self.session.mount("https://", http_adapter)
 
         if self.source:
             self.headers["User-Agent"] = self.source
