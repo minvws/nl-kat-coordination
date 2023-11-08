@@ -112,6 +112,7 @@ repos:
       ^rocky/.*/templates/.*$ |
       ^rocky/reports/report_types/.*/.*\.html
       )
+    exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
   - id: djlint-django
     files: |
@@ -119,6 +120,7 @@ repos:
       ^rocky/.*/templates/.*$ |
       ^rocky/reports/report_types/.*/.*\.html
       )
+    exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
 - repo: https://github.com/thibaudcolas/pre-commit-stylelint
   rev: v15.10.1

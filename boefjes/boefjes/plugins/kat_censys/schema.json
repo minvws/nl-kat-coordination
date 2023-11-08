@@ -18,5 +18,8 @@
     "required": [
         "CENSYS_API_ID",
         "CENSYS_API_SECRET"
+    ],
+    "secret": [
+        "CENSYS_API_SECRET"
     ]
 }
