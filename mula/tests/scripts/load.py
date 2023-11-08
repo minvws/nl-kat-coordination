@@ -63,7 +63,7 @@ def run():
             print("Enabled boefje ", boefje_id)
 
     declarations: List[Dict[str, Any]] = []
-    with Path.open("data.csv", newline="") as csv_file:
+    with Path("data.csv").open(newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=",", quotechar='"')
         for row in csv_reader:
             name = row["name"]
