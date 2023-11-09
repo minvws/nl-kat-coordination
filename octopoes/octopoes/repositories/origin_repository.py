@@ -120,7 +120,7 @@ class XTDBOriginRepository(OriginRepository):
             old_origin = None
 
         if old_origin == origin:
-            # Declared and inferered origins won't have a task id, so if the old
+            # Declared and inferred origins won't have a task id, so if the old
             # origin is the same as the one being saved we can just return. In
             # case an observed origin is saved, we will delete the origin with
             # the old task id and create a new one. We can still fetch the old
