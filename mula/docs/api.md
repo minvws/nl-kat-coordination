@@ -1,16 +1,15 @@
 API
 ===
 
-[open api spec](openapi.json)
 
-[http://localhost:8004/docs](http://localhost:8004/docs)
-
+The browsable api docs can be view at: [http://localhost:8004/docs](http://localhost:8004/docs).
+A formal description of the spec can be referenced here: [open api spec](openapi.json)
 
 Filtering
 ---------
 
-For the endpoints `/tasks` and `/queues/{queue_id}/pop` additional payload
-filters can be specified. An example:
+The endpoints `/tasks` and `/queues/{queue_id}/pop` support additional payload
+filters. An example:
 
 ```json
 POST /tasks
@@ -79,7 +78,7 @@ POST /tasks
 }
 ```
 
-`or`:
+Example using the `or` operator:
 
 ```json
 POST /tasks
@@ -102,7 +101,7 @@ POST /tasks
 }
 ```
 
-`not`:
+Example using the `not` operator:
 
 ```json
 POST /tasks
@@ -125,7 +124,7 @@ POST /tasks
 Querying on nested field is also possible. Note that both the `Task`, and
 `PrioritizedItem` model have both a `JSONB` column. To query nested field in
 these `JSONB` columns you can use the `__` (double under, dunder) separators,
-to specify what nested field.
+to specify what nested field to filter on.
 
 
 Example:
@@ -154,7 +153,9 @@ POST /tasks
 Operators
 ---------
 
-| Operator      | Explanation | Example |
+Here's a list of the operators that you can use in the filters:
+
+| Operator      | Description | Example |
 |---------------|-------------|---------|
 | `==`, `eq`    |             |         |
 | `!=`, `ne`    |             |         |
@@ -166,17 +167,17 @@ Operators
 | `<`, `lt`     |             |         |
 | `>=`, `gte`   |             |         |
 | `<=`, `lte`   |             |         |
-| `like`        |             |         |
-| `not_like`    |             |         |
-| `ilike`       |             |         |
-| `not_ilike`   |             |         |
-| `in`          |             |         |
-| `not_in`      |             |         |
-| `contains`    |             |         |
+| `like`        | pattern matching | |
+| `not_like`    | pattern matching | |
+| `ilike`       | case-insensitive pattern matching | |
+| `not_ilike`   | case-insensitive pattern matching | |
+| `in`          | matching against a list of values | |
+| `not_in`      | matching against a list of values | |
+| `contains`    | substring matching | |
 | `any`         |             |         |
 | `match`       |             |         |
 | `starts_with` |             |         |
-| `@>`          | Contains, used to check if one JSON or arrray value contains another JSON or array value |         |
-| `<@`          | Is contained by, it checks if one JSON or array value is contained by another JSON or arrray value |         |
-| `@?`          | Exists, used to check if a key exists in a JSON object |         |
-| `@@`          | Full text search, performs postgresql full text searching using queries (requires `tsvector`) |         |
+| `@>`          | Contains, used to check if one JSON or array value contains another JSON or array value | |
+| `<@`          | Is contained by, it checks if one JSON or array value is contained by another JSON or array value | |
+| `@?`          | Exists, used to check if a key exists in a JSON object | |
+| `@@`          | Full text search, performs postgresql full text searching using queries (requires `tsvector` columns) | |
