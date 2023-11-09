@@ -357,7 +357,7 @@ def task() -> Task:
                         ],
                     },
                     "input_ooi": "Hostname|internet|mispo.es",
-                    "organization": "_dev",
+                    "organization": "test",
                 },
             },
             "status": "completed",
@@ -365,6 +365,49 @@ def task() -> Task:
             "modified_at": "2022-08-09 11:54:21.002838",
         }
     )
+
+
+@pytest.fixture
+def bytes_raw_metas():
+    return [
+        {
+            "id": "85c01c8c-c0bf-4fe8-bda5-abdf2d03117c",
+            "boefje_meta": {
+                "id": "6dea9549-c05d-42c9-b55b-8ad54cb9e413",
+                "started_at": "2023-11-01T15:02:46.764085+00:00",
+                "ended_at": "2023-11-01T15:02:47.276154+00:00",
+                "boefje": {"id": "dns-sec", "version": None},
+                "input_ooi": "Hostname|internet|mispoes.nl",
+                "arguments": {},
+                "organization": "test",
+                "runnable_hash": "ed871e9731f3d528ea92ca23c8eb18f38ac47e6d89a634b654a073fc2ca5fb50",
+                "environment": {},
+            },
+            "mime_types": [
+                {"value": "boefje/dns-sec"},
+                {"value": "boefje/dns-sec-c90404f60aeacf9b254abbd250bd3214e3b1a65b5a883dcbc"},
+                {"value": "dns-sec"},
+            ],
+            "secure_hash": "sha512:23e40f3e0c4381b89a296a5708a3c7a2dff369dc272b5cbce584d0fd7e17b1a5ebb1a947"
+            "be36ed19e8930116a46be2f4b450353b786696f83c328f197a8ae741",
+            "signing_provider_url": None,
+            "hash_retrieval_link": "a9b261d1-e981-42db-bd92-ee0c36372678",
+        }
+    ]
+
+
+@pytest.fixture
+def bytes_get_raw():
+    byte_string = ";; Number of trusted keys: 2\\n;; Chasing: mispoes.nl."
+    " A\\n\\n\\nDNSSEC Trust tree:\\nantagonist.nl. (A)\\n|---mispoes.nl. (DNSKEY keytag: 47684 alg: 13 flags:"
+    " 257)\\n    |---mispoes.nl. (DS keytag: 47684 digest type: 2)\\n        "
+    "|---nl. (DNSKEY keytag: 52707 alg: 13 flags: 256)\\n            "
+    "|---nl. (DNSKEY keytag: 17153 alg: 13 flags: 257)\\n            "
+    "|---nl. (DS keytag: 17153 digest type: 2)\\n                "
+    "|---. (DNSKEY keytag: 46780 alg: 8 flags: 256)\\n                    "
+    b"|---. (DNSKEY keytag: 20326 alg: 8 flags: 257)\\n;; Chase successful\\n"
+
+    return byte_string.encode()
 
 
 @pytest.fixture
