@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Set, Type
 
 from account.mixins import OrganizationView
@@ -7,12 +6,11 @@ from django.core.exceptions import BadRequest
 from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import get_katalogus
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
-from tools.view_helpers import convert_date_to_datetime, get_ooi_url
+from tools.view_helpers import get_ooi_url, is_future_date
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
@@ -46,11 +44,7 @@ class OOIReportView(BaseOOIDetailView):
             raise BadRequest("Missing ooi_id parameter")
         ooi_id = request.GET["ooi_id"]
 
-        if self.get_observed_at() > convert_date_to_datetime(datetime.now(timezone.utc)):
-            messages.error(
-                request,
-                _("You can't generate a report for an OOI on a date in the future."),
-            )
+        if is_future_date(request, self.get_observed_at()):
             return redirect(get_ooi_url("ooi_detail", ooi_id, self.organization.code))
         return super().dispatch(request, *args, **kwargs)
 

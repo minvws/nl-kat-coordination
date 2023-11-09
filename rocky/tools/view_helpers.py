@@ -179,3 +179,13 @@ def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrior
                 "It may take some time, a refresh of the page may be needed to show the results."
             ),
         )
+
+
+def is_future_date(request: HttpRequest, observed_at: datetime) -> bool:
+    is_future_date = observed_at > convert_date_to_datetime(datetime.now(timezone.utc))
+    if is_future_date:
+        messages.error(
+            request,
+            _("You can't generate a report for an OOI on a date in the future."),
+        )
+    return is_future_date

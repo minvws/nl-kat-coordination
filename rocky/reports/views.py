@@ -1,13 +1,14 @@
 from logging import getLogger
-from typing import Dict, List, Set, TypedDict
+from typing import Any, Dict, List, Set, TypedDict
 
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
-from tools.view_helpers import BreadcrumbsMixin
+from tools.view_helpers import BreadcrumbsMixin, is_future_date
 
 from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
@@ -67,6 +68,10 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
         self.selected_oois = request.GET.getlist("ooi", [])
         self.yielded_report_types = get_report_types_for_oois(self.selected_oois)
         self.selected_report_types = request.GET.getlist("report_type", [])
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        is_future_date(request, self.valid_time)
+        return super().get(request, *args, **kwargs)
 
     def get_oois(self) -> List[OOI]:
         return [self.get_single_ooi(ooi_id) for ooi_id in self.selected_oois]

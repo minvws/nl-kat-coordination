@@ -68,6 +68,14 @@ class ObservedAtForm(BaseRockyForm):
         help_text=OBSERVED_AT_HELP_TEXT,
     )
 
+    def clean_observed_at(self):
+        observed_at = self.cleaned_data["observed_at"]
+        now = datetime.datetime.now(tz=datetime.timezone.utc).date()
+        diff = observed_at - now
+        if diff.days > 0:
+            raise forms.ValidationError(_("The date can not be in the future. Please select a different date."))
+        return observed_at
+
 
 class LabeledCheckboxInput(forms.CheckboxInput):
     template_name = "forms/widgets/checkbox_option.html"

@@ -44,6 +44,8 @@
                     <form class="inline layout-wide"
                           method="get"
                           action="{% url 'report_setup_scan' organization.code %}">
+                        {% include "forms/report_form_fields.html" %}
+
                         {% for ooi in selected_oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
                         <div class="column-4 tiles">
                             {% include "partials/report_types_tiles.html" with report_types=report_types_choices %}
