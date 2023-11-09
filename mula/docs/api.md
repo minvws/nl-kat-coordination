@@ -159,11 +159,11 @@ Here's a list of the operators that you can use in the filters:
 |---------------|-------------|
 | `==`, `eq`    |             |
 | `!=`, `ne`    |             |
-| `is`          |             | 
-| `is_not`      |             | 
-| `is_null`     |             | 
-| `is_not_null` |             | 
-| `>`, `gt`     |             | 
+| `is`          |             |
+| `is_not`      |             |
+| `is_null`     |             |
+| `is_not_null` |             |
+| `>`, `gt`     |             |
 | `<`, `lt`     |             |
 | `>=`, `gte`   |             |
 | `<=`, `lte`   |             |
