@@ -122,7 +122,7 @@ POST /tasks
 ### Nested fields
 
 Querying on nested field is also possible. Note that both the `Task`, and
-`PrioritizedItem` model have both a `JSONB` column. To query nested field in
+`PrioritizedItem` models both use a `JSONB` column. To query nested field in
 these `JSONB` columns you can use the `__` (double under, dunder) separators,
 to specify what nested field to filter on.
 
@@ -155,29 +155,29 @@ Operators
 
 Here's a list of the operators that you can use in the filters:
 
-| Operator      | Description | Example |
-|---------------|-------------|---------|
-| `==`, `eq`    |             |         |
-| `!=`, `ne`    |             |         |
-| `is`          |             |         | 
-| `is_not`      |             |         | 
-| `is_null`     |             |         | 
-| `is_not_null` |             |         | 
-| `>`, `gt`     |             |         | 
-| `<`, `lt`     |             |         |
-| `>=`, `gte`   |             |         |
-| `<=`, `lte`   |             |         |
-| `like`        | pattern matching | |
-| `not_like`    | pattern matching | |
-| `ilike`       | case-insensitive pattern matching | |
-| `not_ilike`   | case-insensitive pattern matching | |
-| `in`          | matching against a list of values | |
-| `not_in`      | matching against a list of values | |
-| `contains`    | substring matching | |
-| `any`         |             |         |
-| `match`       |             |         |
-| `starts_with` |             |         |
-| `@>`          | Contains, used to check if one JSON or array value contains another JSON or array value | |
-| `<@`          | Is contained by, it checks if one JSON or array value is contained by another JSON or array value | |
-| `@?`          | Exists, used to check if a key exists in a JSON object | |
-| `@@`          | Full text search, performs postgresql full text searching using queries (requires `tsvector` columns) | |
+| Operator      | Description |
+|---------------|-------------|
+| `==`, `eq`    |             |
+| `!=`, `ne`    |             |
+| `is`          |             | 
+| `is_not`      |             | 
+| `is_null`     |             | 
+| `is_not_null` |             | 
+| `>`, `gt`     |             | 
+| `<`, `lt`     |             |
+| `>=`, `gte`   |             |
+| `<=`, `lte`   |             |
+| `like`        | pattern matching |
+| `not_like`    | pattern matching |
+| `ilike`       | case-insensitive pattern matching |
+| `not_ilike`   | case-insensitive pattern matching |
+| `in`          | matching against a list of values |
+| `not_in`      | matching against a list of values |
+| `contains`    | substring matching |
+| `any`         |             |
+| `match`       |             |
+| `starts_with` |             |
+| `@>`          | Contains, used to check if one JSON or array value contains another JSON or array value |
+| `<@`          | Is contained by, it checks if one JSON or array value is contained by another JSON or array value |
+| `@?`          | Exists, used to check if a key exists in a JSON object |
+| `@@`          | Full text search, performs postgresql full text searching using queries (requires `tsvector` columns) |
