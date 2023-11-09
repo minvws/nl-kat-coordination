@@ -30,20 +30,23 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
 
     if "unsafe-inline" in header.value or "unsafe-eval" in header.value or "unsafe-hashes" in header.value:
         findings.append(
-            "Unsafe-inline, unsafe-eval and unsafe-hashes should not be used in the CSP settings of an HTTP Header."
+            "unsafe-inline, unsafe-eval and unsafe-hashes should not be used in the CSP settings of an HTTP Header."
         )
 
     if "frame-src" not in header.value and "default-src" not in header.value and "child-src" not in header.value:
-        findings.append("Frame-src has not been defined or does not have a fallback.")
+        findings.append("frame-src has not been defined or does not have a fallback.")
 
     if "script-src" not in header.value and "default-src" not in header.value:
-        findings.append("Script-src has not been defined or does not have a fallback.")
+        findings.append("script-src has not been defined or does not have a fallback.")
 
+    if "base-uri" not in header.value:
+        findings.append("base-uri has not been defined, default-src does not apply.")
+    
     if "frame-ancestors" not in header.value:
-        findings.append("Frame-ancestors has not been defined.")
+        findings.append("frame-ancestors has not been defined.")
 
     if "default-src" not in header.value:
-        findings.append("Default-src has not been defined.")
+        findings.append("default-src has not been defined.")
 
     policies = [policy.strip().split(" ") for policy in header.value.split(";")]
     for policy in policies:
@@ -57,8 +60,15 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
 
         if (policy[0] == "default-src" or policy[0] == "object-src" or policy[0] == "script-src") and "data:" in policy:
             findings.append(
-                "'Data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
+                "'data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
             )
+        if policy[0].endswith("-uri") and (
+            "unsafe-eval" in policy[2:] or 
+            "unsafe-hashes" in policy[2:] or 
+            "unsafe-inline" in policy[2:] or 
+            "strict-dynamic" in policy[2:]):
+            findings.append(f"{policy[0]} has illogical values.")
+
         if policy[1].strip() == "*":
             findings.append("A wildcard source should not be used in the value of any type in the CSP settings.")
         if policy[1].strip() in ("http:", "https:"):
