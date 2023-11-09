@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Optional, Type
+from typing import Dict, List, Optional, Type
 from uuid import UUID
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Query
 
 from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
@@ -35,19 +35,11 @@ class RawDataFilter(BaseModel):
     limit: Optional[int] = 1
     offset: Optional[int] = 0
 
-    @root_validator(pre=False)
-    def either_organization_or_boefje_meta_id(  # pylint: disable=no-self-argument
-        cls, values: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        if values.get("organization") or values.get("boefje_meta_id"):
-            return values
-
-        raise ValueError("boefje_meta_id and organization cannot both be None.")
-
     def apply(self, query: Query) -> Query:
         if self.boefje_meta_id:
             query = query.filter(RawFileInDB.boefje_meta_id == str(self.boefje_meta_id))
-        else:
+
+        if self.organization:
             query = query.join(BoefjeMetaInDB).filter(BoefjeMetaInDB.organization == self.organization)
 
         if self.normalized:

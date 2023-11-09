@@ -144,23 +144,7 @@ class SQLMetaDataRepository(MetaDataRepository):
     def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
         logger.debug("Querying raw data: %s", query_filter.json())
         query = self.session.query(RawFileInDB)
-
-        if query_filter.boefje_meta_id:
-            query = query.filter(RawFileInDB.boefje_meta_id == str(query_filter.boefje_meta_id))
-
-        if query_filter.organization:
-            query = query.join(BoefjeMetaInDB).filter(BoefjeMetaInDB.organization == query_filter.organization)
-
-        if query_filter.normalized:
-            query = query.join(NormalizerMetaInDB, isouter=False)
-
-        if query_filter.normalized is False:  # it can also be None, in which case we do not want a filter
-            query = query.join(NormalizerMetaInDB, isouter=True).filter(NormalizerMetaInDB.id.is_(None))
-
-        if query_filter.mime_types:
-            query = query.filter(RawFileInDB.mime_types.contains([m.value for m in query_filter.mime_types]))
-
-        query = query.offset(query_filter.offset).limit(query_filter.limit)
+        query = query_filter.apply(query)
 
         return [to_raw_meta(raw_file_in_db) for raw_file_in_db in query]
 
