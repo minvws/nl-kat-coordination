@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-06 13:48+0000\n"
+"POT-Creation-Date: 2023-11-09 14:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2985,6 +2985,10 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
+#: tools/forms/base.py
+msgid "The date can not be in the future. Please select a different date."
+msgstr ""
+
 #: tools/forms/boefje.py
 msgid ""
 "Not all required boefjes are selected. Please select all required boefjes."
@@ -3340,6 +3344,10 @@ msgid ""
 "Your task is scheduled and will soon be started in the background. Results "
 "will be added to the object list when they are in. It may take some time, a "
 "refresh of the page may be needed to show the results."
+msgstr ""
+
+#: tools/view_helpers.py
+msgid "You can't generate a report for an OOI on a date in the future."
 msgstr ""
 
 #: rocky/messaging.py
@@ -3854,6 +3862,8 @@ msgid "Crisis room"
 msgstr ""
 
 #: rocky/templates/header.html rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr ""
@@ -5463,10 +5473,6 @@ msgstr ""
 
 #: rocky/views/ooi_mute.py
 msgid "Finding(s) successfully muted."
-msgstr ""
-
-#: rocky/views/ooi_report.py
-msgid "You can't generate a report for an OOI on a date in the future."
 msgstr ""
 
 #: rocky/views/ooi_report.py
