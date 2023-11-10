@@ -1,10 +1,11 @@
+import { language, organization_code } from './utils.js'
 
 const buttons = document.querySelectorAll(".expando-button.normalizer-list-table-row");
 
 buttons.forEach((button) => {
   const raw_task_id = button.closest('tr').getAttribute('data-task-id');
   const task_id = button.closest('tr').getAttribute('data-task-id').replace(/-/g, "");
-  const json_url = location.pathname + "/" + encodeURI(task_id);
+  const json_url = "/" + language + "/" + organization_code +"/tasks/normalizers/" + encodeURI(task_id);
 
   const getJson = (url, callback) => {
     var xhr = new XMLHttpRequest();
@@ -48,7 +49,7 @@ buttons.forEach((button) => {
       // Retrieve JSON containing yielded objects of task.
       getJson(json_url, function(data) {
         if(data['oois'].length > 0) {
-          const url = location.pathname.replace('/tasks/normalizers', '');
+          const url = "/" + language + "/" + organization_code;
           let object_list = "";
 
           // Build HTML snippet for every yielded object.

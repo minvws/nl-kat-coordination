@@ -3,7 +3,7 @@
 This module has several entry points discussed below, but let us first consider the prerequisites and scope.
 If you already have running setup and want to learn where each bit of functionality goes, read the following page:
 
-[Developing Openkat Plugins](README.md#your-first-boefje)
+[Developing Openkat Plugins]([https://docs.openkat.nl/introduction/makeyourown.html])
 
 ## Prerequisites
 
