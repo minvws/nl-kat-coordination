@@ -1,9 +1,12 @@
 from http import HTTPStatus
 from unittest.mock import call
 
+import pytest
+from django.http import Http404
 from pytest_django.asserts import assertContains
 from requests import HTTPError
 
+from rocky.views.bytes_raw import BytesRawView
 from rocky.views.tasks import BoefjesTaskListView
 from tests.conftest import setup_request
 
@@ -113,3 +116,59 @@ def test_reschedule_task_already_queued(rf, client_member, mocker, task):
 
     assert response.status_code == 302
     assert list(request._messages)[0].message == "Task queue is full, please try again later."
+
+
+def test_reschedule_task_from_other_org(rf, client_member, client_member_b, mocker, task):
+    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
+    mock_scheduler_client.get_task_details.return_value = task
+
+    request = setup_request(
+        rf.post(
+            f"/en/{client_member.organization.code}/tasks/boefjes/?task_id={task.id}",
+            data={"action": "reschedule_task"},
+        ),
+        client_member_b.user,
+    )
+    with pytest.raises(Http404):
+        BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+
+
+def test_download_task_other_org_from_other_org_url(
+    rf, client_member, client_member_b, mock_bytes_client, bytes_raw_metas
+):
+    with pytest.raises(Http404):
+        BytesRawView.as_view()(
+            setup_request(rf.get("bytes_raw"), client_member.user),
+            organization_code=client_member_b.organization.code,
+            boefje_meta_id=bytes_raw_metas[0]["id"],
+        )
+
+
+def test_download_task_same_org(rf, client_member, mock_bytes_client, bytes_raw_metas, bytes_get_raw):
+    mock_bytes_client().get_raw.return_value = bytes_get_raw
+    mock_bytes_client().get_raw_metas.return_value = bytes_raw_metas
+
+    request = setup_request(rf.get("bytes_raw"), client_member.user)
+
+    response = BytesRawView.as_view()(
+        request,
+        organization_code=client_member.organization.code,
+        boefje_meta_id=bytes_raw_metas[0]["id"],
+    )
+
+    assert response.status_code == 200
+
+
+def test_download_task_forbidden(rf, client_member, mock_bytes_client, bytes_raw_metas):
+    mock_bytes_client().get_raw_metas.side_effect = Http404
+
+    request = setup_request(rf.get("bytes_raw"), client_member.user)
+
+    response = BytesRawView.as_view()(
+        request,
+        organization_code=client_member.organization.code,
+        boefje_meta_id=bytes_raw_metas[0]["id"],
+    )
+
+    assert response.status_code == 302
+    assert list(request._messages)[0].message == "Getting raw data failed."
