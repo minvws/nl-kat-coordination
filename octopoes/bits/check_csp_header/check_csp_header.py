@@ -63,10 +63,10 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
                 "'data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
             )
         if policy[0].endswith("-uri") and (
-            "unsafe-eval" in policy[2:] or
-            "unsafe-hashes" in policy[2:] or
-            "unsafe-inline" in policy[2:] or
-            "strict-dynamic" in policy[2:]
+            "unsafe-eval" in policy[2:]
+            or "unsafe-hashes" in policy[2:]
+            or "unsafe-inline" in policy[2:]
+            or "strict-dynamic" in policy[2:]
         ):
             findings.append(f"{policy[0]} has illogical values.")
 
