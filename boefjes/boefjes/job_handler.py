@@ -27,6 +27,7 @@ from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.types import OOIType
 
 logger = logging.getLogger(__name__)
+
 bytes_api_client = BytesAPIClient(
     settings.bytes_api,
     username=settings.bytes_username,
@@ -153,7 +154,6 @@ class BoefjeHandler(Handler):
             boefje_meta.ended_at = datetime.now(timezone.utc)
             logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
-            bytes_api_client.login()
             bytes_api_client.save_boefje_meta(boefje_meta)
 
             if boefje_results:
@@ -175,7 +175,6 @@ class NormalizerHandler(Handler):
     def handle(self, normalizer_meta: NormalizerMeta) -> None:
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
-        bytes_api_client.login()
         raw = bytes_api_client.get_raw(normalizer_meta.raw_data.id)
 
         normalizer_meta.started_at = datetime.now(timezone.utc)

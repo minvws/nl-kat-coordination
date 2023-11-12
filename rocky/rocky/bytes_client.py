@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Set
 
 import requests
 from django.conf import settings
+from django.http import Http404
 
 from octopoes.api.models import Declaration
 from rocky.health import ServiceHealth
@@ -121,7 +122,7 @@ class BytesClient:
 
         return response.content
 
-    def get_raw_metas(self, boefje_meta_id: str) -> List:
+    def get_raw_metas(self, boefje_meta_id: str, organization_code: str) -> List:
         # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
         raw_files_limit = 100
         params = {"boefje_meta_id": boefje_meta_id, "limit": raw_files_limit, "organization": self.organization}
@@ -130,7 +131,9 @@ class BytesClient:
         response.raise_for_status()
 
         metas = response.json()
-
+        metas = [raw_meta for raw_meta in metas if raw_meta["boefje_meta"]["organization"] == organization_code]
+        if not metas:
+            raise Http404
         if len(metas) >= raw_files_limit:
             logger.warning("Reached raw file limit for current view.")
 
