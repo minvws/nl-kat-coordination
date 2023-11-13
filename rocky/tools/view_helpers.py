@@ -181,11 +181,11 @@ def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrior
         )
 
 
-def is_future_date(request: HttpRequest, observed_at: datetime) -> bool:
-    is_future_date = observed_at > convert_date_to_datetime(datetime.now(timezone.utc))
+def is_future_date_observed_at(request: HttpRequest, observed_at: datetime) -> bool:
+    is_future_date = observed_at > datetime.now(timezone.utc)
     if is_future_date:
         messages.error(
             request,
-            _("You can't generate a report for an OOI on a date in the future."),
+            _("Your selected date is in the future. Please select a different date."),
         )
     return is_future_date

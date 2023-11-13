@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from katalogus.client import get_katalogus
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
-from tools.view_helpers import get_ooi_url, is_future_date
+from tools.view_helpers import get_ooi_url, is_future_date_observed_at
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
@@ -44,7 +44,7 @@ class OOIReportView(BaseOOIDetailView):
             raise BadRequest("Missing ooi_id parameter")
         ooi_id = request.GET["ooi_id"]
 
-        if is_future_date(request, self.get_observed_at()):
+        if is_future_date_observed_at(request, self.get_observed_at()):
             return redirect(get_ooi_url("ooi_detail", ooi_id, self.organization.code))
         return super().dispatch(request, *args, **kwargs)
 

@@ -1,14 +1,18 @@
 from logging import getLogger
 from typing import Any, Dict, List, Set, TypedDict
 
+from django import forms
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
-from tools.view_helpers import BreadcrumbsMixin, is_future_date
+from tools.forms.base import ObservedAtForm
+from tools.forms.ooi_form import ClearanceFilterForm
+from tools.view_helpers import BreadcrumbsMixin, is_future_date_observed_at
 
 from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
@@ -59,7 +63,17 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
         return breadcrumbs[: self.current_step]
 
 
-class BaseReportView(ReportBreadcrumbs, OctopoesView):
+class ReportFilterMixin:
+    def get_filters(self) -> Dict[str, forms.Form]:
+        selection = self.request.GET
+        return {
+            "observed_at_form": ObservedAtForm(selection),
+            "ooi_type_form": OOITypeMultiCheckboxForReportForm(selection),
+            "clearance_form": ClearanceFilterForm(selection),
+        }
+
+
+class BaseReportView(ReportBreadcrumbs, OctopoesView, ReportFilterMixin):
     ooi_types = get_ooi_types_with_report()
 
     def setup(self, request, *args, **kwargs):
@@ -70,7 +84,8 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
         self.selected_report_types = request.GET.getlist("report_type", [])
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        is_future_date(request, self.valid_time)
+        if is_future_date_observed_at(request, self.valid_time):
+            return redirect(reverse("report_oois_selection", kwargs={"organization_code": self.organization.code}))
         return super().get(request, *args, **kwargs)
 
     def get_oois(self) -> List[OOI]:
@@ -87,8 +102,7 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observed_at"] = self.valid_time
-        context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(self.request.GET)
+        context.update(self.get_filters())
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
         return context
