@@ -1,6 +1,7 @@
 from logging import getLogger
 from typing import Dict, List, Set, TypedDict
 
+from account.mixins import OrganizationView
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -38,8 +39,12 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
 
         breadcrumbs = [
             {
-                "url": reverse("report_oois_selection", kwargs=kwargs) + selection,
+                "url": reverse("reports", kwargs=kwargs) + selection,
                 "text": _("Reports"),
+            },
+            {
+                "url": reverse("report_oois_selection", kwargs=kwargs) + selection,
+                "text": _("Select OOIs"),
             },
             {
                 "url": reverse("report_types_selection", kwargs=kwargs) + selection,
@@ -50,8 +55,8 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
                 "text": _("Set up scan"),
             },
             {
-                "url": reverse("report_view", kwargs=kwargs) + selection,
-                "text": _("View Report"),
+                "url": reverse("generate_report_view", kwargs=kwargs) + selection,
+                "text": _("Generate Report"),
             },
         ]
 
@@ -126,13 +131,18 @@ class PluginSelectionView(BaseReportView):
         return context
 
 
+class ReportView(ReportBreadcrumbs, OrganizationView, TemplateView):
+    template_name = "reports.html"
+    current_step = 1
+
+
 class ReportOOISelectionView(BaseReportView, BaseOOIListView):
     """
     Select OOIs from list to include in report.
     """
 
     template_name = "report_oois_selection.html"
-    current_step = 1
+    current_step = 2
 
 
 class ReportTypeSelectionView(BaseSelectionView, TemplateView):
@@ -142,7 +152,7 @@ class ReportTypeSelectionView(BaseSelectionView, TemplateView):
     """
 
     template_name = "report_types_selection.html"
-    current_step = 2
+    current_step = 3
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
@@ -164,12 +174,12 @@ class ReportSetupScanView(PluginSelectionView, TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
+class GenerateReportView(BaseSelectionView, PluginSelectionView, TemplateView):
     """
     Shows the report generated from OOIS and report types.
     """
 
-    template_name = "report.html"
+    template_name = "generate_report.html"
     current_step = 4
 
     def get(self, request, *args, **kwargs):

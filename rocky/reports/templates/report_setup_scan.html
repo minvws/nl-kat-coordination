@@ -46,7 +46,7 @@
                     <form id="generate_report"
                           class="inline"
                           method="get"
-                          action="{% url 'report_view' organization.code %}">
+                          action="{% url 'generate_report_view' organization.code %}">
                         {% include "forms/report_form_fields.html" %}
 
                         {% for ooi in selected_oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}

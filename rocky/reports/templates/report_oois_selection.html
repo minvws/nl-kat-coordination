@@ -43,9 +43,10 @@
                             <th>
                                 <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
                             </th>
-                            <th>{% translate "Object" %}</th>
-                            <th>{% translate "Type" %}</th>
+                            <th>{% translate "OOI" %}</th>
+                            <th>{% translate "OOI-Type" %}</th>
                             <th>{% translate "Clearance level" %}</th>
+                            <th>{% translate "Clearance type" %}</th>
                         </thead>
                         <tbody>
                             {% for object in object_list %}
@@ -59,6 +60,7 @@
                                         {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
 
                                     </td>
+                                    <td>{{ object.scan_profile.scan_profile_type|title }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
