@@ -4,6 +4,11 @@ Octopoes Research
 General note to the reader: this document is based on some internal project notes and does not have an official or formal status.
 It may contain oversights, mistakes, and/or omissions. Any thoughts or insights are very welcome through GitHub or by contacting the team through Signal!
 
+Master students from the University of Groningen have written a paper about the use of Semantic Web Technologies in OpenKAT.
+
+- :download:`Investigating the use of Semantic Web Technologies in OpenKAT (paper)<pdf/Investigating the use of Semantic Web Technologies in OpenKAT paper.pdf>`
+- :download:`Investigating the use of Semantic Web Technologies in OpenKAT (slides) <pdf/Investigating the use of Semantic Web Technologies in OpenKAT slides.pdf>`
+
 Introduction
 ============
 The project has gone through several iterations of refinement and changes in scope, but the overall software architecture has remained stable for a while now.
