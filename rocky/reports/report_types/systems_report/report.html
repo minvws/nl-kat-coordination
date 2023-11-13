@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<h2>{% translate "Systems mockup report" %}</h2>
+<p>The input ooi is {{ data.input_ooi }}.</p>
+{% if data.systems %}
+    <p>The systems that are found are :</p>
+    <ul>
+        <li>
+            {% for system in data.systems %}
+                {{ system }}
+            </li>
+        {% endfor %}
+    {% else %}
+        <p>No systems found.</p>
+    {% endif %}
+</ul>

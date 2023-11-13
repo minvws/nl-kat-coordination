@@ -15,6 +15,11 @@ class ReportPlugins(TypedDict):
     optional: List[str]
 
 
+class AggregateReportSubReports(TypedDict):
+    required: List[str]
+    optional: List[str]
+
+
 class Report(ABC):
     id: str
     name: str
@@ -27,4 +32,18 @@ class Report(ABC):
         self.octopoes_api_connector = octopoes_api_connector
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+        raise NotImplementedError
+
+
+class AggregateReport(ABC):
+    id: str
+    name: str
+    description: str
+    reports: AggregateReportSubReports
+    template_path: str = "report.html"
+
+    def __init__(self, octopoes_api_connector):
+        self.octopoes_api_connector = octopoes_api_connector
+
+    def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError

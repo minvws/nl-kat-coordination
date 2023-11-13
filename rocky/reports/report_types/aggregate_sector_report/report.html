@@ -1,0 +1,6 @@
+<h2>Systems</h2>
+<ol>
+    {% for system in data.systems %}<li>Types: {{ system.system_types }}, OOIs: {{ system.oois }}</li>{% endfor %}
+</ol>
+<h2>Open Ports</h2>
+{% for ip, port in data.open_ports.items %}<p>{{ ip }}: {{ port }}</p>{% endfor %}
