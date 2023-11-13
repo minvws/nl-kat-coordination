@@ -13,9 +13,14 @@
                     <div>
                         <h1>{% translate "Reports" %}</h1>
                         <p class="emphasized">{% translate "Overview of reports" %}</p>
-                        <a class="button"
-                           href="{% url 'report_oois_selection' organization.code %}?{{ request.GET.urlencode }}">
-                        {% translate "Aggregate Report" %}</a>
+                        <div class="button-container">
+                            <a class="button"
+                               href="{% url 'report_oois_selection' organization.code %}?{{ request.GET.urlencode }}">
+                            {% translate "Generate Report" %}</a>
+                            <a class="button"
+                               href="{% url 'aggregate_reports' organization.code %}?{{ request.GET.urlencode }}">
+                            {% translate "Aggregate Report" %}</a>
+                        </div>
                     </div>
                     <div class="horizontal-view toolbar"></div>
                 </div>
