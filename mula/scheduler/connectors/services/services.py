@@ -42,7 +42,8 @@ class HTTPService(Connector):
         self,
         host: str,
         source: str,
-        timeout: int = 5,
+        timeout: int = 10,
+        pool_connections: int = 10,
         retries: int = 5,
     ):
         """Initializer of the HTTPService class. During initialization the
@@ -57,6 +58,8 @@ class HTTPService(Connector):
                 from where the requests came from.
             timeout:
                 An integer defining the timeout of requests.
+            pool_connections:
+                The number of connections kept alive in the pool.
             retries:
                 An integer defining the number of retries to make before
                 giving up.
@@ -68,6 +71,7 @@ class HTTPService(Connector):
         self.host: str = host
         self.timeout: int = timeout
         self.retries: int = retries
+        self.pool_connections: int = pool_connections
         self.source: str = source
 
         max_retries = Retry(
@@ -77,18 +81,9 @@ class HTTPService(Connector):
         )
 
         # Mount the HTTPAdapter to the session
-        self.session.mount(
-            "http://",
-            HTTPAdapter(
-                max_retries=max_retries,
-            ),
-        )
-        self.session.mount(
-            "https://",
-            HTTPAdapter(
-                max_retries=max_retries,
-            ),
-        )
+        http_adapter = HTTPAdapter(max_retries=max_retries, pool_connections=self.pool_connections)
+        self.session.mount("http://", http_adapter)
+        self.session.mount("https://", http_adapter)
 
         if self.source:
             self.headers["User-Agent"] = self.source
