@@ -163,7 +163,7 @@ def test_create_query_from_path():
 
 
 def test_finding_type_count_query():
-    query = Query(FindingType).where(Finding, finding_type=FindingType).group_by(FindingType).count(Finding)
+    query = Query(FindingType).where(Finding, finding_type=FindingType).pull(FindingType).count(Finding)
     object_type_options = [
         '[ FindingType :object_type "ADRFindingType" ]',
         '[ FindingType :object_type "CAPECFindingType" ]',

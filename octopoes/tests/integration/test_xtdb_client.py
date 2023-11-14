@@ -1,16 +1,24 @@
 import os
+import uuid
 from datetime import datetime
+from ipaddress import ip_address
+from typing import List
 
 import pytest
 from requests import HTTPError
 
+from octopoes.api.models import Declaration, Observation
 from octopoes.config.settings import XTDBType
-from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI
+from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
+from octopoes.models.ooi.network import IPAddressV4, IPPort, Network
+from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
-from octopoes.xtdb.query import Query
+from octopoes.xtdb.query import A, Query
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
@@ -142,3 +150,83 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     assert xtdb_session.client.query(str(query)) == []
 
     assert len(xtdb_session.client.query(str(Query(Network)))) == 2
+
+
+def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, xtdb_session: XTDBSession, valid_time):
+    network = Network(name="test")
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
+
+    hostnames: List[OOI] = [
+        Hostname(network=network.reference, name="example.com"),
+        Hostname(network=network.reference, name="a.example.com"),
+        Hostname(network=network.reference, name="b.example.com"),
+        Hostname(network=network.reference, name="c.example.com"),
+        Hostname(network=network.reference, name="d.example.com"),
+        Hostname(network=network.reference, name="e.example.com"),
+    ]
+
+    addresses = [IPAddressV4(network=network.reference, address=ip_address("192.0.2.3"))]
+    ports = [
+        IPPort(address=addresses[0].reference, protocol="tcp", port=25),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=443),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=22),
+    ]
+    services = [Service(name="smtp"), Service(name="https"), Service(name="http"), Service(name="ssh")]
+    ip_services = [
+        IPService(ip_port=ports[0].reference, service=services[0].reference),
+        IPService(ip_port=ports[1].reference, service=services[1].reference),
+        IPService(ip_port=ports[2].reference, service=services[3].reference),
+    ]
+
+    resolved_hostnames = [
+        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[1].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[2].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[5].reference, address=addresses[0].reference),
+    ]
+    software = Software(name="smtp", version="1.1")
+    software_instance = SoftwareInstance(ooi=addresses[0].reference, software=software.reference)
+
+    oois = hostnames + addresses + ports + services + ip_services + resolved_hostnames + [software, software_instance]
+    octopoes_api_connector.save_observation(
+        Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
+    )
+
+    second_hostname = A(Hostname)
+    second_resolved_hostname = A(ResolvedHostname)
+
+    # Find all hostnames that are connected to example.com because they point to the same IpAddressV4. Filter
+    # IPAddressV4 where there is an IPService with service name "smtp" on one of its ports.
+    q = (
+        Query(second_hostname)
+        .pull(IPAddressV4)
+        .where(Hostname, name="example.com")
+        .where(ResolvedHostname, hostname=Hostname)
+        .where(ResolvedHostname, address=IPAddressV4)
+        .where(second_resolved_hostname, hostname=second_hostname)
+        .where(second_resolved_hostname, address=IPAddressV4)
+        .where(IPPort, address=IPAddressV4)
+        .where(IPService, ip_port=IPPort)
+        .where(IPService, service=Service)
+        .where(Service, name="smtp")
+    )
+
+    assert len(xtdb_session.client.query(str(q))) == 6
+
+    q = (
+        Query(second_hostname)
+        .pull(IPAddressV4)
+        .where(Hostname, name="example.com")
+        .where(ResolvedHostname, hostname=Hostname)
+        .where(ResolvedHostname, address=IPAddressV4)
+        .where(second_resolved_hostname, hostname=second_hostname)
+        .where(second_resolved_hostname, address=IPAddressV4)
+        .where(IPPort, address=IPAddressV4)
+        .where(IPService, ip_port=IPPort)
+        .where(IPService, service=Service)
+        .where(Service, name="http")
+    )
+
+    assert len(xtdb_session.client.query(str(q))) == 0

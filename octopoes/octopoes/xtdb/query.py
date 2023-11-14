@@ -115,13 +115,13 @@ class Query:
 
         return query
 
-    def count(self, ooi_type: Ref) -> "Query":
-        self._find_clauses.append(f"(count {self._get_object_alias(ooi_type)})")
+    def pull(self, ooi_type: Ref) -> "Query":
+        self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} [*])")
 
         return self
 
-    def group_by(self, ooi_type: Ref) -> "Query":
-        self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} [*])")
+    def count(self, ooi_type: Ref) -> "Query":
+        self._find_clauses.append(f"(count {self._get_object_alias(ooi_type)})")
 
         return self
 
