@@ -55,7 +55,7 @@ class BytesClient:
         )
 
         self._save_boefje_meta(boefje_meta)
-        all_mime_types = {"manual", "boefje/manual"}.union(manual_mime_types)
+        all_mime_types = {"boefje/manual"}.union(manual_mime_types)
         raw_id = self._save_raw(boefje_meta.id, raw, all_mime_types)
 
         self._save_normalizer_meta(
@@ -86,7 +86,7 @@ class BytesClient:
         )
 
         self._save_boefje_meta(boefje_meta)
-        self._save_raw(boefje_meta.id, raw, {"manual", "boefje/manual"}.union(manual_mime_types))
+        self._save_raw(boefje_meta.id, raw, {"boefje/manual"}.union(manual_mime_types))
 
     def _save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         response = self.session.post(f"{self.base_url}/bytes/boefje_meta", data=boefje_meta.json())

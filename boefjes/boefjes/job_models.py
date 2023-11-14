@@ -1,4 +1,3 @@
-import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Literal, Optional, Union
 from uuid import UUID
@@ -47,12 +46,6 @@ class BoefjeMeta(Job):
     organization: str
     runnable_hash: Optional[str]
     environment: Optional[Dict[str, str]]
-
-    @property
-    def parameterized_arguments_hash(self) -> str:
-        encoded_arguments = ",".join(f"{k}={v}" for k, v in self.arguments.items())
-
-        return hashlib.sha256(encoded_arguments.encode("utf-8")).hexdigest()
 
 
 class RawDataMeta(BaseModel):

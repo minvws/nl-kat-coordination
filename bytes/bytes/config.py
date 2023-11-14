@@ -126,6 +126,9 @@ class Settings(BaseSettings):
     metrics_ttl_seconds: int = Field(
         300, description="The time to cache slow queries performed in the metrics endpoint"
     )
+    metrics_cache_size: int = Field(
+        200, description="The amount of cache entries to keep for metrics endpoints with query parameters."
+    )
 
     span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
         None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"

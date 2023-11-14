@@ -1,9 +1,9 @@
 {
     "id": "kat_nmap_normalize",
     "consumes": [
-        "nmap",
-        "nmap-ports",
-        "nmap-ip-range"
+        "boefje/nmap",
+        "boefje/nmap-ports",
+        "boefje/nmap-ip-range"
     ],
     "produces": [
         "IPAddressV6",
