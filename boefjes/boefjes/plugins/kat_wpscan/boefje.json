@@ -5,10 +5,6 @@
         "consumes": [
             "SoftwareInstance"
         ],
-        "produces": [
-            "Finding",
-            "CVEFindingType"
-        ],
         "environment_keys": ["WP_SCAN_API"],
         "scan_level": 2
     }

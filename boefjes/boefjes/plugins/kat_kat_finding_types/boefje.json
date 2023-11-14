@@ -5,9 +5,6 @@
     "consumes": [
         "KATFindingType"
     ],
-    "produces": [
-        "KATFindingType"
-    ],
     "scan_level": 0,
     "enabled": true
 }

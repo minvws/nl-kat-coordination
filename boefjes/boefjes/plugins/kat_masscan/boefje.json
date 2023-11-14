@@ -5,10 +5,6 @@
     "consumes": [
         "IPV4NetBlock"
     ],
-    "produces": [
-        "IPAddressV4",
-        "IPPort"
-    ],
     "environment_keys": [
         "PORTS",
         "MAX_RATE"
