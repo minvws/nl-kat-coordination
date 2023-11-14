@@ -1,7 +1,7 @@
 {
     "id": "kat_nuclei_cve_normalize",
     "consumes": [
-        "nuclei-cve"
+        "boefje/nuclei-cve"
     ],
     "produces": [
         "Findings",

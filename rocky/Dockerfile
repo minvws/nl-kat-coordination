@@ -69,4 +69,4 @@ RUN export SECRET_KEY="secret" BYTES_API="http://bytes:8000" BYTES_PASSWORD="pas
 
 USER rocky
 
-CMD ["uwsgi", "--ini", "uwsgi.ini", "--wsgi-file", "rocky/wsgi.py"]
+CMD ["granian", "--interface", "wsgi", "rocky.wsgi:application", "--host", "0.0.0.0"]

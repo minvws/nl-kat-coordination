@@ -69,6 +69,28 @@ def test_metrics(bytes_api_client: BytesAPIClient) -> None:
     assert database_files.samples[1].value == 1.0
 
 
+def test_get_mime_type_count(bytes_api_client: BytesAPIClient) -> None:
+    boefje_meta = get_boefje_meta()
+    bytes_api_client.save_boefje_meta(boefje_meta)
+
+    bytes_api_client.save_raw(boefje_meta.id, b"test 123", ["boefje"])
+    raw_id = bytes_api_client.save_raw(boefje_meta.id, b"test 12334", ["text/boefje", "boefje"])
+
+    normalizer_meta = get_normalizer_meta(raw_id)
+    bytes_api_client.save_normalizer_meta(normalizer_meta)
+
+    assert bytes_api_client.get_mime_type_count(RawDataFilter(organization="test")) == {
+        "boefje": 2,
+        "text/boefje": 1,
+    }
+
+    assert bytes_api_client.get_mime_type_count(RawDataFilter(organization="test", normalized=True)) == {
+        "boefje": 1,
+        "text/boefje": 1,
+    }
+    assert bytes_api_client.get_mime_type_count(RawDataFilter(organization="test", normalized=False)) == {"boefje": 1}
+
+
 def test_boefje_meta(bytes_api_client: BytesAPIClient) -> None:
     boefje_meta = get_boefje_meta()
     bytes_api_client.save_boefje_meta(boefje_meta)
