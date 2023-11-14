@@ -5,7 +5,7 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import Column, DateTime, Enum, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
@@ -102,6 +102,34 @@ class TaskDB(Base):
             created_at.desc(),
         ),
     )
+
+
+class TaskEvent(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+
+    event_type: str
+
+    task_id: uuid.UUID
+
+    event_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    data: dict
+
+
+class TaskEventDB(Base):
+    __tablename__ = "task_events"
+
+    id = Column(Integer, primary_key=True)
+
+    event_type = Column(String)
+
+    task_id = Column(GUID)
+
+    event_time = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    data = Column(JSONB, nullable=False)
 
 
 class NormalizerTask(BaseModel):
