@@ -1,3 +1,4 @@
+from ast import List
 from typing import Set
 
 from django import forms
@@ -14,7 +15,7 @@ class OOITypeMultiCheckboxForReportForm(BaseRockyForm):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    def __init__(self, ooi_types: Set[Report], *args, **kwargs):
+    def __init__(self, ooi_types: List, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["ooi_type"].choices = ((ooi_type, ooi_type) for ooi_type in ooi_types)
 

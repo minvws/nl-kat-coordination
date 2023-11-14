@@ -7,24 +7,12 @@
     {% include "header.html" %}
 
     <main id="main-content" tabindex="-1" class="choose-report">
-        <section>
-            <div>
-                <div class="fifty-fifty">
-                    <div>
-                        <h1>{% translate "Reports" %}</h1>
-                        <p class="emphasized">{% translate "Overview of reports" %}</p>
-                        <div class="button-container">
-                            <a class="button"
-                               href="{% url 'report_oois_selection' organization.code %}?{{ request.GET.urlencode }}">
-                            {% translate "Generate Report" %}</a>
-                            <a class="button"
-                               href="{% url 'aggregate_reports' organization.code %}?{{ request.GET.urlencode }}">
-                            {% translate "Aggregate Report" %}</a>
-                        </div>
-                    </div>
-                    <div class="horizontal-view toolbar"></div>
-                </div>
-            </div>
-        </section>
+        {% include "partials/main_navigation.html" %}
+        {% include "partials/report_ooi_list.html" %}
+
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

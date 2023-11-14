@@ -1,12 +1,31 @@
-{% for report_type in report_types %}
-    <div class="tile-container">
-        <p class="tile-title">
-            {{ report_type.name }}
-            <input type="checkbox"
-                   name="report_type"
-                   value="{{ report_type.id }}"
-                   {% if report_type.id in request.GET.urlencode %}checked{% endif %} />
-        </p>
-        <p class="tile-description">{{ report_type.description }}</p>
-    </div>
-{% endfor %}
+{% if "required" in report_types %}
+    {% for option, report_types in report_types.items %}
+        {% for report_type in report_types %}
+            <div class="tile-container">
+                <p class="tile-title">
+                    {{ report_type.name }}
+                    {% if option == "optional" %}
+                        <input type="checkbox"
+                               name="report_type"
+                               value="{{ report_type.id }}"
+                               {% if report_type.id in request.GET.urlencode %}checked{% endif %} />
+                    {% endif %}
+                </p>
+                <p class="tile-description">{{ report_type.description }}</p>
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% else %}
+    {% for report_type in report_types %}
+        <div class="tile-container">
+            <p class="tile-title">
+                {{ report_type.name }}
+                <input type="checkbox"
+                       name="report_type"
+                       value="{{ report_type.id }}"
+                       {% if report_type.id in request.GET.urlencode %}checked{% endif %} />
+            </p>
+            <p class="tile-description">{{ report_type.description }}</p>
+        </div>
+    {% endfor %}
+{% endif %}

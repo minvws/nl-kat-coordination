@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<div>
+    <nav class="tabs" aria-label="{% translate "Report Navigation" %}">
+        <ul>
+            <li {% if view == "generate_report" %}aria-current="page"{% endif %}>
+                <a href="{% url 'generate_report' organization.code %}?{{ request.GET.urlencode }}">{% translate "Generate Report" %}</a>
+            </li>
+            <li {% if view == "aggregate_report" %}aria-current="page"{% endif %}>
+                <a href="{% url 'aggregate_report' organization.code %}?{{ request.GET.urlencode }}">{% translate "Aggregate Report" %}</a>
+            </li>
+        </ul>
+    </nav>
+</div>

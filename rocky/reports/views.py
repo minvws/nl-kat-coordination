@@ -1,7 +1,6 @@
 from logging import getLogger
 from typing import Dict, List, Set, TypedDict
 
-from account.mixins import OrganizationView
 from django.contrib import messages
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -12,22 +11,19 @@ from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.report_types.aggregate_sector_report.report import AggregateSectorReport
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_reports,
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
     get_report_by_id,
     get_report_types_for_oois,
+    get_reports_from_aggregate_reports,
 )
 from rocky.views.mixins import OctopoesView
 from rocky.views.ooi_view import BaseOOIListView
 
 logger = getLogger(__name__)
-
-SORTED_OOI_TYPES_FOR_REPORT = sorted([ooi_class.get_ooi_type() for ooi_class in get_ooi_types_with_report()])
-SORTED_OOI_TYPES_FOR_AGGREGRATE_REPORT = sorted(
-    [ooi_class.get_ooi_type() for ooi_class in get_ooi_types_from_aggregate_reports()]
-)
 
 
 class ReportType(TypedDict):
@@ -53,22 +49,6 @@ class ReportBreadcrumbs(BreadcrumbsMixin):
             {
                 "url": reverse("reports", kwargs=kwargs) + selection,
                 "text": _("Reports"),
-            },
-            {
-                "url": reverse("report_oois_selection", kwargs=kwargs) + selection,
-                "text": _("Select OOIs"),
-            },
-            {
-                "url": reverse("report_types_selection", kwargs=kwargs) + selection,
-                "text": _("Choose report types"),
-            },
-            {
-                "url": reverse("report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Set up scan"),
-            },
-            {
-                "url": reverse("generate_report_view", kwargs=kwargs) + selection,
-                "text": _("Generate Report"),
             },
         ]
 
@@ -100,7 +80,9 @@ class BaseReportView(ReportBreadcrumbs, OctopoesView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at"] = self.valid_time
-        context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(SORTED_OOI_TYPES_FOR_REPORT, self.request.GET)
+        context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(
+            sorted([ooi_class.get_ooi_type() for ooi_class in get_ooi_types_with_report()]), self.request.GET
+        )
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
         return context
@@ -143,22 +125,67 @@ class PluginSelectionView(BaseReportView):
         return context
 
 
-class ReportView(ReportBreadcrumbs, OrganizationView, TemplateView):
+class ReportView(BaseReportView, BaseOOIListView):
     template_name = "reports.html"
     current_step = 1
+    view = "generate_report"
 
-
-class AggregateReportView(ReportBreadcrumbs, BaseOOIListView):
-    template_name = "report_oois_selection.html"
-    current_step = 2
-    ooi_types = get_ooi_types_from_aggregate_reports()
+    def get_form_action(self):
+        return reverse("aggregate_report_types", kwargs={"organization_code": self.organization.code})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(
-            SORTED_OOI_TYPES_FOR_AGGREGRATE_REPORT, self.request.GET
-        )
+        context["view"] = self.view
+        context["form_action"] = self.get_form_action()
         return context
+
+    def build_breadcrumbs(self):
+        breadcrumbs = super().build_breadcrumbs()
+        breadcrumbs.append(
+            {
+                "url": reverse("reports", kwargs=self.get_kwargs()) + self.get_selection(),
+                "text": _("Generate report"),
+            },
+        )
+        return breadcrumbs
+
+
+class BaseAggregateReportView(ReportBreadcrumbs):
+    view = "aggregate_report"
+    report = AggregateSectorReport
+    ooi_types = get_ooi_types_from_aggregate_reports(report)
+
+
+class AggregateReportView(BaseAggregateReportView, BaseOOIListView):
+    template_name = "reports.html"
+    current_step = 2
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["view"] = self.view
+        context["ooi_type_form"] = OOITypeMultiCheckboxForReportForm(
+            sorted([ooi_class.get_ooi_type() for ooi_class in self.ooi_types]), self.request.GET
+        )
+        context["form_action"] = reverse("aggregate_report_types", kwargs={"organization_code": self.organization.code})
+        return context
+
+    def build_breadcrumbs(self):
+        breadcrumbs = super().build_breadcrumbs()
+        breadcrumbs.append(
+            {
+                "url": reverse("aggregate_report", kwargs=self.get_kwargs()) + self.get_selection(),
+                "text": _("Aggregate report"),
+            },
+        )
+        return breadcrumbs
+
+
+class AggregateReportTypeSelectionView(BaseAggregateReportView, BaseSelectionView, TemplateView):
+    template_name = "report_types_selection.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.report_types_choices = get_reports_from_aggregate_reports(self.report)
 
 
 class ReportOOISelectionView(BaseReportView, BaseOOIListView):

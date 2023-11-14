@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from typing import Dict, List, Set, Type
 
 from octopoes.models import OOI, Reference
@@ -65,21 +66,19 @@ def get_plugins_for_report_ids(reports: List[str]) -> Dict[str, Set[str]]:
     return {"required": required_boefjes, "optional": optional_boefjes}
 
 
-def get_reports_from_aggregate_reports() -> Dict[str, Set[str]]:
+def get_reports_from_aggregate_reports(aggregate_report: ABCMeta) -> Dict[str, Set[str]]:
     required_reports = set()
     optional_reports = set()
 
-    for aggregate_report in AGGREGATE_REPORTS:
-        required_reports.update(aggregate_report.reports["required"])
-        optional_reports.update(aggregate_report.reports["optional"])
+    required_reports.update(aggregate_report.reports["required"])
+    optional_reports.update(aggregate_report.reports["optional"])
 
     return {"required": required_reports, "optional": optional_reports}
 
 
-def get_ooi_types_from_aggregate_reports() -> Set[Type[OOI]]:
+def get_ooi_types_from_aggregate_reports(aggregate_report: ABCMeta) -> Set[Type[OOI]]:
     ooi_types = set()
-    for aggregate_report in AGGREGATE_REPORTS:
-        for reports in aggregate_report.reports.values():
-            for report in reports:
-                ooi_types.update(report.input_ooi_types)
+    for reports in aggregate_report.reports.values():
+        for report in reports:
+            ooi_types.update(report.input_ooi_types)
     return ooi_types

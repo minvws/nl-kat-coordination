@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<section>
+    <div>
+        <div class="fifty-fifty">
+            <div>
+                <h1>{% translate "Reports" %}</h1>
+                <p class="emphasized">{% translate "Overview of reports" %}</p>
+            </div>
+            <div class="horizontal-view toolbar"></div>
+        </div>
+    </div>
+    {% include "partials/report_navigation.html" with active="generate_report" %}
+
+</section>
