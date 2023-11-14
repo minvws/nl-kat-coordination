@@ -53,7 +53,7 @@ OpenKAT scans for vulnerabilities. If you find any, it is valid that you deal wi
 
 Many organizations have their contact information in ``security.txt`` in the root of their domain, so you get straight to the right people. Not every organization handles it equally professionally, but that's no reason not to want to use that standard yourself.
 
-If you find any vulnerabilities in the software of OpenKAT itself you can report them per e-mail to: security @ rdobeheer.nl (remove the spaces). 
+If you find any vulnerabilities in the software of OpenKAT itself you can report them per e-mail to: security @ rdobeheer.nl (remove the spaces).
 
 What are the plans for the future?
 ==================================
