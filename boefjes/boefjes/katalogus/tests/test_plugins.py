@@ -115,10 +115,7 @@ class TestPlugins(TestCase):
 
         # For boefjes that are pulled from the local repository, we actually get the default mime_types
         assert set(self.client.get("/v1/organisations/test-org/plugins/kat_test").json()["mime_types"]) == set(
-            [
-                "kat_test",
-                "boefje/kat_test",
-            ]
+            ["boefje/kat_test"]
         )
 
     def test_non_existing_plugin(self):

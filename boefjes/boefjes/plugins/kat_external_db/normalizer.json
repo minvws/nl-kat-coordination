@@ -1,7 +1,7 @@
 {
     "id": "kat_external_db_normalize",
     "consumes": [
-        "external_db"
+        "boefje/external_db"
     ],
     "produces": [
         "Hostname",
