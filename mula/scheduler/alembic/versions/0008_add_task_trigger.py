@@ -21,14 +21,18 @@ depends_on = None
 def upgrade():
     # Add task_events table
     op.create_table(
-        'task_events',
-        sa.Column('id', sa.Integer(), nullable=False, autoincrement=True),
-        sa.Column('event_type', sa.String(length=10), nullable=True),
-        sa.Column('task_id', scheduler.utils.datastore.GUID(), nullable=True),
-        sa.Column('event_time', sa.TIMESTAMP(), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=True),
-        sa.Column('data', postgresql.JSONB(), nullable=True),
-        sa.PrimaryKeyConstraint('id'),
+        "task_events",
+        sa.Column("id", sa.Integer(), nullable=False, autoincrement=True),
+        sa.Column("task_id", scheduler.utils.datastore.GUID(), nullable=True),
+        sa.Column("type", sa.String(), nullable=True),
+        sa.Column("context", sa.String(), nullable=True),
+        sa.Column("event", sa.String(), nullable=True),
+        sa.Column("datetime", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
+        sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.PrimaryKeyConstraint("id"),
     )
+
+    op.create_index(op.f("ix_task_events_task_id"), "task_events", ["task_id"], unique=False)
 
     # Create the record_task_event function
     op.execute("""
@@ -37,11 +41,11 @@ def upgrade():
         $$
         BEGIN
             IF TG_OP = 'INSERT' THEN
-                INSERT INTO task_events (event_type, task_id, data)
-                VALUES ('insert', NEW.id, row_to_json(NEW));
+                INSERT INTO task_events (task_id, type, context, event, data)
+                VALUES (NEW.id, 'events.db', 'task', 'insert', row_to_json(NEW));
             ELSIF TG_OP = 'UPDATE' THEN
-                INSERT INTO task_events (event_type, task_id, data)
-                VALUES ('update', NEW.id, row_to_json(NEW));
+                INSERT INTO task_events (task_id, type, context, event, data)
+                VALUES (NEW.id, 'events.db', 'task', 'update', row_to_json(NEW));
             END IF;
             RETURN NEW;
         END;

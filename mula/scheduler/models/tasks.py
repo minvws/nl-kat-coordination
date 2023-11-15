@@ -103,19 +103,19 @@ class TaskDB(Base):
         ),
     )
 
+    _event_store = None
 
-class TaskEvent(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    @classmethod
+    def set_event_store(cls, event_store):
+        cls._event_store = event_store
 
-    id: int
+    @property
+    def duration(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskEventDB.set_event_store to set it.")
 
-    event_type: str
+        return self._event_store.get_task_duration(self.task_id)
 
-    task_id: uuid.UUID
-
-    event_time: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    data: dict
 
 
 class TaskEventDB(Base):
@@ -123,13 +123,25 @@ class TaskEventDB(Base):
 
     id = Column(Integer, primary_key=True)
 
-    event_type = Column(String)
-
     task_id = Column(GUID)
 
-    event_time = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    type = Column(String)
+
+    context = Column(String)
+
+    event = Column(String)
+
+    datetime = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     data = Column(JSONB, nullable=False)
+
+    __table_args__ = (
+        Index(
+            "ix_task_events_task_id",
+            task_id,
+        ),
+    )
+
 
 
 class NormalizerTask(BaseModel):

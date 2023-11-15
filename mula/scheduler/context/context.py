@@ -9,6 +9,7 @@ import scheduler
 from scheduler import storage
 from scheduler.config import settings
 from scheduler.connectors import services
+from scheduler.models import TaskDB
 from scheduler.utils import remove_trailing_slash
 
 
@@ -85,6 +86,8 @@ class AppContext:
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
             }
         )
+
+        TaskDB.set_event_store(self.datastores.task_store)
 
         # Metrics collector registry
         self.metrics_registry: CollectorRegistry = CollectorRegistry()
