@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, Set, Type, Union
+from typing import Dict, List, Optional, Set, Type, Union
 from uuid import UUID, uuid4
 
 from octopoes.models import OOI
@@ -93,7 +93,8 @@ class Query:
 
         ooi_type = path.segments[-1].target_type
         query = cls(ooi_type)
-        alias_map = {}
+        target_ref = None
+        alias_map: Dict[str, Ref] = {}
 
         for segment in path.segments:
             source_ref = alias_map.get(segment.source_type.get_object_type(), segment.source_type)
@@ -112,6 +113,9 @@ class Query:
                 query = query.where(source_ref, **{segment.property_name: target_ref})
             else:
                 query = query.where(target_ref, **{segment.property_name: source_ref})
+
+        if target_ref:  # Make sure we use the last reference in the path as a target
+            query.result_type = target_ref
 
         return query
 

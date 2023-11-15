@@ -12,9 +12,10 @@ from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.network import IPAddressV4, IPPort, Network
+from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
+from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
@@ -194,39 +195,63 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
 
-    second_hostname = A(Hostname)
     second_resolved_hostname = A(ResolvedHostname)
 
     # Find all hostnames that are connected to example.com because they point to the same IpAddressV4. Filter
     # IPAddressV4 where there is an IPService with service name "smtp" on one of its ports.
-    q = (
-        Query(second_hostname)
-        .pull(IPAddressV4)
+    query = (
+        Query(Hostname)
         .where(Hostname, primary_key="Hostname|test|example.com")
         .where(ResolvedHostname, hostname=Hostname)
-        .where(ResolvedHostname, address=IPAddressV4)
-        .where(second_resolved_hostname, hostname=second_hostname)
-        .where(second_resolved_hostname, address=IPAddressV4)
-        .where(IPPort, address=IPAddressV4)
+        .where(ResolvedHostname, address=IPAddress)
+        .where(second_resolved_hostname, hostname=A(Hostname))
+        .where(second_resolved_hostname, address=IPAddress)
+        .where(IPPort, address=IPAddress)
         .where(IPService, ip_port=IPPort)
         .where(IPService, service=Service)
         .where(Service, name="smtp")
     )
 
-    assert len(xtdb_session.client.query(q)) == 6
+    assert len(xtdb_session.client.query(query)) == 6
 
-    q = (
-        Query(second_hostname)
-        .pull(IPAddressV4)
+    query = (
+        Query(Hostname)
         .where(Hostname, primary_key="Hostname|test|example.com")
         .where(ResolvedHostname, hostname=Hostname)
-        .where(ResolvedHostname, address=IPAddressV4)
-        .where(second_resolved_hostname, hostname=second_hostname)
-        .where(second_resolved_hostname, address=IPAddressV4)
-        .where(IPPort, address=IPAddressV4)
+        .where(ResolvedHostname, address=IPAddress)
+        .where(second_resolved_hostname, hostname=A(Hostname))
+        .where(second_resolved_hostname, address=IPAddress)
+        .where(IPPort, address=IPAddress)
         .where(IPService, ip_port=IPPort)
         .where(IPService, service=Service)
         .where(Service, name="http")
     )
 
-    assert len(xtdb_session.client.query(str(q))) == 0
+    assert len(xtdb_session.client.query(query)) == 0
+
+    # Splitting this query up into two path queries that can be used from the API:
+
+    # Find all hostnames with the same ip address
+    query = Query.from_path(
+        Path.parse("Hostname.<hostname[is ResolvedHostname].address.<address[is ResolvedHostname].hostname")
+    ).where(Hostname, primary_key="Hostname|test|example.com")
+    result = xtdb_session.client.query(query)
+
+    assert len(result) == 6
+    assert result[0][0]["Hostname/primary_key"] == "Hostname|test|a.example.com"
+    assert result[1][0]["Hostname/primary_key"] == "Hostname|test|b.example.com"
+    assert result[2][0]["Hostname/primary_key"] == "Hostname|test|c.example.com"
+    assert result[3][0]["Hostname/primary_key"] == "Hostname|test|d.example.com"
+    assert result[4][0]["Hostname/primary_key"] == "Hostname|test|e.example.com"
+    assert result[5][0]["Hostname/primary_key"] == "Hostname|test|example.com"
+
+    # Find all services attached to the hostnames ip address
+    query = Query.from_path(Path.parse("IPAddress.<address[is IPPort].<ip_port [is IPService].service")).where(
+        IPAddress, primary_key="IPAddressV4|test|192.0.2.3"
+    )
+    result = xtdb_session.client.query(query)
+    assert len(result) == 3
+
+    assert result[0][0]["Service/primary_key"] == "Service|ssh"
+    assert result[1][0]["Service/primary_key"] == "Service|smtp"
+    assert result[2][0]["Service/primary_key"] == "Service|https"
