@@ -50,7 +50,7 @@ def test_delete_non_existing_node(xtdb_http_client: XTDBHTTPClient):
 def test_query_no_results(xtdb_session: XTDBSession):
     query = Query(Network).where(Network, name="test")
 
-    result = xtdb_session.client.query(str(query))
+    result = xtdb_session.client.query(query)
     assert result == []
 
 
@@ -58,17 +58,17 @@ def test_query_simple_filter(xtdb_session: XTDBSession, valid_time: datetime):
     xtdb_session.put(XTDBOOIRepository.serialize(Network(name="testnetwork")), valid_time)
 
     query = Query(Network).where(Network, name="test")
-    result = xtdb_session.client.query(str(query))
+    result = xtdb_session.client.query(query)
     assert result == []
 
     xtdb_session.commit()
 
     query = Query(Network).where(Network, name="test")
-    result = xtdb_session.client.query(str(query))
+    result = xtdb_session.client.query(query)
     assert result == []
 
     query = Query(Network).where(Network, name="testnetwork")
-    result = xtdb_session.client.query(str(query))
+    result = xtdb_session.client.query(query)
     assert result == [
         [
             {
@@ -97,7 +97,7 @@ def test_query_not_empty_on_reference_filter_for_hostname(xtdb_session: XTDBSess
     xtdb_session.commit()
 
     query = Query(Network).where(Hostname, name="testhostname").where(Hostname, network=Network)
-    result = xtdb_session.client.query(str(query))
+    result = xtdb_session.client.query(query)
     assert result == [
         [
             {
@@ -110,7 +110,7 @@ def test_query_not_empty_on_reference_filter_for_hostname(xtdb_session: XTDBSess
     ]
 
     query = query.where(Network, name="testnetwork")
-    result = xtdb_session.client.query(str(query))
+    result = xtdb_session.client.query(query)
     assert result == [
         [
             {
@@ -134,7 +134,7 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     xtdb_session.commit()
 
     query = Query(Network).where(Network, name="testnetwork").where(Hostname, name="secondhostname")  # No foreign key
-    result = xtdb_session.client.query(str(query))
+    result = xtdb_session.client.query(query)
     assert result == [
         [
             {
@@ -147,7 +147,7 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     ]
 
     query = query.where(Hostname, network=Network)  # Add foreign key constraint
-    assert xtdb_session.client.query(str(query)) == []
+    assert xtdb_session.client.query(query) == []
 
     assert len(xtdb_session.client.query(str(Query(Network)))) == 2
 
@@ -202,7 +202,7 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
     q = (
         Query(second_hostname)
         .pull(IPAddressV4)
-        .where(Hostname, name="example.com")
+        .where(Hostname, primary_key="Hostname|test|example.com")
         .where(ResolvedHostname, hostname=Hostname)
         .where(ResolvedHostname, address=IPAddressV4)
         .where(second_resolved_hostname, hostname=second_hostname)
@@ -213,12 +213,12 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
         .where(Service, name="smtp")
     )
 
-    assert len(xtdb_session.client.query(str(q))) == 6
+    assert len(xtdb_session.client.query(q)) == 6
 
     q = (
         Query(second_hostname)
         .pull(IPAddressV4)
-        .where(Hostname, name="example.com")
+        .where(Hostname, primary_key="Hostname|test|example.com")
         .where(ResolvedHostname, hostname=Hostname)
         .where(ResolvedHostname, address=IPAddressV4)
         .where(second_resolved_hostname, hostname=second_hostname)
