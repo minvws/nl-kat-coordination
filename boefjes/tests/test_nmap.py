@@ -1,6 +1,12 @@
 from unittest import TestCase
 
+from pydantic import parse_obj_as
+
 from boefjes.plugins.kat_nmap.main import Protocol, build_nmap_arguments
+from boefjes.job_handler import serialize_ooi
+from boefjes.plugins.kat_nmap.normalize import run
+from octopoes.models.types import OOIType
+from tests.loading import get_boefje_meta, get_dummy_data, get_normalizer_meta
 
 
 class NmapTest(TestCase):
@@ -163,3 +169,17 @@ class NmapTest(TestCase):
             ],
             args,
         )
+
+    def test_normalizer(self):
+        input_ooi = parse_obj_as(
+                    OOIType,
+                    {
+                        "object_type": "IPAddressV4",
+                        "network": "Network|internet",
+                        "address": "134.209.85.72",
+                    },
+                )
+        boefje_meta = get_boefje_meta(input_ooi=input_ooi.reference)
+        boefje_meta.arguments["input"] = serialize_ooi(input_ooi)
+        output = [x for x in run(get_normalizer_meta(boefje_meta), get_dummy_data("raw/nmap_mispoes.xml"))]
+        self.assertEqual(17, len(output))
