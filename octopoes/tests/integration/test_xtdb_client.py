@@ -246,9 +246,11 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
     assert result[5][0]["Hostname/primary_key"] == "Hostname|test|example.com"
 
     # Find all services attached to the hostnames ip address
-    query = Query.from_path(Path.parse("IPAddress.<address[is IPPort].<ip_port [is IPService].service")).where(
-        IPAddress, primary_key="IPAddressV4|test|192.0.2.3"
-    )
+    query = Query.from_path(
+        Path.parse(
+            "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ip_port [is IPService].service"
+        )
+    ).where(Hostname, primary_key="Hostname|test|example.com")
     result = xtdb_session.client.query(query)
     assert len(result) == 3
 
