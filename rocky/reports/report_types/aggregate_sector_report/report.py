@@ -35,6 +35,6 @@ class AggregateSectorReport(AggregateReport):
                         add_or_combine_systems(systems, system)
 
                 if report == "Open Ports Report":
-                    open_ports[input_ooi] = data["data"]
+                    open_ports[data["data"]["ip"]] = data["data"]
 
         return {"systems": systems, "open_ports": open_ports}
