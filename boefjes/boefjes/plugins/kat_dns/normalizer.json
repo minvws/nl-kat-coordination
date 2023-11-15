@@ -1,7 +1,7 @@
 {
     "id": "kat_dns_normalize",
     "consumes": [
-        "dns-records"
+        "boefje/dns-records"
     ],
     "produces": [
         "IPAddressV6",

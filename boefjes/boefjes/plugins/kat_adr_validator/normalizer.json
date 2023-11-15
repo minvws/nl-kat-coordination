@@ -1,7 +1,7 @@
 {
     "id": "adr-validator",
     "consumes": [
-        "adr-validator"
+        "boefje/adr-validator"
     ],
     "produces": [
         "APIDesignRule",
