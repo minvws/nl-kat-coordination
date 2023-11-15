@@ -748,6 +748,9 @@ pyhanko-certvalidator==0.23.0 ; python_version >= "3.8" and python_version < "4.
 pyhanko==0.20.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:2b693e20a3b06ef97dc3a375e9f99bf78db60cc3ce4bf4d05ad043f5df38d105 \
     --hash=sha256:d494f4f59672b182587f0ae55b76ef4296a94bda5c1ca9c2e771e58237e130db
+pyparsing==3.1.1 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:32c7c0b711493c72ff18a981d24f28aaf9c1fb7ed5e9667c9e84e3db623bdbfb \
+    --hash=sha256:ede28a1a32462f5a9705e07aea48001a08f7cf81a021585011deba701581a0db
 pypdf==3.17.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:67f6bb7acd8fdbcf7e7a7d5319d12b8de100f5f94538d6e5647aaec3eb7c7dde \
     --hash=sha256:9fab275fea57c9e5b2416035d13d867a459ebe36294a4c39a3d0bb45a7404bad
