@@ -5,10 +5,6 @@
         "consumes": [
             "Hostname"
         ],
-        "produces": [
-            "Finding",
-            "CVEFindingType"
-        ],
         "environment_keys": [
             "REPLY_FQDN"
         ],
