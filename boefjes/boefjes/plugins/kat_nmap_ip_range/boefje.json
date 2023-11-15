@@ -6,13 +6,6 @@
         "IPV6NetBlock",
         "IPV4NetBlock"
     ],
-    "produces": [
-        "IPAddressV6",
-        "Service",
-        "IPPort",
-        "IPAddressV4",
-        "IPService"
-    ],
     "environment_keys": [
         "TOP_PORTS_TCP",
         "TOP_PORTS_UDP"
