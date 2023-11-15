@@ -1,7 +1,7 @@
 {
     "id": "kat_crt_sh_normalize",
     "consumes": [
-        "certificate-search"
+        "boefje/certificate-search"
     ],
     "produces": [
         "Hostname",

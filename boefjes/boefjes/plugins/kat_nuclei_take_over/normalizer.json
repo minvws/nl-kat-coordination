@@ -1,7 +1,7 @@
 {
     "id": "kat_nuclei_takeover_normalize",
     "consumes": [
-        "nuclei-takeover"
+        "boefje/nuclei-takeover"
     ],
     "produces": [
         "Findings",

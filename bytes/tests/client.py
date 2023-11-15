@@ -80,6 +80,16 @@ class BytesAPIClient:
         return response.content
 
     @retry_with_login
+    def get_mime_type_count(self, query_filter: RawDataFilter) -> Dict[str, str]:
+        params = query_filter.dict()
+        params["mime_types"] = [m.value for m in query_filter.mime_types]
+
+        response = self._session.get("/bytes/mime_types", headers=self.headers, params=params)
+        self._verify_response(response)
+
+        return response.json()  # type: ignore
+
+    @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         response = self._session.post("/bytes/boefje_meta", data=boefje_meta.json(), headers=self.headers)
 

@@ -30,7 +30,7 @@ class Plugin(BaseModel):
     related: List[str] = Field(default_factory=list)
     enabled: bool
     type: str
-    produces: Set[Type[OOI]]
+    produces: Set[str]
 
     def dict(self, *args, **kwargs):
         """Pydantic does not stringify the OOI classes, but then templates can't render them"""
@@ -175,18 +175,12 @@ def parse_boefje(boefje: Dict) -> Boefje:
     scan_level = SCAN_LEVEL(boefje["scan_level"])
 
     consumes = set()
-    produces = set()
+
     for type_name in boefje.get("consumes", []):
         try:
             consumes.add(type_by_name(type_name))
         except StopIteration:
             logger.warning("Unknown OOI type %s for boefje consumes %s", type_name, boefje["id"])
-
-    for type_name in boefje.get("produces", []):
-        try:
-            produces.add(type_by_name(type_name))
-        except StopIteration:
-            logger.warning("Unknown OOI type %s for boefje produces %s", type_name, boefje["id"])
 
     return Boefje(
         id=boefje["id"],
@@ -197,7 +191,7 @@ def parse_boefje(boefje: Dict) -> Boefje:
         type=boefje["type"],
         scan_level=scan_level,
         consumes=consumes,
-        produces=produces,
+        produces=boefje["produces"],
     )
 
 
