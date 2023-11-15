@@ -15,7 +15,7 @@ from typing import (
     Union,
 )
 
-from pydantic import BaseModel, GetCoreSchemaHandler, RootModel, computed_field, field_serializer
+from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
 from pydantic_core.core_schema import ValidationInfo
 
@@ -131,7 +131,7 @@ class OOI(BaseModel, abc.ABC):
 
     primary_key: str = ""
 
-    def model_post_init(self, __context: Any) -> None:
+    def model_post_init(self, __context: Any) -> None:  # noqa: F841
         self.primary_key = self.primary_key or f"{self.get_object_type()}|{self.natural_key}"
 
     def __str__(self):
