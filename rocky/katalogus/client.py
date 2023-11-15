@@ -8,7 +8,7 @@ import requests
 from django.conf import settings
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
@@ -32,12 +32,9 @@ class Plugin(BaseModel):
     type: str
     produces: Set[str]
 
-    def dict(self, *args, **kwargs):
-        """Pydantic does not stringify the OOI classes, but then templates can't render them"""
-        plugin_dict = dict(self)
-        # todo: use field_serializer instead
-        plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
-        return plugin_dict
+    # def dict(self, *args, **kwargs):
+    #     """Pydantic does not stringify the OOI classes, but then templates can't render them"""
+    #     # todo: use field_serializer instead
 
     def can_scan(self, member) -> bool:
         return member.has_perm("tools.can_scan_organization")
@@ -49,12 +46,10 @@ class Boefje(Plugin):
     options: List[str] = None
     runnable_hash: Optional[str] = None
 
-    def dict(self, *args, **kwargs):
-        """Pydantic does not stringify the OOI classes, but then templates can't render them"""
-        boefje_dict = super().dict(*args, **kwargs)
-        # todo: use `field_serializer` instead
-        boefje_dict["consumes"] = {ooi_class.get_ooi_type() for ooi_class in boefje_dict["consumes"]}
-        return boefje_dict
+    # use a custom field_serializer for `consumes`
+    @field_serializer("consumes")
+    def serialize_consumes(self, consumes: Set[Type[OOI]]):
+        return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     def can_scan(self, member) -> bool:
         return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value

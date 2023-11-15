@@ -23,7 +23,7 @@ class Health(OrganizationView, View):
     def get(self, request, *args, **kwargs) -> JsonResponse:
         octopoes_connector = self.octopoes_api_connector
         rocky_health = get_rocky_health(octopoes_connector)
-        return JsonResponse(rocky_health.dict())
+        return JsonResponse(rocky_health.model_dump())
 
 
 def get_bytes_health() -> ServiceHealth:
