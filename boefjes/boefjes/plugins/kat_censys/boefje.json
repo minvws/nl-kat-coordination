@@ -6,13 +6,6 @@
         "IPAddressV4",
         "IPAddressV6"
     ],
-    "produces": [
-        "IPPort",
-        "X509Certificate",
-        "SoftwareInstance",
-        "ResolvedHostname",
-        "HTTPHeader"
-    ],
     "environment_keys": [
         "CENSYS_API_ID",
         "CENSYS_API_SECRET"

@@ -6,11 +6,6 @@
             "IPAddressV4",
             "IPAddressV6"
         ],
-        "produces": [
-            "Finding",
-            "IPPort",
-            "CVEFindingType"
-        ],
         "environment_keys": ["SHODAN_API"],
         "scan_level": 1
     }

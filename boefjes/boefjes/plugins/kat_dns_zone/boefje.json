@@ -5,10 +5,5 @@
     "consumes": [
         "DNSZone"
     ],
-    "produces": [
-        "Hostname",
-        "DNSZone",
-        "DNSSOARecord"
-    ],
     "scan_level": 1
 }

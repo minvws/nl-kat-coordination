@@ -6,13 +6,6 @@
         "IPAddressV4",
         "IPAddressV6"
     ],
-    "produces": [
-        "IPAddressV6",
-        "Service",
-        "IPPort",
-        "IPAddressV4",
-        "IPService"
-    ],
     "environment_keys": [
         "PORTS"
     ],
