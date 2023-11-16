@@ -15,12 +15,12 @@ def add_or_combine_systems(systems, new_system):
     systems.append(new_system)
 
 
-class AggregateSectorReport(AggregateReport):
-    id = "aggregate-sector-report"
-    name = "Aggregate Sector Report"
-    description = "Aggregate Sector Report"
+class AggregateOrganisationReport(AggregateReport):
+    id = "aggregate-organisation-report"
+    name = "Aggregate Rrganisation Report"
+    description = "Aggregate Organisation Report"
     reports = {"required": [SystemsReport, OpenPortsReport], "optional": []}
-    template_path = "aggregate_sector_report/report.html"
+    template_path = "aggregate_organisation_report/report.html"
 
     def post_process_data(self, data):
         systems = []

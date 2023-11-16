@@ -11,7 +11,7 @@ from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.aggregate_sector_report.report import AggregateSectorReport
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_reports,
     get_ooi_types_with_report,
@@ -152,7 +152,7 @@ class ReportView(BaseReportView, BaseOOIListView):
 
 class BaseAggregateReportView(ReportBreadcrumbs):
     view = "aggregate_report"
-    report = AggregateSectorReport
+    report = AggregateOrganisationReport
     ooi_types = get_ooi_types_from_aggregate_reports(report)
 
 
