@@ -1,19 +1,20 @@
 # Brenno de Winter <brenno@dewinter.com>, 2023.
+# Luca Racchetti <razzo1987@gmail.com>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-09 14:01+0000\n"
-"PO-Revision-Date: 2023-10-11 21:00+0000\n"
-"Last-Translator: Brenno de Winter <brenno@dewinter.com>\n"
-"Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/it/>\n"
+"PO-Revision-Date: 2023-11-16 20:05+0000\n"
+"Last-Translator: Luca Racchetti <razzo1987@gmail.com>\n"
+"Language-Team: Italian <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.1-dev\n"
+"X-Generator: Weblate 5.2\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -42,11 +43,11 @@ msgstr "Come ti chiamiamo?"
 
 #: account/forms/account_setup.py
 msgid "Email"
-msgstr "Email"
+msgstr "E-mail"
 
 #: account/forms/account_setup.py
 msgid "Enter your email address."
-msgstr "Inserisci il tuo indirizzo email."
+msgstr "Inserisci il tuo indirizzo e-mail."
 
 #: account/forms/account_setup.py
 msgid "Password"
@@ -58,11 +59,11 @@ msgstr "Scegli la tua super segreta password"
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
-msgstr "Scegli un'altra email."
+msgstr "Scegli un'altra e-mail."
 
 #: account/forms/account_setup.py tools/forms/settings.py
 msgid "--- Please select one of the available options ----"
-msgstr "--- Per favore seleziona una delle opzioni disponibili ----"
+msgstr "--- Seleziona una delle opzioni disponibili ----"
 
 #: account/forms/account_setup.py
 msgid "Account Type"
