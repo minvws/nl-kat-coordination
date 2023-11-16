@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from octopoes.models import Reference
-from reports.report_types.aggregate_sector_report.report import AggregateSectorReport
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
     get_plugins_for_report_ids,
@@ -67,7 +67,7 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, OOISelecti
 
     template_name = "aggregate_report/select_oois.html"
     current_step = 3
-    ooi_types = get_ooi_types_from_aggregate_report(AggregateSectorReport)
+    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
 
 class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, ReportTypeSelectionView, TemplateView):
@@ -78,7 +78,7 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Re
 
     template_name = "aggregate_report/select_report_types.html"
     current_step = 4
-    available_report_types = get_report_types_from_aggregate_report(AggregateSectorReport)
+    available_report_types = get_report_types_from_aggregate_report(AggregateOrganisationReport)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
