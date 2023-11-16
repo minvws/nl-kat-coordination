@@ -1,3 +1,4 @@
+import datetime
 import logging
 from functools import cached_property
 from typing import Iterable, Set
@@ -19,7 +20,9 @@ from katalogus.exceptions import (
 )
 from requests import RequestException
 
+from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models.ooi.web import Network
 from rocky.exceptions import (
     OctopoesDownException,
     OctopoesException,
@@ -160,6 +163,8 @@ class Organization(models.Model):
 
         try:
             octopoes_client.create_node()
+            valid_time = datetime.datetime.now(datetime.timezone.utc)
+            octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
         except Exception as e:
             try:
                 katalogus_client.delete_organization()
