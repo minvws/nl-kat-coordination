@@ -18,7 +18,7 @@ def add_or_combine_systems(systems, new_system):
 
 class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
-    name = "Aggregate Rrganisation Report"
+    name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemsReport, OpenPortsReport, IPv6Report], "optional": []}
     template_path = "aggregate_organisation_report/report.html"
