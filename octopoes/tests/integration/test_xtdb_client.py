@@ -10,15 +10,15 @@ from requests import HTTPError
 from octopoes.api.models import Declaration, Observation
 from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6, IPPort, Network
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
-from octopoes.xtdb.query import A, Query
+from octopoes.xtdb.query import Query
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
@@ -152,7 +152,7 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     assert len(xtdb_session.client.query(str(Query(Network)))) == 2
 
 
-def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, xtdb_session: XTDBSession, valid_time):
+def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
@@ -202,48 +202,9 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
 
-    second_resolved_hostname = A(ResolvedHostname)
-    second_hostname = A(Hostname)
 
-    # Find all hostnames that are connected to example.com because they point to the same IpAddressV4. Filter
-    # IPAddressV4 where there is an IPService with service name "smtp" on one of its ports.
-    query = (
-        Query(second_hostname)
-        .where(Hostname, primary_key="Hostname|test|example.com")
-        .where(ResolvedHostname, hostname=Hostname)
-        .where(ResolvedHostname, address=IPAddress)
-        .where(second_resolved_hostname, hostname=second_hostname)
-        .where(second_resolved_hostname, address=IPAddress)
-        .where(IPPort, address=IPAddress)
-        .where(IPService, ip_port=IPPort)
-        .where(IPService, service=Service)
-        .where(Service, name="smtp")
-    )
-
-    assert len(xtdb_session.client.query(query)) == 6
-
-    query = (
-        Query(second_hostname)
-        .where(Hostname, primary_key="Hostname|test|example.com")
-        .where(ResolvedHostname, hostname=Hostname)
-        .where(ResolvedHostname, address=IPAddress)
-        .where(second_resolved_hostname, hostname=second_hostname)
-        .where(second_resolved_hostname, address=IPAddress)
-        .where(IPPort, address=IPAddress)
-        .where(IPService, ip_port=IPPort)
-        .where(IPService, service=Service)
-        .where(Service, name="http")
-    )
-
-    result = xtdb_session.client.query(query)
-    assert len(result) == 4  # through ipv6
-
-    assert result[0][0]["Hostname/primary_key"] == "Hostname|test|c.example.com"
-    assert result[1][0]["Hostname/primary_key"] == "Hostname|test|d.example.com"
-    assert result[2][0]["Hostname/primary_key"] == "Hostname|test|example.com"
-    assert result[3][0]["Hostname/primary_key"] == "Hostname|test|f.example.com"
-
-    # Splitting this query up into two path queries that can be used from the API:
+def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, xtdb_session: XTDBSession, valid_time):
+    seed_system(octopoes_api_connector, valid_time)
 
     # Find all hostnames with the same ip address
     query = Query.from_path(
@@ -278,3 +239,29 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
     assert result[1][0]["Service/primary_key"] == "Service|smtp"
     assert result[2][0]["Service/primary_key"] == "Service|https"
     assert result[3][0]["Service/primary_key"] == "Service|http"  # Through ipv6
+
+    # Queries performed in Rocky's system report
+    ips = octopoes_api_connector.query(
+        "Hostname.<hostname[is ResolvedHostname].address", valid_time, Reference.from_str("Hostname|test|c.example.com")
+    )
+
+    hnames = {}
+    services = {}
+
+    for ip in ips:
+        hnames[str(ip.reference)] = octopoes_api_connector.query(
+            "IPAddress.<address[is ResolvedHostname].hostname",
+            valid_time,
+            ip.reference,
+        )
+        services[str(ip.reference)] = octopoes_api_connector.query(
+            "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+            valid_time,
+            ip.reference,
+        )
+
+    assert len(ips) == 2
+    assert len(hnames["IPAddressV4|test|192.0.2.3"]) == 6
+    assert len(hnames["IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]) == 4
+    assert len(services["IPAddressV4|test|192.0.2.3"]) == 3
+    assert len(services["IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]) == 1

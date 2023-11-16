@@ -4,6 +4,7 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, Dict, List, Set, TypedDict
 
+from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.types import OOIType
 
 REPORTS_DIR = Path(__file__).parent
@@ -24,7 +25,7 @@ class Report(ABC):
     template_path: str = "report.html"
 
     def __init__(self, octopoes_api_connector):
-        self.octopoes_api_connector = octopoes_api_connector
+        self.octopoes_api_connector: OctopoesAPIConnector = octopoes_api_connector
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
         raise NotImplementedError
