@@ -4,3 +4,5 @@
 </ol>
 <h2>Open Ports</h2>
 {% for ip, port in data.open_ports.items %}<p>{{ ip }}: {{ port }}</p>{% endfor %}
+<h2>IPv6 Enabled</h2>
+{% for hostname, enabled in data.ipv6.items %}<p>{{ hostname }}: {{ enabled }}</p>{% endfor %}

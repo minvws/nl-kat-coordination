@@ -5,11 +5,12 @@ from octopoes.models import OOI, Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import Report
 from reports.report_types.dns_report.report import DNSReport
+from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.open_ports_report.report import OpenPortsReport
 from reports.report_types.systems_report.report import SystemsReport
 from reports.report_types.tls_report.report import TLSReport
 
-REPORTS = [DNSReport, TLSReport, SystemsReport, OpenPortsReport]
+REPORTS = [DNSReport, TLSReport, SystemsReport, OpenPortsReport, IPv6Report]
 AGGREGATE_REPORTS = [AggregateOrganisationReport]
 
 
