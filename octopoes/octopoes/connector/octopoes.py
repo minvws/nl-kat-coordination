@@ -35,7 +35,7 @@ class OctopoesAPISession(requests.Session):
     def __init__(self, base_url: str):
         super().__init__()
 
-        self._base_uri = f"{base_url}"
+        self._base_uri = base_url
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -75,8 +75,10 @@ class OctopoesAPIConnector:
     """
 
     def __init__(self, base_uri: str, client: str):
-        self.base_uri = base_uri.rstrip("/")
+        base_uri = base_uri.rstrip("/")
+        self.base_uri = base_uri
         self.client = client
+
         self.session = OctopoesAPISession(base_uri)
 
     def root_health(self) -> ServiceHealth:
