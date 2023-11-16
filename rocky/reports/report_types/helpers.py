@@ -66,7 +66,7 @@ def get_plugins_for_report_ids(reports: List[str]) -> Dict[str, Set[str]]:
     return {"required": required_boefjes, "optional": optional_boefjes}
 
 
-def get_reports_from_aggregate_reports(aggregate_report: ABCMeta) -> Dict[str, Set[str]]:
+def get_report_types_from_aggregate_report(aggregate_report: ABCMeta) -> Dict[str, Set[Type[Report]]]:
     required_reports = set()
     optional_reports = set()
 
@@ -76,7 +76,7 @@ def get_reports_from_aggregate_reports(aggregate_report: ABCMeta) -> Dict[str, S
     return {"required": required_reports, "optional": optional_reports}
 
 
-def get_ooi_types_from_aggregate_reports(aggregate_report: ABCMeta) -> Set[Type[OOI]]:
+def get_ooi_types_from_aggregate_report(aggregate_report: ABCMeta) -> Set[Type[OOI]]:
     ooi_types = set()
     for reports in aggregate_report.reports.values():
         for report in reports:

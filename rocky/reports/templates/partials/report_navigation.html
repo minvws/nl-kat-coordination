@@ -1,13 +1,16 @@
 {% load i18n %}
 
 <div>
+    {{ active }}
     <nav class="tabs" aria-label="{% translate "Report Navigation" %}">
         <ul>
-            <li {% if view == "generate_report" %}aria-current="page"{% endif %}>
-                <a href="{% url 'generate_report' organization.code %}?{{ request.GET.urlencode }}">{% translate "Generate Report" %}</a>
+            {% url "generate_report_landing" organization.code as index_url_generate_report %}
+            <li {% if index_url_generate_report in request.path|urlencode %}aria-current="page"{% endif %}>
+                <a href="{{ index_url_generate_report }}?{{ request.GET.urlencode }}">{% translate "Generate Report" %}</a>
             </li>
-            <li {% if view == "aggregate_report" %}aria-current="page"{% endif %}>
-                <a href="{% url 'aggregate_report' organization.code %}?{{ request.GET.urlencode }}">{% translate "Aggregate Report" %}</a>
+            {% url "aggregate_report_landing" organization.code as index_url_aggregate_report %}
+            <li {% if index_url_aggregate_report in request.path|urlencode %}aria-current="page"{% endif %}>
+                <a href="{{ index_url_aggregate_report }}?{{ request.GET.urlencode }}">{% translate "Aggregate Report" %}</a>
             </li>
         </ul>
     </nav>

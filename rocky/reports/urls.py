@@ -1,22 +1,44 @@
 from django.urls import path
 
-from reports.views import (
-    AggregateReportTypeSelectionView,
+from reports.views.aggregate_report import (
     AggregateReportView,
+    LandingAggregateReportView,
+    OOISelectionAggregateReportView,
+    ReportTypesSelectionAggregateReportView,
+)
+from reports.views.base import ReportsLandingView
+from reports.views.generate_report import (
     GenerateReportView,
-    ReportOOISelectionView,
-    ReportSetupScanView,
-    ReportTypeSelectionView,
-    ReportView,
+    LandingGenerateReportView,
+    OOISelectionGenerateReportView,
+    ReportTypesSelectionGenerateReportView,
+    SetupScanGenerateReportView,
 )
 
+# Generate report urls
 urlpatterns = [
-    path("", ReportView.as_view(), name="reports"),
-    path("generate-report/", ReportView.as_view(), name="generate_report"),
-    path("aggregate-report/", AggregateReportView.as_view(), name="aggregate_report"),
-    path("aggregate-report/report-types/", AggregateReportTypeSelectionView.as_view(), name="aggregate_report_types"),
-    path("select/oois/", ReportOOISelectionView.as_view(), name="report_oois_selection"),
-    path("select/report-types/", ReportTypeSelectionView.as_view(), name="report_types_selection"),
-    path("setup/scan/", ReportSetupScanView.as_view(), name="report_setup_scan"),
-    path("view/", GenerateReportView.as_view(), name="generate_report_view"),
+    path("", ReportsLandingView.as_view(), name="reports"),
+    path("generate-report/", LandingGenerateReportView.as_view(), name="generate_report_landing"),
+    path("generate-report/select/oois/", OOISelectionGenerateReportView.as_view(), name="generate_report_select_oois"),
+    path(
+        "generate-report/select/report-types/",
+        ReportTypesSelectionGenerateReportView.as_view(),
+        name="generate_report_select_report_types",
+    ),
+    path("generate-report/setup-scan/", SetupScanGenerateReportView.as_view(), name="generate_report_setup_scan"),
+    path("generate-report/view/", GenerateReportView.as_view(), name="generate_report_view"),
+]
+
+# Aggregate report urls
+urlpatterns += [
+    path("aggregate-report/", LandingAggregateReportView.as_view(), name="aggregate_report_landing"),
+    path(
+        "aggregate-report/select/oois/", OOISelectionAggregateReportView.as_view(), name="aggregate_report_select_oois"
+    ),
+    path(
+        "aggregate-report/select/report-types/",
+        ReportTypesSelectionAggregateReportView.as_view(),
+        name="aggregate_report_select_report_types",
+    ),
+    path("aggregate-report/view/", AggregateReportView.as_view(), name="aggregate_report_view"),
 ]

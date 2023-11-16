@@ -22,7 +22,9 @@
                    href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
             </div>
         {% else %}
-            <form method="get" action="{{ form_action }}" class="inline layout-wide">
+            <form method="get" action="{{ next }}" class="inline layout-wide">
+                {% include "forms/report_form_fields.html" %}
+
                 <table>
                     <thead>
                         <th>
@@ -50,8 +52,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                {% include "forms/report_form_fields.html" %}
-
                 <button type="submit" class="button">
                     {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
                 </button>
