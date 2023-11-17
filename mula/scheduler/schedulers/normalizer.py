@@ -8,7 +8,16 @@ from opentelemetry import trace
 
 from scheduler import context, queues, rankers
 from scheduler.connectors import listeners
-from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, RawData, TaskStatus
+from scheduler.models import (
+    Normalizer,
+    NormalizerTask,
+    Organisation,
+    Plugin,
+    PrioritizedItem,
+    RawData,
+    RawDataReceivedEvent,
+    TaskStatus,
+)
 
 from .scheduler import Scheduler
 
@@ -80,13 +89,16 @@ class NormalizerScheduler(Scheduler):
         )
 
     @tracer.start_as_current_span("normalizer_push_task_for_received_raw_data")
-    def push_tasks_for_received_raw_data(self, latest_raw_data: RawData) -> None:
+    def push_tasks_for_received_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
 
         Args:
             latest_raw_data: A `RawData` object that was received from the
             message queue.
         """
+        # Convert body into a RawDataReceivedEvent
+        latest_raw_data = RawDataReceivedEvent.parse_raw(body)
+
         self.logger.debug(
             "Received new raw data from message queue [raw_data_id=%s, organisation_id=%s, scheduler_id=%s]",
             latest_raw_data.raw_data.id,
