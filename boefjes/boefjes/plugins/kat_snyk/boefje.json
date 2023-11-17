@@ -5,11 +5,5 @@
         "consumes": [
             "SoftwareInstance"
         ],
-        "produces": [
-            "Finding",
-            "KATFindingType",
-            "SnykFindingType",
-            "CVEFindingType"
-        ],
         "scan_level": 1
     }

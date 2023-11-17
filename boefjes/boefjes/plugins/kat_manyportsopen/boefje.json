@@ -6,9 +6,5 @@
             "IPAddressV4",
             "IPAddressV6"
         ],
-        "produces": [
-            "KATFindingType",
-            "Finding"
-        ],
         "scan_level": 1
     }
