@@ -1,4 +1,3 @@
-# Ansible playbook to install OpenKAT
 #
 # Copyright (C) 2023  Jeroen Baten <jbaten@i2rs.nl>
 #
@@ -23,6 +22,7 @@
 # 2023-08-14 J. Baten Debugging. Hacking Superadmin password to support 
 #                     current stable standard Ansible
 # 2023-09-16 J. Baten Inject variables for version numers, and prepare for MR.                    
+# 2023-11-19 J. Baten Handling MR feedback.
 
 # Usage; Make sure you can ssh to the root account on the remote server using
 #        authorized_keys. After that run the following command (and don't forget
@@ -34,24 +34,62 @@
 
 - name: Playbook to install OpenKAT 1.10.1 on Debian 12
   hosts: all
+  become: true
+  become_user: root
 
   vars:
     katrelease: "1.11.0"
     xtdbrelease: "1.0.7"
+    arch: "amd64"
 
   tasks:
 
+  - name: First let's check if this is indeed a Debian 12 server.
+    fail:
+      msg: "This playbook only works for a Debian 12 server. But this is a {{ ansible_facts['distribution'] ansible_facts['distribution_major_version'] }} server."
+    when: not ( ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "12" )
+
+  - name: Generate the random passwords we need during this play.
+    ansible.builtin.set_fact:
+      # Generate unique passwords for several services.
+      # Turns out that special characters create problems!
+      #var: "{{ lookup('community.general.random_string', length=20, min_numeric=3, min_upper=3, min_special=3) }}"
+      rocky_db_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
+      # Generate a unique secure password for the KAT-alogus database user. You can use the same method we used for generating the Rocky database user password.
+      kat_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
+      bytes_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
+      mula_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
+      # The next password needs minimum 2 uppercase, 2 lowercase and 2 special characties. 
+      # Because community.general.random_string is only available in recent versions of Ansible we fix these mandatory syntax rules this way.
+      admin_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}AaBb12-_!"
+      # DJANGO_CSRF_TRUSTED_ORIGINS="https://openkat.example.org"
+      # TODO read IPv4 and IPv6 dict of IP's and add them all here separated with a comma.
+      django_csrf: "https://{{ ansible_default_ipv4.address }}"
+      # Generate a safe password for the KAT user in rabbitmq. You can use the /dev/urandom method again and put it in a shell variable to use it later:
+      # rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20). Well, you can, but this works too. :-)
+      kat_mq_password: "{{ lookup('password', '/dev/null length=20 chars=ascii_letters') }}"
+
   # Downloading and installing
   # Download the packages for all the components of KAT from GitHub. Also download the XTDB multinode package from GitHub.
+  - name: Get latest version from OpenKAT website
+    ansible.builtin.shell: 
+      cmd: 'curl -sL https://github.com/minvws/nl-kat-coordination/releases/latest | grep -m 1 -Po "(?<=tag\/)v[0-9\.]*(?=)" | sed "s/^v//" '
+    register: openkat_curl_output
+
+  - name: Set version fact
+    ansible.builtin.set_fact:
+      openkat_version: "{{ openkat_curl_output.stdout }}"
+
+  # https://github.com/minvws/nl-kat-coordination/releases/download/v{{ openkat_version }}/kat-debian12-{{ openkat_version }}.tar.gz
 
   - name: "Download release {{ katrelease }} to our Debian 12 server"
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/minvws/nl-kat-coordination/releases/download/v{{ katrelease }}/kat-debian12-{{ katrelease }}.tar.gz"
       dest: /tmp
       mode: '0440'
 
   - name: "Download release xtdb {{ xtdbrelease }} to our Debian 12 server"
-    get_url:
+    ansible.builtin.get_url:
       url: "https://github.com/dekkers/xtdb-http-multinode/releases/download/v{{ xtdbrelease }}/xtdb-http-multinode_{{ xtdbrelease }}_all.deb"
       dest: /tmp
       mode: '0440'
@@ -59,23 +97,23 @@
   # After downloading they can be installed as follows:
   # tar zvxf kat-*.tar.gz
   - name: Unpack tar OpenKAT file
-    unarchive:
+    ansible.builtin.unarchive:
       src: "/tmp/kat-debian12-{{ katrelease }}.tar.gz"
       remote_src: yes
       dest: /tmp
 
   # sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
   - name: Install all needed packages
-    apt:
+    ansible.builtin.apt:
       deb: "/tmp/{{ item }}"
       install_recommends: false
     loop:
-      - "kat-boefjes_{{ katrelease }}_amd64.deb"
-      - "kat-bytes_{{ katrelease }}_amd64.deb"
-      - "kat-keiko_{{ katrelease }}_amd64.deb"
-      - "kat-mula_{{ katrelease }}_amd64.deb"
-      - "kat-octopoes_{{ katrelease }}_amd64.deb"
-      - "kat-rocky_{{ katrelease }}_amd64.deb"
+      - "kat-boefjes_{{ katrelease }}_{{ arch }}.deb"
+      - "kat-bytes_{{ katrelease }}_{{ arch }}.deb"
+      - "kat-keiko_{{ katrelease }}_{{ arch }}.deb"
+      - "kat-mula_{{ katrelease }}_{{ arch }}.deb"
+      - "kat-octopoes_{{ katrelease }}_{{ arch }}.deb"
+      - "kat-rocky_{{ katrelease }}_{{ arch }}.deb"
       - "xtdb-http-multinode_{{ xtdbrelease }}_all.deb"
 
   # Set up the databases
@@ -83,7 +121,7 @@
   # If you will be running the database on the same machine as KAT, you can install Postgres:
   # sudo apt install postgresql
   - name: Install other needed packages
-    apt:
+    ansible.builtin.apt:
       name: "{{ item }}"
       state: present
     loop:
@@ -94,22 +132,9 @@
       - rabbitmq-server
       - sudo
 
-  # Rocky DB
-  # Generate a secure password for the Rocky database user, as an example we’ll use /dev/urandom:
-  # echo $(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
-  - name: Generate random password for Rocky DB
-    set_fact:
-      # Turns out that special characters create problems.
-      #var: "{{ lookup('community.general.random_string', length=20, min_numeric=3, min_upper=3, min_special=3) }}"
-      rocky_db_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
-
-  - name: Show password for debugging purposes (TODO comment these lines)
-    debug:
-      var: rocky_db_password
-
   # To configure rocky to use this password, open /etc/kat/rocky.conf and fill in this password for ROCKY_DB_PASSWORD.
   - name: Store password in /etc/kat/rocky.conf
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/kat/rocky.conf
       regexp: "ROCKY_DB_PASSWORD=.*"
       line:  "ROCKY_DB_PASSWORD={{ rocky_db_password }}"
@@ -118,8 +143,7 @@
   - name: Create Postgresql user rocky and grant privs
     become: true
     become_user: postgres
-    become_method: sudo
-    postgresql_user:
+    community.postgresql.postgresql_user:
       name: rocky
       password: "{{ rocky_db_password }}"
       role_attr_flags: NOSUPERUSER
@@ -129,8 +153,7 @@
   - name: Create Postgresql database rocky_db
     become: true
     become_user: postgres
-    become_method: sudo
-    postgresql_db:
+    community.postgresql.postgresql_db:
       name: rocky_db
       owner: rocky
       encoding: UTF-8
@@ -142,35 +165,25 @@
   - name: initialize Rocky database
     become: true
     become_user: kat
-    become_method: sudo
-    shell:
+    ansible.builtin.shell:
       cmd: rocky-cli migrate
 
   # sudo -u kat rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
   - name: Load data into OpenKAT
     become: true
     become_user: kat
-    become_method: sudo
-    shell:
+    ansible.builtin.shell:
       cmd: rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
 
   # 
   # The steps for creating the other databases will be similar, but we’ll explain them anyway for completeness.
   # KAT-alogus DB
   # 
-  # Generate a unique secure password for the KAT-alogus database user. You can use the same method we used for generating the Rocky database user password.
-  - name: Generate random password for KAT-alogus database user
-    set_fact:
-      kat_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
-
-  - name: Show password for debugging purposes (TODO comment these lines)
-    debug:
-      var: kat_password
 
   # Insert this password into the connection string for the KAT-alogus DB in /etc/kat/boefjes.conf. For example:
   # KATALOGUS_DB_URI=postgresql://katalogus:<password>@localhost/katalogus_db
   - name: Store password in /etc/kat/rocky.conf
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/kat/boefjes.conf
       regexp: "KATALOGUS_DB_URI=.*"
       line:  "KATALOGUS_DB_URI=postgresql://katalogus:{{ kat_password }}@localhost/katalogus_db"
@@ -181,8 +194,7 @@
   - name: Create Postgresql user katalogus and grant privs
     become: true
     become_user: postgres
-    become_method: sudo
-    postgresql_user:
+    community.postgresql.postgresql_user:
       name: katalogus
       password: "{{ kat_password }}"
       role_attr_flags: NOSUPERUSER
@@ -192,37 +204,16 @@
   - name: Create Postgresql database katalogus_db
     become: true
     become_user: postgres
-    become_method: sudo
-    postgresql_db:
+    community.postgresql.postgresql_db:
       name: katalogus_db
       owner: katalogus
       encoding: UTF-8
       template: template0
 
-  # Initialize the database using the update-katalogus-db tool:
-  # 
-  # sudo -u kat update-katalogus-db
-  - name: initialize katalogus database
-    become: true
-    become_user: kat
-    become_method: sudo
-    shell:
-      cmd: update-katalogus-db
-
-  # Bytes DB
-  # Generate a unique password for the Bytes database user. 
-  - name: Generate random password for Bytes database user
-    set_fact:
-      bytes_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
-
-  - name: Show password for debugging purposes (TODO comment these lines)
-    debug:
-      var: bytes_password
-
   # Insert this password into the connection string for the Bytes DB in /etc/kat/bytes.conf. For example:
   # BYTES_DB_URI=postgresql://bytes:<password>@localhost/bytes_db
   - name: Store password in /etc/kat/bytes.conf
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/kat/bytes.conf
       regexp: "BYTES_DB_URI=.*"
       line:  "BYTES_DB_URI=postgresql://bytes:{{ bytes_password }}@localhost/bytes_db"
@@ -233,8 +224,7 @@
   - name: Create Postgresql user bytes and grant privs
     become: true
     become_user: postgres
-    become_method: sudo
-    postgresql_user:
+    community.postgresql.postgresql_user:
       name: bytes
       password: "{{ bytes_password }}"
       role_attr_flags: NOSUPERUSER
@@ -245,47 +235,27 @@
   - name: Create Postgresql database katalogus_db
     become: true
     become_user: postgres
-    become_method: sudo
-    postgresql_db:
+    community.postgresql.postgresql_db:
       name: bytes_db
       owner: bytes
       encoding: UTF-8
       template: template0
   
-  # Initialize the Bytes database:
-  # sudo -u kat update-bytes-db
-  - name: initialize Bytes database
-    become: true
-    become_user: kat
-    become_method: sudo
-    shell:
-      cmd: update-bytes-db
-
-  # Mula DB
-  # Generate a unique password for the Mula database user. 
-  - name: Generate random password for Mula database user
-    set_fact:
-      mula_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
-
-  - name: Show password for debugging purposes (TODO comment these lines)
-    debug:
-      var: mula_password
-
   # Insert this password into the connection string for the Mula DB in /etc/kat/mula.conf. For example:
   # SCHEDULER_DB_DSN=postgresql://mula:<password>@localhost/mula_db
+  # Somebody renamed this to SCHEDULER_DB_URI... Le sigh...
   - name: Store password in /etc/kat/mula.conf
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/kat/mula.conf
-      regexp: "SCHEDULER_DB_DSN=.*"
-      line:  "SCHEDULER_DB_DSN=postgresql://mula:{{ mula_password }}@localhost/mula_db"
+      regexp: "SCHEDULER_DB_URI=.*"
+      line:  "SCHEDULER_DB_URI=postgresql://mula:{{ mula_password }}@localhost/mula_db"
 
   # Create a new database and user for Mula:
   # sudo -u postgres createuser mula -P
   - name: Create Postgresql user bytes and grant privs
     become: true
     become_user: postgres
-    become_method: sudo
-    postgresql_user:
+    community.postgresql.postgresql_user:
       name: mula
       password: "{{ mula_password }}"
       role_attr_flags: NOSUPERUSER
@@ -295,34 +265,12 @@
   - name: Create Postgresql database mula_db
     become: true
     become_user: postgres
-    become_method: sudo
-    postgresql_db:
+    community.postgresql.postgresql_db:
       name: mula_db
       owner: mula
       encoding: UTF-8
       template: template0
  
-  # Initialize the Mula database:
-  # sudo -u kat update-mula-db
-  - name: initialize Mula database
-    become: true
-    become_user: kat
-    become_method: sudo
-    shell:
-      cmd: update-mula-db
-
-  # Prepare vars for next cli dialog
-  - name: Generate random password for Superadmin user...
-    set_fact:
-      # var: "{{ lookup('community.general.random_string', length=20, min_numeric=3, min_upper=3, min_special=3) }}"
-      # This password needs minimum 2 uppercase, 2 lowercase and 2 special characties. 
-      # Because community.general.random_string s only available in recent versions of Ansible we fix imandatory syntax rules this way.
-      admin_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}AaBb12-_!"
-
-  - name: Show password for debugging purposes (TODO comment these lines)
-    debug:
-      var: admin_password
-
   # Create Rocky superuser and set up default groups and permissions
   # Create an admin user for OpenKAT
   # sudo -u kat rocky-cli createsuperuser
@@ -341,8 +289,7 @@
   - name: Create Rocky superuser
     become: true
     become_user: kat
-    become_method: sudo
-    expect:
+    ansible.builtin.expect:
       command: /usr/bin/rocky-cli createsuperuser
       echo: yes
       responses:
@@ -353,28 +300,12 @@
         "Bypass password validation and create user anyway.*": "y"
     ignore_errors: yes
 
-  # command: /opt/bitwarden/bitwarden.sh install
-  #   chdir: /opt/bitwarden
-  #   timeout: 120
-  #   echo: yes
-  #   responses:
-  #     "Enter the domain name for your Bitwarden instance": "{{ ansible_fqdn }}"
-  #     "Do you want to use Let's Encrypt to generate a free SSL certificate":  n
-  #     "Enter the database name for your Bitwarden instance": vault
-  #     "Enter your installation id": "{{ bitwarden_installation_id }}"
-  #     "Enter your installation key": "{{ bitwarden_installation_key }}"
-  #     "Do you have a SSL certificate to use": y
-  #     "Is this a trusted SSL certificate": y
-  # ignore_errors: yes
-
-
   # Create the default groups and permissions for KAT:
   # sudo -u kat rocky-cli setup_dev_account
   - name:  Create the default groups and permissions for KAT
     become: true
     become_user: kat
-    become_method: sudo
-    shell:
+    ansible.builtin.shell:
       cmd: rocky-cli setup_dev_account
    
   # Set up RabbitMQ
@@ -386,14 +317,14 @@
   # By default RabbitMQ will listen on all interfaces. For a single node setup this is not what we want. To prevent RabbitMQ from being accessed from the internet add the following lines to /etc/rabbitmq/rabbitmq-env.conf:
   # export ERL_EPMD_ADDRESS=127.0.0.1
   - name: Change ERL_EPMD_ADDRESS in RabbitMQ settings
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/rabbitmq/rabbitmq-env.conf
       regexp: "ERL_EPMD_ADDRESS=.*"
       line:  "ERL_EPMD_ADDRESS=127.0.0.1"
 
   # export NODENAME=rabbit@localhost
   - name: Change NODENAME in RabbitMQ settings
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/rabbitmq/rabbitmq-env.conf
       regexp: "NODENAME=.*"
       line:  "NODENAME=rabbit@localhost"
@@ -401,23 +332,26 @@
   # Stop RabbitMQ :
   # sudo systemctl stop rabbitmq-server
   - name: Stop RabbitMQ server
-    systemd:
+    ansible.builtin.systemd:
       name: rabbitmq-server
       state: stopped
 
   # Stop epmd:
   # sudo epmd -kill
   - name: Stop epmd
-    shell:
+    ansible.builtin.shell:
       cmd: /usr/bin/epmd -kill
 
   # Create a new file /etc/rabbitmq/rabbitmq.conf and add the following lines:
   # listeners.tcp.local = 127.0.0.1:5672
   - name: Create /etc/rabbitmq/rabbitmq.conf file
-    shell:
-      cmd: echo "listeners.tcp.local = 127.0.0.1:5672" > /etc/rabbitmq/rabbitmq.conf ; chmod 0644 /etc/rabbitmq/rabbitmq.conf 
-
-   
+    ansible.builtin.copy:
+      content: "listeners.tcp.local = 127.0.0.1:5672"
+      dest: /etc/rabbitmq/rabbitmq.conf
+      owner: root
+      group: root
+      mode: '0644'  
+      
   # Create a new file /etc/rabbitmq/advanced.conf and add the following lines:
   # [
   #     {kernel,[
@@ -425,7 +359,7 @@
   #     ]}
   # ].
   - name: Create /etc/rabbitmq/advanced.conf
-    blockinfile:
+    ansible.builtin.blockinfile:
       path: /etc/rabbitmq/advanced.conf
       create: yes
       block: |
@@ -438,41 +372,31 @@
   # Now start RabbitMQ again and check if it only listens on localhost for ports 5672 and 25672:
   # systemctl start rabbitmq-server
   - name: Start RabbitMQ server
-    systemd:
+    ansible.builtin.systemd:
       name: rabbitmq-server
       state: started
 
   # Add the ‘kat’ vhost
-  # Generate a safe password for the KAT user in rabbitmq. You can use the /dev/urandom method again and put it in a shell variable to use it later:
-  # rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20)
-  - name: Generate random password for KAT user in RabbitMQ
-    set_fact:
-      kat_mq_password: "{{ lookup('password', '/dev/null length=20 chars=ascii_letters') }}"
-
-  - name: Show password for debugging purposes (TODO comment these lines)
-    debug:
-      var: kat_mq_password
-
   # Now create a KAT user for RabbitMQ, create the virtual host and set the permissions:
   # sudo rabbitmqctl add_user kat ${rabbitmq_pass}
   - name: Create KAT user for RabbitMQ
-    shell:
+    ansible.builtin.shell:
       cmd: "rabbitmqctl add_user kat {{ kat_mq_password }}"
 
   # sudo rabbitmqctl add_vhost kat
   - name: Create virtual host
-    shell:
+    ansible.builtin.shell:
       cmd: rabbitmqctl add_vhost kat
 
   # sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
   - name: Set permissions in RabbitMQ for kat user
-    shell:
+    ansible.builtin.shell:
       cmd: rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
 
   # Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for /etc/kat/mula.conf:
   # SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@127.0.0.1:5672/kat
   - name: Configure KAT to use the virtual host
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/kat/mula.conf
       regexp: "SCHEDULER_RABBITMQ_DSN=.*"
       line:  "SCHEDULER_RABBITMQ_DSN=amqp://kat:{{ kat_mq_password }}@127.0.0.1:5672/kat"
@@ -485,7 +409,7 @@
   # Or use this command to do it for you:
   # sudo sed -i "s|QUEUE_URI= *\$|QUEUE_URI=amqp://kat:${rabbitmq_pass}@127.0.0.1:5672/kat|" /etc/kat/*.conf
   - name: Update QUEUE_URI setting in rocky.conf, bytes.conf, boefjes.conf and octopoes.conf
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: "/etc/kat/{{ item }}"
       regexp: "QUEUE_URI=.*"
       line:  "QUEUE_URI=amqp://kat:{{ kat_mq_password }}@127.0.0.1:5672/kat"
@@ -494,6 +418,7 @@
       - bytes.conf
       - boefjes.conf
       - octopoes.conf
+      - mula.conf
 
   # Configure Bytes credentials
   # copy the value of BYTES_PASSWORD in /etc/kat/bytes.conf to the setting with the same name in the following files:
@@ -503,7 +428,7 @@
   # This oneliner will do it for you, executed as root:
   # sudo sed -i "s/BYTES_PASSWORD= *\$/BYTES_PASSWORD=$(grep BYTES_PASSWORD /etc/kat/bytes.conf | awk -F'=' '{ print $2 }')/" /etc/kat/*.conf
   - name: Update BYTES_PASSWORD setting in rocky.conf, boefjes.conf and mula.conf
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: "/etc/kat/{{ item }}"
       regexp: "BYTES_PASSWORD=.*"
       line:  "BYTES_PASSWORD={{ bytes_password }}"
@@ -518,30 +443,49 @@
   # be used to access OpenKAT. If openkat.example.org is used to access OpenKAT
   # the configuration should be:
   # DJANGO_ALLOWED_HOSTS="openkat.example.org"
-  # TODO read IPv4 and IPv6 dict of IP's and add them all here separated with a comma.
-  #
+  # TODO someday: read IPv4 and IPv6 dict of IP's and add them all here separated with a comma. 
   - name: Configure hostname in Rocky. Currently we configure IP address. Please add FQDN later to  DJANGO_ALLOWED_HOSTS setting in /etc/kat/rocky.conf !
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: "/etc/kat/rocky.conf"
       regexp: "DJANGO_ALLOWED_HOSTS=.*"
       line:  "DJANGO_ALLOWED_HOSTS=\"{{ ansible_default_ipv4.address }}\""
-  # DJANGO_CSRF_TRUSTED_ORIGINS="https://openkat.example.org"
-  # TODO read IPv4 and IPv6 dict of IP's and add them all here separated with a comma.
-  - name: Prepare DJANGO_CSRF_TRUSTED_ORIGINS setting
-    set_fact:
-      django_csrf: "https://{{ ansible_default_ipv4.address }}"
   - name: Configure hostname in Rocky. Currently we configure IP address. Please add FQDN later to  DJANGO_CSRF_TRUSTED_ORIGINS setting in /etc/kat/rocky.conf !
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: "/etc/kat/rocky.conf"
       regexp: "DJANGO_CSRF_TRUSTED_ORIGINS=.*"
       line:  "DJANGO_CSRF_TRUSTED_ORIGINS=\"{{ django_csrf }}\""
 
   # Enable debugging on rocky
   # default: DEBUG="False"
-    lineinfile:
+    ansible.builtin.lineinfile:
       path: /etc/kat/rocky.conf
       regexp: "DEBUG=.*"
       line:  "DEBUG=\"True\""
+
+  # Initialize the Bytes database:
+  # sudo -u kat update-bytes-db
+  - name: initialize Bytes database
+    become: true
+    become_user: kat
+    ansible.builtin.shell:
+      cmd: update-bytes-db
+
+  # Initialize the Mula database:
+  # sudo -u kat update-mula-db
+  - name: initialize Mula database
+    become: true
+    become_user: kat
+    ansible.builtin.shell:
+      cmd: update-mula-db
+
+  # Initialize the database using the update-katalogus-db tool:
+  # 
+  # sudo -u kat update-katalogus-db
+  - name: initialize katalogus database
+    become: true
+    become_user: kat
+    ansible.builtin.shell:
+      cmd: update-katalogus-db
 
   # Restart KAT
   # After finishing these steps, you should restart KAT to load the new configuration:
@@ -550,7 +494,7 @@
   # To start KAT when the system boots, enable all KAT services:
   # sudo systemctl enable kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
   - name: Start  kat-rocky kat-mula kat-bytes kat-boefjes kat-normalizers kat-katalogus kat-keiko kat-octopoes kat-octopoes-worker
-    systemd:
+    ansible.builtin.systemd:
       name: "{{ item }}"
       state: restarted
       enabled: true
@@ -572,7 +516,7 @@
   #
 
   - name: Important post-install message
-    pause:
+    ansible.builtin.pause:
       seconds: 1
       prompt: |
         ********************************************************************************************************
