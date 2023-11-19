@@ -5,9 +5,6 @@
     "consumes": [
         "CVEFindingType"
     ],
-    "produces": [
-        "CVEFindingType"
-    ],
     "environment_keys": [
         "CVEAPI_URL"
     ],

@@ -5,10 +5,5 @@
     "consumes": [
         "Website"
     ],
-    "produces": [
-        "KATFindingType",
-        "Finding"
-    ],
-    "environment_keys": [],
     "scan_level": 1
 }

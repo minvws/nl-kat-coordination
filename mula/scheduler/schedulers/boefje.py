@@ -20,6 +20,7 @@ from scheduler.models import (
     ScanProfileMutation,
     TaskStatus,
 )
+from scheduler.storage import filters
 
 from .scheduler import Scheduler
 
@@ -113,14 +114,17 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
-    @tracer.start_as_current_span("push_tasks_for_scan_profile_mutations")
-    def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
+    @tracer.start_as_current_span("boefje_push_tasks_for_scan_profile_mutations")
+    def push_tasks_for_scan_profile_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
 
         Args:
             mutation: The mutation that was received.
         """
-        self.logger.info(
+        # Convert body into a ScanProfileMutation
+        mutation = ScanProfileMutation.parse_raw(body)
+
+        self.logger.debug(
             "Received scan level mutation %s for: %s [ooi_primary_key=%s, organisation_id=%s, scheduler_id=%s]",
             mutation.operation,
             mutation.primary_key,
@@ -144,13 +148,16 @@ class BoefjeScheduler(Scheduler):
             # remove them from the queue.
             items, _ = self.ctx.datastores.pq_store.get_items(
                 scheduler_id=self.scheduler_id,
-                filters=[
-                    models.Filter(
-                        field="input_ooi",
-                        operator="eq",
-                        value=ooi.primary_key,
-                    ),
-                ],
+                filters=filters.FilterRequest(
+                    filters=[
+                        filters.Filter(
+                            column="data",
+                            field="input_ooi",
+                            operator="eq",
+                            value=ooi.primary_key,
+                        ),
+                    ],
+                ),
             )
 
             # Delete all items for this ooi, update all tasks for this ooi
@@ -193,7 +200,7 @@ class BoefjeScheduler(Scheduler):
                     self.push_tasks_for_scan_profile_mutations.__name__,
                 )
 
-    @tracer.start_as_current_span("push_tasks_for_new_boefjes")
+    @tracer.start_as_current_span("boefje_push_tasks_for_new_boefjes")
     def push_tasks_for_new_boefjes(self) -> None:
         """When new boefjes are added or enabled we find the ooi's that
         boefjes can run on, and create tasks for it."""
@@ -251,7 +258,7 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_new_boefjes.__name__,
                     )
 
-    @tracer.start_as_current_span("push_tasks_for_random_objects")
+    @tracer.start_as_current_span("boefje_push_tasks_for_random_objects")
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random ooi's from octopoes to the queue."""
         if self.queue.full():
@@ -315,6 +322,7 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_random_objects.__name__,
                     )
 
+    @tracer.start_as_current_span("boefje_is_task_allowed_to_run")
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
 
@@ -390,6 +398,7 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
+    @tracer.start_as_current_span("boefje_is_task_running")
     def is_task_running(self, task: BoefjeTask) -> bool:
         """Check if the same task is already running.
 
@@ -482,6 +491,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
+    @tracer.start_as_current_span("boefje_is_task_stalled")
     def is_task_stalled(self, task: BoefjeTask) -> bool:
         """Check if the same task is stalled.
 
@@ -517,6 +527,7 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
+    @tracer.start_as_current_span("boefje_push_task")
     def push_task(self, boefje: Plugin, ooi: OOI, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
@@ -668,6 +679,7 @@ class BoefjeScheduler(Scheduler):
             caller,
         )
 
+    @tracer.start_as_current_span("boefje_has_grace_period_passed")
     def has_grace_period_passed(self, task: BoefjeTask) -> bool:
         """Check if the grace period has passed for a task in both the
         datastore and bytes.

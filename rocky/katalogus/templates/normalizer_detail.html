@@ -2,7 +2,6 @@
 
 {% load static %}
 {% load i18n %}
-{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -12,11 +11,6 @@
             <div class="two-thirds-one-third">
                 <div>
                     <h1>{{ plugin.name }}</h1>
-                    <div class="horizontal-view scan-intensity">
-                        <span class="de-emphasized">{% translate "Scan level" %}</span>
-                        {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
-
-                    </div>
                     <p>
                         <strong>{% translate "Description" %}</strong>
                     </p>
@@ -44,14 +38,13 @@
                 {% if plugin.consumes %}
                     <p>
                         {% blocktranslate trimmed with plugin_name=plugin.name %}
-                            {{ plugin_name }} is able to scan the following object types:
+                            {{ plugin_name }} is able to process the following mime types:
                         {% endblocktranslate %}
                     </p>
                     <p>
-                        {% for ooi in plugin.consumes %}
-                            <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
-                            {% if ooi != plugin.consumes|last %}-{% endif %}
-                        {% endfor %}
+                        <ul>
+                            {% for mime_type in plugin.consumes %}<li>{{ mime_type }}</li>{% endfor %}
+                        </ul>
                     </p>
                 {% else %}
                     {% blocktranslate trimmed with plugin_name=plugin.name %}
@@ -65,27 +58,19 @@
                     {% endblocktranslate %}
                 </p>
                 <p>
-                    {% for ooi in plugin.produces %}
-                        <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
-                        {% if ooi != plugin.produces|last %}-{% endif %}
-                    {% endfor %}
+                    {% for ooi in plugin.produces %}{{ ooi }}{% endfor %}
                 </p>
                 <p>
-                    {% include "partials/scan_history.html" %}
+                    {% include "tasks/partials/normalizer_task_history.html" %}
 
                 </p>
             </div>
         </section>
-        {% if perms.tools.can_scan_organization %}
-            {% include "partials/objects_to_scan.html" with plugin=plugin %}
-
-        {% endif %}
     </main>
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    {% compress js %}
-        <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-        <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    {% endcompress %}
+    <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/renderNormalizerOutputOOIs.js" %}" type="module" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

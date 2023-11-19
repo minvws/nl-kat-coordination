@@ -33,22 +33,21 @@ environ.Env.read_env(BASE_DIR / ".env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_URI = env.url("QUEUE_URI", "").geturl()
+OCTOPOES_API = env.url("OCTOPOES_API").geturl()
 
-OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()
+SCHEDULER_API = env.url("SCHEDULER_API").geturl()
 
-SCHEDULER_API = env.url("SCHEDULER_API", "").geturl()
+KATALOGUS_API = env.url("KATALOGUS_API").geturl()
 
-KATALOGUS_API = env.url("KATALOGUS_API", "").geturl()
+BYTES_API = env.url("BYTES_API").geturl()
+BYTES_USERNAME = env("BYTES_USERNAME")
+BYTES_PASSWORD = env("BYTES_PASSWORD")
 
-BYTES_API = env.url("BYTES_API", "").geturl()
-BYTES_USERNAME = env("BYTES_USERNAME", default="")
-BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
-
-KEIKO_API = env.url("KEIKO_API", "").geturl()
+KEIKO_API = env.url("KEIKO_API").geturl()
 # Report generation timeout in seconds
 KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
 ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
+FEATURE_REPORTS = env.bool("FEATURE_REPORTS", False)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", False)
@@ -152,6 +151,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "tagulous",
     "compressor",
+    "reports",
     # "drf_standardized_errors",
 ]
 
@@ -184,7 +184,7 @@ ROOT_URLCONF = "rocky.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "rocky/templates"],
+        "DIRS": [BASE_DIR / "rocky/templates", BASE_DIR / "reports/report_types"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -192,6 +192,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "tools.context_processors.feature_flags",
                 "tools.context_processors.languages",
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
@@ -276,6 +277,7 @@ LOCALE_PATHS = (BASE_DIR / "rocky/locale",)
 # Add custom languages not provided by Django
 EXTRA_LANG_INFO = {
     "pap": {"bidi": False, "code": "pap", "name": "Papiamentu", "name_local": "Papiamentu"},
+    "en@pirate": {"bidi": False, "code": "en@pirate", "name": "English (Pirate)", "name_local": "English (Pirate)"},
 }
 LANG_INFO = locale.LANG_INFO.copy()
 LANG_INFO.update(EXTRA_LANG_INFO)
@@ -287,6 +289,12 @@ LANGUAGES = [
     ("pap", "pap"),
     ("it", "it"),
 ]
+
+if env.bool("PIRATE", False):
+    LANGUAGE_CODE = "en@pirate"
+    LANGUAGES += [
+        ("en@pirate", "en@pirate"),
+    ]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -390,7 +398,7 @@ CSP_IMG_SRC = ["'self'"]
 CSP_FONT_SRC = ["'self'"]
 CSP_STYLE_SRC = ["'self'"]
 CSP_FRAME_ANCESTORS = ["'none'"]
-CSP_BASE = ["'none'"]
+CSP_BASE_URI = ["'none'"]
 CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
 CSP_CONNECT_SRC = ["'self'"]

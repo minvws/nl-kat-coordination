@@ -1,7 +1,7 @@
+import threading
 import typing
 from functools import wraps
 from typing import Any, Callable, Dict, Optional
-from urllib.parse import urljoin
 
 import requests
 from requests.models import HTTPError
@@ -34,7 +34,7 @@ class Bytes(HTTPService):
 
     name = "bytes"
 
-    def __init__(self, host: str, source: str, user: str, password: str, timeout: int = 5):
+    def __init__(self, host: str, source: str, user: str, password: str, timeout: int, pool_connections: int):
         """Initialize the Bytes service.
 
         Args:
@@ -49,21 +49,23 @@ class Bytes(HTTPService):
             "password": password,
         }
 
-        super().__init__(host=host, source=source, timeout=timeout)
+        self.lock: threading.Lock = threading.Lock()
+
+        super().__init__(host, source, timeout, pool_connections)
 
     def login(self) -> None:
-        self.headers.update({"Authorization": f"bearer {self._get_token()}"})
+        with self.lock:
+            self.headers.update({"Authorization": f"bearer {self.get_token()}"})
 
     @staticmethod
     def _verify_response(response: requests.Response) -> None:
         response.raise_for_status()
 
-    def _get_token(self) -> str:
-        url = urljoin(self.host, "/token")
+    def get_token(self) -> str:
+        url = f"{self.host}/token"
         response = self.post(
             url=url,
             payload=self.credentials,
-            headers={"Content-Type": "application/x-www-form-urlendcoded"},
         )
 
         self._verify_response(response)
@@ -73,7 +75,7 @@ class Bytes(HTTPService):
     @retry_with_login
     @exception_handler
     def get_last_run_boefje(self, boefje_id: str, input_ooi: str, organization_id: str) -> Optional[BoefjeMeta]:
-        url = urljoin(self.host, "/bytes/boefje_meta")
+        url = f"{self.host}/bytes/boefje_meta"
         response = self.get(
             url=url,
             params={
@@ -95,7 +97,7 @@ class Bytes(HTTPService):
     @retry_with_login
     @exception_handler
     def get_last_run_boefje_by_organisation_id(self, organization_id: str) -> Optional[BoefjeMeta]:
-        url = urljoin(self.host, "/bytes/boefje_meta")
+        url = f"{self.host}/bytes/boefje_meta"
         response = self.get(
             url=url,
             params={

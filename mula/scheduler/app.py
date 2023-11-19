@@ -169,26 +169,28 @@ class App:
                 additions,
             )
 
+    @tracer.start_as_current_span("collect_metrics")
     def collect_metrics(self) -> None:
         """Collect application metrics
 
         This method that allows to collect metrics throughout the application.
         """
-        for s in self.schedulers.values():
-            self.ctx.metrics_qsize.labels(
-                scheduler_id=s.scheduler_id,
-            ).set(
-                s.queue.qsize(),
-            )
-
-            status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
-            for status, count in status_counts.items():
-                self.ctx.metrics_task_status_counts.labels(
+        with self.lock:
+            for s in self.schedulers.values():
+                self.ctx.metrics_qsize.labels(
                     scheduler_id=s.scheduler_id,
-                    status=status,
                 ).set(
-                    count,
+                    s.queue.qsize(),
                 )
+
+                status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
+                for status, count in status_counts.items():
+                    self.ctx.metrics_task_status_counts.labels(
+                        scheduler_id=s.scheduler_id,
+                        status=status,
+                    ).set(
+                        count,
+                    )
 
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the

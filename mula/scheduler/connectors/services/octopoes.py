@@ -1,5 +1,4 @@
 from typing import List
-from urllib.parse import urljoin
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import OOI, Organisation
@@ -18,10 +17,11 @@ class Octopoes(HTTPService):
         host: str,
         source: str,
         orgs: List[Organisation],
+        pool_connections: int,
         timeout: int = 10,
     ):
         self.orgs: List[Organisation] = orgs
-        super().__init__(host, source, timeout)
+        super().__init__(host, source, timeout, pool_connections)
 
     @exception_handler
     def get_objects_by_object_types(
@@ -31,7 +31,7 @@ class Octopoes(HTTPService):
         if scan_level is None:
             scan_level = []
 
-        url = urljoin(self.host, f"/{organisation_id}/objects")
+        url = f"{self.host}/{organisation_id}/objects"
 
         params = {
             "types": object_types,
@@ -63,7 +63,7 @@ class Octopoes(HTTPService):
         if scan_level is None:
             scan_level = []
 
-        url = urljoin(self.host, f"/{organisation_id}/objects/random")
+        url = f"{self.host}/{organisation_id}/objects/random"
 
         params = {
             "amount": str(n),
@@ -84,7 +84,7 @@ class Octopoes(HTTPService):
     def is_healthy(self) -> bool:
         healthy = True
         for org in self.orgs:
-            if not self.is_host_healthy(self.host, f"/{org.id}{self.health_endpoint}"):
+            if not self.is_host_healthy(self.host, f"{org.id}/health"):
                 return False
 
         return healthy

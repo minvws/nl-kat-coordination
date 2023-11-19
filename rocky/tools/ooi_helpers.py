@@ -253,7 +253,7 @@ def get_or_create_ooi(
         return api_connector.get(ooi.reference, observed_at), False
     except ObjectNotFoundException:
         if observed_at < _now:
-            # don't create an OOI when expected valid_time is in the past
+            # don't create an OOI when expected observed_at is in the past
             raise ValueError(f"OOI not found and unable to create at {observed_at}")
 
         create_ooi(api_connector, bytes_client, ooi, observed_at)

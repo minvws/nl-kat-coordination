@@ -125,7 +125,7 @@ class TestPluginsService(TestCase):
         self.assertEqual("kat_test", kat_test.id)
         self.assertEqual("Kat test name", kat_test.name)
         self.assertEqual({"DNSZone"}, kat_test.consumes)
-        self.assertSetEqual({"Hostname", "X509Certificate"}, set(kat_test.produces))
+        self.assertSetEqual({"boefje/kat_test"}, set(kat_test.produces))
 
         kat_test_norm = list(filter(lambda x: x.id == "kat_test_normalize", plugins)).pop()
         self.assertIn("kat_test_normalize", kat_test_norm.id)

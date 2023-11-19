@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 import logging
 import threading
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import pydantic
 
@@ -90,12 +90,12 @@ class PriorityQueue(abc.ABC):
         self.pq_store: storage.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
-    def pop(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
+    def pop(self, filters: Optional[storage.filters.FilterRequest] = None) -> Optional[models.PrioritizedItem]:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
 
         Args:
-            filters: A list of filters to be applied to the queue.
+            filters: A FilterRequest instance that defines the filters
 
         Returns:
             The highest priority item from the queue.
@@ -140,7 +140,10 @@ class PriorityQueue(abc.ABC):
             if not self._is_valid_item(p_item.data):
                 raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
 
-            if self.full():
+            if not p_item.priority:
+                raise InvalidPrioritizedItemError("PrioritizedItem must have a priority")
+
+            if self.full() and p_item.priority > 1:
                 raise QueueFullError(f"Queue {self.pq_id} is full.")
 
             # We try to get the item from the queue by a specified identifier of

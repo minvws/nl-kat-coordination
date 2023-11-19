@@ -1,0 +1,64 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="choose-report">
+        <section>
+            <div>
+                <h1>{% translate "Choose report types" %}</h1>
+                <p>
+                    {% blocktranslate trimmed %}
+                        Various types of reports, such as DNS reports and TLS reports, are essential for identifying
+                        vulnerabilities in different aspects of a system's security. DNS reports focus on domain name
+                        system configuration and potential weaknesses, while TLS reports assess the security of data
+                        encryption and transmission protocols, helping organizations pinpoint areas where security
+                        improvements are needed.
+                    {% endblocktranslate %}
+                </p>
+                {% if not oois %}
+                    <a class="button ghost"
+                       href="{% url 'report_oois_selection' organization.code %}">
+                        <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
+                    </a>
+                {% else %}
+                    <h2>
+                        {% blocktranslate trimmed count counter=oois|length %}
+                            Selected object
+                        {% plural %}
+                            Selected objects
+                        {% endblocktranslate %}
+                    </h2>
+                    {% include "summary/ooi_selection.html" %}
+
+                    <a href="{% url 'report_oois_selection' organization.code %}?{{ request.GET.urlencode }}"
+                       class="button ghost">
+                        <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
+                    </a>
+                    <h2>{% translate "Available report types" %} ({{ report_types_choices|length }})</h2>
+                    <p>{% translate "All report types that are available for your selection." %}</p>
+                    <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
+                    <form class="inline layout-wide"
+                          method="get"
+                          action="{% url 'report_setup_scan' organization.code %}">
+                        {% for ooi in selected_oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
+                        <div class="column-4 tiles">
+                            {% include "partials/report_types_tiles.html" with report_types=report_types_choices %}
+
+                        </div>
+                        <button type="submit">
+                            {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

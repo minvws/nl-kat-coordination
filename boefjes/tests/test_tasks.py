@@ -20,7 +20,7 @@ from boefjes.job_models import (
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class TaskTest(TestCase):
@@ -132,9 +132,7 @@ class TaskTest(TestCase):
         assert "JobRuntimeError: Boefje failed" in raw_call_args[0][1]
         assert raw_call_args[0][2] == {
             "error/boefje",
-            "dummy_boefje_runtime_exception",
             "boefje/dummy_boefje_runtime_exception",
-            f"boefje/dummy_boefje_runtime_exception-{meta.parameterized_arguments_hash}",
         }
 
     def test_exception_raised_unsupported_return_type_normalizer(self):

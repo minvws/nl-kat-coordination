@@ -1,3 +1,4 @@
+import hashlib
 from enum import Enum
 from importlib import import_module
 from inspect import isfunction, signature
@@ -53,7 +54,9 @@ class BoefjeResource:
 
     def __init__(self, path: Path, package: str):
         self.path = path
-        self.boefje = Boefje.parse_file(path / BOEFJE_DEFINITION_FILE)
+        self.boefje: Boefje = Boefje.parse_file(path / BOEFJE_DEFINITION_FILE)
+        self.boefje.runnable_hash = get_runnable_hash(self.path)
+        self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
         self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
 
 
@@ -63,4 +66,30 @@ class NormalizerResource:
     def __init__(self, path: Path, package: str):
         self.path = path
         self.normalizer = Normalizer.parse_file(path / NORMALIZER_DEFINITION_FILE)
+        self.normalizer.consumes.append(f"normalizer/{self.normalizer.id}")
         self.module = get_runnable_module_from_package(package, ENTRYPOINT_NORMALIZERS, parameter_count=2)
+
+
+def get_runnable_hash(path: Path) -> str:
+    """Returns sha256(file1 + file2 + ...) of all files in the given path."""
+
+    folder_hash = hashlib.sha256()
+
+    for file in sorted(path.glob("**/*")):
+        # Note that the hash does not include *.pyc files
+        # Thus there may be a desync between the source code and the cached, compiled bytecode
+        if file.is_file() and file.suffix != ".pyc":
+            with file.open("rb") as f:
+                while chunk := f.read(32768):
+                    folder_hash.update(chunk)
+
+    return folder_hash.hexdigest()
+
+
+def _default_mime_types(boefje: Boefje):
+    mime_types = {f"boefje/{boefje.id}"}
+
+    if boefje.version is not None:
+        mime_types = mime_types.union({f"boefje/{boefje.id}-{boefje.version}"})
+
+    return mime_types

@@ -1,6 +1,6 @@
 import logging
 import urllib.parse
-from typing import Any, Dict, Optional
+from typing import Any, Dict, MutableMapping, Optional, Union
 
 import requests
 from requests.adapters import HTTPAdapter, Retry
@@ -36,9 +36,16 @@ class HTTPService(Connector):
     """
 
     name: Optional[str] = None
-    health_endpoint: Optional[str] = "/health"
+    health_endpoint: Optional[str] = "health"
 
-    def __init__(self, host: str, source: str, timeout: int = 5, retries: int = 5):
+    def __init__(
+        self,
+        host: str,
+        source: str,
+        timeout: int = 10,
+        pool_connections: int = 10,
+        retries: int = 5,
+    ):
         """Initializer of the HTTPService class. During initialization the
         host will be checked if it is available and healthy.
 
@@ -51,6 +58,8 @@ class HTTPService(Connector):
                 from where the requests came from.
             timeout:
                 An integer defining the timeout of requests.
+            pool_connections:
+                The number of connections kept alive in the pool.
             retries:
                 An integer defining the number of retries to make before
                 giving up.
@@ -61,7 +70,8 @@ class HTTPService(Connector):
         self.session: requests.Session = requests.Session()
         self.host: str = host
         self.timeout: int = timeout
-        self.retries = retries
+        self.retries: int = retries
+        self.pool_connections: int = pool_connections
         self.source: str = source
 
         max_retries = Retry(
@@ -69,13 +79,11 @@ class HTTPService(Connector):
             backoff_factor=0.1,
             status_forcelist=[500, 502, 503, 504],
         )
-        self.session.mount("http://", HTTPAdapter(max_retries=max_retries))
-        self.session.mount("https://", HTTPAdapter(max_retries=max_retries))
 
-        self.headers: Dict[str, str] = {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
+        # Mount the HTTPAdapter to the session
+        http_adapter = HTTPAdapter(max_retries=max_retries, pool_connections=self.pool_connections)
+        self.session.mount("http://", http_adapter)
+        self.session.mount("https://", http_adapter)
 
         if self.source:
             self.headers["User-Agent"] = self.source
@@ -86,7 +94,6 @@ class HTTPService(Connector):
         self,
         url: str,
         payload: Optional[Dict[str, Any]] = None,
-        headers: Optional[Dict[str, Any]] = None,
         params: Optional[Dict[str, Any]] = None,
     ) -> requests.Response:
         """Execute a HTTP GET request
@@ -102,7 +109,7 @@ class HTTPService(Connector):
         """
         response = self.session.get(
             url,
-            headers=self.headers.update(headers) if headers else self.headers,
+            headers=self.headers,
             params=params,
             data=payload,
             timeout=self.timeout,
@@ -120,7 +127,6 @@ class HTTPService(Connector):
         self,
         url: str,
         payload: Dict[str, Any],
-        headers: Optional[Dict[str, Any]] = None,
         params: Optional[Dict[str, Any]] = None,
     ) -> requests.Response:
         """Execute a HTTP POST request
@@ -136,7 +142,7 @@ class HTTPService(Connector):
         """
         response = self.session.post(
             url,
-            headers=self.headers.update(headers) if headers else self.headers,
+            headers=self.headers,
             params=params,
             data=payload,
             timeout=self.timeout,
@@ -152,6 +158,10 @@ class HTTPService(Connector):
         self._verify_response(response)
 
         return response
+
+    @property
+    def headers(self) -> MutableMapping[str, Union[str, bytes]]:
+        return self.session.headers
 
     def _do_checks(self) -> None:
         """Do checks whether a host is available and healthy."""

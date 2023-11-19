@@ -3,13 +3,14 @@ $bit-bg: #42145f;
 $normalizer-bg: #e17000;
 
 
-.plugins {
+.tiles {
   &.tiles {
     img {
       object-fit: cover;
       object-position: center;
       height: 15rem;
     }
+
   }
 
   /* Tile */
@@ -35,10 +36,15 @@ $normalizer-bg: #e17000;
 
     /* Checkbox */
     >input[type="checkbox"] {
+      accent-color: var(--form-accent-color-color, initial);
+      cursor: var(--form-checkbox-cursor);
       left: 1rem;
-      margin-top: 0;
+      margin: 0;
       position: absolute;
       top: 1rem;
+      width: var(--form-checkbox-width);
+      min-height: var(--form-checkbox-width);
+      height: var(--form-checkbox-width);
     }
 
     .tile-label {
@@ -74,7 +80,7 @@ $normalizer-bg: #e17000;
     }
   }
 
-  .plugin-title,
+  .tile-title,
   .action-buttons a {
     font-weight: 700;
     line-height: 1.25rem;
@@ -86,12 +92,12 @@ $normalizer-bg: #e17000;
 
   }
 
-  .plugin-detail-link {
+  .tile-detail-link {
     padding: 4px 16px;
     line-height: var(--form-button-line-height);
   }
 
-  .plugin-description {
+  .tile-description {
     font-size: var(--tile-font-size);
   }
 

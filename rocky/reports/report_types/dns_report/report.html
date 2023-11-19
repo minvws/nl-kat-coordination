@@ -1,0 +1,123 @@
+{% load i18n %}
+
+<h2>{% translate "IP address lookup" %}</h2>
+<div class="horizontal-scroll">
+    <div class="column-2">
+        {% if data.ipv4 %}
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">IPv4</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {% for ip in data.ipv4 %}<td>{{ ip }}</td>{% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+        {% if not data.enough_ipv6_webservers %}
+            <div class="warning" role="group" aria-label="{% translate "warning" %}">
+                <span>IPv6 {% translate "Warning" %}:</span>
+                <p>
+                    {% blocktranslate trimmed %}
+                        You have less than one webserver that is reachable over IPv6,
+                        which is <strong>not</strong> in compliance to internet.nl standards.
+                    {% endblocktranslate %}
+                </p>
+            </div>
+        {% else %}
+            <table class="summary">
+                <thead>
+                    <tr>
+                        <th scope="col">IPv6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        {% for ip in data.ipv6 %}<td>{{ ip }}</td>{% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+</div>
+{% if data.other_records %}
+    <h2>{% translate "Other records found" %}</h2>
+    <div class="horizontal-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Record" %}</th>
+                    <th>{% translate "Value" %}</th>
+                    <th>{% translate "Found by" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ooi in data.other_records %}
+                    <tr>
+                        <td>{{ ooi.human_readable }}</td>
+                        <td>{{ ooi.content }}</td>
+                        <td>{{ ooi.origin }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <h2>{% translate "Security measures" %}</h2>
+    <div class="horizontal-scroll">
+        <div class="column-3">
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% translate "Enabled" %}</th>
+                        <th>{% translate "Type" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            {% if data.security.spf %}
+                                <i class="icon positive"></i>{% translate "Yes" %}
+                            {% else %}
+                                <i class="icon negative"></i>{% translate "No" %}
+                            {% endif %}
+                        </td>
+                        <td>SPF</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {% if data.security.dmarc %}
+                                <i class="icon positive"></i>{% translate "Yes" %}
+                            {% else %}
+                                <i class="icon negative"></i>{% translate "No" %}
+                            {% endif %}
+                        </td>
+                        <td>DMARC</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {% if data.security.dkim %}
+                                <i class="icon positive"></i>{% translate "Yes" %}
+                            {% else %}
+                                <i class="icon negative"></i>{% translate "No" %}
+                            {% endif %}
+                        </td>
+                        <td>DKIM</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {% if data.security.dnssec %}
+                                <i class="icon positive"></i>{% translate "Yes" %}
+                            {% else %}
+                                <i class="icon negative"></i>{% translate "No" %}
+                            {% endif %}
+                        </td>
+                        <td>DNSSEC</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}

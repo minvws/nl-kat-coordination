@@ -11,5 +11,8 @@
   },
   "required": [
     "SHODAN_API"
+  ],
+  "secret": [
+    "SHODAN_API"
   ]
 }

@@ -6,11 +6,17 @@ repos:
   - id: mixed-line-ending
     args: ["--fix=lf"]
   - id: detect-private-key
+    exclude: ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
   - id: check-case-conflict
   - id: check-yaml
   - id: check-json
   - id: check-toml
   - id: debug-statements
+    exclude: |
+      (?x)(
+      ^boefjes/tools |
+      ^octopoes/tools
+      )
   - id: end-of-file-fixer
     exclude: |
       (?x)(
@@ -58,7 +64,7 @@ repos:
   rev: v1.2.0
   hooks:
   - id: mypy
-    additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'pydantic', 'pynacl']
+    additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'types-retry', 'pydantic', 'pynacl']
     exclude: |
       (?x)(
       ^boefjes/ |
@@ -93,17 +99,28 @@ repos:
       ^rocky/assets/js/vendor |
       ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
       ^rocky/tests/stubs |
-      ^docs/source/_static
+      ^docs/source/_static |
+      ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
       )
 
 - repo: https://github.com/Riverside-Healthcare/djLint
   rev: v1.32.1
   hooks:
   - id: djlint-reformat-django
-    files: '^rocky/.*/templates/.*$'
+    files: |
+      (?x)(
+      ^rocky/.*/templates/.*$ |
+      ^rocky/reports/report_types/.*/.*\.html
+      )
+    exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
   - id: djlint-django
-    files: '^rocky/.*/templates/.*$'
+    files: |
+      (?x)(
+      ^rocky/.*/templates/.*$ |
+      ^rocky/reports/report_types/.*/.*\.html
+      )
+    exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
 - repo: https://github.com/thibaudcolas/pre-commit-stylelint
   rev: v15.10.1
