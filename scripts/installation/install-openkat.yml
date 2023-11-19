@@ -23,7 +23,7 @@
 # 2023-09-16 J. Baten Inject variables for version numers, and prepare for MR.                    
 # 2023-11-19 J. Baten Handling MR feedback.
 
-# Usage; Make sure you can ssh to the root account on the remote server using
+# Usage: Make sure you can ssh to the root account on the remote server using
 #        authorized_keys. After that run the following command (and don't forget
 #        the comma!
 #
