@@ -124,18 +124,21 @@ class Task(BaseModel):
 
     status: TaskStatus
 
+    duration: Optional[float] = Field(None, alias="duration", readonly=True)
+
+    queued: Optional[float] = Field(None, alieas="queued", readonly=True)
+
+    runtime: Optional[float] = Field(None, alias="runtime", readonly=True)
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    duration: Optional[float] = None
-
-    queued: Optional[float] = None
-
-    runtime: Optional[float] = None
-
     def __repr__(self):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
+
+    def model_dump_db(self):
+        return self.dict(exclude={"duration", "queued", "runtime"})
 
 
 class NormalizerTask(BaseModel):

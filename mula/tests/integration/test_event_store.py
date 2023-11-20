@@ -1,5 +1,4 @@
 import unittest
-from datetime import datetime, timedelta
 from types import SimpleNamespace
 from unittest import mock
 
@@ -39,14 +38,19 @@ class EventStoreTestCase(unittest.TestCase):
         # Arrange
         p_item = functions.create_p_item(self.organisation.id, 1)
         task = functions.create_task(p_item)
-        self.mock_ctx.datastores.task_store.create_task(task)
+        task_db = self.mock_ctx.datastores.task_store.create_task(task)
 
-        task.status = models.TaskStatus.COMPLETED
-        task.modified_at = datetime.now() + timedelta(seconds=60)
-        self.mock_ctx.datastores.task_store.update_task(task)
+        task_db.status = models.TaskStatus.DISPATCHED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
 
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task.id)
-        print(task_db)
+        task_db.status = models.TaskStatus.COMPLETED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+
+        result = self.mock_ctx.datastores.task_store.get_task_by_id(task.id)
+        print(result)
+
+        duration = self.mock_ctx.datastores.event_store.get_task_duration(task.id)
+        print(duration)
         breakpoint()
 
     def test_get_task_runtime(self):

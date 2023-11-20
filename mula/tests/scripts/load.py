@@ -14,7 +14,7 @@ SCHEDULER_API = "http://localhost:8004"
 def run():
     # Create organisations
     orgs: List[Dict[str, Any]] = []
-    for n in range(1, 2):
+    for n in range(0, 1):
         org = {
             "id": f"org-{n}",
             "name": f"Organisation {n}",
@@ -62,10 +62,16 @@ def run():
 
             print("Enabled boefje ", boefje_id)
 
+    count = 0
+    limit = 10
+
     declarations: List[Dict[str, Any]] = []
     with Path("data.csv").open(newline="") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=",", quotechar='"')
         for row in csv_reader:
+            if count >= limit:
+                break
+
             name = row["name"]
             declaration = {
                 "ooi": {
@@ -85,6 +91,7 @@ def run():
                 "task_id": str(uuid.uuid4()),
             }
             declarations.append(declaration)
+            count += 1
 
     for org in orgs:
         for declaration in declarations:

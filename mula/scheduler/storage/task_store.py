@@ -66,7 +66,6 @@ class TaskStore:
                 return None
 
             task = Task.model_validate(task_orm)
-            breakpoint()
 
             return task
 
@@ -107,7 +106,7 @@ class TaskStore:
     @retry()
     def create_task(self, task: Task) -> Optional[Task]:
         with self.dbconn.session.begin() as session:
-            task_orm = TaskDB(**task.model_dump())
+            task_orm = TaskDB(**task.model_dump_db())
             session.add(task_orm)
 
             created_task = Task.model_validate(task_orm)
@@ -117,7 +116,7 @@ class TaskStore:
     @retry()
     def update_task(self, task: Task) -> None:
         with self.dbconn.session.begin() as session:
-            (session.query(TaskDB).filter(TaskDB.id == task.id).update(task.model_dump()))
+            (session.query(TaskDB).filter(TaskDB.id == task.id).update(task.model_dump_db()))
 
     @retry()
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
