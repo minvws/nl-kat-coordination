@@ -5,8 +5,5 @@
         "consumes": [
             "Hostname"
         ],
-        "produces": [
-            "Hostname"
-        ],
         "scan_level": 2
     }
