@@ -9,7 +9,7 @@ from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import post_save, pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import KATalogusClientV1, get_katalogus
@@ -178,8 +178,8 @@ class Organization(models.Model):
         try:
             valid_time = datetime.datetime.now(datetime.timezone.utc)
             octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
-        except Exception as e:
-            logger.exception(f"Could not seed internet for organization {sender}")
+        except Exception:
+            logger.exception("Could not seed internet for organization %s", sender)
 
     @staticmethod
     def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
