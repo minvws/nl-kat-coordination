@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Tuple
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -12,17 +12,13 @@ from reports.report_types.aggregate_organisation_report.report import AggregateO
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
     get_plugins_for_report_ids,
-    get_report_by_id,
     get_report_types_from_aggregate_report,
 )
 from reports.views.base import (
-    BaseSelectionView,
-    OOISelectionView,
-    PluginSelectionView,
+    BaseReportView,
     ReportBreadcrumbs,
-    ReportType,
-    ReportTypeSelectionView,
 )
+from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
@@ -51,7 +47,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseSelectionView):
+class LandingAggregateReportView(BreadcrumbsAggregateReportView, TemplateView):
     """
     Landing page to start the 'Aggregate Report' flow.
     """
@@ -60,7 +56,7 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseSelectionVi
         return redirect(reverse("aggregate_report_select_oois", kwargs=self.get_kwargs()))
 
 
-class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, OOISelectionView):
+class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):
     """
     Select OOIs for the 'Aggregate Report' flow.
     """
@@ -69,8 +65,13 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, OOISelecti
     current_step = 3
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(self.get_ooi_filter_forms(self.ooi_types))
+        return context
 
-class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, ReportTypeSelectionView, TemplateView):
+
+class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
     """
     Shows all possible report types from a list of OOIs.
     Chooses report types for the 'Aggregate Report' flow.
@@ -78,15 +79,24 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Re
 
     template_name = "aggregate_report/select_report_types.html"
     current_step = 4
-    available_report_types = get_report_types_from_aggregate_report(AggregateOrganisationReport)
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.available_report_types = self.get_report_types_for_aggregate_report(
+            get_report_types_from_aggregate_report(AggregateOrganisationReport)
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["available_report_types"] = self.get_report_types_for_aggregate_report(self.available_report_types)
+        context["oois"] = self.get_oois()
+        context["available_report_types_aggregate"] = self.available_report_types
+        context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
+            self.available_report_types["optional"]
+        )
         return context
 
 
-class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, PluginSelectionView, TemplateView):
+class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -103,38 +113,19 @@ class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, PluginSelecti
             messages.error(self.request, _("Select at least one report type to proceed."))
         return super().get(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["plugins"] = self.plugins
+        return context
 
-class AggregateReportView(BreadcrumbsAggregateReportView, PluginSelectionView, TemplateView):
+
+class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
     """
     Shows the report generated from OOIS and report types.
     """
 
     template_name = "aggregate_report.html"
     current_step = 5
-
-    def get(self, request, *args, **kwargs):
-        if not self.are_plugins_enabled():
-            messages.warning(
-                self.request,
-                _("This report may not show all the data as some plugins are not enabled."),
-            )
-        return super().get(request, *args, **kwargs)
-
-    def are_plugins_enabled(self) -> bool:
-        enabled_plugins = []
-        for k, plugins in self.plugins.items():
-            for plugin in plugins:
-                enabled_plugins.append(plugin.enabled)
-        return all(enabled_plugins)
-
-    def get_report_types_from_choice(self):
-        return [get_report_by_id(report_type) for report_type in self.selected_report_types]
-
-    def get_report_types(self) -> List[ReportType]:
-        return [
-            {"id": report_type.id, "name": report_type.name, "description": report_type.description}
-            for report_type in self.get_report_types_from_choice()
-        ]
 
     def generate_reports_for_oois(self) -> Tuple[Any, Any, Dict[Any, Dict[Any, Any]]]:
         report_data = {}

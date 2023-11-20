@@ -1,7 +1,7 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
 
-from django import http
 from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -11,17 +11,13 @@ from octopoes.models import Reference
 from reports.report_types.helpers import (
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
-    get_report_by_id,
     get_report_types_for_oois,
 )
 from reports.views.base import (
-    BaseSelectionView,
-    OOISelectionView,
-    PluginSelectionView,
+    BaseReportView,
     ReportBreadcrumbs,
-    ReportType,
-    ReportTypeSelectionView,
 )
+from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
@@ -54,16 +50,16 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseSelectionView):
+class LandingGenerateReportView(BreadcrumbsGenerateReportView, TemplateView):
     """
     Landing page to start the 'Generate Report' flow.
     """
 
-    def get(self, request: http.HttpRequest, *args: Any, **kwargs: Any) -> http.HttpResponse:
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return redirect(reverse("generate_report_select_oois", kwargs=self.get_kwargs()) + self.get_selection())
 
 
-class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, OOISelectionView):
+class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):
     """
     Select OOIs for the 'Generate Report' flow.
     """
@@ -72,8 +68,13 @@ class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, OOISelection
     current_step = 3
     ooi_types = get_ooi_types_with_report()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(self.get_ooi_filter_forms(self.ooi_types))
+        return context
 
-class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, ReportTypeSelectionView, TemplateView):
+
+class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
     """
     Shows all possible report types from a list of OOIs.
     Chooses report types for the 'Generate Report' flow.
@@ -89,13 +90,14 @@ class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, Repo
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["oois"] = self.get_oois()
         context["available_report_types"] = self.get_report_types_for_generate_report(
             get_report_types_for_oois(self.selected_oois)
         )
         return context
 
 
-class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, PluginSelectionView, TemplateView):
+class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -103,17 +105,18 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, PluginSelection
     template_name = "generate_report/setup_scan.html"
     current_step = 5
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
-
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
             messages.error(self.request, _("Select at least one report type to proceed."))
         return super().get(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+        return context
 
-class GenerateReportView(BreadcrumbsGenerateReportView, PluginSelectionView, TemplateView):
+
+class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -121,29 +124,17 @@ class GenerateReportView(BreadcrumbsGenerateReportView, PluginSelectionView, Tem
     template_name = "generate_report.html"
     current_step = 6
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+
     def get(self, request, *args, **kwargs):
-        if not self.are_plugins_enabled():
+        if not self.are_plugins_enabled(self.plugins):
             messages.warning(
                 self.request,
                 _("This report may not show all the data as some plugins are not enabled."),
             )
         return super().get(request, *args, **kwargs)
-
-    def are_plugins_enabled(self) -> bool:
-        enabled_plugins = []
-        for k, plugins in self.plugins.items():
-            for plugin in plugins:
-                enabled_plugins.append(plugin.enabled)
-        return all(enabled_plugins)
-
-    def get_report_types_from_choice(self):
-        return [get_report_by_id(report_type) for report_type in self.selected_report_types]
-
-    def get_report_types(self) -> List[ReportType]:
-        return [
-            {"id": report_type.id, "name": report_type.name, "description": report_type.description}
-            for report_type in self.get_report_types_from_choice()
-        ]
 
     def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         report_data = {}
@@ -159,6 +150,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, PluginSelectionView, Tem
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["oois"] = self.get_oois()
+        context["plugins"] = self.plugins
         context["report_types"] = self.get_report_types()
         context["report_data"] = self.generate_reports_for_oois()
         return context

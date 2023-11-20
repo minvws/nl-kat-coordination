@@ -48,8 +48,7 @@
                 </button>
             </form>
         {% else %}
-            <a class="button ghost"
-               href="{% url 'report_types_selection' organization.code %}?{{ request.GET.urlencode }}">
+            <a class="button ghost" href="{{ previous }}">
                 <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
             </a>
         {% endif %}

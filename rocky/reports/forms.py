@@ -1,10 +1,10 @@
-from ast import List
 from typing import Set
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
 
+from octopoes.models.types import OOIType
 from reports.report_types.definitions import Report
 
 
@@ -15,7 +15,7 @@ class OOITypeMultiCheckboxForReportForm(BaseRockyForm):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    def __init__(self, ooi_types: List, *args, **kwargs):
+    def __init__(self, ooi_types: list[OOIType], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["ooi_type"].choices = ((ooi_type, ooi_type) for ooi_type in ooi_types)
 
