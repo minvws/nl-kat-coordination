@@ -1,0 +1,33 @@
+.report {
+  gap: var(--spacing-grid-500);
+
+  section {
+    > div {
+      gap: var(--spacing-grid-300);
+    }
+
+    &.introduction {
+      dl {
+        gap: var(--spacing-grid-200);
+
+        > div {
+          padding: 0;
+          border: 0;
+
+          dt,
+          dd {
+            padding: 0;
+          }
+
+          dt {
+            font-weight: bold;
+          }
+
+          dd {
+            font-weight: normal;
+          }
+        }
+      }
+    }
+  }
+}

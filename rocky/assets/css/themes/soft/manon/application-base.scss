@@ -5,10 +5,12 @@
   --application-base-font-family: var(--text-set-font-family);
   --application-base-font-size: var(--text-set-font-size);
   --application-base-line-height: var(--text-set-line-height);
-  --application-base-gap: var(--spacing-grid-normal);
+  --application-base-gap: var(--spacing-grid-200);
   --application-base-text-color: var(--text-color-dark);
 
   /* Accent color */
   --application-base-accent-color: var(--branding-color-1);
-  --application-base-accent-color-text-color: var(--branding-color-1-text-color);
+  --application-base-accent-color-text-color: var(
+    --branding-color-1-text-color
+  );
 }
