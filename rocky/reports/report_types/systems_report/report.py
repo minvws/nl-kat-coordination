@@ -38,24 +38,30 @@ class SystemReport(Report):
         elif reference.class_type in [IPAddressV4, IPAddressV6]:
             ips = [self.octopoes_api_connector.get(reference)]
 
-        hostnames = {}
-        services = {}
+        ip_services = {}
 
         for ip in ips:
-            hostnames[str(ip.reference)] = self.octopoes_api_connector.query(
-                "IPAddress.<address[is ResolvedHostname].hostname",
-                valid_time,
-                ip.reference,
-            )
-            services[str(ip.reference)] = self.octopoes_api_connector.query(
-                "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
-                valid_time,
-                ip.reference,
-            )
+            ip_services[str(ip.address)] = {
+                "hostnames": [
+                    str(x.name)
+                    for x in self.octopoes_api_connector.query(
+                        "IPAddress.<address[is ResolvedHostname].hostname",
+                        valid_time,
+                        ip.reference,
+                    )
+                ],
+                "services": [
+                    str(x.name)
+                    for x in self.octopoes_api_connector.query(
+                        "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                        valid_time,
+                        ip.reference,
+                    )
+                ],
+            }
 
         data = {
             "input_ooi": input_ooi,
-            "services": services,
-            "hostnames": hostnames,
+            "services": ip_services,
         }
         return data

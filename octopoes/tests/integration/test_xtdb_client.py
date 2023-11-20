@@ -1,19 +1,15 @@
 import os
-import uuid
 from datetime import datetime
-from ipaddress import ip_address
-from typing import List
 
 import pytest
+from tests.conftest import seed_system
 from requests import HTTPError
 
-from octopoes.api.models import Declaration, Observation
 from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference
-from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
-from octopoes.models.ooi.service import IPService, Service
+from octopoes.models import Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import Network
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
@@ -150,57 +146,6 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     assert xtdb_session.client.query(query) == []
 
     assert len(xtdb_session.client.query(str(Query(Network)))) == 2
-
-
-def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
-    network = Network(name="test")
-    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
-
-    hostnames: List[OOI] = [
-        Hostname(network=network.reference, name="example.com"),
-        Hostname(network=network.reference, name="a.example.com"),
-        Hostname(network=network.reference, name="b.example.com"),
-        Hostname(network=network.reference, name="c.example.com"),
-        Hostname(network=network.reference, name="d.example.com"),
-        Hostname(network=network.reference, name="e.example.com"),
-        Hostname(network=network.reference, name="f.example.com"),
-    ]
-
-    addresses = [
-        IPAddressV4(network=network.reference, address=ip_address("192.0.2.3")),
-        IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230")),
-    ]
-    ports = [
-        IPPort(address=addresses[0].reference, protocol="tcp", port=25),
-        IPPort(address=addresses[0].reference, protocol="tcp", port=443),
-        IPPort(address=addresses[0].reference, protocol="tcp", port=22),
-        IPPort(address=addresses[1].reference, protocol="tcp", port=80),
-    ]
-    services = [Service(name="smtp"), Service(name="https"), Service(name="http"), Service(name="ssh")]
-    ip_services = [
-        IPService(ip_port=ports[0].reference, service=services[0].reference),
-        IPService(ip_port=ports[1].reference, service=services[1].reference),
-        IPService(ip_port=ports[2].reference, service=services[3].reference),
-        IPService(ip_port=ports[3].reference, service=services[2].reference),
-    ]
-
-    resolved_hostnames = [
-        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[0].reference),  # ipv4
-        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[1].reference),  # ipv6
-        ResolvedHostname(hostname=hostnames[1].reference, address=addresses[0].reference),
-        ResolvedHostname(hostname=hostnames[2].reference, address=addresses[0].reference),
-        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[0].reference),
-        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[0].reference),
-        ResolvedHostname(hostname=hostnames[5].reference, address=addresses[0].reference),
-        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[1].reference),
-        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[1].reference),
-        ResolvedHostname(hostname=hostnames[6].reference, address=addresses[1].reference),
-    ]
-
-    oois = hostnames + addresses + ports + services + ip_services + resolved_hostnames
-    octopoes_api_connector.save_observation(
-        Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
-    )
 
 
 def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, xtdb_session: XTDBSession, valid_time):

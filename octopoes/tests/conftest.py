@@ -1,5 +1,6 @@
+import uuid
 from datetime import datetime, timezone
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, ip_address
 from typing import Dict, Iterator, List, Optional, Set
 from unittest.mock import Mock
 
@@ -8,6 +9,7 @@ from bits.runner import BitRunner
 from requests.adapters import HTTPAdapter, Retry
 
 from octopoes.api.api import app
+from octopoes.api.models import Declaration, Observation
 from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -15,6 +17,7 @@ from octopoes.core.app import get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
+from octopoes.models.ooi.network import IPAddressV6
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import (
     DNSZone,
@@ -255,3 +258,54 @@ def mock_xtdb_session():
 @pytest.fixture
 def origin_repository(mock_xtdb_session):
     yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
+    network = Network(name="test")
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
+
+    hostnames: List[OOI] = [
+        Hostname(network=network.reference, name="example.com"),
+        Hostname(network=network.reference, name="a.example.com"),
+        Hostname(network=network.reference, name="b.example.com"),
+        Hostname(network=network.reference, name="c.example.com"),
+        Hostname(network=network.reference, name="d.example.com"),
+        Hostname(network=network.reference, name="e.example.com"),
+        Hostname(network=network.reference, name="f.example.com"),
+    ]
+
+    addresses = [
+        IPAddressV4(network=network.reference, address=ip_address("192.0.2.3")),
+        IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230")),
+    ]
+    ports = [
+        IPPort(address=addresses[0].reference, protocol="tcp", port=25),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=443),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=22),
+        IPPort(address=addresses[1].reference, protocol="tcp", port=80),
+    ]
+    services = [Service(name="smtp"), Service(name="https"), Service(name="http"), Service(name="ssh")]
+    ip_services = [
+        IPService(ip_port=ports[0].reference, service=services[0].reference),
+        IPService(ip_port=ports[1].reference, service=services[1].reference),
+        IPService(ip_port=ports[2].reference, service=services[3].reference),
+        IPService(ip_port=ports[3].reference, service=services[2].reference),
+    ]
+
+    resolved_hostnames = [
+        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[0].reference),  # ipv4
+        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[1].reference),  # ipv6
+        ResolvedHostname(hostname=hostnames[1].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[2].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[5].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[1].reference),
+        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[1].reference),
+        ResolvedHostname(hostname=hostnames[6].reference, address=addresses[1].reference),
+    ]
+
+    oois = hostnames + addresses + ports + services + ip_services + resolved_hostnames
+    octopoes_api_connector.save_observation(
+        Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
+    )
