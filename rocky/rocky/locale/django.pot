@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-20 13:39+0000\n"
+"POT-Creation-Date: 2023-11-20 13:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2724,6 +2724,14 @@ msgstr ""
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "System Report"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Combine ip addresses, hostnames and services into systems."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
