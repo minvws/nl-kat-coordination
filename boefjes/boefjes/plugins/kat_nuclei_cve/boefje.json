@@ -6,9 +6,5 @@
             "Hostname",
             "HostnameHTTPURL"
         ],
-        "produces": [
-            "Finding",
-            "CVEFindingType"
-        ],
         "scan_level": 3
     }

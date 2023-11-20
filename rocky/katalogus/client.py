@@ -30,13 +30,7 @@ class Plugin(BaseModel):
     related: List[str] = None
     enabled: bool
     type: str
-    produces: Set[Type[OOI]]
-
-    def dict(self, *args, **kwargs):
-        """Pydantic does not stringify the OOI classes, but then templates can't render them"""
-        plugin_dict = super().dict(*args, **kwargs)
-        plugin_dict["produces"] = {ooi_class.get_ooi_type() for ooi_class in plugin_dict["produces"]}
-        return plugin_dict
+    produces: Set[str]
 
     def can_scan(self, member) -> bool:
         return member.has_perm("tools.can_scan_organization")
@@ -173,18 +167,12 @@ def parse_boefje(boefje: Dict) -> Boefje:
     scan_level = SCAN_LEVEL(boefje["scan_level"])
 
     consumes = set()
-    produces = set()
+
     for type_name in boefje.get("consumes", []):
         try:
             consumes.add(type_by_name(type_name))
         except StopIteration:
             logger.warning("Unknown OOI type %s for boefje consumes %s", type_name, boefje["id"])
-
-    for type_name in boefje.get("produces", []):
-        try:
-            produces.add(type_by_name(type_name))
-        except StopIteration:
-            logger.warning("Unknown OOI type %s for boefje produces %s", type_name, boefje["id"])
 
     return Boefje(
         id=boefje["id"],
@@ -195,7 +183,7 @@ def parse_boefje(boefje: Dict) -> Boefje:
         type=boefje["type"],
         scan_level=scan_level,
         consumes=consumes,
-        produces=produces,
+        produces=boefje["produces"],
     )
 
 
