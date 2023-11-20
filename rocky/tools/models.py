@@ -9,7 +9,7 @@ from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import KATalogusClientV1, get_katalogus
@@ -163,8 +163,6 @@ class Organization(models.Model):
 
         try:
             octopoes_client.create_node()
-            valid_time = datetime.datetime.now(datetime.timezone.utc)
-            octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
         except Exception as e:
             try:
                 katalogus_client.delete_organization()
@@ -172,6 +170,16 @@ class Organization(models.Model):
                 raise KATalogusException("Failed deleting organization in the Katalogus") from e
 
             raise OctopoesException("Failed creating organization in Octopoes") from e
+
+    @classmethod
+    def post_create(cls, sender, instance, *args, **kwargs):
+        octopoes_client = cls._get_healthy_octopoes(instance.code)
+
+        try:
+            valid_time = datetime.datetime.now(datetime.timezone.utc)
+            octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
+        except Exception as e:
+            logger.exception(f"Could not seed internet for organization {sender}")
 
     @staticmethod
     def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
@@ -202,6 +210,7 @@ class Organization(models.Model):
 
 
 pre_save.connect(Organization.pre_create, sender=Organization)
+post_save.connect(Organization.post_create, sender=Organization)
 
 
 class OrganizationMember(models.Model):
