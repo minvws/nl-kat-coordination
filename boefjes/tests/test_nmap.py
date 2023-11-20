@@ -1,11 +1,9 @@
 from unittest import TestCase
 
-from pydantic import parse_obj_as
-
 from boefjes.job_handler import serialize_ooi
 from boefjes.plugins.kat_nmap.main import Protocol, build_nmap_arguments
 from boefjes.plugins.kat_nmap.normalize import run
-from octopoes.models.types import OOIType
+from octopoes.models.ooi.network import IPAddressV4, Network
 from tests.loading import get_boefje_meta, get_dummy_data, get_normalizer_meta
 
 
@@ -171,16 +169,17 @@ class NmapTest(TestCase):
         )
 
     def test_normalizer(self):
-        input_ooi = parse_obj_as(
-            OOIType,
-            {
-                "object_type": "IPAddressV4",
-                "network": "Network|internet",
-                "address": "134.209.85.72",
-            },
-        )
+        input_ooi = IPAddressV4(network=Network(name="internet").reference, address="134.209.85.72")
         boefje_meta = get_boefje_meta(input_ooi=input_ooi.reference)
         boefje_meta.arguments["input"] = serialize_ooi(input_ooi)
-        output = [x for x in run(get_normalizer_meta(boefje_meta), get_dummy_data("raw/nmap_mispoes.xml"))]
+        output = list(run(get_normalizer_meta(boefje_meta), get_dummy_data("raw/nmap_mispoes.xml")))
         self.assertEqual(17, len(output))
-        self.assertEqual("https", output[12].name)
+        for i in range(0, len(output)):
+            if output[i].object_type == "IPPort" and output[i + 1].object_type == "Service":
+                if output[i].port == 80:
+                    self.assertEqual("http", output[i + 1].name)
+                elif output[i].port == 443:
+                    self.assertEqual("https", output[i + 1].name)
+                else:
+                    self.assertNotEqual("http", output[i + 1].name)
+                    self.assertNotEqual("https", output[i + 1].name)
