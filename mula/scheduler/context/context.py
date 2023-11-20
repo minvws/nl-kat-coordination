@@ -84,10 +84,11 @@ class AppContext:
             **{
                 storage.TaskStore.name: storage.TaskStore(dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
+                storage.EventStore.name: storage.EventStore(dbconn),
             }
         )
 
-        TaskDB.set_event_store(self.datastores.task_store)
+        TaskDB.set_event_store(self.datastores.event_store)
 
         # Metrics collector registry
         self.metrics_registry: CollectorRegistry = CollectorRegistry()

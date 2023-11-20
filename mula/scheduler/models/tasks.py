@@ -5,8 +5,9 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, Integer, String
+from sqlalchemy import Column, DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
@@ -42,27 +43,6 @@ class TaskStatus(str, enum.Enum):
 
     # Task has been cancelled
     CANCELLED = "cancelled"
-
-
-class Task(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: uuid.UUID
-
-    scheduler_id: str
-
-    type: str
-
-    p_item: PrioritizedItem
-
-    status: TaskStatus
-
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    def __repr__(self):
-        return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
 
 class TaskDB(Base):
@@ -109,39 +89,53 @@ class TaskDB(Base):
     def set_event_store(cls, event_store):
         cls._event_store = event_store
 
-    @property
+    @hybrid_property
     def duration(self) -> float:
         if self._event_store is None:
-            raise ValueError("EventStore instance is not set. Use TaskEventDB.set_event_store to set it.")
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
 
-        return self._event_store.get_task_duration(self.task_id)
+        return self._event_store.get_task_duration(self.id)
+
+    @hybrid_property
+    def queued(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_queued(self.id)
+
+    @hybrid_property
+    def runtime(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_runtime(self.id)
 
 
+class Task(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
 
-class TaskEventDB(Base):
-    __tablename__ = "task_events"
+    id: uuid.UUID
 
-    id = Column(Integer, primary_key=True)
+    scheduler_id: str
 
-    task_id = Column(GUID)
+    type: str
 
-    type = Column(String)
+    p_item: PrioritizedItem
 
-    context = Column(String)
+    status: TaskStatus
 
-    event = Column(String)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    datetime = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    data = Column(JSONB, nullable=False)
+    duration: Optional[float] = None
 
-    __table_args__ = (
-        Index(
-            "ix_task_events_task_id",
-            task_id,
-        ),
-    )
+    queued: Optional[float] = None
 
+    runtime: Optional[float] = None
+
+    def __repr__(self):
+        return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
 
 class NormalizerTask(BaseModel):

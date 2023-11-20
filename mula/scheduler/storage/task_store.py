@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Tuple
 
 from sqlalchemy import exc, func
 
-from scheduler.models import Task, TaskDB, TaskEventDB, TaskStatus
+from scheduler.models import Task, TaskDB, TaskStatus
 
 from .filters import FilterRequest, apply_filter
 from .storage import DBConn, retry
@@ -66,6 +66,7 @@ class TaskStore:
                 return None
 
             task = Task.model_validate(task_orm)
+            breakpoint()
 
             return task
 
@@ -179,117 +180,3 @@ class TaskStore:
                 response[status.value] = task_count
 
             return response
-
-    @retry()
-    def get_task_duration(self, task_id: str) -> float:
-        start_time: Optional[datetime] = None
-        end_time: Optional[datetime] = None
-
-        with self.dbconn.session.begin() as session:
-            query = (
-                session.query(TaskEventDB.task_id == task_id)
-                .filter(TaskEventDB.type == "events.db")
-                .filter(TaskEventDB.context == "task")
-                .filter(TaskEventDB.event == "insert")
-                .filter(TaskEventDB.data["status"] == TaskStatus.QUEUED)
-                .order_by(TaskEventDB.datetime.asc())
-            )
-
-            result_start = query.first()
-            if result_start is not None:
-                start_time = result_start.datetime
-
-            # Get task event end time when status is completed or failed
-            query = (
-                session.query(TaskEventDB.task_id == task_id)
-                .filter(TaskEventDB.type == "events.db")
-                .filter(TaskEventDB.context == "task")
-                .filter(TaskEventDB.event == "update")
-                .filter(TaskEventDB.data["status"].in_([TaskStatus.COMPLETED, TaskStatus.FAILED]))
-                .order_by(TaskEventDB.datetime.desc())
-            )
-
-            result_end = query.first()
-            if result_end is not None:
-                end_time = result_end.datetime
-
-        if start_time is not None and end_time is not None:
-            return (end_time - start_time).total_seconds()
-
-        return 0
-
-    @retry()
-    def get_task_runtime(self, task_id: str) -> float:
-        start_time: Optional[datetime] = None
-        end_time: Optional[datetime] = None
-
-        with self.dbconn.session.begin() as session:
-            query = (
-                session.query(TaskEventDB.task_id == task_id)
-                .filter(TaskEventDB.type == "events.db")
-                .filter(TaskEventDB.context == "task")
-                .filter(TaskEventDB.event == "update")
-                .filter(TaskEventDB.data["status"] == TaskStatus.DISPATCHED)
-                .order_by(TaskEventDB.datetime.asc())
-            )
-
-            result_start = query.first()
-            if result_start is not None:
-                start_time = result_start.datetime
-
-            # Get task event end time when status is completed or failed
-            query = (
-                session.query(TaskEventDB.task_id == task_id)
-                .filter(TaskEventDB.type == "events.db")
-                .filter(TaskEventDB.context == "task")
-                .filter(TaskEventDB.event == "update")
-                .filter(TaskEventDB.data["status"].in_([TaskStatus.COMPLETED, TaskStatus.FAILED]))
-                .order_by(TaskEventDB.datetime.desc())
-            )
-
-            result_end = query.first()
-            if result_end is not None:
-                end_time = result_end.datetime
-
-        if start_time is not None and end_time is not None:
-            return (end_time - start_time).total_seconds()
-
-        return 0
-
-    @retry()
-    def get_task_queued(self, task_id: str) -> float:
-        start_time: Optional[datetime] = None
-        end_time: Optional[datetime] = None
-
-        with self.dbconn.session.begin() as session:
-            query = (
-                session.query(TaskEventDB.task_id == task_id)
-                .filter(TaskEventDB.type == "events.db")
-                .filter(TaskEventDB.context == "task")
-                .filter(TaskEventDB.event == "insert")
-                .filter(TaskEventDB.data["status"] == TaskStatus.QUEUED)
-                .order_by(TaskEventDB.datetime.asc())
-            )
-
-            result_start = query.first()
-            if result_start is not None:
-                start_time = result_start.datetime
-
-            # Get task event end time when status is completed or failed
-            query = (
-                session.query(TaskEventDB.task_id == task_id)
-                .filter(TaskEventDB.type == "events.db")
-                .filter(TaskEventDB.context == "task")
-                .filter(TaskEventDB.event == "update")
-                .filter(TaskEventDB.data["status"] == TaskStatus.DISPATCHED)
-                .order_by(TaskEventDB.datetime.desc())
-            )
-
-            result_end = query.first()
-            if result_end is not None:
-                end_time = result_end.datetime
-
-        if start_time is not None and end_time is not None:
-            return (end_time - start_time).total_seconds()
-
-        return 0
