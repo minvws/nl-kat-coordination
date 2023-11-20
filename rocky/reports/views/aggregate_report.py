@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -109,7 +109,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, PluginSelectionView, T
     Shows the report generated from OOIS and report types.
     """
 
-    template_name = "generate_report.html"
+    template_name = "aggregate_report.html"
     current_step = 5
 
     def get(self, request, *args, **kwargs):
@@ -136,20 +136,27 @@ class AggregateReportView(BreadcrumbsAggregateReportView, PluginSelectionView, T
             for report_type in self.get_report_types_from_choice()
         ]
 
-    def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def generate_reports_for_oois(self) -> Tuple[Any, Any, Dict[Any, Dict[Any, Any]]]:
         report_data = {}
+        aggregate_report = AggregateOrganisationReport(self.octopoes_api_connector)
+        aggregate_template = aggregate_report.template_path
         for ooi in self.selected_oois:
             report_data[ooi] = {}
-            for report_type in self.get_report_types_from_choice():
+            for report_type in aggregate_report.reports["required"]:
                 if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
                     report = report_type(self.octopoes_api_connector)
                     data = report.generate_data(ooi, valid_time=self.valid_time)
                     template = report.template_path
                     report_data[ooi][report_type.name] = {"data": data, "template": template}
-        return report_data
+        post_processed_data = aggregate_report.post_process_data(report_data)
+
+        return aggregate_template, post_processed_data, report_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["report_types"] = self.get_report_types()
-        context["report_data"] = self.generate_reports_for_oois()
+        template, post_processed_data, report_data = self.generate_reports_for_oois()
+        context["template"] = template
+        context["post_processed_data"] = post_processed_data
+        context["report_data"] = report_data
         return context
