@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 
 import pytest
-from tests.conftest import seed_system
 from requests import HTTPError
 
 from octopoes.config.settings import XTDBType
@@ -15,6 +14,7 @@ from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
 from octopoes.xtdb.query import Query
+from tests.conftest import seed_system
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
