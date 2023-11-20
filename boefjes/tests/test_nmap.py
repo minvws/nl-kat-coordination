@@ -174,11 +174,11 @@ class NmapTest(TestCase):
         boefje_meta.arguments["input"] = serialize_ooi(input_ooi)
         output = list(run(get_normalizer_meta(boefje_meta), get_dummy_data("raw/nmap_mispoes.xml")))
         self.assertEqual(17, len(output))
-        for i in range(0, len(output) - 1):
-            if output[i].object_type == "IPPort" and output[i + 1].object_type == "Service":
-                if output[i].port == 80:
+        for i, out in enumerate(output[:-1]):
+            if out.object_type == "IPPort" and output[i + 1].object_type == "Service":
+                if out.port == 80:
                     self.assertEqual("http", output[i + 1].name)
-                elif output[i].port == 443:
+                elif out.port == 443:
                     self.assertEqual("https", output[i + 1].name)
                 else:
                     self.assertNotEqual("http", output[i + 1].name)
