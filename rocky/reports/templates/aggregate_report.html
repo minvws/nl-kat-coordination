@@ -5,25 +5,6 @@
 
 {% block content %}
     {% include "header.html" %}
+    {% include template with data=post_processed_data %}
 
-    <main id="main-content" tabindex="-1" class="choose-report">
-        <section class="dividing-line">
-            <div>
-                <h2>Aggregate Report Data</h2>
-                {% include template with data=post_processed_data %}
-
-            </div>
-        </section>
-        {% for ooi, report in report_data.items %}
-            {% for report_type,data in report.items %}
-                <section class="dividing-line">
-                    <div>
-                        <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
-                        {% include data.template with data=data.data %}
-
-                    </div>
-                </section>
-            {% endfor %}
-        {% endfor %}
-    </main>
 {% endblock content %}
