@@ -5,6 +5,7 @@ from reports.views.aggregate_report import (
     LandingAggregateReportView,
     OOISelectionAggregateReportView,
     ReportTypesSelectionAggregateReportView,
+    SetupScanAggregateReportView,
 )
 from reports.views.base import ReportsLandingView
 from reports.views.generate_report import (
@@ -40,5 +41,6 @@ urlpatterns += [
         ReportTypesSelectionAggregateReportView.as_view(),
         name="aggregate_report_select_report_types",
     ),
+    path("aggregate-report/setup-scan/", SetupScanAggregateReportView.as_view(), name="aggregate_report_setup_scan"),
     path("aggregate-report/view/", AggregateReportView.as_view(), name="aggregate_report_view"),
 ]

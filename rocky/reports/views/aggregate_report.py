@@ -40,6 +40,10 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
                 "text": _("Select report types"),
             },
             {
+                "url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection,
+                "text": _("Setup scan"),
+            },
+            {
                 "url": reverse("aggregate_report_view", kwargs=kwargs) + selection,
                 "text": _("View report"),
             },
@@ -86,6 +90,11 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Ba
             get_report_types_from_aggregate_report(AggregateOrganisationReport)
         )
 
+    def get(self, request, *args, **kwargs):
+        if not self.selected_oois:
+            messages.error(self.request, _("Select at least one OOI to proceed."))
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.get_oois()
@@ -102,11 +111,7 @@ class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportVie
     """
 
     template_name = "aggregate_report/setup_scan.html"
-    current_step = 4
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+    current_step = 5
 
     def get(self, request, *args, **kwargs):
         if not self.selected_report_types:
@@ -115,7 +120,7 @@ class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugins"] = self.plugins
+        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
         return context
 
 
@@ -125,7 +130,11 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     """
 
     template_name = "aggregate_report.html"
-    current_step = 5
+    current_step = 6
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
 
     def generate_reports_for_oois(self) -> Tuple[Any, Any, Dict[Any, Dict[Any, Any]]]:
         report_data = {}
