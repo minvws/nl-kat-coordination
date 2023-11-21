@@ -5,7 +5,7 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import DDL, Column, DateTime, Enum, String, event
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.schema import Index
@@ -138,7 +138,7 @@ class Task(BaseModel):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
     def model_dump_db(self):
-        return self.dict(exclude={"duration", "queued", "runtime"})
+        return self.model_dump(exclude={"duration", "queued", "runtime"})
 
 
 class NormalizerTask(BaseModel):
@@ -181,3 +181,30 @@ class BoefjeTask(BaseModel):
             return mmh3.hash_bytes(f"{self.input_ooi}-{self.boefje.id}-{self.organization}").hex()
 
         return mmh3.hash_bytes(f"{self.boefje.id}-{self.organization}").hex()
+
+func_record_event = DDL("""
+    CREATE OR REPLACE FUNCTION record_event()
+        RETURNS TRIGGER AS
+    $$
+    BEGIN
+        IF TG_OP = 'INSERT' THEN
+            INSERT INTO events (task_id, type, context, event, data)
+            VALUES (NEW.id, 'events.db', 'task', 'insert', row_to_json(NEW));
+        ELSIF TG_OP = 'UPDATE' THEN
+            INSERT INTO events (task_id, type, context, event, data)
+            VALUES (NEW.id, 'events.db', 'task', 'update', row_to_json(NEW));
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+""")
+
+trigger_tasks_insert_update = DDL("""
+    CREATE TRIGGER tasks_insert_update_trigger
+    AFTER INSERT OR UPDATE ON tasks
+    FOR EACH ROW
+    EXECUTE FUNCTION record_event();
+""")
+
+event.listen(TaskDB.__table__, "after_create", func_record_event.execute_if(dialect="postgresql"))
+event.listen(TaskDB.__table__, "after_create", trigger_tasks_insert_update.execute_if(dialect="postgresql"))

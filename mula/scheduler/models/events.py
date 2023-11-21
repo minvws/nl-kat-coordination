@@ -1,6 +1,7 @@
-from datetime import datetime
+import uuid
+from datetime import datetime, timezone
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.schema import Index
@@ -18,6 +19,22 @@ class RawDataReceivedEvent(BaseModel):
     raw_data: RawData
 
 
+class Event(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    task_id: uuid.UUID
+
+    type: str
+
+    context: str
+
+    event: str
+
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    data: dict
+
+
 class EventDB(Base):
     __tablename__ = "events"
 
@@ -31,7 +48,7 @@ class EventDB(Base):
 
     event = Column(String)
 
-    datetime = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    timestamp = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     data = Column(JSONB, nullable=False)
 

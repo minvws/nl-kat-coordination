@@ -1,41 +1,23 @@
 """Add tasks trigger
 
-Revision ID: 0008
-Revises: 0007
+Revision ID: 0009
+Revises: 0008
 Create Date: 2023-11-14 15:00:00.000000
 
 """
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import postgresql
-
-import scheduler
 
 # revision identifiers, used by Alembic.
-revision = "0008"
-down_revision = "0007"
+revision = "0009"
+down_revision = "0008"
 branch_labels = None
 depends_on = None
 
 
 def upgrade():
-    # Add events table
-    op.create_table(
-        "events",
-        sa.Column("id", sa.Integer(), nullable=False, autoincrement=True),
-        sa.Column("task_id", scheduler.utils.datastore.GUID(), nullable=True),
-        sa.Column("type", sa.String(), nullable=True),
-        sa.Column("context", sa.String(), nullable=True),
-        sa.Column("event", sa.String(), nullable=True),
-        sa.Column("datetime", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
-        sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-        sa.PrimaryKeyConstraint("id"),
-    )
-
-    op.create_index(op.f("ix_events_task_id"), "events", ["task_id"], unique=False)
-
     # Create the record_event function
-    op.execute("""
+    op.execute(sa.DDL("""
         CREATE OR REPLACE FUNCTION record_event()
             RETURNS TRIGGER AS
         $$
@@ -50,22 +32,19 @@ def upgrade():
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
-    """)
+    """))
 
     # Create the triggers
-    op.execute("""
+    op.execute(sa.DDL("""
         CREATE TRIGGER tasks_insert_update_trigger
         AFTER INSERT OR UPDATE ON tasks
         FOR EACH ROW
         EXECUTE FUNCTION record_event();
-    """)
+    """))
 
 def downgrade():
-    # Drop the events table
-    op.drop_table('events')
-
     # Drop the record_event function
-    op.execute("DROP FUNCTION IF EXISTS record_event()")
+    op.execute(sa.DDL("DROP FUNCTION IF EXISTS record_event()"))
 
     # Drop the trigger
-    op.execute("DROP TRIGGER IF EXISTS tasks_insert_update_trigger ON tasks")
+    op.execute(sa.DDL("DROP TRIGGER IF EXISTS tasks_insert_update_trigger ON tasks"))

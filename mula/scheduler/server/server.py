@@ -207,6 +207,15 @@ class Server:
             description="Push an item to a queue",
         )
 
+        self.api.add_api_route(
+            path="/events",
+            endpoint=self.list_events,
+            methods=["GET", "POST"],
+            response_model=PaginatedResponse,
+            status_code=status.HTTP_200_OK,
+            description="List all task events",
+        )
+
     def root(self) -> Any:
         return None
 
@@ -566,6 +575,72 @@ class Server:
             ) from exc_not_allowed
 
         return models.PrioritizedItem(**p_item.model_dump())
+
+    def list_events(
+        self,
+        request: fastapi.Request,
+        task_id: Optional[str] = None,
+        type_: Optional[str] = None,
+        context: Optional[str] = None,
+        event: Optional[str] = None,
+        timestamp: Optional[datetime.datetime] = None,
+        offset: int = 0,
+        limit: int = 10,
+        filters: Optional[storage.filters.FilterRequest] = None,
+        item: Optional[models.Event] = None,
+    ) -> Any:
+        if item is not None and request.method == "POST":
+            return self.create_event(item=item)
+
+        try:
+            results, count = self.ctx.datastores.event_store.get_events(
+                task_id=task_id,
+                type=type,
+                context=context,
+                event=event,
+                timestamp=timestamp,
+                offset=offset,
+                limit=limit,
+                filters=filters,
+            )
+        except storage.filters.errors.FilterError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except ValueError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to get tasks",
+            ) from exc
+
+        return paginate(request, results, count, offset, limit)
+
+    def create_event(self, item: models.Event) -> Any:
+        try:
+            event = models.Event(**item.dict())
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+
+        try:
+            self.ctx.datastores.event_store.create_event(event)
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to create event",
+            ) from exc
+
+        return event
 
     def run(self) -> None:
         uvicorn.run(

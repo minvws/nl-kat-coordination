@@ -618,3 +618,14 @@ class APITasksEndpointTestCase(APITemplateTestCase):
 
         response = self.client.get(f"/tasks/stats/{self.first_item_api.get('scheduler_id')}")
         self.assertEqual(200, response.status_code)
+
+
+class APIEventsEndpointTestCase(APITempleTestCase):
+    def setUp(self):
+        super().setUp()
+
+    def test_create_event(self):
+        pass
+
+    def test_list_events(self):
+        pass
