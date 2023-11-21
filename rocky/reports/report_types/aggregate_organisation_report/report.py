@@ -4,6 +4,7 @@ from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.open_ports_report.report import OpenPortsReport
 from reports.report_types.systems_report.report import SystemsReport
+from reports.report_types.vulnerability_report.report import VulnerabilityReport
 
 logger = getLogger(__name__)
 
@@ -20,13 +21,14 @@ class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
-    reports = {"required": [SystemsReport, OpenPortsReport, IPv6Report], "optional": []}
+    reports = {"required": [SystemsReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
     template_path = "aggregate_organisation_report/report.html"
 
     def post_process_data(self, data):
         systems = []
         open_ports = {}
         ipv6 = {}
+        vulnerabilities = {}
         # input oois
         for input_ooi, report_data in data.items():
             # reports
@@ -37,10 +39,12 @@ class AggregateOrganisationReport(AggregateReport):
                         add_or_combine_systems(systems, system)
 
                 if report == "Open Ports Report":
-                    open_ports[data["data"]["ip"]] = data["data"]
+                    open_ports = data["data"]["ports"]
 
                 if report == "IPv6 Report":
                     for hostname, enabled in data["data"]["results"].items():
                         ipv6[hostname] = enabled
+                if report == "Vulnerability Report":
+                    vulnerabilities = data["data"]["vulnerabilities"]
 
-        return {"systems": systems, "open_ports": open_ports, "ipv6": ipv6}
+        return {"systems": systems, "open_ports": open_ports, "ipv6": ipv6, "vulnerabilities": vulnerabilities}

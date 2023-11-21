@@ -1,4 +1,4 @@
 {% load i18n %}
 
-<h2>{% translate "Systems mockup report" %}</h2>
-{{ data }}
+<h2>Open Ports</h2>
+{% for ip, port in data.items %}<p>{{ ip }}: {{ port }}</p>{% endfor %}
