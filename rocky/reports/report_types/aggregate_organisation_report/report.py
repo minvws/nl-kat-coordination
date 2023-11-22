@@ -21,7 +21,7 @@ class AggregateOrganisationReport(AggregateReport):
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemsReport, OpenPortsReport, IPv6Report], "optional": []}
-    template_path = "aggregate_organisation_report/report.html"
+    template_path = "aggregate_organisation_report/report_design.html"
 
     def post_process_data(self, data):
         systems = []

@@ -1,8 +1,10 @@
 /* DL - Variables */
 dl {
   /* Fix whitespace issue after linter adds spaces. */
-  dt,
-  dd {
-    white-space: initial;
+
+  @media (width >= 24rem) {
+    > div {
+      flex-wrap: nowrap;
+    }
   }
 }

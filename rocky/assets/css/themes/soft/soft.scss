@@ -7,10 +7,9 @@
 @import "colors";
 @import "manon/body-text-set";
 @import "manon/spot-large";
-
-/* Branding colors */
 @import "manon/headings-base-set";
 @import "manon/text-colors";
+@import "manon/headings";
 
 /* Defining available heading styles */
 @import "manon/spacing";
@@ -43,16 +42,14 @@
 @import "manon/footer";
 @import "manon/form";
 
-/* Components */
-@import "manon/accordion";
-@import "manon/breadcrumb-bar";
-@import "manon/button-ghost";
-
 /* Button */
 @import "manon/button-icon";
 @import "manon/button-destructive";
 
-/* Icon button */
+/* Components */
+@import "manon/accordion";
+@import "manon/breadcrumb-bar";
+@import "manon/button-ghost";
 @import "manon/collapsible";
 @import "manon/emphasized";
 @import "manon/expando-rows";
@@ -66,6 +63,7 @@
 @import "manon/notification-block";
 @import "manon/icon";
 @import "manon/layout-column-4";
+@import "manon/max-line-length";
 @import "manon/description-list";
 @import "manon/form-fieldset";
 @import "manon/form-radio";
