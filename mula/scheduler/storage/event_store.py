@@ -22,7 +22,8 @@ class EventStore:
         type: Optional[str] = None,
         context: Optional[str] = None,
         event: Optional[str] = None,
-        timestamp: Optional[datetime] = None,
+        min_timestamp: Optional[datetime] = None,
+        max_timestamp: Optional[datetime] = None,
         offset: int = 0,
         limit: int = 100,
         filters: Optional[FilterRequest] = None,
@@ -42,8 +43,11 @@ class EventStore:
             if event is not None:
                 query = query.filter(EventDB.event == event)
 
-            if timestamp is not None:
-                query = query.filter(EventDB.timestamp == timestamp)
+            if min_timestamp is not None:
+                query = query.filter(EventDB.timestamp >= min_timestamp)
+
+            if max_timestamp is not None:
+                query = query.filter(EventDB.timestamp <= max_timestamp)
 
             if filters is not None:
                 query = apply_filter(EventDB, query, filters)
@@ -191,5 +195,77 @@ class EventStore:
 
         if start_time is not None and end_time is not None:
             return (end_time - start_time).total_seconds()
+
+        return 0
+
+    @retry()
+    def get_task_cpu(self, task_id: str) -> float:
+        with self.dbconn.session.begin() as session:
+            query = (
+                session.query(EventDB)
+                .filter(EventDB.task_id == task_id)
+                .filter(EventDB.type == "events.runner")
+                .filter(EventDB.context == "task")
+                .filter(EventDB.event == "cpu")
+                .order_by(EventDB.timestamp.desc())
+            )
+
+            result = query.first()
+            if result is not None:
+                return result.data["cpu"].as_float()
+
+        return 0
+
+    @retry()
+    def get_task_memory(self, task_id: str) -> float:
+        with self.dbconn.session.begin() as session:
+            query = (
+                session.query(EventDB)
+                .filter(EventDB.task_id == task_id)
+                .filter(EventDB.type == "events.runner")
+                .filter(EventDB.context == "task")
+                .filter(EventDB.event == "memory")
+                .order_by(EventDB.timestamp.desc())
+            )
+
+            result = query.first()
+            if result is not None:
+                return result.data["memory"].as_float()
+
+        return 0
+
+    @retry()
+    def get_task_disk(self, task_id: str) -> float:
+        with self.dbconn.session.begin() as session:
+            query = (
+                session.query(EventDB)
+                .filter(EventDB.task_id == task_id)
+                .filter(EventDB.type == "events.runner")
+                .filter(EventDB.context == "task")
+                .filter(EventDB.event == "disk")
+                .order_by(EventDB.timestamp.desc())
+            )
+
+            result = query.first()
+            if result is not None:
+                return result.data["disk"].as_float()
+
+        return 0
+
+    @retry()
+    def get_task_network(self, task_id: str) -> float:
+        with self.dbconn.session.begin() as session:
+            query = (
+                session.query(EventDB)
+                .filter(EventDB.task_id == task_id)
+                .filter(EventDB.type == "events.runner")
+                .filter(EventDB.context == "task")
+                .filter(EventDB.event == "network")
+                .order_by(EventDB.timestamp.desc())
+            )
+
+            result = query.first()
+            if result is not None:
+                return result.data["network"].as_float()
 
         return 0

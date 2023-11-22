@@ -155,7 +155,165 @@ class EventStoreTestCase(unittest.TestCase):
         self.assertEqual(events[1].task_id, first_event.task_id)
 
     def test_get_events_task_id(self):
-        pass
+        # Arange
+        first_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        second_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        self.mock_ctx.datastores.event_store.create_event(first_event)
+        self.mock_ctx.datastores.event_store.create_event(second_event)
+
+        # Act
+        events, count = self.mock_ctx.datastores.event_store.get_events(
+            task_id=first_event.task_id
+        )
+
+        # Assert
+        self.assertEqual(count, 1)
+        self.assertEqual(events[0].task_id, first_event.task_id)
+
+    def test_get_events_type(self):
+        # Arange
+        first_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        second_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.app",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        self.mock_ctx.datastores.event_store.create_event(first_event)
+        self.mock_ctx.datastores.event_store.create_event(second_event)
+
+        # Act
+        events, count = self.mock_ctx.datastores.event_store.get_events(
+            type="events.db"
+        )
+
+        # Assert
+        self.assertEqual(count, 1)
+        self.assertEqual(events[0].type, "events.db")
+
+    def test_get_events_context(self):
+        # Arange
+        first_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        second_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task2",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        self.mock_ctx.datastores.event_store.create_event(first_event)
+        self.mock_ctx.datastores.event_store.create_event(second_event)
+
+        # Act
+        events, count = self.mock_ctx.datastores.event_store.get_events(
+            context="task"
+        )
+
+        # Assert
+        self.assertEqual(count, 1)
+        self.assertEqual(events[0].context, "task")
+
+    def test_get_events_min_timestamp(self):
+        # Arange
+        first_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        second_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        self.mock_ctx.datastores.event_store.create_event(first_event)
+        self.mock_ctx.datastores.event_store.create_event(second_event)
+
+        # Act
+        events, count = self.mock_ctx.datastores.event_store.get_events(
+            min_timestamp=first_event.timestamp
+        )
+
+        # Assert
+        self.assertEqual(count, 2)
+        self.assertEqual(events[0].task_id, second_event.task_id)
+        self.assertEqual(events[1].task_id, first_event.task_id)
+
+    def test_get_events_max_timestamp(self):
+        # Arange
+        first_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        second_event = models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            timestamp=datetime.now(timezone.utc),
+            data={"test": "test"},
+        )
+
+        self.mock_ctx.datastores.event_store.create_event(first_event)
+        self.mock_ctx.datastores.event_store.create_event(second_event)
+
+        # Act
+        events, count = self.mock_ctx.datastores.event_store.get_events(
+            max_timestamp=first_event.timestamp
+        )
+
+        # Assert
+        self.assertEqual(count, 1)
+        self.assertEqual(events[0].task_id, first_event.task_id)
 
     def test_get_events_filter(self):
         # Arrange

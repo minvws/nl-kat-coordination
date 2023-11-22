@@ -1,4 +1,5 @@
 import copy
+import json
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -6,7 +7,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, server, storage
+from scheduler import config, models, server, storage, utils
 
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
@@ -28,8 +29,11 @@ class APITemplateTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.EventStore.name: storage.EventStore(self.dbconn),
             }
         )
+
+        models.TaskDB.set_event_store(self.mock_ctx.datastores.event_store)
 
         # Organisation
         self.organisation = OrganisationFactory()
@@ -556,7 +560,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         }
         response = self.client.get("/tasks", params=params)
         self.assertEqual(400, response.status_code)
-        self.assertEqual("min_date must be less than max_date", response.json().get("detail"))
+        self.assertEqual("min_created_at cannot be greater than max_created_at", response.json().get("detail"))
 
     def test_get_tasks_min_created_at_future(self):
         # Get tasks based on datetime for something in the future, should return 0 items
@@ -620,12 +624,125 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
 
 
-class APIEventsEndpointTestCase(APITempleTestCase):
+class APIEventsEndpointTestCase(APITemplateTestCase):
+
     def setUp(self):
         super().setUp()
 
+        # Arrange
+        first_event = {"item": models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            data={"test": "test"},
+        ).model_dump()}
+
+        first_event_json = json.dumps(first_event, cls=utils.UUIDEncoder, default=str)
+        self.first_event_api = self.client.post("/events", data=first_event_json).json()
+
+        second_event = {"item": models.Event(
+            task_id=uuid.uuid4(),
+            type="events.app",
+            context="user",
+            event="login",
+            data={"foo": "bar"},
+        ).model_dump()}
+
+        second_event_json = json.dumps(second_event, cls=utils.UUIDEncoder, default=str)
+        self.second_event_api = self.client.post("/events", data=second_event_json).json()
+
     def test_create_event(self):
-        pass
+        # Arrange
+        event = {"item": models.Event(
+            task_id=uuid.uuid4(),
+            type="events.db",
+            context="task",
+            event="insert",
+            data={"test": "test"},
+        ).model_dump()}
+
+        event_json = json.dumps(event, cls=utils.UUIDEncoder, default=str)
+
+        # Act
+        response = self.client.post("/events", data=event_json)
+
+        # Assert
+        self.assertEqual(201, response.status_code)
+        self.assertEqual(str(event["item"]["task_id"]), response.json().get("task_id"))
 
     def test_list_events(self):
-        pass
+        response = self.client.get("/events")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+
+    def test_list_events_task_id(self):
+        response = self.client.get(f"/events?task_id={self.first_event_api.get('task_id')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(self.first_event_api.get("task_id"), response.json()["results"][0]["task_id"])
+
+    def test_list_events_type(self):
+        response = self.client.get(f"/events?type={self.first_event_api.get('type')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(self.first_event_api.get("type"), response.json()["results"][0]["type"])
+
+    def test_list_events_context(self):
+        response = self.client.get(f"/events?context={self.first_event_api.get('context')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(self.first_event_api.get("context"), response.json()["results"][0]["context"])
+
+    def test_list_events_event(self):
+        response = self.client.get(f"/events?event={self.first_event_api.get('event')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(self.first_event_api.get("event"), response.json()["results"][0]["event"])
+
+    def test_list_events_min_timestamp(self):
+        response = self.client.get(f"/events?min_timestamp={self.first_event_api.get('timestamp')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+
+        response = self.client.get(f"/events?min_timestamp={self.second_event_api.get('timestamp')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+
+    def test_list_events_max_timestamp(self):
+        response = self.client.get(f"/events?max_timestamp={self.first_event_api.get('timestamp')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+
+        response = self.client.get(f"/events?max_timestamp={self.second_event_api.get('timestamp')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+
+    def test_list_events_min_and_max_timestamp(self):
+        response = self.client.get(f"/events?min_timestamp={self.first_event_api.get('timestamp')}&max_timestamp={self.second_event_api.get('timestamp')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+
+    def test_list_events_min_timestamp_greater_than_max_timestamp(self):
+        response = self.client.get(f"/events?min_timestamp={self.second_event_api.get('timestamp')}&max_timestamp={self.first_event_api.get('timestamp')}")
+        self.assertEqual(400, response.status_code)
+        self.assertEqual("min_timestamp cannot be greater than max_timestamp", response.json()["detail"])
+
+    def test_list_events_filter(self):
+        response = self.client.post(
+            "/events", json={"filters": {"filters": [{"column": "data", "field": "test", "operator": "eq", "value": "test"}]}}
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual("test", response.json()["results"][0]["data"]["test"])

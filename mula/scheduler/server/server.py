@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import fastapi
 import prometheus_client
@@ -211,8 +211,7 @@ class Server:
             path="/events",
             endpoint=self.list_events,
             methods=["GET", "POST"],
-            response_model=PaginatedResponse,
-            status_code=status.HTTP_200_OK,
+            response_model=Union[PaginatedResponse, models.Event],
             description="List all task events",
         )
 
@@ -303,7 +302,7 @@ class Server:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="min_date must be less than max_date",
+                detail="min_created_at cannot be greater than max_created_at",
             )
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
@@ -580,17 +579,29 @@ class Server:
         self,
         request: fastapi.Request,
         task_id: Optional[str] = None,
-        type_: Optional[str] = None,
+        type: Optional[str] = None,
         context: Optional[str] = None,
         event: Optional[str] = None,
-        timestamp: Optional[datetime.datetime] = None,
+        min_timestamp: Optional[datetime.datetime] = None,
+        max_timestamp: Optional[datetime.datetime] = None,
         offset: int = 0,
         limit: int = 10,
         filters: Optional[storage.filters.FilterRequest] = None,
         item: Optional[models.Event] = None,
     ) -> Any:
         if item is not None and request.method == "POST":
-            return self.create_event(item=item)
+            created_event = fastapi.encoders.jsonable_encoder(self.create_event(item=item))
+
+            return fastapi.responses.JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=created_event,
+            )
+
+        if (min_timestamp is not None and max_timestamp is not None) and min_timestamp > max_timestamp:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail="min_timestamp cannot be greater than max_timestamp",
+            )
 
         try:
             results, count = self.ctx.datastores.event_store.get_events(
@@ -598,7 +609,8 @@ class Server:
                 type=type,
                 context=context,
                 event=event,
-                timestamp=timestamp,
+                min_timestamp=min_timestamp,
+                max_timestamp=max_timestamp,
                 offset=offset,
                 limit=limit,
                 filters=filters,
@@ -617,7 +629,7 @@ class Server:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get tasks",
+                detail="failed to get events",
             ) from exc
 
         return paginate(request, results, count, offset, limit)
