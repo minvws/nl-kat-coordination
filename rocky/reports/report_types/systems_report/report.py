@@ -22,7 +22,7 @@ class System:
 class SystemReport(Report):
     id = "systems-report"
     name = _("System Report")
-    description = _("Combine ip addresses, hostnames and services into systems.")
+    description = _("Combine IP addresses, hostnames and services into systems.")
     plugins = {"required": [], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "systems_report/report.html"
@@ -35,7 +35,7 @@ class SystemReport(Report):
             ips = self.octopoes_api_connector.query(
                 "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
             )
-        elif reference.class_type in [IPAddressV4, IPAddressV6]:
+        elif reference.class_type in (IPAddressV4, IPAddressV6):
             ips = [self.octopoes_api_connector.get(reference)]
 
         ip_services = {}

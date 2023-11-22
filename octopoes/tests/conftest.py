@@ -264,7 +264,7 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
-    hostnames: List[OOI] = [
+    hostnames = [
         Hostname(network=network.reference, name="example.com"),
         Hostname(network=network.reference, name="a.example.com"),
         Hostname(network=network.reference, name="b.example.com"),

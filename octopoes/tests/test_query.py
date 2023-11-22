@@ -265,7 +265,7 @@ def test_aliased_query_starting_with_hostname(mocker):
 
 
 def test_build_system_query_with_path_segments(mocker):
-    uuid_batch = [uuid.uuid4() for i in range(3)]
+    uuid_batch = [uuid.uuid4() for _ in range(3)]
     uuid_mock = mocker.patch("octopoes.xtdb.query.uuid4")
     uuid_mock.side_effect = uuid_batch
 
