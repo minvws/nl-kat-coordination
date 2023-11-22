@@ -1,7 +1,7 @@
 {
     "id": "kat_rdns_normalize",
     "consumes": [
-        "rdns"
+        "boefje/rdns"
     ],
     "produces": [
         "DNSPTRRecord"
