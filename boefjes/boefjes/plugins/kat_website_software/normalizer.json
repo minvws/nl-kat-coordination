@@ -1,7 +1,7 @@
 {
     "id": "kat_website_software_normalize",
     "consumes": [
-        "website-software"
+        "boefje/website-software"
     ],
     "produces": [
         "Software",
