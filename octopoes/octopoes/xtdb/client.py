@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from requests import HTTPError, Response
 
 from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
+from octopoes.xtdb.query import Query
 
 logger = logging.getLogger(__name__)
 
@@ -93,13 +94,13 @@ class XTDBHTTPClient:
         self._verify_response(res)
         return res.json()
 
-    def query(self, query: str, valid_time: Optional[datetime] = None) -> List[List[Any]]:
+    def query(self, query: Union[str, Query], valid_time: Optional[datetime] = None) -> List[List[Any]]:
         if valid_time is None:
             valid_time = datetime.now(timezone.utc)
         res = self._session.post(
             f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
-            data=query,
+            data=str(query),
             headers={"Content-Type": "application/edn"},
         )
         self._verify_response(res)
