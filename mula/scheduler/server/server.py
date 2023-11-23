@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional
 
 import fastapi
 import prometheus_client
-import uvicorn
 from fastapi import status
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -568,6 +567,8 @@ class Server:
         return models.PrioritizedItem(**p_item.model_dump())
 
     def run(self) -> None:
+        import uvicorn
+
         uvicorn.run(
             self.api,
             host=str(self.ctx.config.api_host),
