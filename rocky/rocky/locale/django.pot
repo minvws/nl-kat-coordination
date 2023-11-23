@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-22 08:23+0000\n"
+"POT-Creation-Date: 2023-11-23 08:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2728,19 +2728,19 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.html
 msgid "IP address"
-msgstr "IP-adres"
+msgstr ""
 
 #: reports/report_types/systems_report/report.html
 msgid "Domain"
-msgstr "Domein"
+msgstr ""
 
 #: reports/report_types/systems_report/report.html
 msgid "System type"
-msgstr "Systeem type"
+msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "System Report"
-msgstr "Systeem Rapport"
+msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
