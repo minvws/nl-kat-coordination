@@ -2,11 +2,11 @@
 
 <h2>{% translate "Systems mockup report" %}</h2>
 <p>The input ooi is {{ data.input_ooi }}.</p>
-{% if data.systems %}
+{% if data %}
     <p>The systems that are found are :</p>
     <ul>
         <li>
-            {% for system in data.systems %}
+            {% for system in data %}
                 {{ system }}
             </li>
         {% endfor %}

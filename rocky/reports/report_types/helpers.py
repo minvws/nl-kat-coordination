@@ -9,8 +9,9 @@ from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.open_ports_report.report import OpenPortsReport
 from reports.report_types.systems_report.report import SystemsReport
 from reports.report_types.tls_report.report import TLSReport
+from reports.report_types.vulnerability_report.report import VulnerabilityReport
 
-REPORTS = [DNSReport, TLSReport, SystemsReport, OpenPortsReport, IPv6Report]
+REPORTS = [DNSReport, TLSReport, SystemsReport, OpenPortsReport, IPv6Report, VulnerabilityReport]
 AGGREGATE_REPORTS = [AggregateOrganisationReport]
 
 
