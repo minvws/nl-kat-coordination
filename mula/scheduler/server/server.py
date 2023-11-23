@@ -579,8 +579,8 @@ class Server:
         self,
         request: fastapi.Request,
         task_id: Optional[str] = None,
-        type: Optional[str] = None,
-        context: Optional[str] = None,
+        type: Optional[str] = None,  # noqa: A002
+        context: Optional[str] = None,  # noqa: A002
         event: Optional[str] = None,
         min_timestamp: Optional[datetime.datetime] = None,
         max_timestamp: Optional[datetime.datetime] = None,

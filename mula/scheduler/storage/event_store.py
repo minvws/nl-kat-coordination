@@ -19,7 +19,7 @@ class EventStore:
     def get_events(
         self,
         task_id: Optional[str] = None,
-        type: Optional[str] = None,
+        type: Optional[str] = None,  # noqa: A002
         context: Optional[str] = None,
         event: Optional[str] = None,
         min_timestamp: Optional[datetime] = None,
