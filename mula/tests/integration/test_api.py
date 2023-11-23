@@ -625,42 +625,47 @@ class APITasksEndpointTestCase(APITemplateTestCase):
 
 
 class APIEventsEndpointTestCase(APITemplateTestCase):
-
     def setUp(self):
         super().setUp()
 
         # Arrange
-        first_event = {"item": models.Event(
-            task_id=uuid.uuid4(),
-            type="events.db",
-            context="task",
-            event="insert",
-            data={"test": "test"},
-        ).model_dump()}
+        first_event = {
+            "item": models.Event(
+                task_id=uuid.uuid4(),
+                type="events.db",
+                context="task",
+                event="insert",
+                data={"test": "test"},
+            ).model_dump()
+        }
 
         first_event_json = json.dumps(first_event, cls=utils.UUIDEncoder, default=str)
         self.first_event_api = self.client.post("/events", data=first_event_json).json()
 
-        second_event = {"item": models.Event(
-            task_id=uuid.uuid4(),
-            type="events.app",
-            context="user",
-            event="login",
-            data={"foo": "bar"},
-        ).model_dump()}
+        second_event = {
+            "item": models.Event(
+                task_id=uuid.uuid4(),
+                type="events.app",
+                context="user",
+                event="login",
+                data={"foo": "bar"},
+            ).model_dump()
+        }
 
         second_event_json = json.dumps(second_event, cls=utils.UUIDEncoder, default=str)
         self.second_event_api = self.client.post("/events", data=second_event_json).json()
 
     def test_create_event(self):
         # Arrange
-        event = {"item": models.Event(
-            task_id=uuid.uuid4(),
-            type="events.db",
-            context="task",
-            event="insert",
-            data={"test": "test"},
-        ).model_dump()}
+        event = {
+            "item": models.Event(
+                task_id=uuid.uuid4(),
+                type="events.db",
+                context="task",
+                event="insert",
+                data={"test": "test"},
+            ).model_dump()
+        }
 
         event_json = json.dumps(event, cls=utils.UUIDEncoder, default=str)
 
@@ -728,19 +733,24 @@ class APIEventsEndpointTestCase(APITemplateTestCase):
         self.assertEqual(2, len(response.json()["results"]))
 
     def test_list_events_min_and_max_timestamp(self):
-        response = self.client.get(f"/events?min_timestamp={self.first_event_api.get('timestamp')}&max_timestamp={self.second_event_api.get('timestamp')}")
+        response = self.client.get(
+            f"/events?min_timestamp={self.first_event_api.get('timestamp')}&max_timestamp={self.second_event_api.get('timestamp')}"
+        )
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
     def test_list_events_min_timestamp_greater_than_max_timestamp(self):
-        response = self.client.get(f"/events?min_timestamp={self.second_event_api.get('timestamp')}&max_timestamp={self.first_event_api.get('timestamp')}")
+        response = self.client.get(
+            f"/events?min_timestamp={self.second_event_api.get('timestamp')}&max_timestamp={self.first_event_api.get('timestamp')}"
+        )
         self.assertEqual(400, response.status_code)
         self.assertEqual("min_timestamp cannot be greater than max_timestamp", response.json()["detail"])
 
     def test_list_events_filter(self):
         response = self.client.post(
-            "/events", json={"filters": {"filters": [{"column": "data", "field": "test", "operator": "eq", "value": "test"}]}}
+            "/events",
+            json={"filters": {"filters": [{"column": "data", "field": "test", "operator": "eq", "value": "test"}]}},
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])

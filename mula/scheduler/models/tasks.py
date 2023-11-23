@@ -219,7 +219,8 @@ class BoefjeTask(BaseModel):
         return mmh3.hash_bytes(f"{self.boefje.id}-{self.organization}").hex()
 
 
-func_record_event = DDL("""
+func_record_event = DDL(
+    """
     CREATE OR REPLACE FUNCTION record_event()
         RETURNS TRIGGER AS
     $$
@@ -234,14 +235,17 @@ func_record_event = DDL("""
         RETURN NEW;
     END;
     $$ LANGUAGE plpgsql;
-""")
+"""
+)
 
-trigger_tasks_insert_update = DDL("""
+trigger_tasks_insert_update = DDL(
+    """
     CREATE TRIGGER tasks_insert_update_trigger
     AFTER INSERT OR UPDATE ON tasks
     FOR EACH ROW
     EXECUTE FUNCTION record_event();
-""")
+"""
+)
 
 event.listen(TaskDB.__table__, "after_create", func_record_event.execute_if(dialect="postgresql"))
 event.listen(TaskDB.__table__, "after_create", trigger_tasks_insert_update.execute_if(dialect="postgresql"))

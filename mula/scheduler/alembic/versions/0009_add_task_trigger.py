@@ -17,7 +17,9 @@ depends_on = None
 
 def upgrade():
     # Create the record_event function
-    op.execute(sa.DDL("""
+    op.execute(
+        sa.DDL(
+            """
         CREATE OR REPLACE FUNCTION record_event()
             RETURNS TRIGGER AS
         $$
@@ -32,15 +34,22 @@ def upgrade():
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
-    """))
+    """
+        )
+    )
 
     # Create the triggers
-    op.execute(sa.DDL("""
+    op.execute(
+        sa.DDL(
+            """
         CREATE TRIGGER tasks_insert_update_trigger
         AFTER INSERT OR UPDATE ON tasks
         FOR EACH ROW
         EXECUTE FUNCTION record_event();
-    """))
+    """
+        )
+    )
+
 
 def downgrade():
     # Drop the record_event function

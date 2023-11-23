@@ -178,9 +178,7 @@ class EventStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.event_store.create_event(second_event)
 
         # Act
-        events, count = self.mock_ctx.datastores.event_store.get_events(
-            task_id=first_event.task_id
-        )
+        events, count = self.mock_ctx.datastores.event_store.get_events(task_id=first_event.task_id)
 
         # Assert
         self.assertEqual(count, 1)
@@ -210,9 +208,7 @@ class EventStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.event_store.create_event(second_event)
 
         # Act
-        events, count = self.mock_ctx.datastores.event_store.get_events(
-            type="events.db"
-        )
+        events, count = self.mock_ctx.datastores.event_store.get_events(type="events.db")
 
         # Assert
         self.assertEqual(count, 1)
@@ -242,9 +238,7 @@ class EventStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.event_store.create_event(second_event)
 
         # Act
-        events, count = self.mock_ctx.datastores.event_store.get_events(
-            context="task"
-        )
+        events, count = self.mock_ctx.datastores.event_store.get_events(context="task")
 
         # Assert
         self.assertEqual(count, 1)
@@ -274,9 +268,7 @@ class EventStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.event_store.create_event(second_event)
 
         # Act
-        events, count = self.mock_ctx.datastores.event_store.get_events(
-            min_timestamp=first_event.timestamp
-        )
+        events, count = self.mock_ctx.datastores.event_store.get_events(min_timestamp=first_event.timestamp)
 
         # Assert
         self.assertEqual(count, 2)
@@ -307,9 +299,7 @@ class EventStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.event_store.create_event(second_event)
 
         # Act
-        events, count = self.mock_ctx.datastores.event_store.get_events(
-            max_timestamp=first_event.timestamp
-        )
+        events, count = self.mock_ctx.datastores.event_store.get_events(max_timestamp=first_event.timestamp)
 
         # Assert
         self.assertEqual(count, 1)

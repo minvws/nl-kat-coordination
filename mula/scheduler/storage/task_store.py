@@ -121,9 +121,9 @@ class TaskStore:
     @retry()
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
         with self.dbconn.session.begin() as session:
-            session.query(TaskDB).filter(
-                TaskDB.scheduler_id == scheduler_id, TaskDB.id.in_(task_ids)
-            ).update({"status": TaskStatus.CANCELLED.name})
+            session.query(TaskDB).filter(TaskDB.scheduler_id == scheduler_id, TaskDB.id.in_(task_ids)).update(
+                {"status": TaskStatus.CANCELLED.name}
+            )
 
     @retry()
     def get_status_count_per_hour(

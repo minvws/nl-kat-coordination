@@ -74,8 +74,7 @@ class EventStore:
 
     @retry()
     def get_task_queued(self, task_id: str) -> float:
-        """Get task queued (how long has task been on queue) time in seconds
-        """
+        """Get task queued (how long has task been on queue) time in seconds"""
         start_time: Optional[datetime] = None
         end_time: Optional[datetime] = None
 
@@ -116,8 +115,7 @@ class EventStore:
 
     @retry()
     def get_task_runtime(self, task_id: str) -> float:
-        """Get task runtime in seconds
-        """
+        """Get task runtime in seconds"""
         start_time: Optional[datetime] = None
         end_time: Optional[datetime] = None
 
@@ -143,7 +141,9 @@ class EventStore:
                 .filter(EventDB.type == "events.db")
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "update")
-                .filter(EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED.upper(), TaskStatus.FAILED.upper()]))
+                .filter(
+                    EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED.upper(), TaskStatus.FAILED.upper()])
+                )
                 .order_by(EventDB.timestamp.desc())
             )
 
@@ -158,8 +158,7 @@ class EventStore:
 
     @retry()
     def get_task_duration(self, task_id: str) -> float:
-        """Total duration of a task from start to finish in seconds
-        """
+        """Total duration of a task from start to finish in seconds"""
         start_time: Optional[datetime] = None
         end_time: Optional[datetime] = None
 
@@ -185,7 +184,9 @@ class EventStore:
                 .filter(EventDB.type == "events.db")
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "update")
-                .filter(EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED.upper(), TaskStatus.FAILED.upper()]))
+                .filter(
+                    EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED.upper(), TaskStatus.FAILED.upper()])
+                )
                 .order_by(EventDB.timestamp.desc())
             )
 

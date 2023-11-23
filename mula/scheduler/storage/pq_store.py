@@ -16,9 +16,7 @@ class PriorityQueueStore:
     @retry()
     def pop(self, scheduler_id: str, filters: Optional[FilterRequest] = None) -> Optional[PrioritizedItem]:
         with self.dbconn.session.begin() as session:
-            query = session.query(PrioritizedItemDB).filter(
-                PrioritizedItemDB.scheduler_id == scheduler_id
-            )
+            query = session.query(PrioritizedItemDB).filter(PrioritizedItemDB.scheduler_id == scheduler_id)
 
             if filters is not None:
                 query = apply_filter(PrioritizedItemDB, query, filters)
@@ -93,21 +91,13 @@ class PriorityQueueStore:
     @retry()
     def empty(self, scheduler_id: str) -> bool:
         with self.dbconn.session.begin() as session:
-            count = (
-                session.query(PrioritizedItemDB)
-                .filter(PrioritizedItemDB.scheduler_id == scheduler_id)
-                .count()
-            )
+            count = session.query(PrioritizedItemDB).filter(PrioritizedItemDB.scheduler_id == scheduler_id).count()
             return count == 0
 
     @retry()
     def qsize(self, scheduler_id: str) -> int:
         with self.dbconn.session.begin() as session:
-            count = (
-                session.query(PrioritizedItemDB)
-                .filter(PrioritizedItemDB.scheduler_id == scheduler_id)
-                .count()
-            )
+            count = session.query(PrioritizedItemDB).filter(PrioritizedItemDB.scheduler_id == scheduler_id).count()
 
             return count
 
@@ -118,9 +108,7 @@ class PriorityQueueStore:
         filters: Optional[FilterRequest],
     ) -> Tuple[List[PrioritizedItem], int]:
         with self.dbconn.session.begin() as session:
-            query = session.query(PrioritizedItemDB).filter(
-                PrioritizedItemDB.scheduler_id == scheduler_id
-            )
+            query = session.query(PrioritizedItemDB).filter(PrioritizedItemDB.scheduler_id == scheduler_id)
 
             if filters is not None:
                 query = apply_filter(PrioritizedItemDB, query, filters)
@@ -149,19 +137,11 @@ class PriorityQueueStore:
     @retry()
     def get_items_by_scheduler_id(self, scheduler_id: str) -> List[PrioritizedItem]:
         with self.dbconn.session.begin() as session:
-            items_orm = (
-                session.query(PrioritizedItemDB)
-                .filter(PrioritizedItemDB.scheduler_id == scheduler_id)
-                .all()
-            )
+            items_orm = session.query(PrioritizedItemDB).filter(PrioritizedItemDB.scheduler_id == scheduler_id).all()
 
             return [PrioritizedItem.model_validate(item_orm) for item_orm in items_orm]
 
     @retry()
     def clear(self, scheduler_id: str) -> None:
         with self.dbconn.session.begin() as session:
-            (
-                session.query(PrioritizedItemDB)
-                .filter(PrioritizedItemDB.scheduler_id == scheduler_id)
-                .delete()
-            )
+            (session.query(PrioritizedItemDB).filter(PrioritizedItemDB.scheduler_id == scheduler_id).delete())

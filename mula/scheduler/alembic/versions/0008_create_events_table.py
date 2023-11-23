@@ -34,6 +34,7 @@ def upgrade():
 
     op.create_index(op.f("ix_events_task_id"), "events", ["task_id"], unique=False)
 
+
 def downgrade():
     # Drop the events table
-    op.drop_table('events')
+    op.drop_table("events")
