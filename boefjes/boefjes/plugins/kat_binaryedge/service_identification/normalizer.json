@@ -1,7 +1,7 @@
 {
     "id": "kat_binaryedge_service_identification",
     "consumes": [
-        "binaryedge"
+        "boefje/binaryedge"
     ],
     "produces": [
         "KATFindingType",

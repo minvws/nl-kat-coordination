@@ -6,8 +6,7 @@
         "HostnameHTTPURL",
         "IPAddressHTTPURL"
     ],
-    "produces": [],
-    "mime_types": [
+    "produces": [
         "image/png",
         "application/zip+json",
         "application/har+json",

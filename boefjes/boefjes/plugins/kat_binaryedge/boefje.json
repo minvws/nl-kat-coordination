@@ -6,16 +6,6 @@
         "IPAddressV4",
         "IPAddressV6"
     ],
-    "produces": [
-        "KATFindingType",
-        "SoftwareInstance",
-        "Service",
-        "IPPort",
-        "Finding",
-        "Software",
-        "IPService",
-        "CVEFindingType"
-    ],
     "environment_keys": ["BINARYEDGE_API"],
     "scan_level": 2
 }

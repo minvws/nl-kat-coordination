@@ -6,8 +6,5 @@
         "IPAddressV4",
         "IPAddressV6"
     ],
-    "produces": [
-        "DNSPTRRecord"
-    ],
     "scan_level": 1
 }

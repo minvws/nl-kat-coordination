@@ -39,7 +39,7 @@ Where do I start with OpenKAT?
 
 The documentation explains how the system works and what the main principles are. This gives an impression, but after reading the documentation, trying it yourself is the best way to find out how OpenKAT works. There are `several options to install OpenKAT <https://docs.openkat.nl/technical_design/index.html>`_.
 
-The easiest way to get to know the system is a local installation. If you don't have a debian or ubuntu machine (yet), try the Gitpod test environment. `The installation chapter <https://docs.openkat.nl/technical_design/index.html>`_ has a comprehensive roadmap for creating a local installation. In addition to the documentation, read `the readme from the general repository <https://github.com/minvws/nl-kat-coordination>`_ (dutch).
+The easiest way to get to know the system is a local installation. If you don't have a debian or ubuntu machine (yet), try the Gitpod test environment. `The installation chapter <https://docs.openkat.nl/technical_design/index.html>`_ has a comprehensive roadmap for creating a local installation. In addition to the documentation, read `the readme from the general repository <https://github.com/minvws/nl-kat-coordination>`_.
 
 Where is the software located?
 ==============================
@@ -52,6 +52,8 @@ Responsible disclosure
 OpenKAT scans for vulnerabilities. If you find any, it is valid that you deal with them properly. If you come across a vulnerability in a central government system you can report it to the `NCSC <https://www.ncsc.nl/contact/kwetsbaarheid-melden>`_.
 
 Many organizations have their contact information in ``security.txt`` in the root of their domain, so you get straight to the right people. Not every organization handles it equally professionally, but that's no reason not to want to use that standard yourself.
+
+If you find any vulnerabilities in the software of OpenKAT itself you can report them per e-mail to: security @ rdobeheer.nl (remove the spaces).
 
 What are the plans for the future?
 ==================================
