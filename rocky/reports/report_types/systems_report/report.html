@@ -15,10 +15,22 @@
                     <tr>
                         <td>{{ ip }}</td>
                         <td>
-                            {% for hostname in ip_services.hostnames %}{{ hostname }},{% endfor %}
+                            {% for hostname in ip_services.hostnames %}
+                                {% if not forloop.last %}
+                                    {{ hostname }},
+                                {% else %}
+                                    {{ hostname }}
+                                {% endif %}
+                            {% endfor %}
                         </td>
                         <td>
-                            {% for service in ip_services.services %}{{ service }},{% endfor %}
+                            {% for service in ip_services.services %}
+                                {% if not forloop.last %}
+                                    {{ service }},
+                                {% else %}
+                                    {{ service }}
+                                {% endif %}
+                            {% endfor %}
                         </td>
                     </tr>
                 {% endfor %}
