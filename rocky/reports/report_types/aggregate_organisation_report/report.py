@@ -30,6 +30,7 @@ class AggregateOrganisationReport(AggregateReport):
         ipv6 = {}
         vulnerabilities = {}
         # input oois
+
         for input_ooi, report_data in data.items():
             # reports
             for report, data in report_data.items():
@@ -45,6 +46,6 @@ class AggregateOrganisationReport(AggregateReport):
                     for hostname, enabled in data["data"]["results"].items():
                         ipv6[hostname] = enabled
                 if report == "Vulnerability Report":
-                    vulnerabilities = data["data"]["vulnerabilities"]
+                    vulnerabilities.update(data["data"])
 
         return {"systems": systems, "open_ports": open_ports, "ipv6": ipv6, "vulnerabilities": vulnerabilities}

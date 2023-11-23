@@ -230,7 +230,9 @@ class FindingList:
     def __getitem__(self, key: Union[int, slice]) -> List[HydratedFinding]:
         if isinstance(key, slice):
             offset = key.start or 0
-            limit = key.stop - offset
+            limit = self.HARD_LIMIT
+            if key.stop:
+                limit = key.stop - offset
             findings = self.octopoes_connector.list_findings(
                 severities=self.severities,
                 exclude_muted=self.exclude_muted,

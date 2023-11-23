@@ -2,10 +2,18 @@
 
 <main>
     <section>
+        <h1>{% translate "Report OpenKAT" %}</h1>
+        <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
         {% include "systems_report/report.html" with data=data.systems %}
         {% include "open_ports_report/report.html" with data=data.open_ports %}
         {% include "ipv6_report/report.html" with data=data.ipv6 %}
-        {% include "vulnerability_report/report.html" with data=data.vulnerabilities %}
 
+        {% if data.vulnerabilities %}
+            <div>
+                <h2>{% translate "Vulnerabilities" %}</h2>
+                {% include "vulnerability_report/report.html" with data=data.vulnerabilities %}
+
+            </div>
+        {% endif %}
     </section>
 </main>

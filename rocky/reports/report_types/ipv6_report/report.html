@@ -1,5 +1,4 @@
 {% load i18n %}
 
-<h2>{% translate "IPv6 Report" %}</h2>
-<h2>IPv6 Enabled</h2>
+<h2>{% translate "IPv6 Enabled" %}</h2>
 {% for hostname, enabled in data.items %}<p>{{ hostname }}: {{ enabled }}</p>{% endfor %}

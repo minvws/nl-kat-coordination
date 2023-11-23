@@ -1,8 +1,17 @@
 /* DL - Variables */
 dl {
   /* Fix whitespace issue after linter adds spaces. */
+
   dt,
   dd {
     white-space: initial;
+  }
+}
+
+main {
+  div {
+    dl>div {
+      padding: 0;
+    }
   }
 }
