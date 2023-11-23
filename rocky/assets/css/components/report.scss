@@ -1,0 +1,56 @@
+.report {
+  gap: var(--spacing-grid-500);
+
+  > section {
+    gap: var(--spacing-grid-200);
+
+    > div {
+      gap: var(--spacing-grid-200);
+      width: 100%;
+    }
+
+    > ol,
+    > ul {
+      padding: 0;
+      gap: var(--spacing-grid-500);
+
+      > li {
+        max-width: 100%;
+        gap: var(--spacing-grid-200);
+
+        > section {
+          gap: var(--spacing-grid-500);
+        }
+
+        > section > div {
+          gap: var(--spacing-grid-200);
+          width: 100%;
+        }
+      }
+    }
+
+    &.introduction {
+      dl {
+        gap: var(--spacing-grid-200);
+
+        > div {
+          padding: 0;
+          border: 0;
+
+          dt,
+          dd {
+            padding: 0;
+          }
+
+          dt {
+            font-weight: bold;
+          }
+
+          dd {
+            font-weight: normal;
+          }
+        }
+      }
+    }
+  }
+}

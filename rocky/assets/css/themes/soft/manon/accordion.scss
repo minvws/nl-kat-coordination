@@ -1,8 +1,44 @@
 /* Accordion - Variables */
 
 :root {
+  /* Button */
+  --accordion-button-padding: 0;
+  --accordion-button-justify-content: flex-start;
+  --accordion-button-background-color: transparent;
+  --accordion-button-text-color: #006fb3;
+
+  /* Button icon */
+
+  /* Side menu button before */
+  --accordion-button-icon-before-font-size: 1.25rem;
+  --accordion-button-icon-after-font-size: 1.25rem;
+
+  /* add content within "", this could be text or a unicode for an icon */
+
+  /* Choose before or after */
+  --accordion-button-icon-font-family: var(--icon-font-family);
+
+  /* content on the button when the menu is collapsed */
+  --accordion-button-icon-before-open-content: none;
   --accordion-button-icon-after-open-content: "\ea5f";
+
+  /* content on the button when the menu is expanded */
+  --accordion-button-icon-before-close-content: none;
   --accordion-button-icon-after-close-content: "\ea62";
+  --accordion-button-icon-after-margin-left: auto;
+
+  /* Content */
   --accordion-content-gap: 1.5rem;
+  --accordion-content-border-width: 0 0 1px 0;
+  --accordion-content-border-style: solid;
+  --accordion-content-border-color: #cccccc;
+  --accordion-content-background-color: #ffffff;
   --accordion-content-text-color: #000000;
+}
+
+.accordion button {
+  border-width: 0 0 1px;
+  border-radius: 0;
+  border-color: #d4d4d4;
+  max-width: 100%;
 }

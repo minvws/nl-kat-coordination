@@ -6,8 +6,29 @@
     {% include "partials/report_sidemenu.html" %}
 
     <section class="report" lang="nl">
-        {% include "partials/report_header.html" %}
-
+        <section class="introduction">
+            <div class="horizontal-view toolbar">
+                <button>Save report</button>
+            </div>
+            <div>
+                <h1>Mockup rapportage OpenKAT</h1>
+                <p>Dit is het OpenKAT rapport voor organisatie Organisatienaam.</p>
+                <dl>
+                    <div>
+                        <dt>{% translate "Observed at:" %}</dt>
+                        <dd>
+                            {{ observed_at }} {{ TIME_ZONE }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Created by:" %}</dt>
+                        <dd>
+                            {{ organization_member.user.full_name }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
         <section>
             <div>
                 <h2>{% translate "Summary" %}</h2>
@@ -61,12 +82,6 @@
                         </dd>
                     </div>
                     <div>
-                        <dt>Newly discovered since</dt>
-                        <dd>
-                            Last week, September 27th 2023
-                        </dd>
-                    </div>
-                    <div>
                         <dt>Terms in report</dt>
                         <dd>
                             DNS, SPF, CVE-2012-12345
@@ -77,228 +92,361 @@
         </section>
         <ol>
             <li>
-                <h2>Recommendations</h2>
-                <p>
-                    Er zijn <i>n</i> kwetsbaarheden gevonden op <i>m</i> systemen. <i>O</i> systemen missen belangrijke basisbeveiligingsmaatregelen.
-                </p>
-                <ul>
-                    <li>Update the web server of system IP (domain name)</li>
-                    <li>Install the firewall in the OS of system IP (domain name)</li>
-                    <li>
-                        Check if <a href="">SPF [1]</a> is properly installed on all mail servers
-                    </li>
-                </ul>
+                <section>
+                    <div>
+                        <h2>Recommendations</h2>
+                        <p>
+                            Er zijn <i>n</i> kwetsbaarheden gevonden op <i>m</i> systemen. <i>O</i> systemen missen belangrijke basisbeveiligingsmaatregelen.
+                        </p>
+                        <ul>
+                            <li>Update the web server of system IP (domain name)</li>
+                            <li>Install the firewall in the OS of system IP (domain name)</li>
+                            <li>
+                                Check if <a href="">SPF [1]</a> is properly installed on all mail servers
+                            </li>
+                        </ul>
+                    </div>
+                </section>
             </li>
             <li>
-                <h2>Asset overview</h2>
-                <p>
-                    Assets zijn <i>a</i>, <i>b</i> , <i>c</i> en <i>d</i> . Ze verhouden zich op manier <i>x</i> met systemen, IP adressen, open poorten en domeinen.
-                </p>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adip isicing elit, sed do eiusmod * Er zijn webservers, mailservers, nameservers en overige systemen gevonden. De overige systemen betreft een DICOM server.
-                </p>
-                <h3>Handmatig gevrijwaarde gescande assets</h3>
-                <p>
-                    Een overzicht van de handmatig gevrijwaarde gescande assets. <strong>Dikgedrukte</strong> assets zijn als startpunt genomen, niet dikgedrukte assets zijn door KAT zelf gevonden.
-                </p>
-                <p>
-                    [Uitleg systeem]: Multiple hostnames that resolve to one ip address where at least one of the hostnames or the ip address has a declared scan level that is at least L1.Type systemen zijn webservers, mailservers, en nameservers (DNS).[Uitleg webserver] Voor webservers geldt hetzelfde maar http services gewoonlijk op porten 80 en 443. ((heeft dus extra uitleg ooit nodig welke services dat zijn)) [Uitleg mailserver] Een mailserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor mail servers, gewoonlijk op porten 465, 25 en 995. ((heeft dus extra uitleg ooit nodig welke services dat zijn)) [Uitleg nameserver] Een nameserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor dns servers, gewoonlijk op port 53. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
-                </p>
-                <div class="horizontal-scroll">
-                    <table>
-                        <caption>Overzicht Handmatig gevrijwaarde gescande assets:</caption>
-                        <thead>
-                            <tr>
-                                <th scope="col">IP address</th>
-                                <th scope="col">Domain</th>
-                                <th scope="col">System type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>192.0.2.3</td>
-                                <td>example.com, sub.example.com</td>
-                                <td>Mail, web</td>
-                            </tr>
-                            <tr>
-                                <td class="error">
-                                    192.0.2.5 <span class="new">New</span>
-                                </td>
-                                <td>sub.example.com</td>
-                                <td>Web</td>
-                            </tr>
-                            <tr>
-                                <td>192.0.2.8</td>
-                                <td>-</td>
-                                <td>Nameserver (DNS)</td>
-                            </tr>
-                            <tr>
-                                <td>198.51.100.125</td>
-                                <td>a.example.com, b.example.com, c.example.com, d.example.com, e.example.com, f.example.com</td>
-                                <td>Web, mail, dicom</td>
-                            </tr>
-                            <tr>
-                                <td>2001:db8:ffff:ffff:ffff:ffff:ffff:ffff</td>
-                                <td>ipv6.example.com</td>
-                                <td>Web</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <h3>Open ports</h3>
-                <p>
-                    Overzicht van gevonden open poorten zien. <strong>Dikgedrukte</strong> open poorten zijn gevonden door directe scans die de organisatie uitvoert via KAT. Overige open poorten zijn daar buiten aangetroffen door KAT zelf. Scans met dezelfde domeinen, poorten en IPs zijn samengevoegd.
-                </p>
-                <div class="horizontal-scroll">
-                    <table>
-                        <caption>Overzicht Handmatig gevrijwaarde gescande assets:</caption>
-                        <thead>
-                            <tr>
-                                <th scope="col">IP address</th>
-                                <th scope="col">Open port</th>
-                                <th scope="col">Domain</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>192.0.2.3</td>
-                                <td>
-                                    80, 443, <span class="open">5885</span>
-                                </td>
-                                <td>example.com, sub.example.com</td>
-                            </tr>
-                            <tr>
-                                <td>192.0.2.4</td>
-                                <td>
-                                    80, 443, <span class="open">5885</span>
-                                </td>
-                                <td>example.com, sub.example.com</td>
-                            </tr>
-                            <tr>
-                                <td>192.0.2.5</td>
-                                <td>
-                                    5-25, <span class="open">33</span>, <span class="open">1200</span>, 5000-5005
-                                </td>
-                                <td>-</td>
-                            </tr>
-                            <tr>
-                                <td>198.51.100.125</td>
-                                <td>
-                                    1, 3, 5, 7, 9, 11, 14, 19, 21, 23, 25, 27, 29, 31, 33, 36, <span class="open">41</span>, 51, 61, 71, 73, 75, 81, 85, 91, 95, 101, 105, 110, 120, 130, 140, 150, 160, 170, 180
-                                </td>
-                                <td>a.example.com, b.example.com, c.example.com, d.example.com, e.example.com, f.example.com</td>
-                            </tr>
-                            <tr>
-                                <td>2001:db8:ffff:ffff:ffff:ffff:ffff:ffff</td>
-                                <td>
-                                    <span class="open">112</span>
-                                </td>
-                                <td>ipv6.example.com</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </li>
-            <li>
-                <h2>Basic security</h2>
-                <p>
-                    In dit hoofstuk wordt eerst een tabel compliency checks getoond en vervolgens per onderdeel de compliency issues uitgelicht. Bij elk van deze onderdelen zijn twee percentages te zien, waarvan de één aangeeft hoe goed de basisbeveilging op orde is (hoger is beter) en de ander hoe goed dit bij andere gescande organisaties in de sector is (mediaan).
-                </p>
-                <h3>Overzicht van de basisbeveiligingsstatus</h3>
-                <p>
-                    Deze tabel geeft een overzicht van de basisbeveiligingsstatus van de bekende assets. In principe moeten alle waardes in deze tabel groen kleuren.
-                </p>
-                <div class="horizontal-scroll">
-                    <table>
-                        <caption>Overzicht Handmatig gevrijwaarde gescande assets:</caption>
-                        <thead>
-                            <tr>
-                                <th scope="col">System type</th>
-                                <th scope="col">IPv6</th>
-                                <th scope="col">Safe connections</th>
-                                <th scope="col">System specific</th>
-                                <th scope="col">RPKI</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>E-mailserver</td>
-                                <td class="confirmation">6/6</td>
-                                <td class="confirmation">6/6</td>
-                                <td class="confirmation">6/6</td>
-                                <td class="confirmation">6/6</td>
-                            </tr>
-                            <tr>
-                                <td>Web server</td>
-                                <td class="error">4/8</td>
-                                <td class="error">6/8</td>
-                                <td class="error">3/8</td>
-                                <td class="confirmation">8/8</td>
-                            </tr>
-                            <tr>
-                                <td>Name server</td>
-                                <td class="error">0/2</td>
-                                <td class="error">0/2</td>
-                                <td class="confirmation">2/2</td>
-                                <td class="confirmation">2/2</td>
-                            </tr>
-                            <tr>
-                                <td>Other</td>
-                                <td class="confirmation">1/1</td>
-                                <td class="error">0/1</td>
-                                <td class="confirmation">1/1</td>
-                                <td class="confirmation">1/1</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <ol>
-                    <li>
-                        <h3>IPv6</h3>
-                        <div class="horizontal-view">
-                            <span>Medium</span>
-                            <p>Score: 80%, Sector: 90%</p>
-                        </div>
-                        <h4>Web server</h4>
+                <section>
+                    <div>
+                        <h2>Asset overview</h2>
+                        <p>
+                            [Toelichting hoofdstuk]. Voor definities van begrippen die in dit hoofdstuk worden gebruikt, zie onderstaand begrippenkader.
+                        </p>
+                        <ul class="accordion">
+                            <li>
+                                <button id="definition-system">Asset</button>
+                                <div aria-labelledby="definition-system">
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+                                </div>
+                            </li>
+                            <li>
+                                <button id="definition-system">System</button>
+                                <div aria-labelledby="definition-system">
+                                    <p>
+                                        Multiple hostnames that resolve to one ip address where at least one of the hostnames or the ip address has a declared scan level that is at least L1.
+                                        Type systemen zijn webservers, mailservers, en nameservers (DNS).
+                                    </p>
+                                </div>
+                            </li>
+                            <li>
+                                <button id="definition-webserver">Webserver</button>
+                                <div aria-labelledby="definition-webserver">
+                                    <p>
+                                        Voor webservers geldt hetzelfde maar http services gewoonlijk op porten 80 en 443. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                                    </p>
+                                </div>
+                            </li>
+                            <li>
+                                <button id="definition-mailserver">Mailserver</button>
+                                <div aria-labelledby="definition-mailserver">
+                                    <p>
+                                        Een mailserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor mail servers, gewoonlijk op porten 465, 25 en 995. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                                    </p>
+                                </div>
+                            </li>
+                            <li>
+                                <button id="definition-nameserver">Nameserver</button>
+                                <div aria-labelledby="definition-nameserver">
+                                    <p>
+                                        Een nameserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor dns servers, gewoonlijk op port 53. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                                    </p>
+                                </div>
+                            </li>
+                            <li>
+                                <button id="example-accordion-ul-item-2">[V2] DISCOM server</button>
+                                <div aria-labelledby="example-accordion-ul-item-2">
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Gescande assets</h3>
+                        <p>Handmatig gevrijwaarde gescande assets</p>
+                        <p>
+                            Een overzicht van de handmatig gevrijwaarde gescande assets. <strong>Dikgedrukte</strong> assets zijn als startpunt genomen, niet dikgedrukte assets zijn door KAT zelf gevonden.
+                        </p>
                         <div class="horizontal-scroll">
                             <table>
-                                <caption>
-                                    IPV6 overzicht op webservers:
-                                </caption>
+                                <caption class="visually-hidden">Overzicht Handmatig gevrijwaarde gescande assets:</caption>
                                 <thead>
-                                    <th scope="col">Asset</th>
-                                    <th scope="col">Compliency issues</th>
-                                    <th scope="col">Risk level</th>
+                                    <tr>
+                                        <th scope="col">IP address</th>
+                                        <th scope="col">Domain</th>
+                                        <th scope="col">System type</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>198.51.100.125</td>
-                                        <td>Geen IPv6 connectie</td>
-                                        <td>Medium</td>
+                                        <td>192.0.2.3</td>
+                                        <td>example.com, sub.example.com</td>
+                                        <td>Mail, web</td>
                                     </tr>
-                                    <tr class="expando-row">
-                                        <td colspan="3">
-                                            <span class="visually-hidden">Extra details over ipv6 op webserver A</span>
-                                            <p>Het systeem 192.0.3 heeft geen IPv6 connectie</p>
+                                    <tr>
+                                        <td class="nowrap">
+                                            <i class="icon cancelled"></i> 192.0.2.5 <span class="new">New</span>
+                                        </td>
+                                        <td>sub.example.com</td>
+                                        <td>Web</td>
+                                    </tr>
+                                    <tr>
+                                        <td>192.0.2.8</td>
+                                        <td>-</td>
+                                        <td>Nameserver (DNS)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>198.51.100.125</td>
+                                        <td>a.example.com, b.example.com, c.example.com, d.example.com, e.example.com, f.example.com</td>
+                                        <td>Web, mail, dicom</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2001:db8:ffff:ffff:ffff:ffff:ffff:ffff</td>
+                                        <td>ipv6.example.com</td>
+                                        <td>Web</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </li>
+            <li>
+                <section>
+                    <div>
+                        <h3>Open ports</h3>
+                        <p>
+                            Overzicht van gevonden open poorten zien. <strong>Dikgedrukte</strong> open poorten zijn gevonden door directe scans die de organisatie uitvoert via KAT. Overige open poorten zijn daar buiten aangetroffen door KAT zelf. Scans met dezelfde domeinen, poorten en IPs zijn samengevoegd.
+                        </p>
+                        <div class="horizontal-scroll">
+                            <table>
+                                <caption class="visually-hidden">Overzicht Handmatig gevrijwaarde gescande assets:</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">IP address</th>
+                                        <th scope="col">Open port</th>
+                                        <th scope="col">Domain</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>192.0.2.3</td>
+                                        <td>
+                                            80, 443, <span class="open">5885</span>
+                                        </td>
+                                        <td>example.com, sub.example.com</td>
+                                    </tr>
+                                    <tr>
+                                        <td>192.0.2.4</td>
+                                        <td>
+                                            80, 443, <span class="open">5885</span>
+                                        </td>
+                                        <td>example.com, sub.example.com</td>
+                                    </tr>
+                                    <tr>
+                                        <td>192.0.2.5</td>
+                                        <td>
+                                            5-25, <span class="open">33</span>, <span class="open">1200</span>, 5000-5005
+                                        </td>
+                                        <td>-</td>
+                                    </tr>
+                                    <tr>
+                                        <td>198.51.100.125</td>
+                                        <td>
+                                            1, 3, 5, 7, 9, 11, 14, 19, 21, 23, 25, 27, 29, 31, 33, 36, <span class="open">41</span>, 51, 61, 71, 73, 75, 81, 85, 91, 95, 101, 105, 110, 120, 130, 140, 150, 160, 170, 180
+                                        </td>
+                                        <td>a.example.com, b.example.com, c.example.com, d.example.com, e.example.com, f.example.com</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2001:db8:ffff:ffff:ffff:ffff:ffff:ffff</td>
+                                        <td>
+                                            <span class="open">112</span>
+                                        </td>
+                                        <td>ipv6.example.com</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </li>
+            <li>
+                <section>
+                    <div>
+                        <h3>IPv6</h3>
+                        <p>[Uitleg IPv6 en belang ervan] Waarom moet elk domein aan IPv4 en IPv6 voldoen.</p>
+                        <div class="horizontal-scroll">
+                            <table>
+                                <caption class="visually-hidden">Basisvoorbeeld tabel:</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Domain</th>
+                                        <th scope="col">System type</th>
+                                        <th scope="col">IPv6</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>example.com</td>
+                                        <td>Mail</td>
+                                        <td>
+                                            <span class="icon negative">IPv6 mist</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>sub.example.com</td>
+                                        <td>Mail, web</td>
+                                        <td>
+                                            <span class="icon negative">IPv6 mist</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>a.example.com</td>
+                                        <td>Mail, web</td>
+                                        <td>
+                                            <span class="icon negative">IPv6 mist</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>b.example.com</td>
+                                        <td>Mail, web</td>
+                                        <td>
+                                            <span class="icon negative">IPv6 mist</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>c.example.com</td>
+                                        <td>Mail, web</td>
+                                        <td>
+                                            <span class="icon negative">IPv6 mist</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>d.example.com</td>
+                                        <td>Mail, web</td>
+                                        <td>
+                                            <span class="icon negative">IPv6 mist</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>e.example.com</td>
+                                        <td>Mail, web</td>
+                                        <td>
+                                            <span class="icon negative">IPv6 mist</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>f.example.com</td>
+                                        <td>Mail, web</td>
+                                        <td>
+                                            <span class="icon negative">IPv6 mist</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>ipv6.example.com</td>
+                                        <td>Web</td>
+                                        <td>
+                                            <span class="icon positive">IPv6 mist</span>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                    </li>
-                </ol>
+                    </div>
+                </section>
+            </li>
+            <li>
+                <section>
+                    <div>
+                        <h2>Basic security</h2>
+                        <p>
+                            In dit hoofstuk wordt eerst een tabel compliency checks getoond en vervolgens per onderdeel de compliency issues uitgelicht. Bij elk van deze onderdelen zijn twee percentages te zien, waarvan de één aangeeft hoe goed de basisbeveilging op orde is (hoger is beter) en de ander hoe goed dit bij andere gescande organisaties in de sector is (mediaan).
+                        </p>
+                        <h3>Overzicht van de basisbeveiligingsstatus</h3>
+                        <p>
+                            Deze tabel geeft een overzicht van de basisbeveiligingsstatus van de bekende assets. In principe moeten alle waardes in deze tabel groen kleuren.
+                        </p>
+                        <div class="horizontal-scroll">
+                            <table>
+                                <caption class="visually-hidden">Overzicht Handmatig gevrijwaarde gescande assets:</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">System type</th>
+                                        <th scope="col">IPv6</th>
+                                        <th scope="col">Safe connections</th>
+                                        <th scope="col">System specific</th>
+                                        <th scope="col">RPKI</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>E-mailserver</td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Web server</td>
+                                        <td>
+                                            <i class="icon negative">Negatief icoon</i> 4/8
+                                        </td>
+                                        <td>
+                                            <i class="icon negative">Negatief icoon</i> 6/8
+                                        </td>
+                                        <td>
+                                            <i class="icon negative">Negatief icoon</i> 3/8
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 8/8
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Name server</td>
+                                        <td>
+                                            <i class="icon negative">Negatief icoon</i> 0/2
+                                        </td>
+                                        <td>
+                                            <i class="icon negative">Negatief icoon</i> 0/2
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 2/2
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 2/2
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Other</td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 1/1
+                                        </td>
+                                        <td>
+                                            <i class="icon negative">Negatief icoon</i> 0/1
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 1/1
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 1/1
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
             </li>
         </ol>
-        <!-- {% for ooi, report in report_data.items %}
-                {% for report_type,data in report.items %}
-                    <section class="dividing-line">
-                        <div>
-                            <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
-                            {% include data.template with data=data.data %}
-
-                        </div>
-                    </section>
-                {% endfor %}
-            {% endfor %} -->
     </section>
 </main>
