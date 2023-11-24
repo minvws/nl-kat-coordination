@@ -6,9 +6,5 @@
             "Hostname",
             "HostnameHTTPURL"
         ],
-        "produces": [
-            "Finding",
-            "KATFindingType"
-        ],
         "scan_level": 3
     }

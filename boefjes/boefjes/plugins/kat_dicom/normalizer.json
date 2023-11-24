@@ -1,7 +1,7 @@
 {
     "id": "kat_dicom_normalize",
     "consumes": [
-        "dicom"
+        "boefje/dicom"
     ],
     "produces": [
         "KATFindingType",

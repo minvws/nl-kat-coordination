@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-06 13:48+0000\n"
+"POT-Creation-Date: 2023-11-24 15:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,11 +36,11 @@ msgid "Name"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "This name we will use to communicate with you."
+msgid "The name that will be used in order to communicate."
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "What do we call you?"
+msgid "Please provide username"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -48,7 +48,7 @@ msgid "Email"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Enter your email address."
+msgid "Enter an email address."
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -56,7 +56,7 @@ msgid "Password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Choose your super secret password"
+msgid "Choose a super secret password"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -177,7 +177,7 @@ msgid "New password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Enter your new password"
+msgid "Enter a new password"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -185,11 +185,11 @@ msgid "New password confirmation"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Repeat your new password"
+msgid "Repeat the new password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Confirm your new password"
+msgid "Confirm the new password"
 msgstr ""
 
 #: account/forms/login.py
@@ -1028,6 +1028,7 @@ msgstr ""
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Details"
@@ -2725,6 +2726,26 @@ msgid ""
 "weaknesses."
 msgstr ""
 
+#: reports/report_types/systems_report/report.html
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Domain"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "System type"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "System Report"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/partials/task_history.html
@@ -3613,6 +3634,7 @@ msgstr ""
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Close details"
@@ -3621,6 +3643,7 @@ msgstr ""
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Open details"
@@ -3854,6 +3877,8 @@ msgid "Crisis room"
 msgstr ""
 
 #: rocky/templates/header.html rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr ""
@@ -4941,6 +4966,30 @@ msgstr ""
 msgid "Created date"
 msgstr ""
 
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Yielded objects"
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefje_task_detail.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Download meta and raw data"
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Reschedule"
+msgstr ""
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Download task data"
+msgstr ""
+
 #: rocky/templates/scan.html
 msgid "Boefjes overview:"
 msgstr ""
@@ -5002,12 +5051,6 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/tasks/boefje_task_detail.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Download meta and raw data"
-msgstr ""
-
-#: rocky/templates/tasks/boefje_task_detail.html
 msgid "Download meta data"
 msgstr ""
 
@@ -5039,26 +5082,12 @@ msgstr ""
 msgid "Input Object"
 msgstr ""
 
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Reschedule"
-msgstr ""
-
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Download task data"
-msgstr ""
-
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Normalizer"
 msgstr ""
 
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Boefje input OOI"
-msgstr ""
-
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Yielded objects"
 msgstr ""
 
 #: rocky/templates/tasks/partials/tab_navigation.html
@@ -5326,6 +5355,10 @@ msgstr ""
 
 #: rocky/templates/upload_raw.html rocky/views/upload_raw.py
 msgid "Upload raw"
+msgstr ""
+
+#: rocky/views/bytes_raw.py
+msgid "Getting raw data failed."
 msgstr ""
 
 #: rocky/views/finding_add.py

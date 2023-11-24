@@ -5,20 +5,5 @@
     "consumes": [
         "Hostname"
     ],
-    "produces": [
-        "IPAddressV6",
-        "DNSARecord",
-        "DNSNSRecord",
-        "DNSTXTRecord",
-        "DNSSOARecord",
-        "NXDOMAIN",
-        "DNSCNAMERecord",
-        "DNSMXRecord",
-        "Hostname",
-        "Network",
-        "DNSAAAARecord",
-        "IPAddressV4",
-        "DNSZone"
-    ],
     "scan_level": 1
 }
