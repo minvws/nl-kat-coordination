@@ -29,11 +29,11 @@ class UserRegistrationForm(forms.Form):
     name = forms.CharField(
         label=_("Name"),
         max_length=254,
-        help_text=_("This name we will use to communicate with you."),
+        help_text=_("The name that will be used in order to communicate."),
         widget=forms.TextInput(
             attrs={
                 "autocomplete": "off",
-                "placeholder": _("What do we call you?"),
+                "placeholder": _("Please provide username"),
                 "aria-describedby": "explanation-name",
             }
         ),
@@ -41,7 +41,7 @@ class UserRegistrationForm(forms.Form):
     email = forms.EmailField(
         label=_("Email"),
         max_length=254,
-        help_text=_("Enter your email address."),
+        help_text=_("Enter an email address."),
         widget=forms.EmailInput(
             attrs={
                 "autocomplete": "off",
@@ -55,7 +55,7 @@ class UserRegistrationForm(forms.Form):
         widget=forms.PasswordInput(
             attrs={
                 "autocomplete": "off",
-                "placeholder": _("Choose your super secret password"),
+                "placeholder": _("Choose a super secret password"),
                 "aria-describedby": "explanation-password",
             }
         ),
@@ -289,7 +289,7 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
         widget=forms.PasswordInput(
             attrs={
                 "autocomplete": "new-password",
-                "placeholder": _("Enter your new password"),
+                "placeholder": _("Enter a new password"),
             }
         ),
         strip=False,
@@ -302,9 +302,9 @@ class SetPasswordForm(auth_forms.SetPasswordForm):
         widget=forms.PasswordInput(
             attrs={
                 "autocomplete": "new-password",
-                "placeholder": _("Repeat your new password"),
+                "placeholder": _("Repeat the new password"),
             }
         ),
-        help_text=_("Confirm your new password"),
+        help_text=_("Confirm the new password"),
         validators=[validate_password],
     )
