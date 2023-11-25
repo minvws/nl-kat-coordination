@@ -35,6 +35,8 @@ Install dependencies
 
 Dependencies are packages required for OpenKAT to work. Run the following commands to install them:
 
+*Debian based systems:*
+
 
 .. code-block:: sh
 
@@ -43,6 +45,16 @@ Dependencies are packages required for OpenKAT to work. Run the following comman
 	$ curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
 	$ echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 	$ sudo apt-get update && sudo apt-get install yarn
+
+*RHEL based systems:*
+
+.. code-block:: sh
+
+    $ sudo dnf install https://rpm.nodesource.com/pub_18.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
+    $ sudo dnf install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
+    $ sudo dnf install -y nodejs gcc g++ make python3-pip docker-compose
+    $ curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+    $ sudo dnf install yarn -y
 
 Getting Started
 ---------------
@@ -126,4 +138,5 @@ OpenTelemetry
 
 OpenTelemetry is a way to trace requests through the system. It is used to find out where a request is going wrong and to instrument performance problems. OpenTelemetry is not enabled by default, but can be enabled by uncommenting the environment variable ``SPAN_EXPORT_GRPC_ENDPOINT`` in the ``.env`` file.
 
-The `Jaeger <https://www.jaegertracing.io>`_ tracing system is used to view the traces. It can be enabled by enabling the `Docker Compose profile <https://docs.docker.com/compose/profiles/#enable-profiles>`, for example by running ``docker-compose --profile jaeger up -d`` or using ``export COMPOSE_PROFILES=jaeger`` and then running Make as usual. The Jaeger UI can then be found at http://localhost:16686.
+The `Jaeger <https://www.jaegertracing.io>`_ tracing system is used to view the traces. It can be enabled by enabling the `Docker Compose profile <https://docs.docker.com/compose/profiles/#enable-profiles>`_, for example by running ``docker-compose --profile jaeger up -d`` or using ``export COMPOSE_PROFILES=jaeger`` and then running Make as usual. The Jaeger UI can then be found at http://localhost:16686.
+
