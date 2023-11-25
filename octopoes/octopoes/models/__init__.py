@@ -4,6 +4,7 @@ import abc
 from enum import Enum, IntEnum
 from typing import (
     Any,
+    ClassVar,
     Dict,
     List,
     Literal,
@@ -127,7 +128,7 @@ class OOI(BaseModel, abc.ABC):
     _natural_key_attrs: List[str] = []
     _reverse_relation_names: Dict[str, str] = {}
     _information_value: List[str] = []
-    _traversable = True
+    _traversable: ClassVar[bool] = True
 
     primary_key: str = ""
 
