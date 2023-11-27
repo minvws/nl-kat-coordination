@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Tuple
 
 from sqlalchemy import exc, func
 
-from scheduler.models import Task, TaskDB, TaskStatus
+from scheduler.models import Task, TaskDB, TaskList, TaskStatus
 
 from .filters import FilterRequest, apply_filter
 from .storage import DBConn, retry
@@ -26,7 +26,7 @@ class TaskStore:
         filters: Optional[FilterRequest] = None,
         offset: int = 0,
         limit: int = 100,
-    ) -> Tuple[List[Task], int]:
+    ) -> Tuple[List[TaskList], int]:
         with self.dbconn.session.begin() as session:
             query = session.query(TaskDB)
 
@@ -50,11 +50,12 @@ class TaskStore:
 
             try:
                 count = query.count()
-                tasks_orm = query.order_by(TaskDB.created_at.desc()).offset(offset).limit(limit).all()
+                query = query.order_by(TaskDB.created_at.desc()).offset(offset).limit(limit)
+                tasks_orm = query.all()
             except exc.ProgrammingError as e:
                 raise ValueError(f"Invalid filter: {e}") from e
 
-            tasks = [Task.model_validate(task_orm) for task_orm in tasks_orm]
+            tasks = [TaskList.model_validate(task_orm) for task_orm in tasks_orm]
 
             return tasks, count
 
@@ -70,7 +71,7 @@ class TaskStore:
             return task
 
     @retry()
-    def get_tasks_by_hash(self, task_hash: str) -> Optional[List[Task]]:
+    def get_tasks_by_hash(self, task_hash: str) -> Optional[List[TaskList]]:
         with self.dbconn.session.begin() as session:
             tasks_orm = (
                 session.query(TaskDB)
@@ -82,7 +83,7 @@ class TaskStore:
             if tasks_orm is None:
                 return None
 
-            tasks = [Task.model_validate(task_orm) for task_orm in tasks_orm]
+            tasks = [TaskList.model_validate(task_orm) for task_orm in tasks_orm]
 
             return tasks
 

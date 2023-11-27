@@ -54,6 +54,50 @@ class EventStoreTestCase(unittest.TestCase):
         events = self.mock_ctx.datastores.event_store.get_events()
         self.assertGreater(len(events), 0)
 
+    def test_get_tasks(self):
+        """Should not return hybrid properties when getting tasks"""
+        # Arrange
+        p_item = functions.create_p_item(self.organisation.id, 1)
+        task = functions.create_task(p_item)
+        task_db = self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        task_db.status = models.TaskStatus.DISPATCHED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+
+        task_db.status = models.TaskStatus.COMPLETED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+
+        # Assert
+        tasks, count = self.mock_ctx.datastores.task_store.get_tasks()
+        self.assertEqual(len(tasks), 1)
+        self.assertEqual(count, 1)
+
+        self.assertNotIn("duration", tasks[0])
+        self.assertNotIn("queued", tasks[0])
+        self.assertNotIn("runtime", tasks[0])
+
+    def test_get_task_by_id(self):
+        """Should return hybrid properties when getting task by id"""
+        # Arrange
+        p_item = functions.create_p_item(self.organisation.id, 1)
+        task = functions.create_task(p_item)
+        task_db = self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        task_db.status = models.TaskStatus.DISPATCHED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+
+        task_db.status = models.TaskStatus.COMPLETED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+
+        # Assert
+        task = self.mock_ctx.datastores.task_store.get_task_by_id(task.id)
+        task_detail = task.model_dump()
+        self.assertIn("duration", task_detail)
+        self.assertIn("queued", task_detail)
+        self.assertIn("runtime", task_detail)
+
     def test_get_task_duration(self):
         # Arrange
         p_item = functions.create_p_item(self.organisation.id, 1)

@@ -928,4 +928,6 @@ class TaskStoreTestCase(unittest.TestCase):
 
         # Act
         with self.assertRaises(ValueError):
-            tasks, count = self.mock_ctx.datastores.task_store.get_tasks(filters=f_req)
+            tasks, count = self.mock_ctx.datastores.task_store.get_tasks(
+                filters=f_req,
+            )

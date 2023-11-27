@@ -31,6 +31,7 @@ services:
 
   ci_postgres:
     image: postgres:15
+    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
     healthcheck:
       test: ["CMD", "gosu", "postgres", "pg_isready"]
       interval: 3s
