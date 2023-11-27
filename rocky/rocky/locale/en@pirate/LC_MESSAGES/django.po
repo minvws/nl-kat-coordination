@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-09 14:01+0000\n"
+"POT-Creation-Date: 2023-11-24 15:30+0000\n"
 "PO-Revision-Date: 2023-11-18 13:03+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: English (Pirate) <https://hosted.weblate.org/projects/openkat/"
@@ -36,19 +36,19 @@ msgid "Name"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "This name we will use to communicate with you."
-msgstr "This name we will use t' talk to ye."
+msgid "The name that will be used in order to communicate."
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "What do we call you?"
-msgstr "Whats yur name Capt'n?"
+msgid "Please provide username"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Email"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Enter your email address."
+msgid "Enter an email address."
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -56,8 +56,8 @@ msgid "Password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Choose your super secret password"
-msgstr "What would be ye super secret password?"
+msgid "Choose a super secret password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
@@ -178,7 +178,7 @@ msgid "New password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Enter your new password"
+msgid "Enter a new password"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -186,11 +186,11 @@ msgid "New password confirmation"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Repeat your new password"
+msgid "Repeat the new password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Confirm your new password"
+msgid "Confirm the new password"
 msgstr ""
 
 #: account/forms/login.py
@@ -2725,6 +2725,26 @@ msgstr ""
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Domain"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "System type"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "System Report"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Combine IP addresses, hostnames and services into systems."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -5691,3 +5711,12 @@ msgstr ""
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr ""
+
+#~ msgid "This name we will use to communicate with you."
+#~ msgstr "This name we will use t' talk to ye."
+
+#~ msgid "What do we call you?"
+#~ msgstr "Whats yur name Capt'n?"
+
+#~ msgid "Choose your super secret password"
+#~ msgstr "What would be ye super secret password?"
