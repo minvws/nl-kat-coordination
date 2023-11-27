@@ -1,7 +1,7 @@
 {
     "id": "kat_masscan_normalize",
     "consumes": [
-        "masscan"
+        "boefje/masscan"
     ],
     "produces": [
         "IPAddressV4",

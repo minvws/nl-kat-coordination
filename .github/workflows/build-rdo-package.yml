@@ -15,7 +15,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     # Generic bits
     steps:
@@ -26,7 +26,7 @@ jobs:
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: '3.10'
           cache: 'pip'
 
       - name: Prep Install requirements
@@ -48,12 +48,12 @@ jobs:
 
       - name: Octopoes Build whl package
         run: |
-          python3.8 -m pip install build
-          python3.8 -m build
+          python3.10 -m pip install build
+          python3.10 -m build
         working-directory: ./octopoes
 
       - name: Octopoes Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Octopoes Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
@@ -84,7 +84,7 @@ jobs:
         working-directory: ./rocky
 
       - name: Rocky Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Rocky Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
@@ -113,7 +113,7 @@ jobs:
         working-directory: ./rocky
 
       - name: Rocky Compilemessages
-        run: /var/www/html/.venv/bin/python3.8 manage.py collectstatic && /var/www/html/.venv/bin/python3.8 manage.py compress && /var/www/html/.venv/bin/python3.8 manage.py compilemessages
+        run: /var/www/html/.venv/bin/python3.10 manage.py collectstatic && /var/www/html/.venv/bin/python3.10 manage.py compress && /var/www/html/.venv/bin/python3.10 manage.py compilemessages
         working-directory: ./rocky
         env:
           BYTES_API: http://bytes:8000
@@ -138,7 +138,7 @@ jobs:
         working-directory: ./bytes
 
       - name: Bytes Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Bytes Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
@@ -159,14 +159,14 @@ jobs:
         working-directory: ./mula
 
       - name: Mula Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Create scheduler release archive
         run: tar -cvzf ${{ env.PKGDIR }}/scheduler_${{ env.RELEASE_VERSION }}.tar.gz --exclude=./.git* --exclude=Makefile --exclude=Dockerfile --exclude=base.yml --exclude=requirements* --exclude=tests .
         working-directory: ./mula
 
       - name: Create virtual env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Install requirements
         run: source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
@@ -184,7 +184,7 @@ jobs:
         working-directory: ./boefjes
 
       - name: Boefjes Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Install requirements
         run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
@@ -206,7 +206,7 @@ jobs:
         working-directory: ./keiko
 
       - name: Keiko Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Keiko Install requirements
         run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r

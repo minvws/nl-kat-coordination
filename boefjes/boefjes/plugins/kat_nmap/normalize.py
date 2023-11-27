@@ -44,9 +44,7 @@ def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Referen
             yield ip_port
 
             service_name = service.service
-            if port == 80:
-                service_name = "http"
-            if port == 443:
+            if service_name == "http" and service.tunnel == "ssl":
                 service_name = "https"
 
             port_service = Service(name=service_name)
