@@ -139,4 +139,3 @@ OpenTelemetry
 OpenTelemetry is a way to trace requests through the system. It is used to find out where a request is going wrong and to instrument performance problems. OpenTelemetry is not enabled by default, but can be enabled by uncommenting the environment variable ``SPAN_EXPORT_GRPC_ENDPOINT`` in the ``.env`` file.
 
 The `Jaeger <https://www.jaegertracing.io>`_ tracing system is used to view the traces. It can be enabled by enabling the `Docker Compose profile <https://docs.docker.com/compose/profiles/#enable-profiles>`_, for example by running ``docker-compose --profile jaeger up -d`` or using ``export COMPOSE_PROFILES=jaeger`` and then running Make as usual. The Jaeger UI can then be found at http://localhost:16686.
-
