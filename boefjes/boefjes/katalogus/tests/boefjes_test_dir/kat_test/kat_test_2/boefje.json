@@ -6,8 +6,7 @@
         "DNSZone"
     ],
     "produces": [
-        "X509Certificate",
-        "Hostname"
+        "text/html"
     ],
     "environment_keys": [],
     "scan_level": 1

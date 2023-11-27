@@ -13,13 +13,15 @@
 
         {% for ooi, report in report_data.items %}
             {% for report_type,data in report.items %}
-                <section class="dividing-line">
-                    <div>
-                        <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
-                        {% include data.template with data=data.data %}
+                {% if data.data %}
+                    <section class="dividing-line">
+                        <div>
+                            <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
+                            {% include data.template with data=data.data %}
 
-                    </div>
-                </section>
+                        </div>
+                    </section>
+                {% endif %}
             {% endfor %}
         {% endfor %}
     </main>

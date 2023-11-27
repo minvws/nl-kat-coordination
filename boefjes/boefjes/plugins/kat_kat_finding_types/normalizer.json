@@ -1,7 +1,7 @@
 {
     "id": "kat_kat_finding_types_normalize",
     "consumes": [
-        "kat-finding-types"
+        "boefje/kat-finding-types"
     ],
     "produces": [
         "KATFindingType"

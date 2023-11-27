@@ -601,7 +601,7 @@ class XTDBOOIRepository(OOIRepository):
         """
 
         for finding_type_name, finding_type_object, finding_count in self.session.client.query(
-            str(query), valid_time=valid_time
+            query, valid_time=valid_time
         ):
             if not finding_type_object:
                 logger.warning(
@@ -714,4 +714,4 @@ class XTDBOOIRepository(OOIRepository):
         )
 
     def query(self, query: Query, valid_time: datetime) -> List[OOI]:
-        return [self.deserialize(row[0]) for row in self.session.client.query(str(query), valid_time=valid_time)]
+        return [self.deserialize(row[0]) for row in self.session.client.query(query, valid_time=valid_time)]

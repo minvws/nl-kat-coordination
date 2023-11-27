@@ -5,9 +5,6 @@
     "consumes": [
         "RetireJSFindingType"
     ],
-    "produces": [
-        "RetireJSFindingType"
-    ],
     "scan_level": 0,
     "enabled": true
 }

@@ -1,7 +1,6 @@
 {
     "id": "calvin-normalize",
     "consumes": [
-        "calvin",
         "boefje/calvin"
     ],
     "produces": [

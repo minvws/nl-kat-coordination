@@ -1,16 +1,40 @@
 {% load i18n %}
 
-<h2>{% translate "Systems mockup report" %}</h2>
-<p>The input ooi is {{ data.input_ooi }}.</p>
-{% if data %}
-    <p>The systems that are found are :</p>
-    <ul>
-        <li>
-            {% for system in data %}
-                {{ system }}
-            </li>
-        {% endfor %}
-    {% else %}
-        <p>No systems found.</p>
-    {% endif %}
-</ul>
+<p class="horizontal-scroll">
+    <p class="column-2">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "IP address" %}</th>
+                    <th scope="col">{% translate "Domain" %}</th>
+                    <th scope="col">{% translate "System type" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ip, ip_services in data.services.items %}
+                    <tr>
+                        <td>{{ ip }}</td>
+                        <td>
+                            {% for hostname in ip_services.hostnames %}
+                                {% if not forloop.last %}
+                                    {{ hostname }},
+                                {% else %}
+                                    {{ hostname }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for service in ip_services.services %}
+                                {% if not forloop.last %}
+                                    {{ service }},
+                                {% else %}
+                                    {{ service }}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </p>
+</p>
