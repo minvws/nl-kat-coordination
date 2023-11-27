@@ -21,15 +21,16 @@ class OOITreeView(BaseOOIDetailView):
 
     def get_connector_form_kwargs(self):
         tree_dict = self.get_tree_dict()
-        ooi_types = get_ooi_types_from_tree(tree_dict, False)
+
+        ooi_types = get_ooi_types_from_tree(tree_dict, True)
 
         kwargs = {
-            "initial": {"ooi_type": ooi_types},
             "ooi_types": ooi_types,
         }
 
         if "observed_at" in self.request.GET:
             kwargs.update({"data": self.request.GET})
+
         return kwargs
 
     def build_breadcrumbs(self) -> List[Breadcrumb]:
