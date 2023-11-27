@@ -5,9 +5,5 @@
     "consumes": [
         "DNSZone"
     ],
-    "produces": [
-        "Hostname",
-        "X509Certificate"
-    ],
     "scan_level": 1
 }

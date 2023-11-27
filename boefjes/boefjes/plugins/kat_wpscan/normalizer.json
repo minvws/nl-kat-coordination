@@ -1,7 +1,7 @@
 {
     "id": "kat_wpscan_normalize",
     "consumes": [
-        "wp-scan"
+        "boefje/wp-scan"
     ],
     "produces": [
         "Finding",

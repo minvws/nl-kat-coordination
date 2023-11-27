@@ -1,7 +1,7 @@
 {
     "id": "kat_ssl_certificates_normalize",
     "consumes": [
-        "ssl-certificates"
+        "boefje/ssl-certificates"
     ],
     "produces": [
         "X509Certificate"
