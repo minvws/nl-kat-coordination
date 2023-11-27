@@ -189,26 +189,17 @@ class TaskNotFoundError(SchedulerError):
     message = _("Task could not be found.")
 
 
-class SchedulerSession(requests.Session):
+class SchedulerClient:
     def __init__(self, base_uri: str):
         super().__init__()
-        self.session = self
         self._base_uri = base_uri
-
+        self.session = requests.Session()
         try:
-            self.session.get(f"{self._base_uri}/health")
-        except (
-            requests.ConnectionError,
-            requests.RequestException,
-            requests.TooManyRedirects,
-            requests.ConnectTimeout,
-            requests.ReadTimeout,
-            requests.Timeout,
-        ) as error:
+            # check if Scheduler can be accessed
+            self.session.get(f"{self._base_uri}")
+        except requests.RequestException as error:
             raise SchedulerError(error)
 
-
-class SchedulerClient(SchedulerSession):
     def list_tasks(
         self,
         **kwargs,
