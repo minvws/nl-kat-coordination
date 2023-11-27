@@ -39,7 +39,7 @@ class App:
         schedulers:
             A dict of schedulers, keyed by scheduler id.
         server:
-            The server instance.
+            The http rest api server instance.
     """
 
     def __init__(self, ctx: context.AppContext) -> None:
@@ -229,7 +229,7 @@ class App:
         self.server = server.Server(self.ctx, self.schedulers)
         thread.ThreadRunner(
             name="server",
-            target=server.Server(self.ctx, self.schedulers).run,
+            target=self.server.run,
             stop_event=self.stop_event,
         ).start()
 
