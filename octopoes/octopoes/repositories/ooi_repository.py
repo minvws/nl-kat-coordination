@@ -8,7 +8,7 @@ from http import HTTPStatus
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
 from bits.definitions import BitDefinition
-from pydantic import RootModel, parse_obj_as
+from pydantic import RootModel, TypeAdapter
 from requests import HTTPError
 
 from octopoes.config.settings import (
@@ -364,7 +364,7 @@ class XTDBOOIRepository(OOIRepository):
         )
         res = self.session.client.query(query, valid_time=valid_time)
         res = [element[0] for element in res]
-        xtdb_reference_root_nodes = parse_obj_as(List[XTDBReferenceNode], res)
+        xtdb_reference_root_nodes = TypeAdapter(List[XTDBReferenceNode]).validate_python(res)
         return [x.to_reference_node(self.pk_prefix()) for x in xtdb_reference_root_nodes]
 
     def _get_tree_level(

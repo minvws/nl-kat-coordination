@@ -126,7 +126,7 @@ class KATalogusClientV1:
         response = self.session.get(f"{self.base_uri}/health")
         response.raise_for_status()
 
-        return ServiceHealth.parse_obj(response.json())
+        return ServiceHealth.model_validate_json(response.content)
 
     def get_normalizers(self) -> List[Normalizer]:
         return self.get_plugins(plugin_type="normalizer")
