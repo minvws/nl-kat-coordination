@@ -1,4 +1,35 @@
 {% load i18n %}
 
-<h2>{% translate "IPv6 Enabled" %}</h2>
-{% for hostname, enabled in data.items %}<p>{{ hostname }}: {{ enabled }}</p>{% endfor %}
+<section>
+    <div>
+        <h3>IPv6</h3>
+        <p>{% translate "[Explanation of IPv6 and its importance] Why must every domain comply with IPv4 and IPv6." %}</p>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">{% translate "Basic example table:" %}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Domain" %}</th>
+                        <th scope="col">{% translate "System type" %}</th>
+                        <th scope="col">IPv6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hostname, enabled in data.items %}
+                        <tr>
+                            <td>{{ hostname }}</td>
+                            <td>-</td>
+                            <td>
+                                {% if enabled %}
+                                    <span class="icon positive"></span>
+                                {% else %}
+                                    <span class="icon negative"></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

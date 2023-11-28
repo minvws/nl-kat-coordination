@@ -22,7 +22,7 @@ class AggregateOrganisationReport(AggregateReport):
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemsReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
-    template_path = "aggregate_organisation_report/report.html"
+    template_path = "aggregate_organisation_report/report_design.html"
 
     def post_process_data(self, data):
         systems = []
@@ -40,7 +40,10 @@ class AggregateOrganisationReport(AggregateReport):
                         add_or_combine_systems(systems, system)
 
                 if report == "Open Ports Report":
-                    open_ports = data["data"]["ports"]
+                    open_ports[data["data"]["ip"]] = {
+                        "ports": data["data"]["ports"],
+                        "hostnames": data["data"]["hostnames"],
+                    }
 
                 if report == "IPv6 Report":
                     for hostname, enabled in data["data"]["results"].items():
