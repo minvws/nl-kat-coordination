@@ -24,6 +24,7 @@ def with_lock(method):
     def wrapper(self, *args, **kwargs):
         with self.lock:
             return method(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -178,9 +179,7 @@ class PriorityQueue(abc.ABC):
             message = f"Item {p_item} already on queue {self.pq_id}."
 
             if item_on_queue and not self.allow_replace:
-                message = (
-                    "Item already on queue, we're not allowed to replace the item that is already on the queue."
-                )
+                message = "Item already on queue, we're not allowed to replace the item that is already on the queue."
 
             if item_on_queue and item_changed and not self.allow_updates:
                 message = (
