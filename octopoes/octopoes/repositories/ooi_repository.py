@@ -33,6 +33,7 @@ from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.tree import ReferenceNode, ReferenceTree
 from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
+from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
@@ -60,7 +61,7 @@ def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> Tuple[OOI, bool]:
     return ooi_new.__class__.parse_obj(data_old), changed
 
 
-class OOIRepository:
+class OOIRepository(Repository):
     def __init__(self, event_manager: EventManager):
         self.event_manager = event_manager
 
@@ -131,6 +132,9 @@ class OOIRepository:
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> List[OOI]:
         raise NotImplementedError
 
+    def query(self, query: Query, valid_time: datetime) -> List[OOI]:
+        raise NotImplementedError
+
 
 class XTDBReferenceNode(BaseModel):
     __root__: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
@@ -181,6 +185,9 @@ class XTDBOOIRepository(OOIRepository):
         super().__init__(event_manager)
         self.session = session
         self.__class__.xtdb_type = xtdb_type
+
+    def commit(self):
+        self.session.commit()
 
     @classmethod
     def pk_prefix(cls):
@@ -586,16 +593,26 @@ class XTDBOOIRepository(OOIRepository):
 
         query = """
             {:query {
-                :find [(pull ?finding_type [*]) (count ?finding)]
+                :find [?finding_type (pull ?finding_type [*]) (count ?finding)]
                 :where [
                     [?finding :Finding/finding_type ?finding_type]
                     (not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])
                     ]}}
         """
 
-        for finding_type, finding_count in self.session.client.query(str(query), valid_time=valid_time):
-            ft = cast(FindingType, self.deserialize(finding_type))
-            severity = ft.risk_severity or RiskLevelSeverity.PENDING
+        for finding_type_name, finding_type_object, finding_count in self.session.client.query(
+            query, valid_time=valid_time
+        ):
+            if not finding_type_object:
+                logger.warning(
+                    "There are %d %s findings but the finding type is not in the database",
+                    finding_count,
+                    finding_type_name,
+                )
+                severity = RiskLevelSeverity.PENDING
+            else:
+                ft = cast(FindingType, self.deserialize(finding_type_object))
+                severity = ft.risk_severity or RiskLevelSeverity.PENDING
             severity_counts.update([severity] * finding_count)
         return severity_counts
 
@@ -608,19 +625,21 @@ class XTDBOOIRepository(OOIRepository):
             .where(Config, bit_id=bit_definition.id)
         )
 
-        configs = [self.deserialize(res[0]) for res in self.session.client.query(str(query), valid_time=valid_time)]
+        configs = self.query(query, valid_time)
 
         return [config for config in configs if isinstance(config, Config)]
 
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> List[OOI]:
         path_start_alias = path.segments[0].source_type
         query = Query.from_path(path).where(path_start_alias, primary_key=ooi.primary_key)
-        return [self.deserialize(row[0]) for row in self.session.client.query(str(query), valid_time=valid_time)]
+
+        return self.query(query, valid_time)
 
     def list_findings(
         self,
         severities: Set[RiskLevelSeverity],
         exclude_muted=False,
+        only_muted=False,
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
         valid_time: Optional[datetime] = None,
@@ -640,9 +659,11 @@ class XTDBOOIRepository(OOIRepository):
         ]
         or_scores = f"(or {' '.join(score_clauses)})"
 
-        exclude_muted_clause = ""
+        muted_clause = ""
         if exclude_muted:
-            exclude_muted_clause = "(not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])"
+            muted_clause = "(not-join [?finding] [?muted_finding :MutedFinding/finding ?finding])"
+        elif only_muted:
+            muted_clause = "[?muted_finding :MutedFinding/finding ?finding]"
 
         severity_values = ", ".join([str_val(severity.value) for severity in severities])
 
@@ -655,7 +676,7 @@ class XTDBOOIRepository(OOIRepository):
                             [?finding :Finding/finding_type ?finding_type]
                             [(== ?severity severities_)]
                             {or_severities}
-                            {exclude_muted_clause}]
+                            {muted_clause}]
                 }}
                 :in-args [[{severity_values}]]
             }}
@@ -676,7 +697,7 @@ class XTDBOOIRepository(OOIRepository):
                             [(== ?severity severities_)]
                             {or_severities}
                             {or_scores}
-                            {exclude_muted_clause}]
+                            {muted_clause}]
                     :limit {limit}
                     :offset {offset}
                     :order-by [[?score :desc]]
@@ -691,3 +712,6 @@ class XTDBOOIRepository(OOIRepository):
             count=count,
             items=findings,
         )
+
+    def query(self, query: Query, valid_time: datetime) -> List[OOI]:
+        return [self.deserialize(row[0]) for row in self.session.client.query(query, valid_time=valid_time)]

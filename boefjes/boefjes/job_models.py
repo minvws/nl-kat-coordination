@@ -1,6 +1,6 @@
-import hashlib
 from datetime import datetime, timedelta
 from typing import Dict, List, Literal, Optional, Union
+from uuid import UUID
 
 from pydantic import BaseModel, Extra, Field, constr
 
@@ -13,7 +13,7 @@ class JobException(Exception):
 
 
 class Job(BaseModel):
-    id: str
+    id: UUID
     started_at: Optional[datetime] = Field(default=None)
     ended_at: Optional[datetime] = Field(default=None)
 
@@ -47,15 +47,9 @@ class BoefjeMeta(Job):
     runnable_hash: Optional[str]
     environment: Optional[Dict[str, str]]
 
-    @property
-    def parameterized_arguments_hash(self) -> str:
-        encoded_arguments = ",".join(f"{k}={v}" for k, v in self.arguments.items())
-
-        return hashlib.sha256(encoded_arguments.encode("utf-8")).hexdigest()
-
 
 class RawDataMeta(BaseModel):
-    id: str
+    id: UUID
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
 

@@ -1,23 +1,10 @@
 #!/bin/sh
 set -e
-. /usr/share/debconf/confmodule
 
-adduser --home /etc/kat --no-create-home --system --group kat || true
-
-chown -R root:kat /etc/kat
-
-if [ "$1" = "upgrade" ]; then
-    systemctl daemon-reload
-
-    if systemctl is-active --quiet kat-octopoes.service; then
-        systemctl restart kat-octopoes.service
-    fi
-
-    if systemctl is-active --quiet kat-octopoes-worker.service; then
-        systemctl restart kat-octopoes-worker.service
-    fi
-fi
-
-db_stop || true
+# Newer versions might not be able to read the celery beat database so we delete
+# it here before restarting octopoes.
+rm -f /tmp/celerybeat-schedule.db
 
 #DEBHELPER#
+#
+chown -R root:kat /etc/kat

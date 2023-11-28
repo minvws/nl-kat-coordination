@@ -219,18 +219,24 @@ class ImageMetadata(OOI):
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
-        t = reference.tokenized
-
-        port = f":{t.resource.web_url.port}" if t.resource.web_url.port else ""
         try:
-            netloc = t.resource.web_url.netloc.address
-        except KeyError:
-            netloc = t.resource.web_url.netloc.name
+            t = reference.tokenized
 
-        web_url = f"{t.resource.web_url.scheme}://{netloc}{port}{t.resource.web_url.path}"
-        address = t.resource.website.ip_service.ip_port.address.address
+            port = f":{t.resource.web_url.port}" if t.resource.web_url.port else ""
+            try:
+                netloc = t.resource.web_url.netloc.address
+            except KeyError:
+                netloc = t.resource.web_url.netloc.name
 
-        return f"{web_url} @ {address}"
+            web_url = f"{t.resource.web_url.scheme}://{netloc}{port}{t.resource.web_url.path}"
+            address = t.resource.website.ip_service.ip_port.address.address
+
+            return f"{web_url} @ {address}"
+        except IndexError:
+            # try parsing reference as a HostnameHTTPURL instead
+            tokenized = HostnameHTTPURL.get_tokenized_primary_key(reference.natural_key)
+            port = f":{tokenized.port}" if tokenized.port else ""
+            return f"{tokenized.scheme}://{tokenized.netloc.name}{port}{tokenized.path}"
 
 
 class RESTAPI(OOI):
@@ -284,3 +290,22 @@ class APIDesignRuleResult(OOI):
         api_url = format_web_url_token(t.rest_api.api_url)
 
         return f"{rule} @ {api_url}"
+
+
+class SecurityTXT(OOI):
+    object_type: Literal["SecurityTXT"] = "SecurityTXT"
+
+    website: Reference = ReferenceField("Website", max_issue_scan_level=0, max_inherit_scan_level=4)
+    url: Reference = ReferenceField("URL", max_issue_scan_level=0, max_inherit_scan_level=4)
+
+    redirects_to: Optional[Reference] = ReferenceField(
+        "SecurityTXT", max_issue_scan_level=2, max_inherit_scan_level=0, default=None
+    )
+    security_txt: Optional[str]
+
+    _natural_key_attrs = ["website", "url"]
+    _reverse_relation_names = {
+        "website": "security_txt_of",
+        "url": "security_txt",
+        "redirects_to": "is_being_redirected_to_by",
+    }

@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from requests import HTTPError, Response
 
 from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
+from octopoes.xtdb.query import Query
 
 logger = logging.getLogger(__name__)
 
@@ -95,13 +96,13 @@ class XTDBHTTPClient:
         self._verify_response(res)
         return res.json()
 
-    def query(self, query: str, valid_time: Optional[datetime] = None) -> List[List[Any]]:
+    def query(self, query: Union[str, Query], valid_time: Optional[datetime] = None) -> List[List[Any]]:
         if valid_time is None:
             valid_time = datetime.now(timezone.utc)
         res = self._session.post(
             f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
-            data=query,
+            data=str(query),
             headers={"Content-Type": "application/edn"},
         )
         self._verify_response(res)
@@ -164,7 +165,6 @@ class XTDBSession:
         self.client = client
 
         self._operations = []
-        self._committed = False
         self.post_commit_callbacks = []
 
     def __enter__(self):
@@ -180,14 +180,10 @@ class XTDBSession:
         self.add((OperationType.PUT, document, valid_time))
 
     def commit(self) -> None:
-        if self._committed:
-            raise RuntimeError("Session already committed")
-
         if self._operations:
             logger.debug(self._operations)
             self.client.submit_transaction(self._operations)
-
-        self._committed = True
+            self._operations = []
 
         if not self.post_commit_callbacks:
             return
@@ -196,6 +192,7 @@ class XTDBSession:
             callback()
 
         logger.info("Called %s callbacks after committing XTDBSession", len(self.post_commit_callbacks))
+        self.post_commit_callbacks = []
 
     def listen_post_commit(self, callback: Callable[[], None]):
         self.post_commit_callbacks.append(callback)

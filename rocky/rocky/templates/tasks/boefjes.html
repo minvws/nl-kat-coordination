@@ -14,58 +14,14 @@
 
                 <h1>{% translate "Boefjes" %}</h1>
                 {% include "tasks/partials/task_filter.html" %}
+
                 {% if not object_list %}
                     <p class="emphasized">{% translate "There are no tasks for boefjes" %}</p>
                 {% else %}
                     <p class="emphasized">{% translate "List of tasks for boefjes" %}</p>
                     <div class="horizontal-scroll">
-                        <table rf-selector="table-boefjes">
-                            <caption>{% translate "List of tasks for " %}{{ organization.name }}</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">{% translate "OOI" %}</th>
-                                    <th scope="col">{% translate "Boefje" %}</th>
-                                    <th scope="col">{% translate "Status" %}</th>
-                                    <th scope="col">{% translate "Created date" %}</th>
-                                    <th scope="col">{% translate "Download task details" %}</th>
-                                    <th scope="col">{% translate "Reschedule" %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for task in object_list %}
-                                    <tr>
-                                        {% if task.p_item.data.input_ooi %}
-                                            <td>
-                                                <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code %}">{{ task.p_item.data.input_ooi }}</a>
-                                            </td>
-                                        {% else %}
-                                            <td>{% translate "No input OOI" %}</td>
-                                        {% endif %}
-                                        <td>
-                                          <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type='boefje' plugin_id=task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.id }}</a>
-                                        </td>
-                                        {% if task.status.value == "completed" %}
-                                            <td class="confirmation">{{ task.status.value|capfirst }}</td>
-                                        {% elif task.status.value == "failed" %}
-                                            <td class="warning">{{ task.status.value|capfirst }}</td>
-                                        {% else %}
-                                            <td>{{ task.status.value|capfirst }}</td>
-                                        {% endif %}
-                                        <td>{{ task.created_at }}</td>
-                                        <td>
-                                            {% if task.status.value in "completed,failed" %}
-                                                <a href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}">{% translate "Download meta and raw data" %}</a>
-                                            {% else %}
-                                                <a href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}">{% translate "Download meta data" %}</a>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                          {% include "partials/single_action_form.html" with btn_text="Reschedule" action="reschedule_task" key="task_id" value=task.id btn_class="ghost" %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        {% include "tasks/partials/boefje_task_history.html" with task_history=object_list %}
+
                     </div>
                     {% include "partials/list_paginator.html" %}
 
@@ -74,8 +30,3 @@
         </section>
     </main>
 {% endblock content %}
-
-{% block script %}
-    {{ block.super }}
-    <script src="{% static '/js/checkboxToggler.js' %}" nonce="{{ request.csp_nonce }}"></script>
-{% endblock script %}

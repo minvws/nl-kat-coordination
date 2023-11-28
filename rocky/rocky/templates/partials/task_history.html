@@ -1,0 +1,146 @@
+{% load i18n %}
+
+<div class="horizontal-scroll">
+    <h2>{% translate "Tasks" %}</h2>
+    <div class="filter">
+        <div>
+            <p>{% translate "Filter" %}</p>
+            <button aria-expanded="false"
+                    data-hide-filters-label="{% translate "Hide filters" %}">{% translate "Show filters" %}</button>
+        </div>
+        <form action="" method="get" novalidate method="get">
+            <fieldset>
+                <label for="task_history_from">{% translate "From" %}</label>
+                <input type="date"
+                       name="task_history_from"
+                       id="task_history-from"
+                       value="{{ request.GET.task_history_from }}">
+            </fieldset>
+            <fieldset>
+                <label for="task_history_to">{% translate "To" %}</label>
+                <input type="date"
+                       name="task_history_to"
+                       id="task_history-to"
+                       value="{{ request.GET.task_history_to }}">
+            </fieldset>
+            <fieldset>
+                <label for="task_history_status">{% translate "Status" %}</label>
+                <select name="task_history_status" id="task_history_status">
+                    <option value="" disabled selected>{% translate "Select status" %}</option>
+                    <option value="completed"
+                            {% if request.GET.task_history_status == "completed" %}selected{% endif %}>
+                        {% translate "Success" %}
+                    </option>
+                    <option value="failed"
+                            {% if request.GET.task_history_status == "failed" %}selected{% endif %}>
+                        {% translate "Failure" %}
+                    </option>
+                </select>
+            </fieldset>
+            <fieldset>
+                <label for="task_history_search">{% translate "Search" %}</label>
+                <input type="text"
+                       name="task_history_search"
+                       id="task_history_search"
+                       value="{{ request.GET.task_history_search }}"
+                       placeholder="{% translate "Search by object name" %}">
+            </fieldset>
+            {% for key, value in request.GET.items %}
+                {% if key not in task_history_form_fields %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
+            {% endfor %}
+            <fieldset>
+                <button type="submit">{% translate "Submit" %}</button>
+            </fieldset>
+        </form>
+    </div>
+    {% if not task_history %}
+        {% translate "No tasks found for this object." %}
+    {% else %}
+        <table rf-selector="table-scan-history">
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "Object" %}</th>
+                    <th scope="col">{% translate "Plugin" %}</th>
+                    <th scope="col">{% translate "Status" %}</th>
+                    <th scope="col">{% translate "Created date" %}</th>
+                    <th scope="col" class="visually-hidden">{% translate "Details" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in task_history %}
+                    <tr data-task-id="{{ task.id }}">
+                        <td>
+                            {% if task.type == "boefje" %}
+                                <a href="{% ooi_url "ooi_detail" task.p_item.data.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.p_item.data.input_ooi }}</a>
+                            {% elif task.type == "normalizer" %}
+                                <a href="{% ooi_url "ooi_detail" task.p_item.data.raw_data.boefje_meta.input_ooi organization.code observed_at=task.created_at|date:'c' %}">{{ task.p_item.data.raw_data.boefje_meta.input_ooi }}</a>
+                            {% else %}
+                                {{ task.id }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if task.type == "boefje" %}
+                                <a href="{% url "boefje_detail" organization.code task.p_item.data.boefje.id %}">{{ task.p_item.data.boefje.name }}</a>
+                            {% elif task.type == "normalizer" %}
+                                <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
+                            {% else %}
+                                {{ task.id }}
+                            {% endif %}
+                        </td>
+                        <td class="nowrap">
+                            {% if task.status.value == "pending" or task.status.value == "queued" %}
+                                <i class="icon queued"></i>&nbsp;{{ task.status.value|capfirst }}
+                            {% elif task.status.value == "running" or task.status.value == "dispatched" %}
+                                <i class="icon running"></i>&nbsp;{{ task.status.value|capfirst }}
+                            {% elif task.status.value == "cancelled" %}
+                                <i class="icon cancelled"></i>&nbsp;{{ task.status.value|capfirst }}
+                            {% elif task.status.value == "failed" %}
+                                <i class="icon negative"></i>&nbsp;{{ task.status.value|capfirst }}
+                            {% elif task.status.value == "completed" %}
+                                <i class="icon positive"></i>&nbsp;{{ task.status.value|capfirst }}
+                            {% else %}
+                                <i class="icon neutral"></i>&nbsp;{{ task.status.value|capfirst }}
+                            {% endif %}
+                        </td>
+                        <td>{{ task.created_at }}</td>
+                        <td>
+                            <button type="button"
+                                    class="expando-button normalizer-list-table-row"
+                                    data-icon-open-class="icon ti-chevron-down"
+                                    data-icon-close-class="icon ti-chevron-up"
+                                    data-close-label="{% translate "Close details" %}">
+                                {% translate "Open details" %}
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="expando-row">
+                        <td colspan="7">
+                            {% if task.type == "normalizer" %}
+                                <section>
+                                    <div id="yielded-objects-{{ task.id }}">
+                                        <h2>{% translate "Yielded objects" %}</h2>
+                                    </div>
+                                </section>
+                                <br>
+                            {% endif %}
+                            <section>
+                                <div class="button-container">
+                                    {% if task.status.value in "completed,failed" %}
+                                        <a class="button"
+                                           href="{% url 'bytes_raw' organization_code=organization.code boefje_meta_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download meta and raw data" %}</a>
+                                        {% include "partials/single_action_form.html" with btn_text=_("Reschedule") btn_class="ghost" btn_icon="icon ti-refresh" action="reschedule_task" key="task_id" value=task.id %}
+
+                                    {% else %}
+                                        <a class="button"
+                                           href="{% url 'download_task_meta' organization_code=organization.code task_id=task.id %}"><span class="icon ti-download"></span>{% translate "Download task data" %}</a>
+                                    {% endif %}
+                                </div>
+                            </section>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% include "partials/list_paginator.html" with page_obj=task_history page_param="task_history_page" %}

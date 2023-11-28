@@ -244,7 +244,13 @@ def test_update_scan_profiles_forbidden_acknowledged(rf, client_member, mock_org
 
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 403
+    assert response.status_code == 302
+    assert response.headers["location"] == "/en/test/account/"
+    assert (
+        list(request._messages)[0].message
+        == "Could not raise clearance level to L1. You acknowledged a clearance level of L-1. "
+        "Please accept the clearance level below to proceed."
+    )
 
 
 def test_update_scan_profiles_forbidden_trusted(rf, client_member, mock_organization_view_octopoes):

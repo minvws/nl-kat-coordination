@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import re
 from pathlib import Path
 
 import environ
@@ -19,12 +20,12 @@ from django.utils.translation import gettext_lazy as _
 
 from rocky.otel import OpenTelemetryHelper
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
+env = environ.Env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -32,24 +33,38 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
-QUEUE_NAME_BOEFJES = env("QUEUE_NAME_BOEFJES", default="boefjes")
-QUEUE_NAME_NORMALIZERS = env("QUEUE_NAME_NORMALIZERS", default="normalizers")
-QUEUE_URI = env.url("QUEUE_URI", "").geturl()
+OCTOPOES_API = env.url("OCTOPOES_API").geturl()
 
-OCTOPOES_API = env.url("OCTOPOES_API", "").geturl()
+SCHEDULER_API = env.url("SCHEDULER_API").geturl()
 
-SCHEDULER_API = env.url("SCHEDULER_API", "").geturl()
+KATALOGUS_API = env.url("KATALOGUS_API").geturl()
 
-KATALOGUS_API = env.url("KATALOGUS_API", "").geturl()
+BYTES_API = env.url("BYTES_API").geturl()
+BYTES_USERNAME = env("BYTES_USERNAME")
+BYTES_PASSWORD = env("BYTES_PASSWORD")
 
-BYTES_API = env.url("BYTES_API", "").geturl()
-BYTES_USERNAME = env("BYTES_USERNAME", default="")
-BYTES_PASSWORD = env("BYTES_PASSWORD", default="")
-
-KEIKO_API = env.url("KEIKO_API", "").geturl()
+KEIKO_API = env.url("KEIKO_API").geturl()
+# Report generation timeout in seconds
+KEIKO_REPORT_TIMEOUT = env.int("KEIKO_REPORT_TIMEOUT", 60)
+ROCKY_REPORT_PERMALINKS = env.bool("ROCKY_REPORT_PERMALINKS", True)
+FEATURE_REPORTS = env.bool("FEATURE_REPORTS", False)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = env.bool("DEBUG", False)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+}
 
 # Make sure this header can never be set by an attacker, see also the security
 # warning at https://docs.djangoproject.com/en/4.2/howto/auth-remote-user/
@@ -113,6 +128,7 @@ HELP_DESK_EMAIL = env("HELP_DESK_EMAIL", default="")
 # Application definition
 
 INSTALLED_APPS = [
+    "whitenoise.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -134,11 +150,14 @@ INSTALLED_APPS = [
     "django_password_validators.password_history",
     "rest_framework",
     "tagulous",
+    "compressor",
+    "reports",
     # "drf_standardized_errors",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -165,7 +184,7 @@ ROOT_URLCONF = "rocky.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "rocky/templates"],
+        "DIRS": [BASE_DIR / "rocky/templates", BASE_DIR / "reports/report_types"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -173,6 +192,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "tools.context_processors.feature_flags",
                 "tools.context_processors.languages",
                 "tools.context_processors.organizations_including_blocked",
                 "tools.context_processors.rocky_version",
@@ -257,6 +277,7 @@ LOCALE_PATHS = (BASE_DIR / "rocky/locale",)
 # Add custom languages not provided by Django
 EXTRA_LANG_INFO = {
     "pap": {"bidi": False, "code": "pap", "name": "Papiamentu", "name_local": "Papiamentu"},
+    "en@pirate": {"bidi": False, "code": "en@pirate", "name": "English (Pirate)", "name_local": "English (Pirate)"},
 }
 LANG_INFO = locale.LANG_INFO.copy()
 LANG_INFO.update(EXTRA_LANG_INFO)
@@ -266,16 +287,50 @@ LANGUAGES = [
     ("en", "en"),
     ("nl", "nl"),
     ("pap", "pap"),
+    ("it", "it"),
 ]
+
+if env.bool("PIRATE", False):
+    LANGUAGE_CODE = "en@pirate"
+    LANGUAGES += [
+        ("en@pirate", "en@pirate"),
+    ]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = env.path("STATIC_ROOT", BASE_DIR / "static")
 STATICFILES_DIRS = (BASE_DIR / "assets",)
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]
+COMPRESS_OFFLINE = True
+COMPRESS_STORAGE = "compressor.storage.BrotliCompressorFileStorage"
 
-LOGIN_URL = "two_factor:login"
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+_IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
+
+
+def immutable_file_test(path, url):
+    # Match filename with 12 hex digits before the extension e.g.
+    # app.db8f2edc0c8a.js. Confifguraring this is necessary because whitenoise
+    # doesn't automatically detect the django-compressor files as immutable.
+    return _IMMUTABLE_FILE_TEST_PATTERN.match(url)
+
+
+WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
+# TODO: set this to True when we aren't using uWSGI anymore
+WHITENOISE_KEEP_ONLY_HASHED_FILES = False
+
+LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
 
 # Default primary key field type
@@ -283,7 +338,7 @@ LOGIN_REDIRECT_URL = "crisis_room"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-SESSION_EXPIRE_SECONDS = 60 * 60 * 2  # 2 hours
+SESSION_EXPIRE_SECONDS = env.int("SESSION_EXPIRE_SECONDS", 7200)
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 
 # Require session cookie to be secure, so only a https session can be started
@@ -343,9 +398,10 @@ CSP_IMG_SRC = ["'self'"]
 CSP_FONT_SRC = ["'self'"]
 CSP_STYLE_SRC = ["'self'"]
 CSP_FRAME_ANCESTORS = ["'none'"]
-CSP_BASE = ["'none'"]
+CSP_BASE_URI = ["'none'"]
 CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
+CSP_CONNECT_SRC = ["'self'"]
 
 CSP_BLOCK_ALL_MIXED_CONTENT = True
 

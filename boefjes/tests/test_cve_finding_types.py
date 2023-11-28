@@ -6,7 +6,7 @@ from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.types import (
     CVEFindingType,
 )
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class CVETest(TestCase):
@@ -29,8 +29,33 @@ class CVETest(TestCase):
                 description="The video framework has memory overwriting caused by addition overflow. "
                 "Successful exploitation of this vulnerability may affect availability.",
                 source="https://cve.circl.lu/cve/CVE-2021-46882",
-                risk_severity=RiskLevelSeverity.MEDIUM,
+                risk_severity=RiskLevelSeverity.HIGH,
                 risk_score=7.5,
+            ),
+        ]
+
+        self.assertEqual(expected, oois)
+
+    def test_cve_with_cvss2(self):
+        meta = NormalizerMeta.parse_raw(get_dummy_data("cve-normalizer-cvss2.json"))
+
+        oois = list(
+            run(
+                meta,
+                get_dummy_data("inputs/cve-result-with-cvss2.json"),
+            )
+        )
+
+        # noinspection PyTypeChecker
+        expected = [
+            CVEFindingType(
+                id="CVE-2016-0616",
+                description="Unspecified vulnerability in Oracle MySQL 5.5.46 and earlier and MariaDB before "
+                "5.5.47, 10.0.x before 10.0.23, and 10.1.x before 10.1.10 allows remote authenticated users "
+                "to affect availability via unknown vectors related to Optimizer.",
+                source="https://cve.circl.lu/cve/CVE-2016-0616",
+                risk_severity=RiskLevelSeverity.MEDIUM,
+                risk_score=4.0,
             ),
         ]
 

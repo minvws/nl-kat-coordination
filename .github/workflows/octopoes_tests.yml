@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.version }}
         uses: actions/setup-python@v4
@@ -34,7 +34,7 @@ jobs:
         run: pytest --cov-report=xml
         working-directory: ./octopoes
 
-      - if: ${{ matrix.version == '3.8' }}
+      - if: ${{ matrix.version == '3.11' }}
         name: Upload coverage as artifact
         uses: actions/upload-artifact@v3
         with:

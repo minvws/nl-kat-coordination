@@ -1,0 +1,57 @@
+{
+  "id": "645fd349-6d62-43dd-8cfe-d3ab03c9e4b7",
+  "raw_data": {
+    "id": "81f9d01c-1b4e-448d-8228-97ba9f710da9",
+    "boefje_meta": {
+      "id": "6a24ce1b-4e9e-47fa-a439-9733d8c89752",
+      "started_at": "2023-08-10T11:33:59.358073+00:00",
+      "ended_at": "2023-08-10T11:34:26.365753+00:00",
+      "boefje": {
+        "id": "testssl-sh-ciphers",
+        "version": null
+      },
+      "input_ooi": "IPService|internet|134.209.85.72|tcp|80|http",
+      "arguments": {
+        "input": {
+          "object_type": "IPService",
+          "scan_profile": "scan_profile_type='declared' reference=Reference('IPService|internet|134.209.85.72|tcp|80|http') level=<ScanLevel.L2: 2>",
+          "primary_key": "IPService|internet|134.209.85.72|tcp|80|http",
+          "ip_port": {
+            "address": {
+              "network": {
+                "name": "internet"
+              },
+              "address": "134.209.85.72"
+            },
+            "protocol": "tcp",
+            "port": "80"
+          },
+          "service": {
+            "name": "http"
+          }
+        }
+      },
+      "organization": "as",
+      "runnable_hash": "cea9c084a20a4189e1a5db58a2bfe2abc9f9bbc3e6636b30b6c9163fda15ad05",
+      "environment": {}
+    },
+    "mime_types": [
+      {
+        "value": "boefje/testssl-sh-ciphers-8cd5c5b6a8b09ef2d24f336dbaae81e97ef567"
+      },
+      {
+        "value": "testssl-sh-ciphers"
+      },
+      {
+        "value": "boefje/testssl-sh-ciphers"
+      }
+    ],
+    "secure_hash": "sha512:d2a0188d9c5adff26564ecc744ac900ff31f0efe4b4e5cbf8af1b1774713ca137d5863dae60197105e17ffe6a094dbccdaed3dd5fc5434c0bb67406aee199d48",
+    "signing_provider_url": null,
+    "hash_retrieval_link": "2af4f7c5-ffc8-4566-88d2-fe60b11fb160"
+  },
+  "normalizer": {
+    "id": "kat_ssltest_sh_ciphers.normalize",
+    "version": null
+  }
+}

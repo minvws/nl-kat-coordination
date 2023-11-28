@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.models import OOI
 from tools.forms.base import (
     BaseRockyForm,
-    CheckboxGroup,
     CheckboxTable,
     LabeledCheckboxInput,
     ObservedAtForm,
@@ -32,7 +31,7 @@ class OOIReportSettingsForm(ObservedAtForm):
 class OoiTreeSettingsForm(OOIReportSettingsForm):
     ooi_type = forms.MultipleChoiceField(
         label=_("Filter types"),
-        widget=CheckboxGroup(toggle_all_button=True),
+        widget=forms.CheckboxSelectMultiple(),
         required=False,
     )
 
@@ -44,8 +43,7 @@ class OoiTreeSettingsForm(OOIReportSettingsForm):
         if not ooi_types:
             self.fields.pop("ooi_type", None)
             return
-
-        ooi_types_choices = [(type_, _(type_)) for type_ in ooi_types]
+        ooi_types_choices = [(type_, type_) for type_ in ooi_types]
         self.set_choices_for_field("ooi_type", ooi_types_choices)
 
 
@@ -66,11 +64,14 @@ class SelectOOIForm(BaseRockyForm):
         self,
         oois: List[OOI],
         organization_code: str,
+        mandatory_fields: list = None,
         *args,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.fields["ooi"].widget.attrs["organization_code"] = organization_code
+        if mandatory_fields:
+            self.fields["ooi"].widget.attrs["mandatory_fields"] = mandatory_fields
         self.set_choices_for_field("ooi", [self._to_choice(ooi) for ooi in oois])
         if len(self.fields["ooi"].choices) == 1:
             self.fields["ooi"].initial = self.fields["ooi"].choices[0][0]
@@ -86,7 +87,7 @@ class SelectOOIForm(BaseRockyForm):
 
 class SelectOOIFilterForm(BaseRockyForm):
     show_all = forms.NullBooleanField(
-        label=_("Show objects that don't meet the Boefjes scan level"),
+        label=_("Show objects that don't meet the Boefjes scan level."),
         widget=forms.CheckboxInput(
             attrs={"class": "submit-on-click"},
         ),
@@ -96,7 +97,7 @@ class SelectOOIFilterForm(BaseRockyForm):
 class PossibleBoefjesFilterForm(BaseRockyForm):
     show_all = forms.NullBooleanField(
         widget=LabeledCheckboxInput(
-            label=_("Show Boefjes that exceed the objects clearance level"),
+            label=_("Show Boefjes that exceed the objects clearance level."),
             autosubmit=True,
         ),
     )

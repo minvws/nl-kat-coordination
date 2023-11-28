@@ -17,7 +17,7 @@ jobs:
     steps:
 
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: actions/setup-python@v4
         with:
@@ -28,7 +28,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Compile static HTML
-        run: sphinx-build -b html docs/source docs/_build
+        run: make docs
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3

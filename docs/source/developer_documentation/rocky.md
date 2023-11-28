@@ -74,54 +74,6 @@ ROCKY_DB_DSN=
 
 The `ROCKY_DB_DSN` is optional (e.g. `postgresql://username:password@hostname:port/database_name`) and if unset the other DB variables will be used to setup the database connection.
 
-### KATalogus View Structure
-
-This diagram shows the current view structure and what properties are set in each class for the KATalogus.
-
-```{mermaid}
-%%{ init : {"theme" : "base"}}%%
-
-classDiagram
-direction BT
-    class FormView
-    class OrganizationView
-    class SinglePluginView
-    class KATalogusView
-    class PluginSettingsAddView
-    class PluginEnableDisableView
-    class SingleSettingView
-    class PluginSettingsListView
-
-    OrganizationView : organization
-    OrganizationView : octopoes_api_connector
-    OrganizationView : organization_member
-    OrganizationView : indemnification_present
-
-    SinglePluginView : katalogus_client
-    SinglePluginView : plugin
-    SinglePluginView : plugin_schema
-
-    SingleSettingView : setting_name
-
-    class PluginSettingsUpdateView
-    class PluginSettingsDeleteView
-    class PluginDetailView
-
-    KATalogusView  <|--  OrganizationView
-    KATalogusView  <|--  FormView
-    SinglePluginView  <|--  OrganizationView
-    SingleSettingView  <|--  SinglePluginView
-    PluginDetailView  <|--  PluginSettingsListView
-    PluginEnableDisableView  <|--  SinglePluginView
-    PluginSettingsAddView  <|--  FormView
-    PluginSettingsAddView  <|--  SinglePluginView
-    PluginSettingsDeleteView  <|--  SingleSettingView
-    PluginSettingsUpdateView  <|--  FormView
-    PluginSettingsUpdateView  <|--  SingleSettingView
-    PluginSettingsListView  <|--  SinglePluginView
-```
-
-
 ### Fonts license
 
 All fonts used within Rocky remain under their own license. For example: Fredoka, Open Sans & Tabler icons.
@@ -217,7 +169,7 @@ direction RL
     OctopoesView <|-- OrganizationView
 
     BoefjeMixin <|-- OctopoesView
-    PluginDetailView <|-- BoefjeMixin
+    BoefjeDetailView <|-- BoefjeMixin
     OOIDetailView <|-- BoefjeMixin
     OOIDetailView <|-- OOIRelatedObjectAddView
     OOIDetailView <|-- OOIFindingManager
@@ -269,6 +221,8 @@ direction RL
 
 #### KATalogus Views
 
+This diagram shows the current view structure and what properties are set in each class for the KATalogus.
+
 ```{mermaid}
 classDiagram
 direction RL
@@ -293,14 +247,14 @@ direction RL
     SingleSettingView : setting_name
 
     class PluginSettingsDeleteView
-    class PluginDetailView
+    class BoefjeDetailView
 
     KATalogusView  <|--  OrganizationView
     KATalogusView  <|--  FormView
     SinglePluginView  <|--  OrganizationView
     SingleSettingView  <|--  SinglePluginView
-    PluginDetailView  <|--  PluginSettingsListView
-    PluginDetailView  <|--  BoefjeMixin
+    BoefjeDetailView  <|--  PluginSettingsListView
+    BoefjeDetailView  <|--  BoefjeMixin
     PluginEnableDisableView  <|--  SinglePluginView
     PluginSettingsAddView  <|--  FormView
     PluginSettingsAddView  <|--  SinglePluginView

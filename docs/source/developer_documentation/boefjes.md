@@ -3,7 +3,7 @@
 This module has several entry points discussed below, but let us first consider the prerequisites and scope.
 If you already have running setup and want to learn where each bit of functionality goes, read the following page:
 
-[Developing Openkat Plugins](README.md#your-first-boefje)
+[Developing Openkat Plugins]([https://docs.openkat.nl/introduction/makeyourown.html])
 
 ## Prerequisites
 
@@ -11,7 +11,7 @@ To run a development environment you need to have:
 
 - A running RabbitMQ service
 - A running Bytes API service
-- A copy of `./.env-dist` in `./env` containing the environment variables explained below
+- A `./env` containing the environment variables explained below
 - Everything in `requirements.txt` installed
 
 Optionally, you could have an instance of the octopoes api listening on a port that receives the normalized data from
@@ -46,7 +46,7 @@ Supported HTTP methods (for CRUD): `POST`, `GET`, `DELETE`, `PUT`.
 Includes an endpoint that lists all objects.
 
 The KATalogus stores environment settings for the different organisations and plugins, accessible through the API.
-These can be encrypted by setting the `ENCRYPTION_MIDDLEWARE=NACL_SEALBOX`, and the public and private key env vars.
+These can be encrypted by setting the `BYTES_ENCRYPTION_MIDDLEWARE=NACL_SEALBOX`, and the public and private key env vars.
 More info about the encryption scheme can be found here: https://pynacl.readthedocs.io/en/latest/public/.
 Currently, the settings are encrypted when stored, and returned decrypted.
 This could be changed in the future when the boefje-runner/plugin-code can decrypt the secrets itself,
@@ -62,30 +62,75 @@ This feature can also be used to set default values for KAT-alogus settings. For
 will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
 This default value can be overridden by setting any value for `TOP_PORTS` in the KAT-alogus.
 
-
-| Environment variable       | Value                        | Description                                                      |
-|----------------------------|------------------------------|------------------------------------------------------------------|
-| QUEUE_NAME_BOEFJES         | "boefjes"                    | Queue name for boefjes                                           |
-| QUEUE_NAME_NORMALIZERS     | "normalizers"                | Queue name for normalizers                                       |
-| QUEUE_HOST                 | "rabbitmq"                   | The RabbitMQ host                                                |
-| WORKER_HEARTBEAT           | "1.0"                        | Seconds to wait before checking the workers when queues are full |
-| OCTOPOES_API               | "http://octopoes_api:80"     | URI for the Octopoes API                                         |
-| BYTES_API                  | "http://bytes:8000"          | URI for the Bytes API                                            |
-| KATALOGUS_API              | "http://katalogus:8000"      | URI for the Katalogus API                                        |
-| KATALOGUS_DB_URI           | "postgresql:// ..."          | URI for the Postgresql DB                                        |
-| ENCRYPTION_MIDDLEWARE      | "IDENTITY" or "NACL_SEALBOX" | Encryption to use for the katalogus settings                     |
-| KATALOGUS_PRIVATE_KEY_B_64 | "..."                        | KATalogus NaCl Sealbox base-64 private key string                |
-| KATALOGUS_PUBLIC_KEY_B_64  | "..."                        | KATalogus NaCl Sealbox base-64 public key string                 |
-
 ## Design
 
 Boefjes will run as containerized workers pulling jobs from a centralized job queue:
 
-![design](docs/design.png)
+![design](img/boefje_design.png)
 
 Connections to other components, represented by the yellow squares, are abstracted by the modules inside them. The red
 components live outside the boefjes module. The green core files however is what can be focused on and can be
 developed/refactored further to support boefjes of all different kinds.
+
+### Boefje and Normalizer Workers
+
+When we configure a `POOL_SIZE` of `n`, we have `n` + 1 processes: one main process and `n` workers.
+The main process pushes to a `multiprocessing.Manager.Queue` and keeps track of the task that was being handled by the workers.
+It sets the status to failed when the worker was killed,
+like when the process [runs out of memory and is killed by Docker](https://github.com/minvws/nl-kat-coordination/pull/1187).
+(Note: `multiprocessing.Queue` will not work due to [`qsize()` not being implemented on macOS](https://github.com/minvws/nl-kat-coordination/pull/1374).)
+No maximum size is defined on the queue since we want to avoid blocking.
+Hence, we manually check if the queue does not pile up beyond the number of workers, i.e. `n`.
+
+#### Design
+
+The setup for the main process and workers:
+
+```{mermaid}
+graph LR
+
+SchedulerRuntimeManager -- "pop()" --> Scheduler
+
+subgraph Process 0
+
+  multiprocessing.Queue
+  SchedulerRuntimeManager -- "put(p_item)" --> multiprocessing.Queue["multiprocessing.Manager.Queue()"]
+
+  Worker-1["Worker 1<br/><i>target = _start_working()"] -- "get()" --> multiprocessing.Queue
+
+  subgraph Process 1
+    Worker-1
+    Worker-1 -- runs --> Plugin1["Plugin"]
+  end
+
+  Worker-2["Worker 2<br/><i>target = _start_working()"] -- "get()" --> multiprocessing.Queue
+
+  subgraph Process 2
+      Worker-2
+      Worker-2 -- runs --> Plugin2["Plugin"]
+  end
+end
+```
+
+#### Worker failure mode
+Rough representation of the failure mode when a SIGKILL has been sent to the worker:
+
+```{mermaid}
+sequenceDiagram
+  participant SchedulerRuntimeManager
+  participant handling_tasks
+  participant Worker1
+  participant Scheduler
+  participant Worker2
+  Worker1->>handling_tasks: set p_item.id for worker1.pid
+  SchedulerRuntimeManager->>Worker1: if not is_alive()
+  SchedulerRuntimeManager->>handling_tasks: get p_item.id for worker1.pid
+  SchedulerRuntimeManager->>Scheduler: set p_item.status to FAILED
+  SchedulerRuntimeManager->>Worker1: close()
+  SchedulerRuntimeManager->>Worker2: start()
+```
+
+
 
 ### Running as a Docker container
 
@@ -137,11 +182,47 @@ The job file for a DNS scan might look like this:
 
 If the tool runs smoothly, the data can be accessed using the Bytes API (see Bytes documentation).
 
-### Running a tool or normalizer directly using a job file
+### Manually running a boefje or normalizer
 
-It's also possible to run the job runner for a json file containing a job:
-- `python -m run --job tests/examples/my-boefje-job.json boefje` or
-- `python -m run --job tests/examples/my-normalizer-job.json normalizer`
+It is possible to manually run a boefje using
+
+```shell
+$ ./tools/run_boefje.py ORGANIZATION_CODE BOEFJE_ID INPUT_OOI
+```
+
+This will execute the boefje with debug logging turned on. It will log the raw
+file id in the output, which can be viewed using `show_raw`:
+
+```shell
+$ ./tools/show_raw.py RAW_ID
+```
+
+There is also a `--json` option to parse the raw file as JSON and pretty print
+it. The normalizer is run using:
+
+```shell
+$ ./tools/run_normalizer.py NORMALIZER_ID RAW_ID
+```
+
+Both `run_boefje.py` and `run_normalizer.py` support the `--pdb` option to enter
+the standard Python Debugger when an exceptions happens or breakpoint is
+triggered.
+
+If you are using the standard docker compose developer setup, you can use
+`docker compose exec` to execute the commands in the container. The boefje and
+normalizer containers use the same images and settings, so you can use both:
+
+```shell
+$ docker compose exec boefje ./tools/run_boefje.py ORGANIZATION_CODE BOEFJE_ID INPUT_OOI
+```
+
+For example:
+
+```shell
+$ docker compose exec boefje ./tools/run_boefje.py myorganization dns-records "Hostname|internet|example.com"
+$ docker compose exec boefje ./tools/show_raw.py --json 794986d7-cf39-4a2c-8bdf-17ae58f361ea
+$ docker compose exec boefje ./tools/run_normalizer.py kat_dns_normalize 794986d7-cf39-4a2c-8bdf-17ae58f361ea
+```
 
 
 ### Boefje and normalizer structure

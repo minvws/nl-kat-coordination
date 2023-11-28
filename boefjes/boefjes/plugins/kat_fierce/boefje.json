@@ -5,13 +5,5 @@
     "consumes": [
         "Hostname"
     ],
-    "produces": [
-        "IPAddressV6",
-        "DNSARecord",
-        "Hostname",
-        "DNSAAAARecord",
-        "IPAddressV4"
-    ],
-    "environment_keys": [],
     "scan_level": 3
 }

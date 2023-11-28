@@ -5,15 +5,15 @@
     <table>
         <caption>
             {% blocktranslate trimmed with name=ooi.human_readable type=ooi.get_ooi_type %}
-        Findings for {{ type }} {{ name }} on {{ observed_at }}:
-      {% endblocktranslate %}
+                Findings for {{ type }} {{ name }} on {{ observed_at }}:
+            {% endblocktranslate %}
         </caption>
         <thead>
             <tr>
                 <th scope="col">{% translate "Risk level" %}</th>
                 <th scope="col">{% translate "Finding type" %}</th>
                 <th scope="col">{% translate "Occurrences" %}</th>
-                <th scope="col">{% translate "Details" %}</th>
+                <th scope="col" class="visually-hidden">{% translate "Details" %}</th>
             </tr>
         </thead>
         <tbody>

@@ -1,7 +1,7 @@
 {
     "id": "pdio-subfinder-normalizer",
     "consumes": [
-        "pdio-subfinder"
+        "boefje/pdio-subfinder"
     ],
     "produces": [
         "Hostname"

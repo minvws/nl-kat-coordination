@@ -1,0 +1,17 @@
+body > header nav ul li a.user-icon,
+.user-icon {
+  $border-radius: 50%;
+
+  min-width: initial;
+  width: 3rem;
+  height: 3rem;
+  max-width: 3rem;
+  max-height: 3rem;
+  background-color: var(--colors-purrple-8);
+  color: #ffffff;
+  margin: auto 0;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  border-radius: $border-radius;
+  border: 0;
+}

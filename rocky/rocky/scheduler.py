@@ -3,11 +3,14 @@ from __future__ import annotations
 import datetime
 import uuid
 from enum import Enum
+from http import HTTPStatus
 from typing import Any, Dict, List, Optional, Union
 
 import requests
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from pydantic import BaseModel, Field
+from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
 
@@ -16,13 +19,14 @@ class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
+    name: Optional[str] = Field(default=None)
     version: Optional[str] = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):
     """BoefjeMeta is the response object returned by the Bytes API"""
 
-    id: str
+    id: uuid.UUID
     boefje: Boefje
     input_ooi: Optional[str]
     arguments: Dict[str, Any]
@@ -32,7 +36,7 @@ class BoefjeMeta(BaseModel):
 
 
 class RawData(BaseModel):
-    id: str
+    id: uuid.UUID
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
     secure_hash: Optional[str]
@@ -48,7 +52,7 @@ class Normalizer(BaseModel):
 
 
 class NormalizerMeta(BaseModel):
-    id: str
+    id: uuid.UUID
     raw_data: RawData
     normalizer: Normalizer
     started_at: datetime.datetime
@@ -58,18 +62,20 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
-    id: Optional[str]
+    id: uuid.UUID
     normalizer: Normalizer
     raw_data: RawData
+    type: str = "normalizer"
 
 
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
-    id: Optional[str]
+    id: uuid.UUID
     boefje: Boefje
     input_ooi: Optional[str]
     organization: str
+    type: str = "boefje"
 
 
 class QueuePrioritizedItem(BaseModel):
@@ -96,7 +102,7 @@ class TaskStatus(Enum):
 
 
 class Task(BaseModel):
-    id: str
+    id: uuid.UUID
     scheduler_id: str
     type: str
     p_item: QueuePrioritizedItem
@@ -157,6 +163,25 @@ class LazyTaskList:
         return res.results
 
 
+class SchedulerError(Exception):
+    message = _("Connectivity issues with Mula.")
+
+    def __str__(self):
+        return str(self.message)
+
+
+class TooManyRequestsError(SchedulerError):
+    message = _("Task queue is full, please try again later.")
+
+
+class BadRequestError(SchedulerError):
+    message = _("Task is invalid.")
+
+
+class ConflictError(SchedulerError):
+    message = _("Task already queued.")
+
+
 class SchedulerClient:
     def __init__(self, base_uri: str):
         self.session = requests.Session()
@@ -198,8 +223,19 @@ class SchedulerClient:
         return Task.parse_raw(res.content)
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
-        res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
-        res.raise_for_status()
+        try:
+            res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
+            res.raise_for_status()
+        except HTTPError as http_error:
+            code = http_error.response.status_code
+            if code == HTTPStatus.TOO_MANY_REQUESTS:
+                raise TooManyRequestsError()
+            elif code == HTTPStatus.BAD_REQUEST:
+                raise BadRequestError()
+            elif code == HTTPStatus.CONFLICT:
+                raise ConflictError()
+            else:
+                raise SchedulerError()
 
     def health(self) -> ServiceHealth:
         health_endpoint = self.session.get(f"{self._base_uri}/health")

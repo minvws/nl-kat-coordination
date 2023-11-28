@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from uuid import UUID
 
 from bytes.config import Settings
 from bytes.models import BoefjeMeta, RawData
@@ -11,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 def create_raw_repository(settings: Settings) -> RawRepository:
     return FileRawRepository(
-        settings.bytes_data_dir,
+        settings.data_dir,
         make_middleware(),
-        folder_permissions=int(settings.bytes_folder_permission, 8),
-        file_permissions=int(settings.bytes_file_permission, 8),
+        folder_permissions=int(settings.folder_permission, 8),
+        file_permissions=int(settings.file_permission, 8),
     )
 
 
@@ -34,7 +35,7 @@ class FileRawRepository(RawRepository):
         self._folder_permissions = folder_permissions
         self._file_permissions = file_permissions
 
-    def save_raw(self, raw_id: str, raw: RawData) -> None:
+    def save_raw(self, raw_id: UUID, raw: RawData) -> None:
         file_path = self._raw_file_path(raw_id, raw.boefje_meta)
 
         for parent in reversed(file_path.parents):
@@ -46,7 +47,7 @@ class FileRawRepository(RawRepository):
         file_path.write_bytes(contents)
         file_path.chmod(self._file_permissions)
 
-    def get_raw(self, raw_id: str, boefje_meta: BoefjeMeta) -> RawData:
+    def get_raw(self, raw_id: UUID, boefje_meta: BoefjeMeta) -> RawData:
         file_path = self._raw_file_path(raw_id, boefje_meta)
 
         if not file_path.exists():
@@ -55,8 +56,8 @@ class FileRawRepository(RawRepository):
         contents = file_path.read_bytes()
         return RawData(value=self.file_middleware.decode(contents), boefje_meta=boefje_meta)
 
-    def _raw_file_path(self, raw_id: str, boefje_meta: BoefjeMeta) -> Path:
-        return self.base_path / boefje_meta.organization / self._index(raw_id) / raw_id
+    def _raw_file_path(self, raw_id: UUID, boefje_meta: BoefjeMeta) -> Path:
+        return self.base_path / boefje_meta.organization / self._index(raw_id) / str(raw_id)
 
-    def _index(self, raw_id: str) -> str:
-        return raw_id[: self.UUID_INDEX]
+    def _index(self, raw_id: UUID) -> str:
+        return str(raw_id)[: self.UUID_INDEX]

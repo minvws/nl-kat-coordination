@@ -3,12 +3,15 @@ import json
 import logging
 from os import urandom
 from pathlib import Path
+from typing import Dict
 from unittest.mock import MagicMock, patch
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Group, Permission
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
@@ -26,8 +29,22 @@ from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSever
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
 
+LANG_LIST = [code for code, _ in settings.LANGUAGES]
+
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+@pytest.fixture(params=LANG_LIST)
+def current_language(request):
+    return request.param
+
+
+@pytest.fixture
+def language(current_language):
+    activate(current_language)
+    yield current_language
+    deactivate()
 
 
 def create_user(django_user_model, email, password, name, device_name, superuser=False):
@@ -66,7 +83,7 @@ def create_member(user, organization):
 
 
 def add_admin_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_ADMIN)
+    group = Group.objects.get(name=GROUP_ADMIN)
     member.groups.add(group)
     admin_permissions = [
         Permission.objects.get(codename="view_organization").id,
@@ -82,7 +99,7 @@ def add_admin_group_permissions(member):
 
 
 def add_redteam_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_REDTEAM)
+    group = Group.objects.get(name=GROUP_REDTEAM)
     member.groups.add(group)
     redteam_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
@@ -97,12 +114,19 @@ def add_redteam_group_permissions(member):
 
 
 def add_client_group_permissions(member):
-    group, _ = Group.objects.get_or_create(name=GROUP_CLIENT)
+    group = Group.objects.get(name=GROUP_CLIENT)
     member.groups.add(group)
     client_permissions = [
         Permission.objects.get(codename="can_scan_organization").id,
     ]
     group.permissions.set(client_permissions)
+
+
+@pytest.fixture(autouse=True)
+def seed_groups(db):
+    Group.objects.get_or_create(name=GROUP_CLIENT)
+    Group.objects.get_or_create(name=GROUP_REDTEAM)
+    Group.objects.get_or_create(name=GROUP_ADMIN)
 
 
 @pytest.fixture
@@ -295,55 +319,101 @@ def lazy_task_list_empty() -> MagicMock:
 
 
 @pytest.fixture
-def lazy_task_list_with_boefje() -> MagicMock:
-    mock = MagicMock()
-    mock.__getitem__.return_value = [
-        Task.parse_obj(
-            {
+def task() -> Task:
+    return Task.parse_obj(
+        {
+            "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
+            "hash": "19ed51514b37d42f79c5e95469956b05",
+            "scheduler_id": "boefje-test",
+            "type": "boefje",
+            "p_item": {
                 "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
                 "hash": "19ed51514b37d42f79c5e95469956b05",
-                "scheduler_id": "boefje-test",
-                "type": "boefje",
-                "p_item": {
-                    "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
-                    "hash": "19ed51514b37d42f79c5e95469956b05",
-                    "priority": 1,
-                    "data": {
-                        "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
-                        "boefje": {
-                            "id": "test-boefje",
-                            "name": "TestBoefje",
-                            "description": "Fetch the DNS record(s) of a hostname",
-                            "repository_id": None,
-                            "version": None,
-                            "scan_level": 1,
-                            "consumes": ["Hostname"],
-                            "produces": [
-                                "DNSNSRecord",
-                                "DNSARecord",
-                                "DNSCNAMERecord",
-                                "DNSMXRecord",
-                                "DNSZone",
-                                "Hostname",
-                                "DNSAAAARecord",
-                                "IPAddressV4",
-                                "DNSSOARecord",
-                                "DNSTXTRecord",
-                                "IPAddressV6",
-                                "Network",
-                                "NXDOMAIN",
-                            ],
-                        },
-                        "input_ooi": "Hostname|internet|mispo.es",
-                        "organization": "_dev",
+                "priority": 1,
+                "data": {
+                    "id": "1b20f85f63d54baabe9ef3f19d6e3fae",
+                    "boefje": {
+                        "id": "test-boefje",
+                        "name": "TestBoefje",
+                        "description": "Fetch the DNS record(s) of a hostname",
+                        "repository_id": None,
+                        "version": None,
+                        "scan_level": 1,
+                        "consumes": ["Hostname"],
+                        "produces": [
+                            "DNSNSRecord",
+                            "DNSARecord",
+                            "DNSCNAMERecord",
+                            "DNSMXRecord",
+                            "DNSZone",
+                            "Hostname",
+                            "DNSAAAARecord",
+                            "IPAddressV4",
+                            "DNSSOARecord",
+                            "DNSTXTRecord",
+                            "IPAddressV6",
+                            "Network",
+                            "NXDOMAIN",
+                        ],
                     },
+                    "input_ooi": "Hostname|internet|mispo.es",
+                    "organization": "test",
                 },
-                "status": "completed",
-                "created_at": "2022-08-09 11:53:41.378292",
-                "modified_at": "2022-08-09 11:54:21.002838",
-            }
-        )
+            },
+            "status": "completed",
+            "created_at": "2022-08-09 11:53:41.378292",
+            "modified_at": "2022-08-09 11:54:21.002838",
+        }
+    )
+
+
+@pytest.fixture
+def bytes_raw_metas():
+    return [
+        {
+            "id": "85c01c8c-c0bf-4fe8-bda5-abdf2d03117c",
+            "boefje_meta": {
+                "id": "6dea9549-c05d-42c9-b55b-8ad54cb9e413",
+                "started_at": "2023-11-01T15:02:46.764085+00:00",
+                "ended_at": "2023-11-01T15:02:47.276154+00:00",
+                "boefje": {"id": "dns-sec", "version": None},
+                "input_ooi": "Hostname|internet|mispoes.nl",
+                "arguments": {},
+                "organization": "test",
+                "runnable_hash": "ed871e9731f3d528ea92ca23c8eb18f38ac47e6d89a634b654a073fc2ca5fb50",
+                "environment": {},
+            },
+            "mime_types": [
+                {"value": "boefje/dns-sec"},
+                {"value": "boefje/dns-sec-c90404f60aeacf9b254abbd250bd3214e3b1a65b5a883dcbc"},
+                {"value": "dns-sec"},
+            ],
+            "secure_hash": "sha512:23e40f3e0c4381b89a296a5708a3c7a2dff369dc272b5cbce584d0fd7e17b1a5ebb1a947"
+            "be36ed19e8930116a46be2f4b450353b786696f83c328f197a8ae741",
+            "signing_provider_url": None,
+            "hash_retrieval_link": "a9b261d1-e981-42db-bd92-ee0c36372678",
+        }
     ]
+
+
+@pytest.fixture
+def bytes_get_raw():
+    byte_string = ";; Number of trusted keys: 2\\n;; Chasing: mispoes.nl."
+    " A\\n\\n\\nDNSSEC Trust tree:\\nantagonist.nl. (A)\\n|---mispoes.nl. (DNSKEY keytag: 47684 alg: 13 flags:"
+    " 257)\\n    |---mispoes.nl. (DS keytag: 47684 digest type: 2)\\n        "
+    "|---nl. (DNSKEY keytag: 52707 alg: 13 flags: 256)\\n            "
+    "|---nl. (DNSKEY keytag: 17153 alg: 13 flags: 257)\\n            "
+    "|---nl. (DS keytag: 17153 digest type: 2)\\n                "
+    "|---. (DNSKEY keytag: 46780 alg: 8 flags: 256)\\n                    "
+    b"|---. (DNSKEY keytag: 20326 alg: 8 flags: 257)\\n;; Chase successful\\n"
+
+    return byte_string.encode()
+
+
+@pytest.fixture
+def lazy_task_list_with_boefje(task) -> MagicMock:
+    mock = MagicMock()
+    mock.__getitem__.return_value = [task]
     mock.count.return_value = 1
     return mock
 
@@ -435,6 +505,29 @@ def plugin_schema():
     }
 
 
+@pytest.fixture
+def plugin_schema_no_required():
+    return {
+        "title": "Arguments",
+        "type": "object",
+        "properties": {
+            "TEST_PROPERTY": {
+                "title": "TEST_PROPERTY",
+                "maxLength": 128,
+                "type": "string",
+                "description": "Test description",
+            },
+            "TEST_PROPERTY2": {
+                "title": "TEST_PROPERTY2",
+                "type": "integer",
+                "minimum": 2,
+                "maximum": 200,
+                "description": "Test description2",
+            },
+        },
+    }
+
+
 def setup_request(request, user):
     request = SessionMiddleware(lambda r: r)(request)
     request.session[DEVICE_ID_SESSION_KEY] = user.staticdevice_set.get().persistent_id
@@ -451,8 +544,20 @@ def mock_scheduler(mocker):
     return mocker.patch("rocky.views.ooi_detail.scheduler.client")
 
 
-def get_boefjes_data():
-    return json.loads((Path(__file__).parent / "stubs" / "katalogus_boefjes.json").read_text())
+def get_stub_path(file_name: str) -> Path:
+    return Path(__file__).parent / "stubs" / file_name
+
+
+def get_boefjes_data() -> Dict:
+    return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
+
+
+def get_normalizers_data() -> Dict:
+    return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
+
+
+def get_plugins_data() -> Dict:
+    return get_boefjes_data() + get_normalizers_data()
 
 
 @pytest.fixture()

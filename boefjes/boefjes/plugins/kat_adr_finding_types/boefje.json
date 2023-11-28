@@ -5,10 +5,6 @@
     "consumes": [
         "ADRFindingType"
     ],
-    "produces": [
-        "ADRFindingType"
-    ],
-    "environment_keys": [],
     "scan_level": 0,
     "enabled": true
 }

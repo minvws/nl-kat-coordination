@@ -3,6 +3,7 @@
 {% load i18n %}
 {% load static %}
 {% load ooi_extra %}
+{% load compress %}
 
 {% block content %}
     {% include "header.html" %}
@@ -15,18 +16,22 @@
 
                 {% endif %}
                 {% include "partials/ooi_head.html" with ooi=ooi view="ooi_detail" %}
-            </div>
 
+            </div>
             <div>
                 {% include "oois/ooi_detail_object.html" with ooi=ooi object_details=object_details %}
-            </div>
 
+                {% if is_question %}
+                    {% include "forms/json_schema_form.html" with json_schema=ooi.json_schema %}
+
+                {% endif %}
+            </div>
             <div>
                 {% include "oois/ooi_detail_origins_declarations.html" %}
                 {% include "oois/ooi_detail_origins_observations.html" %}
                 {% include "oois/ooi_detail_origins_inference.html" %}
                 {% include "partials/ooi_detail_related_object.html" with query=mandatory_fields ooi_past_due=ooi_past_due related=related ooi=ooi %}
-                {% include "partials/scan_history.html" %}
+                {% include "partials/task_history.html" %}
 
             </div>
             <div>
@@ -72,7 +77,7 @@
                                 {% for boefje in boefjes %}
                                     <tr>
                                         <td>
-                                            <a href="{% url "plugin_detail" organization_code=organization.code plugin_type="boefje" plugin_id=boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
+                                            <a href="{% url "boefje_detail" organization_code=organization.code plugin_id=boefje.id %}?ooi_id={{ ooi }}">{{ boefje.name }}</a>
                                         </td>
                                         <td>{{ boefje.description }}</td>
                                         <td>
@@ -93,16 +98,14 @@
                 {% else %}
                     <div class="system">
                         {% if not enabled_boefjes_available %}
-                            <p >
+                            <p>
                                 {% translate "There are no boefjes enabled to scan an OOI of type" %} "{{ ooi.get_ooi_type }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
                             </p>
                         {% else %}
                             <p>
                                 {% translate "There are no boefjes available within the current clearance level of" %} "{{ ooi.human_readable }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
                             </p>
-                            <p>
-                                {% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".
-                            </p>
+                            <p>{% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".</p>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -116,5 +119,8 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% compress js %}
+        <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script src="{% static "js/jsonSchemaToForm.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    {% endcompress %}
 {% endblock html_at_end_body %}

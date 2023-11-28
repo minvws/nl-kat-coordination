@@ -63,7 +63,7 @@ jobs:
       PKG_NAME: kat-${{ matrix.package }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Generate version.py and set RELEASE_VERSION
         run: |

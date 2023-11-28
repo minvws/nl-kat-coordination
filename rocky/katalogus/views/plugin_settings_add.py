@@ -47,7 +47,7 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
 
         try:
             self.katalogus_client.upsert_plugin_settings(self.plugin.id, form.cleaned_data)
-            messages.add_message(self.request, messages.SUCCESS, _("Added settings for '{}'").format(self.plugin.id))
+            messages.add_message(self.request, messages.SUCCESS, _("Added settings for '{}'").format(self.plugin.name))
         except RequestException:
             messages.add_message(self.request, messages.ERROR, _("Failed adding settings"))
             return redirect(self.get_success_url())
@@ -56,10 +56,10 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
             try:
                 self.katalogus_client.enable_boefje(self.plugin)
             except RequestException:
-                messages.add_message(self.request, messages.ERROR, _("Enabling {} failed").format(self.plugin.id))
+                messages.add_message(self.request, messages.ERROR, _("Enabling {} failed").format(self.plugin.name))
                 return redirect(self.get_success_url())
 
-            messages.add_message(self.request, messages.SUCCESS, _("Boefje '{}' enabled.").format(self.plugin.id))
+            messages.add_message(self.request, messages.SUCCESS, _("Boefje '{}' enabled.").format(self.plugin.name))
 
         return redirect(self.get_success_url())
 
@@ -72,10 +72,9 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
             },
             {
                 "url": reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin.type,
                         "plugin_id": self.plugin.id,
                     },
                 ),
@@ -100,10 +99,9 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
 
     def get_success_url(self):
         return reverse(
-            "plugin_detail",
+            "boefje_detail",
             kwargs={
                 "organization_code": self.organization.code,
-                "plugin_type": self.plugin.type,
                 "plugin_id": self.plugin.id,
             },
         )

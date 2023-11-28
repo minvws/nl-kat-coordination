@@ -2,10 +2,10 @@
 
 <nav class="tabs" aria-label="{% translate "List of tasks" %}">
     <ul>
-        <li {% if view == "boefjes_tasks" %} aria-current="page"{% endif %}>
+        <li {% if view == "boefjes_tasks" %}aria-current="page"{% endif %}>
             <a href="{% url 'boefjes_task_list' organization.code %}">{% translate "Boefjes" %}</a>
         </li>
-        <li {% if view == "normalizers_tasks" %} aria-current="page"{% endif %}>
+        <li {% if view == "normalizers_tasks" %}aria-current="page"{% endif %}>
             <a href="{% url 'normalizers_task_list' organization.code %}">{% translate "Normalizers" %}</a>
         </li>
     </ul>

@@ -34,7 +34,7 @@ done: lint test ## Prepare for a commit.
 lint: ## Format the code using black.
 	pre-commit run --all-files --show-diff-on-failure --color always
 
-py-run := docker-compose --rm run bytes python
+py-run := docker-compose run --rm bytes python
 
 
 export revid
@@ -65,12 +65,14 @@ ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
 
 utest: ## Run the unit tests.
 	$(ci-docker-compose) build $(build_args)
+	$(ci-docker-compose) kill
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm bytes_unit
 
 
 itest: ## Run the integration tests.
 	$(ci-docker-compose) build $(build_args)
+	$(ci-docker-compose) kill
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm bytes_integration
 

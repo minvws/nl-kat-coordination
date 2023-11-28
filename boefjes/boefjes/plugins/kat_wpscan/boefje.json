@@ -1,13 +1,9 @@
     {
         "id": "wp-scan",
         "name": "WPScan",
-        "description": "Scan wordpress sites",
+        "description": "WordPress security scanner",
         "consumes": [
             "SoftwareInstance"
-        ],
-        "produces": [
-            "Finding",
-            "CVEFindingType"
         ],
         "environment_keys": ["WP_SCAN_API"],
         "scan_level": 2

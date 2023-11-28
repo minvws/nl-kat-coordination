@@ -1,5 +1,6 @@
 from io import BytesIO
 
+import pytest
 from django.core.management import call_command
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
@@ -11,37 +12,40 @@ from octopoes.models.tree import ReferenceTree
 from rocky.views.ooi_report import FindingReportPDFView, OOIReportPDFView, OOIReportView
 from tests.conftest import setup_request
 
-TREE_DATA = {
-    "root": {
-        "reference": "Finding|Network|testnetwork|KAT-000",
-        "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
-    },
-    "store": {
-        "Network|testnetwork": {
-            "object_type": "Network",
-            "primary_key": "Network|testnetwork",
-            "name": "testnetwork",
+
+@pytest.fixture
+def tree_data():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-000",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
         },
-        "Finding|Network|testnetwork|KAT-000": {
-            "object_type": "Finding",
-            "primary_key": "Finding|Network|testnetwork|KAT-000",
-            "ooi": "Network|testnetwork",
-            "finding_type": "KATFindingType|KAT-000",
+        "store": {
+            "Network|testnetwork": {
+                "object_type": "Network",
+                "primary_key": "Network|testnetwork",
+                "name": "testnetwork",
+            },
+            "Finding|Network|testnetwork|KAT-000": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-000",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-000",
+            },
+            "KATFindingType|KAT-000": {
+                "object_type": "KATFindingType",
+                "id": "KAT-000",
+                "description": "Fake description...",
+                "recommendation": "Fake recommendation...",
+                "risk_score": 3.9,
+                "risk_severity": "low",
+            },
         },
-        "KATFindingType|KAT-000": {
-            "object_type": "KATFindingType",
-            "id": "KAT-000",
-            "description": "Fake description...",
-            "recommendation": "Fake recommendation...",
-            "risk_score": 3.9,
-            "risk_severity": "low",
-        },
-    },
-}
+    }
 
 
-def test_ooi_report(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+def test_ooi_report(rf, client_member, mock_organization_view_octopoes, tree_data):
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(tree_data)
 
     request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user)
     request.resolver_match = resolve(
@@ -55,8 +59,29 @@ def test_ooi_report(rf, client_member, mock_organization_view_octopoes):
     assertContains(response, "Fake recommendation...")
 
 
-def test_ooi_pdf_report(rf, client_member, mock_organization_view_octopoes, mocker):
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+def test_ooi_report_missing_finding_type(rf, client_member, mock_organization_view_octopoes, tree_data):
+    tree_data["store"]["Finding|Network|testnetwork|KAT-001"] = {
+        "object_type": "Finding",
+        "primary_key": "Finding|Network|testnetwork|KAT-001",
+        "ooi": "Network|testnetwork",
+        "finding_type": "KATFindingType|KAT-001",
+    }
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(tree_data)
+
+    request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user)
+    request.resolver_match = resolve(
+        reverse("ooi_report", kwargs={"organization_code": client_member.organization.code})
+    )
+    response = OOIReportView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+    assertContains(response, "testnetwork")
+    assertContains(response, "Fake description...")
+    assertContains(response, "Fake recommendation...")
+
+
+def test_ooi_pdf_report(rf, client_member, mock_organization_view_octopoes, mocker, tree_data):
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(tree_data)
 
     request = setup_request(
         rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
@@ -69,6 +94,7 @@ def test_ooi_pdf_report(rf, client_member, mock_organization_view_octopoes, mock
     mock_datetime = mocker.patch("rocky.keiko.datetime")
     mock_mixin_datetime = mocker.patch("rocky.views.mixins.datetime")
     mock_datetime.now().strftime.return_value = dt_in_filename
+    mock_mixin_datetime.now().date.return_value = "2010-10-10"
     mock_mixin_datetime.now().strftime.return_value = dt_in_filename
 
     # Setup Keiko mock
@@ -265,8 +291,8 @@ def test_pdf_report_command(tmp_path, client_member, network, finding_types, moc
     }
 
 
-def test_ooi_pdf_report_timeout(rf, client_member, mock_organization_view_octopoes, mocker):
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+def test_ooi_pdf_report_timeout(rf, client_member, mock_organization_view_octopoes, mocker, tree_data):
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(tree_data)
 
     request = setup_request(
         rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user

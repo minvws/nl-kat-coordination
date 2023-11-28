@@ -12,8 +12,8 @@ from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 def test_save_boefje_meta(meta_repository: SQLMetaDataRepository) -> None:
     boefje_meta = get_boefje_meta()
-    second_boefje_meta = get_boefje_meta(str(uuid.uuid4()), boefje_id=boefje_meta.boefje.id, input_ooi=None)
-    third_boefje_meta = get_boefje_meta(str(uuid.uuid4()), boefje_id="kat-test-2", input_ooi=boefje_meta.input_ooi)
+    second_boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id=boefje_meta.boefje.id, input_ooi=None)
+    third_boefje_meta = get_boefje_meta(uuid.uuid4(), boefje_id="kat-test-2", input_ooi=boefje_meta.input_ooi)
 
     second_boefje_meta.started_at = boefje_meta.started_at + timedelta(hours=5)
     third_boefje_meta.started_at = boefje_meta.started_at - timedelta(hours=5)
@@ -110,7 +110,7 @@ def test_save_raw(meta_repository: SQLMetaDataRepository) -> None:
     )
     first_updated_raw = meta_repository.get_raw(query_filter).pop()
 
-    assert first_updated_raw.signing_provider_url == "https://test"
+    assert first_updated_raw.signing_provider_url in ["https://test", "https://freetsa.org/tsr"]  # Depends on CI env
     assert "hash_retrieval_link" in first_updated_raw.json()
     assert "secure_hash" in first_updated_raw.json()
     assert "signing_provider" in first_updated_raw.json()
@@ -170,7 +170,35 @@ def test_filter_raw_on_organization(meta_repository: SQLMetaDataRepository) -> N
     assert len(meta_repository.get_raw(query_filter)) == 1
 
     query_filter.organization = "test2"
-    assert len(meta_repository.get_raw(query_filter)) == 1
+    assert len(meta_repository.get_raw(query_filter)) == 0
+
+
+def test_filter_raw_not_on_organization(meta_repository: SQLMetaDataRepository) -> None:
+    raw = get_raw_data()
+    raw2 = get_raw_data()
+    raw2.boefje_meta.id = "c5d7d1da-7d94-4ac4-b0f6-ac065eeb0c97"
+
+    with meta_repository:
+        meta_repository.save_boefje_meta(raw.boefje_meta)
+        meta_repository.save_raw(raw)
+        meta_repository.save_raw(raw)
+        meta_repository.save_raw(raw)
+        meta_repository.save_raw(raw)
+        meta_repository.save_raw(raw)
+        meta_repository.save_boefje_meta(raw2.boefje_meta)
+        meta_repository.save_raw(raw2)
+        meta_repository.save_raw(raw2)
+
+    # Test offset-limit
+    assert len(meta_repository.get_raw(RawDataFilter(boefje_meta_id=raw.boefje_meta.id, limit=2))) == 2
+    assert len(meta_repository.get_raw(RawDataFilter(boefje_meta_id=raw.boefje_meta.id, limit=6))) == 5
+    assert len(meta_repository.get_raw(RawDataFilter(boefje_meta_id=raw.boefje_meta.id, limit=2, offset=1))) == 2
+    assert len(meta_repository.get_raw(RawDataFilter(boefje_meta_id=raw.boefje_meta.id, limit=2, offset=4))) == 1
+
+    # Test without boefje_meta id
+    assert len(meta_repository.get_raw(RawDataFilter(limit=2, offset=4))) == 2
+    assert len(meta_repository.get_raw(RawDataFilter(limit=100))) == 7
+    assert len(meta_repository.get_raw(RawDataFilter(limit=100, normalized=False))) == 7
 
 
 def test_filter_normalizer_meta(meta_repository: SQLMetaDataRepository) -> None:

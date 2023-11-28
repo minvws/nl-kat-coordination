@@ -1,7 +1,7 @@
 {
     "id": "kat_censys_normalize",
     "consumes": [
-        "censys"
+        "boefje/censys"
     ],
     "produces": [
         "IPPort",

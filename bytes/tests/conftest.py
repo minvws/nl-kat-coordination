@@ -44,7 +44,7 @@ def test_client(settings: Settings) -> TestClient:
 
 @pytest.fixture
 def nacl_middleware(settings: Settings) -> NaclBoxMiddleware:
-    return NaclBoxMiddleware(kat_private=settings.kat_private_key_b64, vws_public=settings.vws_public_key_b64)
+    return NaclBoxMiddleware(kat_private=settings.private_key_b64, vws_public=settings.public_key_b64)
 
 
 @pytest.fixture
@@ -67,7 +67,7 @@ def meta_repository(
     alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
     alembic.config.main(argv=alembicArgs)
 
-    engine = get_engine(settings.bytes_db_uri)
+    engine = get_engine(settings.db_uri)
     session = sessionmaker(bind=engine)()
 
     yield SQLMetaDataRepository(session, raw_repository, mock_hash_repository, settings)
@@ -84,13 +84,16 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
     alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
     alembic.config.main(argv=alembicArgs)
 
-    yield BytesAPIClient(
+    client = BytesAPIClient(
         "http://ci_bytes:8000",
-        settings.bytes_username,
-        settings.bytes_password,
+        settings.username,
+        settings.password,
     )
+    client.login()
 
-    sessionmaker(bind=get_engine(settings.bytes_db_uri), autocommit=True)().execute(
+    yield client
+
+    sessionmaker(bind=get_engine(settings.db_uri), autocommit=True)().execute(
         ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
 

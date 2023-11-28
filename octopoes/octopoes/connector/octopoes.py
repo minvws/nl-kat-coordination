@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from typing import Dict, List, Optional, Set, Type, Union
+from uuid import UUID
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -136,7 +137,7 @@ class OctopoesAPIConnector:
         valid_time: Optional[datetime] = None,
         source: Optional[Reference] = None,
         result: Optional[Reference] = None,
-        task_id: Optional[str] = None,
+        task_id: Optional[UUID] = None,
         origin_type: Optional[OriginType] = None,
     ) -> List[Origin]:
         res = self.session.get(
@@ -145,7 +146,7 @@ class OctopoesAPIConnector:
                 "valid_time": valid_time,
                 "source": source,
                 "result": result,
-                "task_id": task_id,
+                "task_id": str(task_id) if task_id else None,
                 "origin_type": origin_type,
             },
         )
@@ -204,6 +205,7 @@ class OctopoesAPIConnector:
         self,
         severities: Set[RiskLevelSeverity],
         exclude_muted: bool = True,
+        only_muted: bool = False,
         valid_time: Optional[datetime] = None,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
@@ -214,6 +216,7 @@ class OctopoesAPIConnector:
             "limit": limit,
             "severities": {s.value for s in severities},
             "exclude_muted": exclude_muted,
+            "only_muted": only_muted,
         }
         res = self.session.get(f"/{self.client}/findings", params=params)
         return Paginated[Finding].parse_obj(res.json())
@@ -229,3 +232,20 @@ class OctopoesAPIConnector:
 
     def recalculate_bits(self) -> int:
         return self.session.post(f"/{self.client}/bits/recalculate").json()
+
+    def query(
+        self,
+        path: str,
+        valid_time: datetime,
+        source: Optional[Reference] = None,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+    ) -> List[OOI]:
+        params = {
+            "path": path,
+            "source": source,
+            "valid_time": valid_time,
+            "offset": offset,
+            "limit": limit,
+        }
+        return [parse_obj_as(OOIType, ooi) for ooi in self.session.get(f"/{self.client}/query", params=params).json()]
