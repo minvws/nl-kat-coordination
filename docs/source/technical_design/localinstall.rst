@@ -50,6 +50,7 @@ Dependencies are packages required for OpenKAT to work. Run the following comman
 
 .. code-block:: sh
 
+    $ sudo dnf install openssl -y
     $ sudo dnf install https://rpm.nodesource.com/pub_18.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
     $ sudo dnf install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
     $ sudo dnf install -y nodejs gcc g++ make python3-pip docker-compose
