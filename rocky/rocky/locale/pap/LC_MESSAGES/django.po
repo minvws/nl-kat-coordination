@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-09 14:01+0000\n"
+"POT-Creation-Date: 2023-11-24 15:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,28 +30,28 @@ msgid "Name"
 msgstr "Nòmber"
 
 #: account/forms/account_setup.py
-msgid "This name we will use to communicate with you."
-msgstr "E nomber aki nos lo huza pa komuniká ku bo."
+msgid "The name that will be used in order to communicate."
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "What do we call you?"
-msgstr "Kon nos por jama'bu?"
+msgid "Please provide username"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Email"
 msgstr "Email"
 
 #: account/forms/account_setup.py
-msgid "Enter your email address."
-msgstr "Yena bo email adres"
+msgid "Enter an email address."
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Password"
 msgstr "Password"
 
 #: account/forms/account_setup.py
-msgid "Choose your super secret password"
-msgstr "Skohé bo password super sekreto"
+msgid "Choose a super secret password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
@@ -180,20 +180,20 @@ msgid "New password"
 msgstr "Password nobo"
 
 #: account/forms/account_setup.py
-msgid "Enter your new password"
-msgstr "Yena bo password nobo"
+msgid "Enter a new password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "New password confirmation"
 msgstr "Konfirmashon password nobo"
 
 #: account/forms/account_setup.py
-msgid "Repeat your new password"
-msgstr "Ripiti bo password nobo"
+msgid "Repeat the new password"
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Confirm your new password"
-msgstr "Konfirmá bo password nobo"
+msgid "Confirm the new password"
+msgstr ""
 
 #: account/forms/login.py
 msgid "Please enter a correct email address and password."
@@ -3108,6 +3108,26 @@ msgstr ""
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Domain"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "System type"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "System Report"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Combine IP addresses, hostnames and services into systems."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -6278,6 +6298,27 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "This name we will use to communicate with you."
+#~ msgstr "E nomber aki nos lo huza pa komuniká ku bo."
+
+#~ msgid "What do we call you?"
+#~ msgstr "Kon nos por jama'bu?"
+
+#~ msgid "Enter your email address."
+#~ msgstr "Yena bo email adres"
+
+#~ msgid "Choose your super secret password"
+#~ msgstr "Skohé bo password super sekreto"
+
+#~ msgid "Enter your new password"
+#~ msgstr "Yena bo password nobo"
+
+#~ msgid "Repeat your new password"
+#~ msgstr "Ripiti bo password nobo"
+
+#~ msgid "Confirm your new password"
+#~ msgstr "Konfirmá bo password nobo"
 
 #~ msgid "List of tasks for "
 #~ msgstr "Lista di tareanan pa "
