@@ -1,74 +1,53 @@
 import os
 import uuid
 from datetime import datetime
-from ipaddress import ip_address
-from typing import List
 
 import pytest
 
 from octopoes.api.models import Declaration, Observation
 from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
-from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSMXRecord, DNSNSRecord
+from octopoes.models import ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
-from octopoes.models.ooi.service import IPService, Service
-from octopoes.models.ooi.web import Website
-from octopoes.models.origin import OriginType
+from octopoes.models.ooi.dns.records import NXDOMAIN
+from octopoes.models.ooi.network import Network
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
-
 XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 
+def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+    network = Network(name="internet")
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time, level=ScanLevel.L2))
+    dns = "mispo.es"
+    hostname = Hostname(network=network.reference, name=dns)
+    octopoes_api_connector.save_declaration(Declaration(ooi=hostname, valid_time=valid_time, level=ScanLevel.L2))
 
-def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
-    network = Network(name="test")
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
-    hostnames: List[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
-    task_id = uuid.uuid4()
+    original_size = len(octopoes_api_connector.list_origins(task_id={}))
+    assert original_size >= 2
+    octopoes_api_connector.recalculate_bits()
+    bits_size = len(octopoes_api_connector.list_origins(task_id={}))
+    assert bits_size >= original_size
 
+    nxd = NXDOMAIN(hostname=hostname.reference)
     octopoes_api_connector.save_observation(
         Observation(
             method="normalizer_id",
-            source=network.reference,
-            task_id=task_id,
+            source=hostname.reference,
+            task_id=uuid.uuid4(),
             valid_time=valid_time,
-            result=hostnames,
+            result=[nxd],
         )
     )
+    octopoes_api_connector.recalculate_bits()
 
-    octopoes_api_connector.save_many_scan_profiles(
-        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in hostnames + [network]], valid_time
-    )
+    octopoes_api_connector.delete(network.reference)
+    octopoes_api_connector.delete(hostname.reference)
 
-    assert octopoes_api_connector.list(types={Network}).count == 1
-    assert octopoes_api_connector.list(types={Hostname}).count == 10
-    assert octopoes_api_connector.list(types={Network, Hostname}).count == 11
-
-    assert len(octopoes_api_connector.list_origins(task_id=uuid.uuid4())) == 0
-    origins = octopoes_api_connector.list_origins(task_id=task_id)
-    assert len(origins) == 1
-    assert origins[0].dict() == {
-        "method": "normalizer_id",
-        "origin_type": OriginType.OBSERVATION,
-        "source": network.reference,
-        "result": [hostname.reference for hostname in hostnames],
-        "task_id": task_id,
-    }
-
-    assert len(octopoes_api_connector.list_origins(result=hostnames[0].reference)) == 1
+    assert len(octopoes_api_connector.list_origins(task_id={})) < bits_size
 
     octopoes_api_connector.recalculate_bits()
 
-    # Delete even-numbered test hostnames
-    octopoes_api_connector.delete_many([Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)])
-    assert octopoes_api_connector.list(types={Network, Hostname}).count == 6
+    assert len(octopoes_api_connector.list_origins(task_id={})) < original_size
