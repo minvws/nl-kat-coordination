@@ -1,4 +1,7 @@
 from logging import getLogger
+from typing import Any, Dict
+
+from django.utils.translation import gettext_lazy as _
 
 from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
@@ -22,13 +25,31 @@ class AggregateOrganisationReport(AggregateReport):
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemsReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
-    template_path = "aggregate_organisation_report/report_design.html"
+    template_path = "aggregate_organisation_report/report.html"
+
+    def get_summary(self, data: Dict[str, Any]):
+        summary = {
+            _("General recommendations"): 3,
+            _("Critical vulnerabilities"): 1,
+            _("Assets (IP/domains) scanned"): "x",
+            _("Indemnification"): "xxxxx",
+            _("Sector of organisation"): "This is a sector definition to make it clear for the rest of the report "
+            "what all the comparisons between percentages mean",
+            _("Basic security score compared to sector"): "Score 80%, Sector: 77,5%",
+            _("Sector defined"): "All healthcare organisations that use KAT for example.",
+            _("Lowest security score in organisation"): "System specific",
+            _("Newly discovered items since last week, october 8th 2023"): "1 systeem",
+            _("Terms in report"): ["DNS", "SPF"],
+        }
+        return summary
 
     def post_process_data(self, data):
         systems = []
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
+        summary = {}
+
         # input oois
 
         for input_ooi, report_data in data.items():
@@ -51,4 +72,10 @@ class AggregateOrganisationReport(AggregateReport):
                 if report == "Vulnerability Report":
                     vulnerabilities.update(data["data"])
 
-        return {"systems": systems, "open_ports": open_ports, "ipv6": ipv6, "vulnerabilities": vulnerabilities}
+        return {
+            "summary": summary,
+            "systems": systems,
+            "open_ports": open_ports,
+            "ipv6": ipv6,
+            "vulnerabilities": vulnerabilities,
+        }

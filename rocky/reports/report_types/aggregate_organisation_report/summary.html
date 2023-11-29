@@ -1,0 +1,65 @@
+{% load i18n %}
+{% load static %}
+
+<section>
+    <div>
+        {{ data }}
+        <h2>{% translate "Summary" %}</h2>
+        <dl>
+            <div>
+                <dt>General recommendations</dt>
+                <dd>
+                    3
+                </dd>
+            </div>
+            <div>
+                <dt>Critical vulnerabilities</dt>
+                <dd>
+                    1
+                </dd>
+            </div>
+            <div>
+                <dt>Assets (IP/domains) scanned</dt>
+                <dd>
+                    x
+                </dd>
+            </div>
+            <div>
+                <dt>Sector of organisation</dt>
+                <dd>
+                    This is a sector definition to make it clear for the rest of the report what all the comparisons between percentages mean
+                </dd>
+            </div>
+            <div>
+                <dt>Basic security score compared to sector</dt>
+                <dd>
+                    Score 80%, Sector: 77,5%
+                </dd>
+            </div>
+            <div>
+                <dt>Sector defined</dt>
+                <dd>
+                    All healthcare organisations that use KAT for example.
+                </dd>
+            </div>
+            <div>
+                <dt>Lowest security score in organisation</dt>
+                <dd>
+                    System specific
+                </dd>
+            </div>
+            <div>
+                <dt>Newly discovered items since last week, october 8th 2023</dt>
+                <dd>
+                    <a href="">1 system</a>
+                </dd>
+            </div>
+            <div>
+                <dt>Terms in report</dt>
+                <dd>
+                    DNS, SPF, CVE-2012-12345
+                </dd>
+            </div>
+        </dl>
+    </div>
+</section>

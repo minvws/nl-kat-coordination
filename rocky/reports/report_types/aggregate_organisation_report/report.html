@@ -4,6 +4,7 @@
     <section>
         <h1>{% translate "Report OpenKAT" %}</h1>
         <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
+        {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
         {% include "systems_report/report.html" with data=data.systems %}
         {% include "open_ports_report/report.html" with data=data.open_ports %}
         {% include "ipv6_report/report.html" with data=data.ipv6 %}
@@ -11,8 +12,15 @@
         {% if data.vulnerabilities %}
             <div>
                 <h2>{% translate "Vulnerabilities" %}</h2>
-                {% include "vulnerability_report/report.html" with data=data.vulnerabilities %}
+                <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                    <h3>{{ input_ooi }}</h3>
+                    <p>
+                        <strong>{{ vulnerabilities|length }}</strong> {% translate "vulnerabilities on this system" %}
+                    </p>
+                    {% include "vulnerability_report/report.html" with data=vulnerabilities %}
 
+                {% endfor %}
             </div>
         {% endif %}
     </section>
