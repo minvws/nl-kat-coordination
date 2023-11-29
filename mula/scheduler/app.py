@@ -50,11 +50,11 @@ class App:
                 Application context of shared data (e.g. configuration,
                 external services connections).
         """
-        threading.excepthook = self.unhandled_exception  # type: ignore
 
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
 
+        threading.excepthook = self.unhandled_exception  # type: ignore
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
 
@@ -63,33 +63,6 @@ class App:
         ] = {}
         self.server: Optional[server.Server] = None
 
-    def initialize_boefje_schedulers(self) -> None:
-        """Initialize the schedulers for the Boefje tasks. We will create
-        schedulers for all organisations in the Katalogus service.
-        """
-        orgs = self.ctx.services.katalogus.get_organisations()
-        for org in orgs:
-            scheduler = schedulers.BoefjeScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"boefje-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
-            )
-            self.schedulers[scheduler.scheduler_id] = scheduler
-
-    def initialize_normalizer_schedulers(self) -> None:
-        """Initialize the schedulers for the Normalizer tasks. We will create
-        schedulers for all organisations in the Katalogus service.
-        """
-        orgs = self.ctx.services.katalogus.get_organisations()
-        for org in orgs:
-            scheduler = schedulers.NormalizerScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"normalizer-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
-            )
-            self.schedulers[scheduler.scheduler_id] = scheduler
 
     @tracer.start_as_current_span("monitor_organisations")
     def monitor_organisations(self) -> None:
@@ -192,6 +165,55 @@ class App:
                         count,
                     )
 
+    def start_schedulers(self) -> None:
+        # Initialize the schedulers
+        orgs = self.ctx.services.katalogus.get_organisations()
+        for org in orgs:
+            boefje_scheduler = schedulers.BoefjeScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"boefje-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+            self.schedulers[boefje_scheduler.scheduler_id] = boefje_scheduler
+
+            normalizer_scheduler = schedulers.NormalizerScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"normalizer-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+            self.schedulers[normalizer_scheduler.scheduler_id] = normalizer_scheduler
+
+        # Start schedulers
+        for scheduler in self.schedulers.values():
+            scheduler.run()
+
+    def start_monitors(self) -> None:
+        thread.ThreadRunner(
+            name="monitor_organisations",
+            target=self.monitor_organisations,
+            stop_event=self.stop_event,
+            interval=self.ctx.config.monitor_organisations_interval,
+        ).start()
+
+    def start_collectors(self) -> None:
+        thread.ThreadRunner(
+            name="metrics_collector",
+            target=self.collect_metrics,
+            stop_event=self.stop_event,
+            interval=10,
+        ).start()
+
+    def start_server(self) -> None:
+        self.server = server.Server(self.ctx, self.schedulers)
+        thread.ThreadRunner(
+            name="server",
+            target=self.server.run,
+            stop_event=self.stop_event,
+            loop=False,
+        ).start()
+
     def run(self) -> None:
         """Start the main scheduler application, and run in threads the
         following processes:
@@ -202,54 +224,53 @@ class App:
             * metrics collecting
             * api server
         """
-        # Start the schedulers
-        self.initialize_boefje_schedulers()
-        self.initialize_normalizer_schedulers()
-        for scheduler in self.schedulers.values():
-            scheduler.run()
+        # Start schedulers
+        self.start_schedulers()
 
         # Start monitors
-        thread.ThreadRunner(
-            name="monitor_organisations",
-            target=self.monitor_organisations,
-            stop_event=self.stop_event,
-            interval=self.ctx.config.monitor_organisations_interval,
-        ).start()
+        self.start_monitors()
 
         # Start metrics collecting
         if self.ctx.config.collect_metrics:
-            thread.ThreadRunner(
-                name="metrics_collector",
-                target=self.collect_metrics,
-                stop_event=self.stop_event,
-                interval=10,
-            ).start()
+            self.start_collectors()
 
         # API Server
-        self.server = server.Server(self.ctx, self.schedulers)
-        thread.ThreadRunner(
-            name="server",
-            target=self.server.run,
-            stop_event=self.stop_event,
-        ).start()
+        self.start_server()
 
         # Main thread
         while not self.stop_event.is_set():
-            self.stop_event.wait(0.01)
+            self.stop_event.wait()
+
+        # When the stop event is set, we want to gracefully shutdown the
+        # rest of the application.
+        self.shutdown()
+
+        # We're calling this here, because we want to issue a shutdown from
+        # within a thread, otherwise it will not exit a docker container.
+        # Source: https://stackoverflow.com/a/1489838/1346257
+        os._exit(1)
 
     def shutdown(self) -> None:
-        """Shutdown the scheduler application, and all threads."""
-        for s in self.schedulers.copy().values():
-            s.stop()
+        """Shutdown the scheduler application, and all threads.
+        """
+        self.logger.info("Shutdown initiated")
 
         self.stop_event.set()
 
-    def unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
-        """Gracefully shutdown the scheduler application, and all threads
-        When a unhandled exception occurs.
-        """
-        self.logger.error("Unhandled exception occurred: %s", args.exc_value)
+        # First stop schedulers
+        for s in self.schedulers.copy().values():
+            s.stop()
 
+        # Stop all threads that are still running, except the main thread.
+        # These threads likely have a blocking call and as such are not able
+        # to leverage a stop event.
+        self.stop_threads()
+
+        self.logger.info("Shutdown complete")
+
+    def stop_threads(self) -> None:
+        """Stop all threads, except the main thread.
+        """
         for t in threading.enumerate():
             if t is threading.current_thread():
                 continue
@@ -262,12 +283,12 @@ class App:
 
             t.join(5)
 
-        self.logger.info("Shutdown complete")
-
-        # We're calling this here, because we want to issue a shutdown from
-        # within a thread, otherwise it will not exit a docker container.
-        # Source: https://stackoverflow.com/a/1489838/1346257
-        os._exit(1)
+    def unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
+        """Gracefully shutdown the scheduler application, and all threads
+        when a unhandled exception occurs.
+        """
+        self.logger.error("Unhandled exception occurred: %s", args.exc_value)
+        self.stop_event.set()
 
     def remove_scheduler(self, scheduler_id: str) -> None:
         """Remove a scheduler from the application. This method is passed

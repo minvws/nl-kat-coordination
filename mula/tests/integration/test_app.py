@@ -1,9 +1,9 @@
+import threading
 import unittest
 from types import SimpleNamespace
 from unittest import mock
 
 import scheduler
-from fastapi.testclient import TestClient
 from scheduler import config, models, server, storage
 
 from tests.factories import OrganisationFactory
@@ -32,9 +32,6 @@ class AppTestCase(unittest.TestCase):
         # App
         self.app = scheduler.App(self.mock_ctx)
         self.app.server = server.Server(self.mock_ctx, self.app.schedulers)
-
-        # Test client
-        self.client = TestClient(self.app.server.api)
 
     def tearDown(self):
         self.app.shutdown()
@@ -124,3 +121,39 @@ class AppTestCase(unittest.TestCase):
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-3"}, scheduler_org_ids)
+
+    def test_shutdown(self):
+        """Test that the app shuts down gracefully"""
+        # Arrange
+        self.mock_ctx.services.katalogus.organisations = {
+            "org-1": OrganisationFactory(id="org-1"),
+        }
+
+        self.app.start_schedulers()
+        self.app.start_monitors()
+
+        # TODO: start the server
+
+        # Shutdown the app
+        self.app.shutdown()
+
+        # Assert that the schedulers have been stopped
+        for scheduler in self.app.schedulers.values():
+            self.assertFalse(scheduler.is_alive())
+
+        # Assert that the server has been stopped
+
+        # Assert that all threads have been stopped
+        # for thread in self.app.threads:
+        for t in threading.enumerate():
+            if t is threading.main_thread():
+                continue
+
+            self.assertFalse(t.is_alive())
+
+    def test_unhandled_exception(self):
+        pass
+
+    def test_stop_event(self):
+        # TODO: set the stop event and check if the threads are stopped
+        pass

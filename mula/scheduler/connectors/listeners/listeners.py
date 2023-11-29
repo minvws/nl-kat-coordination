@@ -1,9 +1,7 @@
 import functools
-import json
 import logging
-import urllib.parse
 from concurrent import futures
-from typing import Callable, Dict, Optional
+from typing import Callable, Optional
 
 import pika
 from retry import retry
@@ -52,12 +50,20 @@ class RabbitMQ(Listener):
         dsn:
             A string defining the data source name of the RabbitMQ host to
             connect to.
+        queue:
+            A string defining the queue to listen to.
+        durable:
+            A boolean defining if the queue should be durable.
+        prefetch_count:
+            An integer defining the prefetch count.
+        func:
+            A callable that will be called when a message is received.
+        executor:
+            A concurrent.futures.ThreadPoolExecutor instance.
         connection:
             A pika.BlockingConnection instance.
         channel:
             A pika.BlockingConnection.channel instance.
-        executor:
-            A concurrent.futures.ThreadPoolExecutor instance.
     """
 
     def __init__(self, dsn: str, queue: str, func: Callable, durable: bool = True, prefetch_count: int = 1) -> None:
@@ -67,6 +73,14 @@ class RabbitMQ(Listener):
             dsn:
                 A string defining the data source name of the RabbitMQ host to
                 connect to.
+            queue:
+                A string defining the queue to listen to.
+            func:
+                A callable that will be called when a message is received.
+            durable:
+                A boolean defining if the queue should be durable.
+            prefetch_count:
+                An integer defining the prefetch count.
         """
         super().__init__()
 
@@ -82,13 +96,6 @@ class RabbitMQ(Listener):
 
     def listen(self) -> None:
         self.basic_consume(self.queue, self.durable, self.prefetch_count)
-
-    def dispatch(self, channel, delivery_tag, body: bytes) -> None:
-        # Call the function
-        self.func(body)
-
-        # Acknowledge the message
-        self.connection.add_callback_threadsafe(functools.partial(self.ack_message, channel, delivery_tag))
 
     @retry(
         (pika.exceptions.AMQPConnectionError, pika.exceptions.ConnectionClosedByBroker), delay=5, jitter=(1, 3), tries=5
@@ -120,24 +127,6 @@ class RabbitMQ(Listener):
             self.logger.error("AMQPChannelError: %s", exc)
             raise exc
 
-    def get(self, queue: str) -> Optional[Dict[str, object]]:
-        method, properties, body = self.channel.basic_get(queue)
-
-        if body is None:
-            return None
-
-        response = json.loads(body)
-        self.channel.basic_ack(method.delivery_tag)
-
-        return response
-
-    def ack_message(self, channel, delivery_tag):
-        if channel.is_open:
-            channel.basic_ack(delivery_tag)
-        else:
-            # Channel is already closed, so we can't ack this message
-            self.logger.debug("Channel already closed, cannot ack message!")
-
     def callback(
         self,
         channel: pika.channel.Channel,
@@ -149,20 +138,23 @@ class RabbitMQ(Listener):
         queue.
         """
         self.logger.debug("Received message on queue %s, message: %r", method.routing_key, body)
+
+        # Submit the message to the thread pool executor
         self.executor.submit(self.dispatch, channel, method.delivery_tag, body)
 
-    def is_healthy(self) -> bool:
-        """Check if the RabbitMQ connection is healthy"""
-        parsed_url = urllib.parse.urlparse(self.dsn)
-        if parsed_url.hostname is None or parsed_url.port is None:
-            self.logger.warning(
-                "Not able to parse hostname and port from %s [host=%s]",
-                self.dsn,
-                self.dsn,
-            )
-            return False
+    def dispatch(self, channel, delivery_tag, body: bytes) -> None:
+        # Call the function
+        self.func(body)
 
-        return self.is_host_available(parsed_url.hostname, parsed_url.port)
+        # Acknowledge the message
+        self.connection.add_callback_threadsafe(functools.partial(self.ack_message, channel, delivery_tag))
+
+    def ack_message(self, channel, delivery_tag):
+        if channel.is_open:
+            channel.basic_ack(delivery_tag)
+        else:
+            # Channel is already closed, so we can't ack this message
+            self.logger.debug("Channel already closed, cannot ack message!")
 
     def stop(self) -> None:
         self.logger.debug("Stopping RabbitMQ connection")

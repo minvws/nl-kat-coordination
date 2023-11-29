@@ -31,7 +31,7 @@ class ThreadRunner(threading.Thread):
         stop_event: threading.Event,
         callback: Optional[Callable[[], Any]] = None,
         callback_args: Optional[tuple] = None,
-        interval: float = 0.01,
+        interval: Optional[float] = None,
         daemon: bool = False,
         loop: bool = True,
     ) -> None:
