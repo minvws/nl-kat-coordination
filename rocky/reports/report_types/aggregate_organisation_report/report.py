@@ -69,7 +69,12 @@ class AggregateOrganisationReport(AggregateReport):
 
                 if report == "IPv6 Report":
                     for hostname, enabled in data["data"]["results"].items():
-                        ipv6[hostname] = enabled
+                        ipv6[hostname] = {"enabled": enabled, "systems": []}
+
+                        for ip, system in systems["services"].items():
+                            if hostname in system["hostnames"]:
+                                ipv6[hostname]["systems"].extend(system["services"])
+
                 if report == "Vulnerability Report":
                     vulnerabilities.update(data["data"])
 

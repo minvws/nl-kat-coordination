@@ -15,12 +15,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for hostname, enabled in data.items %}
+                    {% for hostname, info in data.items %}
                         <tr>
                             <td>{{ hostname }}</td>
-                            <td>-</td>
                             <td>
-                                {% if enabled %}
+                                {% for system in info.systems %}
+                                    {% if not forloop.last %}
+                                        {{ system }},
+                                    {% else %}
+                                        {{ system }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if info.enabled %}
                                     <span class="icon positive"></span>
                                 {% else %}
                                     <span class="icon negative"></span>
