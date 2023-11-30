@@ -113,6 +113,7 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
     def create_option(self, *arg, **kwargs) -> Dict[str, Any]:
         option = super().create_option(*arg, **kwargs)
         option["wrap_label"] = self.wrap_label
+        option["attrs"]["checked"] = self.is_required_option(option["value"])
         option["attrs"]["required"] = self.is_required_option(option["value"])
         return option
 

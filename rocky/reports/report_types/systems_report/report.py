@@ -19,49 +19,49 @@ class System:
     oois: list
 
 
-class SystemsReport(Report):
+class SystemReport(Report):
     id = "systems-report"
     name = _("System Report")
-    description = _("Combine OOIs into systems")
-    plugins = {"required": [], "optional": []}
+    description = _("Combine IP addresses, hostnames and services into systems.")
+    plugins = {"required": ["nmap"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "systems_report/report.html"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
-        systems = []
         reference = Reference.from_str(input_ooi)
+        ips = []
 
-        # IMPORTANT: SHOULD BE CHANGED TO PATH QUERIES
-        # check record connections of hostname
         if reference.class_type == Hostname:
-            ref = Reference.from_str(input_ooi)
-            tree = self.octopoes_api_connector.get_tree(
-                ref, depth=3, types={IPAddressV4, IPAddressV6}, valid_time=valid_time
-            ).store
+            ips = self.octopoes_api_connector.query(
+                "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
+            )
+        elif reference.class_type in (IPAddressV4, IPAddressV6):
+            ips = [self.octopoes_api_connector.get(reference)]
 
-            for ooi_type, ooi in tree.items():
-                a_record_connections = []
-                if isinstance(ooi, (IPAddressV4, IPAddressV6)):
-                    a_record_connections.append(ooi.primary_key)
-                if a_record_connections:
-                    a_record_connections.append(input_ooi)
-                    systems.append(System(system_types=["Connected by DNS A Record"], oois=a_record_connections))
+        ip_services = {}
 
-        # IMPORTANT: SHOULD BE CHANGED TO PATH QUERIES
-        if reference.class_type == IPAddressV4 or reference.class_type == IPAddressV6:
-            ref = Reference.from_str(input_ooi)
-            tree = self.octopoes_api_connector.get_tree(ref, depth=3, types={Hostname}, valid_time=valid_time).store
-
-            for ooi_type, ooi in tree.items():
-                a_record_connections = []
-                if isinstance(ooi, Hostname):
-                    a_record_connections.append(ooi.primary_key)
-                if a_record_connections:
-                    a_record_connections.append(input_ooi)
-                    systems.append(System(system_types=["Connected by DNS A Record"], oois=a_record_connections))
+        for ip in ips:
+            ip_services[str(ip.address)] = {
+                "hostnames": [
+                    str(x.name)
+                    for x in self.octopoes_api_connector.query(
+                        "IPAddress.<address[is ResolvedHostname].hostname",
+                        valid_time,
+                        ip.reference,
+                    )
+                ],
+                "services": [
+                    str(x.name)
+                    for x in self.octopoes_api_connector.query(
+                        "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                        valid_time,
+                        ip.reference,
+                    )
+                ],
+            }
 
         data = {
-            "systems": systems,
             "input_ooi": input_ooi,
+            "services": ip_services,
         }
         return data
