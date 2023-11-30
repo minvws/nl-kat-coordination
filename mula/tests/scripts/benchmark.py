@@ -12,7 +12,7 @@ SCHEDULER_API = "http://localhost:8004"
 logger = logging.getLogger(__name__)
 
 def are_tasks_done():
-    resp_tasks_stats = requests.get(
+    response = requests.get(
         url=f"{SCHEDULER_API}/tasks/stats",
     )
 
