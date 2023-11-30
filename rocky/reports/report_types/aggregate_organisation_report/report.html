@@ -16,7 +16,7 @@
                 {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
                     <h3>{{ input_ooi }}</h3>
                     <p>
-                        <strong>{{ vulnerabilities|length }}</strong> {% translate "vulnerabilities on this system" %}
+                        <strong>{{ vulnerabilities.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
                     </p>
                     {% include "vulnerability_report/report.html" with data=vulnerabilities %}
 

@@ -43,11 +43,18 @@ class AggregateOrganisationReport(AggregateReport):
         }
         return summary
 
+    def get_total_vulnerabilities(self, vulnerabilities) -> int:
+        total_vulnerabilities = 0
+        for finding, finding_details in vulnerabilities.items():
+            total_vulnerabilities += finding_details["occurrences"]
+        return total_vulnerabilities
+
     def post_process_data(self, data):
         systems = []
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
+
         summary = {}
 
         # input oois
@@ -70,7 +77,8 @@ class AggregateOrganisationReport(AggregateReport):
                     for hostname, enabled in data["data"]["results"].items():
                         ipv6[hostname] = enabled
                 if report == "Vulnerability Report":
-                    vulnerabilities.update(data["data"])
+                    data["data"]["total_findings"] = self.get_total_vulnerabilities(data["data"])
+                    vulnerabilities[input_ooi] = data["data"]
 
         return {
             "summary": summary,
