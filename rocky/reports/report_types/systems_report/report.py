@@ -58,6 +58,15 @@ class SystemReport(Report):
                         ip.reference,
                     )
                 ],
+                "websites": [
+                    str(x.name)
+                    for x in self.octopoes_api_connector.query(
+                        "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
+                        valid_time,
+                        ip.reference,
+                    )
+                    if x.hostname == input_ooi or reference.class_type != Hostname
+                ],
             }
 
         data = {
