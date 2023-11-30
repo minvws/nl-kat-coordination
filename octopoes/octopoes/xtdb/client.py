@@ -9,6 +9,7 @@ import requests
 from pydantic import BaseModel, Field, parse_obj_as
 from requests import HTTPError, Response
 
+from octopoes.models.transaction import TransactionRecord
 from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
 from octopoes.xtdb.query import Query
 
@@ -52,14 +53,6 @@ class XTDBStatus(BaseModel):
     kvStore: Optional[str]
     estimateNumKeys: Optional[int]
     size: Optional[int]
-
-
-class XTDBTransaction(BaseModel):
-    txTime: datetime
-    txId: int
-    validTime: datetime
-    contentHash: str
-    doc: Optional[Dict]
 
 
 @lru_cache(maxsize=1)
@@ -107,7 +100,7 @@ class XTDBHTTPClient:
     def get_entity_history(
         self,
         entity_id: str,
-    ) -> List[XTDBTransaction]:
+    ) -> List[TransactionRecord]:
         params = {
             "eid": entity_id,
             "sort-order": "asc",
@@ -118,7 +111,7 @@ class XTDBHTTPClient:
         res = self._session.get(f"{self.client_url()}/entity", params=params)
         self._verify_response(res)
 
-        return parse_obj_as(List[XTDBTransaction], res.json())
+        return parse_obj_as(List[TransactionRecord], res.json())
 
     def query(self, query: Union[str, Query], valid_time: Optional[datetime] = None) -> List[List[Any]]:
         if valid_time is None:

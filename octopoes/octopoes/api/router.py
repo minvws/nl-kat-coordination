@@ -33,10 +33,11 @@ from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path as ObjectPath
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBSession, XTDBTransaction
+from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.exceptions import NoMultinode, XTDBException
 from octopoes.xtdb.query import Query as XTDBQuery
 
@@ -174,7 +175,7 @@ def get_object(
 def get_object_history(
     octopoes: OctopoesService = Depends(octopoes_service),
     reference: Reference = Depends(extract_reference),
-) -> List[XTDBTransaction]:
+) -> List[TransactionRecord]:
     return octopoes.get_ooi_history(reference)
 
 

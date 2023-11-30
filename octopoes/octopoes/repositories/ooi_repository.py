@@ -31,12 +31,13 @@ from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceNode, ReferenceTree
 from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
 from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
-from octopoes.xtdb.client import XTDBSession, XTDBTransaction
+from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.query import Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
@@ -68,7 +69,7 @@ class OOIRepository(Repository):
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         raise NotImplementedError
 
-    def get_history(self, reference: Reference) -> List[XTDBTransaction]:
+    def get_history(self, reference: Reference) -> List[TransactionRecord]:
         raise NotImplementedError
 
     def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
@@ -231,7 +232,7 @@ class XTDBOOIRepository(OOIRepository):
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
-    def get_history(self, reference: Reference) -> List[XTDBTransaction]:
+    def get_history(self, reference: Reference) -> List[TransactionRecord]:
         try:
             return self.session.client.get_entity_history(str(reference))
         except HTTPError as e:

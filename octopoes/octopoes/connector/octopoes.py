@@ -27,9 +27,9 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
-from octopoes.xtdb.client import XTDBTransaction
 
 
 class OctopoesAPISession(requests.Session):
@@ -113,12 +113,12 @@ class OctopoesAPIConnector:
         )
         return parse_obj_as(OOIType, res.json())
 
-    def get_history(self, reference: Reference) -> List[XTDBTransaction]:
+    def get_history(self, reference: Reference) -> List[TransactionRecord]:
         res = self.session.get(
             f"/{self.client}/object-history",
             params={"reference": str(reference)},
         )
-        return parse_obj_as(List[XTDBTransaction], res.json())
+        return parse_obj_as(List[TransactionRecord], res.json())
 
     def get_tree(
         self,
