@@ -95,7 +95,7 @@ def collect_memory(pid: int):
 
 def run(pid: int):
     # Start capturing logs
-    th_capture_logs = threading.Thread(target=capture_logs, args=(pid, "logs.txt"))
+    thread = threading.Thread(target=capture_logs, args=(pid, "logs.txt"))
     th_capture_logs.start()
 
     # Wait for tasks to finish
