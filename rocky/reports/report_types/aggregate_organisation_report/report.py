@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.open_ports_report.report import OpenPortsReport
-from reports.report_types.systems_report.report import SystemsReport
+from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
 
 logger = getLogger(__name__)
@@ -24,7 +24,7 @@ class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
-    reports = {"required": [SystemsReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
+    reports = {"required": [SystemReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
     template_path = "aggregate_organisation_report/report.html"
 
     def get_summary(self, data: Dict[str, Any]):
