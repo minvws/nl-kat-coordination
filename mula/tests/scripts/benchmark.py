@@ -3,13 +3,15 @@ import logging
 import subprocess
 import threading
 import time
+from pathlib import Path
 
-import psutil
 import requests
 
 SCHEDULER_API = "http://localhost:8004"
+TIMEOUT_FOR_LOG_CAPTURE = 5
 
 logger = logging.getLogger(__name__)
+
 
 def are_tasks_done():
     response = requests.get(
@@ -17,15 +19,12 @@ def are_tasks_done():
     )
 
     try:
-        resp_tasks_stats.raise_for_status()
+        response.raise_for_status()
     except requests.exceptions.HTTPError:
         logger.error("Error getting tasks")
         raise
 
-    tasks_stats = resp_tasks_stats.json()
-    if not tasks_stats:
-        logger.debug("No tasks found")
-        return False
+    tasks_stats = response.json()
 
     return all(tasks_stats[hour].get("queued") <= 0 for hour in tasks_stats)
 
@@ -47,64 +46,79 @@ def parse_stats():
         running = tasks_stats[hour].get("running")
         failed = tasks_stats[hour].get("failed")
         completed = tasks_stats[hour].get("completed")
-        logger.info(f"HOUR {hour}, QUEUED {queued}, RUNNING {running}, FAILED {failed}, COMPLETED {completed}")
+
+        logger.info(
+            "HOUR %s, QUEUED %s, RUNNING %s, FAILED %s, COMPLETED %s",
+            hour,
+            queued,
+            running,
+            failed,
+            completed,
+        )
 
 
-def capture_logs(pid: int, output_file: str):
-    try:
-        with open(output_file, 'a') as file:
-            process = subprocess.Popen(['tail', '-f', f'/proc/{pid}/fd/1'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
-            while process.poll() is None:
-                output_line = process.stdout.readline().strip()
-                error_line = process.stderr.readline().strip()
-
-                if output_line:
-                    file.write(f"STDOUT: {output_line}\n")
-                if error_line:
-                    file.write(f"STDERR: {error_line}\n")
-    except Exception as e:
-        logger.error(f"Error capturing logs: {e}")
-        raise
+def capture_logs(container_id: str, output_file: str):
+    # Capture logs
+    with Path.open(output_file, "w", encoding="utf-8") as file:
+        subprocess.run(
+            ["docker", "logs", container_id],
+            stdout=file,
+            stderr=file,
+            check=True,
+        )
 
 
 def parse_logs(path: str):
     # Check if there were any errors in the logs
     count = 0
-    with open(path, encoding="utf-8") as file:
+    with Path.open(path, encoding="utf-8") as file:
         for line in file:
-            if "ERROR" in line:
-                count += 1
-                logger.info(line)
-            if "Traceback" in line:
+            if line.startswith("ERROR") or line.startswith("Traceback"):
                 count += 1
                 logger.info(line)
 
     if count > 0:
-        logger.error(f"Found {count} errors in the logs")
+        logger.error("Found %d errors in the logs", count)
 
 
-def collect_cpu(pid: int):
-    process = psutil.Process(pid)
-    return process.cpu_percent()
+def collect_cpu(container_id: str) -> str:
+    return (
+        subprocess.run(
+            ["docker", "stats", "--no-stream", "--format", "{{.CPUPerc}}", container_id],
+            capture_output=True,
+            check=True,
+        )
+        .stdout.decode("utf-8")
+        .strip("%\n")
+    )
 
 
-def collect_memory(pid: int):
-    process = psutil.Process(pid)
-    return process.memory_info().rss / 1024 / 1024
+def collect_memory(container_id: str) -> str:
+    return (
+        subprocess.run(
+            ["docker", "stats", "--no-stream", "--format", "{{.MemUsage}}", container_id],
+            capture_output=True,
+            check=True,
+        )
+        .stdout.decode("utf-8")
+        .split("/")[0]
+        .strip("MiB\n")
+    )
 
 
-def run(pid: int):
+def run(container_id: str):
     # Start capturing logs
-    thread = threading.Thread(target=capture_logs, args=(pid, "logs.txt"))
-    th_capture_logs.start()
+    if container_id is not None:
+        thread = threading.Thread(target=capture_logs, args=(container_id, "logs.txt"))
+        thread.start()
 
     # Wait for tasks to finish
     while not are_tasks_done():
         logger.debug("Tasks are not done yet")
 
-        cpu = collect_cpu(pid)
-        memory = collect_memory(pid)
-        logger.info(f"CPU {cpu}, MEM {memory:.2f}")
+        cpu = collect_cpu(container_id)
+        memory = collect_memory(container_id)
+        logger.info("CPU %s, MEMORY %s", cpu, memory)
 
         # Parse stats
         parse_stats()
@@ -115,7 +129,7 @@ def run(pid: int):
     logger.debug("Tasks are done")
 
     # Stop capturing logs
-    th_capture_logs.join(timeout=TIMEOUT_FOR_LOG_CAPTURE)
+    thread.join(timeout=TIMEOUT_FOR_LOG_CAPTURE)
 
     # Parse stats
     parse_stats()
@@ -125,24 +139,18 @@ def run(pid: int):
 
 
 if __name__ == "__main__":
-    TIMEOUT_FOR_LOG_CAPTURE = 5
-
     # Setup command line interface
     parser = argparse.ArgumentParser(description="Check")
 
     # Add arguments
-    parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Set to enable verbose logging.")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Set to enable verbose logging.")
 
     parser.add_argument(
-        "--pid",
-        "-p",
-        type=int,
-        required=True,
-        help="The pid of the process to monitor.",
+        "--container-id",
+        "-c",
+        type=str,
+        required=False,
+        help="The container id of the process to monitor.",
     )
 
     # Parse arguments
@@ -151,13 +159,13 @@ if __name__ == "__main__":
     # Configure logging level, if the -v (verbose) flag was given this will
     # set the log-level to DEBUG (printing all debug messages and higher),
     # if -v was not given it defaults to printing level warning and higher.
-    default_loglevel = logging.INFO
+    level = logging.INFO
     if args.verbose:
         default_loglevel = logging.DEBUG
 
     logging.basicConfig(
-        level=default_loglevel,
+        level=level,
         format="%(asctime)s %(name)-10s %(levelname)-8s %(message)s",
     )
 
-    run(args.pid)
+    run(args.container_id)
