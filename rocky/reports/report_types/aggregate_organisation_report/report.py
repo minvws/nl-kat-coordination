@@ -44,7 +44,7 @@ class AggregateOrganisationReport(AggregateReport):
         return summary
 
     def post_process_data(self, data):
-        systems = []
+        systems = {"services": {}}
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
@@ -57,8 +57,7 @@ class AggregateOrganisationReport(AggregateReport):
             for report, data in report_data.items():
                 # data in report, specifically we use system to couple reports
                 if report == "System Report":
-                    for system in data["data"]["systems"]:
-                        add_or_combine_systems(systems, system)
+                    systems["services"].update(data["data"]["services"])
 
                 if report == "Open Ports Report":
                     open_ports[data["data"]["ip"]] = {
