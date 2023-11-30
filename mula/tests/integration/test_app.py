@@ -132,16 +132,12 @@ class AppTestCase(unittest.TestCase):
         self.app.start_schedulers()
         self.app.start_monitors()
 
-        # TODO: start the server
-
         # Shutdown the app
         self.app.shutdown()
 
         # Assert that the schedulers have been stopped
-        for scheduler in self.app.schedulers.values():
-            self.assertFalse(scheduler.is_alive())
-
-        # Assert that the server has been stopped
+        for s in self.app.schedulers.copy().values():
+            self.assertFalse(s.is_alive())
 
         # Assert that all threads have been stopped
         # for thread in self.app.threads:
@@ -150,10 +146,3 @@ class AppTestCase(unittest.TestCase):
                 continue
 
             self.assertFalse(t.is_alive())
-
-    def test_unhandled_exception(self):
-        pass
-
-    def test_stop_event(self):
-        # TODO: set the stop event and check if the threads are stopped
-        pass

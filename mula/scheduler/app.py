@@ -63,7 +63,6 @@ class App:
         ] = {}
         self.server: Optional[server.Server] = None
 
-
     @tracer.start_as_current_span("monitor_organisations")
     def monitor_organisations(self) -> None:
         """Monitor the organisations from the Katalogus service, and add/remove
@@ -251,8 +250,7 @@ class App:
         os._exit(1)
 
     def shutdown(self) -> None:
-        """Shutdown the scheduler application, and all threads.
-        """
+        """Shutdown the scheduler application, and all threads."""
         self.logger.info("Shutdown initiated")
 
         self.stop_event.set()
@@ -269,8 +267,7 @@ class App:
         self.logger.info("Shutdown complete")
 
     def stop_threads(self) -> None:
-        """Stop all threads, except the main thread.
-        """
+        """Stop all threads, except the main thread."""
         for t in threading.enumerate():
             if t is threading.current_thread():
                 continue

@@ -6,4 +6,5 @@ class ScanProfileMutation(RabbitMQ):
     mutation queue and calls the function passed to it. This is used within the
     BoefjeScheduler.
     """
+
     pass
