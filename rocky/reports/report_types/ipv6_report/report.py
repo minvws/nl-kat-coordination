@@ -47,8 +47,8 @@ class IPv6Report(Report):
             ips = self.octopoes_api_connector.query(path=path, source=hostname, valid_time=valid_time)
 
             results = {
-                hostname.tokenized.name: any(ip.reference.class_type == IPAddressV6 for ip in ips)
+                hostname.tokenized.name: {"enabled": any(ip.reference.class_type == IPAddressV6 for ip in ips)}
                 for hostname in hostnames
             }
 
-        return {"results": results}
+        return results
