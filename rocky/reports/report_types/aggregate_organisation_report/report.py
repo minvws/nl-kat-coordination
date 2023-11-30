@@ -12,14 +12,6 @@ from reports.report_types.vulnerability_report.report import VulnerabilityReport
 logger = getLogger(__name__)
 
 
-def add_or_combine_systems(systems, new_system):
-    for system in systems:
-        if set(system.oois) == set(new_system.oois):
-            system.system_types.extend(x for x in new_system.system_types if x not in system.system_types)
-            return
-    systems.append(new_system)
-
-
 class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
     name = "Aggregate Organisation Report"
@@ -57,7 +49,17 @@ class AggregateOrganisationReport(AggregateReport):
             for report, data in report_data.items():
                 # data in report, specifically we use system to couple reports
                 if report == "System Report":
-                    systems["services"].update(data["data"]["services"])
+                    for ip, system in data["data"]["services"].items():
+                        if ip not in systems["services"]:
+                            systems["services"][ip] = system
+                        else:
+                            # makes sure that there are no duplicates in the list
+                            systems["services"][ip]["hostnames"] = list(
+                                set(systems["services"][ip]["hostnames"]) | set(system["hostnames"])
+                            )
+                            systems["services"][ip]["services"] = list(
+                                set(systems["services"][ip]["services"]) | set(system["services"])
+                            )
 
                 if report == "Open Ports Report":
                     open_ports[data["data"]["ip"]] = {
