@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from functools import lru_cache
 from http import HTTPStatus
-from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 import requests
 from pydantic import BaseModel, Field, parse_obj_as
@@ -107,12 +107,10 @@ class XTDBHTTPClient:
     def get_entity_history(
         self,
         entity_id: str,
-        *,
-        sort_order: Literal["asc", "desc"] = "asc",
     ) -> List[XTDBTransaction]:
         params = {
             "eid": entity_id,
-            "sort-order": sort_order,
+            "sort-order": "asc",
             "history": "true",
             "with-docs": "true",
         }
