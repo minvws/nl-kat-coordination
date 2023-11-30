@@ -40,6 +40,28 @@ class SystemReport(Report):
 
         ip_services = {}
 
+        WEB = _("Web")
+        MAIL = _("Mail")
+        DICOM = _("Dicom")
+        DNS = _("DNS")
+        OTHER = _("Other")
+
+        service_mapping = {
+            # "http-alt": WEB,
+            "domain": DNS,
+            "tsdns": DNS,
+            "mdns": DNS,
+            "smtp": MAIL,
+            "smtp-stats": MAIL,
+            "smtp-proxy": MAIL,
+            "mail-admin": MAIL,
+            "mailq": MAIL,
+            "dicom": DICOM,
+        }
+        software_mapping = {
+            "DICOM": DICOM,
+        }
+
         for ip in ips:
             ip_services[str(ip.address)] = {
                 "hostnames": [
@@ -50,27 +72,42 @@ class SystemReport(Report):
                         ip.reference,
                     )
                 ],
-                "services": [
-                    str(x.name)
-                    for x in self.octopoes_api_connector.query(
-                        "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
-                        valid_time,
-                        ip.reference,
+                "services": list(
+                    set(
+                        [
+                            service_mapping.get(str(x.name), OTHER)
+                            for x in self.octopoes_api_connector.query(
+                                "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                                valid_time,
+                                ip.reference,
+                            )
+                        ]
+                    ).union(
+                        set(
+                            [
+                                software_mapping.get(str(x.name), OTHER)
+                                for x in self.octopoes_api_connector.query(
+                                    "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
+                                    valid_time,
+                                    ip.reference,
+                                )
+                            ]
+                        )
                     )
-                ],
-                "websites": [
-                    str(x.name)
-                    for x in self.octopoes_api_connector.query(
+                ),
+            }
+            if bool(
+                [
+                    self.octopoes_api_connector.query(
                         "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
                         valid_time,
                         ip.reference,
                     )
-                    if x.hostname == input_ooi or reference.class_type != Hostname
-                ],
-            }
+                ]
+            ):
+                ip_services[str(ip.address)]["services"].append(WEB)
 
-        data = {
+        return {
             "input_ooi": input_ooi,
             "services": ip_services,
         }
-        return data

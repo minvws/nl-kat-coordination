@@ -202,14 +202,29 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
                     ip.reference,
                 )
             ],
-            "services": [
-                str(x.name)
-                for x in octopoes_api_connector.query(
-                    "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
-                    valid_time,
-                    ip.reference,
+            "services": list(
+                set(
+                    [
+                        str(x.name)
+                        for x in octopoes_api_connector.query(
+                            "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                            valid_time,
+                            ip.reference,
+                        )
+                    ]
+                ).union(
+                    set(
+                        [
+                            str(x.name)
+                            for x in octopoes_api_connector.query(
+                                "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
+                                valid_time,
+                                ip.reference,
+                            )
+                        ]
+                    )
                 )
-            ],
+            ),
             "websites": [
                 str(x.hostname)
                 for x in octopoes_api_connector.query(
@@ -223,7 +238,7 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
 
     assert len(ips) == 2
     assert len(ip_services["192.0.2.3"]["hostnames"]) == 6
-    assert len(ip_services["192.0.2.3"]["services"]) == 3
+    assert len(ip_services["192.0.2.3"]["services"]) == 4
     assert len(ip_services["192.0.2.3"]["websites"]) == 1
     assert ip_services["192.0.2.3"]["websites"][0] == "Hostname|test|c.example.com"
 
