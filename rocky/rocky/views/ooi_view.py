@@ -1,6 +1,7 @@
 from time import sleep
-from typing import Dict, List, Set, Type
+from typing import Any, Dict, List, Set, Type
 
+from django import http
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -78,7 +79,7 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
 
 
 class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request: http.HttpRequest, *args: Any, **kwargs: Any) -> http.HttpResponse:
         self.ooi = self.get_ooi()
         return super().get(request, *args, **kwargs)
 
