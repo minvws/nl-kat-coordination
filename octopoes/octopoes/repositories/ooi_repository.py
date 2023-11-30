@@ -36,7 +36,7 @@ from octopoes.models.types import get_concrete_types, get_relation, get_relation
 from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
-from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.client import XTDBSession, XTDBTransaction
 from octopoes.xtdb.query import Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
@@ -66,6 +66,9 @@ class OOIRepository(Repository):
         self.event_manager = event_manager
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
+        raise NotImplementedError
+
+    def get_history(self, reference: Reference) -> List[XTDBTransaction]:
         raise NotImplementedError
 
     def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
@@ -224,6 +227,13 @@ class XTDBOOIRepository(OOIRepository):
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
             return self.deserialize(res)
+        except HTTPError as e:
+            if e.response.status_code == HTTPStatus.NOT_FOUND:
+                raise ObjectNotFoundException(str(reference))
+
+    def get_history(self, reference: Reference) -> List[XTDBTransaction]:
+        try:
+            return self.session.client.get_entity_history(str(reference))
         except HTTPError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))

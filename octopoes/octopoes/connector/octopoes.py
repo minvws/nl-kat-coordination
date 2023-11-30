@@ -29,6 +29,7 @@ from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
+from octopoes.xtdb.client import XTDBTransaction
 
 
 class OctopoesAPISession(requests.Session):
@@ -111,6 +112,13 @@ class OctopoesAPIConnector:
             params={"reference": str(reference), "valid_time": valid_time},
         )
         return parse_obj_as(OOIType, res.json())
+
+    def get_history(self, reference: Reference) -> List[XTDBTransaction]:
+        res = self.session.get(
+            f"/{self.client}/object-history",
+            params={"reference": str(reference)},
+        )
+        return parse_obj_as(List[XTDBTransaction], res.json())
 
     def get_tree(
         self,

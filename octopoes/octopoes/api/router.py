@@ -36,7 +36,7 @@ from octopoes.models.path import Path as ObjectPath
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.client import XTDBSession, XTDBTransaction
 from octopoes.xtdb.exceptions import NoMultinode, XTDBException
 from octopoes.xtdb.query import Query as XTDBQuery
 
@@ -168,6 +168,14 @@ def get_object(
     reference: Reference = Depends(extract_reference),
 ):
     return octopoes.get_ooi(reference, valid_time)
+
+
+@router.get("/object-history", tags=["Objects"])
+def get_object_history(
+    octopoes: OctopoesService = Depends(octopoes_service),
+    reference: Reference = Depends(extract_reference),
+) -> List[XTDBTransaction]:
+    return octopoes.get_ooi_history(reference)
 
 
 @router.get("/objects/random", tags=["Objects"])

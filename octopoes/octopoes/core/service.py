@@ -46,6 +46,7 @@ from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
 from octopoes.repositories.origin_repository import OriginRepository
 from octopoes.repositories.scan_profile_repository import ScanProfileRepository
+from octopoes.xtdb.client import XTDBTransaction
 
 logger = getLogger(__name__)
 settings = Settings()
@@ -91,6 +92,9 @@ class OctopoesService:
     def get_ooi(self, reference: Reference, valid_time: datetime) -> OOI:
         ooi = self.ooi_repository.get(reference, valid_time)
         return self._populate_scan_profiles([ooi], valid_time)[0]
+
+    def get_ooi_history(self, reference: Reference) -> List[XTDBTransaction]:
+        return self.ooi_repository.get_history(reference)
 
     def list_ooi(
         self,

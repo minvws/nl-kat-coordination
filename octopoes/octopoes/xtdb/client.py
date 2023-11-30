@@ -3,10 +3,10 @@ from datetime import datetime, timezone
 from enum import Enum
 from functools import lru_cache
 from http import HTTPStatus
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Tuple, Type, Union
 
 import requests
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, parse_obj_as
 from requests import HTTPError, Response
 
 from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
@@ -54,6 +54,14 @@ class XTDBStatus(BaseModel):
     size: Optional[int]
 
 
+class XTDBTransaction(BaseModel):
+    txTime: datetime
+    txId: int
+    validTime: datetime
+    contentHash: str
+    doc: Optional[Dict]
+
+
 @lru_cache(maxsize=1)
 def get_xtdb_http_session(base_url):
     return XTDBHTTPSession(base_url)
@@ -95,6 +103,24 @@ class XTDBHTTPClient:
         )
         self._verify_response(res)
         return res.json()
+
+    def get_entity_history(
+        self,
+        entity_id: str,
+        *,
+        sort_order: Literal["asc", "desc"] = "asc",
+    ) -> List[XTDBTransaction]:
+        params = {
+            "eid": entity_id,
+            "sort-order": sort_order,
+            "history": "true",
+            "with-docs": "true",
+        }
+
+        res = self._session.get(f"{self.client_url()}/entity", params=params)
+        self._verify_response(res)
+
+        return parse_obj_as(List[XTDBTransaction], res.json())
 
     def query(self, query: Union[str, Query], valid_time: Optional[datetime] = None) -> List[List[Any]]:
         if valid_time is None:

@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from ipaddress import ip_address
 from typing import List
 
@@ -70,6 +70,30 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
     # Delete even-numbered test hostnames
     octopoes_api_connector.delete_many([Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)])
     assert octopoes_api_connector.list(types={Network, Hostname}).count == 6
+
+
+def test_history(octopoes_api_connector: OctopoesAPIConnector):
+    network = Network(name="test")
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=network,
+            valid_time=datetime.now(tz=timezone.utc),
+        )
+    )
+    octopoes_api_connector.delete(network.reference)
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=network,
+            valid_time=datetime.now(tz=timezone.utc),
+        )
+    )
+
+    history = octopoes_api_connector.get_history(network.reference)
+    assert len(history) == 3
+
+    assert history[0].doc is not None
+    assert history[1].doc is None
+    assert history[2].doc is not None
 
 
 def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
