@@ -318,4 +318,6 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     octopoes_api_connector.save_observation(
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
+    import time
+    time.sleep(5)
     octopoes_api_connector.recalculate_bits()
