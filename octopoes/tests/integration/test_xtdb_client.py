@@ -190,23 +190,59 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
         "Hostname.<hostname[is ResolvedHostname].address", valid_time, Reference.from_str("Hostname|test|c.example.com")
     )
 
-    hnames = {}
-    services = {}
+    ip_services = {}
 
     for ip in ips:
-        hnames[str(ip.reference)] = octopoes_api_connector.query(
-            "IPAddress.<address[is ResolvedHostname].hostname",
-            valid_time,
-            ip.reference,
-        )
-        services[str(ip.reference)] = octopoes_api_connector.query(
-            "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
-            valid_time,
-            ip.reference,
-        )
+        ip_services[str(ip.address)] = {
+            "hostnames": [
+                str(x.name)
+                for x in octopoes_api_connector.query(
+                    "IPAddress.<address[is ResolvedHostname].hostname",
+                    valid_time,
+                    ip.reference,
+                )
+            ],
+            "services": list(
+                set(
+                    [
+                        str(x.name)
+                        for x in octopoes_api_connector.query(
+                            "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                            valid_time,
+                            ip.reference,
+                        )
+                    ]
+                ).union(
+                    set(
+                        [
+                            str(x.name)
+                            for x in octopoes_api_connector.query(
+                                "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
+                                valid_time,
+                                ip.reference,
+                            )
+                        ]
+                    )
+                )
+            ),
+            "websites": [
+                str(x.hostname)
+                for x in octopoes_api_connector.query(
+                    "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
+                    valid_time,
+                    ip.reference,
+                )
+                if x.hostname == Reference.from_str("Hostname|test|c.example.com")
+            ],
+        }
 
     assert len(ips) == 2
-    assert len(hnames["IPAddressV4|test|192.0.2.3"]) == 6
-    assert len(hnames["IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]) == 4
-    assert len(services["IPAddressV4|test|192.0.2.3"]) == 3
-    assert len(services["IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]) == 1
+    assert len(ip_services["192.0.2.3"]["hostnames"]) == 6
+    assert len(ip_services["192.0.2.3"]["services"]) == 4
+    assert len(ip_services["192.0.2.3"]["websites"]) == 1
+    assert ip_services["192.0.2.3"]["websites"][0] == "Hostname|test|c.example.com"
+
+    assert len(ip_services["3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["hostnames"]) == 4
+    assert len(ip_services["3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["services"]) == 1
+    assert len(ip_services["3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["websites"]) == 1
+    assert ip_services["3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["websites"][0] == "Hostname|test|c.example.com"
