@@ -1,0 +1,15 @@
+/* Nested ordered lists */
+
+/* Includes parent numbers */
+ol {
+  counter-reset: item;
+
+  > li {
+    display: block;
+
+    &::before {
+      content: counters(item, ". ") ". ";
+      counter-increment: item;
+    }
+  }
+}
