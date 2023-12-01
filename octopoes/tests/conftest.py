@@ -320,5 +320,5 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
 
-    time.sleep(6)  # wait an arbitrary time for the system to recalculate bits
+    time.sleep(10)  # wait an arbitrary time for the system to recalculate bits
     octopoes_api_connector.recalculate_bits()
