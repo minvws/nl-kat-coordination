@@ -1,3 +1,4 @@
+import time
 import uuid
 from datetime import datetime, timezone
 from ipaddress import IPv4Address, ip_address
@@ -318,6 +319,6 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     octopoes_api_connector.save_observation(
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
-    import time
-    time.sleep(5)
+
+    time.sleep(6)  # wait an arbitrary time for the system to recalculate bits
     octopoes_api_connector.recalculate_bits()
