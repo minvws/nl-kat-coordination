@@ -69,7 +69,17 @@ class OOIRepository(Repository):
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         raise NotImplementedError
 
-    def get_history(self, reference: Reference) -> List[TransactionRecord]:
+    def get_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = True,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
         raise NotImplementedError
 
     def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
@@ -232,9 +242,27 @@ class XTDBOOIRepository(OOIRepository):
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
-    def get_history(self, reference: Reference) -> List[TransactionRecord]:
+    def get_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = True,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
         try:
-            return self.session.client.get_entity_history(str(reference))
+            return self.session.client.get_entity_history(
+                str(reference),
+                sort_order=sort_order,
+                with_docs=with_docs,
+                has_doc=has_doc,
+                offset=offset,
+                limit=limit,
+                indices=indices,
+            )
         except HTTPError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))

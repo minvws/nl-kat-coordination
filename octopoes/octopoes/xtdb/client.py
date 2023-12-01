@@ -100,18 +100,35 @@ class XTDBHTTPClient:
     def get_entity_history(
         self,
         entity_id: str,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = True,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
     ) -> List[TransactionRecord]:
         params = {
             "eid": entity_id,
-            "sort-order": "asc",
+            "sort-order": sort_order,
             "history": "true",
-            "with-docs": "true",
+            "with-docs": "true" if with_docs else "false",
         }
 
         res = self._session.get(f"{self.client_url()}/entity", params=params)
         self._verify_response(res)
 
-        return parse_obj_as(List[TransactionRecord], res.json())
+        transactions: List[TransactionRecord] = parse_obj_as(List[TransactionRecord], res.json())
+        if has_doc is True and with_docs is True:  # Checking makes no sense without docs
+            transactions = [transaction for transaction in transactions if transaction.doc]
+
+        if has_doc is False and with_docs is True:  # Checking makes no sense without docs
+            transactions = [transaction for transaction in transactions if not transaction.doc]
+
+        if indices:
+            return [tx for i, tx in enumerate(transactions) if i in indices or i - len(transactions) in indices]
+
+        return transactions[offset:limit]
 
     def query(self, query: Union[str, Query], valid_time: Optional[datetime] = None) -> List[List[Any]]:
         if valid_time is None:

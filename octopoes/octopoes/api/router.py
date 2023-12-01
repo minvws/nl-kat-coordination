@@ -173,10 +173,24 @@ def get_object(
 
 @router.get("/object-history", tags=["Objects"])
 def get_object_history(
-    octopoes: OctopoesService = Depends(octopoes_service),
     reference: Reference = Depends(extract_reference),
+    sort_order: str = "asc",  # Or: "desc"
+    with_docs: bool = True,
+    has_doc: Optional[bool] = None,
+    offset: int = 0,
+    limit: Optional[int] = None,
+    indices: Optional[List[int]] = None,
+    octopoes: OctopoesService = Depends(octopoes_service),
 ) -> List[TransactionRecord]:
-    return octopoes.get_ooi_history(reference)
+    return octopoes.get_ooi_history(
+        reference,
+        sort_order=sort_order,
+        with_docs=with_docs,
+        has_doc=has_doc,
+        offset=offset,
+        limit=limit,
+        indices=indices,
+    )
 
 
 @router.get("/objects/random", tags=["Objects"])

@@ -113,10 +113,28 @@ class OctopoesAPIConnector:
         )
         return parse_obj_as(OOIType, res.json())
 
-    def get_history(self, reference: Reference) -> List[TransactionRecord]:
+    def get_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = True,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
         res = self.session.get(
             f"/{self.client}/object-history",
-            params={"reference": str(reference)},
+            params={
+                "reference": str(reference),
+                "sort_order": sort_order,
+                "with_docs": with_docs,
+                "has_doc": has_doc,
+                "offset": offset,
+                "limit": limit,
+                "indices": indices,
+            },
         )
         return parse_obj_as(List[TransactionRecord], res.json())
 

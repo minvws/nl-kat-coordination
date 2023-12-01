@@ -93,8 +93,26 @@ class OctopoesService:
         ooi = self.ooi_repository.get(reference, valid_time)
         return self._populate_scan_profiles([ooi], valid_time)[0]
 
-    def get_ooi_history(self, reference: Reference) -> List[TransactionRecord]:
-        return self.ooi_repository.get_history(reference)
+    def get_ooi_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = True,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
+        return self.ooi_repository.get_history(
+            reference,
+            sort_order=sort_order,
+            with_docs=with_docs,
+            has_doc=has_doc,
+            offset=offset,
+            limit=limit,
+            indices=indices,
+        )
 
     def list_ooi(
         self,
