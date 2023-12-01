@@ -208,7 +208,7 @@ def xtdbtype_crux():
     app.dependency_overrides = overrides
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def app_settings():
     return Settings()
 
@@ -223,7 +223,7 @@ def bit_runner(mocker) -> BitRunner:
     return mocker.patch("octopoes.core.service.BitRunner")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
     client = get_xtdb_client(str(app_settings.xtdb_uri), "test", app_settings.xtdb_type)
     client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
@@ -231,7 +231,7 @@ def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
     return client
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
     xtdb_http_client.create_node()
 
@@ -320,5 +320,5 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
 
-    # time.sleep(10)  # wait an arbitrary time for the system to recalculate bits
+    time.sleep(20)  # wait an arbitrary time for the system to recalculate bits
     octopoes_api_connector.recalculate_bits()
