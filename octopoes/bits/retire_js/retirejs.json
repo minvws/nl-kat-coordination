@@ -3061,7 +3061,7 @@
         "identifiers": {
           "summary": "XSS is possible in the data-target attribute.",
           "CVE": [
-            " CVE-2016-10735"
+            "CVE-2016-10735"
           ]
         },
         "info": [
@@ -3075,7 +3075,7 @@
         "identifiers": {
           "summary": "XSS is possible in the data-target attribute.",
           "CVE": [
-            " CVE-2016-10735"
+            "CVE-2016-10735"
           ]
         },
         "info": [

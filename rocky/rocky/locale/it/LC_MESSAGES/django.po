@@ -4,11 +4,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-09 14:01+0000\n"
+"POT-Creation-Date: 2023-11-24 15:30+0000\n"
 "PO-Revision-Date: 2023-11-16 20:05+0000\n"
 "Last-Translator: Luca Racchetti <razzo1987@gmail.com>\n"
-"Language-Team: Italian <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/it/>\n"
+"Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/it/>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,28 +34,28 @@ msgid "Name"
 msgstr "Nome"
 
 #: account/forms/account_setup.py
-msgid "This name we will use to communicate with you."
-msgstr "Questo nome verrà utilizzato per comunicare con te."
+msgid "The name that will be used in order to communicate."
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "What do we call you?"
-msgstr "Come ti chiamiamo?"
+msgid "Please provide username"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Email"
 msgstr "E-mail"
 
 #: account/forms/account_setup.py
-msgid "Enter your email address."
-msgstr "Inserisci il tuo indirizzo e-mail."
+msgid "Enter an email address."
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Password"
 msgstr "Password"
 
 #: account/forms/account_setup.py
-msgid "Choose your super secret password"
-msgstr "Scegli la tua super segreta password"
+msgid "Choose a super secret password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
@@ -187,20 +187,20 @@ msgid "New password"
 msgstr "Nuova password"
 
 #: account/forms/account_setup.py
-msgid "Enter your new password"
-msgstr "Inserisci la tua nuova password"
+msgid "Enter a new password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "New password confirmation"
 msgstr "Conferma nuova password"
 
 #: account/forms/account_setup.py
-msgid "Repeat your new password"
-msgstr "Ripeti la tua nuova password"
+msgid "Repeat the new password"
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Confirm your new password"
-msgstr "Conferma la tua nuova password"
+msgid "Confirm the new password"
+msgstr ""
 
 #: account/forms/login.py
 msgid "Please enter a correct email address and password."
@@ -3172,6 +3172,26 @@ msgstr ""
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Domain"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "System type"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "System Report"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Combine IP addresses, hostnames and services into systems."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -6387,6 +6407,27 @@ msgstr "Impossibile caricare il file raw su Bytes: codice di stato %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "File raw aggiunto con successo."
+
+#~ msgid "This name we will use to communicate with you."
+#~ msgstr "Questo nome verrà utilizzato per comunicare con te."
+
+#~ msgid "What do we call you?"
+#~ msgstr "Come ti chiamiamo?"
+
+#~ msgid "Enter your email address."
+#~ msgstr "Inserisci il tuo indirizzo e-mail."
+
+#~ msgid "Choose your super secret password"
+#~ msgstr "Scegli la tua super segreta password"
+
+#~ msgid "Enter your new password"
+#~ msgstr "Inserisci la tua nuova password"
+
+#~ msgid "Repeat your new password"
+#~ msgstr "Ripeti la tua nuova password"
+
+#~ msgid "Confirm your new password"
+#~ msgstr "Conferma la tua nuova password"
 
 #~ msgid "List of tasks for "
 #~ msgstr "Elenco dei compiti per"
