@@ -156,21 +156,21 @@ class OctopoesAPIConnector:
         return TypeAdapter(List[Origin]).validate_json(res.content)
 
     def save_observation(self, observation: Observation) -> None:
-        self.session.post(f"/{self.client}/observations", data=observation.json())
+        self.session.post(f"/{self.client}/observations", data=observation.model_dump_json())
 
     def save_declaration(self, declaration: Declaration) -> None:
-        self.session.post(f"/{self.client}/declarations", data=declaration.json())
+        self.session.post(f"/{self.client}/declarations", data=declaration.model_dump_json())
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
-        self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.json())
+        self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.model_dump_json())
 
     def save_many_scan_profiles(self, scan_profiles: List[ScanProfile], valid_time: Optional[datetime] = None) -> None:
         params = {"valid_time": valid_time}
         self.session.post(
             f"/{self.client}/scan_profiles/save_many",
             params=params,
-            json=[json.loads(scan_profile.json()) for scan_profile in scan_profiles],
+            json=[json.loads(scan_profile.model_dump_json()) for scan_profile in scan_profiles],
         )
 
     def delete(self, reference: Reference, valid_time: Optional[datetime] = None) -> None:
@@ -181,7 +181,7 @@ class OctopoesAPIConnector:
         params = {"valid_time": valid_time}
         self.session.post(f"/{self.client}/objects/delete_many", params=params, json=[str(ref) for ref in references])
 
-    def list_origin_parameters(self, origin_id: Set[str], valid_time: Optional[datetime] = None) -> List[str]:
+    def list_origin_parameters(self, origin_id: Set[str], valid_time: Optional[datetime] = None) -> List[OriginParameter]:
         params = {"origin_id": origin_id, "valid_time": valid_time}
         res = self.session.get(f"/{self.client}/origin_parameters", params=params)
         return TypeAdapter(List[OriginParameter]).validate_json(res.content)
