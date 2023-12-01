@@ -85,7 +85,7 @@ class SubjectAlternativeNameQualifier(SubjectAlternativeName):
         return reference.tokenized.name
 
 
-X509Certificate.update_forward_refs()
-SubjectAlternativeNameHostname.update_forward_refs()
-SubjectAlternativeNameIP.update_forward_refs()
-SubjectAlternativeNameQualifier.update_forward_refs()
+X509Certificate.model_rebuild()
+SubjectAlternativeNameHostname.model_rebuild()
+SubjectAlternativeNameIP.model_rebuild()
+SubjectAlternativeNameQualifier.model_rebuild()

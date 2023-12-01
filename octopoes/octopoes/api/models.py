@@ -16,7 +16,7 @@ class ServiceHealth(BaseModel):
     results: List["ServiceHealth"] = Field(default_factory=list)
 
 
-ServiceHealth.update_forward_refs()
+ServiceHealth.model_rebuild()
 
 
 class _BaseObservation(BaseModel):

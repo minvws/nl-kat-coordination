@@ -245,7 +245,7 @@ class PrimaryKeyToken(RootModel):
         return self.root[item]
 
 
-PrimaryKeyToken.update_forward_refs()
+PrimaryKeyToken.model_rebuild()
 
 
 def get_leaf_subclasses(cls: Type[OOI]) -> Set[Type[OOI]]:

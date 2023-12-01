@@ -153,8 +153,8 @@ class IPV4NetBlock(NetBlock):
     }
 
 
-IPAddressV4.update_forward_refs()
-IPAddressV6.update_forward_refs()
-NetBlock.update_forward_refs()
-IPV4NetBlock.update_forward_refs()
-IPV6NetBlock.update_forward_refs()
+IPAddressV4.model_rebuild()
+IPAddressV6.model_rebuild()
+NetBlock.model_rebuild()
+IPV4NetBlock.model_rebuild()
+IPV6NetBlock.model_rebuild()

@@ -181,7 +181,9 @@ class OctopoesAPIConnector:
         params = {"valid_time": valid_time}
         self.session.post(f"/{self.client}/objects/delete_many", params=params, json=[str(ref) for ref in references])
 
-    def list_origin_parameters(self, origin_id: Set[str], valid_time: Optional[datetime] = None) -> List[OriginParameter]:
+    def list_origin_parameters(
+        self, origin_id: Set[str], valid_time: Optional[datetime] = None
+    ) -> List[OriginParameter]:
         params = {"origin_id": origin_id, "valid_time": valid_time}
         res = self.session.get(f"/{self.client}/origin_parameters", params=params)
         return TypeAdapter(List[OriginParameter]).validate_json(res.content)

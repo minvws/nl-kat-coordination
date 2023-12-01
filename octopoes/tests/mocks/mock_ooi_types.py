@@ -179,4 +179,4 @@ MockOOIType = Union[
 ]
 
 for ooi_type in ALL_OOI_TYPES:
-    ooi_type.update_forward_refs()
+    ooi_type.model_rebuild()
