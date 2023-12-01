@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-08 09:15+0000\n"
+"POT-Creation-Date: 2023-11-30 15:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2744,6 +2744,26 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Web"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Mail"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Dicom"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "DNS"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Other"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
