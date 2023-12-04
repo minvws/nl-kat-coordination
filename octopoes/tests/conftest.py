@@ -221,13 +221,9 @@ def bit_runner(mocker) -> BitRunner:
     return mocker.patch("octopoes.core.service.BitRunner")
 
 
-testnode = "test"
-
-
 @pytest.fixture
 def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
-    global testnode
-    testnode = f"{testnode}I"
+    testnode = f"test-{str(uuid.uuid4())}"
     client = get_xtdb_client(app_settings.xtdb_uri, testnode, app_settings.xtdb_type)
     client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
