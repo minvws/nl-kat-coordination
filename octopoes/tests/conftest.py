@@ -220,7 +220,9 @@ def octopoes_service() -> OctopoesService:
 def bit_runner(mocker) -> BitRunner:
     return mocker.patch("octopoes.core.service.BitRunner")
 
+
 testnode = "test"
+
 
 @pytest.fixture
 def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
