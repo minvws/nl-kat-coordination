@@ -91,8 +91,9 @@ class RabbitMQ(Listener):
         self.func: Callable = func
 
         self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
-        self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
-        self.channel = self.connection.channel()
+        self.connection: Optional[pika.BlockingConnection] = None
+        self.channel: Optional[pika.BlockingConnection.channel] = None
+        self.connect(self.queue, self.durable, self.prefetch_count)
 
     def listen(self) -> None:
         self.basic_consume(self.queue, self.durable, self.prefetch_count)
@@ -101,10 +102,34 @@ class RabbitMQ(Listener):
         (pika.exceptions.AMQPConnectionError, pika.exceptions.ConnectionClosedByBroker), delay=5, jitter=(1, 3), tries=5
     )
     def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
+        self.connect(queue, durable, prefetch_count)
+
+        if not self.channel:
+            raise RuntimeError("No channel available to consume messages on!")
+
+        if not self.connection:
+            raise RuntimeError("No connection available to consume messages on!")
+
         try:
-            if self.connection.is_closed:
-                self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
-                self.channel = self.connection.channel()
+            self.channel.basic_qos(prefetch_count=prefetch_count)
+            self.channel.basic_consume(queue, on_message_callback=self.callback)
+            self.channel.start_consuming()
+        except pika.exceptions.AMQPChannelError as exc:
+            # Do not recover on channel errors
+            self.logger.error("AMQPChannelError: %s", exc)
+            raise exc
+
+    @retry((pika.exceptions.AMQPConnectionError,), delay=5, jitter=(1, 3), tries=5)
+    def connect(self, queue: str, durable: bool, prefetch_count: int) -> None:
+        """Connect to the RabbitMQ host and declare the queue."""
+        try:
+            self.connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
+        except pika.exceptions.AMQPConnectionError as exc:
+            self.logger.error("AMQPConnectionError: %s", exc)
+            raise exc
+
+        try:
+            self.channel = self.connection.channel()
             self.channel.queue_declare(queue=queue, durable=durable)
         except pika.exceptions.ChannelClosedByBroker as exc:
             if "inequivalent arg 'durable'" in exc.reply_text:
@@ -117,15 +142,6 @@ class RabbitMQ(Listener):
                 self.channel.queue_declare(queue=queue, durable=durable)
             else:
                 raise
-
-        try:
-            self.channel.basic_qos(prefetch_count=prefetch_count)
-            self.channel.basic_consume(queue, on_message_callback=self.callback)
-            self.channel.start_consuming()
-        except pika.exceptions.AMQPChannelError as exc:
-            # Do not recover on channel errors
-            self.logger.error("AMQPChannelError: %s", exc)
-            raise exc
 
     def callback(
         self,
@@ -143,6 +159,16 @@ class RabbitMQ(Listener):
         self.executor.submit(self.dispatch, channel, method.delivery_tag, body)
 
     def dispatch(self, channel, delivery_tag, body: bytes) -> None:
+        # Check if we still have a connection
+        if not self.connection:
+            self.logger.debug("No connection available, cannot dispatch message!")
+            return
+
+        # Check if we still have a channel
+        if not self.channel:
+            self.logger.debug("No channel available, cannot dispatch message!")
+            return
+
         # Call the function
         self.func(body)
 
@@ -159,8 +185,10 @@ class RabbitMQ(Listener):
     def stop(self) -> None:
         self.logger.debug("Stopping RabbitMQ connection")
 
-        self.executor.shutdown()
-        self.connection.add_callback_threadsafe(self._close_callback)
+        self.executor.shutdown(wait=True)
+
+        if self.connection:
+            self.connection.add_callback_threadsafe(self._close_callback)
 
         self.logger.debug("RabbitMQ connection closed")
 
