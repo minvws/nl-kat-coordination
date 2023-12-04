@@ -140,7 +140,7 @@ def run(container_id: str):
 
 if __name__ == "__main__":
     # Setup command line interface
-    parser = argparse.ArgumentParser(description="Check")
+    parser = argparse.ArgumentParser(description="Benchmark the scheduler.")
 
     # Add arguments
     parser.add_argument("--verbose", "-v", action="store_true", help="Set to enable verbose logging.")
