@@ -5,8 +5,5 @@
         "consumes": [
             "Website"
         ],
-        "produces": [
-            "X509Certificate"
-        ],
         "scan_level": 1
     }

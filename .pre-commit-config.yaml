@@ -64,7 +64,7 @@ repos:
   rev: v1.2.0
   hooks:
   - id: mypy
-    additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'pydantic', 'pynacl']
+    additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'types-retry', 'pydantic', 'pynacl']
     exclude: |
       (?x)(
       ^boefjes/ |

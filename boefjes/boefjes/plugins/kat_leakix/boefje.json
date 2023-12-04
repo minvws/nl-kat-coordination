@@ -7,16 +7,6 @@
             "IPAddressV6",
             "Hostname"
         ],
-        "produces": [
-            "KATFindingType",
-            "SoftwareInstance",
-            "Service",
-            "IPPort",
-            "Finding",
-            "Software",
-            "IPService",
-            "CVEFindingType"
-        ],
         "environment_keys": ["LEAKIX_API"],
         "scan_level": 1
     }

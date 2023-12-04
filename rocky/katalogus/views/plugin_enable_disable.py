@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 
 class PluginEnableDisableView(SinglePluginView):
     def check_required_settings(self, settings: Dict):
-        if self.plugin_schema is None:
+        if self.plugin_schema is None or "required" not in self.plugin_schema:
             return True
 
         return all([field in settings for field in self.plugin_schema["required"]])

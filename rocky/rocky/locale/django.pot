@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-09 14:01+0000\n"
+"POT-Creation-Date: 2023-11-30 15:14+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,11 +36,11 @@ msgid "Name"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "This name we will use to communicate with you."
+msgid "The name that will be used in order to communicate."
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "What do we call you?"
+msgid "Please provide username"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -48,7 +48,7 @@ msgid "Email"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Enter your email address."
+msgid "Enter an email address."
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -56,7 +56,7 @@ msgid "Password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Choose your super secret password"
+msgid "Choose a super secret password"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -177,7 +177,7 @@ msgid "New password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Enter your new password"
+msgid "Enter a new password"
 msgstr ""
 
 #: account/forms/account_setup.py
@@ -185,11 +185,11 @@ msgid "New password confirmation"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Repeat your new password"
+msgid "Repeat the new password"
 msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Confirm your new password"
+msgid "Confirm the new password"
 msgstr ""
 
 #: account/forms/login.py
@@ -2726,6 +2726,46 @@ msgid ""
 "weaknesses."
 msgstr ""
 
+#: reports/report_types/systems_report/report.html
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Domain"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "System type"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "System Report"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Web"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Mail"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Dicom"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "DNS"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Other"
+msgstr ""
+
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/partials/task_history.html
@@ -3817,6 +3857,7 @@ msgstr ""
 
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
+#: rocky/templates/tasks/partials/task_filter.html
 msgid "Clear filters"
 msgstr ""
 

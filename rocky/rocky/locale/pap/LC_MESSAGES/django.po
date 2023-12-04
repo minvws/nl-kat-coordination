@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-17 13:44+0000\n"
+"POT-Creation-Date: 2023-11-24 15:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,28 +30,28 @@ msgid "Name"
 msgstr "Nòmber"
 
 #: account/forms/account_setup.py
-msgid "This name we will use to communicate with you."
-msgstr "E nomber aki nos lo huza pa komuniká ku bo."
+msgid "The name that will be used in order to communicate."
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "What do we call you?"
-msgstr "Kon nos por jama'bu?"
+msgid "Please provide username"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Email"
 msgstr "Email"
 
 #: account/forms/account_setup.py
-msgid "Enter your email address."
-msgstr "Yena bo email adres"
+msgid "Enter an email address."
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Password"
 msgstr "Password"
 
 #: account/forms/account_setup.py
-msgid "Choose your super secret password"
-msgstr "Skohé bo password super sekreto"
+msgid "Choose a super secret password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
@@ -180,20 +180,20 @@ msgid "New password"
 msgstr "Password nobo"
 
 #: account/forms/account_setup.py
-msgid "Enter your new password"
-msgstr "Yena bo password nobo"
+msgid "Enter a new password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "New password confirmation"
 msgstr "Konfirmashon password nobo"
 
 #: account/forms/account_setup.py
-msgid "Repeat your new password"
-msgstr "Ripiti bo password nobo"
+msgid "Repeat the new password"
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Confirm your new password"
-msgstr "Konfirmá bo password nobo"
+msgid "Confirm the new password"
+msgstr ""
 
 #: account/forms/login.py
 msgid "Please enter a correct email address and password."
@@ -1081,7 +1081,9 @@ msgstr "Nivel di rísiko"
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Details"
 msgstr "Detayes"
 
@@ -1829,7 +1831,8 @@ msgstr "Segur bo ke bo ke eliminá tur ajuste pa e plug-in %(plugin_name)s?"
 
 #: katalogus/templates/plugin_settings_delete.html
 #: katalogus/templates/plugin_settings_list.html
-#: katalogus/views/plugin_settings_delete.py rocky/views/ooi_delete.py
+#: katalogus/views/plugin_settings_delete.py
+#: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
 msgstr "Eliminá"
 
@@ -3107,10 +3110,31 @@ msgid ""
 "weaknesses."
 msgstr ""
 
+#: reports/report_types/systems_report/report.html
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Domain"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "System type"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "System Report"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Status"
 msgstr "Estádo"
@@ -3209,7 +3233,7 @@ msgid "Select which objects you want to include in your report."
 msgstr ""
 
 #: reports/templates/report_oois_selection.html
-#: rocky/templates/oois/ooi_list.html
+#: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
@@ -3514,6 +3538,8 @@ msgid "Filter types"
 msgstr "Tipo di filternan"
 
 #: tools/forms/ooi.py tools/view_helpers.py
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html rocky/templates/indemnification_present.html
 #: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
@@ -3885,6 +3911,119 @@ msgid ""
 msgstr ""
 "E página ku bo kera wak òf e file ku bo kera mira no por wordu enkontra."
 
+#: rocky/templates/admin/base.html
+msgid "Skip to main content"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "Welcome,"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "View site"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "Documentation"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "Change password"
+msgstr ""
+
+#: rocky/templates/admin/base.html
+msgid "Log out"
+msgstr ""
+
+#: rocky/templates/admin/base.html rocky/templates/header.html
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
+
+#: rocky/templates/admin/base.html rocky/templates/admin/change_form.html
+#: rocky/templates/admin/change_list.html
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+msgid "Home"
+msgstr ""
+
+#: rocky/templates/admin/change_form.html
+#, python-format
+msgid "Add %(name)s"
+msgstr ""
+
+#: rocky/templates/admin/change_form.html
+#: rocky/templates/admin/change_list.html
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#: rocky/templates/admin/change_list.html
+msgid "Clear all filters"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+msgid "Yes, I’m sure"
+msgstr ""
+
+#: rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+msgid "No, take me back"
+msgstr ""
+
+#: rocky/templates/admin/delete_selected_confirmation.html
+msgid "Delete multiple objects"
+msgstr ""
+
+#: rocky/templates/admin/delete_selected_confirmation.html
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+
+#: rocky/templates/admin/delete_selected_confirmation.html
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+
+#: rocky/templates/admin/delete_selected_confirmation.html
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+
+#: rocky/templates/admin/popup_response.html
+msgid "Popup closing…"
+msgstr ""
+
 #: rocky/templates/crisis_room/crisis_room.html
 msgid ""
 "An overview of all (critical) findings OpenKAT found. Check the detail "
@@ -3904,14 +4043,18 @@ msgstr "Diskubrimentu Totál"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Close details"
 msgstr "Sera detayes"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Open details"
 msgstr "Habri detayes"
 
@@ -4153,13 +4296,11 @@ msgid "Crisis room"
 msgstr "Sala di krísis"
 
 #: rocky/templates/header.html rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 #: rocky/views/task_detail.py rocky/views/tasks.py
 msgid "Tasks"
 msgstr "Enkargonan"
-
-#: rocky/templates/header.html
-msgid "Breadcrumbs"
-msgstr "Breadcrumbs"
 
 #: rocky/templates/health.html
 msgid "Health Checks"
@@ -4361,8 +4502,9 @@ msgstr "uzando boefjes"
 
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/partials/task_history.html rocky/templates/scan.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
+#: rocky/templates/scan.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Boefje"
 msgstr "Boefje"
 
@@ -5307,32 +5449,39 @@ msgid "Search by object name"
 msgstr "Buska riba nómber di opheto"
 
 #: rocky/templates/partials/task_history.html
-msgid "No scans found for this object."
-msgstr "Ningun skan enkontra pa e opheto."
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Created date"
-msgstr "Fecha kreá"
-
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/boefjes.html
-msgid "Input Object"
-msgstr "Opheto di entrada"
-
-#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "No tasks found for this object."
 msgstr ""
 
 #: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/normalizers.html
-msgid "Normalizer"
-msgstr "Normalizer"
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Created date"
+msgstr "Fecha kreá"
 
 #: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/normalizers.html
-msgid "Boefje input OOI"
-msgstr "Opheto di Entrada \"Boefje\""
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Yielded objects"
+msgstr "Ophetonan generá"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/boefje_task_detail.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Download meta and raw data"
+msgstr "Download meta data i data krudo"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Reschedule"
+msgstr "Kambia fecha"
+
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Download task data"
+msgstr "Descarga datonan di tarea"
 
 #: rocky/templates/scan.html
 msgid "Boefjes overview:"
@@ -5419,11 +5568,6 @@ msgstr ""
 "cu el a generá."
 
 #: rocky/templates/tasks/boefje_task_detail.html
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Download meta and raw data"
-msgstr "Download meta data i data krudo"
-
-#: rocky/templates/tasks/boefje_task_detail.html
 msgid "Download meta data"
 msgstr "Deskarga meta datonan"
 
@@ -5439,22 +5583,6 @@ msgstr "No tin tareanan pa boefjes"
 msgid "List of tasks for boefjes"
 msgstr "Lista di tareanan pa boefjes"
 
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "List of tasks for "
-msgstr "Lista di tareanan pa "
-
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "No input OOI"
-msgstr "No tin entrada OOI"
-
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Reschedule"
-msgstr "Kambia fecha"
-
-#: rocky/templates/tasks/boefjes.html rocky/templates/tasks/normalizers.html
-msgid "Download task data"
-msgstr "Descarga datonan di tarea"
-
 #: rocky/templates/tasks/normalizers.html
 msgid "There are no tasks for normalizers"
 msgstr "No tin tareanan pa normalizers"
@@ -5463,9 +5591,21 @@ msgstr "No tin tareanan pa normalizers"
 msgid "List of tasks for normalizers"
 msgstr "Lista di tareanan pa normalizers"
 
-#: rocky/templates/tasks/normalizers.html
-msgid "Yielded objects"
-msgstr "Ophetonan generá"
+#: rocky/templates/tasks/partials/boefje_task_history.html
+msgid "No scans found for this object."
+msgstr "Ningun skan enkontra pa e opheto."
+
+#: rocky/templates/tasks/partials/boefje_task_history.html
+msgid "Input Object"
+msgstr "Opheto di entrada"
+
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Normalizer"
+msgstr "Normalizer"
+
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Boefje input OOI"
+msgstr "Opheto di Entrada \"Boefje\""
 
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
@@ -5769,6 +5909,10 @@ msgstr "Automatizá e kreo di varios ophetonan dor di karga un arkivo."
 #: rocky/templates/upload_raw.html rocky/views/upload_raw.py
 msgid "Upload raw"
 msgstr "Karga CSV"
+
+#: rocky/views/bytes_raw.py
+msgid "Getting raw data failed."
+msgstr ""
 
 #: rocky/views/finding_add.py
 msgid "Add Finding"
@@ -6154,6 +6298,33 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "This name we will use to communicate with you."
+#~ msgstr "E nomber aki nos lo huza pa komuniká ku bo."
+
+#~ msgid "What do we call you?"
+#~ msgstr "Kon nos por jama'bu?"
+
+#~ msgid "Enter your email address."
+#~ msgstr "Yena bo email adres"
+
+#~ msgid "Choose your super secret password"
+#~ msgstr "Skohé bo password super sekreto"
+
+#~ msgid "Enter your new password"
+#~ msgstr "Yena bo password nobo"
+
+#~ msgid "Repeat your new password"
+#~ msgstr "Ripiti bo password nobo"
+
+#~ msgid "Confirm your new password"
+#~ msgstr "Konfirmá bo password nobo"
+
+#~ msgid "List of tasks for "
+#~ msgstr "Lista di tareanan pa "
+
+#~ msgid "No input OOI"
+#~ msgstr "No tin entrada OOI"
 
 #~ msgid ""
 #~ "Can not parse observed_at parameter, falling back to showing current "
