@@ -18,6 +18,7 @@ from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.ooi.network import IPAddressV6
+from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import (
     DNSZone,
@@ -305,7 +306,15 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ResolvedHostname(hostname=hostnames[6].reference, address=addresses[1].reference),
     ]
 
-    oois = hostnames + addresses + ports + services + ip_services + resolved_hostnames
+    websites = [
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[0].reference),
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[1].reference),
+    ]
+    software = [Software(name="DICOM")]
+    instance = [SoftwareInstance(ooi=ports[0].reference, software=software[0].reference)]
+
+    oois = hostnames + addresses + ports + services + ip_services + resolved_hostnames + websites + software + instance
     octopoes_api_connector.save_observation(
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
+    octopoes_api_connector.recalculate_bits()

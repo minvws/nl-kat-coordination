@@ -77,7 +77,9 @@ class AggregateOrganisationReport(AggregateReport):
 
                         for ip, system in systems["services"].items():
                             if hostname in system["hostnames"]:
-                                ipv6[hostname]["systems"].extend(system["services"])
+                                ipv6[hostname]["systems"] = list(
+                                    set(ipv6[hostname]["systems"]).union(set(system["services"]))
+                                )
 
                 if report == "Vulnerability Report":
                     data["data"]["total_findings"] = self.get_total_vulnerabilities(data["data"])
