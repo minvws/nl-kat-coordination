@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <section id="open-ports">
-    <div>
+    <div class="horizontal-scroll">
         <h3>{% translate "Open ports" %}</h3>
         <p>
             {% blocktranslate trimmed %}
@@ -11,41 +11,39 @@
                 ports and IPs are merged.
             {% endblocktranslate %}
         </p>
-        <div class="horizontal-scroll">
-            <table>
-                <caption class="visually-hidden">{% translate "Overview of open ports found for the scanned assets." %}</caption>
-                <thead>
+        <table>
+            <caption class="visually-hidden">{% translate "Overview of open ports found for the scanned assets." %}</caption>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "IP address" %}</th>
+                    <th scope="col">{% translate "Open ports" %}</th>
+                    <th scope="col">{% translate "Domain" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ip, detailed_data in data.items %}
                     <tr>
-                        <th scope="col">{% translate "IP address" %}</th>
-                        <th scope="col">{% translate "Open ports" %}</th>
-                        <th scope="col">{% translate "Domain" %}</th>
+                        <td>{{ ip }}</td>
+                        <td>
+                            {% for port, is_open in detailed_data.ports.items %}
+                                {% if is_open %}
+                                    <span class="open">{{ port }}</span>
+                                {% else %}
+                                    {{ port }}
+                                    {{ meta_data.ports|length }}
+                                {% endif %}
+                                {% if meta_data.ports|length > 1 and not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for hostnames in detailed_data.hostnames %}
+                                {{ hostnames }}
+                                {% if meta_data.hostnames|length > 1 and not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for ip, meta_data in data.items %}
-                        <tr>
-                            <td>{{ ip }}</td>
-                            <td>
-                                {% for port, is_open in meta_data.ports.items %}
-                                    {% if is_open %}
-                                        <span class="open">{{ port }}</span>
-                                    {% else %}
-                                        {{ port }}
-                                        {{ meta_data.ports|length }}
-                                    {% endif %}
-                                    {% if meta_data.ports|length > 1 and not forloop.last %},{% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% for hostnames in meta_data.hostnames %}
-                                    {{ hostnames }}
-                                    {% if meta_data.hostnames|length > 1 and not forloop.last %},{% endif %}
-                                {% endfor %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </section>

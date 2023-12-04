@@ -66,10 +66,7 @@ class AggregateOrganisationReport(AggregateReport):
                             )
 
                 if report == "Open Ports Report":
-                    open_ports[data["data"]["ip"]] = {
-                        "ports": data["data"]["ports"],
-                        "hostnames": data["data"]["hostnames"],
-                    }
+                    open_ports.update(data["data"])
 
                 if report == "IPv6 Report":
                     for hostname, info in data["data"].items():

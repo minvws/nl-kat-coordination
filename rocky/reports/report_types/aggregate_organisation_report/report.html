@@ -29,6 +29,8 @@
         {% include "aggregate_organisation_report/recommendations.html" %}
         {% include "aggregate_organisation_report/term_overview.html" %}
         {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
+
+        <h3>{% translate "Open ports" %}</h3>
         {% include "open_ports_report/report.html" with data=data.open_ports %}
         {% include "ipv6_report/report.html" with data=data.ipv6 %}
 
