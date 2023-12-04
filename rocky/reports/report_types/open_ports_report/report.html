@@ -1,49 +1,44 @@
 {% load i18n %}
 
-<section id="open-ports">
-    <div class="horizontal-scroll">
-        <h3>{% translate "Open ports" %}</h3>
-        <p>
-            {% blocktranslate trimmed %}
-                See an overview of open ports found. <strong>Bold</strong> open ports are found through
-                direct scans that the organization performs via OpenKAT.
-                Other open ports were found outside by OpenKAT itself. Scans with the same domains,
-                ports and IPs are merged.
-            {% endblocktranslate %}
-        </p>
-        <table>
-            <caption class="visually-hidden">{% translate "Overview of open ports found for the scanned assets." %}</caption>
-            <thead>
-                <tr>
-                    <th scope="col">{% translate "IP address" %}</th>
-                    <th scope="col">{% translate "Open ports" %}</th>
-                    <th scope="col">{% translate "Domain" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for ip, detailed_data in data.items %}
-                    <tr>
-                        <td>{{ ip }}</td>
-                        <td>
-                            {% for port, is_open in detailed_data.ports.items %}
-                                {% if is_open %}
-                                    <span class="open">{{ port }}</span>
-                                {% else %}
-                                    {{ port }}
-                                    {{ meta_data.ports|length }}
-                                {% endif %}
-                                {% if meta_data.ports|length > 1 and not forloop.last %},{% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for hostnames in detailed_data.hostnames %}
-                                {{ hostnames }}
-                                {% if meta_data.hostnames|length > 1 and not forloop.last %},{% endif %}
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</section>
+<p>
+    {% blocktranslate trimmed %}
+        See an overview of open ports found. <strong>Bold</strong> open ports are found through
+        direct scans that the organization performs via OpenKAT.
+        Other open ports were found outside by OpenKAT itself. Scans with the same domains,
+        ports and IPs are merged.
+    {% endblocktranslate %}
+</p>
+<table>
+    <caption class="visually-hidden">{% translate "Overview of open ports found for the scanned assets." %}</caption>
+    <thead>
+        <tr>
+            <th scope="col">{% translate "IP address" %}</th>
+            <th scope="col">{% translate "Open ports" %}</th>
+            <th scope="col">{% translate "Domain" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ip, detailed_data in data.items %}
+            <tr>
+                <td>{{ ip }}</td>
+                <td>
+                    {% for port, is_open in detailed_data.ports.items %}
+                        {% if is_open %}
+                            <span class="open">{{ port }}</span>
+                        {% else %}
+                            {{ port }}
+                            {{ meta_data.ports|length }}
+                        {% endif %}
+                        {% if meta_data.ports|length > 1 and not forloop.last %},{% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for hostnames in detailed_data.hostnames %}
+                        {{ hostnames }}
+                        {% if meta_data.hostnames|length > 1 and not forloop.last %},{% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
