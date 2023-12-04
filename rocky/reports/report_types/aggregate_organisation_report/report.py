@@ -1,3 +1,4 @@
+from datetime import datetime
 from logging import getLogger
 
 from django.utils.translation import gettext_lazy as _
@@ -17,22 +18,21 @@ class AggregateOrganisationReport(AggregateReport):
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
     template_path = "aggregate_organisation_report/report.html"
+    summary = {
+        _("General recommendations"): "",
+        _("Critical vulnerabilities"): 0,
+        _("Assets (IP/domains) scanned"): 0,
+        _("Sector of organisation"): "",
+        _("Basic security score compared to sector"): "",
+        _("Sector defined"): "",
+        _("Lowest security score in organisation"): "",
+        _("Newly discovered items since last week, october 8th 2023"): "",
+        _("Terms in report"): "",
+    }
 
-    def get_summary(self):
-        summary = {
-            _("General recommendations"): 3,
-            _("Critical vulnerabilities"): 1,
-            _("Assets (IP/domains) scanned"): "x",
-            _("Indemnification"): "xxxxx",
-            _("Sector of organisation"): "This is a sector definition to make it clear for the rest of the report "
-            "what all the comparisons between percentages mean",
-            _("Basic security score compared to sector"): "Score 80%, Sector: 77,5%",
-            _("Sector defined"): "All healthcare organisations that use KAT for example.",
-            _("Lowest security score in organisation"): "System specific",
-            _("Newly discovered items since last week, october 8th 2023"): "1 systeem",
-            _("Terms in report"): ["DNS", "SPF"],
-        }
-        return summary
+    def get_summary(self, valid_time: datetime, input_ooi: str):
+        vulnerability_summary = VulnerabilityReport.get_summary(input_ooi, self.octopoes_api_connector, valid_time)
+        return vulnerability_summary
 
     def get_total_vulnerabilities(self, vulnerabilities) -> int:
         total_vulnerabilities = 0
@@ -40,14 +40,15 @@ class AggregateOrganisationReport(AggregateReport):
             total_vulnerabilities += finding_details["occurrences"]
         return total_vulnerabilities
 
-    def post_process_data(self, data):
+    def post_process_data(self, valid_time, data):
         systems = {"services": {}}
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
+        self.summary["Critical vulnerabilities"] = 0
+        self.summary["Assets (IP/domains) scanned"] = len(data.values())
 
         # input oois
-
         for input_ooi, report_data in data.items():
             # reports
             for report, data in report_data.items():
@@ -82,8 +83,13 @@ class AggregateOrganisationReport(AggregateReport):
                     data["data"]["total_findings"] = self.get_total_vulnerabilities(data["data"])
                     vulnerabilities[input_ooi] = data["data"]
 
+            self.summary["Critical vulnerabilities"] += self.get_summary(
+                valid_time,
+                input_ooi,
+            )["critical_vulnerabilities"]
+
         return {
-            "summary": self.get_summary(),
+            "summary": self.summary,
             "systems": systems,
             "open_ports": open_ports,
             "ipv6": ipv6,
