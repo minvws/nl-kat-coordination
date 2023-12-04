@@ -15,7 +15,7 @@ Step 1: Install WSL
 WSL (Windows Subsystem for Linux) allows you to run Linux commands from your Windows operating system. This example uses Debian, but this could also be another Linux distribution, such as Ubuntu.
 
 - Open PowerShell as administrator
-- Run: 
+- Run:
 
 .. code-block:: sh
 
@@ -30,7 +30,7 @@ WSL (Windows Subsystem for Linux) allows you to run Linux commands from your Win
 Step 2: Preparation
 --------------------
 
-Now it's time to prepare your system. 
+Now it's time to prepare your system.
 
 - Make sure Docker is installed, updated and running
 - Check the settings of Docker
@@ -43,7 +43,7 @@ Now it's time to prepare your system.
 Step 3: Open your Linux subsystem
 ----------------------------------
 
-- In PowerShell, run: 
+- In PowerShell, run:
 
 .. code-block:: sh
 
@@ -69,7 +69,7 @@ Step 5: Open the code in Visual Studio Code
 
 To do this, VS Code must already be installed on your Windows and you must have the WSL plugin installed in VS Code.
 
-- In your Debian Powershell, run: 
+- In your Debian Powershell, run:
 
 .. code-block:: sh
 
@@ -82,7 +82,7 @@ Step 6: Complete the .env file
 
 If you go to the ``.env`` file in the code, you should see that the passwords don't have a value yet. To fix this, run the following command.
 
-- In your Debian Powershell, run: 
+- In your Debian Powershell, run:
 
 .. code-block:: sh
 
@@ -94,13 +94,13 @@ Step 7: Start OpenKAT
 ----------------------
 
 Now you can start OpenKat.
-- In your Debian Powershell, run: 
+- In your Debian Powershell, run:
 
 .. code-block:: sh
 
     $ make kat
 
-- Go to `http://localhost:8000` and follow the onboarding. 
+- Go to `http://localhost:8000` and follow the onboarding.
 - Once you are through the onboarding, check that all of OpenKat's services are running properly using the "Health" link at the right side of the footer (http://localhost:8000/nl/{organization_id}/health/v1).
 
 Troubleshooting
