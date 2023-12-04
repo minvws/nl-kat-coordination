@@ -1,5 +1,6 @@
 import functools
 import logging
+import socket
 from concurrent import futures
 from typing import Callable, Optional
 
@@ -119,7 +120,7 @@ class RabbitMQ(Listener):
             self.logger.error("AMQPChannelError: %s", exc)
             raise exc
 
-    @retry((pika.exceptions.AMQPConnectionError,), delay=5, jitter=(1, 3), tries=5)
+    @retry((pika.exceptions.AMQPConnectionError, socket.gaierror), delay=5, jitter=(1, 3), tries=5)
     def connect(self, queue: str, durable: bool, prefetch_count: int) -> None:
         """Connect to the RabbitMQ host and declare the queue."""
         try:

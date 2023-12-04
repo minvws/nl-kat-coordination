@@ -111,16 +111,6 @@ class App:
         for org_id in additions:
             org = self.ctx.services.katalogus.get_organisation(org_id)
 
-            scheduler_normalizer = schedulers.NormalizerScheduler(
-                ctx=self.ctx,
-                scheduler_id=f"normalizer-{org.id}",
-                organisation=org,
-                callback=self.remove_scheduler,
-            )
-
-            self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
-            scheduler_normalizer.run()
-
             scheduler_boefje = schedulers.BoefjeScheduler(
                 ctx=self.ctx,
                 scheduler_id=f"boefje-{org.id}",
@@ -128,7 +118,18 @@ class App:
                 callback=self.remove_scheduler,
             )
 
-            self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
+            scheduler_normalizer = schedulers.NormalizerScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"normalizer-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+
+            with self.lock:
+                self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
+                self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
+
+            scheduler_normalizer.run()
             scheduler_boefje.run()
 
         if additions:
@@ -148,7 +149,7 @@ class App:
         This method that allows to collect metrics throughout the application.
         """
         with self.lock:
-            for s in self.schedulers.values():
+            for s in self.schedulers.copy().values():
                 self.ctx.metrics_qsize.labels(
                     scheduler_id=s.scheduler_id,
                 ).set(
