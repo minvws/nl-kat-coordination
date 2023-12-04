@@ -3583,7 +3583,7 @@ msgstr "Selecteer een {option_label}"
 
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance level"
-msgstr "Filter op vrijwaring niveau"
+msgstr "Filter op vrijwaringsniveau"
 
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance type"
@@ -3652,7 +3652,7 @@ msgid ""
 msgstr ""
 "OpenKAT bewaart een tijdsindicatie bij elke observatie, hierdoor is het "
 "mogelijk de status van de objecten op elk moment van de tijd in de historie "
-"te bekijken. Selecteer een datum-tijd om naar die weergave te springen."
+"te bekijken. Selecteer een datum om naar die weergave te springen."
 
 #: tools/forms/settings.py
 msgid "Depth of the tree."
@@ -5035,7 +5035,7 @@ msgstr "Verberg instellingen"
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Toggle all OOI types"
-msgstr "Schakel alle OOI-typen"
+msgstr "Schakel alle OOI-types in"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Children"
