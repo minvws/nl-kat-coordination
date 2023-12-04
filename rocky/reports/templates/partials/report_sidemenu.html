@@ -1,35 +1,37 @@
+{% load i18n %}
+
 <nav data-open-label="Zijbalknavigatie"
      data-close-label="Sluit zijbalknavigatie"
      aria-label="Zijbalknavigatie">
     <ol>
         <li>
-            <a href="">Recommendations</a>
+            <a href="#recommendations">{% translate "Recommendations" %}</a>
         </li>
         <li>
-            <a href="">Asset overview</a>
+            <a href="#asset-overview">{% translate "Asset overview" %}</a>
         </li>
         <li>
-            <a href="">Open ports</a>
+            <a href="#open-ports">{% translate "Open ports" %}</a>
         </li>
         <li>
-            <a href="">IPv6</a>
+            <a href="#ipv6">IPv6</a>
         </li>
         <li>
-            <a href="">Basic security</a>
+            <a href="#basic-security">{% translate "Basic security" %}</a>
             <ol>
                 <li>
-                    <a href="">Safe connections</a>
+                    <a href="#safe-connections">{% translate "Safe connections" %}</a>
                 </li>
                 <li>
-                    <a href="">System specific</a>
+                    <a href="#system-specific">{% translate "System specific" %}</a>
                 </li>
                 <li>
-                    <a href="">Resource Public Key Infrastructure</a>
+                    <a href="#rpki">{% translate "Resource Public Key Infrastructure" %}</a>
                 </li>
             </ol>
         </li>
         <li>
-            <a href="">Vulnerabilities</a>
+            <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
             <ol>
                 <li>
                     <a href="">'ipv6.example.com'</a>
@@ -42,7 +44,7 @@
     </ol>
     <ol type="A">
         <li>
-            <a href="">Appendix</a>
+            <a href="#appendix">{% translate "Appendix" %}</a>
         </li>
     </ol>
 </nav>

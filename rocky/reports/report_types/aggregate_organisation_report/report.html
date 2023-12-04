@@ -1,16 +1,39 @@
 {% load i18n %}
 
-<main>
-    <section>
-        <h1>{% translate "Report OpenKAT" %}</h1>
-        <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
+<main id="main-content" tabindex="-1" class="sidemenu choose-report">
+    {% include "partials/report_sidemenu.html" %}
+
+    <section class="report" lang="nl">
+        <section class="introduction">
+            <div class="horizontal-view toolbar"></div>
+            <div>
+                <h1>{% translate "OpenKAT Aggregate Report" %}</h1>
+                <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
+                <dl>
+                    <div>
+                        <dt>{% translate "Observed at:" %}</dt>
+                        <dd>
+                            {{ observed_at }} {{ TIME_ZONE }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Created by:" %}</dt>
+                        <dd>
+                            {{ organization_member.user.full_name }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
         {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
-        {% include "systems_report/report.html" with data=data.systems %}
+        {% include "aggregate_organisation_report/recommendations.html" %}
+        {% include "aggregate_organisation_report/term_overview.html" %}
+        {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
         {% include "open_ports_report/report.html" with data=data.open_ports %}
         {% include "ipv6_report/report.html" with data=data.ipv6 %}
 
         {% if data.vulnerabilities %}
-            <div>
+            <div id="vulnerabilities">
                 <h2>{% translate "Vulnerabilities" %}</h2>
                 <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
                 {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}

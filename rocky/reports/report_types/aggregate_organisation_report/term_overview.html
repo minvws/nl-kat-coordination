@@ -1,0 +1,57 @@
+{% load i18n %}
+
+<section id="term-overview">
+    <div>
+        <h2>{% translate "Term overview" %}</h2>
+        <p>
+            {% translate "[Explanation of chapter]. For definitions of terms used in this chapter, see the glossary below." %}
+        </p>
+        <ul class="accordion">
+            <li>
+                <button id="definition-system">Asset</button>
+                <div aria-labelledby="definition-system">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+                </div>
+            </li>
+            <li>
+                <button id="definition-system">System</button>
+                <div aria-labelledby="definition-system">
+                    <p>
+                        Multiple hostnames that resolve to one ip address where at least one of the hostnames or the ip address has a declared scan level that is at least L1.
+                        Type systemen zijn webservers, mailservers, en nameservers (DNS).
+                    </p>
+                </div>
+            </li>
+            <li>
+                <button id="definition-webserver">Webserver</button>
+                <div aria-labelledby="definition-webserver">
+                    <p>
+                        Voor webservers geldt hetzelfde maar http services gewoonlijk op porten 80 en 443. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                    </p>
+                </div>
+            </li>
+            <li>
+                <button id="definition-mailserver">Mailserver</button>
+                <div aria-labelledby="definition-mailserver">
+                    <p>
+                        Een mailserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor mail servers, gewoonlijk op porten 465, 25 en 995. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                    </p>
+                </div>
+            </li>
+            <li>
+                <button id="definition-nameserver">Nameserver</button>
+                <div aria-labelledby="definition-nameserver">
+                    <p>
+                        Een nameserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor dns servers, gewoonlijk op port 53. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                    </p>
+                </div>
+            </li>
+            <li>
+                <button id="example-accordion-ul-item-2">[V2] DISCOM server</button>
+                <div aria-labelledby="example-accordion-ul-item-2">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>

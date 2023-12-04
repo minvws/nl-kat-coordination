@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import Any, Dict
 
 from django.utils.translation import gettext_lazy as _
 
@@ -19,7 +18,7 @@ class AggregateOrganisationReport(AggregateReport):
     reports = {"required": [SystemReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
     template_path = "aggregate_organisation_report/report.html"
 
-    def get_summary(self, data: Dict[str, Any]):
+    def get_summary(self):
         summary = {
             _("General recommendations"): 3,
             _("Critical vulnerabilities"): 1,
@@ -46,8 +45,6 @@ class AggregateOrganisationReport(AggregateReport):
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
-
-        summary = {}
 
         # input oois
 
@@ -87,7 +84,7 @@ class AggregateOrganisationReport(AggregateReport):
                     vulnerabilities[input_ooi] = data["data"]
 
         return {
-            "summary": summary,
+            "summary": self.get_summary(),
             "systems": systems,
             "open_ports": open_ports,
             "ipv6": ipv6,
