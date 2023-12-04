@@ -18,6 +18,7 @@ from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
 from octopoes.models.ooi.network import IPAddressV6
+from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import (
     DNSZone,
@@ -222,7 +223,8 @@ def bit_runner(mocker) -> BitRunner:
 
 @pytest.fixture
 def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
-    client = get_xtdb_client(app_settings.xtdb_uri, "test", app_settings.xtdb_type)
+    testnode = f"test-{str(uuid.uuid4())}"
+    client = get_xtdb_client(app_settings.xtdb_uri, testnode, app_settings.xtdb_type)
     client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return client
@@ -239,7 +241,7 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
 
 @pytest.fixture
 def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
-    connector = OctopoesAPIConnector("http://ci_octopoes:80", "test")
+    connector = OctopoesAPIConnector("http://ci_octopoes:80", xtdb_session.client._client)
     connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return connector
@@ -305,7 +307,15 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ResolvedHostname(hostname=hostnames[6].reference, address=addresses[1].reference),
     ]
 
-    oois = hostnames + addresses + ports + services + ip_services + resolved_hostnames
+    websites = [
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[0].reference),
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[1].reference),
+    ]
+    software = [Software(name="DICOM")]
+    instance = [SoftwareInstance(ooi=ports[0].reference, software=software[0].reference)]
+
+    oois = hostnames + addresses + ports + services + ip_services + resolved_hostnames + websites + software + instance
     octopoes_api_connector.save_observation(
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
+    octopoes_api_connector.recalculate_bits()
