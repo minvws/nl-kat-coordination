@@ -24,9 +24,9 @@ Before installing
 Install Docker
 **************
 
-OpenKAT is installed in Docker, and therefore Docker must be installed first. The preferred method of installation is through a repository.
+OpenKAT is installed in Docker, and therefore Docker must be installed first. The preferred method of installation is through a repository. However, OpenKAT requires a newer version of Docker than what is available in the default ubuntu and debian repositories. That is why you should always use Docker's repository. 
 
-OpenKAT requires a newer version of Docker than what is available in the default ubuntu and debian repositories. That is why you should always use Docker's repository. On the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_ page you can find links to installation pages for all major Linux distributions. For a specific example using the Docker repository on Debian, see `Debian install using the repository <https://docs.docker.com/engine/install/debian/#install-using-the-repository>`_. The installation pages for the other Linux distributions contain similar instructions.
+On the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_ page you can find links to installation pages for all major Linux distributions. For a specific example using the Docker repository on Debian, see `Debian install using the repository <https://docs.docker.com/engine/install/debian/#install-using-the-repository>`_. The installation pages for the other Linux distributions contain similar instructions.
 
 **Important:** Please follow the post-installation steps as well! You can find them here: `Docker Engine post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/>`_.
 
@@ -41,10 +41,16 @@ Dependencies are packages required for OpenKAT to work. Run the following comman
 .. code-block:: sh
 
 	$ curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-	$ sudo apt-get install -y nodejs gcc g++ make python3-pip docker-compose
+	$ sudo apt-get install -y nodejs gcc g++ make python3-pip
 	$ curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
 	$ echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 	$ sudo apt-get update && sudo apt-get install yarn
+
+After installing Docker from the Docker repository it might be necessary to create a symlink for the command `docker-compose` as the latest version now uses a space instead of a dash. You can do this with the following command: 
+
+.. code-block:: sh
+
+	$ ln -s /usr/libexec/docker/cli/plugins/compose /usr/bin/docker-compose
 
 *RHEL based systems:*
 
@@ -81,6 +87,7 @@ Default installation
 
 .. code-block:: sh
 
+	$ make env
 	$ make kat
 
 Currently, the ``make kat`` command only works for the first user on a ``*nix`` system. This is a known problem which will be solved soon. The current user must be user 1000. You can check this by executing `id`.
