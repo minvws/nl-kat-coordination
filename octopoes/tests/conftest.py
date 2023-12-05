@@ -223,9 +223,9 @@ def bit_runner(mocker) -> BitRunner:
 
 
 @pytest.fixture
-def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
-    testnode = f"test-{str(uuid.uuid4())}"
-    client = get_xtdb_client(str(app_settings.xtdb_uri), testnode, app_settings.xtdb_type)
+def xtdb_http_client(request, app_settings: Settings) -> XTDBHTTPClient:
+    test_node = f"test-{request.node.originalname}"
+    client = get_xtdb_client(str(app_settings.xtdb_uri), test_node, app_settings.xtdb_type)
     client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return client
