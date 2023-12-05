@@ -104,16 +104,16 @@ class TypeSystemTest(TestCase):
 
     def test_paginated(self):
         with pytest.raises(ValidationError):
-            Paginated.parse_obj({"items": []})
+            Paginated.model_validate({"items": []})
 
         with pytest.raises(ValidationError):
-            Paginated.parse_obj({"count": 0})
+            Paginated.model_validate({"count": 0})
 
-        Paginated.parse_obj({"count": 0, "items": []})
-        Paginated.parse_obj({"count": 0, "items": ["a"]})
-        Paginated[MockOOIType].parse_obj({"count": 0, "items": []})
+        Paginated.model_validate({"count": 0, "items": []})
+        Paginated.model_validate({"count": 0, "items": ["a"]})
+        Paginated[MockOOIType].model_validate({"count": 0, "items": []})
 
         with pytest.raises(ValidationError):
-            Paginated[MockOOIType].parse_obj({"count": 0, "items": ["a"]})
+            Paginated[MockOOIType].model_validate({"count": 0, "items": ["a"]})
 
-        Paginated[MockOOIType].parse_obj({"count": 0, "items": [MockNetwork(name="test").dict()]})
+        Paginated[MockOOIType].model_validate({"count": 0, "items": [MockNetwork(name="test")]})
