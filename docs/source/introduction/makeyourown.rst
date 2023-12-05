@@ -2,7 +2,13 @@
 Plugins for OpenKAT: boefjes, whiskers and bits
 ===============================================
 
-OpenKAT is modular and can be easily extended. This guide provides a first step for the development of new plugins: boefjes that scan, whiskers that collect objects, and bits that contain businessrules.
+OpenKAT is modular and can be easily extended. This guide provides a first step for the development of new plugins:
+
+- boefjes that scan
+
+- whiskers that collect objects
+
+- bits that contain businessrules
 
 OpenKAT comes with a KATalog of boefjes, which can be viewed through the front end of the system. The premise is that all information is processed and stored in the smallest unit, ensuring the modular nature of OpenKAT.
 
@@ -13,9 +19,9 @@ This guide explains how the plugins work and how they are created, and gives an 
 What types of plugins are available?
 ====================================
 
-There are three types of plugins, deployed by OpenKAT to collect information, translate it into objects for the data model and then analyze it. Boefjes gather facts, Whiskers structure the information for the data model and Bits determine what you want to think about it; they are the business rules. Each action is cut into the smallest possible pieces.
+There are three types of plugins: deployed by OpenKAT to collect information, translate information into objects for the data model and then analyze this information. Boefjes gather facts, Whiskers structure the information for the data model and Bits determine what you want to think about it; they are the business rules. Each action is cut into the smallest possible pieces.
 
-- Boefjes gather factual information, such as by calling an external scanning tool like nmap or using a database like shodan.
+- Boefjes gather factual information, such as by calling an external scanning tool like nmap or using a database like Shodan.
 
 - Whiskers analyze the information and turn it into objects for the data model in Octopoes.
 
@@ -30,7 +36,7 @@ A hostname given as an object to OpenKAT, for example, is used as input to a sea
 
 Thus, OpenKAT is like a snowball rolling through the network based on the data model. The logical connections between objects point the way, and OpenKAT keeps looking for new boefjes until the model is complete.
 
-The new objects in the data model are evaluated by Bits, the business rules. This produces findings, which are added as objects. For example, the hostname includes a dns configuration, which must meet certain requirements. If it goes outside the established parameters it leads to a finding.
+The new objects in the data model are evaluated by Bits, the business rules. This produces findings, which are added as objects. For example, the hostname includes a DNS configuration, which must meet certain requirements. If it goes outside the established parameters it leads to a finding.
 
 Where to start?
 ===============
@@ -56,7 +62,7 @@ The existing boefjes can be viewed via the KATalog in OpenKAT and are on `GitHUB
 Object-types, classes and objects.
 ----------------------------------
 
-When we talk about object-types, we mean things like IPAddressV4. These have corresponding python classes that are all derived from the OOI base class.  These classes are defined in the Octopoes models directory.
+When we talk about object-types, we mean things like IPAddressV4. These have corresponding python classes that are all derived from the OOI base class. These classes are defined in the Octopoes models directory.
 
 They are used everywhere, both in code and as strings in json definition files.
 
@@ -94,16 +100,11 @@ An example:
             "IPAddressV4",
             "IPAddressV6"
         ],
-        "produces": [
-            "Finding",
-            "IPPort",
-            "CVEFindingType"
-        ],
         "environment_keys": ["SHODAN_API"],
         "scan_level": 1
     }
 
-The object-types associated with this boefje are *IPAddressV4, IPAddressV6, Finding, CVEFindingType.*
+The object-types associated with this boefje are *IPAddressV4, IPAddressV6*.
 
 This boefje consumes IP addresses and produces findings about the open ports, supplemented by the information about these ports.
 
@@ -121,6 +122,8 @@ To allow the user to add information through the web interface, add the schema.j
 
 Currently, however, OpenKAT only understands fairly shallow structures. For example, not all field types are supported, nor does OpenKAT understand references. You can test whether your Schema is neatly understood by checking the settings form in Rocky's KAT catalog for your boefje.
 
+In case your boefje uses sensitive secrets, such as API keys, make sure to add them to the secret section. This will ensure they are hidden in the Katalogus from regular users.
+
 .. code-block:: json
 
  {
@@ -135,6 +138,9 @@ Currently, however, OpenKAT only understands fairly shallow structures. For exam
     }
   },
   "required": [
+    "SHODAN_API"
+  ],
+  "secret": [
     "SHODAN_API"
   ]
  }
@@ -195,7 +201,7 @@ The normalizers translate the output of a boefje into objects that fit the data 
 	{
 	    "id": "kat_shodan_normalize",
 	    "consumes": [
-	        "shodan"
+	        "boefje/shodan"
 	    ],
 	    "produces": [
 	        "Finding",
@@ -207,66 +213,78 @@ The normalizers translate the output of a boefje into objects that fit the data 
 normalize.py
 ************
 
-The file normalize.py contains the actual normalizer: Its only job is to parse raw data and create, fill and yield the actual objects. (of valid object-types that are subclassed from OOI like IPPort)
+The file normalize.py contains the actual normalizer: Its only job is to parse raw data and create, fill and yield the actual objects (of valid object-types that are subclassed from OOI like IPPort).
 
 
 .. code-block:: python
 
- import json
- from typing import Iterable, Union
+	import json
+	import logging
+	from typing import Iterable, Union
+	
+	from boefjes.job_models import NormalizerMeta
+	from octopoes.models import OOI, Reference
+	from octopoes.models.ooi.findings import CVEFindingType, Finding
+	from octopoes.models.ooi.network import IPPort, PortState, Protocol
+	
+	
+	def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+	    results = json.loads(raw)
+	    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+	
+	    if not results:
+	        logging.info("No Shodan results available for normalization.")
+	    elif "data" not in results:
+	        logging.warning("Shodan results exist without data.")
+	    else:
+	        for scan in results["data"]:
+	            port_nr = scan["port"]
+	            transport = scan["transport"]
+	
+	            ip_port = IPPort(
+	                address=ooi,
+	                protocol=Protocol(transport),
+	                port=int(port_nr),
+	                state=PortState("open"),
+	            )
+	            yield ip_port
+	
+	            if "vulns" in scan:
+	                for cve, _ in scan["vulns"].items():
+	                    ft = CVEFindingType(id=cve)
+	                    f = Finding(finding_type=ft.reference, ooi=ip_port.reference)
+	                    yield ft
+	                    yield f
 
- from octopoes.models import OOI, Reference
- from octopoes.models.ooi.findings import CVEFindingType, Finding
- from octopoes.models.ooi.network import IPPort, Protocol, PortState
-
- from boefjes.job_models import NormalizerMeta
-
- def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
-    results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
-
-    for scan in results["data"]:
-        port_nr = scan["port"]
-        transport = scan["transport"]
-
-        ip_port = IPPort(
-            address=ooi,
-            protocol=Protocol(transport),
-            port=int(port_nr),
-            state=PortState("open"),
-        )
-        yield ip_port
-
-        if "vulns" in scan:
-            for cve, _ in scan["vulns"].items():
-                ft = CVEFindingType(id=cve)
-                f = Finding(finding_type=ft.reference, ooi=ip_port.reference)
-                yield ft
-                yield f
 
 Adding object-types
 ===================
 
 If you want to add an object-type, you need to know with which other object-types there is a logical relationship. An object-type is as simple as possible. As a result, a seemingly simple query sometimes explodes into a whole tree of objects.
 
-Adding object-types to the data model requires an addition in octopus. Here, an object-type can be added if it is connected to other object-types. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_.
+Adding object-types to the data model requires an addition in Octopoes. Here, an object-type can be added if it is connected to other object-types. Visually this is well understood using the `Graph explorer <https://mispo.es/model-explorer/model-explorer.html>`_. The actual code is `in the Octopoes repo <https://github.com/minvws/nl-kat-octopoes/tree/main/octopoes/models/ooi>`_.
 
 As with the boefje for shodan, here we again use the example from the functional documentation. A description of an object-type in the data model, in this case an IPPort, looks like this:
 
 
 .. code-block:: python
 
- class IPPort(OOI):
-    object_type: Literal["IPPort"] = "IPPort"
-
-    address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
-    protocol: Protocol
-    port: conint(gt=0, lt=2 ** 16)
-    state: Optional[PortState]
-
-    _natural_key_attrs = ["address", "protocol", "port"]
-    _reverse_relation_names = {"address": "ports"}
-    _information_value = ["protocol", "port"]
+	class IPPort(OOI):
+	    object_type: Literal["IPPort"] = "IPPort"
+	
+	    address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
+	    protocol: Protocol
+	    port: Annotated[int, Field(gt=0, lt=2**16)]
+	    state: Optional[PortState] = None
+	
+	    _natural_key_attrs = ["address", "protocol", "port"]
+	    _reverse_relation_names = {"address": "ports"}
+	    _information_value = ["protocol", "port"]
+	
+	    @classmethod
+	    def format_reference_human_readable(cls, reference: Reference):
+	        tokenized = reference.tokenized
+	        return f"{tokenized.address.address}:{tokenized.port}/{tokenized.protocol}"
 
 
 Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object-type and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document.
@@ -286,9 +304,9 @@ The PortState is defined separately. This can be done for information that has a
 Bits: businessrules
 ===================
 
-Bits are businessrules that assess objects. Which ports are allowed to be open, which are not, which software version is acceptable, which is not. Does a system as a whole meet a set of requirements associated with a particular certification or not? Some bits are configurable through a specific 'question object', which is explained below.
+Bits are businessrules that assess objects within Octopoes. Which ports are allowed to be open, which are not, which software version is acceptable, which is not. Does a system as a whole meet a set of requirements associated with a particular certification or not? Some bits are configurable through a specific 'question object', which is explained below.
 
-In the hostname example, that provides an IP address, and based on the IP address, we look at which ports are open. These include some ports that should be open because certain software is running and ports that should be closed because they are not used from a security or configuration standpoint.
+In the hostname example, that provides an IP address, and based on the IP address, we look at which ports are open. These include some ports that should be open because certain software is running and some ports that should be closed because they are not used from a security or configuration standpoint.
 
 The example below comes from the functional documentation and discusses the Bit for the IPPort object. The bit used for the analysis of open ports consists of three files:
 
@@ -301,91 +319,132 @@ Bit.py gives the structure of the bit, containing the input and the businessrule
 
 .. code-block:: python
 
- from bits.definitions import BitParameterDefinition, BitDefinition
- from octopoes.models.ooi.network import IPPort, IPAddress
+	from bits.definitions import BitDefinition, BitParameterDefinition
+	from octopoes.models.ooi.network import IPAddress, IPPort
+	
+	BIT = BitDefinition(
+	    id="port-classification-ip",
+	    consumes=IPAddress,
+	    parameters=[
+	        BitParameterDefinition(ooi_type=IPPort, relation_path="address"),
+	    ],
+	    module="bits.port_classification_ip.port_classification_ip",
+	    config_ooi_relation_path="IPAddress.network",
+	)
 
- BIT = BitDefinition(
-    id="port-classification",
-    consumes=IPPort,
-    parameters=[],
-    module="bits.port_classification.port_classification",
- )
-
-The businessrules are contained in the module *port_classification*, in the file *port_classification.py*. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed.
+The businessrules are contained in the module *port_classification*, in the file *port_classification.py*. This bit grabs the IPPort object and supplies the KATFindingType and Finding objects. The businessrules in this case distinguish three types of ports: the COMMON_TCP_PORTS that may be open, SA_PORTS that are for management purposes and should be closed, and DB_PORTS that indicate the presence of certain databases and should be closed. The port classification is configurable. Aggregate findings will make sure that all findings of the same type will be shown into one finding. 
 
 The specification for a bit is broad, but limited by the data model: Whereas Boefjes are actively gathering information externally, bits only look at the existing objects they receive from Octopus. Analysis of the information can then be used to create new objects, such as the KATFindingTypes which in turn correspond to a set of specific reports in OpenKAT.
 
 .. code-block:: python
 
- from typing import List, Iterator
-
- from octopoes.models import OOI
- from octopoes.models.ooi.findings import KATFindingType, Finding
- from octopoes.models.ooi.network import IPPort
-
- COMMON_TCP_PORTS = [25, 53, 110, 143, 993, 995, 80, 443]
- SA_PORTS = [21, 22, 23, 3389, 5900]
- DB_PORTS = [1433, 1434, 3050, 3306, 5432]
-
-
- def run(
-    input_ooi: IPPort,
-    additional_oois: List,
- ) -> Iterator[OOI]:
-
-    port = input_ooi.port
-    if port in SA_PORTS:
-        open_sa_port = KATFindingType(id="KAT-OPEN-SYSADMIN-PORT")
-        yield open_sa_port
-        yield Finding(
-            finding_type=open_sa_port.reference,
-            ooi=input_ooi.reference,
-            description=f"Port {port} is a system administrator port and should not be open.",
-        )
-
-    if port in DB_PORTS:
-        ft = KATFindingType(id="KAT-OPEN-DATABASE-PORT")
-        yield ft
-        yield Finding(
-            finding_type=ft.reference,
-            ooi=input_ooi.reference,
-            description=f"Port {port} is a database port and should not be open.",
-        )
-
-    if port not in COMMON_TCP_PORTS and port not in SA_PORTS and port not in DB_PORTS:
-        kat = KATFindingType(id="KAT-UNCOMMON-OPEN-PORT")
-        yield kat
-        yield Finding(
-            finding_type=kat.reference,
-            ooi=input_ooi.reference,
-            description=f"Port {port} is not a common port and should possibly not be open.",
-        )
+	 from typing import List, Iterator
+	
+	 from octopoes.models import OOI
+	 from octopoes.models.ooi.findings import KATFindingType, Finding
+	 from octopoes.models.ooi.network import IPPort
+	
+	 COMMON_TCP_PORTS = [25, 53, 110, 143, 993, 995, 80, 443]
+	 SA_PORTS = [21, 22, 23, 3389, 5900]
+	 DB_PORTS = [1433, 1434, 3050, 3306, 5432]
+	
+	
+	def get_ports_from_config(config, config_key, default):
+	    ports = config.get(config_key, None)
+	    if ports is None:
+	        return default
+	    return list(map(int, ports.split(","))) if ports else []
+	
+	
+	def run(input_ooi: IPPort, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
+	    aggregate_findings = config.get("aggregate_findings", "False").lower() == "true" if config else False
+	    open_ports = []
+	
+	    common_tcp_ports = get_ports_from_config(config, "common_tcp_ports", COMMON_TCP_PORTS)
+	    common_udp_ports = get_ports_from_config(config, "common_udp_ports", COMMON_UDP_PORTS)
+	    sa_tcp_ports = get_ports_from_config(config, "sa_tcp_ports", SA_TCP_PORTS)
+	    db_tcp_ports = get_ports_from_config(config, "db_tcp_ports", DB_TCP_PORTS)
+	
+	    for ip_port in additional_oois:
+	        port = ip_port.port
+	        protocol = ip_port.protocol
+	        if protocol == Protocol.TCP and port in sa_tcp_ports:
+	            open_sa_port = KATFindingType(id="KAT-OPEN-SYSADMIN-PORT")
+	            if aggregate_findings:
+	                open_ports.append(ip_port.port)
+	            else:
+	                yield open_sa_port
+	                yield Finding(
+	                    finding_type=open_sa_port.reference,
+	                    ooi=ip_port.reference,
+	                    description=f"Port {port}/{protocol.value} is a system administrator port and should not be open.",
+	                )
+	        elif protocol == Protocol.TCP and port in db_tcp_ports:
+	            ft = KATFindingType(id="KAT-OPEN-DATABASE-PORT")
+	            if aggregate_findings:
+	                open_ports.append(ip_port.port)
+	            else:
+	                yield ft
+	                yield Finding(
+	                    finding_type=ft.reference,
+	                    ooi=ip_port.reference,
+	                    description=f"Port {port}/{protocol.value} is a database port and should not be open.",
+	                )
+	        elif (protocol == Protocol.TCP and port not in common_tcp_ports) or (
+	            protocol == Protocol.UDP and port not in common_udp_ports
+	        ):
+	            kat = KATFindingType(id="KAT-UNCOMMON-OPEN-PORT")
+	            if aggregate_findings:
+	                open_ports.append(ip_port.port)
+	            else:
+	                yield kat
+	                yield Finding(
+	                    finding_type=kat.reference,
+	                    ooi=ip_port.reference,
+	                    description=f"Port {port}/{protocol.value} is not a common port and should possibly not be open.",
+	                )
+	    if aggregate_findings and open_ports:
+	        ft = KATFindingType(
+	            id="KAT-UNCOMMON-OPEN-PORT",
+	        )
+	        yield ft
+	        yield Finding(
+	            finding_type=ft.reference,
+	            ooi=input_ooi.reference,
+	            description=f"Ports {', '.join([str(port) for port in open_ports])} are not common ports and should "
+	            f"possibly not be open.",
+	        )
 
 Bits can recognize patterns and derive new objects from them.
 
-For example: The Bit for *internet.nl* can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions:
+For example: The bit for *internet.nl* can thus deduce from a series of objects whether a particular site meets the requirements of internet.nl or not. This bit retrieves findings from a series of items and draws conclusions based on them. The analysis underlying this is built up from small steps, which go around OpenKAT several times before enough information is available to draw the right conclusions:
 
 .. code-block:: python
 
-	from bits.definitions import BitParameterDefinition, BitDefinition
+	from bits.definitions import BitDefinition, BitParameterDefinition
 	from octopoes.models.ooi.dns.zone import Hostname
 	from octopoes.models.ooi.findings import Finding
 	from octopoes.models.ooi.web import Website
-
+	
 	BIT = BitDefinition(
 	    id="internet-nl",
 	    consumes=Hostname,
 	    parameters=[
-	        BitParameterDefinition(ooi_type=Finding, relation_path="ooi"),  # findings on hostnames
-	        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.website.hostname"),  # findings on resources
-	        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.resource.website.hostname"),  # findings on headers
-	        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.hostname"),  # findings on websites
-	        BitParameterDefinition(ooi_type=Finding, relation_path="ooi.netloc"),  # findings on weburls
+	        BitParameterDefinition(ooi_type=Finding, relation_path="ooi [is Hostname]"),  # findings on hostnames
+	        BitParameterDefinition(
+	            ooi_type=Finding, relation_path="ooi [is HTTPResource].website.hostname"
+	        ),  # findings on resources
+	        BitParameterDefinition(
+	            ooi_type=Finding, relation_path="ooi [is HTTPHeader].resource.website.hostname"
+	        ),  # findings on headers
+	        BitParameterDefinition(ooi_type=Finding, relation_path="ooi [is Website].hostname"),  # findings on websites
+	        BitParameterDefinition(
+	            ooi_type=Finding, relation_path="ooi [is HostnameHTTPURL].netloc"
+	        ),  # findings on weburls
 	        BitParameterDefinition(ooi_type=Website, relation_path="hostname"),  # only websites have to comply
 	    ],
 	    module="bits.internetnl.internetnl",
 	)
-
 
 Configurable bits
 =================
