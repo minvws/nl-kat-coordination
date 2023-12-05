@@ -27,40 +27,43 @@
         </section>
         {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
         {% include "aggregate_organisation_report/term_overview.html" %}
-        {% include "aggregate_organisation_report/recommendations.html" %}
-        {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
 
-        {% if data.open_ports %}
-            <section id="open-ports">
-                <div class="horizontal-scroll">
-                    <h2>{% translate "Open ports" %}</h2>
-                    {% include "open_ports_report/report.html" with data=data.open_ports %}
+        <section class="chapter-numbers">
+            {% include "aggregate_organisation_report/recommendations.html" %}
+            {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
 
+            {% if data.open_ports %}
+                <section id="open-ports">
+                    <div class="horizontal-scroll">
+                        <h2>{% translate "Open ports" %}</h2>
+                        {% include "open_ports_report/report.html" with data=data.open_ports %}
+
+                    </div>
+                </section>
+            {% endif %}
+            {% if data.ipv6 %}
+                <section id="ipv6">
+                    <div class="horizontal-scroll">
+                        <h2>IPv6</h2>
+                        {% include "ipv6_report/report.html" with data=data.ipv6 %}
+
+                    </div>
+                </section>
+            {% endif %}
+            {% if data.vulnerabilities %}
+                <div id="vulnerabilities">
+                    <h2>{% translate "Vulnerabilities" %}</h2>
+                    <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                        <h3>{{ input_ooi }}</h3>
+                        <p>
+                            <strong>{{ vulnerabilities.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
+                        </p>
+                        {% include "vulnerability_report/report.html" with data=vulnerabilities %}
+
+                    {% endfor %}
                 </div>
-            </section>
-        {% endif %}
-        {% if data.ipv6 %}
-            <section id="ipv6">
-                <div class="horizontal-scroll">
-                    <h2>IPv6</h2>
-                    {% include "ipv6_report/report.html" with data=data.ipv6 %}
-
-                </div>
-            </section>
-        {% endif %}
-        {% if data.vulnerabilities %}
-            <div id="vulnerabilities">
-                <h2>{% translate "Vulnerabilities" %}</h2>
-                <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
-                {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                    <h3>{{ input_ooi }}</h3>
-                    <p>
-                        <strong>{{ vulnerabilities.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
-                    </p>
-                    {% include "vulnerability_report/report.html" with data=vulnerabilities %}
-
-                {% endfor %}
-            </div>
-        {% endif %}
+            {% endif %}
+        </section>
     </section>
 </main>
