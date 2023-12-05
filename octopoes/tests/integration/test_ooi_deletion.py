@@ -1,6 +1,7 @@
 import os
 import uuid
 from datetime import datetime
+import time
 
 import pytest
 
@@ -54,6 +55,9 @@ def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     octopoes_api_connector.delete(network.reference)
     octopoes_api_connector.delete(hostname.reference)
 
+    #This sleep is here because otherwise on some systems this test will fail
+    #Delete when issue #2083 is resolved...
+    time.sleep(1)
     assert len(octopoes_api_connector.list_origins(task_id={})) < bits_size
 
     octopoes_api_connector.recalculate_bits()
