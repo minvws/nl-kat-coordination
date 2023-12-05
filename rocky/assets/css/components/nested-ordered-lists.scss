@@ -1,13 +1,13 @@
 /* Nested ordered lists */
 
 /* Includes parent numbers */
-.nested-numbers {
+.chapter-numbers {
   counter-reset: chapter;
 
   h2 {
     &::before {
       counter-increment: chapter;
-      content: counter(chapter) ": ";
+      content: counter(chapter) ". ";
     }
   }
 }
