@@ -140,7 +140,9 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             report_data[ooi] = {}
             for options, report_types in aggregate_report.reports.items():
                 for report_type in report_types:
-                    if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
+                    if Reference.from_str(ooi).class_type in report_type.input_ooi_types and report_type.id in [
+                        report["id"] for report in self.get_report_types()
+                    ]:
                         report = report_type(self.octopoes_api_connector)
                         data = report.generate_data(ooi, valid_time=self.valid_time)
                         template = report.template_path
