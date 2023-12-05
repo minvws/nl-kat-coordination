@@ -1,5 +1,4 @@
 import os
-import time
 import uuid
 from datetime import datetime
 
@@ -9,8 +8,8 @@ from octopoes.api.models import Declaration, Observation
 from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import ScanLevel
-from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.dns.records import NXDOMAIN
+from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 
@@ -19,11 +18,13 @@ if os.environ.get("CI") != "1":
 
 XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 
+
 def printer(arg1, arg2):
     print(arg1)
     for k in arg2:
         print(k)
     print()
+
 
 def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="internet")
