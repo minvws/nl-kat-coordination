@@ -223,7 +223,8 @@ def bit_runner(mocker) -> BitRunner:
 
 @pytest.fixture
 def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
-    client = get_xtdb_client(app_settings.xtdb_uri, "test", app_settings.xtdb_type)
+    testnode = f"test-{str(uuid.uuid4())}"
+    client = get_xtdb_client(app_settings.xtdb_uri, testnode, app_settings.xtdb_type)
     client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return client
@@ -240,7 +241,7 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
 
 @pytest.fixture
 def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
-    connector = OctopoesAPIConnector("http://ci_octopoes:80", "test")
+    connector = OctopoesAPIConnector("http://ci_octopoes:80", xtdb_session.client._client)
     connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return connector
