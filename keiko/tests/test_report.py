@@ -125,7 +125,7 @@ def report_args(tmp_path):
 
 
 def test_generate_report_empty(report_args):
-    report_args["report_data"] = DataShape.parse_obj(report_data_empty)
+    report_args["report_data"] = DataShape.model_validate(report_data_empty)
     generate_report(**report_args)
 
     report_file = report_args["settings"].reports_folder / "test.keiko.pdf"
@@ -138,7 +138,7 @@ def test_generate_report_empty(report_args):
 
 
 def test_generate_report_debug(report_args):
-    report_args["report_data"] = DataShape.parse_obj(report_data_empty)
+    report_args["report_data"] = DataShape.model_validate(report_data_empty)
     report_args["debug"] = True
     generate_report(**report_args)
 
@@ -152,7 +152,7 @@ def test_generate_report_debug(report_args):
 
 
 def test_generate_report_underscore(report_args):
-    report_args["report_data"] = DataShape.parse_obj(report_data_underscores)
+    report_args["report_data"] = DataShape.model_validate(report_data_underscores)
     generate_report(**report_args)
 
     report_file = report_args["settings"].reports_folder / "test.keiko.pdf"

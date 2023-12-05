@@ -43,7 +43,7 @@ def test_spf_discovery_invalid_():
 
     results = list(run(dnstxt_record, [], {}))
 
-    assert results[0].dict() == KATFindingType(id="KAT-INVALID-SPF")
+    assert results[0] == KATFindingType(id="KAT-INVALID-SPF")
 
 
 def test_spf_discovery_intermediate_success():
