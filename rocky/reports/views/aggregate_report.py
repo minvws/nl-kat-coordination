@@ -147,7 +147,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
                         data = report.generate_data(ooi, valid_time=self.valid_time)
                         template = report.template_path
                         report_data[ooi][report_type.name] = {"data": data, "template": template}
-        post_processed_data = aggregate_report.post_process_data(self.valid_time, report_data)
+        post_processed_data = aggregate_report.post_process_data(report_data)
 
         return aggregate_template, post_processed_data, report_data
 
