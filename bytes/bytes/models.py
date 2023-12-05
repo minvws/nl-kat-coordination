@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, Iterable, List, NewType, Optional, Union
+from typing import Any, Dict, List, NewType, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
-from pydantic.datetime_parse import StrBytesIntFloat, parse_datetime
+from pydantic import AwareDatetime, BaseModel, Field
+from pydantic.v1.datetime_parse import parse_datetime
 
 RetrievalLink = NewType("RetrievalLink", str)
 SecureHash = NewType("SecureHash", str)
@@ -28,17 +28,11 @@ class HashingRepositoryReference(str, Enum):
     RFC3161 = "RFC3161"
 
 
-class TimezoneAwareDatetime(datetime):
-    @classmethod
-    def __get_validators__(cls) -> Iterable[Callable[[Union[datetime, StrBytesIntFloat]], datetime]]:
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, value: Union[datetime, StrBytesIntFloat]) -> datetime:
-        parsed = parse_datetime(value)
-        if parsed.tzinfo is None or parsed.tzinfo.utcoffset(parsed) is None:
-            raise ValueError(f"{parsed} is not timezone aware")
-        return parsed
+def _validate_timezone_aware_datetime(value: datetime) -> datetime:
+    parsed = parse_datetime(value)
+    if parsed.tzinfo is None or parsed.tzinfo.utcoffset(parsed) is None:
+        raise ValueError(f"{parsed} is not timezone aware")
+    return parsed
 
 
 class MimeType(BaseModel):
@@ -47,27 +41,27 @@ class MimeType(BaseModel):
 
 class Job(BaseModel):
     id: UUID
-    started_at: TimezoneAwareDatetime
-    ended_at: TimezoneAwareDatetime
+    started_at: AwareDatetime
+    ended_at: AwareDatetime
 
 
 class Boefje(BaseModel):
     id: str
-    version: Optional[str]
+    version: Optional[str] = None
 
 
 class Normalizer(BaseModel):
     id: str
-    version: Optional[str]
+    version: Optional[str] = None
 
 
 class BoefjeMeta(Job):
     boefje: Boefje
-    input_ooi: Optional[str]
+    input_ooi: Optional[str] = None
     arguments: Dict[str, Any]
     organization: str
-    runnable_hash: Optional[str]
-    environment: Optional[Dict[str, str]]
+    runnable_hash: Optional[str] = None
+    environment: Optional[Dict[str, str]] = None
 
 
 class RawDataMeta(BaseModel):
@@ -78,9 +72,9 @@ class RawDataMeta(BaseModel):
     mime_types: List[MimeType] = Field(default_factory=list)
 
     # These are set once the raw is saved
-    secure_hash: Optional[SecureHash]
-    signing_provider_url: Optional[str]
-    hash_retrieval_link: Optional[RetrievalLink]
+    secure_hash: Optional[SecureHash] = None
+    signing_provider_url: Optional[str] = None
+    hash_retrieval_link: Optional[RetrievalLink] = None
 
 
 class RawData(BaseModel):
@@ -89,9 +83,9 @@ class RawData(BaseModel):
     mime_types: List[MimeType] = Field(default_factory=list)
 
     # These are set once the raw is saved
-    secure_hash: Optional[SecureHash]
-    signing_provider_url: Optional[str]
-    hash_retrieval_link: Optional[RetrievalLink]
+    secure_hash: Optional[SecureHash] = None
+    signing_provider_url: Optional[str] = None
+    hash_retrieval_link: Optional[RetrievalLink] = None
 
 
 class NormalizerMeta(Job):

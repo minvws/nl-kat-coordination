@@ -1,10 +1,11 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Type
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, Field, FilePath, IPvAnyAddress, PostgresDsn
-from pydantic.env_settings import SettingsSourceCallable
+from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
+from pydantic_settings.sources import EnvSettingsSource
 
 BASE_DIR: Path = Path(__file__).parent.resolve()
 
@@ -13,15 +14,15 @@ if os.getenv("DOCS"):
     BASE_DIR = Path("../")
 
 
-class BackwardsCompatibleEnvSettings:
+class BackwardsCompatibleEnvSettings(EnvSettingsSource):
     backwards_compatibility_mapping = {
         "LOG_CFG": "BOEFJES_LOG_CFG",
     }
 
-    def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
+    def __call__(self) -> Dict[str, Any]:
         d: Dict[str, Any] = {}
         env_vars = {k.lower(): v for k, v in os.environ.items()}
-        env_prefix = settings.__config__.env_prefix.lower()
+        env_prefix = self.settings_cls.model_config.get("env_prefix", "").lower()
 
         for old_name, new_name in self.backwards_compatibility_mapping.items():
             old_name, new_name = old_name.lower(), new_name.lower()
@@ -48,25 +49,27 @@ class Settings(BaseSettings):
     )
 
     # Queue configuration
-    queue_uri: AmqpDsn = Field(..., description="KAT queue URI", example="amqp://", env="QUEUE_URI")
+    queue_uri: AmqpDsn = Field(..., description="KAT queue URI", examples=["amqp://"], validation_alias="QUEUE_URI")
 
     katalogus_db_uri: PostgresDsn = Field(
         ...,
-        example="postgresql://xx:xx@host:5432/katalogus",
+        examples=["postgresql://xx:xx@host:5432/katalogus"],
         description="Katalogus Postgres DB URI",
-        env="KATALOGUS_DB_URI",
+        validation_alias="KATALOGUS_DB_URI",
     )
 
     scheduler_api: AnyHttpUrl = Field(
-        ..., example="http://localhost:8004", description="Mula API URL", env="SCHEDULER_API"
+        ..., examples=["http://localhost:8004"], description="Mula API URL", validation_alias="SCHEDULER_API"
     )
     katalogus_api: AnyHttpUrl = Field(
-        ..., example="http://localhost:8003", description="Katalogus API URL", env="KATALOGUS_API"
+        ..., examples=["http://localhost:8003"], description="Katalogus API URL", validation_alias="KATALOGUS_API"
     )
     octopoes_api: AnyHttpUrl = Field(
-        ..., example="http://localhost:8001", description="Octopoes API URL", env="OCTOPOES_API"
+        ..., examples=["http://localhost:8001"], description="Octopoes API URL", validation_alias="OCTOPOES_API"
     )
-    boefje_api: AnyHttpUrl = Field(..., example="http://boefje:8000", description="Boefje API URL", env="BOEFJE_API")
+    boefje_api: AnyHttpUrl = Field(
+        ..., examples=["http://boefje:8000"], description="Boefje API URL", validation_alias="BOEFJE_API"
+    )
     # Boefje server settings
     boefje_api_host: str = Field(
         "0.0.0.0",
@@ -76,33 +79,38 @@ class Settings(BaseSettings):
         8000,
         description="Host port of the Boefje API server",
     )
-
     boefje_docker_network: str = Field(
         "bridge",
         description="Docker network to run Boefjes in",
         env="BOEFJE_DOCKER_NETWORK",
     )
-
-    bytes_api: AnyHttpUrl = Field(..., example="http://localhost:8002", description="Bytes API URL", env="BYTES_API")
-    bytes_username: str = Field(..., example="test", description="Bytes JWT login username", env="BYTES_USERNAME")
-    bytes_password: str = Field(..., example="secret", description="Bytes JWT login password", env="BYTES_PASSWORD")
-
-    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
-        None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
+    bytes_api: AnyHttpUrl = Field(
+        ..., examples=["http://localhost:8002"], description="Bytes API URL", validation_alias="BYTES_API"
+    )
+    bytes_username: str = Field(
+        ..., examples=["test"], description="Bytes JWT login username", validation_alias="BYTES_USERNAME"
+    )
+    bytes_password: str = Field(
+        ..., examples=["secret"], description="Bytes JWT login password", validation_alias="BYTES_PASSWORD"
     )
 
-    class Config:
-        env_prefix = "BOEFJES_"
+    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
+        None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
+    )
 
-        @classmethod
-        def customise_sources(
-            cls,
-            init_settings: SettingsSourceCallable,
-            env_settings: SettingsSourceCallable,
-            file_secret_settings: SettingsSourceCallable,
-        ) -> Tuple[SettingsSourceCallable, ...]:
-            backwards_compatible_settings = BackwardsCompatibleEnvSettings()
-            return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
+    model_config = SettingsConfigDict(env_prefix="BOEFJES_")
+
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        backwards_compatible_settings = BackwardsCompatibleEnvSettings(settings_cls)
+        return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
 
 # Do not initialize the settings module when compiling environment docs
