@@ -5,8 +5,9 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import DDL, Column, DateTime, Enum, String, event
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
@@ -42,27 +43,6 @@ class TaskStatus(str, enum.Enum):
 
     # Task has been cancelled
     CANCELLED = "cancelled"
-
-
-class Task(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: uuid.UUID
-
-    scheduler_id: str
-
-    type: str
-
-    p_item: PrioritizedItem
-
-    status: TaskStatus
-
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    def __repr__(self):
-        return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
 
 class TaskDB(Base):
@@ -102,6 +82,99 @@ class TaskDB(Base):
             created_at.desc(),
         ),
     )
+
+    _event_store = None
+
+    @classmethod
+    def set_event_store(cls, event_store):
+        cls._event_store = event_store
+
+    @hybrid_property
+    def duration(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_duration(self.id)
+
+    @hybrid_property
+    def queued(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_queued(self.id)
+
+    @hybrid_property
+    def runtime(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_runtime(self.id)
+
+    @hybrid_property
+    def cpu(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_cpu(self.id)
+
+    @hybrid_property
+    def memory(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_memory(self.id)
+
+    @hybrid_property
+    def disk(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_disk(self.id)
+
+    @hybrid_property
+    def network(self) -> float:
+        if self._event_store is None:
+            raise ValueError("EventStore instance is not set. Use TaskDB.set_event_store to set it.")
+
+        return self._event_store.get_task_network(self.id)
+
+
+class Task(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+
+    scheduler_id: str
+
+    type: str
+
+    p_item: PrioritizedItem
+
+    status: TaskStatus
+
+    duration: Optional[float] = Field(None, alias="duration", readonly=True)
+
+    queued: Optional[float] = Field(None, alieas="queued", readonly=True)
+
+    runtime: Optional[float] = Field(None, alias="runtime", readonly=True)
+
+    cpu: Optional[float] = Field(None, alias="cpu", readonly=True)
+
+    memory: Optional[float] = Field(None, alias="memory", readonly=True)
+
+    disk: Optional[float] = Field(None, alias="disk", readonly=True)
+
+    network: Optional[float] = Field(None, alias="network", readonly=True)
+
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    def __repr__(self):
+        return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
+
+    def model_dump_db(self):
+        return self.model_dump(exclude={"duration", "queued", "runtime", "cpu", "memory", "disk", "network"})
 
 
 class NormalizerTask(BaseModel):
@@ -144,3 +217,35 @@ class BoefjeTask(BaseModel):
             return mmh3.hash_bytes(f"{self.input_ooi}-{self.boefje.id}-{self.organization}").hex()
 
         return mmh3.hash_bytes(f"{self.boefje.id}-{self.organization}").hex()
+
+
+func_record_event = DDL(
+    """
+    CREATE OR REPLACE FUNCTION record_event()
+        RETURNS TRIGGER AS
+    $$
+    BEGIN
+        IF TG_OP = 'INSERT' THEN
+            INSERT INTO events (task_id, type, context, event, data)
+            VALUES (NEW.id, 'events.db', 'task', 'insert', row_to_json(NEW));
+        ELSIF TG_OP = 'UPDATE' THEN
+            INSERT INTO events (task_id, type, context, event, data)
+            VALUES (NEW.id, 'events.db', 'task', 'update', row_to_json(NEW));
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+"""
+)
+
+trigger_tasks_insert_update = DDL(
+    """
+    CREATE TRIGGER tasks_insert_update_trigger
+    AFTER INSERT OR UPDATE ON tasks
+    FOR EACH ROW
+    EXECUTE FUNCTION record_event();
+"""
+)
+
+event.listen(TaskDB.__table__, "after_create", func_record_event.execute_if(dialect="postgresql"))
+event.listen(TaskDB.__table__, "after_create", trigger_tasks_insert_update.execute_if(dialect="postgresql"))

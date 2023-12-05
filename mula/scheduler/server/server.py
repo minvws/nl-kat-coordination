@@ -1,6 +1,6 @@
 import datetime
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import fastapi
 import prometheus_client
@@ -207,6 +207,14 @@ class Server:
             description="Push an item to a queue",
         )
 
+        self.api.add_api_route(
+            path="/events",
+            endpoint=self.list_events,
+            methods=["GET", "POST"],
+            response_model=Union[PaginatedResponse, models.Event],
+            description="List all task events",
+        )
+
     def root(self) -> Any:
         return None
 
@@ -294,7 +302,7 @@ class Server:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="min_date must be less than max_date",
+                detail="min_created_at cannot be greater than max_created_at",
             )
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
@@ -566,6 +574,85 @@ class Server:
             ) from exc_not_allowed
 
         return models.PrioritizedItem(**p_item.model_dump())
+
+    def list_events(
+        self,
+        request: fastapi.Request,
+        task_id: Optional[str] = None,
+        type: Optional[str] = None,  # noqa: A002
+        context: Optional[str] = None,  # noqa: A002
+        event: Optional[str] = None,
+        min_timestamp: Optional[datetime.datetime] = None,
+        max_timestamp: Optional[datetime.datetime] = None,
+        offset: int = 0,
+        limit: int = 10,
+        filters: Optional[storage.filters.FilterRequest] = None,
+        item: Optional[models.Event] = None,
+    ) -> Any:
+        if item is not None and request.method == "POST":
+            created_event = fastapi.encoders.jsonable_encoder(self.create_event(item=item))
+
+            return fastapi.responses.JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=created_event,
+            )
+
+        if (min_timestamp is not None and max_timestamp is not None) and min_timestamp > max_timestamp:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail="min_timestamp cannot be greater than max_timestamp",
+            )
+
+        try:
+            results, count = self.ctx.datastores.event_store.get_events(
+                task_id=task_id,
+                type=type,
+                context=context,
+                event=event,
+                min_timestamp=min_timestamp,
+                max_timestamp=max_timestamp,
+                offset=offset,
+                limit=limit,
+                filters=filters,
+            )
+        except storage.filters.errors.FilterError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except ValueError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to get events",
+            ) from exc
+
+        return paginate(request, results, count, offset, limit)
+
+    def create_event(self, item: models.Event) -> Any:
+        try:
+            event = models.Event(**item.dict())
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+
+        try:
+            self.ctx.datastores.event_store.create_event(event)
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to create event",
+            ) from exc
+
+        return event
 
     def run(self) -> None:
         uvicorn.run(
