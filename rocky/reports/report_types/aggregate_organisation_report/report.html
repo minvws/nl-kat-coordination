@@ -30,20 +30,24 @@
         {% include "aggregate_organisation_report/recommendations.html" %}
         {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
 
-        <section id="open-ports">
-            <div class="horizontal-scroll">
-                <h2>3. {% translate "Open ports" %}</h2>
-                {% include "open_ports_report/report.html" with data=data.open_ports %}
+        {% if data.open_ports %}
+            <section id="open-ports">
+                <div class="horizontal-scroll">
+                    <h2>3. {% translate "Open ports" %}</h2>
+                    {% include "open_ports_report/report.html" with data=data.open_ports %}
 
-            </div>
-        </section>
-        <section id="ipv6">
-            <div class="horizontal-scroll">
-                <h2>4. IPv6</h2>
-                {% include "ipv6_report/report.html" with data=data.ipv6 %}
+                </div>
+            </section>
+        {% endif %}
+        {% if data.ipv6 %}
+            <section id="ipv6">
+                <div class="horizontal-scroll">
+                    <h2>4. IPv6</h2>
+                    {% include "ipv6_report/report.html" with data=data.ipv6 %}
 
-            </div>
-        </section>
+                </div>
+            </section>
+        {% endif %}
         {% if data.vulnerabilities %}
             <div id="vulnerabilities">
                 <h2>5. {% translate "Vulnerabilities" %}</h2>

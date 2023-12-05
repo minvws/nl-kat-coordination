@@ -16,8 +16,8 @@ class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
-    reports = {"required": [SystemReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
-    template_path = "aggregate_organisation_report/report_design.html"
+    reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report]}
+    template_path = "aggregate_organisation_report/report.html"
     summary = {
         _("General recommendations"): "",
         _("Critical vulnerabilities"): 0,
@@ -83,10 +83,10 @@ class AggregateOrganisationReport(AggregateReport):
                     data["data"]["total_findings"] = self.get_total_vulnerabilities(data["data"])
                     vulnerabilities[input_ooi] = data["data"]
 
-            self.summary["Critical vulnerabilities"] += self.get_summary(
-                valid_time,
-                input_ooi,
-            )["critical_vulnerabilities"]
+                    self.summary["Critical vulnerabilities"] += self.get_summary(
+                        valid_time,
+                        input_ooi,
+                    )["critical_vulnerabilities"]
 
         return {
             "summary": self.summary,
