@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Type
 
 from pydantic import BaseModel
 
-from octopoes.models import OOI
+from octopoes.models.types import OOIType
 
 BITS_DIR = Path(__file__).parent
 BIT_ATTR_NAME = "BIT"
@@ -16,18 +16,18 @@ logger = getLogger(__name__)
 
 
 class BitParameterDefinition(BaseModel):
-    ooi_type: Type[OOI]
+    ooi_type: Type[OOIType]
     relation_path: str
 
 
 class BitDefinition(BaseModel):
     id: str
-    consumes: Type[OOI]
+    consumes: Type[OOIType]
     parameters: List[BitParameterDefinition]
     module: str
     min_scan_level: int = 1
     default_enabled: bool = True
-    config_ooi_relation_path: Optional[str]
+    config_ooi_relation_path: Optional[str] = None
 
 
 @lru_cache(maxsize=32)

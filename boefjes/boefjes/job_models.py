@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Dict, List, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Extra, Field, constr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints
+from typing_extensions import Annotated
 
 
 class JobException(Exception):
@@ -14,8 +15,8 @@ class JobException(Exception):
 
 class Job(BaseModel):
     id: UUID
-    started_at: Optional[datetime] = Field(default=None)
-    ended_at: Optional[datetime] = Field(default=None)
+    started_at: Optional[AwareDatetime] = Field(default=None)
+    ended_at: Optional[AwareDatetime] = Field(default=None)
 
     @property
     def runtime(self) -> Optional[timedelta]:
@@ -28,24 +29,24 @@ class Job(BaseModel):
 class Boefje(BaseModel):
     """Identifier for Boefje in a BoefjeMeta"""
 
-    id: constr(min_length=1)
+    id: Annotated[str, StringConstraints(min_length=1)]
     version: Optional[str] = Field(default=None)
 
 
 class Normalizer(BaseModel):
     """Identifier for Normalizer in a NormalizerMeta"""
 
-    id: constr(min_length=1)
+    id: Annotated[str, StringConstraints(min_length=1)]
     version: Optional[str] = Field(default=None)
 
 
 class BoefjeMeta(Job):
     boefje: Boefje
-    input_ooi: Optional[str]
+    input_ooi: Optional[str] = None
     arguments: Dict = {}
     organization: str
-    runnable_hash: Optional[str]
-    environment: Optional[Dict[str, str]]
+    runnable_hash: Optional[str] = None
+    environment: Optional[Dict[str, str]] = None
 
 
 class RawDataMeta(BaseModel):
@@ -65,7 +66,7 @@ class ObservationsWithoutInputOOI(JobException):
             "Observations are yielded in the normalizer but no input ooi was found. "
             "Your boefje should either yield observations with a custom input"
             "or always run on a specified input ooi type.\n"
-            f"NormalizerMeta: {normalizer_meta.json(indent=3)}"
+            f"NormalizerMeta: {normalizer_meta.model_dump_json(indent=3)}"
         )
 
 
@@ -81,10 +82,7 @@ class InvalidReturnValueNormalizer(JobException):
 
 class NormalizerPlainOOI(BaseModel):  # Validation of plain OOIs being returned from Normalizers
     object_type: str
-
-    class Config:
-        allow_population_by_field_name = True
-        extra = Extra.allow
+    model_config = ConfigDict(populate_by_name=True, extra="allow")
 
 
 class NormalizerObservation(BaseModel):

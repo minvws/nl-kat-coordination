@@ -4,7 +4,7 @@ from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
 
 settings = Settings()
 
-broker_url = settings.queue_uri
+broker_url = str(settings.queue_uri)
 result_backend = f"rpc://{settings.queue_uri}"
 
 task_serializer = "json"

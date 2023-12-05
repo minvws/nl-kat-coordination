@@ -1,10 +1,10 @@
+import datetime
 from datetime import timezone
 from typing import Optional
 from uuid import UUID
 
 from boefjes.config import BASE_DIR
 from boefjes.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, RawDataMeta
-from octopoes.models.datetime import TimezoneAwareDatetime
 
 
 def get_dummy_data(filename: str) -> bytes:
@@ -23,8 +23,8 @@ def get_boefje_meta(
         input_ooi=input_ooi,
         arguments={"domain": "test.org"},
         organization="test",
-        started_at=TimezoneAwareDatetime(1000, 10, 10, 10, 10, 10, tzinfo=timezone.utc),
-        ended_at=TimezoneAwareDatetime(1000, 10, 10, 10, 10, 11, tzinfo=timezone.utc),
+        started_at=datetime.datetime(1000, 10, 10, 10, 10, 10, tzinfo=timezone.utc),
+        ended_at=datetime.datetime(1000, 10, 10, 10, 10, 11, tzinfo=timezone.utc),
     )
 
 
@@ -36,8 +36,8 @@ def get_normalizer_meta(
         id=UUID("203eedee-a590-43e1-8f80-6d18ffe529f5"),
         raw_data=get_raw_data_meta(raw_file_id, boefje_meta),
         normalizer=Normalizer(id="kat_test.main"),
-        started_at=TimezoneAwareDatetime(1001, 10, 10, 10, 10, 10, tzinfo=timezone.utc),
-        ended_at=TimezoneAwareDatetime(1001, 10, 10, 10, 10, 12, tzinfo=timezone.utc),
+        started_at=datetime.datetime(1001, 10, 10, 10, 10, 10, tzinfo=timezone.utc),
+        ended_at=datetime.datetime(1001, 10, 10, 10, 10, 12, tzinfo=timezone.utc),
     )
 
 

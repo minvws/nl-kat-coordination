@@ -45,7 +45,7 @@ def tree_data():
 
 
 def test_ooi_report(rf, client_member, mock_organization_view_octopoes, tree_data):
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(tree_data)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(tree_data)
 
     request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user)
     request.resolver_match = resolve(
@@ -66,7 +66,7 @@ def test_ooi_report_missing_finding_type(rf, client_member, mock_organization_vi
         "ooi": "Network|testnetwork",
         "finding_type": "KATFindingType|KAT-001",
     }
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(tree_data)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(tree_data)
 
     request = setup_request(rf.get("ooi_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user)
     request.resolver_match = resolve(
@@ -81,7 +81,7 @@ def test_ooi_report_missing_finding_type(rf, client_member, mock_organization_vi
 
 
 def test_ooi_pdf_report(rf, client_member, mock_organization_view_octopoes, mocker, tree_data):
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(tree_data)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(tree_data)
 
     request = setup_request(
         rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
@@ -292,7 +292,7 @@ def test_pdf_report_command(tmp_path, client_member, network, finding_types, moc
 
 
 def test_ooi_pdf_report_timeout(rf, client_member, mock_organization_view_octopoes, mocker, tree_data):
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(tree_data)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(tree_data)
 
     request = setup_request(
         rf.get("ooi_pdf_report", {"ooi_id": "Finding|Network|testnetwork|KAT-000"}), client_member.user
