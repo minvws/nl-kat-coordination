@@ -89,6 +89,8 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The prioritized item from the priority queue.
         """
+        # Create task
+        #
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
         task = models.Task(
@@ -101,16 +103,28 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
+        # Create event
+        event = models.Event(
+            task_id=task.id,
+            type="events.db",
+            context="task",
+            event="insert",
+            data=task.model_dump(),
+        )
+
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
+            event.event = "update"
             self.ctx.datastores.task_store.update_task(task)
+            self.ctx.datastores.event_store.create_event(event)
             return
 
         self.ctx.datastores.task_store.create_task(task)
+        self.ctx.datastores.event_store.create_event(event)
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
-        persist a task to the datastore with the status RUNNING
+        persist a task to the datastore with the status DISPATCHED.
 
         Args:
             p_item: The prioritized item from the priority queue.
@@ -127,10 +141,20 @@ class Scheduler(abc.ABC):
             )
             return None
 
+        # Update task
         task.status = models.TaskStatus.DISPATCHED
         self.ctx.datastores.task_store.update_task(task)
 
-        return None
+        # Create event
+        event = models.Event(
+            task_id=task.id,
+            type="events.db",
+            context="task",
+            event="update",
+            data=task.model_dump(),
+        )
+
+        self.ctx.datastores.event_store.create_event(event)
 
     def pop_item_from_queue(
         self, filters: Optional[storage.filters.FilterRequest] = None

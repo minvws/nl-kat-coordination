@@ -24,6 +24,7 @@ class SchedulerTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.EventStore.name: storage.EventStore(self.dbconn),
             }
         )
 

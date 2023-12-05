@@ -655,6 +655,23 @@ class APIEventsEndpointTestCase(APITemplateTestCase):
         second_event_json = json.dumps(second_event, cls=utils.UUIDEncoder, default=str)
         self.second_event_api = self.client.post("/events", data=second_event_json).json()
 
+    def test_patch_task_create_event(self):
+        # Add one task to the queue
+        first_item = create_p_item(self.organisation.id, 1)
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=first_item.model_dump_json())
+        self.assertEqual(response.status_code, 201)
+
+        # Update task
+        response = self.client.patch(f"/tasks/{first_item.id}", json={"status": "completed"})
+        self.assertEqual(200, response.status_code)
+
+        # Should have created an event
+        response = self.client.get(f"/events?task_id={first_item.id}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(first_item.id, response.json()["results"][0]["task_id"])
+
     def test_create_event(self):
         # Arrange
         event = {

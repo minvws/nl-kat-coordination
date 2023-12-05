@@ -476,6 +476,24 @@ class Server:
                 detail="failed to update task",
             ) from exc
 
+        # Create event
+        try:
+            event = models.Event(
+                task_id=updated_task.id,
+                type="events.db",
+                context="task",
+                event="update",
+                data=updated_task.model_dump(),
+            )
+
+            self.ctx.datastores.event_store.create_event(event)
+        except Exception as exc:
+            self.logger.error(exc)
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to create event",
+            ) from exc
+
         return updated_task
 
     def get_task_stats(self, scheduler_id: Optional[str] = None) -> Optional[Dict[str, Dict[str, int]]]:
