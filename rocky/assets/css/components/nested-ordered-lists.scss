@@ -1,15 +1,13 @@
 /* Nested ordered lists */
 
 /* Includes parent numbers */
-ol {
-  counter-reset: item;
+.nested-numbers {
+  counter-reset: chapter;
 
-  > li {
-    display: block;
-
+  h2 {
     &::before {
-      content: counters(item, ". ") ". ";
-      counter-increment: item;
+      counter-increment: chapter;
+      content: counter(chapter) ": ";
     }
   }
 }

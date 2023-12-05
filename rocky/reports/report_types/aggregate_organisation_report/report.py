@@ -17,7 +17,7 @@ class AggregateOrganisationReport(AggregateReport):
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemReport, OpenPortsReport, IPv6Report], "optional": [VulnerabilityReport]}
-    template_path = "aggregate_organisation_report/report.html"
+    template_path = "aggregate_organisation_report/report_design.html"
     summary = {
         _("General recommendations"): "",
         _("Critical vulnerabilities"): 0,
