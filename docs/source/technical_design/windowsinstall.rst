@@ -101,7 +101,7 @@ Now you can start OpenKat.
     $ make kat
 
 - Go to `http://localhost:8000` and follow the onboarding.
-- Once you are through the onboarding, check that all of OpenKat's services are running properly using the "Health" link at the right side of the footer (http://localhost:8000/nl/{organization_id}/health/v1).
+- Once you are through the onboarding, check that all of OpenKAT's services are running properly using the "Health" link at the right side of the footer (http://localhost:8000/nl/{organization_id}/health/v1).
 
 Troubleshooting
 ================
