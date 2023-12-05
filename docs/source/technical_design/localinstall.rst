@@ -24,7 +24,7 @@ Before installing
 Install Docker
 **************
 
-OpenKAT is installed in Docker, and therefore Docker must be installed first. The preferred method of installation is through a repository. However, OpenKAT requires a newer version of Docker than what is available in the default ubuntu and debian repositories. That is why you should always use Docker's repository. 
+OpenKAT is installed in Docker, and therefore Docker must be installed first. The preferred method of installation is through a repository. However, OpenKAT requires a newer version of Docker than what is available in the default ubuntu and debian repositories. That is why you should always use Docker's repository.
 
 On the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_ page you can find links to installation pages for all major Linux distributions. For a specific example using the Docker repository on Debian, see `Debian install using the repository <https://docs.docker.com/engine/install/debian/#install-using-the-repository>`_. The installation pages for the other Linux distributions contain similar instructions.
 
@@ -46,7 +46,7 @@ Dependencies are packages required for OpenKAT to work. Run the following comman
 	$ echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 	$ sudo apt-get update && sudo apt-get install yarn
 
-After installing Docker from the Docker repository it might be necessary to create a symlink for the command `docker-compose` as the latest version now uses a space instead of a dash. You can do this with the following command: 
+After installing Docker from the Docker repository it might be necessary to create a symlink for the command `docker-compose` as the latest version now uses a space instead of a dash. You can do this with the following command:
 
 .. code-block:: sh
 
