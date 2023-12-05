@@ -33,7 +33,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
             valid_time=valid_time,
         )
     )
-    hostnames: List[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
+    hostnames = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
     task_id = uuid.uuid4()
 
     octopoes_api_connector.save_observation(

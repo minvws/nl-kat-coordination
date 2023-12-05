@@ -7,12 +7,13 @@ from typing import Dict
 
 import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
-from pydantic import parse_obj_as
+from celery.utils.log import get_task_logger
+from pydantic import TypeAdapter
 
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
 from octopoes.connector.katalogus import KATalogusClientV1
 from octopoes.core.app import bootstrap_octopoes, close_rabbit_channel, get_xtdb_client
-from octopoes.events.events import EVENT_TYPE, DBEvent
+from octopoes.events.events import DBEvent, DBEventType
 from octopoes.events.manager import get_rabbit_channel
 from octopoes.tasks.app import app
 from octopoes.xtdb.client import XTDBSession
@@ -39,13 +40,20 @@ def init_worker(**kwargs):
     get_rabbit_channel(settings.queue_uri)
 
 
+log = get_task_logger(__name__)
+
+
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def handle_event(event: Dict):
-    parsed_event: DBEvent = parse_obj_as(EVENT_TYPE, event)
+    try:
+        parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
 
-    session = XTDBSession(get_xtdb_client(settings.xtdb_uri, parsed_event.client, settings.xtdb_type))
-    bootstrap_octopoes(settings, parsed_event.client, session).process_event(parsed_event)
-    session.commit()
+        session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), parsed_event.client, settings.xtdb_type))
+        bootstrap_octopoes(settings, parsed_event.client, session).process_event(parsed_event)
+        session.commit()
+    except Exception:
+        logger.exception("Failed to handle event: %s", event)
+        raise
 
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
@@ -64,7 +72,7 @@ def schedule_scan_profile_recalculations():
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def recalculate_scan_profiles(org: str, *args, **kwargs):
-    session = XTDBSession(get_xtdb_client(settings.xtdb_uri, org, settings.xtdb_type))
+    session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org, settings.xtdb_type))
     octopoes = bootstrap_octopoes(settings, org, session)
 
     timer = timeit.default_timer()
