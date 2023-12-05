@@ -154,16 +154,13 @@ class ClearanceFilterForm(BaseRockyForm):
     )
 
 
-class OOITypeExcluded(Enum):
-    FINDING = "Finding"
-    FINDING_TYPE = "FindingType"
-
+_EXCLUDED_OOI_TYPES = ("Finding", "FindingType")
 
 SORTED_OOI_TYPES = sorted(
     [
         ooi_class.get_ooi_type()
         for ooi_class in get_collapsed_types()
-        if ooi_class.get_ooi_type() not in [excluded_types.value for excluded_types in OOITypeExcluded]
+        if ooi_class.get_ooi_type() not in _EXCLUDED_OOI_TYPES
     ]
 )
 
