@@ -6,7 +6,7 @@ from http import HTTPStatus
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 import requests
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from requests import HTTPError, Response
 
 from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
@@ -28,9 +28,7 @@ Operation = Tuple[OperationType, Union[str, Dict[str, Any]], Optional[datetime]]
 
 class Transaction(BaseModel):
     operations: List[Operation] = Field(alias="tx-ops")
-
-    class Config:
-        allow_population_by_field_name = True
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class XTDBHTTPSession(requests.Session):
@@ -45,13 +43,13 @@ class XTDBHTTPSession(requests.Session):
 
 
 class XTDBStatus(BaseModel):
-    version: Optional[str]
-    revision: Optional[str]
-    indexVersion: Optional[int]
-    consumerState: Optional[str]
-    kvStore: Optional[str]
-    estimateNumKeys: Optional[int]
-    size: Optional[int]
+    version: Optional[str] = None
+    revision: Optional[str] = None
+    indexVersion: Optional[int] = None
+    consumerState: Optional[str] = None
+    kvStore: Optional[str] = None
+    estimateNumKeys: Optional[int] = None
+    size: Optional[int] = None
 
 
 @lru_cache(maxsize=1)
@@ -63,7 +61,7 @@ class XTDBHTTPClient:
     def __init__(self, base_url, client: str, multinode=False):
         self._client = client
         self._is_multinode = multinode
-        self._session = get_xtdb_http_session(base_url)
+        self._session = get_xtdb_http_session(base_url.rstrip("/"))
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -85,7 +83,7 @@ class XTDBHTTPClient:
     def status(self) -> XTDBStatus:
         res = self._session.get(f"{self.client_url()}/status")
         self._verify_response(res)
-        return XTDBStatus.parse_obj(res.json())
+        return XTDBStatus.model_validate_json(res.content)
 
     def get_entity(self, entity_id: str, valid_time: Optional[datetime] = None) -> dict:
         if valid_time is None:

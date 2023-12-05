@@ -142,7 +142,7 @@ class Query:
     def _where_field_is(self, ref: Ref, field_name: str, value: Union[Ref, str, Set[str]]) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
-        if field_name not in ooi_type.__fields__:
+        if field_name not in ooi_type.model_fields:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
         abstract_types = get_abstract_types()
