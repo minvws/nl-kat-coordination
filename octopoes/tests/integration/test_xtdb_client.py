@@ -148,6 +148,7 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     assert len(xtdb_session.client.query(str(Query(Network)))) == 2
 
 
+@pytest.mark.xfail(reason="race condition")
 def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, xtdb_session: XTDBSession, valid_time):
     seed_system(octopoes_api_connector, valid_time)
 

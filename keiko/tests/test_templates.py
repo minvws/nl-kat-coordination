@@ -21,7 +21,11 @@ class KeikoTemplatesTest(TestCase):
 
         self.assertEqual(shape.__name__, "DataShape")
         self.assertEqual(
-            shape.__fields__["models"].type_.__fields__["sub_model"].type_.__fields__["prop2"].type_,
+            shape.model_fields["models"]
+            .annotation.__args__[0]
+            .model_fields["sub_model"]
+            .annotation.model_fields["prop2"]
+            .annotation,
             int,
         )
 

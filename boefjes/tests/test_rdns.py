@@ -30,9 +30,7 @@ def test_rdns_nxdomain():
 
 returned_oois = {
     DNSPTRRecord(
-        object_type="DNSPTRRecord",
         scan_profile=None,
-        primary_key="DNSPTRRecord|internet|example.com|internet|192.0.2.1",
         hostname=Reference("Hostname|internet|example.com"),
         dns_record_type="PTR",
         value="1.2.0.192.in-addr.arpa. 86400 IN PTR example.com.",

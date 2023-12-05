@@ -74,7 +74,7 @@ class KeikoClient:
         res = self.session.get(f"{self._base_uri}/health")
         res.raise_for_status()
 
-        return ServiceHealth.parse_obj(res.json())
+        return ServiceHealth.model_validate_json(res.content)
 
 
 keiko_client = KeikoClient(settings.KEIKO_API, settings.KEIKO_REPORT_TIMEOUT)

@@ -22,17 +22,22 @@ from tests.client import BytesAPIClient
 
 
 @pytest.fixture
-def settings():
+def settings(tmpdir):
+    env_path = Path(__file__).parent.parent / ".ci" / ".env.test"
     try:
-        return Settings()
+        return Settings(data_dir=Path(tmpdir))
     except ValidationError:  # test is probably being run outside the container setup
-        with (Path(__file__).parent.parent / ".ci" / ".env.test").open() as f:
-            lines = [line.strip().split("=") for line in f.readlines() if line.strip() and line.strip()[-1] != "="]
+        with env_path.open() as f:
+            lines = [
+                line.strip().split("=")
+                for line in f.readlines()
+                if line.strip() and line.strip()[-1] != "=" and not line.startswith("#")
+            ]
 
             for key, val in lines:
                 os.environ[key] = val
 
-        return Settings()
+        return Settings(data_dir=Path(tmpdir), _env_file=env_path)
 
 
 @pytest.fixture
@@ -67,7 +72,7 @@ def meta_repository(
     alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
     alembic.config.main(argv=alembicArgs)
 
-    engine = get_engine(settings.db_uri)
+    engine = get_engine(str(settings.db_uri))
     session = sessionmaker(bind=engine)()
 
     yield SQLMetaDataRepository(session, raw_repository, mock_hash_repository, settings)
@@ -93,7 +98,7 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
 
     yield client
 
-    sessionmaker(bind=get_engine(settings.db_uri), autocommit=True)().execute(
+    sessionmaker(bind=get_engine(str(settings.db_uri)), autocommit=True)().execute(
         ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
     )
 
@@ -105,4 +110,4 @@ def raw_repository(tmp_path: Path) -> FileRawRepository:
 
 @pytest.fixture
 def event_manager(settings: Settings) -> RabbitMQEventManager:
-    return RabbitMQEventManager(settings.queue_uri)
+    return RabbitMQEventManager(str(settings.queue_uri))

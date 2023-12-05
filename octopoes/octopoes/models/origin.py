@@ -18,7 +18,7 @@ class Origin(BaseModel):
     method: str
     source: Reference
     result: Optional[List[Reference]] = Field(default_factory=list)
-    task_id: Optional[UUID]
+    task_id: Optional[UUID] = None
 
     def __sub__(self, other) -> Set[Reference]:
         if isinstance(other, Origin):
