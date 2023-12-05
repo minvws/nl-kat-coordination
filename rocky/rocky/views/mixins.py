@@ -267,10 +267,7 @@ class MultipleOOIMixin(OctopoesView):
     filtered_ooi_types: List[str] = []
 
     def get_list(
-        self, 
-        observed_at: datetime, 
-        scan_level: Set[ScanLevel], 
-        scan_profile_type: Set[ScanProfileType]
+        self, observed_at: datetime, scan_level: Set[ScanLevel], scan_profile_type: Set[ScanProfileType]
     ) -> OOIList:
         ooi_types = self.ooi_types
         if self.filtered_ooi_types:
