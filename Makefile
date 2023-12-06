@@ -122,3 +122,14 @@ poetry-dependencies:
 		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt; \
 		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt; \
 	done
+
+fix-poetry-merge-conflict:
+	for path in `git diff --staged --name-only | grep pyproject | cut -d / -f 1`;do \
+		echo $$path; \
+		git restore --staged $$path/poetry.lock $$path/requirements*; \
+		git checkout --theirs $$path/poetry.lock $$path/requirements*; \
+		poetry lock --no-update -C $$path; \
+		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt; \
+		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt; \
+		git add $$path/poetry.lock $$path/requirements*; \
+	done
