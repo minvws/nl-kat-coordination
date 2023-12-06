@@ -28,6 +28,8 @@ class SchedulerTestCase(unittest.TestCase):
             }
         )
 
+        models.TaskDB.set_event_store(self.mock_ctx.datastores.event_store)
+
         identifier = uuid.uuid4().hex
 
         queue = mock_queue.MockPriorityQueue(
@@ -70,6 +72,13 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
+        # Event should be created
+        events_db, _ = self.mock_ctx.datastores.event_store.get_events(
+            task_id=str(task_db.id),
+        )
+        self.assertEqual(1, len(events_db))
+        self.assertEqual(events_db[0].task_id, task_db.id)
+
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
         # Arrange
@@ -99,6 +108,14 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        # Event should be created
+        events_db, _ = self.mock_ctx.datastores.event_store.get_events(
+            task_id=str(task_db.id),
+        )
+        self.assertEqual(2, len(events_db))
+        self.assertEqual(events_db[0].task_id, task_db.id)
+        self.assertEqual(events_db[1].task_id, task_db.id)
 
     def test_disable_scheduler(self):
         # Arrange: start scheduler
