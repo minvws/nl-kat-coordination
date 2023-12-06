@@ -1,13 +1,13 @@
 import pytest
 
-from bytes.config import has_pastebin_key  # noqa: F401
+from bytes.config import get_settings
 from bytes.database.sql_meta_repository import SQLMetaDataRepository
 from bytes.repositories.meta_repository import RawDataFilter
 from bytes.timestamping.pastebin import PastebinHashRepository
 from tests.loading import get_boefje_meta, get_raw_data
 
 
-@pytest.mark.skipif("not has_pastebin_key()")
+@pytest.mark.skipif(get_settings().pastebin_api_dev_key is None, reason="Pastebin API key not set")
 def test_save_raw_data_pastebin(
     meta_repository: SQLMetaDataRepository, pastebin_hash_repository: PastebinHashRepository
 ) -> None:

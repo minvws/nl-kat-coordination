@@ -4,7 +4,8 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import Literal, Optional, Union
 
-from pydantic.types import conint
+from pydantic import Field
+from typing_extensions import Annotated
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -69,7 +70,7 @@ class MockIPPort(OOI):
 
     address: Reference = ReferenceField(MockIPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
     protocol: MockProtocol
-    port: conint(gt=0, lt=2**16)
+    port: Annotated[int, Field(gt=0, lt=2**16)]
     state: Optional[MockPortState]
 
     _natural_key_attrs = ["address", "protocol", "port"]
@@ -140,7 +141,7 @@ class MockLabel(OOI):
 
     ooi: Reference = ReferenceField(OOI)
     label_id: str
-    label_text: Optional[str]
+    label_text: Optional[str] = None
 
     @property
     def natural_key(self) -> str:
@@ -178,4 +179,4 @@ MockOOIType = Union[
 ]
 
 for ooi_type in ALL_OOI_TYPES:
-    ooi_type.update_forward_refs()
+    ooi_type.model_rebuild()

@@ -2,10 +2,10 @@ import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, Type
 
-from pydantic import AmqpDsn, AnyHttpUrl, BaseSettings, DirectoryPath, Field, FilePath, PostgresDsn
-from pydantic.env_settings import SettingsSourceCallable
+from pydantic import AmqpDsn, AnyHttpUrl, DirectoryPath, Field, FilePath, PostgresDsn
+from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
 
 from bytes.models import EncryptionMiddleware, HashingAlgorithm, HashingRepositoryReference
 
@@ -16,7 +16,7 @@ if os.getenv("DOCS"):
     BASE_DIR = Path("../../")
 
 
-class BackwardsCompatibleEnvSettings:
+class BackwardsCompatibleEnvSettings(EnvSettingsSource):
     backwards_compatibility_mapping = {
         "SECRET": "BYTES_SECRET",
         "ACCESS_TOKEN_EXPIRE_MINUTES": "BYTES_ACCESS_TOKEN_EXPIRE_MINUTES",
@@ -32,10 +32,10 @@ class BackwardsCompatibleEnvSettings:
         "RFC3161_CERT_FILE": "BYTES_RFC3161_CERT_FILE",
     }
 
-    def __call__(self, settings: BaseSettings) -> Dict[str, Any]:
+    def __call__(self) -> Dict[str, Any]:
         d: Dict[str, Any] = {}
         env_vars = {k.lower(): v for k, v in os.environ.items()}
-        env_prefix = settings.__config__.env_prefix.lower()
+        env_prefix = self.settings_cls.model_config.get("env_prefix", "").lower()
 
         for old_name, new_name in self.backwards_compatibility_mapping.items():
             old_name, new_name = old_name.lower(), new_name.lower()
@@ -59,15 +59,17 @@ class BackwardsCompatibleEnvSettings:
 class Settings(BaseSettings):
     secret: str = Field(
         ...,
-        example="bec4837fe5108205ce6cd1bc11735d4a220e253345e90619c6",
+        examples=["bec4837fe5108205ce6cd1bc11735d4a220e253345e90619c6"],
         description="Secret key used for generating Bytes' API JWT",
     )
-    username: str = Field(..., example="test", description="Username used for generating Bytes' API JWT")
-    password: str = Field(..., example="secret", description="Password used for generating Bytes' API JWT")
-    queue_uri: AmqpDsn = Field(..., example="amqp://", description="KAT queue URI", env="QUEUE_URI")
+    username: str = Field(..., examples=["test"], description="Username used for generating Bytes' API JWT")
+    password: str = Field(..., examples=["secret"], description="Password used for generating Bytes' API JWT")
+    queue_uri: AmqpDsn = Field(..., examples=["amqp://"], description="KAT queue URI", validation_alias="QUEUE_URI")
     log_cfg: FilePath = Field(BASE_DIR / "dev.logging.conf", description="Path to the logging configuration file")
 
-    db_uri: PostgresDsn = Field(..., example="postgresql://xx:xx@host:5432/bytes", description="Bytes Postgres DB URI")
+    db_uri: PostgresDsn = Field(
+        ..., examples=["postgresql://xx:xx@host:5432/bytes"], description="Bytes Postgres DB URI"
+    )
     data_dir: DirectoryPath = Field(
         "/data",
         description="Root for all the data. "
@@ -90,19 +92,19 @@ class Settings(BaseSettings):
         description="Hashing repository used in Bytes (IN_MEMORY is a stub)",
         possible_values=["IN_MEMORY", "PASTEBIN", "RFC3161"],
     )
-    pastebin_api_dev_key: str = Field(
+    pastebin_api_dev_key: Optional[str] = Field(
         None, description="API key for Pastebin. Required when using PASTEBIN hashing repository."
     )
-    rfc3161_provider: AnyHttpUrl = Field(
+    rfc3161_provider: Optional[AnyHttpUrl] = Field(
         None,
-        example="https://freetsa.org/tsr",
+        examples=["https://freetsa.org/tsr"],
         description="Timestamping. "
         "See https://github.com/trbs/rfc3161ng for a list of public providers and their certificates. "
         "Required when using RFC3161 hashing repository.",
     )
-    rfc3161_cert_file: FilePath = Field(
+    rfc3161_cert_file: Optional[FilePath] = Field(
         None,
-        example="bytes/timestamping/certificates/freetsa.crt",
+        examples=["bytes/timestamping/certificates/freetsa.crt"],
         description="Path to the certificate of the RFC3161 provider. Required when using RFC3161 hashing repository. "
         "`freetsa.crt` is included in the Bytes source code.",
     )
@@ -112,12 +114,12 @@ class Settings(BaseSettings):
         description="Encryption middleware used in Bytes",
         possible_values=["IDENTITY", "NACL_SEALBOX"],
     )
-    private_key_b64: str = Field(
+    private_key_b64: Optional[str] = Field(
         None,
         description="KATalogus NaCl Sealbox base-64 private key string. "
         "Required when using NACL_SEALBOX encryption middleware.",
     )
-    public_key_b64: str = Field(
+    public_key_b64: Optional[str] = Field(
         None,
         description="KATalogus NaCl Sealbox base-64 public key string. "
         "Required when using NACL_SEALBOX encryption middleware.",
@@ -131,32 +133,27 @@ class Settings(BaseSettings):
     )
 
     span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
-        None, description="OpenTelemetry endpoint", env="SPAN_EXPORT_GRPC_ENDPOINT"
+        None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
-    class Config:
-        env_prefix = "BYTES_"
+    model_config = SettingsConfigDict(env_prefix="BYTES_")
 
-        @classmethod
-        def customise_sources(
-            cls,
-            init_settings: SettingsSourceCallable,
-            env_settings: SettingsSourceCallable,
-            file_secret_settings: SettingsSourceCallable,
-        ) -> Tuple[SettingsSourceCallable, ...]:
-            backwards_compatible_settings = BackwardsCompatibleEnvSettings()
-            return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: Type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+        backwards_compatible_settings = BackwardsCompatibleEnvSettings(settings_cls)
+        return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 
 
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-
-
-def has_pastebin_key() -> bool:
-    settings = get_settings()
-
-    return bool(settings.pastebin_api_dev_key)
 
 
 def has_rfc3161_provider() -> bool:

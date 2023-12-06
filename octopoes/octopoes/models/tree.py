@@ -36,7 +36,7 @@ class ReferenceNode(BaseModel):
         return {self.reference}.union(child_references)
 
 
-ReferenceNode.update_forward_refs()
+ReferenceNode.model_rebuild()
 
 
 class ReferenceTree(BaseModel):

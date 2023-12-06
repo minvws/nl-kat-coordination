@@ -40,7 +40,7 @@ class OOIDeleteView(OrganizationPermissionRequiredMixin, SingleOOIMixin, Templat
         )
 
         context["ooi"] = self.ooi
-        context["props"] = self.ooi.dict()
+        context["props"] = self.ooi.model_dump()
         context["breadcrumbs"] = breadcrumb_list
 
         return context
