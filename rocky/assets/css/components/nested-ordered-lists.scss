@@ -4,10 +4,28 @@
 .chapter-numbers {
   counter-reset: chapter;
 
+  > section {
+    counter-reset: subchapter;
+  }
+
   h2 {
     &::before {
       counter-increment: chapter;
       content: counter(chapter) ". ";
+    }
+  }
+
+  h3 {
+    &::before {
+      counter-increment: subchapter;
+      content: counter(chapter) "." counter(subchapter) ". ";
+    }
+  }
+
+  h4 {
+    &::before {
+      counter-increment: subchapter;
+      content: counter(chapter) "." counter(subchapter) ". ";
     }
   }
 }

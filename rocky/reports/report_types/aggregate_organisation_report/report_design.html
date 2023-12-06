@@ -13,20 +13,12 @@
             <div>
                 <h1>Mockup rapportage OpenKAT</h1>
                 <p>Dit is het OpenKAT rapport voor organisatie Organisatienaam.</p>
-                <dl>
-                    <div>
-                        <dt>{% translate "Observed at:" %}</dt>
-                        <dd>
-                            {{ observed_at }} {{ TIME_ZONE }}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>{% translate "Created by:" %}</dt>
-                        <dd>
-                            {{ organization_member.user.full_name }}
-                        </dd>
-                    </div>
-                </dl>
+                <p>
+                    <strong>{% translate "Observed at:" %}</strong> {{ observed_at }} {{ TIME_ZONE }}
+                </p>
+                <p>
+                    <strong>{% translate "Created by:" %}</strong> {{ organization_member.user.full_name }}
+                </p>
             </div>
         </section>
         <section>
@@ -90,79 +82,78 @@
                 </dl>
             </div>
         </section>
-        <section class="report-content chapter-numbers">
-            <section>
+        <section>
+            <div>
+                <h2>Term overview</h2>
+                <p>Onderstaand overzicht bevat definities van begrippen die in deze rapportage worden gebruikt.</p>
+                <ul class="accordion">
+                    <li>
+                        <button id="definition-system" aria-expanded="false">Asset</button>
+                        <div aria-labelledby="definition-system">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
+                        </div>
+                    </li>
+                    <li>
+                        <button id="definition-system">System</button>
+                        <div aria-labelledby="definition-system">
+                            <p>
+                                Multiple hostnames that resolve to one ip address where at least one of the hostnames or the ip address has a declared scan level that is at least L1.
+                                Type systemen zijn webservers, mailservers, en nameservers (DNS).
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <button id="definition-webserver">Webserver</button>
+                        <div aria-labelledby="definition-webserver">
+                            <p>
+                                Voor webservers geldt hetzelfde maar http services gewoonlijk op porten 80 en 443. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <button id="definition-mailserver">Mailserver</button>
+                        <div aria-labelledby="definition-mailserver">
+                            <p>
+                                Een mailserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor mail servers, gewoonlijk op porten 465, 25 en 995. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <button id="definition-nameserver">Nameserver</button>
+                        <div aria-labelledby="definition-nameserver">
+                            <p>
+                                Een nameserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor dns servers, gewoonlijk op port 53. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
+                            </p>
+                        </div>
+                    </li>
+                    <li>
+                        <button id="example-accordion-ul-item-2">[V2] DISCOM server</button>
+                        <div aria-labelledby="example-accordion-ul-item-2">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <section class="chapter-numbers">
+            <section id="general-recommendations">
                 <div>
                     <h2>General recommendations</h2>
                     <p>
                         Er zijn <i>n</i> kwetsbaarheden gevonden op <i>m</i> systemen. <i>O</i> systemen missen belangrijke basisbeveiligingsmaatregelen.
                     </p>
-                    <ol>
+                    <ul>
                         <li>Update the web server of system IP (domain name)</li>
                         <li>Install the firewall in the OS of system IP (domain name)</li>
                         <li>
                             Check if <a href="">SPF [1]</a> is properly installed on all mail servers
                         </li>
-                    </ol>
-                </div>
-            </section>
-            <section>
-                <div>
-                    <h2>Asset overview</h2>
-                    <p>
-                        [Toelichting hoofdstuk]. Voor definities van begrippen die in dit hoofdstuk worden gebruikt, zie onderstaand begrippenkader.
-                    </p>
-                    <ul class="accordion">
-                        <li>
-                            <button id="definition-system" aria-expanded="false">Asset</button>
-                            <div aria-labelledby="definition-system">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit</p>
-                            </div>
-                        </li>
-                        <li>
-                            <button id="definition-system">System</button>
-                            <div aria-labelledby="definition-system">
-                                <p>
-                                    Multiple hostnames that resolve to one ip address where at least one of the hostnames or the ip address has a declared scan level that is at least L1.
-                                    Type systemen zijn webservers, mailservers, en nameservers (DNS).
-                                </p>
-                            </div>
-                        </li>
-                        <li>
-                            <button id="definition-webserver">Webserver</button>
-                            <div aria-labelledby="definition-webserver">
-                                <p>
-                                    Voor webservers geldt hetzelfde maar http services gewoonlijk op porten 80 en 443. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
-                                </p>
-                            </div>
-                        </li>
-                        <li>
-                            <button id="definition-mailserver">Mailserver</button>
-                            <div aria-labelledby="definition-mailserver">
-                                <p>
-                                    Een mailserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor mail servers, gewoonlijk op porten 465, 25 en 995. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
-                                </p>
-                            </div>
-                        </li>
-                        <li>
-                            <button id="definition-nameserver">Nameserver</button>
-                            <div aria-labelledby="definition-nameserver">
-                                <p>
-                                    Een nameserver wordt gedefinieerd als een server waar porten open staan waar ip services draaien die gebruikelijk zijn voor dns servers, gewoonlijk op port 53. ((heeft dus extra uitleg ooit nodig welke services dat zijn))
-                                </p>
-                            </div>
-                        </li>
-                        <li>
-                            <button id="example-accordion-ul-item-2">[V2] DISCOM server</button>
-                            <div aria-labelledby="example-accordion-ul-item-2">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                            </div>
-                        </li>
                     </ul>
                 </div>
+            </section>
+            <section id="asset-overview">
                 <div>
-                    <h3>Gescande assets</h3>
-                    <p>Handmatig gevrijwaarde gescande assets</p>
+                    <h2>Asset overview</h2>
                     <p>
                         Een overzicht van de handmatig gevrijwaarde gescande assets. <strong>Dikgedrukte</strong> assets zijn als startpunt genomen, niet dikgedrukte assets zijn door KAT zelf gevonden.
                     </p>
@@ -209,9 +200,9 @@
                     </div>
                 </div>
             </section>
-            <section>
+            <section id="open-ports">
                 <div>
-                    <h3>Open ports</h3>
+                    <h2>Open ports</h2>
                     <p>
                         Overzicht van gevonden open poorten zien. <strong>Dikgedrukte</strong> open poorten zijn gevonden door directe scans die de organisatie uitvoert via KAT. Overige open poorten zijn daar buiten aangetroffen door KAT zelf. Scans met dezelfde domeinen, poorten en IPs zijn samengevoegd.
                     </p>
@@ -266,9 +257,9 @@
                     </div>
                 </div>
             </section>
-            <section>
+            <section id="ipv6">
                 <div>
-                    <h3>IPv6</h3>
+                    <h2>IPv6</h2>
                     <p>[Uitleg IPv6 en belang ervan] Waarom moet elk domein aan IPv4 en IPv6 voldoen.</p>
                     <div class="horizontal-scroll">
                         <table>
@@ -349,7 +340,7 @@
                     </div>
                 </div>
             </section>
-            <section>
+            <section id="basic-security">
                 <div>
                     <h2>Basic security</h2>
                     <p>
