@@ -12,6 +12,7 @@ jobs:
         with:
           customer: vws
           system: kat
+          targetquality: 2.5
         env:
           SIGRID_CI_TOKEN: "${{ secrets.SIGRID_CI_TOKEN }}"
 #      - name: "Sigrid pull request feedback"
