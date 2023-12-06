@@ -56,7 +56,7 @@ Step 4: Clone nl-kat-coordination
 
 Clone the repository of OpenKAT into your WSL. It is important that you do it in WSL and not in Windows!
 
-- In your Debian Powershell, run:
+- In your Debian PowerShell, run:
 
 .. code-block:: sh
 
@@ -69,7 +69,7 @@ Step 5: Open the code in Visual Studio Code
 
 To do this, VS Code must already be installed on your Windows and you must have the WSL plugin installed in VS Code.
 
-- In your Debian Powershell, run:
+- In your Debian PowerShell, run:
 
 .. code-block:: sh
 
@@ -82,7 +82,7 @@ Step 6: Complete the .env file
 
 If you go to the ``.env`` file in the code, you should see that the passwords don't have a value yet. To fix this, run the following command.
 
-- In your Debian Powershell, run:
+- In your Debian PowerShell, run:
 
 .. code-block:: sh
 
@@ -94,7 +94,7 @@ Step 7: Start OpenKAT
 ----------------------
 
 Now you can start OpenKat.
-- In your Debian Powershell, run:
+- In your Debian PowerShell, run:
 
 .. code-block:: sh
 
