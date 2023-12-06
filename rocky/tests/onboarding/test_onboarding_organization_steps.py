@@ -117,7 +117,7 @@ def test_onboarding_setup_scan_detail_create_ooi(
     response = OnboardingSetupScanOOIAddView.as_view()(
         setup_request(
             rf.post(
-                "step_setup_scan_ooi_add", {"network": "Network|internet", "raw": "http://example.org", "web_url": ""}
+                "step_setup_scan_ooi_add", {"network": "Network|internet", "raw": "http://example.org/", "web_url": ""}
             ),
             member.user,
         ),
@@ -127,7 +127,7 @@ def test_onboarding_setup_scan_detail_create_ooi(
 
     assert response.status_code == 302
     assert response.headers["Location"] == get_ooi_url(
-        "step_clearance_level_introduction", "URL|internet|http://example.org", member.organization.code
+        "step_clearance_level_introduction", "URL|internet|http://example.org/", member.organization.code
     )
 
 

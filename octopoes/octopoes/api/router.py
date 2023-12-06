@@ -5,6 +5,7 @@ from logging import getLogger
 from typing import Generator, List, Optional, Set, Type
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from pydantic import AwareDatetime
 from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
@@ -26,7 +27,6 @@ from octopoes.models import (
     ScanProfileBase,
     ScanProfileType,
 )
-from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
@@ -49,13 +49,13 @@ def extract_client(client: str = Path(...)) -> str:
     return client
 
 
-def extract_valid_time(valid_time: Optional[TimezoneAwareDatetime] = Query(None)) -> datetime:
+def extract_valid_time(valid_time: Optional[AwareDatetime] = Query(None)) -> datetime:
     if valid_time is None:
         return datetime.now(timezone.utc)
     return valid_time
 
 
-def extract_required_valid_time(valid_time: TimezoneAwareDatetime) -> datetime:
+def extract_required_valid_time(valid_time: AwareDatetime) -> datetime:
     return valid_time
 
 
@@ -81,7 +81,7 @@ def settings() -> Settings:
 def xtdb_session(
     client: str = Depends(extract_client), settings_: Settings = Depends(settings)
 ) -> Generator[XTDBSession, None, None]:
-    yield XTDBSession(get_xtdb_client(settings_.xtdb_uri, client, settings_.xtdb_type))
+    yield XTDBSession(get_xtdb_client(str(settings_.xtdb_uri), client, settings_.xtdb_type))
 
 
 def octopoes_service(

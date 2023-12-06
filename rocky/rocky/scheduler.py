@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
@@ -28,26 +28,26 @@ class BoefjeMeta(BaseModel):
 
     id: uuid.UUID
     boefje: Boefje
-    input_ooi: Optional[str]
+    input_ooi: Optional[str] = None
     arguments: Dict[str, Any]
     organization: str
-    started_at: Optional[datetime.datetime]
-    ended_at: Optional[datetime.datetime]
+    started_at: Optional[datetime.datetime] = None
+    ended_at: Optional[datetime.datetime] = None
 
 
 class RawData(BaseModel):
     id: uuid.UUID
     boefje_meta: BoefjeMeta
     mime_types: List[Dict[str, str]]
-    secure_hash: Optional[str]
-    hash_retrieval_link: Optional[str]
+    secure_hash: Optional[str] = None
+    hash_retrieval_link: Optional[str] = None
 
 
 class Normalizer(BaseModel):
     """Normalizer representation."""
 
-    id: Optional[str]
-    name: Optional[str]
+    id: Optional[str] = None
+    name: Optional[str] = None
     version: Optional[str] = Field(default=None)
 
 
@@ -73,7 +73,7 @@ class BoefjeTask(BaseModel):
 
     id: uuid.UUID
     boefje: Boefje
-    input_ooi: Optional[str]
+    input_ooi: Optional[str] = None
     organization: str
     type: str = "boefje"
 
@@ -86,7 +86,7 @@ class QueuePrioritizedItem(BaseModel):
 
     id: uuid.UUID
     priority: int
-    hash: Optional[str]
+    hash: Optional[str] = None
     data: Union[BoefjeTask, NormalizerTask]
 
 
@@ -109,15 +109,13 @@ class Task(BaseModel):
     status: TaskStatus
     created_at: datetime.datetime
     modified_at: datetime.datetime
-
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PaginatedTasksResponse(BaseModel):
     count: int
-    next: Optional[str]
-    previous: Optional[str]
+    next: Optional[str] = None
+    previous: Optional[str] = None
     results: List[Task]
 
 
@@ -192,7 +190,7 @@ class SchedulerClient:
         **kwargs,
     ) -> PaginatedTasksResponse:
         res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
-        return PaginatedTasksResponse.parse_raw(res.text)
+        return PaginatedTasksResponse.model_validate_json(res.content)
 
     def get_lazy_task_list(
         self,
@@ -242,7 +240,7 @@ class SchedulerClient:
     def health(self) -> ServiceHealth:
         health_endpoint = self.session.get(f"{self._base_uri}/health")
         health_endpoint.raise_for_status()
-        return ServiceHealth.parse_raw(health_endpoint.content)
+        return ServiceHealth.model_validate_json(health_endpoint.content)
 
 
 client = SchedulerClient(settings.SCHEDULER_API)
