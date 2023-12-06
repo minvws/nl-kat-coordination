@@ -526,6 +526,3 @@
         * If you want/need to reset your login, get a root shell on the system and issue the following
         * command and answer all the questions.
         * sudo -u kat rocky-cli createsuperuser
-
-
-
