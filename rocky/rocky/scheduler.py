@@ -218,7 +218,7 @@ class SchedulerClient:
     def get_task_details(self, organization_code: str, task_id: str) -> Optional[Task]:
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
         res.raise_for_status()
-        task_details = Task.parse_raw(res.content)
+        task_details = Task.model_validate_json(res.content)
         if task_details.p_item.data.organization == organization_code:
             return task_details
 
