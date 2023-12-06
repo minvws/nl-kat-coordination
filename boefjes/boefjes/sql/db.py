@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Any, Callable, Iterator, Type
 
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from boefjes.config import settings
@@ -17,7 +17,7 @@ SQL_BASE = declarative_base()
 def get_engine() -> Engine:
     logger.info("Connecting to database..")
 
-    engine = create_engine(settings.katalogus_db_uri, pool_pre_ping=True, pool_size=25)
+    engine = create_engine(make_url(str(settings.katalogus_db_uri)), pool_pre_ping=True, pool_size=25)
 
     logger.info("Connected to database")
 

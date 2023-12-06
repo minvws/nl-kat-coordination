@@ -8,7 +8,7 @@ import requests
 from django.conf import settings
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
@@ -26,11 +26,15 @@ class Plugin(BaseModel):
     authors: Optional[str] = None
     created: Optional[str] = None
     description: Optional[str] = None
-    environment_keys: List[str] = None
-    related: List[str] = None
+    environment_keys: Optional[List[str]] = None
+    related: List[str] = Field(default_factory=list)
     enabled: bool
     type: str
     produces: Set[str]
+
+    # def dict(self, *args, **kwargs):
+    #     """Pydantic does not stringify the OOI classes, but then templates can't render them"""
+    #     # todo: use field_serializer instead
 
     def can_scan(self, member) -> bool:
         return member.has_perm("tools.can_scan_organization")
@@ -42,11 +46,10 @@ class Boefje(Plugin):
     options: List[str] = None
     runnable_hash: Optional[str] = None
 
-    def dict(self, *args, **kwargs):
-        """Pydantic does not stringify the OOI classes, but then templates can't render them"""
-        boefje_dict = super().dict(*args, **kwargs)
-        boefje_dict["consumes"] = {ooi_class.get_ooi_type() for ooi_class in boefje_dict["consumes"]}
-        return boefje_dict
+    # use a custom field_serializer for `consumes`
+    @field_serializer("consumes")
+    def serialize_consumes(self, consumes: Set[Type[OOI]]):
+        return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
     def can_scan(self, member) -> bool:
         return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value
@@ -123,7 +126,7 @@ class KATalogusClientV1:
         response = self.session.get(f"{self.base_uri}/health")
         response.raise_for_status()
 
-        return ServiceHealth.parse_obj(response.json())
+        return ServiceHealth.model_validate_json(response.content)
 
     def get_normalizers(self) -> List[Normalizer]:
         return self.get_plugins(plugin_type="normalizer")

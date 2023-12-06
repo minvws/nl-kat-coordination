@@ -3,7 +3,8 @@ from __future__ import annotations
 import string
 from typing import Literal, Optional
 
-from pydantic import constr, validator
+from pydantic import StringConstraints, field_validator
+from typing_extensions import Annotated
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import IPAddress, Network
@@ -33,7 +34,7 @@ class Hostname(OOI):
     object_type: Literal["Hostname"] = "Hostname"
 
     network: Reference = ReferenceField(Network)
-    name: constr(to_lower=True)
+    name: Annotated[str, StringConstraints(to_lower=True)]
 
     dns_zone: Optional[Reference] = ReferenceField(
         DNSZone, max_issue_scan_level=1, max_inherit_scan_level=2, default=None
@@ -51,7 +52,8 @@ class Hostname(OOI):
         "registered_domain": "subdomains",
     }
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def hostname_valid(cls, v: str) -> str:
         for c in v:
             if c not in VALID_HOSTNAME_CHARACTERS:
@@ -78,7 +80,3 @@ class ResolvedHostname(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"{reference.tokenized.hostname.name} -> {reference.tokenized.address.address}"
-
-
-Hostname.update_forward_refs()
-DNSZone.update_forward_refs()

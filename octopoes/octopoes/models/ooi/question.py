@@ -4,7 +4,7 @@ from typing import Literal
 
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
-from pydantic.class_validators import validator
+from pydantic import field_validator
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -21,7 +21,8 @@ class Question(OOI):
     _traversable = False
     _reverse_relation_names = {"ooi": "questions"}
 
-    @validator("json_schema")
+    @field_validator("json_schema")
+    @classmethod
     def json_schema_valid(cls, schema: str) -> str:
         try:
             val = Draft202012Validator({})

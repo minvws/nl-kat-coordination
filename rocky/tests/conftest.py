@@ -1,4 +1,5 @@
 import binascii
+import io
 import json
 import logging
 from os import urandom
@@ -15,6 +16,7 @@ from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
+from requests import Response
 from tools.models import (
     GROUP_ADMIN,
     GROUP_CLIENT,
@@ -320,7 +322,7 @@ def lazy_task_list_empty() -> MagicMock:
 
 @pytest.fixture
 def task() -> Task:
-    return Task.parse_obj(
+    return Task.model_validate(
         {
             "id": "1b20f85f-63d5-4baa-be9e-f3f19d6e3fae",
             "hash": "19ed51514b37d42f79c5e95469956b05",
@@ -568,40 +570,42 @@ def mock_mixins_katalogus(mocker):
 @pytest.fixture
 def mock_scheduler_client_task_list(mocker):
     mock_scheduler_client_session = mocker.patch("rocky.scheduler.client.session")
-    scheduler_return_value = mocker.MagicMock()
-    scheduler_return_value.text = json.dumps(
-        {
-            "count": 1,
-            "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
-            "previous": None,
-            "results": [
-                {
-                    "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
-                    "scheduler_id": "boefje-test",
-                    "type": "boefje",
-                    "p_item": {
+    response = Response()
+    response.raw = io.BytesIO(
+        json.dumps(
+            {
+                "count": 1,
+                "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
+                "previous": None,
+                "results": [
+                    {
                         "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
                         "scheduler_id": "boefje-test",
-                        "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
-                        "priority": 631,
-                        "data": {
-                            "id": "2e757dd366c746b899877cd18252cc6d",
-                            "boefje": {"id": "test-plugin", "version": None},
-                            "input_ooi": "Hostname|internet|example.com",
-                            "organization": "test",
-                            "dispatches": [],
+                        "type": "boefje",
+                        "p_item": {
+                            "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                            "scheduler_id": "boefje-test",
+                            "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
+                            "priority": 631,
+                            "data": {
+                                "id": "2e757dd366c746b899877cd18252cc6d",
+                                "boefje": {"id": "test-plugin", "version": None},
+                                "input_ooi": "Hostname|internet|example.com",
+                                "organization": "test",
+                                "dispatches": [],
+                            },
+                            "created_at": "2023-05-09T09:37:20.899668+00:00",
+                            "modified_at": "2023-05-09T09:37:20.899675+00:00",
                         },
-                        "created_at": "2023-05-09T09:37:20.899668+00:00",
-                        "modified_at": "2023-05-09T09:37:20.899675+00:00",
-                    },
-                    "status": "completed",
-                    "created_at": "2023-05-09T09:37:20.909069+00:00",
-                    "modified_at": "2023-05-09T09:37:20.909071+00:00",
-                }
-            ],
-        }
+                        "status": "completed",
+                        "created_at": "2023-05-09T09:37:20.909069+00:00",
+                        "modified_at": "2023-05-09T09:37:20.909071+00:00",
+                    }
+                ],
+            }
+        ).encode()
     )
 
-    mock_scheduler_client_session.get.return_value = scheduler_return_value
+    mock_scheduler_client_session.get.return_value = response
 
     return mock_scheduler_client_session

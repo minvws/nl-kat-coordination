@@ -56,7 +56,7 @@ class SQLRepositoryStorage(SessionMixin, RepositoryStorage):
         return RepositoryInDB(
             id=repository.id,
             name=repository.name,
-            base_url=repository.base_url,
+            base_url=str(repository.base_url),
         )
 
     @staticmethod
