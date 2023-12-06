@@ -41,6 +41,7 @@ from octopoes.models.path import (
     get_max_scan_level_issuance,
     get_paths_to_neighours,
 )
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.repositories.ooi_repository import OOIRepository
 from octopoes.repositories.origin_parameter_repository import OriginParameterRepository
@@ -91,6 +92,27 @@ class OctopoesService:
     def get_ooi(self, reference: Reference, valid_time: datetime) -> OOI:
         ooi = self.ooi_repository.get(reference, valid_time)
         return self._populate_scan_profiles([ooi], valid_time)[0]
+
+    def get_ooi_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = False,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
+        return self.ooi_repository.get_history(
+            reference,
+            sort_order=sort_order,
+            with_docs=with_docs,
+            has_doc=has_doc,
+            offset=offset,
+            limit=limit,
+            indices=indices,
+        )
 
     def list_ooi(
         self,
