@@ -6,9 +6,10 @@ from http import HTTPStatus
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 import requests
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 from requests import HTTPError, Response
 
+from octopoes.models.transaction import TransactionRecord
 from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
 from octopoes.xtdb.query import Query
 
@@ -93,6 +94,39 @@ class XTDBHTTPClient:
         )
         self._verify_response(res)
         return res.json()
+
+    def get_entity_history(
+        self,
+        entity_id: str,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = False,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
+        params = {
+            "eid": entity_id,
+            "sort-order": sort_order,
+            "history": "true",
+            "with-docs": "true" if with_docs else "false",
+        }
+
+        res = self._session.get(f"{self.client_url()}/entity", params=params)
+        self._verify_response(res)
+        transactions: List[TransactionRecord] = TypeAdapter(List[TransactionRecord]).validate_json(res.content)
+
+        if has_doc is True:  # The doc is None if and only if the hash is  "0000000000000000000000000000000000000000"
+            transactions = [transaction for transaction in transactions if transaction.content_hash != 40 * "0"]
+
+        if has_doc is False:  # The doc is None if and only if the hash is  "0000000000000000000000000000000000000000"
+            transactions = [transaction for transaction in transactions if transaction.content_hash == 40 * "0"]
+
+        if indices:
+            return [tx for i, tx in enumerate(transactions) if i in indices or i - len(transactions) in indices]
+
+        return transactions[offset:limit]
 
     def query(self, query: Union[str, Query], valid_time: Optional[datetime] = None) -> List[List[Any]]:
         if valid_time is None:
