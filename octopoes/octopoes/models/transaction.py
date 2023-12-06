@@ -9,4 +9,4 @@ class TransactionRecord(BaseModel):
     transaction_id: int = Field(alias="txId")
     valid_time: datetime = Field(alias="validTime")
     content_hash: str = Field(alias="contentHash")
-    document: Optional[Dict] = Field(alias="doc")
+    document: Optional[Dict] = Field(None, alias="doc")

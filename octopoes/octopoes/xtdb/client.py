@@ -6,7 +6,7 @@ from http import HTTPStatus
 from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
 
 import requests
-from pydantic import BaseModel, ConfigDict, Field, parse_obj_as
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 from requests import HTTPError, Response
 
 from octopoes.models.transaction import TransactionRecord
@@ -115,8 +115,7 @@ class XTDBHTTPClient:
 
         res = self._session.get(f"{self.client_url()}/entity", params=params)
         self._verify_response(res)
-
-        transactions: List[TransactionRecord] = parse_obj_as(List[TransactionRecord], res.json())
+        transactions: List[TransactionRecord] = TypeAdapter(List[TransactionRecord]).validate_json(res.content)
 
         if has_doc is True:  # The doc is None if and only if the hash is  "0000000000000000000000000000000000000000"
             transactions = [transaction for transaction in transactions if transaction.content_hash != 40 * "0"]
