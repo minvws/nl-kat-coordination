@@ -8,7 +8,7 @@ from http import HTTPStatus
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
 from bits.definitions import BitDefinition
-from pydantic import BaseModel, parse_obj_as
+from pydantic import RootModel, TypeAdapter
 from requests import HTTPError
 
 from octopoes.config.settings import (
@@ -150,18 +150,18 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
 
-class XTDBReferenceNode(BaseModel):
-    __root__: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
+class XTDBReferenceNode(RootModel):
+    root: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
 
     def to_reference_node(self, pk_prefix: str) -> Optional[ReferenceNode]:
-        if not self.__root__:
+        if not self.root:
             return None
         # Apparently relations can be joined to Null values..?!?
-        if pk_prefix not in self.__root__:
+        if pk_prefix not in self.root:
             return None
-        reference = Reference.from_str(self.__root__.pop(pk_prefix))
+        reference = Reference.from_str(self.root.pop(pk_prefix))
         children = {}
-        for name, value in self.__root__.items():
+        for name, value in self.root.items():
             if isinstance(value, XTDBReferenceNode):
                 sub_nodes = [value.to_reference_node(pk_prefix)]
             elif isinstance(value, (List, Set)):
@@ -171,8 +171,6 @@ class XTDBReferenceNode(BaseModel):
                 children[name] = sub_nodes
         return ReferenceNode(reference=reference, children=children)
 
-
-XTDBReferenceNode.update_forward_refs()
 
 entities = {}
 for ooi_type_ in get_concrete_types():
@@ -405,7 +403,7 @@ class XTDBOOIRepository(OOIRepository):
         )
         res = self.session.client.query(query, valid_time=valid_time)
         res = [element[0] for element in res]
-        xtdb_reference_root_nodes = parse_obj_as(List[XTDBReferenceNode], res)
+        xtdb_reference_root_nodes = TypeAdapter(List[XTDBReferenceNode]).validate_python(res)
         return [x.to_reference_node(self.pk_prefix()) for x in xtdb_reference_root_nodes]
 
     def _get_tree_level(

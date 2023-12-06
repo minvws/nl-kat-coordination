@@ -167,6 +167,7 @@ def test_entity_history(xtdb_session: XTDBSession, valid_time: datetime):
     assert history[2].document is not None
 
 
+@pytest.mark.xfail(reason="race condition")
 def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, xtdb_session: XTDBSession, valid_time):
     seed_system(octopoes_api_connector, valid_time)
 

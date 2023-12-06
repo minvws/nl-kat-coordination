@@ -12,7 +12,7 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from boefjes.config import settings
 from boefjes.katalogus.storage.interfaces import StorageError
@@ -59,7 +59,7 @@ class ServiceHealth(BaseModel):
     healthy: bool = False
     version: Optional[str] = None
     additional: Any = None
-    results: List["ServiceHealth"] = []
+    results: List["ServiceHealth"] = Field(default_factory=list)
 
 
 ServiceHealth.update_forward_refs()

@@ -25,9 +25,10 @@ def get_xtdb_client(base_uri: str, client: str, xtdb_type: XTDBType) -> XTDBHTTP
     front. This code can be removed once we no longer support that setup.
     """
 
+    base_uri = base_uri.rstrip("/")
+
     if xtdb_type == XTDBType.XTDB_MULTINODE:
         return XTDBHTTPClient(f"{base_uri}/_xtdb", client, multinode=True)
-
     if client != "_dev":
         return XTDBHTTPClient(f"{base_uri}/{client}/_{xtdb_type.value}", client)
 
@@ -42,11 +43,10 @@ def close_rabbit_channel(queue_uri: str):
         logger.info("Closed connection to RabbitMQ")
     except AMQPError:
         logger.exception("Unable to close rabbit")
-        pass
 
 
 def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSession) -> OctopoesService:
-    event_manager = EventManager(client, settings.queue_uri, celery_app, QUEUE_NAME_OCTOPOES)
+    event_manager = EventManager(client, str(settings.queue_uri), celery_app, QUEUE_NAME_OCTOPOES)
 
     ooi_repository = XTDBOOIRepository(event_manager, xtdb_session, settings.xtdb_type)
     origin_repository = XTDBOriginRepository(event_manager, xtdb_session, settings.xtdb_type)
