@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-30 15:14+0000\n"
+"POT-Creation-Date: 2023-12-06 13:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1733,6 +1733,11 @@ msgid ""
 "Could not raise clearance level of %s to L%s. You acknowledged a clearance "
 "level of L%s. Please accept the clearance level first on your profile page "
 "to proceed."
+msgstr ""
+
+#: katalogus/views/plugin_detail.py rocky/views/ooi_detail.py
+#: rocky/views/task_detail.py rocky/views/tasks.py
+msgid "Task could not be found."
 msgstr ""
 
 #: katalogus/views/plugin_detail.py
