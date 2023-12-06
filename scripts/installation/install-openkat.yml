@@ -456,6 +456,7 @@
 
   # Enable debugging on rocky
   # default: DEBUG="False"
+  - name: Enable debugging on Rocky.
     ansible.builtin.lineinfile:
       path: /etc/kat/rocky.conf
       regexp: "DEBUG=.*"
