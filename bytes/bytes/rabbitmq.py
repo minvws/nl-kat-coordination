@@ -66,6 +66,6 @@ def create_event_manager() -> EventManager:
     settings = get_settings()
 
     if settings.queue_uri:
-        return RabbitMQEventManager(settings.queue_uri)
+        return RabbitMQEventManager(str(settings.queue_uri))
 
     return NullManager()

@@ -8,11 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-09 14:01+0000\n"
+"POT-Creation-Date: 2023-11-24 15:30+0000\n"
 "PO-Revision-Date: 2023-11-16 20:05+0000\n"
 "Last-Translator: 跨性别 <github@lgbt.sh>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/nl/>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,28 +38,28 @@ msgid "Name"
 msgstr "Naam"
 
 #: account/forms/account_setup.py
-msgid "This name we will use to communicate with you."
-msgstr "Deze naam wordt gebruikt om met u te communiceren."
+msgid "The name that will be used in order to communicate."
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "What do we call you?"
-msgstr "Hoe noemen wij u?"
+msgid "Please provide username"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Email"
 msgstr "E-mail"
 
 #: account/forms/account_setup.py
-msgid "Enter your email address."
-msgstr "Voer uw e-mailadres in."
+msgid "Enter an email address."
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Password"
 msgstr "Wachtwoord"
 
 #: account/forms/account_setup.py
-msgid "Choose your super secret password"
-msgstr "Kies uw supergeheime wachtwoord"
+msgid "Choose a super secret password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
@@ -187,20 +187,20 @@ msgid "New password"
 msgstr "Nieuw wachtwoord"
 
 #: account/forms/account_setup.py
-msgid "Enter your new password"
-msgstr "Voer uw nieuwe wachtwoord in"
+msgid "Enter a new password"
+msgstr ""
 
 #: account/forms/account_setup.py
 msgid "New password confirmation"
 msgstr "Nieuw wachtwoord bevestiginging"
 
 #: account/forms/account_setup.py
-msgid "Repeat your new password"
-msgstr "Het nieuwe wachtwoord opnieuw herhalen"
+msgid "Repeat the new password"
+msgstr ""
 
 #: account/forms/account_setup.py
-msgid "Confirm your new password"
-msgstr "Bevestig het nieuwe wachtwoord"
+msgid "Confirm the new password"
+msgstr ""
 
 #: account/forms/login.py
 msgid "Please enter a correct email address and password."
@@ -3091,6 +3091,26 @@ msgid ""
 msgstr ""
 "DNS-rapporten geven inzicht in de Domein naam systeem configuratie en "
 "potentiële zwakheden."
+
+#: reports/report_types/systems_report/report.html
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Domain"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "System type"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "System Report"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
 
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_member_list.html
@@ -6300,6 +6320,27 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#~ msgid "This name we will use to communicate with you."
+#~ msgstr "Deze naam wordt gebruikt om met u te communiceren."
+
+#~ msgid "What do we call you?"
+#~ msgstr "Hoe noemen wij u?"
+
+#~ msgid "Enter your email address."
+#~ msgstr "Voer uw e-mailadres in."
+
+#~ msgid "Choose your super secret password"
+#~ msgstr "Kies uw supergeheime wachtwoord"
+
+#~ msgid "Enter your new password"
+#~ msgstr "Voer uw nieuwe wachtwoord in"
+
+#~ msgid "Repeat your new password"
+#~ msgstr "Het nieuwe wachtwoord opnieuw herhalen"
+
+#~ msgid "Confirm your new password"
+#~ msgstr "Bevestig het nieuwe wachtwoord"
 
 #~ msgid "List of tasks for "
 #~ msgstr "Lijst van taken voor "

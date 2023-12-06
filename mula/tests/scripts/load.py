@@ -1,3 +1,4 @@
+import argparse
 import csv
 import uuid
 from datetime import datetime, timezone
@@ -11,10 +12,10 @@ KATALOGUS_API = "http://localhost:8003"
 SCHEDULER_API = "http://localhost:8004"
 
 
-def run():
+def run(org_num: int = 1):
     # Create organisations
     orgs: List[Dict[str, Any]] = []
-    for n in range(0, 1):
+    for n in range(0, org_num):
         org = {
             "id": f"org-{n}",
             "name": f"Organisation {n}",
@@ -63,7 +64,14 @@ def run():
             print("Enabled boefje ", boefje_id)
 
     declarations: List[Dict[str, Any]] = []
-    with Path("data.csv").open(newline="") as csv_file:
+
+    # Check if data file exists
+    if not Path("data.csv").exists():
+        print("data.csv file not found")
+        return
+
+    data_file = Path("data.csv").open(newline="", encoding="utf-8")
+    with data_file as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=",", quotechar='"')
         for row in csv_reader:
             name = row["name"]
@@ -120,4 +128,13 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    # Setup command line interface
+    parser = argparse.ArgumentParser(description="Load test the scheduler")
+
+    # Add arguments
+    parser.add_argument("--orgs", type=int, default=1, help="Number of organisations to create")
+
+    # Parse arguments
+    args = parser.parse_args()
+
+    run(org_num=args.orgs)
