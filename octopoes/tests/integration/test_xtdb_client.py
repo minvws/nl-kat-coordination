@@ -148,7 +148,6 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     assert len(xtdb_session.client.query(str(Query(Network)))) == 2
 
 
-@pytest.mark.xfail(reason="race condition")
 def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, xtdb_session: XTDBSession, valid_time):
     seed_system(octopoes_api_connector, valid_time)
 
@@ -247,3 +246,40 @@ def test_query_for_system_report(octopoes_api_connector: OctopoesAPIConnector, x
     assert len(ip_services["3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["services"]) == 1
     assert len(ip_services["3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["websites"]) == 1
     assert ip_services["3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["websites"][0] == "Hostname|test|c.example.com"
+
+
+def test_query_for_web_system_report(
+    octopoes_api_connector: OctopoesAPIConnector, xtdb_session: XTDBSession, valid_time
+):
+    seed_system(octopoes_api_connector, valid_time)
+    web_hostname = Hostname(network=Network(name="test").reference, name="example.com")
+    second_web_hostname = Hostname(network=Network(name="test").reference, name="a.example.com")
+
+    query = "Hostname.<ooi[is Finding].finding_type"
+    hostname_finding_types = octopoes_api_connector.query(query, valid_time, web_hostname.reference)
+
+    assert len(hostname_finding_types) == 1
+    ids = [x.id for x in hostname_finding_types]
+    assert "KAT-NO-CSP" in ids
+
+    query = "Hostname.<hostname[is Website].<website[is HTTPResource].<ooi[is Finding].finding_type"
+    assert len(octopoes_api_connector.query(query, valid_time, web_hostname.reference)) == 0
+
+    query = "Hostname.<netloc[is HostnameHTTPURL].<ooi[is Finding].finding_type"
+    web_url_finding_types = octopoes_api_connector.query(query, valid_time, web_hostname.reference)
+    assert len(web_url_finding_types) == 1
+    assert web_url_finding_types[0].id == "KAT-NO-HTTPS-REDIRECT"
+
+    query = "Hostname.<hostname[is Website].<ooi[is Finding].finding_type"
+    assert len(octopoes_api_connector.query(query, valid_time, web_hostname.reference)) == 0
+    assert len(octopoes_api_connector.query(query, valid_time, second_web_hostname.reference)) == 1
+
+    query = "Hostname.<hostname[is Website].<website[is SecurityTXT]"
+    assert len(octopoes_api_connector.query(query, valid_time, web_hostname.reference)) == 0
+    assert len(octopoes_api_connector.query(query, valid_time, second_web_hostname.reference)) == 1
+
+    query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort]"
+    assert len(octopoes_api_connector.query(query, valid_time, web_hostname.reference)) == 4
+
+    query = "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type"
+    assert len(octopoes_api_connector.query(query, valid_time, web_hostname.reference)) == 0
