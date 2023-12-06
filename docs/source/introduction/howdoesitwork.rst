@@ -12,7 +12,7 @@ What OpenKAT adds to the available security and monitoring tools is the ability 
 .. image:: img/stappenopenkat.png
   :alt: steps in OpenKAT
 
-OpenKAT uses a configurable data model. All information is translated into objects, which are stored in the database. This contains both the original information and the objects. Analysis is done on the database based on business rules, noting changes with previous points in time. OpenKAT delivers findings in a dashboard or via reporting software.
+OpenKAT uses a configurable data model. All information is translated into objects, which are stored in the database. This contains both the original information and the objects. Analysis is done on the database based on business rules, observing changes with previous points in time. OpenKAT delivers findings in a dashboard or via reporting software.
 
 
 Basic concepts
