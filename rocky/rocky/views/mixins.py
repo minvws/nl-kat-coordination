@@ -45,9 +45,9 @@ class HydratedFinding:
 
 class OriginData(BaseModel):
     origin: Origin
-    normalizer: Optional[dict]
-    boefje: Optional[Boefje]
-    params: Optional[Dict[str, str]]
+    normalizer: Optional[dict] = None
+    boefje: Optional[Boefje] = None
+    params: Optional[Dict[str, str]] = None
 
 
 class OOIAttributeError(AttributeError):

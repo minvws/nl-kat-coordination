@@ -7,13 +7,13 @@ from octopoes.models.ooi.web import URL, HTTPHeader, HTTPHeaderURL, Website
 
 
 def test_url_extracted_by_oois_in_headers_url():
-    header = HTTPHeader(resource="", key="Location", value="https://www.example.com")
+    header = HTTPHeader(resource="", key="Location", value="https://www.example.com/")
 
     results = list(run_oois_in_headers(header, [], {}))
 
     url = results[0]
     assert isinstance(url, URL)
-    assert url.raw == "https://www.example.com"
+    assert str(url.raw) == "https://www.example.com/"
     assert url.network == "Network|internet"
 
     http_header_url = results[1]
@@ -29,7 +29,7 @@ def test_url_extracted_by_oois_in_headers_relative_path(http_resource_https):
 
     url = results[0]
     assert isinstance(url, URL)
-    assert url.raw == "https://example.com/script.php"
+    assert str(url.raw) == "https://example.com/script.php"
     assert url.network == "Network|internet"
 
     http_header_url = results[1]

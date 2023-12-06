@@ -6,6 +6,7 @@ from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogu
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from pytest_django.asserts import assertContains, assertNotContains
+from requests import Response
 
 from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, get_normalizers_data, get_plugins_data, setup_request
@@ -247,15 +248,11 @@ def test_katalogus_client_organization_exists(mocker):
 def test_katalogus_client(mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
 
-    mock_response = mocker.MagicMock()
+    mock_response = Response()
+    mock_response.status_code = 200
+    mock_response._content = b"""{"service": "test", "healthy": false, "version": null, "additional": 2,
+    "results": []}"""
     mock_requests.Session().get.return_value = mock_response
-    mock_response.json.return_value = {
-        "service": "test",
-        "healthy": False,
-        "version": None,
-        "additional": 2,
-        "results": [],
-    }
 
     client = KATalogusClientV1("test", "test")
 
