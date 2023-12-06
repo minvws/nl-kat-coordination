@@ -120,10 +120,10 @@ class XTDBHTTPClient:
 
         transactions: List[TransactionRecord] = parse_obj_as(List[TransactionRecord], res.json())
         if has_doc is True and with_docs is True:  # Checking makes no sense without docs
-            transactions = [transaction for transaction in transactions if transaction.doc]
+            transactions = [transaction for transaction in transactions if transaction.document]
 
         if has_doc is False and with_docs is True:  # Checking makes no sense without docs
-            transactions = [transaction for transaction in transactions if not transaction.doc]
+            transactions = [transaction for transaction in transactions if not transaction.document]
 
         if indices:
             return [tx for i, tx in enumerate(transactions) if i in indices or i - len(transactions) in indices]

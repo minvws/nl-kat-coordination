@@ -92,23 +92,23 @@ def test_history(octopoes_api_connector: OctopoesAPIConnector):
 
     history = octopoes_api_connector.get_history(network.reference)
     assert len(history) == 3
-    assert history[0].doc is not None
-    assert history[1].doc is None
-    assert history[2].doc is not None
+    assert history[0].document is not None
+    assert history[1].document is None
+    assert history[2].document is not None
 
     assert len(octopoes_api_connector.get_history(network.reference, has_doc=False)) == 1
 
     with_doc = octopoes_api_connector.get_history(network.reference, has_doc=True)
     assert len(with_doc) == 2
-    assert all([x.doc for x in with_doc])
+    assert all([x.document for x in with_doc])
 
     assert len(octopoes_api_connector.get_history(network.reference, offset=1)) == 2
     assert len(octopoes_api_connector.get_history(network.reference, limit=2)) == 2
 
     first_and_last = octopoes_api_connector.get_history(network.reference, has_doc=True, indices=[1, -1])
     assert len(first_and_last) == 2
-    assert first_and_last[0].validTime == first_seen
-    assert first_and_last[1].validTime == last_seen
+    assert first_and_last[0].valid_time == first_seen
+    assert first_and_last[1].valid_time == last_seen
 
 
 def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
