@@ -18,9 +18,9 @@
 # Date       Author   Comments
 # ===========================================================================
 # 2023-08-12 J. Baten Initial version
-# 2023-08-14 J. Baten Debugging. Hacking Superadmin password to support 
+# 2023-08-14 J. Baten Debugging. Hacking Superadmin password to support
 #                     current stable standard Ansible
-# 2023-09-16 J. Baten Inject variables for version numers, and prepare for MR.                    
+# 2023-09-16 J. Baten Inject variables for version numbers, and prepare for MR.
 # 2023-11-19 J. Baten Handling MR feedback.
 
 # Usage: Make sure you can ssh to the root account on the remote server using
@@ -58,7 +58,7 @@
       kat_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
       bytes_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
       mula_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
-      # The next password needs minimum 2 uppercase, 2 lowercase and 2 special characties. 
+      # The next password needs minimum 2 uppercase, 2 lowercase and 2 special characties.
       # Because community.general.random_string is only available in recent versions of Ansible we fix these mandatory syntax rules this way.
       admin_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}AaBb12-_!"
       # DJANGO_CSRF_TRUSTED_ORIGINS="https://openkat.example.org"
@@ -71,7 +71,7 @@
   # Downloading and installing
   # Download the packages for all the components of KAT from GitHub. Also download the XTDB multinode package from GitHub.
   - name: Get latest version from OpenKAT website
-    ansible.builtin.shell: 
+    ansible.builtin.shell:
       cmd: 'curl -sL https://github.com/minvws/nl-kat-coordination/releases/latest | grep -m 1 -Po "(?<=tag\/)v[0-9\.]*(?=)" | sed "s/^v//" '
     register: openkat_curl_output
 
@@ -158,7 +158,6 @@
       encoding: UTF-8
       template: template0
 
-
   # Now use rocky-cli to initialize the database:
   # sudo -u kat rocky-cli migrate
   - name: initialize Rocky database
@@ -174,10 +173,10 @@
     ansible.builtin.shell:
       cmd: rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
 
-  # 
+  #
   # The steps for creating the other databases will be similar, but we’ll explain them anyway for completeness.
   # KAT-alogus DB
-  # 
+  #
 
   # Insert this password into the connection string for the KAT-alogus DB in /etc/kat/boefjes.conf. For example:
   # KATALOGUS_DB_URI=postgresql://katalogus:<password>@localhost/katalogus_db
@@ -188,7 +187,7 @@
       line:  "KATALOGUS_DB_URI=postgresql://katalogus:{{ kat_password }}@localhost/katalogus_db"
 
   # Create a new database and user for KAT-alogus:
-  # 
+  #
   # sudo -u postgres createuser katalogus -P
   - name: Create Postgresql user katalogus and grant privs
     become: true
@@ -218,7 +217,7 @@
       line:  "BYTES_DB_URI=postgresql://bytes:{{ bytes_password }}@localhost/bytes_db"
 
   # Create a new database and user for Bytes:
-  # 
+  #
   # sudo -u postgres createuser bytes -P
   - name: Create Postgresql user bytes and grant privs
     become: true
@@ -239,7 +238,7 @@
       owner: bytes
       encoding: UTF-8
       template: template0
-  
+
   # Insert this password into the connection string for the Mula DB in /etc/kat/mula.conf. For example:
   # SCHEDULER_DB_DSN=postgresql://mula:<password>@localhost/mula_db
   # Somebody renamed this to SCHEDULER_DB_URI... Le sigh...
@@ -269,7 +268,7 @@
       owner: mula
       encoding: UTF-8
       template: template0
- 
+
   # Create Rocky superuser and set up default groups and permissions
   # Create an admin user for OpenKAT
   # sudo -u kat rocky-cli createsuperuser
@@ -278,8 +277,8 @@
   # ?: (staticfiles.W004) The directory '/opt/venvs/kat-rocky/lib/python3.11/site-packages/assets' in the STATICFILES_DIRS setting does not exist.
   # Email: root@localhost
   # Full name: Superadmin account
-  # Password: 
-  # Password (again): 
+  # Password:
+  # Password (again):
   # This password is too short. It must contain at least 12 characters.
   # This password must contain at least 2 digits.
   # This password must contain at least 2 upper case letters.
@@ -306,7 +305,7 @@
     become_user: kat
     ansible.builtin.shell:
       cmd: rocky-cli setup_dev_account
-   
+
   # Set up RabbitMQ
   # Installation
   # Use the following steps to set up RabbitMQ and allow kat to use it.
@@ -349,8 +348,8 @@
       dest: /etc/rabbitmq/rabbitmq.conf
       owner: root
       group: root
-      mode: '0644'  
-      
+      mode: '0644'
+
   # Create a new file /etc/rabbitmq/advanced.conf and add the following lines:
   # [
   #     {kernel,[
@@ -435,19 +434,20 @@
       - rocky.conf
       - boefjes.conf
       - mula.conf
-   
+
   # Configure hostname in Rocky The DJANGO_ALLOWED_HOSTS and
   # DJANGO_CSRF_TRUSTED_ORIGINS variables in /etc/kat/rocky.conf need to be
   # configured with the hostname (or hostnames separated by commas) that will
   # be used to access OpenKAT. If openkat.example.org is used to access OpenKAT
   # the configuration should be:
   # DJANGO_ALLOWED_HOSTS="openkat.example.org"
-  # TODO someday: read IPv4 and IPv6 dict of IP's and add them all here separated with a comma. 
+  # TODO someday: read IPv4 and IPv6 dict of IP's and add them all here separated with a comma.
   - name: Configure hostname in Rocky. Currently we configure IP address. Please add FQDN later to  DJANGO_ALLOWED_HOSTS setting in /etc/kat/rocky.conf !
     ansible.builtin.lineinfile:
       path: "/etc/kat/rocky.conf"
       regexp: "DJANGO_ALLOWED_HOSTS=.*"
       line:  "DJANGO_ALLOWED_HOSTS=\"{{ ansible_default_ipv4.address }}\""
+
   - name: Configure hostname in Rocky. Currently we configure IP address. Please add FQDN later to  DJANGO_CSRF_TRUSTED_ORIGINS setting in /etc/kat/rocky.conf !
     ansible.builtin.lineinfile:
       path: "/etc/kat/rocky.conf"
@@ -478,7 +478,7 @@
       cmd: update-mula-db
 
   # Initialize the database using the update-katalogus-db tool:
-  # 
+  #
   # sudo -u kat update-katalogus-db
   - name: initialize katalogus database
     become: true
@@ -498,18 +498,18 @@
       state: restarted
       enabled: true
     loop:
-      - kat-mula 
-      - kat-bytes 
-      - kat-boefjes 
-      - kat-normalizers 
-      - kat-katalogus 
-      - kat-keiko 
-      - kat-octopoes 
+      - kat-mula
+      - kat-bytes
+      - kat-boefjes
+      - kat-normalizers
+      - kat-katalogus
+      - kat-keiko
+      - kat-octopoes
       - kat-octopoes-worker
-      - kat-rocky 
+      - kat-rocky
 
   # Start using OpenKAT
-  # 
+  #
   # By default OpenKAT will be accessible in your browser through https://<server IP>:8443 (http://<server IP>:8000 for docker based installs). There, Rocky will take you through the steps of setting up your account and running your first boefjes.
   # Upgrading OpenKAT
   #
@@ -522,7 +522,7 @@
         * After a fresh installation of OpenKAT you should be able to start using it.
         "* Visit https://{{ ansible_default_ipv4.address }}{{':'}}8443."
         * The Superadmin user account name is "Superadmin".
-        * The Superadmin user password is "{{ admin_password }}" (without the surrounding qoutes).
+        * The Superadmin user password is "{{ admin_password }}" (without the surrounding quotes).
         * If you want/need to reset your login, get a root shell on the system and issue the following
         * command and answer all the questions.
         * sudo -u kat rocky-cli createsuperuser
