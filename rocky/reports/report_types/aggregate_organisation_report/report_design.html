@@ -1,11 +1,14 @@
 {% load i18n %}
 {% load static %}
 
-<main id="main-content" tabindex="-1" class="sidemenu choose-report">
+<main id="main-content"
+      tabindex="-1"
+      class="sidemenu choose-report report"
+      lang="nl">
     {% comment %} {% include "partials/report_sidemenu.html" %} {% endcomment %}
     {% include "partials/report_sidemenu.html" %}
 
-    <section class="report" lang="nl">
+    <article>
         <section class="introduction">
             <div class="horizontal-view toolbar">
                 <button>Save report</button>
@@ -577,5 +580,5 @@
                 </div>
             </section>
         </div>
-    </section>
+    </article>
 </main>

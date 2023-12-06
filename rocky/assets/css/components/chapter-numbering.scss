@@ -4,7 +4,7 @@
 .chapter-numbers {
   counter-reset: chapter;
 
-  > section {
+  > * {
     counter-reset: subchapter;
   }
 
@@ -19,6 +19,34 @@
     &::before {
       counter-increment: subchapter;
       content: counter(chapter) "." counter(subchapter) ". ";
+    }
+  }
+}
+
+ol.chapter-numbers {
+  padding-left: 0;
+  list-style-position: outside;
+
+  > li {
+    list-style: none;
+    list-style-position: outside;
+
+    &::before {
+      counter-increment: chapter;
+      content: counter(chapter) ". ";
+    }
+
+    > ol {
+      padding-left: 0.75rem;
+
+      > li {
+        list-style: none;
+
+        &::before {
+          counter-increment: subchapter;
+          content: counter(chapter) "." counter(subchapter) ". ";
+        }
+      }
     }
   }
 }
