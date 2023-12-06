@@ -1,4 +1,5 @@
-.report {
+.report,
+.chapter-numbers {
   gap: var(--spacing-grid-500);
 
   > section {
@@ -52,5 +53,9 @@
         }
       }
     }
+  }
+
+  .chapter-numbers {
+    gap: var(--spacing-grid-500);
   }
 }

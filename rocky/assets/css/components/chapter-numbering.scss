@@ -1,4 +1,4 @@
-/* Nested ordered lists */
+/* Chapter numbering */
 
 /* Includes parent numbers */
 .chapter-numbers {
@@ -16,13 +16,6 @@
   }
 
   h3 {
-    &::before {
-      counter-increment: subchapter;
-      content: counter(chapter) "." counter(subchapter) ". ";
-    }
-  }
-
-  h4 {
     &::before {
       counter-increment: subchapter;
       content: counter(chapter) "." counter(subchapter) ". ";
