@@ -217,10 +217,12 @@ class SchedulerClient:
             boefje_name=boefje_name,
         )
 
-    def get_task_details(self, task_id) -> Task:
+    def get_task_details(self, organization_code: str, task_id: str) -> Optional[Task]:
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
         res.raise_for_status()
-        return Task.parse_raw(res.content)
+        task_details = Task.parse_raw(res.content)
+        if task_details.p_item.data.organization == organization_code:
+            return task_details
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         try:
