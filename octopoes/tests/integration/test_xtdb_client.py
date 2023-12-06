@@ -159,7 +159,7 @@ def test_entity_history(xtdb_session: XTDBSession, valid_time: datetime):
     xtdb_session.put(XTDBOOIRepository.serialize(network), datetime.now(timezone.utc))
     xtdb_session.commit()
 
-    history = xtdb_session.client.get_entity_history(str(network.reference))
+    history = xtdb_session.client.get_entity_history(str(network.reference), with_docs=True)
     assert len(history) == 3
 
     assert history[0].document is not None

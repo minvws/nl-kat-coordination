@@ -100,7 +100,7 @@ class XTDBHTTPClient:
         entity_id: str,
         *,
         sort_order: str = "asc",  # Or: "desc"
-        with_docs: bool = True,
+        with_docs: bool = False,
         has_doc: Optional[bool] = None,
         offset: int = 0,
         limit: Optional[int] = None,
@@ -117,11 +117,12 @@ class XTDBHTTPClient:
         self._verify_response(res)
 
         transactions: List[TransactionRecord] = parse_obj_as(List[TransactionRecord], res.json())
-        if has_doc is True and with_docs is True:  # Checking makes no sense without docs
-            transactions = [transaction for transaction in transactions if transaction.document]
 
-        if has_doc is False and with_docs is True:  # Checking makes no sense without docs
-            transactions = [transaction for transaction in transactions if not transaction.document]
+        if has_doc is True:  # The doc is None if and only if the hash is  "0000000000000000000000000000000000000000"
+            transactions = [transaction for transaction in transactions if transaction.content_hash != 40 * "0"]
+
+        if has_doc is False:  # The doc is None if and only if the hash is  "0000000000000000000000000000000000000000"
+            transactions = [transaction for transaction in transactions if transaction.content_hash == 40 * "0"]
 
         if indices:
             return [tx for i, tx in enumerate(transactions) if i in indices or i - len(transactions) in indices]

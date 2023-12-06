@@ -90,7 +90,7 @@ def test_history(octopoes_api_connector: OctopoesAPIConnector):
         )
     )
 
-    history = octopoes_api_connector.get_history(network.reference)
+    history = octopoes_api_connector.get_history(network.reference, with_docs=True)
     assert len(history) == 3
     assert history[0].document is not None
     assert history[1].document is None
@@ -100,7 +100,7 @@ def test_history(octopoes_api_connector: OctopoesAPIConnector):
 
     with_doc = octopoes_api_connector.get_history(network.reference, has_doc=True)
     assert len(with_doc) == 2
-    assert all([x.document for x in with_doc])
+    assert not all([x.document for x in with_doc])
 
     assert len(octopoes_api_connector.get_history(network.reference, offset=1)) == 2
     assert len(octopoes_api_connector.get_history(network.reference, limit=2)) == 2

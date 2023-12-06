@@ -74,7 +74,7 @@ class OOIRepository(Repository):
         reference: Reference,
         *,
         sort_order: str = "asc",  # Or: "desc"
-        with_docs: bool = True,
+        with_docs: bool = False,
         has_doc: Optional[bool] = None,
         offset: int = 0,
         limit: Optional[int] = None,
@@ -245,7 +245,7 @@ class XTDBOOIRepository(OOIRepository):
         reference: Reference,
         *,
         sort_order: str = "asc",  # Or: "desc"
-        with_docs: bool = True,
+        with_docs: bool = False,
         has_doc: Optional[bool] = None,
         offset: int = 0,
         limit: Optional[int] = None,
