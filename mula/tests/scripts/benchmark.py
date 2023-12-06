@@ -13,7 +13,7 @@ TIMEOUT_FOR_LOG_CAPTURE = 5
 logger = logging.getLogger(__name__)
 
 
-def are_tasks_done():
+def are_tasks_done() -> bool:
     response = requests.get(
         url=f"{SCHEDULER_API}/tasks/stats",
     )
@@ -29,7 +29,7 @@ def are_tasks_done():
     return all(tasks_stats[hour].get("queued") <= 0 for hour in tasks_stats)
 
 
-def parse_stats():
+def parse_stats() -> None:
     resp_tasks_stats = requests.get(
         url=f"{SCHEDULER_API}/tasks/stats",
     )
@@ -57,7 +57,7 @@ def parse_stats():
         )
 
 
-def capture_logs(container_id: str, output_file: str):
+def capture_logs(container_id: str, output_file: str) -> None:
     # Capture logs
     with Path.open(output_file, "w", encoding="utf-8") as file:
         subprocess.run(
@@ -68,7 +68,7 @@ def capture_logs(container_id: str, output_file: str):
         )
 
 
-def parse_logs(path: str):
+def parse_logs(path: str) -> None:
     # Check if there were any errors in the logs
     count = 0
     with Path.open(path, encoding="utf-8") as file:
@@ -106,7 +106,7 @@ def collect_memory(container_id: str) -> str:
     )
 
 
-def run(container_id: str):
+def run(container_id: str) -> None:
     # Start capturing logs
     if container_id is not None:
         thread = threading.Thread(target=capture_logs, args=(container_id, "logs.txt"))
