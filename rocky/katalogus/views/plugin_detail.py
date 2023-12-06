@@ -97,7 +97,7 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["task_history"] = self.get_task_history()
         context["task_history_form_fields"] = [
             "task_history_from",
@@ -153,7 +153,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
             context["select_oois_form"] = SelectOOIForm(
                 oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),

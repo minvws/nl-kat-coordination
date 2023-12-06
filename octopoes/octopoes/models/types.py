@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Dict, Iterator, Set, Type, Union
 
-from pydantic.fields import ModelField
-
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import (
     SubjectAlternativeNameHostname,
@@ -40,6 +38,7 @@ from octopoes.models.ooi.findings import (
     CVEFindingType,
     CWEFindingType,
     Finding,
+    FindingType,
     KATFindingType,
     MutedFinding,
     RetireJSFindingType,
@@ -48,6 +47,7 @@ from octopoes.models.ooi.findings import (
 from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
     AutonomousSystem,
+    IPAddress,
     IPAddressV4,
     IPAddressV6,
     IPPort,
@@ -94,6 +94,7 @@ DnsRecordType = Union[
     NXDOMAIN,
 ]
 FindingTypeType = Union[
+    FindingType,
     ADRFindingType,
     KATFindingType,
     CVEFindingType,
@@ -104,6 +105,7 @@ FindingTypeType = Union[
 ]
 NetworkType = Union[
     Network,
+    IPAddress,
     IPAddressV4,
     IPAddressV6,
     AutonomousSystem,
@@ -211,8 +213,8 @@ def type_by_name(type_name: str):
     return next(t for t in ALL_TYPES if t.__name__ == type_name)
 
 
-def related_object_type(field: ModelField) -> Type[OOI]:
-    object_type: Union[str, Type[OOI]] = field.field_info.extra["object_type"]
+def related_object_type(field) -> Type[OOI]:
+    object_type: Union[str, Type[OOI]] = field.json_schema_extra["object_type"]
     if isinstance(object_type, str):
         return type_by_name(object_type)
     return object_type
@@ -220,7 +222,10 @@ def related_object_type(field: ModelField) -> Type[OOI]:
 
 def get_relations(object_type: Type[OOI]) -> Dict[str, Type[OOI]]:
     return {
-        name: related_object_type(field) for name, field in object_type.__fields__.items() if field.type_ == Reference
+        name: related_object_type(field)
+        for name, field in object_type.model_fields.items()
+        if field.annotation == Reference
+        or (hasattr(field.annotation, "__args__") and Reference in field.annotation.__args__)
     }
 
 

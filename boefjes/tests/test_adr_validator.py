@@ -11,7 +11,7 @@ class ADRValidatorNormalizerTest(TestCase):
     def test_no_findings(self):
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
-        meta = NormalizerMeta.parse_raw(get_dummy_data("adr-validator-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("adr-validator-normalize.json"))
 
         raw = """[{"rule": "TEST-01", "passed": true, "message": ""}]"""
         output = runner.run(meta, bytes(raw, "UTF-8"))
@@ -30,7 +30,7 @@ class ADRValidatorNormalizerTest(TestCase):
     def test_with_findings(self):
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
-        meta = NormalizerMeta.parse_raw(get_dummy_data("adr-validator-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("adr-validator-normalize.json"))
 
         raw = """[
             {"rule": "TEST-01", "passed": true, "message": ""},

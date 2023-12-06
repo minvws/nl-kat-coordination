@@ -97,7 +97,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     def get_ooi_from_csv(self, ooi_type_name: str, values: Dict[str, str]):
         ooi_type = self.ooi_types[ooi_type_name]["type"]
         ooi_fields = [
-            (field, model_field.type_ == Reference, model_field.required)
+            (field, model_field.annotation == Reference, model_field.is_required())
             for field, model_field in ooi_type.__fields__.items()
             if field not in self.skip_properties
         ]

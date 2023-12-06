@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import RedirectResponse, Response
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
@@ -26,7 +26,7 @@ class ServiceHealth(BaseModel):
     healthy: bool = False
     version: Optional[str] = None
     additional: Any = None
-    results: List["ServiceHealth"] = []
+    results: List["ServiceHealth"] = Field(default_factory=list)
 
 
 ServiceHealth.update_forward_refs()
