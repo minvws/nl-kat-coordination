@@ -616,6 +616,26 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(400, response.status_code)
         self.assertIn("failed to get task", response.json().get("detail"))
 
+    def test_patch_task_create_event(self):
+        response = self.client.get(f"/events?task_id={self.first_item_api.get('id')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(self.first_item_api.get("id"), response.json()["results"][0]["task_id"])
+
+        # Patch task
+        response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"status": "completed"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("completed", response.json().get("status"))
+
+        # Should have created an event
+        response = self.client.get(f"/events?task_id={self.first_item_api.get('id')}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+        self.assertEqual(self.first_item_api.get("id"), response.json()["results"][0]["task_id"])
+        self.assertEqual(self.first_item_api.get("id"), response.json()["results"][1]["task_id"])
+
     def test_get_tasks_stats(self):
         response = self.client.get("/tasks/stats")
         self.assertEqual(200, response.status_code)
@@ -658,8 +678,16 @@ class APIEventsEndpointTestCase(APITemplateTestCase):
     def test_patch_task_create_event(self):
         # Add one task to the queue
         first_item = create_p_item(self.organisation.id, 1)
+        response = self.client.get(f"/events?task_id={first_item.id}")
+
         response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=first_item.model_dump_json())
         self.assertEqual(response.status_code, 201)
+
+        response = self.client.get(f"/events?task_id={first_item.id}")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, response.json()["count"])
+        self.assertEqual(1, len(response.json()["results"]))
+        self.assertEqual(str(first_item.id), response.json()["results"][0]["task_id"])
 
         # Update task
         response = self.client.patch(f"/tasks/{first_item.id}", json={"status": "completed"})
@@ -668,9 +696,10 @@ class APIEventsEndpointTestCase(APITemplateTestCase):
         # Should have created an event
         response = self.client.get(f"/events?task_id={first_item.id}")
         self.assertEqual(200, response.status_code)
-        self.assertEqual(1, response.json()["count"])
-        self.assertEqual(1, len(response.json()["results"]))
-        self.assertEqual(first_item.id, response.json()["results"][0]["task_id"])
+        self.assertEqual(2, response.json()["count"])
+        self.assertEqual(2, len(response.json()["results"]))
+        self.assertEqual(str(first_item.id), response.json()["results"][0]["task_id"])
+        self.assertEqual(str(first_item.id), response.json()["results"][1]["task_id"])
 
     def test_create_event(self):
         # Arrange
