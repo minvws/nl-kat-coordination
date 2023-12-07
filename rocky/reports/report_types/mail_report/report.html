@@ -6,40 +6,14 @@
             <thead>
                 <tr>
                     <th scope="col">{% translate "Check" %}</th>
-                    <th scope="col">{% translate "Compliancy" %}</th>
+                    <th scope="col">{% translate "Compliance" %}</th>
                 </tr>
             </thead>
             <tbody>
                 {% for finding_type in data.mail_security_measures.items %}
                     <tr>
-                        <td>{{data.email_security_measures}}</td>
-                        <td>
-                            1/1 mailservers complient
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </p>
-</p>
-{% load i18n %}
-
-<p class="horizontal-scroll">
-    <p class="column-2">
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col">{% translate "Check" %}</th>
-                    <th scope="col">{% translate "Compliancy" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for finding_type in data.mail_security_measures.items %}
-                    <tr>
-                        <td>{{data.email_security_measures}}</td>
-                        <td>
-                            1/1 mailservers complient
-                        </td>
+                        <td>{{ data.email_security_measures }}</td>
+                        <td>1/1 mailservers compliant</td>
                     </tr>
                 {% endfor %}
             </tbody>
