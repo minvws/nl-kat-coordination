@@ -1,6 +1,6 @@
 {
     "id": "rpki",
-    "name": "Rpki",
+    "name": "RPKI",
     "description": "Check if an IPV4 or IPV6 address has a valid VRPS record.",
     "consumes": [
         "IPAddressV4",
