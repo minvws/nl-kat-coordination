@@ -33,6 +33,7 @@ from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path as ObjectPath
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
@@ -168,6 +169,28 @@ def get_object(
     reference: Reference = Depends(extract_reference),
 ):
     return octopoes.get_ooi(reference, valid_time)
+
+
+@router.get("/object-history", tags=["Objects"])
+def get_object_history(
+    reference: Reference = Depends(extract_reference),
+    sort_order: str = "asc",  # Or: "desc"
+    with_docs: bool = False,
+    has_doc: Optional[bool] = None,
+    offset: int = 0,
+    limit: Optional[int] = None,
+    indices: Optional[List[int]] = None,
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> List[TransactionRecord]:
+    return octopoes.get_ooi_history(
+        reference,
+        sort_order=sort_order,
+        with_docs=with_docs,
+        has_doc=has_doc,
+        offset=offset,
+        limit=limit,
+        indices=indices,
+    )
 
 
 @router.get("/objects/random", tags=["Objects"])
