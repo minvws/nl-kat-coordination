@@ -99,27 +99,6 @@ class RabbitMQ(Listener):
     def listen(self) -> None:
         self.basic_consume(self.queue, self.durable, self.prefetch_count)
 
-    @retry(
-        (pika.exceptions.AMQPConnectionError, pika.exceptions.ConnectionClosedByBroker), delay=5, jitter=(1, 3), tries=5
-    )
-    def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
-        self.connect(queue, durable, prefetch_count)
-
-        if not self.channel:
-            raise RuntimeError("No channel available to consume messages on!")
-
-        if not self.connection:
-            raise RuntimeError("No connection available to consume messages on!")
-
-        try:
-            self.channel.basic_qos(prefetch_count=prefetch_count)
-            self.channel.basic_consume(queue, on_message_callback=self.callback)
-            self.channel.start_consuming()
-        except pika.exceptions.AMQPChannelError as exc:
-            # Do not recover on channel errors
-            self.logger.error("AMQPChannelError: %s", exc)
-            raise exc
-
     @retry((pika.exceptions.AMQPConnectionError, socket.gaierror), delay=5, jitter=(1, 3), tries=5)
     def connect(self, queue: str, durable: bool, prefetch_count: int) -> None:
         """Connect to the RabbitMQ host and declare the queue."""
@@ -143,6 +122,28 @@ class RabbitMQ(Listener):
                 self.channel.queue_declare(queue=queue, durable=durable)
             else:
                 raise
+
+    @retry(
+        (pika.exceptions.AMQPConnectionError, pika.exceptions.ConnectionClosedByBroker), delay=5, jitter=(1, 3), tries=5
+    )
+    def basic_consume(self, queue: str, durable: bool, prefetch_count: int) -> None:
+        if self.connection and self.connection.is_closed:
+            self.connect(queue, durable, prefetch_count)
+
+        if not self.channel:
+            raise RuntimeError("No channel available to consume messages on!")
+
+        if not self.connection:
+            raise RuntimeError("No connection available to consume messages on!")
+
+        try:
+            self.channel.basic_qos(prefetch_count=prefetch_count)
+            self.channel.basic_consume(queue, on_message_callback=self.callback)
+            self.channel.start_consuming()
+        except pika.exceptions.AMQPChannelError as exc:
+            # Do not recover on channel errors
+            self.logger.error("AMQPChannelError: %s", exc)
+            raise exc
 
     def callback(
         self,
