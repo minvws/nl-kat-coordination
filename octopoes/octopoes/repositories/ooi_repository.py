@@ -31,6 +31,7 @@ from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceNode, ReferenceTree
 from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
 from octopoes.repositories.repository import Repository
@@ -66,6 +67,19 @@ class OOIRepository(Repository):
         self.event_manager = event_manager
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
+        raise NotImplementedError
+
+    def get_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = False,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
         raise NotImplementedError
 
     def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
@@ -222,6 +236,31 @@ class XTDBOOIRepository(OOIRepository):
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
             return self.deserialize(res)
+        except HTTPError as e:
+            if e.response.status_code == HTTPStatus.NOT_FOUND:
+                raise ObjectNotFoundException(str(reference))
+
+    def get_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = False,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
+        try:
+            return self.session.client.get_entity_history(
+                str(reference),
+                sort_order=sort_order,
+                with_docs=with_docs,
+                has_doc=has_doc,
+                offset=offset,
+                limit=limit,
+                indices=indices,
+            )
         except HTTPError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
