@@ -141,9 +141,7 @@ class EventStore:
                 .filter(EventDB.type == "events.db")
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "update")
-                .filter(
-                    EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED, TaskStatus.FAILED])
-                )
+                .filter(EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED, TaskStatus.FAILED]))
                 .order_by(EventDB.timestamp.desc())
             )
 
@@ -184,9 +182,7 @@ class EventStore:
                 .filter(EventDB.type == "events.db")
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "update")
-                .filter(
-                    EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED, TaskStatus.FAILED])
-                )
+                .filter(EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED, TaskStatus.FAILED]))
                 .order_by(EventDB.timestamp.desc())
             )
 
