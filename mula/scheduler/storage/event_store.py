@@ -85,7 +85,7 @@ class EventStore:
                 .filter(EventDB.type == "events.db")
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "insert")
-                .filter(EventDB.data["status"].as_string() == TaskStatus.QUEUED.upper())
+                .filter(EventDB.data["status"].as_string() == TaskStatus.QUEUED)
                 .order_by(EventDB.timestamp.asc())
             )
 
@@ -100,7 +100,7 @@ class EventStore:
                 .filter(EventDB.type == "events.db")
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "update")
-                .filter(EventDB.data["status"].as_string() == TaskStatus.DISPATCHED.upper())
+                .filter(EventDB.data["status"].as_string() == TaskStatus.DISPATCHED)
                 .order_by(EventDB.timestamp.desc())
             )
 
@@ -126,7 +126,7 @@ class EventStore:
                 .filter(EventDB.type == "events.db")
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "update")
-                .filter(EventDB.data["status"].as_string() == TaskStatus.DISPATCHED.upper())
+                .filter(EventDB.data["status"].as_string() == TaskStatus.DISPATCHED)
                 .order_by(EventDB.timestamp.asc())
             )
 
@@ -142,7 +142,7 @@ class EventStore:
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "update")
                 .filter(
-                    EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED.upper(), TaskStatus.FAILED.upper()])
+                    EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED, TaskStatus.FAILED])
                 )
                 .order_by(EventDB.timestamp.desc())
             )
@@ -169,7 +169,7 @@ class EventStore:
                 .filter(EventDB.type == "events.db")
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "insert")
-                .filter(EventDB.data["status"].as_string() == TaskStatus.QUEUED.upper())
+                .filter(EventDB.data["status"].as_string() == TaskStatus.QUEUED)
                 .order_by(EventDB.timestamp.asc())
             )
 
@@ -185,7 +185,7 @@ class EventStore:
                 .filter(EventDB.context == "task")
                 .filter(EventDB.event == "update")
                 .filter(
-                    EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED.upper(), TaskStatus.FAILED.upper()])
+                    EventDB.data["status"].as_string().in_([TaskStatus.COMPLETED, TaskStatus.FAILED])
                 )
                 .order_by(EventDB.timestamp.desc())
             )

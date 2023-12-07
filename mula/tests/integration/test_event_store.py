@@ -105,14 +105,44 @@ class EventStoreTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
+        task_db.status = models.TaskStatus.QUEUED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="insert",
+                data=task_db.model_dump(),
+            )
+        )
+
         task_db.status = models.TaskStatus.DISPATCHED
         self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="update",
+                data=task_db.model_dump(),
+            )
+        )
 
         task_db.status = models.TaskStatus.COMPLETED
         self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="update",
+                data=task_db.model_dump(),
+            )
+        )
 
         # Assert
-        duration = self.mock_ctx.datastores.event_store.get_task_duration(task.id)
+        duration = self.mock_ctx.datastores.event_store.get_task_duration(task_db.id)
         self.assertGreater(duration, 0)
 
     def test_get_task_queued(self):
@@ -122,14 +152,44 @@ class EventStoreTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
+        task_db.status = models.TaskStatus.QUEUED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="insert",
+                data=task_db.model_dump(),
+            )
+        )
+
         task_db.status = models.TaskStatus.DISPATCHED
         self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="update",
+                data=task_db.model_dump(),
+            )
+        )
 
         task_db.status = models.TaskStatus.COMPLETED
         self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="update",
+                data=task_db.model_dump(),
+            )
+        )
 
         # Assert
-        queued = self.mock_ctx.datastores.event_store.get_task_queued(task.id)
+        queued = self.mock_ctx.datastores.event_store.get_task_queued(task_db.id)
         self.assertGreater(queued, 0)
 
     def test_get_task_runtime(self):
@@ -139,14 +199,44 @@ class EventStoreTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
+        task_db.status = models.TaskStatus.QUEUED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="insert",
+                data=task_db.model_dump(),
+            )
+        )
+
         task_db.status = models.TaskStatus.DISPATCHED
         self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="update",
+                data=task_db.model_dump(),
+            )
+        )
 
         task_db.status = models.TaskStatus.COMPLETED
         self.mock_ctx.datastores.task_store.update_task(task_db)
+        self.mock_ctx.datastores.event_store.create_event(
+            models.Event(
+                task_id=task_db.id,
+                type="events.db",
+                context="task",
+                event="update",
+                data=task_db.model_dump(),
+            )
+        )
 
         # Assert
-        runtime = self.mock_ctx.datastores.event_store.get_task_runtime(task.id)
+        runtime = self.mock_ctx.datastores.event_store.get_task_runtime(task_db.id)
         self.assertGreater(runtime, 0)
 
     def test_create_event(self):
