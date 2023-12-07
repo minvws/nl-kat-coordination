@@ -1,0 +1,9 @@
+/* State tags */
+
+.new {
+  @extend %tag;
+
+  background-color: var(--colors-blue-1);
+  border: 1px solid var(--colors-blue-5);
+  color: var(--colors-blue-8);
+}

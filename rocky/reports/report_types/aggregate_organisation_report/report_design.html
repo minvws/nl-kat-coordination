@@ -1,11 +1,14 @@
 {% load i18n %}
 {% load static %}
 
-<main id="main-content" tabindex="-1" class="sidemenu choose-report">
+<main id="main-content"
+      tabindex="-1"
+      class="sidemenu choose-report report"
+      lang="nl">
     {% comment %} {% include "partials/report_sidemenu.html" %} {% endcomment %}
     {% include "partials/report_sidemenu.html" %}
 
-    <section class="report" lang="nl">
+    <article>
         <section class="introduction">
             <div class="horizontal-view toolbar">
                 <button>Save report</button>
@@ -135,7 +138,7 @@
                 </ul>
             </div>
         </section>
-        <section class="chapter-numbers">
+        <div class="chapter-numbers">
             <section id="general-recommendations">
                 <div>
                     <h2>General recommendations</h2>
@@ -169,13 +172,19 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>192.0.2.3</td>
+                                    <td>
+                                        <strong>192.0.2.3</strong>
+                                    </td>
                                     <td>example.com, sub.example.com</td>
                                     <td>Mail, web</td>
                                 </tr>
                                 <tr>
-                                    <td class="nowrap">
-                                        <i class="icon cancelled"></i> 192.0.2.5 <span class="new">New</span>
+                                    <td>
+                                        <i class="icon cancelled"></i> 192.0.2.5
+                                        <span class="nowrap">
+                                            <span class="new">New</span>
+                                            <span class="de-emphasized">since Oct. 8, 2023</span>
+                                        </span>
                                     </td>
                                     <td>sub.example.com</td>
                                     <td>Web</td>
@@ -570,6 +579,6 @@
                     <h4>192.0.2.5 (sub.example.com)</h4>
                 </div>
             </section>
-        </section>
-    </section>
+        </div>
+    </article>
 </main>
