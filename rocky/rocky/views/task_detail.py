@@ -1,21 +1,16 @@
-from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
+from tools.view_helpers import get_scheduler_task
 
-from rocky.scheduler import client
 from rocky.views.mixins import OctopoesView
 
 
 class TaskDetailView(OctopoesView, TemplateView):
     def get_task(self, task_id):
-        task = client.get_task_details(self.organization.code, task_id)
-        if task:
-            return task
-        else:
-            messages.add_message(self.request, messages.ERROR, _("Task could not be found."))
+        return get_scheduler_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

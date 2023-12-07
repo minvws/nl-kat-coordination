@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, datetime, timezone
-from typing import List, TypedDict
+from typing import List, Optional, TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from account.mixins import OrganizationView
@@ -13,8 +13,9 @@ from octopoes.models.types import OOI_TYPES
 from rocky.scheduler import (
     BadRequestError,
     ConflictError,
-    QueuePrioritizedItem,
     SchedulerError,
+    Task,
+    TaskNotFoundError,
     TooManyRequestsError,
     client,
 )
@@ -165,10 +166,18 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         ]
 
 
-def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrioritizedItem) -> None:
+def get_scheduler_task(request: HttpRequest, organization_code: str, task_id: str) -> Optional[Task]:
     try:
+        return client.get_task_details(organization_code, task_id)
+    except TaskNotFoundError as error:
+        messages.error(request, error.message)
+
+
+def schedule_task(request: HttpRequest, organization_code: str, task_id: str) -> None:
+    try:
+        task = client.get_task_details(organization_code, task_id)
         client.push_task(f"{task.data.type}-{organization_code}", task)
-    except (BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
+    except (TaskNotFoundError, BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
         messages.error(request, error.message)
     else:
         messages.success(

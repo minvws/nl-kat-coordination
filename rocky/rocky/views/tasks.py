@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from enum import Enum
 
@@ -11,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
-from tools.view_helpers import schedule_task
+from tools.view_helpers import get_scheduler_task, schedule_task
 
 from rocky.scheduler import client
 
@@ -26,15 +25,13 @@ class DownloadTaskDetail(OrganizationView):
     def get(self, request, *args, **kwargs):
         task_id = kwargs["task_id"]
         filename = "task_" + task_id + ".json"
-        task_details = client.get_task_details(self.organization.code, task_id)
-        if task_details:
-            if not self.is_task_id(task_id) or "detail" in task_details:
-                return self.show_error_message()
-            response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
-            response["Content-Disposition"] = "attachment; filename=" + filename
-            return response
-        else:
-            messages.add_message(self.request, messages.ERROR, _("Task could not be found."))
+        task_details = get_scheduler_task(self.request, self.organization.code, task_id)
+
+        if not self.is_task_id(task_id) or "detail" in task_details:
+            return self.show_error_message()
+        response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
+        response["Content-Disposition"] = "attachment; filename=" + filename
+        return response
 
     def is_task_id(self, task_id):
         forbidden_chars = ["/", ".", " "]
@@ -91,17 +88,7 @@ class TaskListView(OrganizationView, ListView):
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
-            task = client.get_task_details(self.organization.code, task_id)
-            if task:
-                # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-                new_id = uuid.uuid4()
-
-                task.p_item.id = new_id
-                task.p_item.data.id = new_id
-
-                schedule_task(self.request, self.organization.code, task.p_item)
-            else:
-                messages.add_message(self.request, messages.ERROR, _("Task could not be found."))
+            schedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
