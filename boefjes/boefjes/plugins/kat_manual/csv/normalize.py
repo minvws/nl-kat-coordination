@@ -42,8 +42,7 @@ def process_csv(csv_raw_data, reference_cache):
         try:
             ooi, extra_declarations = get_ooi_from_csv(object_type, row, reference_cache)
 
-            for declaration in extra_declarations:
-                yield declaration
+            yield from extra_declarations
 
             yield {
                 "type": "declaration",

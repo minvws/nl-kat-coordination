@@ -109,4 +109,4 @@ settings-doc = "^3.0.0"
 colorama = "0.4.6" # Required on all platforms, not just win32
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "3.2.2"
+pre-commit = "^3.5.0"
