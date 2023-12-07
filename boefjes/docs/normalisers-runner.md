@@ -126,13 +126,13 @@ A single independent process that can be scaled horizontally (multiple processes
 - Do we want to persist the normaliser output in Bytes, or send it directly to Octopoes?
 - Do we want to align the runtime with one that can also work for Boefjes?
 - Do we want to have support for multiple raw files as input?
-- Do we want to re-use a running normaliser for multiple inputs, or do we set up and tear down the normaliser for each run?
+- Do we want to reuse a running normaliser for multiple inputs, or do we set up and tear down the normaliser for each run?
 
 ## Conclusions
 _As discussed with the team on 2023-07-20._
 
 * The new normalisers output format should be refined and implemented outside the scope of the new normalisers runner.
 * We need better development tooling (an SDK) for normalisers. A Python tool that takes a ZIP file from Bytes, runs the normaliser, and shows normaliser output on screen was proposed and would greatly help the development cycle.
-* A new boefjes runner should be prioritised higher than the normalisers runner because we have more issues with the current boefjes runner: boefjes have more diverse dependencies and require external tools. We can likely re-use a part of the boefjes runner for normalisers.
+* A new boefjes runner should be prioritised higher than the normalisers runner because we have more issues with the current boefjes runner: boefjes have more diverse dependencies and require external tools. We can likely reuse a part of the boefjes runner for normalisers.
 * We should not forget about bits; these also need a better design.
 * Overhead for runner normalisers should be limited, for example by allowing batched requests or multiple runs without having to restart the normaliser.

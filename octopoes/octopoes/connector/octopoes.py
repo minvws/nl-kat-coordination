@@ -27,6 +27,7 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 
@@ -113,6 +114,31 @@ class OctopoesAPIConnector:
             params={"reference": str(reference), "valid_time": valid_time},
         )
         return TypeAdapter(OOIType).validate_json(res.content)
+
+    def get_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = False,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
+        res = self.session.get(
+            f"/{self.client}/object-history",
+            params={
+                "reference": str(reference),
+                "sort_order": sort_order,
+                "with_docs": with_docs,
+                "has_doc": has_doc,
+                "offset": offset,
+                "limit": limit,
+                "indices": indices,
+            },
+        )
+        return TypeAdapter(List[TransactionRecord]).validate_json(res.content)
 
     def get_tree(
         self,
