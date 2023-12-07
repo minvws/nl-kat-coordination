@@ -10,12 +10,18 @@
                 </tr>
             </thead>
             <tbody>
-                {% for finding_type in data.mail_security_measures.items %}
-                    <tr>
-                        <td>{{ data.email_security_measures }}</td>
-                        <td>1/1 mailservers compliant</td>
-                    </tr>
-                {% endfor %}
+                <tr>
+                    <td>SPF</td>
+                    <td>{{ data.number_of_spf }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>DKIM</td>
+                    <td>{{ data.number_of_spf }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>DMARC</td>
+                    <td>{{ data.number_of_spf }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
+                </tr>
             </tbody>
         </table>
     </p>

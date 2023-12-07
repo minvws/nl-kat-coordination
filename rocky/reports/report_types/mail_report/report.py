@@ -29,27 +29,43 @@ class MailReport(Report):
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
         reference = Reference.from_str(input_ooi)
+        hostnames = []
         finding_types = []
         mail_security_measures = {}
+        number_of_spf = 0
+        number_of_dmarc = 0
+        number_of_dkim = 0
 
-        if reference.class_type == Hostname:
+        hostnames = self.octopoes_api_connector.query(
+            "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
+        )
+
+        for hostname in hostnames:
             finding_types = self.octopoes_api_connector.query(
-                "Hostname.<ooi[is Finding].finding_type", valid_time, reference
+                "Hostname.<ooi[is Finding].finding_type", valid_time, hostname.reference
             )
-        elif reference.class_type in (IPAddressV4, IPAddressV6):
-            finding_types = self.octopoes_api_connector.query(
-                "IPAddress.<address[is ResolvedHostname].hostname.<ooi[is Finding].finding_type", valid_time, reference
-            )
+            finding_types_ids = [x.id for x in finding_types]
 
-        finding_types_ids = [x.tokenized.id for x in finding_types]
+            has_no_spf = "KAT-NO-SPF" in finding_types_ids
+            has_no_dmarc = "KAT-NO-DMARC" in finding_types_ids
+            has_no_dkim = "KAT-NO-DKIM" in finding_types_ids
 
-        has_spf = "KAT-NO-SPF" in finding_types_ids
-        has_dmarc = "KAT-NO-DMARC" in finding_types_ids
-        has_dkim = "KAT-NO-DKIM" in finding_types_ids
+            if has_no_spf:
+                number_of_spf += 1
+            if has_no_dmarc:
+                number_of_dmarc += 1
+            if has_no_dkim:
+                number_of_dkim += 1
 
-        mail_security_measures = {"has_spf": has_spf, "has_dmarc": has_dmarc, "has_dkim": has_dkim}
+            measures = {"has_no_spf": has_no_spf, "has_no_dmarc": has_no_dmarc, "has_no_dkim": has_no_dkim}
+
+            mail_security_measures = {"hostnames": hostname.name, "measures": measures}
 
         return {
             "input_ooi": input_ooi,
             "mail_security_measures": mail_security_measures,
+            "number_of_hostnames": len(hostnames),
+            "number_of_spf": number_of_spf,
+            "number_of_dmarc": number_of_dmarc,
+            "number_of_dkim": number_of_dkim,
         }
