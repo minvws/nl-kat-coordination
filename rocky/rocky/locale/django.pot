@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-30 15:14+0000\n"
+"POT-Creation-Date: 2023-12-07 17:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2724,6 +2724,48 @@ msgstr ""
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Resource Public Key Infrastructure"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Check"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Compliance"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI Available"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "IPs are compliant"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI Valid"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI record does is not valid for"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI record does not exist for"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.py
+msgid "RPKI Report"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.py
+msgid ""
+"Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
+"the ip addresses and whether they are covered by a valid RPKI ROA."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
