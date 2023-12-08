@@ -9,6 +9,7 @@ import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
 from celery.utils.log import get_task_logger
 from pydantic import TypeAdapter
+from requests import HTTPError
 
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
 from octopoes.connector.katalogus import KATalogusClientV1
@@ -58,7 +59,11 @@ def handle_event(event: Dict):
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def schedule_scan_profile_recalculations():
-    orgs = KATalogusClientV1(settings.katalogus_api).get_organisations()
+    try:
+        orgs = KATalogusClientV1(str(settings.katalogus_api)).get_organisations()
+    except HTTPError:
+        logger.exception("Failed getting organizations")
+        raise
 
     for org in orgs:
         app.send_task(
@@ -76,7 +81,11 @@ def recalculate_scan_profiles(org: str, *args, **kwargs):
     octopoes = bootstrap_octopoes(settings, org, session)
 
     timer = timeit.default_timer()
-    octopoes.recalculate_scan_profiles(datetime.now(timezone.utc))
-    session.commit()
+
+    try:
+        octopoes.recalculate_scan_profiles(datetime.now(timezone.utc))
+        session.commit()
+    except Exception:
+        logger.exception("Failed recalculating scan profiles [org=%s] [dur=%.2fs]", org, timeit.default_timer() - timer)
 
     logger.info("Finished scan profile recalculation [org=%s] [dur=%.2fs]", org, timeit.default_timer() - timer)
