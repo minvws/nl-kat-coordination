@@ -25,10 +25,9 @@
                 </dl>
             </div>
         </section>
-        {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
-        {% include "aggregate_organisation_report/term_overview.html" %}
-
         <div class="chapter-numbers">
+            {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
+            {% include "aggregate_organisation_report/term_overview.html" %}
             {% include "aggregate_organisation_report/recommendations.html" %}
             {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
 

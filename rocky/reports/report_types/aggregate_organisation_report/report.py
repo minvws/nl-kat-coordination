@@ -17,17 +17,6 @@ class AggregateOrganisationReport(AggregateReport):
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report]}
     template_path = "aggregate_organisation_report/report.html"
-    summary = {
-        _("General recommendations"): "",
-        _("Critical vulnerabilities"): 0,
-        _("Assets (IP/domains) scanned"): 0,
-        _("Sector of organisation"): "",
-        _("Basic security score compared to sector"): "",
-        _("Sector defined"): "",
-        _("Lowest security score in organisation"): "",
-        _("Newly discovered items since last week, october 8th 2023"): "",
-        _("Terms in report"): "",
-    }
 
     def post_process_data(self, data):
         systems = {"services": {}}
@@ -36,6 +25,8 @@ class AggregateOrganisationReport(AggregateReport):
         vulnerabilities = {}
         total_criticals = 0
         total_findings = 0
+        total_ips = 0
+        total_hostnames = 0
 
         # input oois
         for input_ooi, report_data in data.items():
@@ -54,6 +45,8 @@ class AggregateOrganisationReport(AggregateReport):
                             systems["services"][ip]["services"] = list(
                                 set(systems["services"][ip]["services"]) | set(system["services"])
                             )
+                    total_ips += data["data"]["summary"]["total_systems"]
+                    total_hostnames += data["data"]["summary"]["total_domains"]
 
                 if report == "Open Ports Report":
                     open_ports.update(data["data"])
@@ -76,7 +69,8 @@ class AggregateOrganisationReport(AggregateReport):
         summary = {
             _("General recommendations"): "",
             _("Critical vulnerabilities"): total_criticals,
-            _("Assets (IP/domains) scanned"): total_findings,
+            _("IPs scanned"): total_ips,
+            _("Domains scanned"): total_hostnames,
             _("Sector of organisation"): "",
             _("Basic security score compared to sector"): "",
             _("Sector defined"): "",
