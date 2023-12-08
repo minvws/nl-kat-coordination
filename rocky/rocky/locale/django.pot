@@ -2731,6 +2731,48 @@ msgid ""
 "weaknesses."
 msgstr ""
 
+#: reports/report_types/rpki_report/report.html
+msgid "Resource Public Key Infrastructure"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Check"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Compliance"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI Available"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "IPs are compliant"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI Valid"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI record does is not valid for"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI record does not exist for"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.py
+msgid "RPKI Report"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.py
+msgid ""
+"Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
+"the ip addresses and whether they are covered by a valid RPKI ROA."
+msgstr ""
+
 #: reports/report_types/systems_report/report.html
 msgid "IP address"
 msgstr ""
