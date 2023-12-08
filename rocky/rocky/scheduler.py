@@ -227,7 +227,12 @@ class SchedulerClient:
         res.raise_for_status()
         task_details = Task.model_validate_json(res.content)
 
-        if task_details.p_item.data.organization != organization_code:
+        if task_details.type == "normalizer":
+            organization = task_details.p_item.data.raw_data.boefje_meta.organization
+        else:
+            organization = task_details.p_item.data.organization
+
+        if organization != organization_code:
             raise TaskNotFoundError()
         return task_details
 

@@ -166,17 +166,10 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         ]
 
 
-def get_scheduler_task(request: HttpRequest, organization_code: str, task_id: str) -> Optional[Task]:
-    try:
-        return client.get_task_details(organization_code, task_id)
-    except TaskNotFoundError as error:
-        messages.error(request, error.message)
-
-
 def schedule_task(request: HttpRequest, organization_code: str, task_id: str) -> None:
     try:
         task = client.get_task_details(organization_code, task_id)
-        client.push_task(f"{task.data.type}-{organization_code}", task)
+        client.push_task(f"{task.p_item.data.type}-{organization_code}", task.p_item)
     except (TaskNotFoundError, BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
         messages.error(request, error.message)
     else:
@@ -188,3 +181,10 @@ def schedule_task(request: HttpRequest, organization_code: str, task_id: str) ->
                 "It may take some time, a refresh of the page may be needed to show the results."
             ),
         )
+
+
+def get_scheduler_task(request: HttpRequest, organization_code: str, task_id: str) -> Optional[Task]:
+    try:
+        return client.get_task_details(organization_code, task_id)
+    except TaskNotFoundError as error:
+        messages.error(request, error.message)
