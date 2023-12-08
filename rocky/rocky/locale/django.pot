@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-06 13:38+0000\n"
+"POT-Creation-Date: 2023-12-08 12:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1735,11 +1735,6 @@ msgid ""
 "to proceed."
 msgstr ""
 
-#: katalogus/views/plugin_detail.py rocky/views/ooi_detail.py
-#: rocky/views/task_detail.py rocky/views/tasks.py
-msgid "Task could not be found."
-msgstr ""
-
 #: katalogus/views/plugin_detail.py
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
@@ -3451,6 +3446,10 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task already queued."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task not found."
 msgstr ""
 
 #: rocky/settings.py
