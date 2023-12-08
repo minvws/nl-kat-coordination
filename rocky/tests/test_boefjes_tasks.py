@@ -70,7 +70,8 @@ def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje)
     assertContains(response, "Fetching tasks failed")
 
 
-def test_reschedule_task(rf, client_member, mock_scheduler, task):
+def test_reschedule_task(rf, client_member, mocker, task):
+    mock_scheduler = mocker.patch("tools.view_helpers.client")
     mock_scheduler.get_task_details.return_value = task
 
     request = setup_request(
@@ -90,7 +91,8 @@ def test_reschedule_task(rf, client_member, mock_scheduler, task):
     )
 
 
-def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocker, task):
+def test_reschedule_task_already_queued(rf, client_member, mocker, task):
+    mock_scheduler = mocker.patch("tools.view_helpers.client")
     mock_scheduler.get_task_details.return_value = task
     mock_scheduler.push_task.side_effect = TooManyRequestsError
 
