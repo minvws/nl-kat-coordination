@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, datetime, timezone
-from typing import List, Optional, TypedDict
+from typing import List, TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from account.mixins import OrganizationView
@@ -14,7 +14,6 @@ from rocky.scheduler import (
     BadRequestError,
     ConflictError,
     SchedulerError,
-    Task,
     TaskNotFoundError,
     TooManyRequestsError,
     client,
@@ -181,10 +180,3 @@ def schedule_task(request: HttpRequest, organization_code: str, task_id: str) ->
                 "It may take some time, a refresh of the page may be needed to show the results."
             ),
         )
-
-
-def get_scheduler_task(request: HttpRequest, organization_code: str, task_id: str) -> Optional[Task]:
-    try:
-        return client.get_task_details(organization_code, task_id)
-    except TaskNotFoundError as error:
-        messages.error(request, error.message)

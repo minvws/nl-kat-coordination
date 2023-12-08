@@ -10,9 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
-from tools.view_helpers import get_scheduler_task, schedule_task
+from tools.view_helpers import schedule_task
 
-from rocky.scheduler import client
+from rocky.scheduler import TaskNotFoundError, client
 
 TASK_LIMIT = 50
 
@@ -23,24 +23,15 @@ class PageActions(Enum):
 
 class DownloadTaskDetail(OrganizationView):
     def get(self, request, *args, **kwargs):
-        task_id = kwargs["task_id"]
-        filename = "task_" + task_id + ".json"
-        task_details = get_scheduler_task(self.request, self.organization.code, task_id)
-
-        if not self.is_task_id(task_id) or "detail" in task_details:
-            return self.show_error_message()
-        response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
-        response["Content-Disposition"] = "attachment; filename=" + filename
-        return response
-
-    def is_task_id(self, task_id):
-        forbidden_chars = ["/", ".", " "]
-        for char in forbidden_chars:
-            return char not in str(task_id)
-
-    def show_error_message(self):
-        error_message = _("Task details not found.")
-        messages.add_message(self.request, messages.ERROR, error_message)
+        try:
+            task_id = kwargs["task_id"]
+            filename = "task_" + task_id + ".json"
+            task_details = client.get_task_details(self.organization.code, task_id)
+            response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
+            response["Content-Disposition"] = "attachment; filename=" + filename
+            return response
+        except TaskNotFoundError as error:
+            messages.error(self.request, error.message)
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
