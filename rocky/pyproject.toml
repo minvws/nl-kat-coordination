@@ -44,6 +44,7 @@ djangorestframework = "^3.14.0"
 django-tagulous = "^1.3.3"
 drf-standardized-errors = "^0.12.5"
 django-compressor = { git = "https://github.com/dekkers/django-compressor", rev = "620bc0ab86590f8981dd24456a70951c9bdbf91f" }
+django-weasyprint = "^2.2.1"
 
 # temp fix to pass build, remove later when https://github.com/xhtml2pdf/xhtml2pdf/issues/589 is solved
 reportlab = "^3.6.13"
