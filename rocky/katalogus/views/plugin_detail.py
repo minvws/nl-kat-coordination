@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from enum import Enum
 from logging import getLogger
@@ -20,7 +19,6 @@ from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky import scheduler
-from rocky.scheduler import client
 
 logger = getLogger(__name__)
 
@@ -84,15 +82,7 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
-            task = client.get_task_details(task_id)
-
-            # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-            new_id = uuid.uuid4()
-
-            task.p_item.id = new_id
-            task.p_item.data.id = new_id
-
-            schedule_task(self.request, self.organization.code, task.p_item)
+            schedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

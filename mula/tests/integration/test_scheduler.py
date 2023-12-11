@@ -19,7 +19,9 @@ class SchedulerTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(cfg.db_uri))
+        models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
+
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),

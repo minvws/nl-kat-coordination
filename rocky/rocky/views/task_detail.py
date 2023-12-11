@@ -1,17 +1,20 @@
+from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 
-from rocky.scheduler import client
+from rocky.scheduler import TaskNotFoundError, client
 from rocky.views.mixins import OctopoesView
 
 
 class TaskDetailView(OctopoesView, TemplateView):
-    @staticmethod
-    def get_task(task_id):
-        return client.get_task_details(task_id)
+    def get_task(self, task_id):
+        try:
+            return client.get_task_details(self.organization.code, task_id)
+        except TaskNotFoundError as error:
+            messages.error(self.request, error.message)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
