@@ -19,9 +19,7 @@
                         {% for key, value in tree_node.items %}
                             {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
                                 <div>
-                                    <dt>
-                                        {{ key }}
-                                    </dt>
+                                    <dt>{{ key }}</dt>
                                     <dd>
                                         {{ value }}
                                     </dd>
@@ -41,7 +39,8 @@
                                 {% if job.ooi_type == "Job" %}
                                     <li>
                                         <a href="{% ooi_url 'ooi_detail' 'Job|'|add:job.id organization.code %}"
-                                           target="_blank">{{ job.human_readable }}</a>
+                                           target="_blank"
+                                           rel="noopener noreferrer">{{ job.human_readable }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
@@ -79,9 +78,7 @@
                         {% for key, value in tree_node.items %}
                             {% if key not in "id,human_readable,tree_meta,children" and value is not None %}
                                 <div>
-                                    <dt>
-                                        {{ key }}
-                                    </dt>
+                                    <dt>{{ key }}</dt>
                                     <dd>
                                         {{ value }}
                                     </dd>
@@ -101,7 +98,8 @@
                                 {% if job.ooi_type == "Job" %}
                                     <li>
                                         <a href="{% ooi_url 'ooi_detail' 'Job|'|add:job.id organization.code %}"
-                                           target="_blank">{{ job.human_readable }}</a>
+                                           target="_blank"
+                                           rel="noopener noreferrer">{{ job.human_readable }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}

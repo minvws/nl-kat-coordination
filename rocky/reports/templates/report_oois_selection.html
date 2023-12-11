@@ -1,0 +1,81 @@
+{% extends "layouts/base.html" %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+    {% include "header.html" %}
+
+    <main id="main-content" tabindex="-1" class="reports">
+        <section>
+            <div class="fifty-fifty">
+                <div>
+                    <h1>{% translate "Reports" %}</h1>
+                    <p class="emphasized">{% translate "Overview of reports" %}</p>
+                </div>
+                <div class="horizontal-view toolbar"></div>
+            </div>
+            <h2>
+                {% blocktranslate trimmed count counter=object_list|length %}
+                    Select OOI
+                {% plural %}
+                    Select OOIs
+                {% endblocktranslate %}
+            </h2>
+            <p>{% translate "Select which objects you want to include in your report." %}</p>
+            {% translate "Filter" as filter_title %}
+            {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
+
+            {% if not object_list %}
+                <p>{% translate "No OOIs found." %}</p>
+                <div class="button-container">
+                    <a class="button ghost"
+                       href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
+                    <a class="button"
+                       href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
+                </div>
+            {% else %}
+                <form method="get"
+                      action="{% url 'report_types_selection' organization.code %}"
+                      class="inline layout-wide">
+                    <table>
+                        <thead>
+                            <th>
+                                <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                            </th>
+                            <th>{% translate "Object" %}</th>
+                            <th>{% translate "Type" %}</th>
+                            <th>{% translate "Clearance level" %}</th>
+                        </thead>
+                        <tbody>
+                            {% for object in object_list %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois %}checked{% endif %}>
+                                    </td>
+                                    <td>{{ object.human_readable }}</td>
+                                    <td>{{ object.ooi_type }}</td>
+                                    <td>
+                                        {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
+
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% include "forms/report_form_fields.html" %}
+
+                    <button type="submit" class="button">
+                        {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
+                    </button>
+                </form>
+                {% include "partials/list_paginator.html" %}
+
+            {% endif %}
+        </section>
+    </main>
+{% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+{% endblock html_at_end_body %}

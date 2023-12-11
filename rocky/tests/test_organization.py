@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
-from requests import RequestException
+from requests import RequestException, Response
 from tools.models import DENY_ORGANIZATION_CODES, Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
@@ -103,8 +103,9 @@ def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
 
 def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker, mock_models_octopoes):
     mock_requests = mocker.patch("katalogus.client.requests")
-    mock_health_response = mocker.MagicMock()
-    mock_health_response.json.return_value = {"service": "test", "healthy": True}
+    mock_health_response = Response()
+    mock_health_response.status_code = 200
+    mock_health_response._content = b'{"service": "test", "healthy": true}'
 
     mock_organization_exists_response = mocker.MagicMock()
     mock_organization_exists_response.status_code = 404
@@ -128,9 +129,10 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
 
 def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
-    mock_response = mocker.MagicMock()
+    mock_response = Response()
+    mock_response.status_code = 200
+    mock_response._content = b'{"service": "test", "healthy": false}'
     mock_requests.Session().get.return_value = mock_response
-    mock_response.json.return_value = {"service": "test", "healthy": False}
 
     request = setup_request(
         rf.post(
@@ -200,9 +202,9 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
 
     assertNotContains(response, new_member.user.full_name)
     assertNotContains(response, blocked_member.user.full_name)
-    assertContains(response, 'class="blocked"')
-    assertNotContains(response, 'class="new"')
-    assertNotContains(response, 'class="active"')
+    assertContains(response, 'class="icon negative"')
+    assertNotContains(response, 'class="icon neutral"')
+    assertNotContains(response, 'class="icon positive"')
 
     # Test with only filter option status "new" checked
     request2 = setup_request(rf.get("organization_member_list", {"client_status": "new"}), superuser_member.user)
@@ -210,9 +212,9 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
 
     assertNotContains(response2, new_member.user.full_name)
     assertNotContains(response2, blocked_member.user.full_name)
-    assertContains(response2, 'class="new"')
-    assertNotContains(response2, 'class="blocked"')
-    assertNotContains(response2, 'class="active"')
+    assertContains(response2, 'class="icon neutral"')
+    assertNotContains(response2, 'class="icon negative"')
+    assertNotContains(response2, 'class="icon positive"')
 
     # Test with every filter option checked (new, active, blocked and unblocked)
     request3 = setup_request(
@@ -229,9 +231,9 @@ def test_organization_filtered_member_list(rf, superuser_member, new_member, blo
     assertNotContains(response3, new_member.user.full_name)
     assertNotContains(response3, blocked_member.user.full_name)
 
-    assertContains(response3, 'class="new"')
-    assertContains(response3, 'class="blocked"')
-    assertContains(response3, 'class="active"')
+    assertContains(response3, 'class="icon neutral"')
+    assertContains(response3, 'class="icon negative"')
+    assertContains(response3, 'class="icon positive"')
 
 
 def test_organization_does_not_exist(client, client_member):

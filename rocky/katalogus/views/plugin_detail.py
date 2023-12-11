@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from logging import getLogger
 from typing import Any, Dict, List
 
@@ -12,6 +13,7 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
+from tools.view_helpers import schedule_task
 
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
@@ -19,6 +21,10 @@ from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky import scheduler
 
 logger = getLogger(__name__)
+
+
+class PageActions(Enum):
+    RESCHEDULE_TASK = "reschedule_task"
 
 
 class PluginCoverImgView(OrganizationView):
@@ -30,33 +36,29 @@ class PluginCoverImgView(OrganizationView):
         return file
 
 
-class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
-    """Detail view for a specific plugin. Shows plugin settings and consumable oois for scanning."""
+class PluginDetailView(PluginSettingsListView, TemplateView):
+    task_history_limit = 10
 
-    template_name = "plugin_detail.html"
-    scan_history_limit = 10
-    limit_ooi_list = 9999
-
-    def get_scan_history(self) -> Page:
+    def get_task_history(self) -> Page:
         scheduler_id = f"{self.plugin.type}-{self.organization.code}"
         plugin_type = self.plugin.type
         plugin_id = self.plugin.id
-        input_ooi = self.request.GET.get("scan_history_search")
-        status = self.request.GET.get("scan_history_status")
+        input_ooi = self.request.GET.get("task_history_search")
+        status = self.request.GET.get("task_history_status")
 
-        if self.request.GET.get("scan_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+        if self.request.GET.get("task_history_from"):
+            min_created_at = datetime.strptime(self.request.GET.get("task_history_from"), "%Y-%m-%d")
         else:
             min_created_at = None
 
-        if self.request.GET.get("scan_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
+        if self.request.GET.get("task_history_to"):
+            max_created_at = datetime.strptime(self.request.GET.get("task_history_to"), "%Y-%m-%d")
         else:
             max_created_at = None
 
-        page = int(self.request.GET.get("scan_history_page", 1))
+        page = int(self.request.GET.get("task_history_page", 1))
 
-        scan_history = scheduler.client.get_lazy_task_list(
+        task_history = scheduler.client.get_lazy_task_list(
             scheduler_id=scheduler_id,
             task_type=plugin_type,
             plugin_id=plugin_id,
@@ -66,7 +68,68 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
             max_created_at=max_created_at,
         )
 
-        return Paginator(scan_history, self.scan_history_limit).page(page)
+        return Paginator(task_history, self.task_history_limit).page(page)
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST["action"]
+
+        if action:
+            self.handle_page_action(action)
+            return redirect(request.path)
+        else:
+            return self.get(request, *args, **kwargs)
+
+    def handle_page_action(self, action: str) -> None:
+        if action == PageActions.RESCHEDULE_TASK.value:
+            task_id = self.request.POST.get("task_id")
+            schedule_task(self.request, self.organization.code, task_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["plugin"] = self.plugin.model_dump()
+        context["task_history"] = self.get_task_history()
+        context["task_history_form_fields"] = [
+            "task_history_from",
+            "task_history_to",
+            "task_history_status",
+            "task_history_search",
+            "task_history_page",
+        ]
+
+        return context
+
+
+class NormalizerDetailView(PluginDetailView):
+    template_name = "normalizer_detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
+                "text": _("KAT-alogus"),
+            },
+            {
+                "url": reverse(
+                    "normalizer_detail",
+                    kwargs={
+                        "organization_code": self.organization.code,
+                        "plugin_id": self.plugin.id,
+                    },
+                ),
+                "text": self.plugin.name,
+            },
+        ]
+
+        return context
+
+
+class BoefjeDetailView(BoefjeMixin, PluginDetailView):
+    """Detail view for a specific boefje. Shows boefje settings and consumable oois for scanning."""
+
+    template_name = "boefje_detail.html"
+    limit_ooi_list = 9999
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,7 +143,7 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
             context["select_oois_form"] = SelectOOIForm(
                 oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
@@ -88,10 +151,9 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
             },
             {
                 "url": reverse(
-                    "plugin_detail",
+                    "boefje_detail",
                     kwargs={
                         "organization_code": self.organization.code,
-                        "plugin_type": self.plugin.type,
                         "plugin_id": self.plugin.id,
                     },
                 ),
@@ -99,18 +161,15 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
             },
         ]
 
-        context["scan_history"] = self.get_scan_history()
-        context["scan_history_form_fields"] = [
-            "scan_history_from",
-            "scan_history_to",
-            "scan_history_status",
-            "scan_history_search",
-            "scan_history_page",
-        ]
-
         return context
 
     def post(self, request, *args, **kwargs):
+        action = request.POST["action"]
+
+        if action == PageActions.RESCHEDULE_TASK.value:
+            self.handle_page_action(action)
+            return redirect(request.path)
+
         """Start scanning oois at plugin detail page."""
         if not self.indemnification_present:
             return self.get(request, *args, **kwargs)
@@ -132,7 +191,6 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
                     boefje=boefje,
                     oois=oois_with_clearance_level,
                 )
-                messages.add_message(self.request, messages.SUCCESS, _("Scanning successfully scheduled."))
 
             if oois_without_clearance_level:
                 if not self.organization_member.has_perm("tools.can_set_clearance_level"):
@@ -151,7 +209,6 @@ class PluginDetailView(PluginSettingsListView, BoefjeMixin, TemplateView):
                             "change_clearance_level",
                             kwargs={
                                 "organization_code": self.organization.code,
-                                "plugin_type": self.plugin.type,
                                 "plugin_id": plugin_id,
                                 "scan_level": self.plugin.scan_level.value,
                             },

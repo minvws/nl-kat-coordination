@@ -1,0 +1,58 @@
+name: Rocky Check if translations are up to date
+
+on:
+  push:
+    paths:
+      - rocky/**
+      - .github/workflows/rocky_makelang.yml
+  pull_request:
+    paths:
+      - rocky/**
+      - .github/workflows/rocky_makelang.yml
+
+jobs:
+  makelang:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        id: py311
+        with:
+          python-version: 3.11
+          cache: pip
+
+      - name: Install GNU gettext utilities
+        run: sudo apt-get install -y --no-install-recommends gettext
+
+      - name: Install requirements.txt
+        run: |
+          grep -v git+https:// requirements.txt | pip install -r /dev/stdin
+          grep git+https:// requirements.txt | pip install -r /dev/stdin
+        working-directory: ./rocky
+
+      - name: Install Octopoes
+        run: pip install wheel && cd octopoes && python setup.py bdist_wheel && pip install dist/octopoes*.whl
+
+      - name: Generate the .pot file if source strings changed
+        run: make lang
+        working-directory: ./rocky
+        env:
+          BYTES_API: http://bytes:8000
+          BYTES_PASSWORD: password
+          BYTES_USERNAME: username
+          KATALOGUS_API: http://katalogus:8000
+          KEIKO_API: http://keiko:8000
+          OCTOPOES_API: http://octopoes_api:80
+          SCHEDULER_API: http://scheduler:8000
+          SECRET_KEY: whatever
+
+      - name: Check if at least one source string changed
+        run: |
+          changed_lines=$(git diff --unified=0 rocky/rocky/locale/django.pot | grep -E -o '^[+-](msgid|msgstr)' | wc -l)
+          if [ "$changed_lines" -ge 1 ]; then
+            echo "More than just POT-Creation-Date changed in django.pot"
+            exit 1
+          fi

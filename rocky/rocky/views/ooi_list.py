@@ -6,18 +6,24 @@ from typing import List
 
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
+from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from requests import RequestException
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
+from tools.forms.ooi_form import OOITypeMultiCheckboxForm
 from tools.models import Indemnification
 from tools.view_helpers import get_mandatory_fields
 
 from octopoes.connector import RemoteException
 from octopoes.models import EmptyScanProfile, Reference
 from octopoes.models.exception import ObjectNotFoundException
-from rocky.exceptions import ClearanceLevelTooLowException, IndemnificationNotPresentException
+from rocky.exceptions import (
+    AcknowledgedClearanceLevelTooLowException,
+    IndemnificationNotPresentException,
+    TrustedClearanceLevelTooLowException,
+)
 from rocky.views.mixins import OctopoesView, OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -34,9 +40,8 @@ class OOIListView(BaseOOIListView, OctopoesView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["types_display"] = self.get_ooi_types_display()
-        context["object_type_filters"] = self.get_ooi_type_filters()
-        context["observed_at"] = self.get_observed_at()
+        context["active_filters"] = self.get_active_filters()
+        context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["select_oois_form"] = SelectOOIForm(
             context.get("ooi_list", []),
@@ -97,17 +102,37 @@ class OOIListView(BaseOOIListView, OctopoesView):
                 ),
             )
             return self.get(request, status=403, *args, **kwargs)
-        except ClearanceLevelTooLowException:
+        except TrustedClearanceLevelTooLowException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _("Could not raise clearance level to L%s. You acknowledged a clearance level of %s.")
+                _(
+                    "Could not raise clearance level to L%s. "
+                    "You were trusted a clearance level of L%s. "
+                    "Contact your administrator to receive a higher clearance."
+                )
+                % (
+                    level,
+                    self.organization_member.trusted_clearance_level,
+                ),
+            )
+            return self.get(request, status=403, *args, **kwargs)
+        except AcknowledgedClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Please accept the clearance level below to proceed."
+                )
                 % (
                     level,
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
-            return self.get(request, status=403, *args, **kwargs)
+            return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
+
         except (RequestException, RemoteException, ConnectionError):
             messages.add_message(request, messages.ERROR, _("An error occurred while saving clearance levels."))
 
@@ -187,7 +212,7 @@ class OOIListExportView(BaseOOIListView):
     def get(self, request, *args, **kwargs):
         file_type = request.GET.get("file_type")
         observed_at = self.get_observed_at()
-        filters = self.get_ooi_types_display()
+        filters = self.get_active_filters()
 
         queryset = self.get_queryset()
         ooi_list = queryset[: OOIList.HARD_LIMIT]

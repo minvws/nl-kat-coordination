@@ -7,7 +7,7 @@ Development: make kat
 make kat
 ========
 
-Install OpenKAT on your own machine with ``make kat`` or ``make kat-stable``. KAT-stable, as the name implies, is the last major release. If you want to deploy OpenKAT in a production environment use the hardening settings as well.
+Install OpenKAT on your own machine with ``make kat``. If you want to deploy OpenKAT in a production environment use the hardening settings as well.
 
 Requirements
 ------------
@@ -24,9 +24,9 @@ Before installing
 Install Docker
 **************
 
-OpenKAT is installed in Docker, and therefore Docker must be installed first. The preferred method of installation is through a repository.
+OpenKAT is installed in Docker, and therefore Docker must be installed first. The preferred method of installation is through a repository. However, OpenKAT requires a newer version of Docker than what is available in the default ubuntu and debian repositories. That is why you should always use Docker's repository.
 
-OpenKAT requires a newer version of Docker than what is available in the default ubuntu and debian repositories. That is why you should always use Docker's repository. On the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_ page you can find links to installation pages for all major Linux distributions. For a specific example using the Docker repository on Debian, see `Debian install using the repository <https://docs.docker.com/engine/install/debian/#install-using-the-repository>`_. The installation pages for the other Linux distributions contain similar instructions.
+On the `Docker Engine installation overview <https://docs.docker.com/engine/install/>`_ page you can find links to installation pages for all major Linux distributions. For a specific example using the Docker repository on Debian, see `Debian install using the repository <https://docs.docker.com/engine/install/debian/#install-using-the-repository>`_. The installation pages for the other Linux distributions contain similar instructions.
 
 **Important:** Please follow the post-installation steps as well! You can find them here: `Docker Engine post-installation steps <https://docs.docker.com/engine/install/linux-postinstall/>`_.
 
@@ -35,14 +35,33 @@ Install dependencies
 
 Dependencies are packages required for OpenKAT to work. Run the following commands to install them:
 
+*Debian based systems:*
+
 
 .. code-block:: sh
 
 	$ curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-	$ sudo apt-get install -y nodejs gcc g++ make python3-pip docker-compose
+	$ sudo apt-get install -y nodejs gcc g++ make python3-pip
 	$ curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
 	$ echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 	$ sudo apt-get update && sudo apt-get install yarn
+
+After installing Docker from the Docker repository it might be necessary to create a symlink for the command `docker-compose` as the latest version now uses a space instead of a dash. You can do this with the following command:
+
+.. code-block:: sh
+
+	$ ln -s /usr/libexec/docker/cli/plugins/compose /usr/bin/docker-compose
+
+*RHEL based systems:*
+
+.. code-block:: sh
+
+    $ sudo dnf install openssl -y
+    $ sudo dnf install https://rpm.nodesource.com/pub_18.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y
+    $ sudo dnf install nodejs -y --setopt=nodesource-nodejs.module_hotfixes=1
+    $ sudo dnf install -y nodejs gcc g++ make python3-pip docker-compose
+    $ curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+    $ sudo dnf install yarn -y
 
 Getting Started
 ---------------
@@ -68,6 +87,7 @@ Default installation
 
 .. code-block:: sh
 
+	$ make env
 	$ make kat
 
 Currently, the ``make kat`` command only works for the first user on a ``*nix`` system. This is a known problem which will be solved soon. The current user must be user 1000. You can check this by executing `id`.
@@ -84,7 +104,7 @@ Then OpenKAT is built, including all the parts such as Octopoes and Rocky.
 Front end
 *********
 
-Find the frontend of your OpenKAT install at port 8000 (http) or 8443 (https) of your localhost and follow the 'onboarding flow' to test your setup and start using your development setup of OpenKAT.
+Find the frontend of your OpenKAT install at port 8000 (http) of your localhost and follow the 'onboarding flow' to test your setup and start using your development setup of OpenKAT.
 
 By default a superuser account is created with email address ``superuser@localhost``. The password can be found as ``DJANGO_SUPERUSER_PASSWORD`` in the .env file.
 
@@ -119,11 +139,11 @@ If you to start over with a clean slate, you can do so with the following comman
 
 This removes all Docker containers and volumes, and then brings up the containers again.
 
-Optionally, first remove the ``.env`` file (``rm .env``) before running ``make reset`` to also reset all configuration in environment variables. This should also resolve issues such as database authentication errors (``password authentication failed``).
+Optionally, first remove the ``.env`` file (``rm .env``) before running ``make env`` and ``make reset`` to also reset all configuration in environment variables. This should also resolve issues such as database authentication errors (``password authentication failed``).
 
 OpenTelemetry
 =============
 
 OpenTelemetry is a way to trace requests through the system. It is used to find out where a request is going wrong and to instrument performance problems. OpenTelemetry is not enabled by default, but can be enabled by uncommenting the environment variable ``SPAN_EXPORT_GRPC_ENDPOINT`` in the ``.env`` file.
 
-The `Jaeger <https://www.jaegertracing.io>`_ tracing system is used to view the traces. It can be enabled by enabling the `Docker Compose profile <https://docs.docker.com/compose/profiles/#enable-profiles>`, for example by running ``docker-compose --profile jaeger up -d`` or using ``export COMPOSE_PROFILES=jaeger`` and then running Make as usual. The Jaeger UI can then be found at http://localhost:16686.
+The `Jaeger <https://www.jaegertracing.io>`_ tracing system is used to view the traces. It can be enabled by enabling the `Docker Compose profile <https://docs.docker.com/compose/profiles/#enable-profiles>`_, for example by running ``docker-compose --profile jaeger up -d`` or using ``export COMPOSE_PROFILES=jaeger`` and then running Make as usual. The Jaeger UI can then be found at http://localhost:16686.

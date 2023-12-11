@@ -1,7 +1,7 @@
 {
     "id": "kat_snyk_finding_types_normalize",
     "consumes": [
-        "snyk-finding-types"
+        "boefje/snyk-finding-types"
     ],
     "produces": [
         "SNYKFindingType"

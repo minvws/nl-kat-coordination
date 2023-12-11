@@ -1,8 +1,11 @@
 import pytest
 from django.core.exceptions import PermissionDenied
+from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
 from onboarding.views import (
+    OnboardingAcknowledgeClearanceLevelView,
     OnboardingChooseReportInfoView,
     OnboardingChooseReportTypeView,
+    OnboardingClearanceLevelIntroductionView,
     OnboardingIntroductionView,
     OnboardingReportView,
     OnboardingSetClearanceLevelView,
@@ -114,7 +117,7 @@ def test_onboarding_setup_scan_detail_create_ooi(
     response = OnboardingSetupScanOOIAddView.as_view()(
         setup_request(
             rf.post(
-                "step_setup_scan_ooi_add", {"network": "Network|internet", "raw": "http://example.org", "web_url": ""}
+                "step_setup_scan_ooi_add", {"network": "Network|internet", "raw": "http://example.org/", "web_url": ""}
             ),
             member.user,
         ),
@@ -124,8 +127,113 @@ def test_onboarding_setup_scan_detail_create_ooi(
 
     assert response.status_code == 302
     assert response.headers["Location"] == get_ooi_url(
-        "step_set_clearance_level", "URL|internet|http://example.org", member.organization.code
+        "step_clearance_level_introduction", "URL|internet|http://example.org/", member.organization.code
     )
+
+
+def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organization_view_octopoes, network):
+    mock_organization_view_octopoes().get.return_value = network
+    ooi_id = "Network|internet"
+
+    response = OnboardingClearanceLevelIntroductionView.as_view()(
+        setup_request(rf.get("step_clearance_level_introduction", {"ooi_id": ooi_id}), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertContains(response, "OpenKAT introduction")
+    assertContains(response, "OOI clearance for " + ooi_id)
+    assertContains(response, "Introduction")
+    assertContains(response, "How to know required clearance level")
+    assertContains(response, "Fierce")
+    assertContains(response, "DNS-Zone")
+    assertContains(response, "Skip onboarding")
+    assertContains(response, "Continue")
+
+
+def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organization_view_octopoes, network):
+    mock_organization_view_octopoes().get.return_value = network
+    ooi_id = "Network|internet"
+
+    response = OnboardingAcknowledgeClearanceLevelView.as_view()(
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+
+    assert response.status_code == 200
+    assertContains(response, "OpenKAT introduction")
+    assertContains(response, "Setup scan - OOI clearance for " + ooi_id)
+    assertContains(response, "Trusted clearance level")
+    assertContains(response, "Acknowledge clearance level")
+    assertContains(response, "What is my clearance level?")
+    assertContains(
+        response,
+        "Your administrator has <strong>trusted</strong> you with a clearance level of <strong>L"
+        + str(redteam_member.trusted_clearance_level)
+        + "</strong>.",
+    )
+    (
+        "You have also <strong>acknowledged</strong> to use this clearance level of <strong>L"
+        + str(redteam_member.acknowledged_clearance_level)
+        + "</strong>."
+    )
+    assertContains(response, "Set clearance level")
+
+    redteam_member.trusted_clearance_level = 2
+    redteam_member.acknowledged_clearance_level = -1
+    redteam_member.save()
+
+    response_accept = OnboardingAcknowledgeClearanceLevelView.as_view()(
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+
+    assertContains(
+        response_accept,
+        "Your administrator has trusted you with a clearance level of <strong>L"
+        + str(redteam_member.trusted_clearance_level)
+        + "</strong>.",
+    )
+    assertContains(response_accept, "You must first accept this clearance level to continue.")
+
+
+@pytest.mark.parametrize("clearance_level", [-1, 0])
+def test_onboarding_acknowledge_clearance_level_no_clearance(
+    rf, redteam_member, clearance_level, mock_organization_view_octopoes, network
+):
+    mock_organization_view_octopoes().get.return_value = network
+    ooi_id = "Network|internet"
+
+    response = OnboardingAcknowledgeClearanceLevelView.as_view()(
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+
+    assert response.status_code == 200
+    redteam_member.trusted_clearance_level = clearance_level
+    redteam_member.acknowledged_clearance_level = clearance_level
+    redteam_member.save()
+
+    response = OnboardingAcknowledgeClearanceLevelView.as_view()(
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        organization_code=redteam_member.organization.code,
+    )
+    assertContains(response, "Unfortunately you cannot continue the onboarding.")
+    assertContains(
+        response,
+        "Your administrator has trusted you with a clearance level of <strong>L" + str(clearance_level) + "</strong>.",
+    )
+    assertContains(
+        response,
+        "You need at least a clearance level of <strong>L"
+        + str(DNS_REPORT_LEAST_CLEARANCE_LEVEL)
+        + "</strong> to scan <strong>"
+        + ooi_id
+        + "</strong>",
+    )
+    assertContains(response, "Contact your administrator to receive a higher clearance.")
+
+    assertContains(response, "Skip onboarding")
 
 
 def test_onboarding_set_clearance_level(
@@ -148,7 +256,6 @@ def test_onboarding_set_clearance_level(
 
     assertContains(response_redteam, "OpenKAT introduction")
     assertContains(response_redteam, "Set clearance level for " + ooi_id)
-    assertContains(response_redteam, "How to know required clearance level")
     assertContains(response_redteam, "Set clearance level")
     assertContains(response_redteam, "Skip onboarding")
 

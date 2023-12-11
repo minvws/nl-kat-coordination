@@ -1,0 +1,8 @@
+/* DL - Variables */
+dl {
+  /* Fix whitespace issue after linter adds spaces. */
+  dt,
+  dd {
+    white-space: initial;
+  }
+}

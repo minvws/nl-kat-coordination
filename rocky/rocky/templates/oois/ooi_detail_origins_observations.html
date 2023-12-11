@@ -18,7 +18,7 @@
                         <tr>
                             <td>
                                 {% if observation.boefje.id %}
-                                    <a href="{% url 'plugin_detail' organization_code=organization.code plugin_type="boefje" plugin_id=observation.boefje.id %}">{{ observation.boefje.name }}</a>
+                                    <a href="{% url 'boefje_detail' organization_code=organization.code plugin_id=observation.boefje.id %}">{{ observation.boefje.name }}</a>
                                 {% endif %}
                             </td>
                             <td>

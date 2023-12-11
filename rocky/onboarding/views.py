@@ -5,6 +5,7 @@ from account.mixins import (
     OrganizationPermissionRequiredMixin,
     OrganizationView,
 )
+from account.views import OOIClearanceMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -43,9 +44,10 @@ from onboarding.view_helpers import (
 )
 from rocky.bytes_client import get_bytes_client
 from rocky.exceptions import (
-    ClearanceLevelTooLowException,
+    AcknowledgedClearanceLevelTooLowException,
     IndemnificationNotPresentException,
     RockyError,
+    TrustedClearanceLevelTooLowException,
 )
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
@@ -112,7 +114,7 @@ class OnboardingSetupScanSelectPluginsView(
     KatIntroductionStepsMixin,
     TemplateView,
 ):
-    template_name = "step_3e_setup_scan_select_plugins.html"
+    template_name = "step_3g_setup_scan_select_plugins.html"
     current_step = 3
     report: Type[Report] = DNSReport
     permission_required = "tools.can_enable_disable_boefje"
@@ -228,7 +230,7 @@ class OnboardingSetupScanOOIAddView(
 
     def get_ooi_success_url(self, ooi: OOI) -> str:
         self.request.session["ooi_id"] = ooi.primary_key
-        return get_ooi_url("step_set_clearance_level", ooi.primary_key, self.organization.code)
+        return get_ooi_url("step_clearance_level_introduction", ooi.primary_key, self.organization.code)
 
     def build_breadcrumbs(self) -> List[Breadcrumb]:
         return super().build_breadcrumbs() + [
@@ -284,13 +286,30 @@ class OnboardingSetupScanOOIDetailView(
                 ),
             )
             return self.get(request, *args, **kwargs)
-        except ClearanceLevelTooLowException:
+        except TrustedClearanceLevelTooLowException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
                 _(
-                    "Could not raise clearance level of %s to L%s. \
-                You acknowledged a clearance level of %s."
+                    "Could not raise clearance level of %s to L%s. "
+                    "You were trusted a clearance level of L%s. "
+                    "Contact your administrator to receive a higher clearance."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
+            return self.get(request, *args, **kwargs)
+        except AcknowledgedClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Please accept the clearance level first on your profile page to proceed."
                 )
                 % (
                     ooi.reference.human_readable,
@@ -315,13 +334,66 @@ class OnboardingSetupScanOOIDetailView(
         return context
 
 
+class OnboardingClearanceLevelIntroductionView(
+    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, TemplateView
+):
+    template_name = "step_3d_clearance_level_introduction.html"
+    permission_required = "tools.can_set_clearance_level"
+    current_step = 3
+
+    def get_boefjes_tiles(self):
+        tiles = [
+            {
+                "id": "dns_zone",
+                "type": "boefje",
+                "scan_level": "l1",
+                "name": "DNS-Zone",
+                "description": "Fetch the parent DNS zone of a hostname",
+                "enabled": False,
+            },
+            {
+                "id": "fierce",
+                "type": "boefje",
+                "scan_level": "l3",
+                "name": "Fierce",
+                "description": "Finds subdomains by brute force",
+                "enabled": False,
+            },
+        ]
+        return tiles
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["boefjes"] = self.get_boefjes_tiles()
+        return context
+
+
+class OnboardingAcknowledgeClearanceLevelView(
+    OrganizationPermissionRequiredMixin,
+    KatIntroductionStepsMixin,
+    OnboardingBreadcrumbsMixin,
+    OOIClearanceMixin,
+    TemplateView,
+):
+    template_name = "step_3e_trusted_acknowledge_clearance_level.html"
+    permission_required = "tools.can_set_clearance_level"
+    current_step = 3
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
+        return context
+
+
 class OnboardingSetClearanceLevelView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     FormView,
 ):
-    template_name = "step_3d_set_clearance_level.html"
+    template_name = "step_3f_set_clearance_level.html"
     form_class = OnboardingSetClearanceLevelForm
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
@@ -329,7 +401,6 @@ class OnboardingSetClearanceLevelView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["boefjes"] = self.get_boefjes_tiles()
         context["ooi"] = self.request.GET.get("ooi_id", None)
         context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         return context
@@ -344,26 +415,6 @@ class OnboardingSetClearanceLevelView(
     def add_success_notification(self):
         success_message = _("Clearance level has been set")
         messages.add_message(self.request, messages.SUCCESS, success_message)
-
-    def get_boefje_cover_img(self, boefje_id):
-        return reverse("plugin_cover", kwargs={"plugin_id": boefje_id, "organization_code": self.organization.code})
-
-    def get_boefjes_tiles(self):
-        tiles = [
-            {
-                "tile_image": self.get_boefje_cover_img("dns_zone"),
-                "scan_level": "l1",
-                "name": "DNS-Zone",
-                "description": "Fetch the parent DNS zone of a hostname",
-            },
-            {
-                "tile_image": self.get_boefje_cover_img("fierce"),
-                "scan_level": "l3",
-                "name": "Fierce",
-                "description": "Finds subdomains by brute force",
-            },
-        ]
-        return tiles
 
 
 class OnboardingReportView(

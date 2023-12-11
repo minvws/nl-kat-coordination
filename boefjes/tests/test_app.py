@@ -7,7 +7,7 @@ import pytest
 from boefjes.app import SchedulerWorkerManager
 from boefjes.runtime_interfaces import WorkerManager
 from tests.conftest import MockHandler, MockSchedulerClient
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 def test_one_process(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:

@@ -1,5 +1,3 @@
-import json
-import uuid
 from datetime import datetime
 from enum import Enum
 
@@ -12,8 +10,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
+from tools.view_helpers import schedule_task
 
-from rocky.scheduler import client
+from rocky.scheduler import TaskNotFoundError, client
 
 TASK_LIMIT = 50
 
@@ -24,23 +23,15 @@ class PageActions(Enum):
 
 class DownloadTaskDetail(OrganizationView):
     def get(self, request, *args, **kwargs):
-        task_id = kwargs["task_id"]
-        filename = "task_" + task_id + ".json"
-        task_details = client.get_task_details(task_id)
-        if not self.is_task_id(task_id) or "detail" in task_details:
-            return self.show_error_message()
-        response = HttpResponse(FileResponse(json.dumps(task_details)), content_type="application/json")
-        response["Content-Disposition"] = "attachment; filename=" + filename
-        return response
-
-    def is_task_id(self, task_id):
-        forbidden_chars = ["/", ".", " "]
-        for char in forbidden_chars:
-            return char not in str(task_id)
-
-    def show_error_message(self):
-        error_message = _("Task details not found.")
-        messages.add_message(self.request, messages.ERROR, error_message)
+        try:
+            task_id = kwargs["task_id"]
+            filename = "task_" + task_id + ".json"
+            task_details = client.get_task_details(self.organization.code, task_id)
+            response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
+            response["Content-Disposition"] = "attachment; filename=" + filename
+            return response
+        except TaskNotFoundError as error:
+            messages.error(self.request, error.message)
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
@@ -81,41 +72,14 @@ class TaskListView(OrganizationView, ListView):
             return []
 
     def post(self, request, *args, **kwargs):
-        if "action" in self.request.POST:
-            self.handle_page_action(request.POST["action"])
-            if request.POST["action"] == PageActions.RESCHEDULE_TASK.value:
-                task_id = self.request.POST.get("task_id")
-                task = client.get_task_details(task_id)
-                if task.type == "normalizer":
-                    return redirect(
-                        reverse("normalizers_task_list", kwargs={"organization_code": self.organization.code})
-                    )
-                if task.type == "boefje":
-                    return redirect(reverse("boefjes_task_list", kwargs={"organization_code": self.organization.code}))
+        self.handle_page_action(request.POST["action"])
 
-                return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
-        return self.get(request, *args, **kwargs)
+        return redirect(request.path)
 
-    def handle_page_action(self, action: str):
+    def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
-            task = client.get_task_details(task_id)
-
-            new_id = uuid.uuid4()
-
-            p_item = task.p_item
-            p_item.id = new_id
-            p_item.data.id = new_id
-
-            client.push_task(f"{task.type}-{self.organization.code}", task.p_item)
-
-            success_message = (
-                "Your task is scheduled and will soon be started in the background. \n "
-                "Results will be added to the object list when they are in. "
-                "It may take some time, a refresh of the page may be needed to show the results."
-            )
-            messages.add_message(self.request, messages.SUCCESS, success_message)
-            return
+            schedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -133,3 +97,15 @@ class BoefjesTaskListView(BoefjeMixin, TaskListView):
 class NormalizersTaskListView(NormalizerMixin, TaskListView):
     template_name = "tasks/normalizers.html"
     plugin_type = "normalizer"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["breadcrumbs"] = [
+            {
+                "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
+                "text": _("Tasks"),
+            },
+        ]
+
+        return context

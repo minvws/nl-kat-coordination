@@ -17,7 +17,7 @@ fileConfig(config.config_file_name)
 # add your model's MetaData object here
 # for 'autogenerate' support
 target_metadata = SQL_BASE.metadata
-config.set_main_option("sqlalchemy.url", get_settings().bytes_db_uri)
+config.set_main_option("sqlalchemy.url", str(get_settings().db_uri))
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

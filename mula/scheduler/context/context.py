@@ -6,9 +6,10 @@ from types import SimpleNamespace
 from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
+from scheduler import storage
 from scheduler.config import settings
 from scheduler.connectors import services
-from scheduler.repositories import sqlalchemy, stores
+from scheduler.utils import remove_trailing_slash
 
 
 class AppContext:
@@ -21,9 +22,15 @@ class AppContext:
         services:
             A dict containing all the external services connectors that
             are used and need to be shared in the scheduler application.
-        datastore:
-            A SQLAlchemy.SQLAlchemy object used for storing and retrieving
-            tasks.
+        task_store:
+            A stores.TaskStore object used for storing tasks.
+        pq_store:
+            A stores.PriorityQueueStore object used for storing priority queues.
+        metrics_registry:
+            A prometheus_client.CollectorRegistry object used for storing metrics.
+        metrics_qsize:
+            A prometheus_client.Gauge object used for storing the queue size of
+            the schedulers.
     """
 
     def __init__(self) -> None:
@@ -36,23 +43,28 @@ class AppContext:
 
         # Services
         katalogus_service = services.Katalogus(
-            host=self.config.host_katalogus,
+            host=remove_trailing_slash(str(self.config.host_katalogus)),
             source=f"scheduler/{scheduler.__version__}",
+            timeout=self.config.katalogus_request_timeout,
+            pool_connections=self.config.katalogus_pool_connections,
             cache_ttl=self.config.katalogus_cache_ttl,
         )
 
         bytes_service = services.Bytes(
-            host=self.config.host_bytes,
+            host=remove_trailing_slash(str(self.config.host_bytes)),
+            source=f"scheduler/{scheduler.__version__}",
             user=self.config.host_bytes_user,
             password=self.config.host_bytes_password,
-            source=f"scheduler/{scheduler.__version__}",
+            timeout=self.config.bytes_request_timeout,
+            pool_connections=self.config.bytes_pool_connections,
         )
 
         octopoes_service = services.Octopoes(
-            host=self.config.host_octopoes,
+            host=remove_trailing_slash(str(self.config.host_octopoes)),
             source=f"scheduler/{scheduler.__version__}",
-            orgs=katalogus_service.get_organisations(),
             timeout=self.config.octopoes_request_timeout,
+            pool_connections=self.config.octopoes_pool_connections,
+            orgs=katalogus_service.get_organisations(),
         )
 
         # Register external services, SimpleNamespace allows us to use dot
@@ -65,13 +77,14 @@ class AppContext:
             }
         )
 
-        # Repositories
-        if not self.config.database_dsn.startswith("postgresql"):
-            raise Exception("PostgreSQL is the only supported database backend")
-
-        datastore = sqlalchemy.SQLAlchemy(self.config.database_dsn)
-        self.task_store: stores.TaskStorer = sqlalchemy.TaskStore(datastore)
-        self.pq_store: stores.PriorityQueueStorer = sqlalchemy.PriorityQueueStore(datastore)
+        # Datastores, SimpleNamespace allows us to use dot notation
+        dbconn = storage.DBConn(str(self.config.db_uri))
+        self.datastores: SimpleNamespace = SimpleNamespace(
+            **{
+                storage.TaskStore.name: storage.TaskStore(dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
+            }
+        )
 
         # Metrics collector registry
         self.metrics_registry: CollectorRegistry = CollectorRegistry()
@@ -83,9 +96,8 @@ class AppContext:
         ).info(
             {
                 "pq_maxsize": str(self.config.pq_maxsize),
-                "pq_populate_interval": str(self.config.pq_populate_interval),
-                "pq_populate_grace_period": str(self.config.pq_populate_grace_period),
-                "pq_populate_max_random_objects": str(self.config.pq_populate_max_random_objects),
+                "pq_grace_period": str(self.config.pq_grace_period),
+                "pq_max_random_objects": str(self.config.pq_max_random_objects),
                 "katalogus_cache_ttl": str(self.config.katalogus_cache_ttl),
                 "monitor_organisations_interval": str(self.config.monitor_organisations_interval),
             }
@@ -96,4 +108,11 @@ class AppContext:
             documentation="Size of the scheduler queue",
             registry=self.metrics_registry,
             labelnames=["scheduler_id"],
+        )
+
+        self.metrics_task_status_counts = Gauge(
+            name="scheduler_task_status_counts",
+            documentation="Number of tasks in each status",
+            registry=self.metrics_registry,
+            labelnames=["scheduler_id", "status"],
         )

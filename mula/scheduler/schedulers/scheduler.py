@@ -6,12 +6,12 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
-from scheduler import connectors, context, models, queues, rankers, utils
+from scheduler import connectors, context, models, queues, storage, utils
 from scheduler.utils import thread
 
 
 class Scheduler(abc.ABC):
-    """The Scheduler class combines the priority queue, and ranker.
+    """The Scheduler class combines the priority queue.
     The scheduler is responsible for populating the queue, and ranking tasks.
 
     Attributes:
@@ -20,29 +20,27 @@ class Scheduler(abc.ABC):
         ctx:
             Application context of shared data (e.g. configuration, external
             services connections).
+        enabled:
+            Whether the scheduler is enabled or not.
         scheduler_id:
             The id of the scheduler.
         queue:
             A queues.PriorityQueue instance
-        ranker:
-            A rankers.Ranker instance.
         threads:
-            A dict of ThreadRunner instances, used for runner processes
+            A dict of ThreadRunner instances, used for running processes
             concurrently.
         stop_event: A threading.Event object used for communicating a stop
             event across threads.
         listeners:
-            A dict of connector.Listener instances.
+            A dict of connector.Listener instances, used for listening to
+            external events.
     """
-
-    organisation: models.Organisation
 
     def __init__(
         self,
         ctx: context.AppContext,
         scheduler_id: str,
         queue: queues.PriorityQueue,
-        ranker: rankers.Ranker,
         callback: Optional[Callable[..., None]] = None,
         max_tries: int = -1,
     ):
@@ -64,11 +62,10 @@ class Scheduler(abc.ABC):
         """
 
         self.logger: logging.Logger = logging.getLogger(__name__)
-        self.enabled: bool = True
         self.ctx: context.AppContext = ctx
-        self.scheduler_id = scheduler_id
+        self.enabled: bool = True
+        self.scheduler_id: str = scheduler_id
         self.queue: queues.PriorityQueue = queue
-        self.ranker: rankers.Ranker = ranker
 
         self.max_tries: int = max_tries
 
@@ -87,10 +84,10 @@ class Scheduler(abc.ABC):
 
     def post_push(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being added to the queue. We
-        persist a task to the datastore with the status QUEUED
+        persist a task to the datastore with the status QUEUED.
 
         Args:
-            p_item: The prioritized item to post-add to queue.
+            p_item: The prioritized item from the priority queue.
         """
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
@@ -104,23 +101,23 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
-        task_db = self.ctx.task_store.get_task_by_id(str(p_item.id))
+        task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
-            self.ctx.task_store.update_task(task)
+            self.ctx.datastores.task_store.update_task(task)
             return
 
-        self.ctx.task_store.create_task(task)
+        self.ctx.datastores.task_store.create_task(task)
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
         persist a task to the datastore with the status RUNNING
 
         Args:
-            p_item: The prioritized item to post-pop from queue.
+            p_item: The prioritized item from the priority queue.
         """
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
-        task = self.ctx.task_store.get_task_by_id(str(p_item.id))
+        task = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task is None:
             self.logger.warning(
                 "Task %s not found in datastore, not updating status [task_id=%s, queue_id=%s]",
@@ -131,12 +128,18 @@ class Scheduler(abc.ABC):
             return None
 
         task.status = models.TaskStatus.DISPATCHED
-        self.ctx.task_store.update_task(task)
+        self.ctx.datastores.task_store.update_task(task)
 
         return None
 
-    def pop_item_from_queue(self, filters: Optional[List[models.Filter]] = None) -> Optional[models.PrioritizedItem]:
+    def pop_item_from_queue(
+        self, filters: Optional[storage.filters.FilterRequest] = None
+    ) -> Optional[models.PrioritizedItem]:
         """Pop an item from the queue.
+
+        Args:
+            filters: A FilterRequest instance to filter the
+            prioritized items from the queue.
 
         Returns:
             A PrioritizedItem instance.
@@ -160,10 +163,10 @@ class Scheduler(abc.ABC):
         return p_item
 
     def push_item_to_queue(self, p_item: models.PrioritizedItem) -> None:
-        """Push an item to the queue.
+        """Push a PrioritizedItem to the queue.
 
         Args:
-            item: The item to push to the queue.
+            p_item: The PrioritizedItem to push to the queue.
         """
         if not self.is_enabled():
             self.logger.warning(
@@ -202,7 +205,7 @@ class Scheduler(abc.ABC):
 
         self.logger.debug(
             "Pushed item (%s) to queue %s with priority %s "
-            "[p_item.id=%s, p_item.hash=%s, queue.pq_id=%s, queue.qsize=%d]",
+            "[p_item_id=%s, p_item_hash=%s, queue_pq_id=%s, queue_qsize=%d]",
             p_item.id,
             self.queue.pq_id,
             p_item.priority,
@@ -215,11 +218,10 @@ class Scheduler(abc.ABC):
         self.post_push(p_item)
 
     def push_items_to_queue(self, p_items: List[models.PrioritizedItem]) -> None:
-        """Add items to a priority queue.
+        """Push multiple PrioritizedItems to the queue.
 
         Args:
-            pq: The priority queue to add items to.
-            items: The items to add to the queue.
+            p_items: The list PrioritzedItem to add to the queue.
         """
         count = 0
         for p_item in p_items:
@@ -295,7 +297,7 @@ class Scheduler(abc.ABC):
 
         Args:
             name: The name of the thread.
-            func: The function to run in the thread.
+            target: The function to run in the thread.
             interval: The interval to run the function.
             daemon: Whether the thread should be a daemon.
             loop: Whether the thread should loop.
@@ -316,6 +318,9 @@ class Scheduler(abc.ABC):
         """Check if there is space on the queue.
 
         NOTE: maxsize 0 means unlimited
+
+        Returns:
+            True if there is space on the queue, False otherwise.
         """
         if (self.queue.maxsize - self.queue.qsize()) <= 0 and self.queue.maxsize != 0:
             return False
@@ -344,12 +349,12 @@ class Scheduler(abc.ABC):
         self.queue.clear()
 
         # Get all tasks that were on the queue and set them to CANCELLED
-        tasks, _ = self.ctx.task_store.get_tasks(
+        tasks, _ = self.ctx.datastores.task_store.get_tasks(
             scheduler_id=self.scheduler_id,
             status=models.TaskStatus.QUEUED,
         )
         task_ids = [task.id for task in tasks]
-        self.ctx.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
+        self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
 
         self.logger.info("Disabled scheduler: %s", self.scheduler_id)
 
@@ -372,11 +377,19 @@ class Scheduler(abc.ABC):
         self.logger.info("Enabled scheduler: %s", self.scheduler_id)
 
     def is_enabled(self) -> bool:
-        """Check if the scheduler is enabled."""
+        """Check if the scheduler is enabled.
+
+        Returns:
+            True if the scheduler is enabled, False otherwise.
+        """
         return self.enabled
 
     def stop(self, callback: bool = True) -> None:
-        """Stop the scheduler."""
+        """Stop the scheduler.
+
+        Args:
+            callback: Whether to call the callback function.
+        """
         self.logger.info("Stopping scheduler: %s", self.scheduler_id)
 
         # First, stop the listeners, when those are running in a thread and
@@ -405,6 +418,7 @@ class Scheduler(abc.ABC):
         self.threads = []
 
     def dict(self) -> Dict[str, Any]:
+        """Get a dict representation of the scheduler."""
         return {
             "id": self.scheduler_id,
             "enabled": self.enabled,

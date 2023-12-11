@@ -5,7 +5,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.forms.base import ObservedAtForm
-from tools.forms.findings import FindingMutedSelectionForm, FindingSeverityMultiSelectForm
+from tools.forms.findings import FindingSeverityMultiSelectForm, MutedFindingSelectionForm
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
@@ -55,18 +55,27 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
         super().setup(request, *args, **kwargs)
         self.severities = self.get_severities()
         self.valid_time = self.get_observed_at()
-        self.exclude_muted = request.GET.get("exclude_muted", False)
+        self.muted_findings = request.GET.get("muted_findings", "non-muted")
+
+        self.exclude_muted = self.muted_findings == "non-muted"
+        self.only_muted = self.muted_findings == "muted"
 
     def get_queryset(self) -> FindingList:
         return FindingList(
-            self.octopoes_api_connector, self.valid_time, self.severities, exclude_muted=self.exclude_muted
+            octopoes_connector=self.octopoes_api_connector,
+            valid_time=self.valid_time,
+            severities=self.severities,
+            exclude_muted=self.exclude_muted,
+            only_muted=self.only_muted,
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
-        context["severity_filter_form"] = FindingSeverityMultiSelectForm(self.request.GET)
-        context["muted_findings_filter_form"] = FindingMutedSelectionForm(self.request.GET)
+        context["valid_time"] = self.valid_time
+        context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
+        context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
+        context["only_muted"] = self.only_muted
         return context
 
 

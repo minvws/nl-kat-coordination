@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from boefjes.config import settings
+from boefjes.config import BASE_DIR
 from boefjes.katalogus.clients import MockPluginRepositoryClient
 from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
@@ -97,7 +97,7 @@ def mock_plugin_service(organisation_id: str) -> PluginService:
     for id_, repo in _mocked_repositories.items():
         repo_store.create(repo)
 
-    test_boefjes_dir = settings.base_dir / "katalogus" / "tests" / "boefjes_test_dir"
+    test_boefjes_dir = BASE_DIR / "katalogus" / "tests" / "boefjes_test_dir"
 
     return PluginService(
         PluginStatesStorageMemory(organisation_id),
@@ -125,7 +125,7 @@ class TestPluginsService(TestCase):
         self.assertEqual("kat_test", kat_test.id)
         self.assertEqual("Kat test name", kat_test.name)
         self.assertEqual({"DNSZone"}, kat_test.consumes)
-        self.assertSetEqual({"Hostname", "X509Certificate"}, set(kat_test.produces))
+        self.assertSetEqual({"boefje/kat_test"}, set(kat_test.produces))
 
         kat_test_norm = list(filter(lambda x: x.id == "kat_test_normalize", plugins)).pop()
         self.assertIn("kat_test_normalize", kat_test_norm.id)

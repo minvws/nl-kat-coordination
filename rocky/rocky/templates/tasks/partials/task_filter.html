@@ -1,43 +1,67 @@
 {% load i18n %}
+
 <div class="filter">
     <div>
         <p>{% translate "Filter" %}</p>
-        <button aria-expanded="false" data-hide-filters-label='{% translate "Hide filters" %}'>{% translate "Show filters" %}</button>
+        <button aria-expanded="false"
+                data-hide-filters-label='{% translate "Hide filters" %}'>{% translate "Show filters" %}</button>
     </div>
-
     <form>
         <fieldset>
             <label for="scan_history_from">{% translate "From" %}</label>
-            <input type="date" name="scan_history_from" id="scan_history-from" value="{{ request.GET.scan_history_from }}">
+            <input type="date"
+                   name="scan_history_from"
+                   id="scan_history-from"
+                   value="{{ request.GET.scan_history_from }}">
         </fieldset>
-
         <fieldset>
             <label for="scan_history_to">{% translate "To" %}</label>
-            <input type="date" name="scan_history_to" id="scan_history-to" value="{{ request.GET.scan_history_to }}">
+            <input type="date"
+                   name="scan_history_to"
+                   id="scan_history-to"
+                   value="{{ request.GET.scan_history_to }}">
         </fieldset>
-
         <fieldset>
             <label for="scan_history_status">{% translate "Status" %}</label>
             <select name="scan_history_status" id="scan_history_status">
-                <option value="" selected>{% translate "all" %}</option>}
-                <option value="pending" {% if request.GET.scan_history_status == 'pending' %}selected{% endif %}>{% translate "Pending" %}</option>}
-                <option value="queued" {% if request.GET.scan_history_status == 'queued' %}selected{% endif %}>{% translate "Queued" %}</option>
-                <option value="dispatched" {% if request.GET.scan_history_status == 'dispatched' %}selected{% endif %}>{% translate "Dispatched" %}</option>
-                <option value="completed" {% if request.GET.scan_history_status == 'completed' %}selected{% endif %}>{% translate "Completed" %}</option>
-                <option value="failed" {% if request.GET.scan_history_status == 'failed' %}selected{% endif %}>{% translate "Failure" %}</option>
+                <option value="" selected>{% translate "all" %}</option>
+                }
+                <option value="pending"
+                        {% if request.GET.scan_history_status == 'pending' %}selected{% endif %}>
+                    {% translate "Pending" %}
+                </option>
+                }
+                <option value="queued"
+                        {% if request.GET.scan_history_status == 'queued' %}selected{% endif %}>
+                    {% translate "Queued" %}
+                </option>
+                <option value="dispatched"
+                        {% if request.GET.scan_history_status == 'dispatched' %}selected{% endif %}>
+                    {% translate "Dispatched" %}
+                </option>
+                <option value="completed"
+                        {% if request.GET.scan_history_status == 'completed' %}selected{% endif %}>
+                    {% translate "Completed" %}
+                </option>
+                <option value="failed"
+                        {% if request.GET.scan_history_status == 'failed' %}selected{% endif %}>
+                    {% translate "Failure" %}
+                </option>
             </select>
         </fieldset>
-
         <fieldset>
             <label for="scan_history_search">{% translate "Search" %}</label>
-            <input type="text" name="scan_history_search" id="scan_history_search" value="{{ request.GET.scan_history_search }}" placeholder="{% translate "Search by object name" %}">
+            <input type="text"
+                   name="scan_history_search"
+                   id="scan_history_search"
+                   value="{{ request.GET.scan_history_search }}"
+                   placeholder="{% translate "Search by object name" %}">
             {% for key, value in request.GET.items %}
-                {% if key not in scan_history_form_fields %}
-                    <input type="hidden" name="{{ key }}" value="{{ value }}">
-                {% endif %}
+                {% if key not in scan_history_form_fields %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
             {% endfor %}
         </fieldset>
-        <input type="submit" value='{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}'/>
-        <a href="../tasks">Clear filters</a>
+        <input type="submit"
+               value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}" />
+        <a href="{{ request.path }}">{% translate "Clear filters" %}</a>
     </form>
 </div>

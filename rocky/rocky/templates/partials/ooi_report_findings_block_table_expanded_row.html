@@ -11,24 +11,20 @@
             <p class="warning" role="group" aria-label="{% translate "warning" %}">
                 <span>{% translate "Warning" %}:</span>
                 {% blocktranslate trimmed %}
-          The severity of this findingtype has not (yet) been determined by the data source. This situation requires
-          manual investigation of the severity.
-        {% endblocktranslate %}
+                    The severity of this findingtype has not (yet) been determined by the data source. This situation requires
+                    manual investigation of the severity.
+                {% endblocktranslate %}
             </p>
         {% endif %}
         <dl>
             <div class="meta">
-                <dt>
-                    {% translate "Type" %}
-                </dt>
+                <dt>{% translate "Type" %}</dt>
                 <dd>
                     {{ finding_type.ooi_type }}
                 </dd>
             </div>
             <div>
-                <dt>
-                    {% translate "Finding" %}
-                </dt>
+                <dt>{% translate "Finding" %}</dt>
                 <dd>
                     <a href="{% ooi_url 'ooi_detail' finding_type.ooi_type|add:'|'|add:finding_type.id organization.code %}">{{ finding_type.id }}</a>
                 </dd>
@@ -36,9 +32,7 @@
             {% include "partials/elements/definition_list_item.html" with label="Description" description=finding_type.description %}
 
             <div>
-                <dt>
-                    {% translate "Risk level" %}
-                </dt>
+                <dt>{% translate "Risk level" %}</dt>
                 <dd>
                     {{ finding_type.risk_score }} / 10
                 </dd>
@@ -48,11 +42,11 @@
 
             {% if finding_type.source %}
                 <div>
-                    <dt>
-                        {% translate "Source" %}
-                    </dt>
+                    <dt>{% translate "Source" %}</dt>
                     <dd>
-                        <a href="{{ finding_type.source }}" target="_blank">{{ finding_type.source }}</a>
+                        <a href="{{ finding_type.source }}"
+                           target="_blank"
+                           rel="noopener noreferrer">{{ finding_type.source }}</a>
                     </dd>
                 </div>
             {% endif %}
@@ -63,9 +57,7 @@
             <h2>{% translate "Occurrences" %}</h2>
             <dl>
                 <div>
-                    <dt>
-                        {% translate "Total occurrences" %}
-                    </dt>
+                    <dt>{% translate "Total occurrences" %}</dt>
                     <dd>
                         {{ findings_list.meta.total_by_finding_type|get_item:finding_type.id }}
                     </dd>

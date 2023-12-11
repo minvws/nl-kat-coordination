@@ -36,9 +36,14 @@ class ReferenceNode(BaseModel):
         return {self.reference}.union(child_references)
 
 
-ReferenceNode.update_forward_refs()
+ReferenceNode.model_rebuild()
 
 
 class ReferenceTree(BaseModel):
+    """A tree-like structure of OOIs representing a subgraph of the objects graph, starting from a `root` ooi.The
+    conversion from graph to tree happens through "unfolding" the graph during traversal and allowing duplication of
+    nodes in the tree to avoidcycles. Because of the duplication the structure includes a unique, flattened list of OOIs
+    present in the tree, the `store`, for convenience."""
+
     root: ReferenceNode
     store: Dict[str, OOIType]

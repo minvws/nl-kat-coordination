@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ServiceHealth(BaseModel):
@@ -12,8 +12,8 @@ class ServiceHealth(BaseModel):
     healthy: bool = False
     version: Optional[str] = None
     additional: Any = None
-    results: List["ServiceHealth"] = []
+    results: List["ServiceHealth"] = Field(default_factory=list)
     externals: Dict[str, bool] = {}
 
 
-ServiceHealth.update_forward_refs()
+ServiceHealth.model_rebuild()

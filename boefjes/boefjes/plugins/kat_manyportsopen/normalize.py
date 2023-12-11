@@ -13,7 +13,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     ooi = Reference.from_str(boefje_meta.input_ooi)
 
-    connector = OctopoesAPIConnector(settings.octopoes_api, boefje_meta.organization)
+    connector = OctopoesAPIConnector(str(settings.octopoes_api), boefje_meta.organization)
 
     # Get current ports
     try:
@@ -52,6 +52,6 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
         yield kat_ooi
         yield Finding(
             finding_type=kat_ooi.reference,
-            ooi=ooi,
+            ooi=ooi.reference,
             description=f"There are {num_new_ports} ports open that were not open last week.",
         )

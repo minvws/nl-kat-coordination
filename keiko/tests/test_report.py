@@ -32,6 +32,8 @@ report_data_empty = {
     "valid_time": "2022-08-26 08:23:58.373810+00:00",
     "report_source_type": "Hostname",
     "report_source_value": "mispo.es.",
+    "filters": {},
+    "report_url": "http://test.test",
 }
 
 
@@ -106,6 +108,8 @@ report_data_underscores = {
     "valid_time": "2022-08-26 08:23:58.373810+00:00",
     "report_source_type": "Hostname",
     "report_source_value": "mispo.es.",
+    "filters": {},
+    "report_url": "http://test.test",
 }
 
 
@@ -121,19 +125,20 @@ def report_args(tmp_path):
 
 
 def test_generate_report_empty(report_args):
-    report_args["report_data"] = DataShape.parse_obj(report_data_empty)
+    report_args["report_data"] = DataShape.model_validate(report_data_empty)
     generate_report(**report_args)
 
     report_file = report_args["settings"].reports_folder / "test.keiko.pdf"
     tex_file = report_args["settings"].reports_folder / "test.keiko.tex"
     json_file = report_args["settings"].reports_folder / "test.keiko.json"
+
     assert report_file.exists()
     assert not tex_file.exists()
     assert not json_file.exists()
 
 
 def test_generate_report_debug(report_args):
-    report_args["report_data"] = DataShape.parse_obj(report_data_empty)
+    report_args["report_data"] = DataShape.model_validate(report_data_empty)
     report_args["debug"] = True
     generate_report(**report_args)
 
@@ -147,7 +152,7 @@ def test_generate_report_debug(report_args):
 
 
 def test_generate_report_underscore(report_args):
-    report_args["report_data"] = DataShape.parse_obj(report_data_underscores)
+    report_args["report_data"] = DataShape.model_validate(report_data_underscores)
     generate_report(**report_args)
 
     report_file = report_args["settings"].reports_folder / "test.keiko.pdf"

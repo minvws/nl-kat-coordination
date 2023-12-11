@@ -1,9 +1,10 @@
+import threading
 import unittest
+from types import SimpleNamespace
 from unittest import mock
 
 import scheduler
-from fastapi.testclient import TestClient
-from scheduler import config, models, repositories, server
+from scheduler import config, models, server, storage
 
 from tests.factories import OrganisationFactory
 from tests.mocks import MockKatalogusService
@@ -11,32 +12,31 @@ from tests.mocks import MockKatalogusService
 
 class AppTestCase(unittest.TestCase):
     def setUp(self):
-        cfg = config.settings.Settings()
-
+        # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        self.mock_ctx.config = cfg
-
-        # Datastore
-        self.mock_ctx.datastore = repositories.sqlalchemy.SQLAlchemy(cfg.database_dsn)
-        models.Base.metadata.create_all(self.mock_ctx.datastore.engine)
-
-        self.pq_store = repositories.sqlalchemy.PriorityQueueStore(self.mock_ctx.datastore)
-        self.task_store = repositories.sqlalchemy.TaskStore(self.mock_ctx.datastore)
-
-        # Application context
-        self.mock_ctx.pq_store = self.pq_store
-        self.mock_ctx.task_store = self.task_store
+        self.mock_ctx.config = config.settings.Settings()
         self.mock_ctx.services.katalogus = MockKatalogusService()
+
+        # Database
+        self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        models.Base.metadata.drop_all(self.dbconn.engine)
+        models.Base.metadata.create_all(self.dbconn.engine)
+
+        self.mock_ctx.datastores = SimpleNamespace(
+            **{
+                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+            }
+        )
 
         # App
         self.app = scheduler.App(self.mock_ctx)
         self.app.server = server.Server(self.mock_ctx, self.app.schedulers)
 
-        # Test client
-        self.client = TestClient(self.app.server.api)
-
     def tearDown(self):
         self.app.shutdown()
+        models.Base.metadata.drop_all(self.dbconn.engine)
+        self.dbconn.engine.dispose()
 
     def test_monitor_orgs_add(self):
         """Test that when a new organisation is added, a new scheduler is created"""
@@ -121,3 +121,28 @@ class AppTestCase(unittest.TestCase):
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-3"}, scheduler_org_ids)
+
+    def test_shutdown(self):
+        """Test that the app shuts down gracefully"""
+        # Arrange
+        self.mock_ctx.services.katalogus.organisations = {
+            "org-1": OrganisationFactory(id="org-1"),
+        }
+
+        self.app.start_schedulers()
+        self.app.start_monitors()
+
+        # Shutdown the app
+        self.app.shutdown()
+
+        # Assert that the schedulers have been stopped
+        for s in self.app.schedulers.copy().values():
+            self.assertFalse(s.is_alive())
+
+        # Assert that all threads have been stopped
+        # for thread in self.app.threads:
+        for t in threading.enumerate():
+            if t is threading.main_thread():
+                continue
+
+            self.assertFalse(t.is_alive())

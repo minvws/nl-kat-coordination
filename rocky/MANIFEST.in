@@ -1,4 +1,3 @@
-include README.md
 include LICENSE
 
 recursive-include rocky/templates *.html
@@ -13,3 +12,4 @@ recursive-include account/templates *.html
 recursive-include account/templates *.txt
 recursive-include onboarding/templates *.html
 recursive-include onboarding/templates *.txt
+recursive-include reports *.html

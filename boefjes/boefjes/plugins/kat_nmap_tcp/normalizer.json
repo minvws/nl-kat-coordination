@@ -1,11 +1,11 @@
 {
     "id": "kat_nmap_normalize",
     "consumes": [
-        "nmap",
-        "nmap-tcp",
-        "nmap-udp",
-        "nmap-ports",
-        "nmap-ip-range"
+        "boefje/nmap",
+        "boefje/nmap-tcp",
+        "boefje/nmap-udp",
+        "boefje/nmap-ports",
+        "boefje/nmap-ip-range"
     ],
     "produces": [
         "IPAddressV6",

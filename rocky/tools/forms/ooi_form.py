@@ -1,16 +1,17 @@
 from enum import Enum
+from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, List, Optional, Type, Union
+from typing import Dict, Literal, Optional, Type, Union
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from pydantic import AnyUrl
-from pydantic.fields import SHAPE_LIST, ModelField
+from pydantic.fields import FieldInfo
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.question import Question
-from octopoes.models.types import get_relations
+from octopoes.models.types import get_collapsed_types, get_relations
 from tools.forms.base import BaseRockyForm, CheckboxGroup
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
 from tools.models import SCAN_LEVEL
@@ -38,36 +39,36 @@ class OOIForm(BaseRockyForm):
         hidden_ooi_fields: Dict[str, str] = None,
     ) -> Dict[str, forms.fields.Field]:
         fields = {}
-        for name, field in self.ooi_class.__fields__.items():
-            default_attrs = default_field_options(field)
+        for name, field in self.ooi_class.model_fields.items():
+            default_attrs = default_field_options(name, field)
 
             if name == "primary_key":
                 continue
 
-            if not hasattr(field.type_, "mro"):  # Literals
+            # skip literals
+            if hasattr(field.annotation, "__origin__") and field.annotation.__origin__ == Literal:
                 continue
 
             if hidden_ooi_fields and name in hidden_ooi_fields:
                 # Hidden ooi fields will have the value of an OOI ID
                 fields[name] = forms.CharField(widget=forms.HiddenInput())
-            elif field.name in get_relations(self.ooi_class):
+            elif name in get_relations(self.ooi_class):
                 fields[name] = generate_select_ooi_field(
-                    self.api_connector,
-                    field,
-                    get_relations(self.ooi_class)[field.name],
-                    self.initial.get(field.name, None),
+                    self.api_connector, name, field, get_relations(self.ooi_class)[name], self.initial.get(name, None)
                 )
-            elif field.type_ in [IPv4Address, IPv6Address]:
+            elif field.annotation in [IPv4Address, IPv6Address]:
                 fields[name] = generate_ip_field(field)
-            elif field.type_ == AnyUrl:
+            elif field.annotation == AnyUrl:
                 fields[name] = generate_url_field(field)
-            elif field.type_ == int or int in field.type_.mro():
+            elif field.annotation == int or (
+                hasattr(field.annotation, "__args__") and int in field.annotation.__args__
+            ):
                 fields[name] = forms.IntegerField(**default_attrs)
-            elif issubclass(field.type_, Enum):
-                fields[name] = generate_select_ooi_type(field)
-            elif self.ooi_class == Question and issubclass(field.type_, str) and name == "json_schema":
+            elif isclass(field.annotation) and issubclass(field.annotation, Enum):
+                fields[name] = generate_select_ooi_type(name, field.annotation, field)
+            elif self.ooi_class == Question and issubclass(field.annotation, str) and name == "json_schema":
                 fields[name] = forms.CharField(**default_attrs)
-            elif issubclass(field.type_, str):
+            elif isclass(field.annotation) and issubclass(field.annotation, str):
                 if name in self.ooi_class.__annotations__ and self.ooi_class.__annotations__[name] == Dict[str, str]:
                     fields[name] = forms.JSONField(**default_attrs)
                 else:
@@ -78,18 +79,18 @@ class OOIForm(BaseRockyForm):
 
 def generate_select_ooi_field(
     api_connector: OctopoesAPIConnector,
-    field: ModelField,
+    name: str,
+    field: FieldInfo,
     related_ooi_type: Type[OOI],
     initial: Optional[str] = None,
 ) -> forms.fields.Field:
-    """Select field will have a list of OOIs"""
     # field is a relation, query all objects, and build select
-    default_attrs = default_field_options(field)
-    is_multiselect = field.shape == SHAPE_LIST
+    default_attrs = default_field_options(name, field)
+    is_multiselect = getattr(field.annotation, "__origin__", None) == list
     option_label = default_attrs.get("label", _("option"))
 
     option_text = "-- " + _("Optionally choose a {option_label}").format(option_label=option_label) + " --"
-    if field.required:
+    if field.is_required():
         option_text = "-- " + _("Please choose a {option_label}").format(option_label=option_label) + " --"
 
     # Generate select options
@@ -109,23 +110,25 @@ def generate_select_ooi_field(
     return forms.CharField(widget=forms.Select(choices=select_options), **default_attrs)
 
 
-def generate_select_ooi_type(field: ModelField) -> forms.fields.Field:
+# todo: name?
+def generate_select_ooi_type(name: str, enumeration: Enum, field: FieldInfo) -> forms.fields.Field:
     """OOI Type (enum) fields will have a select input"""
-    default_attrs = default_field_options(field)
-    choices = [(val.value, val.value) for val in field.type_]
+    default_attrs = default_field_options(name, field)
+    choices = [(entry.value, entry.name) for entry in list(enumeration)]
+
     return forms.CharField(widget=forms.Select(choices=choices), **default_attrs)
 
 
-def generate_ip_field(field: ModelField) -> forms.fields.Field:
+def generate_ip_field(field: FieldInfo) -> forms.fields.Field:
     """IPv4 and IPv6 fields will have a text input"""
-    default_attrs = default_field_options(field)
-    protocol = "IPv4" if field.type_ == IPv4Address else "IPv6"
+    default_attrs = default_field_options("", field)
+    protocol = "IPv4" if field.annotation == IPv4Address else "IPv6"
     return forms.GenericIPAddressField(protocol=protocol, **default_attrs)
 
 
-def generate_url_field(field: ModelField) -> forms.fields.Field:
+def generate_url_field(field: FieldInfo) -> forms.fields.Field:
     """URL fields will have a text input"""
-    default_attrs = default_field_options(field)
+    default_attrs = default_field_options("", field)
     if default_attrs.get("label") == "raw":
         default_attrs.update({"label": "URL"})
     field = forms.URLField(**default_attrs)
@@ -133,27 +136,44 @@ def generate_url_field(field: ModelField) -> forms.fields.Field:
     return field
 
 
-def default_field_options(field: ModelField) -> Dict[str, Union[str, bool]]:
+def default_field_options(name: str, field_info: FieldInfo) -> Dict[str, Union[str, bool]]:
     return {
-        "label": field.name,
-        "required": bool(field.required),
+        "label": name,
+        "required": field_info.is_required(),
     }
 
 
 class ClearanceFilterForm(BaseRockyForm):
     clearance_level = forms.CharField(
-        label="Filter by clearance level",
-        widget=CheckboxGroup(toggle_all_button=True, choices=SCAN_LEVEL.choices),
+        label=_("Filter by clearance level"),
+        widget=CheckboxGroup(choices=SCAN_LEVEL.choices),
         required=False,
     )
 
     clearance_type = forms.CharField(
-        label="Filter by clearance type",
-        widget=CheckboxGroup(toggle_all_button=True, choices=CLEARANCE_TYPE_CHOICES),
+        label=_("Filter by clearance type"),
+        widget=CheckboxGroup(choices=CLEARANCE_TYPE_CHOICES),
         required=False,
     )
 
-    def __init__(self, clearance_level: List[str], selected_clearance_types: List[str], *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["clearance_level"].initial = clearance_level
-        self.fields["clearance_type"].initial = selected_clearance_types
+
+_EXCLUDED_OOI_TYPES = ("Finding", "FindingType")
+
+SORTED_OOI_TYPES = sorted(
+    [
+        ooi_class.get_ooi_type()
+        for ooi_class in get_collapsed_types()
+        if ooi_class.get_ooi_type() not in _EXCLUDED_OOI_TYPES
+    ]
+)
+
+OOI_TYPE_CHOICES = ((ooi_type, ooi_type) for ooi_type in SORTED_OOI_TYPES)
+
+
+class OOITypeMultiCheckboxForm(BaseRockyForm):
+    ooi_type = forms.MultipleChoiceField(
+        label=_("Filter by OOI types"),
+        required=False,
+        choices=OOI_TYPE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+    )

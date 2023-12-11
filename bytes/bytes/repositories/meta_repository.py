@@ -1,14 +1,17 @@
-from typing import Any, Dict, List, Optional, Type
+from typing import Dict, List, Optional, Type
+from uuid import UUID
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field
+from sqlalchemy.orm import Query
 
+from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB
 from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataMeta
 
 
 class BoefjeMetaFilter(BaseModel):
     organization: str
 
-    boefje_id: Optional[str]
+    boefje_id: Optional[str] = None
     input_ooi: Optional[str] = "*"
     limit: int = 1
     offset: int = 0
@@ -16,30 +19,39 @@ class BoefjeMetaFilter(BaseModel):
 
 
 class NormalizerMetaFilter(BaseModel):
-    organization: Optional[str]
-    normalizer_id: Optional[str]
-    raw_id: Optional[str]
+    organization: Optional[str] = None
+    normalizer_id: Optional[str] = None
+    raw_id: Optional[UUID] = None
     limit: int = 1
     offset: int = 0
     descending: bool = True
 
 
 class RawDataFilter(BaseModel):
-    organization: Optional[str]
-    boefje_meta_id: Optional[str]
-    normalized: Optional[bool]
+    organization: Optional[str] = None
+    boefje_meta_id: Optional[UUID] = None
+    normalized: Optional[bool] = None
     mime_types: List[MimeType] = Field(default_factory=list)
-    limit: int = 1
-    offset: int = 0
+    limit: Optional[int] = 1
+    offset: Optional[int] = 0
 
-    @root_validator(pre=False)
-    def either_organization_or_boefje_meta_id(  # pylint: disable=no-self-argument
-        cls, values: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        if values.get("organization") or values.get("boefje_meta_id"):
-            return values
+    def apply(self, query: Query) -> Query:
+        if self.boefje_meta_id:
+            query = query.filter(RawFileInDB.boefje_meta_id == str(self.boefje_meta_id))
 
-        raise ValueError("boefje_meta_id and organization cannot both be None.")
+        if self.organization:
+            query = query.join(BoefjeMetaInDB).filter(BoefjeMetaInDB.organization == self.organization)
+
+        if self.normalized:
+            query = query.join(NormalizerMetaInDB, isouter=False)
+
+        if self.normalized is False:  # it can also be None, in which case we do not want a filter
+            query = query.join(NormalizerMetaInDB, isouter=True).filter(NormalizerMetaInDB.id.is_(None))
+
+        if self.mime_types:
+            query = query.filter(RawFileInDB.mime_types.contains([m.value for m in self.mime_types]))
+
+        return query.offset(self.offset).limit(self.limit)
 
 
 class MetaDataRepository:
@@ -52,7 +64,7 @@ class MetaDataRepository:
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         raise NotImplementedError()
 
-    def get_boefje_meta_by_id(self, boefje_meta_id: str) -> BoefjeMeta:
+    def get_boefje_meta_by_id(self, boefje_meta_id: UUID) -> BoefjeMeta:
         raise NotImplementedError()
 
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
@@ -61,16 +73,16 @@ class MetaDataRepository:
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
         raise NotImplementedError()
 
-    def get_normalizer_meta_by_id(self, normalizer_meta_id: str) -> NormalizerMeta:
+    def get_normalizer_meta_by_id(self, normalizer_meta_id: UUID) -> NormalizerMeta:
         raise NotImplementedError()
 
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
         raise NotImplementedError()
 
-    def save_raw(self, raw: RawData) -> str:
+    def save_raw(self, raw: RawData) -> UUID:
         raise NotImplementedError()
 
-    def get_raw_by_id(self, raw_id: str) -> RawData:
+    def get_raw_by_id(self, raw_id: UUID) -> RawData:
         raise NotImplementedError()
 
     def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
@@ -80,4 +92,10 @@ class MetaDataRepository:
         raise NotImplementedError()
 
     def get_raw_file_count_per_organization(self) -> Dict[str, int]:
+        raise NotImplementedError()
+
+    def get_raw_file_count_per_mime_type(self, query_filter: RawDataFilter) -> Dict[str, int]:
+        raise NotImplementedError()
+
+    def get_raw_meta_by_id(self, raw_id: UUID) -> RawDataMeta:
         raise NotImplementedError()

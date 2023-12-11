@@ -3,13 +3,13 @@ from pathlib import Path
 from typing import Tuple
 from unittest import TestCase
 
-from pydantic import AnyUrl
+from pydantic_core import Url
 
 from boefjes.job_models import NormalizerMeta, NormalizerOutput
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
 from octopoes.models import Reference
-from tests.test_snyk import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class ManualTest(TestCase):
@@ -42,7 +42,7 @@ darknet,https://openkat.nl/""",
     ]
 
     def test_parse_manual_declarations(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("manual-ooi.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("manual-ooi.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
@@ -130,13 +130,13 @@ darknet,https://openkat.nl/""",
                 "network": Reference("Network|internet"),
                 "object_type": "URL",
                 "primary_key": "URL|internet|https://example.com/",
-                "raw": AnyUrl(
-                    "https://example.com/", scheme="https", host="example.com", tld="com", host_type="domain", path="/"
+                "raw": Url(
+                    "https://example.com/",
                 ),
                 "scan_profile": None,
                 "web_url": None,
             },
-            output.declarations[1].ooi.dict(),
+            output.declarations[1].ooi.model_dump(),
         )
 
         meta, output, runner = self.check_network_created(5)
@@ -146,8 +146,8 @@ darknet,https://openkat.nl/""",
                 "network": Reference("Network|internet"),
                 "object_type": "URL",
                 "primary_key": "URL|internet|https://example.com/",
-                "raw": AnyUrl(
-                    "https://example.com/", scheme="https", host="example.com", tld="com", host_type="domain", path="/"
+                "raw": Url(
+                    "https://example.com/",
                 ),
                 "scan_profile": None,
                 "web_url": None,
@@ -156,7 +156,7 @@ darknet,https://openkat.nl/""",
         )
 
     def check_network_created(self, csv_idx: int) -> Tuple[NormalizerMeta, NormalizerOutput, LocalNormalizerJobRunner]:
-        meta = NormalizerMeta.parse_raw(get_dummy_data("manual-csv.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("manual-csv.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
         output = runner.run(meta, self.CSV_EXAMPLES[csv_idx])

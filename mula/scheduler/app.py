@@ -1,13 +1,11 @@
 import logging
 import os
 import threading
-from typing import Dict, Optional, Set
+from typing import Dict, Optional, Set, Union
 
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers, schedulers, server
-from scheduler.connectors import listeners
-from scheduler.models import BoefjeTask, NormalizerTask, Organisation
+from scheduler import context, schedulers, server
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -15,6 +13,20 @@ tracer = trace.get_tracer(__name__)
 
 class App:
     """Main application definition for the scheduler implementation of KAT.
+
+    The App is responsible for starting and managing:
+
+        * Schedulers: The schedulers are responsible for managing the queues
+        and tasks for a specific organisation.
+
+        * Monitors: The monitors are responsible for monitoring the state of
+        the application, and executing procedures based on the state of the
+        application.
+
+        * Server: The server is responsible for exposing the application
+        through a REST API.
+
+        * Metrics: The collection of application specific metrics.
 
     Attributes:
         logger:
@@ -26,8 +38,8 @@ class App:
             event across threads.
         schedulers:
             A dict of schedulers, keyed by scheduler id.
-        listeners:
-            A dict of connector.Listener instances.
+        server:
+            The http rest api server instance.
     """
 
     def __init__(self, ctx: context.AppContext) -> None:
@@ -38,91 +50,18 @@ class App:
                 Application context of shared data (e.g. configuration,
                 external services connections).
         """
-        threading.excepthook = self.unhandled_exception  # type: ignore
 
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.ctx: context.AppContext = ctx
+
+        threading.excepthook = self.unhandled_exception  # type: ignore
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
-        self.schedulers: Dict[str, schedulers.Scheduler] = {}
-        self.listeners: Dict[str, listeners.Listener] = {}
+
+        self.schedulers: Dict[
+            str, Union[schedulers.Scheduler, schedulers.BoefjeScheduler, schedulers.NormalizerScheduler]
+        ] = {}
         self.server: Optional[server.Server] = None
-
-    def initialize_boefje_schedulers(self) -> None:
-        """Initialize the schedulers for the Boefje tasks. We will create
-        schedulers for all organisations in the Katalogus service.
-        """
-        orgs = self.ctx.services.katalogus.get_organisations()
-        for org in orgs:
-            s = self.create_boefje_scheduler(org)
-            self.schedulers[s.scheduler_id] = s
-
-    def initialize_normalizer_schedulers(self) -> None:
-        """Initialize the schedulers for the Normalizer tasks. We will create
-        schedulers for all organisations in the Katalogus service.
-        """
-        orgs = self.ctx.services.katalogus.get_organisations()
-        for org in orgs:
-            s = self.create_normalizer_scheduler(org)
-            self.schedulers[s.scheduler_id] = s
-
-    def create_normalizer_scheduler(self, org: Organisation) -> schedulers.NormalizerScheduler:
-        """Create a normalizer scheduler for the given organisation."""
-        identifier = f"normalizer-{org.id}"
-
-        queue = queues.NormalizerPriorityQueue(
-            pq_id=identifier,
-            maxsize=self.ctx.config.pq_maxsize,
-            item_type=NormalizerTask,
-            allow_priority_updates=True,
-            pq_store=self.ctx.pq_store,
-        )
-
-        ranker = rankers.NormalizerRanker(
-            ctx=self.ctx,
-        )
-
-        scheduler = schedulers.NormalizerScheduler(
-            ctx=self.ctx,
-            scheduler_id=identifier,
-            queue=queue,
-            ranker=ranker,
-            organisation=org,
-            callback=self.remove_scheduler,
-        )
-
-        return scheduler
-
-    def create_boefje_scheduler(self, org: Organisation) -> schedulers.BoefjeScheduler:
-        """Create a scheduler for the given organisation.
-
-        Args:
-            org: The organisation to create a scheduler for.
-        """
-        identifier = f"boefje-{org.id}"
-
-        queue = queues.BoefjePriorityQueue(
-            pq_id=identifier,
-            maxsize=self.ctx.config.pq_maxsize,
-            item_type=BoefjeTask,
-            allow_priority_updates=True,
-            pq_store=self.ctx.pq_store,
-        )
-
-        ranker = rankers.BoefjeRanker(
-            ctx=self.ctx,
-        )
-
-        scheduler = schedulers.BoefjeScheduler(
-            ctx=self.ctx,
-            scheduler_id=identifier,
-            queue=queue,
-            ranker=ranker,
-            organisation=org,
-            callback=self.remove_scheduler,
-        )
-
-        return scheduler
 
     @tracer.start_as_current_span("monitor_organisations")
     def monitor_organisations(self) -> None:
@@ -135,7 +74,9 @@ class App:
         # by the schedulers, and the organisation id's that are in the
         # Katalogus service. We will add/remove schedulers based on the
         # difference between these two sets.
-        scheduler_orgs: Set[str] = {s.organisation.id for s in current_schedulers.values()}
+        scheduler_orgs: Set[str] = {
+            s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
+        }
         katalogus_orgs: Set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
@@ -147,7 +88,9 @@ class App:
         # We need to get scheduler ids of the schedulers that are associated
         # with the removed organisations
         removal_scheduler_ids: Set[str] = {
-            s.scheduler_id for s in current_schedulers.values() if s.organisation.id in removals
+            s.scheduler_id
+            for s in current_schedulers.values()
+            if hasattr(s, "organisation") and s.organisation.id in removals
         }
 
         # Remove schedulers for removed organisations
@@ -168,12 +111,25 @@ class App:
         for org_id in additions:
             org = self.ctx.services.katalogus.get_organisation(org_id)
 
-            scheduler_normalizer = self.create_normalizer_scheduler(org)
-            self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
-            scheduler_normalizer.run()
+            scheduler_boefje = schedulers.BoefjeScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"boefje-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
 
-            scheduler_boefje = self.create_boefje_scheduler(org)
-            self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
+            scheduler_normalizer = schedulers.NormalizerScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"normalizer-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+
+            with self.lock:
+                self.schedulers[scheduler_boefje.scheduler_id] = scheduler_boefje
+                self.schedulers[scheduler_normalizer.scheduler_id] = scheduler_normalizer
+
+            scheduler_normalizer.run()
             scheduler_boefje.run()
 
         if additions:
@@ -186,44 +142,54 @@ class App:
                 additions,
             )
 
+    @tracer.start_as_current_span("collect_metrics")
     def collect_metrics(self) -> None:
         """Collect application metrics
 
         This method that allows to collect metrics throughout the application.
         """
-        # Collect metrics from the schedulers
-        for s in self.schedulers.values():
-            self.ctx.metrics_qsize.labels(
-                scheduler_id=s.scheduler_id,
-            ).set(
-                s.queue.qsize(),
+        with self.lock:
+            for s in self.schedulers.copy().values():
+                self.ctx.metrics_qsize.labels(
+                    scheduler_id=s.scheduler_id,
+                ).set(
+                    s.queue.qsize(),
+                )
+
+                status_counts = self.ctx.datastores.task_store.get_status_counts(s.scheduler_id)
+                for status, count in status_counts.items():
+                    self.ctx.metrics_task_status_counts.labels(
+                        scheduler_id=s.scheduler_id,
+                        status=status,
+                    ).set(
+                        count,
+                    )
+
+    def start_schedulers(self) -> None:
+        # Initialize the schedulers
+        orgs = self.ctx.services.katalogus.get_organisations()
+        for org in orgs:
+            boefje_scheduler = schedulers.BoefjeScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"boefje-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
             )
+            self.schedulers[boefje_scheduler.scheduler_id] = boefje_scheduler
 
-    def run(self) -> None:
-        """Start the main scheduler application, and run in threads the
-        following processes:
+            normalizer_scheduler = schedulers.NormalizerScheduler(
+                ctx=self.ctx,
+                scheduler_id=f"normalizer-{org.id}",
+                organisation=org,
+                callback=self.remove_scheduler,
+            )
+            self.schedulers[normalizer_scheduler.scheduler_id] = normalizer_scheduler
 
-            * api server
-            * listeners
-            * schedulers
-            * monitors
-            * metrics collecting
-        """
-        # Start the schedulers
-        self.initialize_boefje_schedulers()
-        self.initialize_normalizer_schedulers()
+        # Start schedulers
         for scheduler in self.schedulers.values():
             scheduler.run()
 
-        # Start the listeners
-        for name, listener in self.listeners.items():
-            thread.ThreadRunner(
-                name=f"listener_{name}",
-                target=listener.listen,
-                stop_event=self.stop_event,
-            ).start()
-
-        # Start monitors
+    def start_monitors(self) -> None:
         thread.ThreadRunner(
             name="monitor_organisations",
             target=self.monitor_organisations,
@@ -231,39 +197,78 @@ class App:
             interval=self.ctx.config.monitor_organisations_interval,
         ).start()
 
-        # Start metrics collecting
+    def start_collectors(self) -> None:
         thread.ThreadRunner(
             name="metrics_collector",
             target=self.collect_metrics,
             stop_event=self.stop_event,
-            interval=1,
+            interval=10,
         ).start()
 
-        # API Server
+    def start_server(self) -> None:
         self.server = server.Server(self.ctx, self.schedulers)
         thread.ThreadRunner(
             name="server",
-            target=server.Server(self.ctx, self.schedulers).run,
+            target=self.server.run,
             stop_event=self.stop_event,
+            loop=False,
         ).start()
+
+    def run(self) -> None:
+        """Start the main scheduler application, and run in threads the
+        following processes:
+
+            * schedulers
+            * listeners
+            * monitors
+            * metrics collecting
+            * api server
+        """
+        # Start schedulers
+        self.start_schedulers()
+
+        # Start monitors
+        self.start_monitors()
+
+        # Start metrics collecting
+        if self.ctx.config.collect_metrics:
+            self.start_collectors()
+
+        # API Server
+        self.start_server()
 
         # Main thread
         while not self.stop_event.is_set():
-            self.stop_event.wait(0.01)
+            self.stop_event.wait()
+
+        # When the stop event is set, we want to gracefully shutdown the
+        # rest of the application.
+        self.shutdown()
+
+        # We're calling this here, because we want to issue a shutdown from
+        # within a thread, otherwise it will not exit a docker container.
+        # Source: https://stackoverflow.com/a/1489838/1346257
+        os._exit(1)
 
     def shutdown(self) -> None:
         """Shutdown the scheduler application, and all threads."""
-        for s in self.schedulers.copy().values():
-            s.stop()
+        self.logger.info("Shutdown initiated")
 
         self.stop_event.set()
 
-    def unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
-        """Gracefully shutdown the scheduler application, and all threads
-        When a unhandled exception occurs.
-        """
-        self.logger.error("Unhandled exception occurred: %s", args.exc_value)
+        # First stop schedulers
+        for s in self.schedulers.copy().values():
+            s.stop()
 
+        # Stop all threads that are still running, except the main thread.
+        # These threads likely have a blocking call and as such are not able
+        # to leverage a stop event.
+        self.stop_threads()
+
+        self.logger.info("Shutdown complete")
+
+    def stop_threads(self) -> None:
+        """Stop all threads, except the main thread."""
         for t in threading.enumerate():
             if t is threading.current_thread():
                 continue
@@ -276,15 +281,17 @@ class App:
 
             t.join(5)
 
-        self.logger.info("Shutdown complete")
-
-        # We're calling this here, because we want to issue a shutdown from
-        # within a thread, otherwise it will not exit a docker container.
-        # Source: https://stackoverflow.com/a/1489838/1346257
-        os._exit(1)
+    def unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
+        """Gracefully shutdown the scheduler application, and all threads
+        when a unhandled exception occurs.
+        """
+        self.logger.error("Unhandled exception occurred: %s", args.exc_value)
+        self.stop_event.set()
 
     def remove_scheduler(self, scheduler_id: str) -> None:
-        """Remove a scheduler from the application.
+        """Remove a scheduler from the application. This method is passed
+        as a callback to the scheduler, so that the scheduler can remove
+        itself from the application.
 
         Args:
             scheduler_id: The id of the scheduler to remove.

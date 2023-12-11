@@ -7,6 +7,8 @@ from .services import HTTPService
 
 
 class Octopoes(HTTPService):
+    """A class that provides methods to interact with the Octopoes API."""
+
     name = "octopoes"
     health_endpoint = None
 
@@ -15,10 +17,11 @@ class Octopoes(HTTPService):
         host: str,
         source: str,
         orgs: List[Organisation],
+        pool_connections: int,
         timeout: int = 10,
     ):
         self.orgs: List[Organisation] = orgs
-        super().__init__(host, source, timeout)
+        super().__init__(host, source, timeout, pool_connections)
 
     @exception_handler
     def get_objects_by_object_types(
@@ -81,7 +84,7 @@ class Octopoes(HTTPService):
     def is_healthy(self) -> bool:
         healthy = True
         for org in self.orgs:
-            if not self.is_host_healthy(self.host, f"/{org.id}{self.health_endpoint}"):
+            if not self.is_host_healthy(self.host, f"{org.id}/health"):
                 return False
 
         return healthy

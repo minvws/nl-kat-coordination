@@ -11,7 +11,7 @@ alembic = "^1.8.1"
 click = "^8.1.3"
 httpx = "^0.23.3"
 jsonschema = "^4.17.0"
-pydantic = "^1.10.9"
+pydantic = "^2.4.2"
 docker = "^6.1.3"
 fastapi = "^0.101.0"
 uvicorn = "^0.20.0"
@@ -20,11 +20,11 @@ pynacl = "^1.5.0"
 sqlalchemy = "^1.4.48"
 python-dateutil = "^2.8.2"
 tldextract = "^3.4.4"
-opentelemetry-sdk = "^1.18.0"
-opentelemetry-exporter-otlp-proto-grpc = "^1.18.0"
-opentelemetry-instrumentation-fastapi = "^0.39b0"
-opentelemetry-instrumentation-psycopg2 = "^0.39b0"
-opentelemetry-instrumentation-requests = "^0.39b0"
+opentelemetry-sdk = "^1.19.0"
+opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
+opentelemetry-instrumentation-fastapi = "^0.41b0"
+opentelemetry-instrumentation-psycopg2 = "^0.41b0"
+opentelemetry-instrumentation-requests = "^0.41b0"
 # required by kat_snyk, kat_crt_sh, kat_crt_sh boefjes
 requests = "^2.31.0"
 # required by kat_binaryedge boefje
@@ -44,9 +44,9 @@ python-libnmap = "0.7.3"
 # required by kat_shodan boefje
 shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
-cryptography = "41.0.3"
+cryptography = "41.0.6"
 # required by kat_webpage_analysis/check_images normalizer
-Pillow = "9.4.0"
+Pillow = "^10.0.1"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.0.2"
 # required by kat_webpage_analysis (forcediphttpsadapter)
@@ -55,11 +55,18 @@ urllib3 = "^1.26.0"
 python-Wappalyzer = "0.3.1"
 # required by kat_wpscan
 wpscan-out-parse = "1.9.3"
+# required by kat_sec_txt
+sectxt = "0.9.0"
+# required by kat_rpki
+netaddr = "0.9.0"
+pydantic-settings = "^2.0.3"
+opentelemetry-instrumentation = "^0.41b0"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.2.2"
+pre-commit = "^3.5.0"
 pytest = "^7.2.2"
-black = "^23.1.0"
+pytest-env = "^0.8.2"
+black = "^23.11.0"
 
 [build-system]
 requires = ["setuptools>=45", "wheel"]
@@ -72,3 +79,16 @@ transform-concats = true
 [tool.black]
 target-version = ["py38", "py39", "py310", "py311"]
 line-length = 120
+
+[tool.pytest.ini_options]
+env = [
+    "KATALOGUS_DB_URI=postgresql://postgres:postgres@ci_katalogus-db:5432/ci_katalogus",
+    "QUEUE_URI=amqp://placeholder",
+    "BOEFJE_API=http://placeholder:8006",
+    "KATALOGUS_API=http://placeholder:8000",
+    "OCTOPOES_API=http://placeholder:8001",
+    "SCHEDULER_API=http://placeholder:8002",
+    "BYTES_API=http://placeholder:8003",
+    "BYTES_USERNAME=placeholder",
+    "BYTES_PASSWORD=placeholder",
+]

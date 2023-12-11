@@ -86,21 +86,21 @@
     "KAT-TLS-1.0-SUPPORT": {
         "description": "The server supports TLS version 1.0. This is a protocol that encrypts data traffic through a deprecated and discouraged protocol which has security risks.",
         "source": null,
-        "risk": "low",
+        "risk": "medium",
         "impact": null,
         "recommendation": "Disable support for TLS version 1.0."
     },
     "KAT-TLS-1.1-SUPPORT": {
         "description": "The server supports TLS version 1.1. This is a protocol that encrypts data traffic through a deprecated and discouraged protocol which has security risks.",
         "source": null,
-        "risk": "recommendation",
+        "risk": "medium",
         "impact": null,
         "recommendation": "Disable support for TLS version 1.1."
     },
     "KAT-TLS-1.0-AND-1.1-SUPPORT": {
         "description": "The server supports TLS version 1.0 and 1,1. These are protocols that encrypts data traffic using deprecated and discouraged protocols that contain security risks.",
         "source": null,
-        "risk": "low",
+        "risk": "medium",
         "impact": null,
         "recommendation": "Disable support for TLS version 1.0 and 1.1."
     },
@@ -114,7 +114,7 @@
     "KAT-NO-TLS-1.3": {
         "description": "TLS version 1.3 is not supported. This is a current and recommended protocol that securely encrypts data traffic.",
         "source": null,
-        "risk": "low",
+        "risk": "medium",
         "impact": null,
         "recommendation": "Enable support for TLS version 1.3."
     },
@@ -502,5 +502,40 @@
         "risk": "recommendation",
         "impact": null,
         "recommendation": "Ideally to minimize the attack surface as much as possible these panels should not be directly exposed to the internet"
+    },
+    "KAT-CRITICAL-BAD-CIPHER": {
+          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
+          "source": null,
+          "risk": "critical",
+          "impact": null,
+          "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
+    },
+    "KAT-MEDIUM-BAD-CIPHER": {
+          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
+          "source": null,
+          "risk": "medium",
+          "impact": null,
+          "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
+    },
+    "KAT-RECOMMENDATION-BAD-CIPHER": {
+          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
+          "source": null,
+          "risk": "recommendation",
+          "impact": null,
+          "recommendation": "It is recommended to only use ciphers labelled as 'good': TLS_AES_256_GCM_SHA384, TLS_CHACHA20_POLY1305_SHA256, TLS_AES_128_GCM_SHA256"
+    },
+    "KAT-NO-RPKI": {
+            "description": "The IP address does not have a route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+            "source": null,
+            "risk": "low",
+            "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+            "recommendation": "Work on implementing RPKI for your IP addresses. This may involve creating Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses."
+    },
+    "KAT-INVALID-RPKI": {
+            "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+            "source": null,
+            "risk": "low",
+            "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+            "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
     }
 }

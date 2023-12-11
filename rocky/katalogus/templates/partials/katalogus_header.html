@@ -1,0 +1,14 @@
+{% load i18n %}
+
+<div class="fifty-fifty">
+    <div>
+        <h1>{% translate "KAT-alogus" %}</h1>
+        <p class="emphasized">{% translate "An overview of all available plugins." %}</p>
+    </div>
+    {% if perms.tools.can_view_katalogus_settings %}
+        <div class="horizontal-view toolbar">
+            <a class="button ghost"
+               href="{% url 'katalogus_settings' organization.code %}"><span class="icon ti-settings"></span>{% translate "Settings" %}</a>
+        </div>
+    {% endif %}
+</div>

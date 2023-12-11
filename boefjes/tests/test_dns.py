@@ -1,6 +1,9 @@
+import uuid
 from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
 from unittest import TestCase
+
+from pydantic import BaseModel
 
 from boefjes.job_handler import serialize_ooi
 from boefjes.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, ObservationsWithoutInputOOI, RawDataMeta
@@ -18,7 +21,7 @@ from octopoes.models.ooi.dns.records import (
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class DnsTest(TestCase):
@@ -144,14 +147,16 @@ class DnsTest(TestCase):
             + [soa_record]
         )
 
-        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("dns-normalize.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
         results = runner.run(meta, get_dummy_data("inputs/dns-result-example.nl.json"))
 
         self.assertEqual(1, len(results.observations))
-        self.assertCountEqual(expected, results.observations[0].results)
+        self.assertCountEqual(
+            map(BaseModel.model_dump, expected), map(BaseModel.model_dump, results.observations[0].results)
+        )
 
     def test_dns_normalizer_cname(self):
         internet = Network(name="internet")
@@ -216,12 +221,12 @@ class DnsTest(TestCase):
         ]
 
         meta = NormalizerMeta(
-            id="",
+            id=uuid.UUID("72c7d302-0d6f-407a-aaec-9ffcad0ee7c6"),
             normalizer=Normalizer(id="kat_dns_normalize"),
             raw_data=RawDataMeta(
-                id="",
+                id=uuid.UUID("3b8397ba-50e4-476e-834a-2fa2595a43a5"),
                 boefje_meta=BoefjeMeta(
-                    id="1234",
+                    id=uuid.UUID("10535bba-2715-42f9-be47-ccd985b59eea"),
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
                     input_ooi="Hostname|internet|www.example.nl",
@@ -238,16 +243,18 @@ class DnsTest(TestCase):
         runner = LocalNormalizerJobRunner(local_repository)
         results = runner.run(meta, get_dummy_data("inputs/dns-result-www.example.nl.json"))
 
-        self.assertCountEqual(expected, results.observations[0].results)
+        self.assertCountEqual(
+            map(BaseModel.model_dump, expected), map(BaseModel.model_dump, results.observations[0].results)
+        )
 
     def test_parse_record_null_mx_record(self):
         meta = NormalizerMeta(
-            id="",
+            id=uuid.UUID("d7d65462-5ced-4a57-a1d7-c6d2edf38354"),
             normalizer=Normalizer(id="kat_dns_normalize"),
             raw_data=RawDataMeta(
-                id="",
+                id=uuid.UUID("94fe3b47-fb41-4ad7-b2de-1bfe63460c98"),
                 boefje_meta=BoefjeMeta(
-                    id="1234",
+                    id=uuid.UUID("f1e72e47-c11f-47e9-953a-52e3b6833eaf"),
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
                     input_ooi="Hostname|internet|english.example.nl",
@@ -286,9 +293,9 @@ class DnsTest(TestCase):
         runner = LocalNormalizerJobRunner(local_repository)
         results = runner.run(meta, answer)
 
+        expected = [cname_target, cname_record, mx_record, input_hostname]
         self.assertCountEqual(
-            [cname_target, cname_record, mx_record, input_hostname],
-            results.observations[0].results,
+            map(BaseModel.model_dump, expected), map(BaseModel.model_dump, results.observations[0].results)
         )
 
     def test_parse_cname_soa(self):
@@ -364,12 +371,12 @@ class DnsTest(TestCase):
         )
 
         meta = NormalizerMeta(
-            id="",
+            id=uuid.UUID("a2a85d54-a6ce-495d-b7a5-23c1a79f4cec"),
             normalizer=Normalizer(id="kat_dns_normalize"),
             raw_data=RawDataMeta(
-                id="",
+                id=uuid.UUID("ac481bc2-a524-4dcc-91a4-28ed9c2c142b"),
                 boefje_meta=BoefjeMeta(
-                    id="1234",
+                    id=uuid.UUID("0671b9ac-1624-4c09-a94a-4f9edbc40064"),
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
                     input_ooi="Hostname|internet|www.example.com",
@@ -385,7 +392,7 @@ class DnsTest(TestCase):
         runner = LocalNormalizerJobRunner(local_repository)
         results = runner.run(meta, get_dummy_data("inputs/dns-result-example.com-cnames.json"))
 
-        self.assertCountEqual(
+        expected = (
             [
                 zone,
                 zone_hostname,
@@ -399,8 +406,10 @@ class DnsTest(TestCase):
                 soa_hostname,
             ]
             + ns_hostnames
-            + ns_records,
-            results.observations[0].results,
+            + ns_records
+        )
+        self.assertCountEqual(
+            map(BaseModel.model_dump, expected), map(BaseModel.model_dump, results.observations[0].results)
         )
 
     def test_find_parent_dns_zone(self):
@@ -448,12 +457,12 @@ class DnsTest(TestCase):
         )
 
         meta = NormalizerMeta(
-            id="",
+            id=uuid.UUID("ee8374bb-e79f-4083-9ce9-add4f96006f2"),
             normalizer=Normalizer(id="kat_dns_zone_normalize"),
             raw_data=RawDataMeta(
-                id="",
+                id=uuid.UUID("2147da2a-921c-4c51-aef3-fa82d8d6e089"),
                 boefje_meta=BoefjeMeta(
-                    id="1234",
+                    id=uuid.UUID("ff1f0d62-a2e0-480f-8b11-5fb24974edce"),
                     boefje=Boefje(id="dns-records"),
                     organization="_dev",
                     input_ooi="DnsZone|internet|sub.example.nl",
@@ -466,19 +475,19 @@ class DnsTest(TestCase):
         runner = LocalNormalizerJobRunner(local_repository)
         results = runner.run(meta, get_dummy_data("inputs/dns-zone-result-sub.example.nl.txt"))
 
+        expected = [
+            requested_zone,
+            parent_zone,
+            parent_zone_hostname,
+            name_server_hostname,
+            soa_record,
+        ]
         self.assertCountEqual(
-            [
-                requested_zone,
-                parent_zone,
-                parent_zone_hostname,
-                name_server_hostname,
-                soa_record,
-            ],
-            results.observations[0].results,
+            map(BaseModel.model_dump, expected), map(BaseModel.model_dump, results.observations[0].results)
         )
 
     def test_exception_raised_no_input_ooi(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("dns-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("dns-normalize.json"))
         meta.raw_data.boefje_meta.input_ooi = None
 
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")

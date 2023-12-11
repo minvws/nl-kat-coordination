@@ -24,6 +24,8 @@
                                 <td>
                                     {% if setting.value is None %}
                                         {% translate "Unset" %}
+                                    {% elif setting.secret %}
+                                        •••••••••••••
                                     {% else %}
                                         {{ setting.value }}
                                     {% endif %}
@@ -49,9 +51,11 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <form action="{% url "plugin_settings_delete" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}" method="get" class="inline">
-                  {% csrf_token %}
-                  <button type="submit">{% translate "Delete" %}</button>
+                <form action="{% url "plugin_settings_delete" organization_code=organization.code plugin_type=plugin.type plugin_id=plugin.id %}"
+                      method="get"
+                      class="inline">
+                    {% csrf_token %}
+                    <button type="submit">{% translate "Delete" %}</button>
                 </form>
                 {% include "partials/pagination.html" %}
 

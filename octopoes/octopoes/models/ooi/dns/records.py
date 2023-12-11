@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
+from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
 from octopoes.models.persistence import ReferenceField
 
 
@@ -12,7 +12,7 @@ class DNSRecord(OOI, abc.ABC):
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=2)
     dns_record_type: Literal["A", "AAAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
     value: str
-    ttl: Optional[int]  # todo: validation
+    ttl: Optional[int] = None  # todo: validation
 
     _natural_key_attrs = ["hostname", "value"]
     _reverse_relation_names = {
@@ -56,7 +56,7 @@ class DNSMXRecord(DNSRecord):
     dns_record_type: Literal["MX"] = "MX"
 
     mail_hostname: Optional[Reference] = ReferenceField(Hostname, default=None)
-    preference: Optional[int]
+    preference: Optional[int] = None
 
     _reverse_relation_names = {
         "hostname": "dns_mx_records",
@@ -106,11 +106,11 @@ class DNSSOARecord(DNSRecord):
     dns_record_type: Literal["SOA"] = "SOA"
 
     soa_hostname: Reference = ReferenceField(Hostname)
-    serial: Optional[int]
-    retry: Optional[int]
-    refresh: Optional[int]
-    expire: Optional[int]
-    minimum: Optional[int]
+    serial: Optional[int] = None
+    retry: Optional[int] = None
+    refresh: Optional[int] = None
+    expire: Optional[int] = None
+    minimum: Optional[int] = None
 
     _reverse_relation_names = {
         "hostname": "dns_soa_records",
@@ -138,3 +138,20 @@ class NXDOMAIN(OOI):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"NXDOMAIN response on {reference.tokenized.hostname.name}"
+
+
+class DNSPTRRecord(DNSRecord):
+    object_type: Literal["DNSPTRRecord"] = "DNSPTRRecord"
+    dns_record_type: Literal["PTR"] = "PTR"
+    address: Optional[Reference] = ReferenceField(IPAddress)
+
+    _natural_key_attrs = ["hostname", "address"]
+
+    _reverse_relation_names = {
+        "hostname": "dns_ptr_records",
+        "address": "ptr_record_ip",
+    }
+
+    @classmethod
+    def format_reference_human_readable(cls, reference: Reference) -> str:
+        return f"{reference.tokenized.address.address} -> {reference.tokenized.hostname.name}"

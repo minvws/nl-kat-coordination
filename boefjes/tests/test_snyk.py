@@ -10,14 +10,14 @@ from octopoes.models.types import (
     Finding,
     Software,
 )
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class SnykTest(TestCase):
     maxDiff = None
 
     def test_snyk_no_findings(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("snyk-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("snyk-normalizer.json"))
 
         oois = list(
             run(
@@ -32,7 +32,7 @@ class SnykTest(TestCase):
         self.assertCountEqual(expected, oois)
 
     def test_snyk_findings(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("snyk-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("snyk-normalizer.json"))
 
         oois = list(
             run(
@@ -91,7 +91,7 @@ class SnykTest(TestCase):
 
     @mock.patch("boefjes.plugins.kat_snyk.main.requests.get")
     def test_snyk_html_parser(self, mock_get):
-        boefje_meta = BoefjeMeta.parse_raw(get_dummy_data("snyk-job.json"))
+        boefje_meta = BoefjeMeta.model_validate_json(get_dummy_data("snyk-job.json"))
 
         # Mock the first GET request
         mock_first_get = mock.Mock()

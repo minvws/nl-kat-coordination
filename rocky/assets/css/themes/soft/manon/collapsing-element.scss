@@ -1,0 +1,88 @@
+/* Collapsing element */
+
+:root {
+  --collapsing-element-list-item-last-item-border-width: 0;
+}
+
+body header nav.collapsible {
+  /* Uncollapsed state */
+  .collapsing-element {
+    position: relative;
+
+    .collapsible {
+      position: static;
+    }
+
+    .collapsing-element {
+      top: 4rem;
+      right: 0;
+      left: auto;
+      width: auto;
+
+      ul,
+      ol {
+        width: auto;
+
+        li {
+          border: 0;
+
+          &:hover {
+            background-color: var(
+              --language-selector-list-item-hover-background-color
+            );
+          }
+        }
+
+        a[aria-selected="true"] {
+          &::before {
+            content: var(--collapsible-list-selected-icon);
+          }
+
+          background-color: transparent;
+        }
+      }
+    }
+  }
+
+  /* Collapsed state */
+  &.collapsed {
+    button.collapsible-toggle {
+      &[aria-expanded="false"],
+      &[aria-expanded="true"] {
+        &.user-icon {
+          + .collapsing-element {
+            ul {
+              li:first-child {
+                border-width: 1px 0;
+                border-style: solid;
+                border-color: #d3d3d3;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .collapsing-element .collapsible {
+      flex-direction: column;
+    }
+
+    .collapsing-element .collapsible button.collapsible-toggle {
+      display: none;
+
+      &[aria-expanded="false"],
+      &[aria-expanded="true"] {
+        + .collapsing-element {
+          display: flex;
+          position: static;
+          width: 100%;
+          box-shadow: none;
+        }
+      }
+
+      &::before {
+        content: none;
+      }
+    }
+  }
+}

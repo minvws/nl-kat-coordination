@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<fieldset class="grouped-choice-list">
+<fieldset class="{{ fieldset_class }}">
     <legend>{{ field.label }}</legend>
     {% if field.field.required %}
         <span class="nota-bene">{% translate "This field is required" %}</span>
@@ -12,7 +12,7 @@
                    value="{{ choice.data.value }}"
                    id="id_{{ field.name }}_{{ forloop.counter0 }}"
                    {% if choice.data.attrs.disabled %}disabled{% endif %}
-                   {% if choice.data.attrs.checked %}checked{% endif %}/>
+                   {% if choice.data.attrs.checked %}checked{% endif %} />
             <label for="id_{{ field.name }}_{{ forloop.counter0 }}">
                 {% if choice.data.attrs.radio_paws %}
                     {% include "partials/scan_level_indicator.html" with value=choice.data.value custom_class=choice.data.attrs.class %}

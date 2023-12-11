@@ -1,0 +1,9 @@
+    {
+        "id": "testssl-sh-ciphers",
+        "name": "Testssl.sh Ciphers",
+        "description": "Run testssl.sh Docker container and check ciphers",
+        "consumes": [
+            "IPService"
+        ],
+        "scan_level": 2
+    }

@@ -1,19 +1,17 @@
 import uuid
 
 import pytest
-from pydantic import ValidationError
 
 from bytes.config import get_settings
 from bytes.raw.file_raw_repository import FileRawRepository
 from bytes.raw.middleware import NaclBoxMiddleware
-from bytes.repositories.meta_repository import RawDataFilter
 from tests.loading import get_raw_data
 
 
 def has_encryption_keys() -> bool:
     settings = get_settings()
 
-    return settings.kat_private_key_b64 and settings.vws_public_key_b64
+    return settings.private_key_b64 and settings.public_key_b64
 
 
 def test_save_raw(raw_repository: FileRawRepository) -> None:
@@ -34,11 +32,3 @@ def test_nacl_middleware(nacl_middleware: NaclBoxMiddleware) -> None:
 
     assert encrypted != msg
     assert decrypted == msg
-
-
-def test_filter_validator() -> None:
-    with pytest.raises(ValidationError):
-        RawDataFilter()
-
-    RawDataFilter(organization="Not None")
-    RawDataFilter(boefje_meta_id="3a9f1b33-f703-4c32-b0ae-44d0473c8aa5")

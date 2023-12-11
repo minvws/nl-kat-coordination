@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -222,7 +222,7 @@ def filter_ooi_tree_item(ooi_node, show_types, hide_types, self_excluded_from_fi
 
 
 def get_finding_type_from_finding(finding: Finding) -> FindingType:
-    return parse_obj_as(
+    return TypeAdapter(
         Union[
             KATFindingType,
             CVEFindingType,
@@ -230,11 +230,12 @@ def get_finding_type_from_finding(finding: Finding) -> FindingType:
             RetireJSFindingType,
             SnykFindingType,
             CAPECFindingType,
-        ],
+        ]
+    ).validate_python(
         {
             "object_type": finding.finding_type.class_,
             "id": finding.finding_type.natural_key,
-        },
+        }
     )
 
 
@@ -253,7 +254,7 @@ def get_or_create_ooi(
         return api_connector.get(ooi.reference, observed_at), False
     except ObjectNotFoundException:
         if observed_at < _now:
-            # don't create an OOI when expected valid_time is in the past
+            # don't create an OOI when expected observed_at is in the past
             raise ValueError(f"OOI not found and unable to create at {observed_at}")
 
         create_ooi(api_connector, bytes_client, ooi, observed_at)

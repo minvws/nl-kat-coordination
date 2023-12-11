@@ -5,6 +5,8 @@
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
+# Do not turn on OpenTelemetry when building Rocky
+unexport SPAN_EXPORT_GRPC_ENDPOINT
 
 build: build-rocky build-rocky-frontend
 
@@ -52,8 +54,9 @@ export_migrations:
 	python manage.py export_migrations accounts 0001
 
 languages:
-	python manage.py makemessages --locale nl
-	python manage.py makemessages --locale pap
+	# Extracts strings to `.pot` file which should be translated
+  # Note that the creation of `.po` files is delegated to another tool (Weblate)
+	python manage.py makemessages -i "venv/*" -i "build/*" -i "octopoes/*" -i "node_modules/*" --verbosity 2 --add-location file -a --keep-pot
 
 lang: languages
 
