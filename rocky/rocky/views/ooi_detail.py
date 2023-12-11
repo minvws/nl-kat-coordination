@@ -1,5 +1,4 @@
 import json
-import uuid
 from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
@@ -24,7 +23,6 @@ from tools.view_helpers import schedule_task
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
 from rocky import scheduler
-from rocky.scheduler import client
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
 
@@ -64,15 +62,7 @@ class OOIDetailView(
         try:
             if action == PageActions.RESCHEDULE_TASK.value:
                 task_id = self.request.POST.get("task_id")
-                task = client.get_task_details(task_id)
-
-                # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-                new_id = uuid.uuid4()
-
-                task.p_item.id = new_id
-                task.p_item.data.id = new_id
-
-                schedule_task(self.request, self.organization.code, task.p_item)
+                schedule_task(self.request, self.organization.code, task_id)
 
             if action == PageActions.START_SCAN.value:
                 boefje_id = self.request.POST.get("boefje_id")
