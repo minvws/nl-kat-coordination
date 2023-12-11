@@ -114,8 +114,8 @@ class TestAPI(TestCase):
         assert self.client.get(f"/v1/organisations/{new_org_id}/plugins/{plug}").json()["enabled"] is False
 
         # Enable two boefjes that should get disabled by the cloning
-        self.client.patch(f"/v1/organisations/{new_org_id}/repositories/LOCAL/plugins/nmap", json={"enabled": True})
-        assert self.client.get(f"/v1/organisations/{new_org_id}/plugins/nmap").json()["enabled"] is True
+        self.client.patch(f"/v1/organisations/{new_org_id}/repositories/LOCAL/plugins/nmap-tcp", json={"enabled": True})
+        assert self.client.get(f"/v1/organisations/{new_org_id}/plugins/nmap-tcp").json()["enabled"] is True
 
         # Call the clone endpoint
         self.client.post(f"/v1/organisations/{self.org.id}/settings/clone/{new_org_id}")
@@ -129,5 +129,5 @@ class TestAPI(TestCase):
         assert response.json()["enabled"] is True
 
         # And the originally enabled boefje got disabled
-        response = self.client.get(f"/v1/organisations/{new_org_id}/plugins/nmap")
+        response = self.client.get(f"/v1/organisations/{new_org_id}/plugins/nmap-tcp")
         assert response.json()["enabled"] is False
