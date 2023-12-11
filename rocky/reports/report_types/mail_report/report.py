@@ -52,28 +52,26 @@ class MailReport(Report):
             "input_ooi": input_ooi,
             "mail_security_measures": mail_security_measures,
             "number_of_hostnames": len(hostnames),
-            "number_of_spf": self.number_of_spf,
-            "number_of_dmarc": self.number_of_dmarc,
-            "number_of_dkim": self.number_of_dkim,
+            "number_of_spf": (len(hostnames) - self.number_of_spf),
+            "number_of_dmarc": (len(hostnames) - self.number_of_dmarc),
+            "number_of_dkim": (len(hostnames) - self.number_of_dkim),
         }
 
     def __get_measures(self, valid_time: datetime, hostname):
         finding_types = []
+        measures = []
         finding_types = self.octopoes_api_connector.query(
             "Hostname.<ooi[is Finding].finding_type", valid_time, hostname
         )
-        finding_types_ids = [x.id for x in finding_types]
+        for finding in finding_types:
+            if finding.id == "KAT-NO-SPF":
+                self.number_of_spf += 1
+                measures.append(finding)
+            elif finding.id == "KAT-NO-DMARC":
+                self.number_of_dmarc += 1
+                measures.append(finding)
+            elif finding.id == "KAT-NO-DKIM":
+                self.number_of_dkim += 1
+                measures.append(finding)
 
-        has_no_spf = "KAT-NO-SPF" in finding_types_ids
-        has_no_dmarc = "KAT-NO-DMARC" in finding_types_ids
-        has_no_dkim = "KAT-NO-DKIM" in finding_types_ids
-
-        if not has_no_spf:
-            self.number_of_spf += 1
-        if not has_no_dmarc:
-            self.number_of_dmarc += 1
-        if not has_no_dkim:
-            self.number_of_dkim += 1
-
-        measures = {"has_no_spf": has_no_spf, "has_no_dmarc": has_no_dmarc, "has_no_dkim": has_no_dkim}
         return measures

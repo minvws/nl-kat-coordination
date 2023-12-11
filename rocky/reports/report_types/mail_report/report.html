@@ -25,4 +25,22 @@
             </tbody>
         </table>
     </p>
+    <p class="column-2">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "Compliance issue" %}</th>
+                    <th scope="col">{% translate "Risk level" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for measure in data.mail_security_measures.measures %}
+                    <tr>
+                        <td>{{ measure.description }}</td>
+                        <td>{{ measure.risk_severity }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </p>
 </p>
