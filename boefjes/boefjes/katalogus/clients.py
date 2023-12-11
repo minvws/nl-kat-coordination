@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 
-from pydantic.tools import parse_obj_as
+from pydantic import TypeAdapter
 from requests import Session
 
 from boefjes.katalogus.models import PluginType, Repository
@@ -33,7 +33,7 @@ class PluginRepositoryClient(PluginRepositoryClientInterface):
         res = self._session.get(f"{repository.base_url}/plugins", params={"plugin_type": plugin_type})
         res.raise_for_status()
 
-        plugins = parse_obj_as(Dict[str, PluginType], res.json())
+        plugins = TypeAdapter(Dict[str, PluginType]).validate_json(res.content)
 
         for plugin in plugins.values():
             plugin.repository = repository.id
@@ -44,4 +44,4 @@ class PluginRepositoryClient(PluginRepositoryClientInterface):
         res = self._session.get(f"{repository.base_url}/plugins/{plugin_id}")
         res.raise_for_status()
 
-        return parse_obj_as(PluginType, res.json())
+        return PluginType.model_validate_json(res.content)

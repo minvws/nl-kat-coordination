@@ -7,9 +7,9 @@ from octopoes.models.persistence import ReferenceField
 class Software(OOI):
     object_type: Literal["Software"] = "Software"
 
-    name: Optional[str]
-    version: Optional[str]
-    cpe: Optional[str]
+    name: str
+    version: Optional[str] = None
+    cpe: Optional[str] = None
 
     _natural_key_attrs = ["name", "version", "cpe"]
     _information_value = ["name"]

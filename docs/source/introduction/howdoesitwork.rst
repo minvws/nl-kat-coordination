@@ -5,22 +5,22 @@ How does OpenKAT work?
 General notes
 =============
 
-OpenKAT aims to monitor, record and analyze the status of information systems. OpenKAT scans networks, analyzes vulnerabilities and creates accessible reports. It integrates the most widely used network tools and scanning software into a modular framework, accesses external databases such as and combines the information from all these sources into clear reports.
+OpenKAT aims to monitor, record and analyze the status of information systems. OpenKAT scans networks, analyzes vulnerabilities and creates accessible reports. It integrates the most widely used network tools and scanning software into a modular framework, accesses external (public) databases such as Shodan and combines the information from all these sources into clear reports.
 
 What OpenKAT adds to the available security and monitoring tools is the ability to combine the output from different sources for the purpose of analysis. Thanks to its object-oriented data model and forensically secured database, OpenKAT contains a complete overview and timeline of monitored systems. This makes the development through time insightful for analysis and provable for audits and controls.
 
 .. image:: img/stappenopenkat.png
   :alt: steps in OpenKAT
 
-OpenKAT uses a configurable data model. All information is translated into objects, which are stored in the database. This contains both the original information and the objects. Analysis is done on the database based on business rules, noting changes. OpenKAT delivers findings in a dashboard or via reporting software.
+OpenKAT uses a configurable data model. All information is translated into objects, which are stored in the database. This contains both the original information and the objects. Analysis is done on the database based on business rules, observing changes with previous points in time. OpenKAT delivers findings in a dashboard or via reporting software.
 
 
 Basic concepts
 ==============
 
-Central to OpenKAT are objects and the data model. Objects are created by collecting and analyzing information. The objects found are analyzed using business rules, leading to findings that are included as objects in the data model.
+Central to OpenKAT are objects and the data model. Objects (or 'Objects Of Interest, OOI') are created by collecting and analyzing information. The objects found are analyzed using business rules, leading to findings that are included as objects in the data model.
 
-The data model helps in the search for more information, through the logical coherence of objects. When an object is found, OpenKAT automatically checks whether related objects are also present. Based on this, it searches for information again, completing the circle.
+The data model helps in the search for more information, through the logical coherence of objects. Object types are defined in the data model. When an object is found, OpenKAT automatically checks whether related objects are also present. Based on this, it searches for information again, completing the circle.
 
 Objects, the data model and recursivity
 ***************************************
@@ -53,7 +53,7 @@ Intrusion levels or indemnities:
 
 :L4: 'intensive scanning'.
 
-If scanning with OpenKAT poses a risk then it applies to all actors who have access to this particular system and is already worthy of a finding.
+If scanning with OpenKAT poses a risk then it applies to all actors who have access to this particular system and this would already be worthy of a finding.
 
 Users and organizations
 ***********************
@@ -62,7 +62,7 @@ Scanning and reporting in OpenKAT are different systems with separate users. The
 
 :Red team user: Gives the system a certain command and safeguard ('scan this network, with this intrusion level'). Based on this, OpenKAT collects information.
 
-:Reporting user: Has read only access to the objects, can look through time at the scans done and see what findings the system has created.
+:Reporting user: Has read only access to the objects, can look through time at the performed scans and see what findings the system has created.
 
 System design
 =============
@@ -102,16 +102,5 @@ Reports can be created in a couple of ways. In the standard installation of Open
 - missing headers
 - SSL problems and certificates
 - SPF and mail configuration
-
-Specific reports:
-
-- DNS reporting
-- Internet.com (partial)
-- SSL report with certificates
-
-GraphQL:
-
-- Simple input for queries
-- Build complex queries yourself
 
 OpenKAT can generate reports in a number of formats, including LaTeX and PDF. An API is also available that can interface with other systems.

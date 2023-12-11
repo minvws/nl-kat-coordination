@@ -7,14 +7,14 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class SecurityTXTTest(TestCase):
     maxDiff = None
 
     def test_security_txt_same_website(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("security-txt-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("security-txt-normalizer.json"))
 
         oois = list(
             run(
@@ -41,7 +41,7 @@ class SecurityTXTTest(TestCase):
         self.assertEqual(expected, oois)
 
     def test_security_txt_different_website(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("security-txt-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("security-txt-normalizer.json"))
 
         oois = list(
             run(

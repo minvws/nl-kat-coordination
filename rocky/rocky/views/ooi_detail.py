@@ -18,6 +18,7 @@ from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification
 from tools.ooi_helpers import format_display
+from tools.view_helpers import schedule_task
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
@@ -29,6 +30,7 @@ from rocky.views.ooi_view import BaseOOIDetailView
 class PageActions(Enum):
     START_SCAN = "start_scan"
     SUBMIT_ANSWER = "submit_answer"
+    RESCHEDULE_TASK = "reschedule_task"
 
 
 class OOIDetailView(
@@ -58,6 +60,10 @@ class OOIDetailView(
 
     def handle_page_action(self, action: str) -> bool:
         try:
+            if action == PageActions.RESCHEDULE_TASK.value:
+                task_id = self.request.POST.get("task_id")
+                schedule_task(self.request, self.organization.code, task_id)
+
             if action == PageActions.START_SCAN.value:
                 boefje_id = self.request.POST.get("boefje_id")
                 ooi_id = self.request.GET.get("ooi_id")
@@ -95,7 +101,6 @@ class OOIDetailView(
         # self.ooi is already the current state of the OOI
         if self.get_observed_at().date() == datetime.utcnow().date():
             return self.ooi
-
         try:
             return self.get_ooi(pk=self.get_ooi_id(), observed_at=datetime.now(timezone.utc))
         except Http404:
@@ -109,7 +114,7 @@ class OOIDetailView(
 
         # FIXME: in context of ooi detail is doesn't make sense to search
         # for an object name, so we search on plugin id
-        plugin_id = self.request.GET.get("task_history_search")
+        plugin_id = self.request.GET.get("task_history_search") or None
 
         page = int(self.request.GET.get("task_history_page", 1))
 

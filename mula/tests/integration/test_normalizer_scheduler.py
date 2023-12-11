@@ -27,7 +27,9 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
+
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
@@ -216,7 +218,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             ),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
-        )
+        ).model_dump_json()
 
         # Mocks
         self.mock_get_normalizers_for_mime_type.return_value = [
@@ -263,7 +265,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             ),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
-        )
+        ).model_dump_json()
 
         # Mocks
         self.mock_get_normalizers_for_mime_type.return_value = []
@@ -303,7 +305,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             ),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
-        )
+        ).model_dump_json()
 
         self.mock_get_normalizers_for_mime_type.return_value = [
             NormalizerFactory(),
@@ -345,7 +347,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             ),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
-        )
+        ).model_dump_json()
 
         self.mock_get_normalizers_for_mime_type.return_value = [
             NormalizerFactory(),
@@ -388,7 +390,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             ),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
-        )
+        ).model_dump_json()
 
         self.mock_get_normalizers_for_mime_type.return_value = [
             NormalizerFactory(),
@@ -431,7 +433,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             ),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
-        )
+        ).model_dump_json()
 
         raw_data_event2 = models.RawDataReceivedEvent(
             raw_data=RawDataFactory(
@@ -440,7 +442,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             ),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
-        )
+        ).model_dump_json()
 
         self.mock_get_normalizers_for_mime_type.return_value = [
             NormalizerFactory(),
@@ -487,7 +489,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             ),
             organization=self.organisation.name,
             created_at=datetime.datetime.now(),
-        )
+        ).model_dump_json()
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -525,7 +527,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
                 ),
                 organization=self.organisation.name,
                 created_at=datetime.datetime.now(),
-            )
+            ).model_dump_json()
 
             events.append(raw_data_event)
 

@@ -45,16 +45,37 @@ class HydratedFinding:
 
 class OriginData(BaseModel):
     origin: Origin
-    normalizer: Optional[dict]
-    boefje: Optional[Boefje]
-    params: Optional[Dict[str, str]]
+    normalizer: Optional[dict] = None
+    boefje: Optional[Boefje] = None
+    params: Optional[Dict[str, str]] = None
 
 
 class OOIAttributeError(AttributeError):
     pass
 
 
-class OctopoesView(OrganizationView):
+class ObservedAtMixin:
+    def get_observed_at(self) -> datetime:
+        observed_at = self.request.GET.get("observed_at", None)
+        if not observed_at:
+            return datetime.now(timezone.utc)
+
+        try:
+            datetime_format = "%Y-%m-%d"
+            return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
+        except ValueError:
+            try:
+                ret = datetime.fromisoformat(observed_at)
+                if not ret.tzinfo:
+                    ret = ret.replace(tzinfo=timezone.utc)
+
+                return ret
+            except ValueError:
+                messages.error(self.request, _("Can not parse date, falling back to show current date."))
+                return datetime.now(timezone.utc)
+
+
+class OctopoesView(ObservedAtMixin, OrganizationView):
     def get_single_ooi(self, pk: str, observed_at: Optional[datetime] = None) -> OOI:
         try:
             ref = Reference.from_str(pk)
@@ -109,22 +130,6 @@ class OctopoesView(OrganizationView):
             raise Http404("OOI not found")
 
         raise exception
-
-    def get_observed_at(self) -> datetime:
-        observed_at = self.request.GET.get("observed_at", None)
-        if not observed_at:
-            return datetime.now(timezone.utc)
-
-        try:
-            datetime_format = "%Y-%m-%dT%H:%M:%S"
-            return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
-        except ValueError:
-            try:
-                datetime_format = "%Y-%m-%d"
-                return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
-            except ValueError:
-                messages.error(self.request, _("Can not parse date, falling back to show current date."))
-                return datetime.now(timezone.utc)
 
     def get_depth(self, default_depth=DEPTH_DEFAULT) -> int:
         try:
@@ -254,20 +259,19 @@ class FindingList:
         raise NotImplementedError("FindingList only supports slicing")
 
 
+_EXCLUDED_OOI_TYPES = ("Finding", "FindingType")
+
+
 class MultipleOOIMixin(OctopoesView):
     ooi_types: Set[Type[OOI]] = None
-    ooi_type_filters: List = []
     filtered_ooi_types: List[str] = []
 
     def get_list(
-        self,
-        observed_at: datetime,
-        scan_level: Set[ScanLevel],
-        scan_profile_type: Set[ScanProfileType],
+        self, observed_at: datetime, scan_level: Set[ScanLevel], scan_profile_type: Set[ScanProfileType]
     ) -> OOIList:
         ooi_types = self.ooi_types
         if self.filtered_ooi_types:
-            ooi_types = {type_by_name(t) for t in self.filtered_ooi_types}
+            ooi_types = {type_by_name(t) for t in self.filtered_ooi_types if t not in _EXCLUDED_OOI_TYPES}
         return OOIList(
             self.octopoes_api_connector,
             ooi_types,
@@ -345,8 +349,11 @@ class SingleOOIMixin(OctopoesView):
 
 
 class SingleOOITreeMixin(SingleOOIMixin):
-    depth: int = 2
     tree: ReferenceTree
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.depth = self.get_depth()
 
     def get_ooi(self, pk: str = None, observed_at: Optional[datetime] = None) -> OOI:
         if pk is None:
@@ -355,14 +362,10 @@ class SingleOOITreeMixin(SingleOOIMixin):
         if observed_at is None:
             observed_at = self.get_observed_at()
 
-        if self.depth == 1:
-            return self.get_single_ooi(pk, observed_at)
-
         return self.get_object_from_tree(pk, observed_at)
 
     def get_object_from_tree(self, pk: str, observed_at: Optional[datetime] = None) -> OOI:
         self.tree = self.get_ooi_tree(pk, self.depth, observed_at)
-
         return self.tree.store[str(self.tree.root.reference)]
 
 

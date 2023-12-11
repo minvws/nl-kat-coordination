@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from logging import getLogger
 from typing import Any, Dict, List
 
@@ -12,6 +13,7 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
+from tools.view_helpers import schedule_task
 
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
@@ -19,6 +21,10 @@ from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky import scheduler
 
 logger = getLogger(__name__)
+
+
+class PageActions(Enum):
+    RESCHEDULE_TASK = "reschedule_task"
 
 
 class PluginCoverImgView(OrganizationView):
@@ -64,10 +70,24 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
 
         return Paginator(task_history, self.task_history_limit).page(page)
 
+    def post(self, request, *args, **kwargs):
+        action = request.POST["action"]
+
+        if action:
+            self.handle_page_action(action)
+            return redirect(request.path)
+        else:
+            return self.get(request, *args, **kwargs)
+
+    def handle_page_action(self, action: str) -> None:
+        if action == PageActions.RESCHEDULE_TASK.value:
+            task_id = self.request.POST.get("task_id")
+            schedule_task(self.request, self.organization.code, task_id)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["task_history"] = self.get_task_history()
         context["task_history_form_fields"] = [
             "task_history_from",
@@ -123,7 +143,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
             context["select_oois_form"] = SelectOOIForm(
                 oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
@@ -144,6 +164,12 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
         return context
 
     def post(self, request, *args, **kwargs):
+        action = request.POST["action"]
+
+        if action == PageActions.RESCHEDULE_TASK.value:
+            self.handle_page_action(action)
+            return redirect(request.path)
+
         """Start scanning oois at plugin detail page."""
         if not self.indemnification_present:
             return self.get(request, *args, **kwargs)

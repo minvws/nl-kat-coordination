@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from enum import Enum
 
@@ -13,7 +12,7 @@ from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 from tools.view_helpers import schedule_task
 
-from rocky.scheduler import client
+from rocky.scheduler import TaskNotFoundError, client
 
 TASK_LIMIT = 50
 
@@ -24,23 +23,15 @@ class PageActions(Enum):
 
 class DownloadTaskDetail(OrganizationView):
     def get(self, request, *args, **kwargs):
-        task_id = kwargs["task_id"]
-        filename = "task_" + task_id + ".json"
-        task_details = client.get_task_details(task_id)
-        if not self.is_task_id(task_id) or "detail" in task_details:
-            return self.show_error_message()
-        response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
-        response["Content-Disposition"] = "attachment; filename=" + filename
-        return response
-
-    def is_task_id(self, task_id):
-        forbidden_chars = ["/", ".", " "]
-        for char in forbidden_chars:
-            return char not in str(task_id)
-
-    def show_error_message(self):
-        error_message = _("Task details not found.")
-        messages.add_message(self.request, messages.ERROR, error_message)
+        try:
+            task_id = kwargs["task_id"]
+            filename = "task_" + task_id + ".json"
+            task_details = client.get_task_details(self.organization.code, task_id)
+            response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
+            response["Content-Disposition"] = "attachment; filename=" + filename
+            return response
+        except TaskNotFoundError as error:
+            messages.error(self.request, error.message)
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
@@ -88,15 +79,7 @@ class TaskListView(OrganizationView, ListView):
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
-            task = client.get_task_details(task_id)
-
-            # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-            new_id = uuid.uuid4()
-
-            task.p_item.id = new_id
-            task.p_item.data.id = new_id
-
-            schedule_task(self.request, self.organization.code, task.p_item)
+            schedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

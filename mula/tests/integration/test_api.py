@@ -23,7 +23,9 @@ class APITemplateTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
+
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
@@ -406,7 +408,8 @@ class APITestCase(APITemplateTestCase):
 
         # Should get the first item
         response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/pop", json=[{"field": "name", "operator": "eq", "value": "test"}]
+            f"/queues/{self.scheduler.scheduler_id}/pop",
+            json={"filters": [{"column": "data", "field": "name", "operator": "eq", "value": "test"}]},
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(str(first_item.id), response.json().get("id"))
@@ -414,7 +417,8 @@ class APITestCase(APITemplateTestCase):
 
         # Should not return any items
         response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/pop", json=[{"field": "id", "operator": "eq", "value": "123"}]
+            f"/queues/{self.scheduler.scheduler_id}/pop",
+            json={"filters": [{"column": "data", "field": "id", "operator": "eq", "value": "123"}]},
         )
         self.assertEqual(404, response.status_code)
         self.assertEqual({"detail": "could not pop item from queue, check your filters"}, response.json())
@@ -422,7 +426,8 @@ class APITestCase(APITemplateTestCase):
 
         # Should get the second item
         response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/pop", json=[{"field": "name", "operator": "eq", "value": "test"}]
+            f"/queues/{self.scheduler.scheduler_id}/pop",
+            json={"filters": [{"column": "data", "field": "name", "operator": "eq", "value": "test"}]},
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(str(second_item.id), response.json().get("id"))
@@ -561,6 +566,28 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         response = self.client.get("/tasks", params=params)
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, len(response.json()["results"]))
+
+    def test_get_tasks_filtered(self):
+        response = self.client.post(
+            "/tasks", json={"filters": [{"column": "p_item", "field": "data__name", "operator": "eq", "value": "test"}]}
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(2, len(response.json()["results"]))
+
+        response = self.client.post(
+            "/tasks", json={"filters": [{"column": "p_item", "field": "data__id", "operator": "eq", "value": "123"}]}
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["results"]))
+
+        response = self.client.post(
+            "/tasks",
+            json={
+                "filters": [{"column": "p_item", "field": "data__child__name", "operator": "eq", "value": "test.child"}]
+            },
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(1, len(response.json()["results"]))
 
     def test_patch_tasks(self):
         # Patch a task

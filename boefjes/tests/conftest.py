@@ -8,14 +8,14 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
-from pydantic import parse_raw_as
+from pydantic import TypeAdapter
 
 from boefjes.app import SchedulerWorkerManager
 from boefjes.clients.scheduler_client import Queue, QueuePrioritizedItem, SchedulerClientInterface, Task, TaskStatus
 from boefjes.config import Settings
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.runtime_interfaces import Handler, WorkerManager
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class MockSchedulerClient(SchedulerClientInterface):
@@ -44,20 +44,20 @@ class MockSchedulerClient(SchedulerClientInterface):
 
     def get_queues(self) -> List[Queue]:
         time.sleep(self.sleep_time)
-        return parse_raw_as(List[Queue], self.queue_response)
+        return TypeAdapter(List[Queue]).validate_json(self.queue_response)
 
     def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
         time.sleep(self.sleep_time)
 
         try:
             if WorkerManager.Queue.BOEFJES.value in queue:
-                p_item = parse_raw_as(QueuePrioritizedItem, self.boefje_responses.pop(0))
+                p_item = TypeAdapter(QueuePrioritizedItem).validate_json(self.boefje_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 self._tasks[str(p_item.id)] = self._task_from_id(p_item.id)
                 return p_item
 
             if WorkerManager.Queue.NORMALIZERS.value in queue:
-                p_item = parse_raw_as(QueuePrioritizedItem, self.normalizer_responses.pop(0))
+                p_item = TypeAdapter(QueuePrioritizedItem).validate_json(self.normalizer_responses.pop(0))
                 self._popped_items[str(p_item.id)] = p_item
                 return p_item
         except IndexError:

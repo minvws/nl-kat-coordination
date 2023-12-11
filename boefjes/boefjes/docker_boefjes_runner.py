@@ -19,9 +19,9 @@ class DockerBoefjesRunner:
         self.boefje_resource = boefje_resource
         self.boefje_meta = boefje_meta
         self.docker_client = docker.from_env()
-        self.scheduler_client = SchedulerAPIClient(settings.scheduler_api)
+        self.scheduler_client = SchedulerAPIClient(str(settings.scheduler_api))
         self.bytes_api_client = BytesAPIClient(
-            settings.bytes_api,
+            str(settings.bytes_api),
             username=settings.bytes_username,
             password=settings.bytes_password,
         )
@@ -31,9 +31,9 @@ class DockerBoefjesRunner:
             raise RuntimeError("Boefje does not have OCI image")
 
         # local import to prevent circular dependency
-        from boefjes import job_handler
+        import boefjes.plugins.models
 
-        stderr_mime_types = job_handler._collect_default_mime_types(self.boefje_meta)
+        stderr_mime_types = boefjes.plugins.models._default_mime_types(self.boefje_meta.boefje)
 
         task_id = str(self.boefje_meta.id)
         self.scheduler_client.patch_task(task_id, TaskStatus.RUNNING)

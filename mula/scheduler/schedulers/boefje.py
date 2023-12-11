@@ -20,6 +20,7 @@ from scheduler.models import (
     ScanProfileMutation,
     TaskStatus,
 )
+from scheduler.storage import filters
 
 from .scheduler import Scheduler
 
@@ -114,13 +115,16 @@ class BoefjeScheduler(Scheduler):
         )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_scan_profile_mutations")
-    def push_tasks_for_scan_profile_mutations(self, mutation: ScanProfileMutation) -> None:
+    def push_tasks_for_scan_profile_mutations(self, body: bytes) -> None:
         """Create tasks for oois that have a scan level change.
 
         Args:
             mutation: The mutation that was received.
         """
-        self.logger.info(
+        # Convert body into a ScanProfileMutation
+        mutation = ScanProfileMutation.parse_raw(body)
+
+        self.logger.debug(
             "Received scan level mutation %s for: %s [ooi_primary_key=%s, organisation_id=%s, scheduler_id=%s]",
             mutation.operation,
             mutation.primary_key,
@@ -144,13 +148,16 @@ class BoefjeScheduler(Scheduler):
             # remove them from the queue.
             items, _ = self.ctx.datastores.pq_store.get_items(
                 scheduler_id=self.scheduler_id,
-                filters=[
-                    models.Filter(
-                        field="input_ooi",
-                        operator="eq",
-                        value=ooi.primary_key,
-                    ),
-                ],
+                filters=filters.FilterRequest(
+                    filters=[
+                        filters.Filter(
+                            column="data",
+                            field="input_ooi",
+                            operator="eq",
+                            value=ooi.primary_key,
+                        ),
+                    ],
+                ),
             )
 
             # Delete all items for this ooi, update all tasks for this ooi
