@@ -1,11 +1,10 @@
 from unittest import TestCase
 
-from tests.loading import get_boefje_meta, get_dummy_data, get_normalizer_meta
-
 from boefjes.job_handler import serialize_ooi
 from boefjes.plugins.kat_nmap_tcp.main import Protocol, build_nmap_arguments
 from boefjes.plugins.kat_nmap_tcp.normalize import run
 from octopoes.models.ooi.network import IPAddressV4, Network
+from tests.loading import get_boefje_meta, get_dummy_data, get_normalizer_meta
 
 
 class NmapTest(TestCase):
