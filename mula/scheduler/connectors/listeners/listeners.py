@@ -1,10 +1,10 @@
 import functools
-import logging
 import socket
 from concurrent import futures
 from typing import Callable, Optional
 
 import pika
+import structlog
 from retry import retry
 
 from ..connector import Connector  # noqa: TID252
@@ -24,7 +24,7 @@ class Listener(Connector):
 
     def __init__(self) -> None:
         super().__init__()
-        self.logger = logging.getLogger(__name__)
+        self.logger = structlog.getLogger(__name__)
 
     def listen(self) -> None:
         raise NotImplementedError

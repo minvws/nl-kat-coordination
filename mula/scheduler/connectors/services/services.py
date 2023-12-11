@@ -3,6 +3,7 @@ import urllib.parse
 from typing import Any, Dict, MutableMapping, Optional, Union
 
 import requests
+import structlog
 from requests.adapters import HTTPAdapter, Retry
 
 from ..connector import Connector  # noqa: TID252
@@ -66,7 +67,7 @@ class HTTPService(Connector):
         """
         super().__init__()
 
-        self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
+        self.logger: logging.Logger = structlog.getLogger(self.__class__.__name__)
         self.session: requests.Session = requests.Session()
         self.host: str = host
         self.timeout: int = timeout

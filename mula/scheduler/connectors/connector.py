@@ -1,16 +1,16 @@
-import logging
 import socket
 import time
 from typing import Callable
 
 import requests
+import structlog
 
 
 class Connector:
     """A class that provides methods to check if a host is available and healthy."""
 
     def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = structlog.getLogger(self.__class__.__name__)
 
     def is_host_available(self, hostname: str, port: int) -> bool:
         """Check if the host is available.

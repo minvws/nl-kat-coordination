@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 
 import fastapi
 import prometheus_client
+import structlog
 import uvicorn
 from fastapi import status
 from opentelemetry import trace
@@ -44,7 +45,7 @@ class Server:
             s: A dict containing all the schedulers.
         """
 
-        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.logger: logging.Logger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.schedulers: Dict[str, schedulers.Scheduler] = s
         self.config: settings.Settings = settings.Settings()

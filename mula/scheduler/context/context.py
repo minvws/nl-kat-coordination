@@ -3,6 +3,7 @@ import logging.config
 from pathlib import Path
 from types import SimpleNamespace
 
+import structlog
 from prometheus_client import CollectorRegistry, Gauge, Info
 
 import scheduler
@@ -40,6 +41,20 @@ class AppContext:
         # Load logging configuration
         with Path(self.config.log_cfg).open("rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
+
+        # Configure structlog
+        structlog.configure(
+            processors=[
+                structlog.stdlib.filter_by_level,
+                structlog.processors.StackInfoRenderer(),
+                structlog.processors.format_exc_info,
+                structlog.processors.JSONRenderer()
+            ],
+            context_class=dict,
+            logger_factory=structlog.stdlib.LoggerFactory(),
+            wrapper_class=structlog.stdlib.BoundLogger,
+            cache_logger_on_first_use=True,
+        )
 
         # Services
         katalogus_service = services.Katalogus(

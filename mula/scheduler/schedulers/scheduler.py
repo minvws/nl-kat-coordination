@@ -6,6 +6,8 @@ import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
+import structlog
+
 from scheduler import connectors, context, models, queues, storage, utils
 from scheduler.utils import thread
 
@@ -61,7 +63,7 @@ class Scheduler(abc.ABC):
                 the queue.
         """
 
-        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.logger: logging.Logger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.enabled: bool = True
         self.scheduler_id: str = scheduler_id

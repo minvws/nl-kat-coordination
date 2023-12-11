@@ -1,9 +1,9 @@
-import logging
 from concurrent import futures
 from types import SimpleNamespace
 from typing import Callable, Dict, List, Optional
 
 import requests
+import structlog
 from opentelemetry import trace
 
 from scheduler import context, queues, rankers
@@ -41,7 +41,7 @@ class NormalizerScheduler(Scheduler):
         queue: Optional[queues.PriorityQueue] = None,
         callback: Optional[Callable[..., None]] = None,
     ):
-        self.logger = logging.getLogger(__name__)
+        self.logger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
 
         self.queue = queue or queues.NormalizerPriorityQueue(
