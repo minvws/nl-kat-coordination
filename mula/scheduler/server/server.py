@@ -633,12 +633,7 @@ class Server:
                 limit=limit,
                 filters=filters,
             )
-        except storage.filters.errors.FilterError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
-            ) from exc
-        except ValueError as exc:
+        except (storage.filters.errors.FilterError, ValueError) as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail=str(exc),
