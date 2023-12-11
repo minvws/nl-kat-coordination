@@ -252,7 +252,10 @@ function renderfield(required, originalvalue, path, name, field) {
       input.max = field['exclusiveMaximum']-1;
     }
   }
-  if (field['description']) {
+  if (field['default']) {
+    input.value = field['default'];
+    input.placeholder = field['default'];
+  } else if (field['description']) {
     input.placeholder = field['description'];
   }
   if (field['minLength']) {
@@ -261,7 +264,6 @@ function renderfield(required, originalvalue, path, name, field) {
   if (field['maxLength']) {
     input.maxlength = parseInt(field['maxLength']);
   }
-
   let label = document.createElement('label');
   label.htmlFor = input.id;
 
