@@ -4,7 +4,8 @@ from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
 from typing import Literal, Optional, Union
 
-from pydantic.types import conint
+from pydantic import Field
+from typing_extensions import Annotated
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -40,7 +41,7 @@ class IPAddressV4(IPAddress):
     address: IPv4Address
 
     netblock: Optional[Reference] = ReferenceField(
-        "IPV4NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4
+        "IPV4NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
     _reverse_relation_names = {
@@ -54,7 +55,7 @@ class IPAddressV6(IPAddress):
     address: IPv6Address
 
     netblock: Optional[Reference] = ReferenceField(
-        "IPV6NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4
+        "IPV6NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
     _reverse_relation_names = {
@@ -82,8 +83,8 @@ class IPPort(OOI):
 
     address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
     protocol: Protocol
-    port: conint(gt=0, lt=2**16)
-    state: Optional[PortState]
+    port: Annotated[int, Field(gt=0, lt=2**16)]
+    state: Optional[PortState] = None
 
     _natural_key_attrs = ["address", "protocol", "port"]
     _reverse_relation_names = {"address": "ports"}
@@ -130,7 +131,7 @@ class IPV6NetBlock(NetBlock):
     parent: Optional[Reference] = ReferenceField("IPV6NetBlock", default=None)
 
     start_ip: Reference = ReferenceField(IPAddressV6, max_issue_scan_level=4)
-    mask: conint(ge=0, lt=128)
+    mask: Annotated[int, Field(ge=0, lt=128)]
 
     _reverse_relation_names = {
         "parent": "child_netblocks",
@@ -144,7 +145,7 @@ class IPV4NetBlock(NetBlock):
     parent: Optional[Reference] = ReferenceField("IPV4NetBlock", default=None)
 
     start_ip: Reference = ReferenceField(IPAddressV4, max_issue_scan_level=4)
-    mask: conint(ge=0, lt=32)
+    mask: Annotated[int, Field(ge=0, lt=32)]
 
     _reverse_relation_names = {
         "parent": "child_netblocks",
@@ -152,8 +153,8 @@ class IPV4NetBlock(NetBlock):
     }
 
 
-IPAddressV4.update_forward_refs()
-IPAddressV6.update_forward_refs()
-NetBlock.update_forward_refs()
-IPV4NetBlock.update_forward_refs()
-IPV6NetBlock.update_forward_refs()
+IPAddressV4.model_rebuild()
+IPAddressV6.model_rebuild()
+NetBlock.model_rebuild()
+IPV4NetBlock.model_rebuild()
+IPV6NetBlock.model_rebuild()

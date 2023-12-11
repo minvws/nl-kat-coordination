@@ -41,14 +41,8 @@ def check_consistent_history(self, connection):
                 if hasattr(parent_migration.operations[0], "inconsistent_allowed"):
                     continue
                 raise InconsistentMigrationHistory(
-                    "Migration {}.{} is applied before its dependency "
-                    "{}.{} on database '{}'.".format(
-                        migration[0],
-                        migration[1],
-                        parent[0],
-                        parent[1],
-                        connection.alias,
-                    )
+                    f"Migration {migration[0]}.{migration[1]} is applied before its dependency "
+                    f"{parent[0]}.{parent[1]} on database '{connection.alias}'."
                 )
 
 

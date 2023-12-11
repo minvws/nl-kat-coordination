@@ -45,9 +45,9 @@ class HydratedFinding:
 
 class OriginData(BaseModel):
     origin: Origin
-    normalizer: Optional[dict]
-    boefje: Optional[Boefje]
-    params: Optional[Dict[str, str]]
+    normalizer: Optional[dict] = None
+    boefje: Optional[Boefje] = None
+    params: Optional[Dict[str, str]] = None
 
 
 class OOIAttributeError(AttributeError):
@@ -259,20 +259,19 @@ class FindingList:
         raise NotImplementedError("FindingList only supports slicing")
 
 
+_EXCLUDED_OOI_TYPES = ("Finding", "FindingType")
+
+
 class MultipleOOIMixin(OctopoesView):
     ooi_types: Set[Type[OOI]] = None
-    ooi_type_filters: List = []
     filtered_ooi_types: List[str] = []
 
     def get_list(
-        self,
-        observed_at: datetime,
-        scan_level: Set[ScanLevel],
-        scan_profile_type: Set[ScanProfileType],
+        self, observed_at: datetime, scan_level: Set[ScanLevel], scan_profile_type: Set[ScanProfileType]
     ) -> OOIList:
         ooi_types = self.ooi_types
         if self.filtered_ooi_types:
-            ooi_types = {type_by_name(t) for t in self.filtered_ooi_types}
+            ooi_types = {type_by_name(t) for t in self.filtered_ooi_types if t not in _EXCLUDED_OOI_TYPES}
         return OOIList(
             self.octopoes_api_connector,
             ooi_types,

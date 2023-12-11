@@ -42,8 +42,7 @@ def process_csv(csv_raw_data, reference_cache):
         try:
             ooi, extra_declarations = get_ooi_from_csv(object_type, row, reference_cache)
 
-            for declaration in extra_declarations:
-                yield declaration
+            yield from extra_declarations
 
             yield {
                 "type": "declaration",
@@ -82,8 +81,8 @@ def get_ooi_from_csv(ooi_type_name: str, values: Dict[str, str], reference_cache
 
     ooi_type = OOI_TYPES[ooi_type_name]["type"]
     ooi_fields = [
-        (field, model_field.type_ == Reference, model_field.required)
-        for field, model_field in ooi_type.__fields__.items()
+        (field, model_field.annotation == Reference, model_field.is_required())
+        for field, model_field in ooi_type.model_fields.items()
         if field not in skip_properties
     ]
 

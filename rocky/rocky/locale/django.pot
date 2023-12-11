@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-08 09:15+0000\n"
+"POT-Creation-Date: 2023-12-08 16:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2726,6 +2726,48 @@ msgid ""
 "weaknesses."
 msgstr ""
 
+#: reports/report_types/rpki_report/report.html
+msgid "Resource Public Key Infrastructure"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Check"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Compliance"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI Available"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "IPs are compliant"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI Valid"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI record does is not valid for"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI record does not exist for"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.py
+msgid "RPKI Report"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.py
+msgid ""
+"Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
+"the ip addresses and whether they are covered by a valid RPKI ROA."
+msgstr ""
+
 #: reports/report_types/systems_report/report.html
 msgid "IP address"
 msgstr ""
@@ -2744,6 +2786,26 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Web"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Mail"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Dicom"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "DNS"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Other"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3384,6 +3446,10 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task already queued."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task not found."
 msgstr ""
 
 #: rocky/settings.py
@@ -5667,10 +5733,6 @@ msgstr ""
 
 #: rocky/views/scan_profile.py
 msgid "Reset"
-msgstr ""
-
-#: rocky/views/tasks.py
-msgid "Task details not found."
 msgstr ""
 
 #: rocky/views/tasks.py
