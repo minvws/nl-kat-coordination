@@ -31,7 +31,7 @@ class ThreadRunner(threading.Thread):
         stop_event: threading.Event,
         callback: Optional[Callable[[], Any]] = None,
         callback_args: Optional[tuple] = None,
-        interval: float = 0.01,
+        interval: Optional[float] = None,
         daemon: bool = False,
         loop: bool = True,
     ) -> None:
@@ -48,7 +48,7 @@ class ThreadRunner(threading.Thread):
         self.logger: logging.Logger = logging.getLogger(__name__)
         self._target: Callable[[], Any] = target
         self.stop_event: threading.Event = stop_event
-        self.interval: float = interval
+        self.interval: Optional[float] = interval
         self.loop: bool = loop
         self.exception: Optional[Exception] = None
         self.callback: Optional[Callable[[], Any]] = callback

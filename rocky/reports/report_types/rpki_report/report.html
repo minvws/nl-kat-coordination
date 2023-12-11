@@ -1,0 +1,33 @@
+{% load i18n %}
+
+<h2>{% translate "Resource Public Key Infrastructure" %}</h2>
+{% if data.rpki_ips %}
+    <div class="horizontal-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Check" %}</th>
+                    <th>{% translate "Compliance" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{% translate "RPKI Available" %}</td>
+                    <td>{{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>{% translate "RPKI Valid" %}</td>
+                    <td>{{ data.number_of_valid }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% for ip, info in data.rpki_ips.items %}
+        {% if not info.valid %}
+            <p>{% translate "RPKI record does is not valid for" %} {{ ip }}.</p>
+        {% endif %}
+        {% if not info.exists %}
+            <p>{% translate "RPKI record does not exist for" %} {{ ip }}.</p>
+        {% endif %}
+    {% endfor %}
+{% endif %}

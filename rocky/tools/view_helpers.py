@@ -13,8 +13,8 @@ from octopoes.models.types import OOI_TYPES
 from rocky.scheduler import (
     BadRequestError,
     ConflictError,
-    QueuePrioritizedItem,
     SchedulerError,
+    TaskNotFoundError,
     TooManyRequestsError,
     client,
 )
@@ -165,10 +165,11 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         ]
 
 
-def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrioritizedItem) -> None:
+def schedule_task(request: HttpRequest, organization_code: str, task_id: str) -> None:
     try:
-        client.push_task(f"{task.data.type}-{organization_code}", task)
-    except (BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
+        task = client.get_task_details(organization_code, task_id)
+        client.push_task(f"{task.p_item.data.type}-{organization_code}", task.p_item)
+    except (TaskNotFoundError, BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
         messages.error(request, error.message)
     else:
         messages.success(

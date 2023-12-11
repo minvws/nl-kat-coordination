@@ -4,13 +4,14 @@
 # LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2023.
 # Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2023.
 # 跨性别 <github@lgbt.sh>, 2023.
+# Madelon Dohmen <maddohmen@hotmail.com>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-24 15:30+0000\n"
-"PO-Revision-Date: 2023-11-16 20:05+0000\n"
-"Last-Translator: 跨性别 <github@lgbt.sh>\n"
+"POT-Creation-Date: 2023-11-30 15:14+0000\n"
+"PO-Revision-Date: 2023-12-06 15:08+0000\n"
+"Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/nl/>\n"
 "Language: nl\n"
@@ -18,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.2\n"
+"X-Generator: Weblate 5.3-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -2311,7 +2312,7 @@ msgid ""
 "Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
 "and Sport to make your and our world a safer place."
 msgstr ""
-"OpenKAT is de \"Kwetsbaarheden Analyse Tool\" Een Open-Source-project "
+"OpenKAT is de \"Kwetsbaarheden Analyse Tool\". Een Open-Source-project "
 "ontwikkeld door het Ministerie van Volksgezondheid, Welzijn en Sport om uw "
 "en onze wereld veiliger te maken."
 
@@ -2450,8 +2451,8 @@ msgid ""
 "When you generate a report. OpenKAT will let you know which plugins it "
 "requires or suggests so you can choose to enable them."
 msgstr ""
-"Wanneer u een rapport genereert. OpenKAT laat u weten welke plugins het "
-"vereist of voorstelt, zodat u kunt kiezen om ze in te schakelen."
+"Wanneer u een rapport genereert, zal OpenKAT u laten weten welke plugins het "
+"vereist of voorstelt, zodat u ervoor kunt kiezen om ze in te schakelen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Let's choose a report"
@@ -2482,7 +2483,7 @@ msgid ""
 "When you start to generate this report. OpenKAT will guide you through the "
 "necessary steps."
 msgstr ""
-"Wanneer u begint met het genereren van dit rapport. Zal OpenKAT u door de "
+"Wanneer u begint met het genereren van dit rapport, zal OpenKAT u door de "
 "nodige stappen leiden."
 
 #: onboarding/templates/step_2b_choose_report_type.html
@@ -2561,7 +2562,9 @@ msgstr "Maak het eerste object aan door een url in te vullen."
 msgid ""
 "Additional details and examples can be found by pressing on the help button "
 "next to the input field."
-msgstr "De help functie geeft extra informatie."
+msgstr ""
+"Extra details en voorbeelden zijn te vinden door op de helpknop naast het "
+"invoerveld te drukken."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid "Dependencies"
@@ -2575,11 +2578,11 @@ msgid ""
 "object automatically when possible. By running plugins to collect or extract "
 "this data."
 msgstr ""
-"De meeste objecten zijn afhankelijk van het bestaan van andere objecten. "
-"Bijvoorbeeld een URL moet verbonden zijn met een netwerk, hostnaam, fqdn "
-"(fully qualified domain name) en ip-adres. OpenKAT verzamelt deze "
-"aanvullende objecten waar mogelijk automatisch. Door plugins te draaien die "
-"deze gegevens verzamelen of extraheren."
+"De meeste objecten zijn afhankelijk van het bestaan van andere objecten. Een "
+"URL moet bijvoorbeeld verbonden zijn met een netwerk, hostnaam, FQDN (Fully "
+"Qualified Domain Name) en IP-adres. OpenKAT verzamelt deze aanvullende "
+"objecten waar mogelijk automatisch, door plugins uit te voeren die deze "
+"gegevens verzamelen of extraheren."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
@@ -2692,8 +2695,8 @@ msgstr ""
 "Elke plugin die scant krijgt een scan-intesiteitsscore. De intesiteit van de "
 "scan moet gelijk zijn aan of lager zijn dan het vrijgaveniveau dat u voor uw "
 "object hebt ingesteld. Als de scan een te hoog intesiteitsniveau heeft, zal "
-"OpenKAT u waarschuwen voordat hij wordt uitgevoerd. Visueel worden clearance "
-"levels en intesitas scores aangegeven met kleine kattenpootjes."
+"OpenKAT u waarschuwen voordat het wordt uitgevoerd. Visueel worden clearance-"
+"levels en intesitas-scores aangegeven met kleine kattenpootjes."
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
@@ -3110,6 +3113,26 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Web"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Mail"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Dicom"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "DNS"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Other"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3583,7 +3606,7 @@ msgstr "Selecteer een {option_label}"
 
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance level"
-msgstr "Filter op vrijwaring niveau"
+msgstr "Filter op vrijwaringsniveau"
 
 #: tools/forms/ooi_form.py
 msgid "Filter by clearance type"
@@ -3652,7 +3675,7 @@ msgid ""
 msgstr ""
 "OpenKAT bewaart een tijdsindicatie bij elke observatie, hierdoor is het "
 "mogelijk de status van de objecten op elk moment van de tijd in de historie "
-"te bekijken. Selecteer een datum-tijd om naar die weergave te springen."
+"te bekijken. Selecteer een datum om naar die weergave te springen."
 
 #: tools/forms/settings.py
 msgid "Depth of the tree."
@@ -4272,6 +4295,7 @@ msgstr "Selecteer filters"
 
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
+#: rocky/templates/tasks/partials/task_filter.html
 msgid "Clear filters"
 msgstr "Filters wissen"
 
@@ -5035,7 +5059,7 @@ msgstr "Verberg instellingen"
 
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
 msgid "Toggle all OOI types"
-msgstr "Schakel alle OOI-typen"
+msgstr "Schakel alle OOI-types in"
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Children"
