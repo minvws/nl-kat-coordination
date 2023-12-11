@@ -19,12 +19,12 @@
   --accordion-button-icon-font-family: var(--icon-font-family);
 
   /* content on the button when the menu is collapsed */
-  --accordion-button-icon-before-open-content: none;
-  --accordion-button-icon-after-open-content: "\ea5f";
+  --accordion-button-icon-before-open-content: "\ea5f";
+  --accordion-button-icon-after-open-content: none;
 
   /* content on the button when the menu is expanded */
-  --accordion-button-icon-before-close-content: none;
-  --accordion-button-icon-after-close-content: "\ea62";
+  --accordion-button-icon-before-close-content: "\ea62";
+  --accordion-button-icon-after-close-content: none;
   --accordion-button-icon-after-margin-left: auto;
 
   /* Content */
