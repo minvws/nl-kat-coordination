@@ -1,9 +1,9 @@
+import threading
 import unittest
 from types import SimpleNamespace
 from unittest import mock
 
 import scheduler
-from fastapi.testclient import TestClient
 from scheduler import config, models, server, storage
 
 from tests.factories import OrganisationFactory
@@ -19,7 +19,9 @@ class AppTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
+
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
@@ -30,9 +32,6 @@ class AppTestCase(unittest.TestCase):
         # App
         self.app = scheduler.App(self.mock_ctx)
         self.app.server = server.Server(self.mock_ctx, self.app.schedulers)
-
-        # Test client
-        self.client = TestClient(self.app.server.api)
 
     def tearDown(self):
         self.app.shutdown()
@@ -122,3 +121,28 @@ class AppTestCase(unittest.TestCase):
 
         scheduler_org_ids = {s.organisation.id for s in self.app.schedulers.values()}
         self.assertEqual({"org-1", "org-3"}, scheduler_org_ids)
+
+    def test_shutdown(self):
+        """Test that the app shuts down gracefully"""
+        # Arrange
+        self.mock_ctx.services.katalogus.organisations = {
+            "org-1": OrganisationFactory(id="org-1"),
+        }
+
+        self.app.start_schedulers()
+        self.app.start_monitors()
+
+        # Shutdown the app
+        self.app.shutdown()
+
+        # Assert that the schedulers have been stopped
+        for s in self.app.schedulers.copy().values():
+            self.assertFalse(s.is_alive())
+
+        # Assert that all threads have been stopped
+        # for thread in self.app.threads:
+        for t in threading.enumerate():
+            if t is threading.main_thread():
+                continue
+
+            self.assertFalse(t.is_alive())
