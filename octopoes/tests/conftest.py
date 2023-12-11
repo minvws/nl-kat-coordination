@@ -9,7 +9,6 @@ from bits.runner import BitRunner
 from requests.adapters import HTTPAdapter, Retry
 
 from octopoes.api.api import app
-from octopoes.api.models import Declaration, Observation
 from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -22,6 +21,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV6
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL, HTTPHeader, SecurityTXT
+from octopoes.models.origin import Origin, OriginType
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import (
     DNSZone,
@@ -257,6 +257,11 @@ def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository
 
 
 @pytest.fixture
+def xtdb_origin_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
 def mock_xtdb_session():
     return XTDBSession(Mock())
 
@@ -266,9 +271,8 @@ def origin_repository(mock_xtdb_session):
     yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)
 
 
-def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
+def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: XTDBOriginRepository, valid_time):
     network = Network(name="test")
-    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     hostnames = [
         Hostname(network=network.reference, name="example.com"),
@@ -345,7 +349,7 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
     ]
     findings = [
-        Finding(finding_type=finding_types[0].reference, ooi=hostnames[0].reference),
+        Finding(finding_type=finding_types[0].reference, ooi=resources[0].reference),
         Finding(finding_type=finding_types[2].reference, ooi=web_urls[0].reference),
         Finding(finding_type=finding_types[3].reference, ooi=websites[1].reference),
         Finding(finding_type=finding_types[4].reference, ooi=certificates[0].reference),
@@ -370,6 +374,29 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         + security_txts
         + certificates
     )
-    octopoes_api_connector.save_observation(
-        Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
+
+    network_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=network.reference,
+        result=[network.reference],
+        task_id=uuid.uuid4(),
     )
+    xtdb_ooi_repository.save(network, valid_time=valid_time)
+    xtdb_origin_repository.save(network_origin, valid_time=valid_time)
+
+    origin = Origin(
+        origin_type=OriginType.OBSERVATION,
+        method="",
+        source=network.reference,
+        result=[ooi.reference for ooi in oois],
+        task_id=uuid.uuid4(),
+    )
+
+    for ooi in oois:
+        xtdb_ooi_repository.save(ooi, valid_time=valid_time)
+
+    xtdb_origin_repository.save(origin, valid_time=valid_time)
+
+    xtdb_origin_repository.commit()
+    xtdb_ooi_repository.commit()

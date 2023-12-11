@@ -49,17 +49,18 @@ class WebSystemReport(Report):
             if bool(self.octopoes_api_connector.query(has_website_query, valid_time, hostname.reference)):
                 web_hostnames.append(hostname)
 
+        checks = {}
+
         for web_hostname in web_hostnames:
-            self.octopoes_api_connector.query(
-                "Hostname.<ooi[is Finding].finding_type",
-                valid_time,
-                web_hostname.reference,
-            )
-            self.octopoes_api_connector.query(
+            check = {}
+            check["has_csp"] = "KAT-NO-CSP" in [x.id for x in self.octopoes_api_connector.query(
                 "Hostname.<hostname[is Website].<website[is HTTPResource].<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
-            )
+            )]
+            check["has_csp_vulnerabilities"] = check["has_csp"] and "KAT-CSP-VULNERABILITIES" in [
+
+            ]
             self.octopoes_api_connector.query(
                 "Hostname.<netloc[is HostnameHTTPURL].<ooi[is Finding].finding_type",
                 valid_time,
@@ -67,6 +68,11 @@ class WebSystemReport(Report):
             )
             self.octopoes_api_connector.query(
                 "Hostname.<hostname[is Website].<ooi[is Finding].finding_type",
+                valid_time,
+                web_hostname.reference,
+            )
+            self.octopoes_api_connector.query(
+                "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
             )
@@ -80,11 +86,7 @@ class WebSystemReport(Report):
                 valid_time,
                 web_hostname.reference,
             )
-            self.octopoes_api_connector.query(
-                "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type",
-                valid_time,
-                web_hostname.reference,
-            )
+            checks[str(web_hostname.reference)] = check
 
         return {
             "input_ooi": input_ooi,
