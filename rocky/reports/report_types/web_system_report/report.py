@@ -117,7 +117,7 @@ class WebSystemReport(Report):
                 valid_time,
                 web_hostname.reference,
             )
-            check.has_no_csp_vulnerabilities = not check.has_csp or "KAT-CSP-VULNERABILITIES" not in [
+            check.has_no_csp_vulnerabilities = check.has_csp and "KAT-CSP-VULNERABILITIES" not in [
                 x.id for x in header_finding_types
             ]
             url_finding_types = self.octopoes_api_connector.query(
@@ -163,10 +163,10 @@ class WebSystemReport(Report):
                 valid_time,
                 web_hostname.reference,
             )
-            check.certificates_not_expired = not check.has_certificates or "KAT-CERTIFICATE-EXPIRED" not in [
+            check.certificates_not_expired = check.has_certificates and "KAT-CERTIFICATE-EXPIRED" not in [
                 x.id for x in certificate_finding_types
             ]
-            check.certificates_not_expiring_soon = not check.has_certificates or "KAT-CERTIFICATE-EXPIRING-SOON" in [
+            check.certificates_not_expiring_soon = check.has_certificates and "KAT-CERTIFICATE-EXPIRING-SOON" in [
                 x.id for x in certificate_finding_types
             ]
 
