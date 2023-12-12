@@ -7,3 +7,16 @@
   border: 1px solid var(--colors-blue-5);
   color: var(--colors-blue-8);
 }
+
+.tag.critical {
+  @extend %tag;
+
+  background-color: var(--colors-red-3);
+  border: 1px solid var(--risk-level-critical);
+  color: var(--colors-orange-8);
+  display: inline;
+
+  &::before {
+    content: none;
+  }
+}
