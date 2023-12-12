@@ -3,22 +3,49 @@ from typing import Any, Dict
 
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models.ooi.service import IPService
+from octopoes.models import Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
 CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
-TREE_DEPTH = 3
 
 
-class SafeConnectionsRepport(Report):
+class SafeConnectionsReport(Report):
     id = "safe-connections-report"
     name = _("Safe Connections Report")
-    description: str = _("Safe Connections reports ...")
+    description: str = _("Shows whether the IPService contains safe ciphers.")
     plugins = {"required": ["testssl-sh-ciphers"], "optional": []}
-    input_ooi_types = {IPService}
+    input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "safe_connections_report/report.html"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+        reference = Reference.from_str(input_ooi)
+
+        if reference.class_type == Hostname:
+            ips = self.octopoes_api_connector.query(
+                "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
+            )
+        else:
+            ips = [self.octopoes_api_connector.get(reference)]
+
+        sc_ips = {}
+        number_of_ips = len(ips)
+        number_of_available = number_of_ips
+
+        for ip in ips:
+            finding_types = self.octopoes_api_connector.query(
+                "IPAddress.<ooi[is Finding].finding_type", valid_time, ip.reference
+            )
+
+            cipher_findings = list(filter(lambda finding: finding.id in CIPHER_FINDINGS, finding_types))
+
+            sc_ips.update({"ip": ip.address, "cipher_findings": cipher_findings})
+            number_of_available -= 1 if cipher_findings else 0
+
         return {
             "input_ooi": input_ooi,
+            "sc_ips": sc_ips,
+            "number_of_available": number_of_available,
+            "number_of_ips": number_of_ips,
         }
