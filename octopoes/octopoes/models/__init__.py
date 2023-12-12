@@ -244,6 +244,9 @@ class PrimaryKeyToken(RootModel):
     def __getattr__(self, item) -> Union[str, PrimaryKeyToken]:
         return self.root[item]
 
+    def __getitem__(self, item) -> Union[str, PrimaryKeyToken]:
+        return self.root[item]
+
 
 PrimaryKeyToken.model_rebuild()
 
