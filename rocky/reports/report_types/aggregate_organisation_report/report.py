@@ -27,6 +27,7 @@ class AggregateOrganisationReport(AggregateReport):
         total_findings = 0
         total_ips = 0
         total_hostnames = 0
+        terms = []
 
         # input oois
         for input_ooi, report_data in data.items():
@@ -64,7 +65,12 @@ class AggregateOrganisationReport(AggregateReport):
                 if report == "Vulnerability Report":
                     total_criticals += data["data"]["summary"]["total_criticals"]
                     total_findings += data["data"]["summary"]["total_findings"]
+                    terms.extend(data["data"]["summary"]["terms"])
                     vulnerabilities[input_ooi] = data["data"]
+
+        for ip, data in ipv6.items():
+            for system in data["systems"]:
+                terms.append(str(system))
 
         summary = {
             _("General recommendations"): "",
@@ -76,7 +82,7 @@ class AggregateOrganisationReport(AggregateReport):
             _("Sector defined"): "",
             _("Lowest security score in organisation"): "",
             _("Newly discovered items since last week, october 8th 2023"): "",
-            _("Terms in report"): "",
+            _("Terms in report"): ", ".join(terms),
         }
 
         return {
