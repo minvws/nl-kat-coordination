@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-07 17:27+0000\n"
+"POT-Creation-Date: 2023-12-08 16:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3448,6 +3448,10 @@ msgstr ""
 msgid "Task already queued."
 msgstr ""
 
+#: rocky/scheduler.py
+msgid "Task not found."
+msgstr ""
+
 #: rocky/settings.py
 msgid "Blue light"
 msgstr ""
@@ -5729,10 +5733,6 @@ msgstr ""
 
 #: rocky/views/scan_profile.py
 msgid "Reset"
-msgstr ""
-
-#: rocky/views/tasks.py
-msgid "Task details not found."
 msgstr ""
 
 #: rocky/views/tasks.py

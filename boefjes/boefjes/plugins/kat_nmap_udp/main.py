@@ -27,15 +27,7 @@ class Protocol(Enum):
 def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]) -> List[str]:
     """Returns Nmap arguments to use based on protocol and top_ports for host."""
     ip = ip_address(host)
-    args = [
-        "--open",
-        "-T4",
-        "-Pn",
-        "-r",
-        "-v10",
-        "-sV",
-        "-sS" if protocol == Protocol.TCP else "-sU",
-    ]
+    args = ["--open", "-T4", "-Pn", "-r", "-v10", "-sV", "-sS" if protocol == Protocol.TCP else "-sU"]
     if top_ports is None:
         args.append("-p-")
     else:
@@ -51,20 +43,17 @@ def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     """Build Nmap arguments and return results to normalizer."""
-    top_ports = int(getenv("TOP_PORTS", TOP_PORTS_DEFAULT))
+    top_ports = int(getenv("TOP_PORTS_UDP", TOP_PORTS_DEFAULT))
     assert (
         TOP_PORTS_MIN <= top_ports <= TOP_PORTS_MAX
     ), f'{TOP_PORTS_MIN} <= {top_ports} <= {TOP_PORTS_MAX} fails. Check "TOP_PORTS" argument.'
-
-    protocol = getenv("PROTOCOL", "tcp").lower()
-    assert protocol in ["tcp", "udp"], f'Invalid protocol "{protocol}".'
 
     return [
         (
             set(),
             run_nmap(
                 args=build_nmap_arguments(
-                    host=boefje_meta.arguments["input"]["address"], protocol=Protocol(protocol), top_ports=top_ports
+                    host=boefje_meta.arguments["input"]["address"], protocol=Protocol("udp"), top_ports=top_ports
                 )
             ),
         )

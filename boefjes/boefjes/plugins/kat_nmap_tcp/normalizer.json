@@ -2,6 +2,8 @@
     "id": "kat_nmap_normalize",
     "consumes": [
         "boefje/nmap",
+        "boefje/nmap-tcp",
+        "boefje/nmap-udp",
         "boefje/nmap-ports",
         "boefje/nmap-ip-range"
     ],

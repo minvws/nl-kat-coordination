@@ -6,6 +6,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from django_weasyprint import WeasyTemplateResponseMixin
+from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
 from reports.report_types.helpers import (
@@ -154,4 +156,19 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         context["plugins"] = self.plugins
         context["report_types"] = self.get_report_types()
         context["report_data"] = self.generate_reports_for_oois()
+        context["report_download_url"] = url_with_querystring(
+            reverse("generate_report_pdf", kwargs={"organization_code": self.organization.code}),
+            True,
+            **self.request.GET,
+        )
         return context
+
+
+class GenerateReportPDFView(GenerateReportView, WeasyTemplateResponseMixin):
+    template_name = "report_pdf.html"
+
+    pdf_filename = "report.pdf"
+    pdf_attachment = False
+    pdf_options = {
+        "pdf_variant": "pdf/ua-1",
+    }
