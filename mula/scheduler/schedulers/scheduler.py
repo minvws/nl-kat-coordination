@@ -68,15 +68,15 @@ class Scheduler(abc.ABC):
         self.enabled: bool = True
         self.scheduler_id: str = scheduler_id
         self.queue: queues.PriorityQueue = queue
-
         self.max_tries: int = max_tries
-
         self.callback: Optional[Callable[[], Any]] = callback
+        self.last_activity: Optional[datetime] = None
 
         # Listeners
         self.listeners: Dict[str, connectors.listeners.Listener] = {}
 
         # Threads
+        self.lock: threading.Lock = threading.Lock()
         self.stop_event_threads: threading.Event = threading.Event()
         self.threads: List[thread.ThreadRunner] = []
 
@@ -110,6 +110,8 @@ class Scheduler(abc.ABC):
 
         self.ctx.datastores.task_store.create_task(task)
 
+        self.set_last_activity()
+
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
         persist a task to the datastore with the status RUNNING
@@ -127,12 +129,13 @@ class Scheduler(abc.ABC):
                 p_item.data.get("id"),
                 self.queue.pq_id,
             )
-            return None
+            return
 
         task.status = models.TaskStatus.DISPATCHED
         self.ctx.datastores.task_store.update_task(task)
 
-        return None
+        self.set_last_activity()
+
 
     def pop_item_from_queue(
         self, filters: Optional[storage.filters.FilterRequest] = None
@@ -339,7 +342,7 @@ class Scheduler(abc.ABC):
         tasks that were on the queue will be set to CANCELLED.
         """
         if not self.is_enabled():
-            self.logger.debug("Scheduler is already disabled")
+            self.logger.warning("Scheduler is already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
             return
 
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
@@ -358,7 +361,7 @@ class Scheduler(abc.ABC):
         task_ids = [task.id for task in tasks]
         self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
 
-        self.logger.info("Disabled scheduler: %s", self.scheduler_id)
+        self.logger.info("Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
     def enable(self) -> None:
         """Enable the scheduler.
@@ -369,14 +372,14 @@ class Scheduler(abc.ABC):
             self.logger.debug("Scheduler is already enabled")
             return
 
-        self.logger.info("Enabling scheduler: %s", self.scheduler_id)
+        self.logger.info("Enabling scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
         self.enabled = True
 
         self.stop_event_threads.clear()
 
         self.run()
 
-        self.logger.info("Enabled scheduler: %s", self.scheduler_id)
+        self.logger.info("Enabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
     def is_enabled(self) -> bool:
         """Check if the scheduler is enabled.
@@ -392,7 +395,7 @@ class Scheduler(abc.ABC):
         Args:
             callback: Whether to call the callback function.
         """
-        self.logger.info("Stopping scheduler: %s", self.scheduler_id)
+        self.logger.info("Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
         # First, stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
@@ -403,7 +406,7 @@ class Scheduler(abc.ABC):
         if self.callback and callback:
             self.callback(self.scheduler_id)  # type: ignore [call-arg]
 
-        self.logger.info("Stopped scheduler: %s", self.scheduler_id)
+        self.logger.info("Stopped scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
 
     def stop_listeners(self) -> None:
         """Stop the listeners."""
@@ -419,6 +422,10 @@ class Scheduler(abc.ABC):
 
         self.threads = []
 
+    def set_last_activity(self) -> None:
+        with self.lock:
+            self.last_activity = datetime.now(timezone.utc)
+
     def dict(self) -> Dict[str, Any]:
         """Get a dict representation of the scheduler."""
         return {
@@ -433,4 +440,5 @@ class Scheduler(abc.ABC):
                 "allow_updates": self.queue.allow_updates,
                 "allow_priority_updates": self.queue.allow_priority_updates,
             },
+            "last_activity": self.last_activity
         }

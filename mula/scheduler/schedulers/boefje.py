@@ -83,7 +83,6 @@ class BoefjeScheduler(Scheduler):
         Octopoes and create a task for it for the available boefjes for this
         OOI.
         """
-
         # Scan profile mutations
         listener = listeners.ScanProfileMutation(
             dsn=str(self.ctx.config.host_raw_data),
@@ -112,6 +111,13 @@ class BoefjeScheduler(Scheduler):
             name=f"scheduler-{self.scheduler_id}-random",
             target=self.push_tasks_for_random_objects,
             interval=60.0,
+        )
+
+        self.logger.info(
+            "Boefje scheduler started",
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
+            item_type=self.queue.item_type.__name__,
         )
 
     @tracer.start_as_current_span("boefje_push_tasks_for_scan_profile_mutations")
@@ -209,7 +215,7 @@ class BoefjeScheduler(Scheduler):
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
-                "Failed to get new boefjes for organisation: %s [organisation_id=%s, scheduler_id=%s]",
+                "Failed to get new boefjes for organisation: %s from katalogus [organisation_id=%s, scheduler_id=%s]",
                 self.organisation.name,
                 self.organisation.id,
                 self.scheduler_id,
@@ -242,7 +248,7 @@ class BoefjeScheduler(Scheduler):
                 )
             except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
                 self.logger.warning(
-                    "Could not get oois for organisation: %s [organisation_id=%s, scheduler_id=%s]",
+                    "Could not get oois for organisation: %s from octopoes [organisation_id=%s, scheduler_id=%s]",
                     self.organisation.name,
                     self.organisation.id,
                     self.scheduler_id,
@@ -279,7 +285,7 @@ class BoefjeScheduler(Scheduler):
             )
         except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
             self.logger.warning(
-                "Could not get random oois for organisation: %s [organisation_id=%s, scheduler_id=%s]",
+                "Could not get random oois for organisation: %s from octopoes [organisation_id=%s, scheduler_id=%s]",
                 self.organisation.name,
                 self.organisation.id,
                 self.scheduler_id,
@@ -667,7 +673,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        self.logger.info(
+        self.logger.debug(
             "Created boefje task: %s for ooi: %s "
             "[boefje_id=%s, ooi_primary_key=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,

@@ -102,7 +102,7 @@ class App:
             self.schedulers[scheduler_id].stop()
 
         if removals:
-            self.logger.info(
+            self.logger.debug(
                 "Removed %s organisations from scheduler [org_ids=%s]",
                 len(removals),
                 removals,
@@ -137,7 +137,7 @@ class App:
             # Flush katalogus caches when new organisations are added
             self.ctx.services.katalogus.flush_caches()
 
-            self.logger.info(
+            self.logger.debug(
                 "Added %s organisations to scheduler [org_ids=%s]",
                 len(additions),
                 additions,

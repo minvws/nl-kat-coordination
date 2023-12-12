@@ -66,7 +66,7 @@ class Server:
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 
-            self.logger.debug("Finished setting up instrumentation")
+            self.logger.debug("Finished setting up OpenTelemetry instrumentation")
 
         self.api.add_api_route(
             path="/",

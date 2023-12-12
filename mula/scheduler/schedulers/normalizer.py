@@ -88,6 +88,13 @@ class NormalizerScheduler(Scheduler):
             loop=False,
         )
 
+        self.logger.info(
+            "Normalizer scheduler started",
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
+            item_type=self.queue.item_type.__name__,
+        )
+
     @tracer.start_as_current_span("normalizer_push_task_for_received_raw_data")
     def push_tasks_for_received_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
@@ -111,7 +118,7 @@ class NormalizerScheduler(Scheduler):
         # an error.
         for mime_type in latest_raw_data.raw_data.mime_types:
             if mime_type.get("value", "").startswith("error/"):
-                self.logger.warning(
+                self.logger.debug(
                     "Skipping raw data with error mime type [raw_data_id=%s, organisation_id=%s, scheduler_id=%s]",
                     latest_raw_data.raw_data.id,
                     self.organisation.id,
@@ -231,7 +238,7 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        self.logger.info(
+        self.logger.debug(
             "Created normalizer task: %s for raw data: %s "
             "[normalizer_id=%s, raw_data_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
             task,
