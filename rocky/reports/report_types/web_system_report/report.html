@@ -13,43 +13,43 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>CSP Present</td>
+                    <td>{% translate "CSP Present" %}</td>
                     <td>{{ data.web_checks.has_csp }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
                 </tr>
                 <tr>
-                    <td>Secure CSP Header</td>
+                    <td>{% translate "Secure CSP Header" %}</td>
                     <td>
                         {{ data.web_checks.has_csp_vulnerabilities }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}
                     </td>
                 </tr>
                 <tr>
-                    <td>Redirects HTTP to HTTPS</td>
+                    <td>{% translate "Redirects HTTP to HTTPS" %}</td>
                     <td>{{ data.web_checks.redirects_http_https }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
                 </tr>
                 <tr>
-                    <td>Offers HTTPS</td>
+                    <td>{% translate "Offers HTTPS" %}</td>
                     <td>{{ data.web_checks.offers_https }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
                 </tr>
                 <tr>
-                    <td>Has a Security.txt</td>
+                    <td>{% translate "Has a Security.txt" %}</td>
                     <td>{{ data.web_checks.has_security_txt }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
                 </tr>
                 <tr>
-                    <td>No unnecessary ports open</td>
+                    <td>{% translate "No unnecessary ports open" %}</td>
                     <td>{{ data.web_checks.no_uncommon_ports }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
                 </tr>
                 <tr>
-                    <td>Has a certificate</td>
+                    <td>{% translate "Has a certificate" %}</td>
                     <td>{{ data.web_checks.has_certificates }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
                 </tr>
                 <tr>
-                    <td>Certificate is not expired</td>
+                    <td>{% translate "Certificate is not expired" %}</td>
                     <td>
                         {{ data.web_checks.certificates_not_expired }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}
                     </td>
                 </tr>
                 <tr>
-                    <td>Certificate is not expiring soon</td>
+                    <td>{% translate "Certificate is not expiring soon" %}</td>
                     <td>{{ data.web_checks.has_csp }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
                 </tr>
             </tbody>

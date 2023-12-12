@@ -112,7 +112,8 @@ class WebSystemReport(Report):
             )
             check.has_csp = "KAT-NO-CSP" not in [x.id for x in resource_finding_types]
             header_finding_types = self.octopoes_api_connector.query(
-                "Hostname.<hostname[is Website].<website[is HTTPResource].<resource[is HTTPHeader].<ooi[is Finding].finding_type",
+                "Hostname.<hostname[is Website].<website[is HTTPResource].<resource[is HTTPHeader]."
+                "<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
             )

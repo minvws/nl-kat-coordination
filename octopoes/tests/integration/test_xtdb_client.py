@@ -202,7 +202,6 @@ def test_query_for_system_report(
 
     ip_services = {}
 
-
     for ip in ips:
         ip_services[str(ip.address)] = {
             "hostnames": [

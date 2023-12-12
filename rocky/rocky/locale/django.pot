@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-30 15:14+0000\n"
+"POT-Creation-Date: 2023-12-12 13:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2827,6 +2827,72 @@ msgid ""
 "protocols."
 msgstr ""
 
+#: reports/report_types/web_system_report/report.html
+msgid "Check"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Compliance"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "CSP Present"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "webservers compliant"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Secure CSP Header"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Redirects HTTP to HTTPS"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Offers HTTPS"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Has a Security.txt"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "No unnecessary ports open"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Has a certificate"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Certificate is not expired"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Certificate is not expiring soon"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Compliance issue"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Risk level"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.py
+msgid "Web System Report"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.py
+msgid "Web system reports check web systems on basic security standards."
+msgstr ""
+
 #: reports/templates/partials/report_header.html
 msgid "Report for organization"
 msgstr ""
@@ -4822,11 +4888,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #, python-format
 msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Risk level"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
