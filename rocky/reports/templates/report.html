@@ -9,7 +9,10 @@
     <main id="main-content" tabindex="-1" class="choose-report">
         <section class="centered">
             <div class="centered">
-                <a href="{{ report_download_url }}" class="button ghost">Download report</a>
+                <a href="{{ report_download_url }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="button ghost">Download report</a>
             </div>
         </section>
         {% include "partials/report_header.html" %}
