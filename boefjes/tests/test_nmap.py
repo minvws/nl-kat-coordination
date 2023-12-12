@@ -1,15 +1,16 @@
 from unittest import TestCase
 
 from boefjes.job_handler import serialize_ooi
-from boefjes.plugins.kat_nmap_tcp.main import Protocol, build_nmap_arguments
+from boefjes.plugins.kat_nmap_tcp.main import build_nmap_arguments as build_nmap_arguments_tcp
 from boefjes.plugins.kat_nmap_tcp.normalize import run
+from boefjes.plugins.kat_nmap_udp.main import build_nmap_arguments as build_nmap_arguments_udp
 from octopoes.models.ooi.network import IPAddressV4, Network
 from tests.loading import get_boefje_meta, get_dummy_data, get_normalizer_meta
 
 
 class NmapTest(TestCase):
     def test_nmap_arguments_tcp_top_150(self):
-        args = build_nmap_arguments("1.1.1.1", Protocol.TCP, 250)
+        args = build_nmap_arguments_tcp("1.1.1.1", 250)
         self.assertListEqual(
             [
                 "--open",
@@ -29,7 +30,7 @@ class NmapTest(TestCase):
         )
 
     def test_nmap_arguments_tcp_top_150_ipv6(self):
-        args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, 250)
+        args = build_nmap_arguments_tcp("2001:19f0:5001:23fe:5400:3ff:fe60:883b", 250)
         self.assertListEqual(
             [
                 "--open",
@@ -49,86 +50,8 @@ class NmapTest(TestCase):
             args,
         )
 
-    def test_nmap_arguments_tcp_full(self):
-        args = build_nmap_arguments("1.1.1.1", Protocol.TCP, None)
-        self.assertListEqual(
-            [
-                "--open",
-                "-T4",
-                "-Pn",
-                "-r",
-                "-v10",
-                "-sV",
-                "-sS",
-                "-p-",
-                "-oX",
-                "-",
-                "1.1.1.1",
-            ],
-            args,
-        )
-
-    def test_nmap_arguments_tcp_full_ipv6(self):
-        args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.TCP, None)
-        self.assertListEqual(
-            [
-                "--open",
-                "-T4",
-                "-Pn",
-                "-r",
-                "-v10",
-                "-sV",
-                "-sS",
-                "-p-",
-                "-6",
-                "-oX",
-                "-",
-                "2001:19f0:5001:23fe:5400:3ff:fe60:883b",
-            ],
-            args,
-        )
-
-    def test_nmap_arguments_udp_full(self):
-        args = build_nmap_arguments("1.1.1.1", Protocol.UDP, None)
-        self.assertListEqual(
-            [
-                "--open",
-                "-T4",
-                "-Pn",
-                "-r",
-                "-v10",
-                "-sV",
-                "-sU",
-                "-p-",
-                "-oX",
-                "-",
-                "1.1.1.1",
-            ],
-            args,
-        )
-
-    def test_nmap_arguments_udp_full_ipv6(self):
-        args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.UDP, None)
-        self.assertListEqual(
-            [
-                "--open",
-                "-T4",
-                "-Pn",
-                "-r",
-                "-v10",
-                "-sV",
-                "-sU",
-                "-p-",
-                "-6",
-                "-oX",
-                "-",
-                "2001:19f0:5001:23fe:5400:3ff:fe60:883b",
-            ],
-            args,
-        )
-
     def test_nmap_arguments_udp_top250(self):
-        args = build_nmap_arguments("1.1.1.1", Protocol.UDP, 250)
+        args = build_nmap_arguments_udp("1.1.1.1", 250)
         self.assertListEqual(
             [
                 "--open",
@@ -148,7 +71,7 @@ class NmapTest(TestCase):
         )
 
     def test_nmap_arguments_udp_top250_ipv6(self):
-        args = build_nmap_arguments("2001:19f0:5001:23fe:5400:3ff:fe60:883b", Protocol.UDP, 250)
+        args = build_nmap_arguments_udp("2001:19f0:5001:23fe:5400:3ff:fe60:883b", 250)
         self.assertListEqual(
             [
                 "--open",
