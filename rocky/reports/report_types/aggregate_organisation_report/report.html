@@ -4,27 +4,16 @@
     {% include "partials/report_sidemenu.html" %}
 
     <section class="report" lang="nl">
-        <section class="introduction">
-            <div class="horizontal-view toolbar"></div>
-            <div>
-                <h1>{% translate "OpenKAT Aggregate Report" %}</h1>
-                <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
-                <dl>
-                    <div>
-                        <dt>{% translate "Observed at:" %}</dt>
-                        <dd>
-                            {{ observed_at }} {{ TIME_ZONE }}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>{% translate "Created by:" %}</dt>
-                        <dd>
-                            {{ organization_member.user.full_name }}
-                        </dd>
-                    </div>
-                </dl>
-            </div>
-        </section>
+        <div class="horizontal-view toolbar">
+            <a href="{{ report_download_url }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="button">{% translate "Download report" %}</a>
+        </div>
+        <div>
+            {% include "aggregate_organisation_report/introduction.html" %}
+
+        </div>
         <div class="chapter-numbers">
             {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
             {% include "aggregate_organisation_report/term_overview.html" %}

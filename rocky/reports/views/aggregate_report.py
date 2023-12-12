@@ -6,6 +6,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from django_weasyprint import WeasyTemplateResponseMixin
+from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
@@ -158,4 +160,19 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         context["template"] = template
         context["post_processed_data"] = post_processed_data
         context["report_data"] = report_data
+        context["report_download_url"] = url_with_querystring(
+            reverse("aggregate_report_pdf", kwargs={"organization_code": self.organization.code}),
+            True,
+            **self.request.GET,
+        )
         return context
+
+
+class AggregateReportPDFView(AggregateReportView, WeasyTemplateResponseMixin):
+    template_name = "aggregate_report_pdf.html"
+
+    pdf_filename = "aggregate_report.pdf"
+    pdf_attachment = False
+    pdf_options = {
+        "pdf_variant": "pdf/ua-1",
+    }

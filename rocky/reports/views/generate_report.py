@@ -165,9 +165,9 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
 
 class GenerateReportPDFView(GenerateReportView, WeasyTemplateResponseMixin):
-    template_name = "report_pdf.html"
+    template_name = "generate_report_pdf.html"
 
-    pdf_filename = "report.pdf"
+    pdf_filename = "generate_report.pdf"
     pdf_attachment = False
     pdf_options = {
         "pdf_variant": "pdf/ua-1",

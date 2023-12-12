@@ -1,0 +1,22 @@
+{% load i18n %}
+
+<section class="introduction">
+    <div>
+        <h1>{% translate "OpenKAT Aggregate Report" %}</h1>
+        <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
+        <dl>
+            <div>
+                <dt>{% translate "Observed at:" %}</dt>
+                <dd>
+                    {{ observed_at }} {{ TIME_ZONE }}
+                </dd>
+            </div>
+            <div>
+                <dt>{% translate "Created by:" %}</dt>
+                <dd>
+                    {{ organization_member.user.full_name }}
+                </dd>
+            </div>
+        </dl>
+    </div>
+</section>
