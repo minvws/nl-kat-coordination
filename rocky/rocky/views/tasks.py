@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
-from tools.view_helpers import schedule_task
+from tools.view_helpers import reschedule_task
 
 from rocky.scheduler import TaskNotFoundError, client
 
@@ -79,7 +79,7 @@ class TaskListView(OrganizationView, ListView):
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
-            schedule_task(self.request, self.organization.code, task_id)
+            reschedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
