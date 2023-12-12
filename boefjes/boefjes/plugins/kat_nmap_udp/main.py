@@ -1,7 +1,6 @@
-from enum import Enum
 from ipaddress import IPv6Address, ip_address
 from os import getenv
-from typing import List, Optional, Tuple, Union
+from typing import List, Tuple, Union
 
 import docker
 
@@ -19,19 +18,10 @@ def run_nmap(args: List[str]) -> str:
     return client.containers.run(NMAP_IMAGE, args, remove=True).decode()
 
 
-class Protocol(Enum):
-    TCP = "tcp"
-    UDP = "udp"
-
-
-def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]) -> List[str]:
+def build_nmap_arguments(host: str, top_ports: int) -> List[str]:
     """Returns Nmap arguments to use based on protocol and top_ports for host."""
     ip = ip_address(host)
-    args = ["--open", "-T4", "-Pn", "-r", "-v10", "-sV", "-sS" if protocol == Protocol.TCP else "-sU"]
-    if top_ports is None:
-        args.append("-p-")
-    else:
-        args.extend(["--top-ports", str(top_ports)])
+    args = ["--open", "-T4", "-Pn", "-r", "-v10", "-sV", "-sU", "--top-ports", str(top_ports)]
 
     if isinstance(ip, IPv6Address):
         args.append("-6")
@@ -43,17 +33,15 @@ def build_nmap_arguments(host: str, protocol: Protocol, top_ports: Optional[int]
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     """Build Nmap arguments and return results to normalizer."""
-    top_ports = int(getenv("TOP_PORTS_UDP", TOP_PORTS_DEFAULT))
-    assert (
-        TOP_PORTS_MIN <= top_ports <= TOP_PORTS_MAX
-    ), f'{TOP_PORTS_MIN} <= {top_ports} <= {TOP_PORTS_MAX} fails. Check "TOP_PORTS" argument.'
+    top_ports = int(getenv("TOP_PORTS", TOP_PORTS_DEFAULT))
 
     return [
         (
             set(),
             run_nmap(
                 args=build_nmap_arguments(
-                    host=boefje_meta.arguments["input"]["address"], protocol=Protocol("udp"), top_ports=top_ports
+                    host=boefje_meta.arguments["input"]["address"],
+                    top_ports=top_ports,
                 )
             ),
         )
