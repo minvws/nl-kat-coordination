@@ -28,12 +28,21 @@
                 {% include "ipv6_report/report.html" with data=data.ipv6 show_heading="yes" %}
 
             {% endif %}
-            {% if data.system_specific %}
-                {% for system_type, system in data.system_specific.items %}
-                    {% include "rpki_report/report.html" with data=system.rpki show_heading="yes" type=system_type %}
+            {% include "aggregate_organisation_report/basic_security.html" %}
 
-                {% endfor %}
-            {% endif %}
+            {% if data.system_specific %}
+                <section id="rpki">
+                    <div>
+                        <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+                        {% for system_type, system in data.system_specific.items %}
+                            {% if system %}
+                                {% include "rpki_report/report.html" with data=system.rpki type=system_type %}
+
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </section>
             <section>
                 <div id="vulnerabilities">
                     <h2>{% translate "Vulnerabilities" %}</h2>

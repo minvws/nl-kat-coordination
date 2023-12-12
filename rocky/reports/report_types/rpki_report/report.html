@@ -1,6 +1,9 @@
 {% load i18n %}
 
-<h2>{% translate "Resource Public Key Infrastructure" %} {{ type }}</h2>
+{% if show_heading %}
+    <h2>{% translate "Resource Public Key Infrastructure" %}</h2>
+{% endif %}
+<h4>{{ type }}</h4>
 {% if data.rpki_ips %}
     <div class="horizontal-scroll">
         <table>
@@ -13,21 +16,62 @@
             <tbody>
                 <tr>
                     <td>{% translate "RPKI Available" %}</td>
-                    <td>{{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}</td>
+                    <td>
+                        {% if data.number_of_valid != data.number_of_ips %}
+                            <span class="icon negative"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}
+                    </td>
                 </tr>
                 <tr>
                     <td>{% translate "RPKI Valid" %}</td>
-                    <td>{{ data.number_of_valid }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}</td>
+                    <td>
+                        {% if data.number_of_valid != data.number_of_ips %}
+                            <span class="icon negative"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_valid }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
     {% for ip, info in data.rpki_ips.items %}
-        {% if not info.valid %}
-            <p>{% translate "RPKI record is not valid for" %} {{ ip }}.</p>
-        {% endif %}
-        {% if not info.exists %}
-            <p>{% translate "RPKI record does not exist for" %} {{ ip }}.</p>
+        {% if not info.valid or not info.exists %}
+            <h5>{{ ip }}</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th>{% translate "Compliance issue" %}</th>
+                        <th>{% translate "Risk level" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not info.valid %}
+                        <tr>
+                            <td>
+                                <span class="icon negative"></span>{% translate "RPKI record is not valid." %}
+                            </td>
+                            <td>
+                                <span class="low">Low</span>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% if not info.exists %}
+                        <tr>
+                            <td>
+                                <span class="icon negative"></span>{% translate "RPKI record does not exist." %}
+                            </td>
+                            <td>
+                                <span class="low">Low</span>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         {% endif %}
     {% endfor %}
 {% endif %}
