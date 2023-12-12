@@ -39,6 +39,12 @@
                 {% include "ipv6_report/report.html" with data=data.ipv6 show_heading="yes" %}
 
             {% endif %}
+            {% if data.system_specific %}
+                {% for system_type, system in data.system_specific.items %}
+                    {% include "rpki_report/report.html" with data=system.rpki show_heading="yes" type=system_type %}
+
+                {% endfor %}
+            {% endif %}
             <section>
                 <div id="vulnerabilities">
                     <h2>{% translate "Vulnerabilities" %}</h2>

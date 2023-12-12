@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.open_ports_report.report import OpenPortsReport
+from reports.report_types.rpki_report.report import RPKIReport
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
 
@@ -15,7 +16,7 @@ class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
-    reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report]}
+    reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report, RPKIReport]}
     template_path = "aggregate_organisation_report/report.html"
     summary = {
         _("General recommendations"): "",
@@ -38,6 +39,8 @@ class AggregateOrganisationReport(AggregateReport):
         total_findings = 0
         total_ips = 0
         total_hostnames = 0
+        rpki = {"rpki_ips": {}}
+        system_specific = {}
 
         # input oois
         for input_ooi, report_data in data.items():
@@ -77,6 +80,25 @@ class AggregateOrganisationReport(AggregateReport):
                     total_findings += data["data"]["summary"]["total_findings"]
                     vulnerabilities[input_ooi] = data["data"]
 
+                if report == "RPKI Report":
+                    logger.error(data["data"])
+                    rpki["rpki_ips"].update(data["data"]["rpki_ips"])
+
+        # Basic security cleanup
+        # RPKI
+        for ip, compliance in rpki["rpki_ips"].items():
+            services = systems["services"][str(ip)]["services"]
+            for service in services:
+                if service not in system_specific:
+                    system_specific[service] = {
+                        "rpki": {"rpki_ips": {}, "number_of_available": 0, "number_of_valid": 0, "number_of_ips": 0}
+                    }
+                if ip not in system_specific[service]["rpki"]["rpki_ips"]:
+                    system_specific[service]["rpki"]["rpki_ips"][ip] = compliance
+                    system_specific[service]["rpki"]["number_of_ips"] += 1
+                    system_specific[service]["rpki"]["number_of_available"] += 1 if compliance["exists"] else 0
+                    system_specific[service]["rpki"]["number_of_valid"] += 1 if compliance["valid"] else 0
+
         summary = {
             _("General recommendations"): "",
             _("Critical vulnerabilities"): total_criticals,
@@ -95,5 +117,6 @@ class AggregateOrganisationReport(AggregateReport):
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,
+            "system_specific": system_specific,
             "summary": summary,
         }
