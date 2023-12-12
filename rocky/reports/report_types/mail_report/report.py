@@ -16,7 +16,7 @@ class MailReport(Report):
     id = "mail-report"
     name = _("Mail Report")
     description = _("System specific mail report that focusses on IP addresses and hostnames.")
-    plugins = {"required": ["nmap-tcp"], "optional": []}
+    plugins = {"required": ["dns-records"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "mail_report/report.html"
 
