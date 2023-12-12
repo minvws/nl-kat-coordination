@@ -1,67 +1,83 @@
-%report-content {
+%chapter {
   gap: var(--spacing-grid-500);
-}
-
-%report-chapter {
-  gap: var(--spacing-grid-200);
   padding: 0;
-}
 
-%report-sub-chapter {
-  width: 100%;
-  gap: var(--spacing-grid-200);
-  padding: 0;
+  &.introduction {
+    > div {
+      width: 100%;
+
+      .toolbar {
+        width: 100%;
+        max-width: 100%;
+        justify-content: space-between;
+        display: flex;
+        align-items: center;
+
+        button {
+          align-self: center;
+        }
+      }
+
+      > div {
+        gap: var(--spacing-grid-300);
+
+        > div {
+          gap: var(--spacing-grid-200);
+        }
+      }
+    }
+  }
 }
 
 .report {
   article {
-    @extend %report-content;
+    gap: var(--spacing-grid-500);
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-bottom: -0.75rem; /* Reducing margin below the header due to additional space within the font */
+    }
 
     > section {
-      @extend %report-chapter;
+      @extend %chapter;
+    }
 
-      > div {
-        @extend %report-sub-chapter;
+    > div {
+      padding: 0;
+
+      > section {
+        @extend %chapter;
       }
 
-      &.introduction {
-        dl {
-          gap: var(--spacing-grid-200);
+      &.report-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-grid-500);
 
+        > section {
           > div {
+            display: flex;
+            width: 100%;
+            gap: var(--spacing-grid-200);
             padding: 0;
-            border: 0;
 
-            dt,
-            dd {
-              padding: 0;
-            }
+            > div {
+              width: 100%;
+              margin: 1rem 0;
+              gap: var(--spacing-grid-200);
 
-            dt {
-              font-weight: bold;
-            }
-
-            dd {
-              font-weight: normal;
+              &:last-child {
+                margin-bottom: 0;
+              }
             }
           }
         }
       }
     }
   }
-
-  // .chapter-numbers {
-  //   gap: var(--spacing-grid-500);
-  //   padding: 0;
-
-  //   > section {
-  //     @extend %report-chapter;
-
-  //     > div {
-  //       @extend %report-sub-chapter;
-  //     }
-  //   }
-  // }
 
   &.sidemenu > nav {
     li {

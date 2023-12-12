@@ -10,18 +10,22 @@
 
     <article>
         <section class="introduction">
-            <div class="horizontal-view toolbar">
-                <button>Save report</button>
-            </div>
             <div>
-                <h1>Mockup rapportage OpenKAT</h1>
-                <p>Dit is het OpenKAT rapport voor organisatie Organisatienaam.</p>
-                <p>
-                    <strong>{% translate "Observed at:" %}</strong> {{ observed_at }} {{ TIME_ZONE }}
-                </p>
-                <p>
-                    <strong>{% translate "Created by:" %}</strong> {{ organization_member.user.full_name }}
-                </p>
+                <div class="horizontal-view toolbar">
+                    <h1>Mockup rapportage OpenKAT</h1>
+                    <button>Save report</button>
+                </div>
+                <div>
+                    <p>Dit is het OpenKAT rapport voor organisatie Organisatienaam.</p>
+                    <div>
+                        <p>
+                            <strong>{% translate "Observed at:" %}</strong> {{ observed_at }} {{ TIME_ZONE }}
+                        </p>
+                        <p>
+                            <strong>{% translate "Created by:" %}</strong> {{ organization_member.user.full_name }}
+                        </p>
+                    </div>
+                </div>
             </div>
         </section>
         <section>
@@ -138,7 +142,7 @@
                 </ul>
             </div>
         </section>
-        <div class="chapter-numbers">
+        <div class="chapter-numbers report-content">
             <section id="general-recommendations">
                 <div>
                     <h2>General recommendations</h2>
@@ -355,6 +359,8 @@
                     <p>
                         In dit hoofstuk wordt eerst een tabel compliency checks getoond en vervolgens per onderdeel de compliency issues uitgelicht. Bij elk van deze onderdelen zijn twee percentages te zien, waarvan de één aangeeft hoe goed de basisbeveilging op orde is (hoger is beter) en de ander hoe goed dit bij andere gescande organisaties in de sector is (mediaan).
                     </p>
+                </div>
+                <div>
                     <h3>Overzicht van de basisbeveiligingsstatus</h3>
                     <p>
                         Deze tabel geeft een overzicht van de basisbeveiligingsstatus van de bekende assets. In principe moeten alle waardes in deze tabel groen kleuren.
@@ -436,147 +442,150 @@
                         </table>
                     </div>
                 </div>
-            </section>
-            <section>
                 <div>
-                    <h2>Safe connections</h2>
+                    <h3>Safe connections</h3>
                     <p>
                         <span>Critical</span> Score: 80%, Sector: 90%
                     </p>
                     <p>
                         [Uitleg context van safe connections: wat betekent het als een systeem er niet voldoen? Waarom is dit ‘critical’?]
                     </p>
-                    <h3>E-emailserver</h3>
-                    <p>
-                        Er zijn geen problemen aangetroffen bij de mailservers op het gebied van Safe Connections. In deze tabel is te zien welke checks er zijn uitgevoerd.
-                    </p>
-                    <div class="horizontal-scroll">
-                        <table>
-                            <caption class="visually-hidden">Overzicht Handmatig gevrijwaarde gescande assets:</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Check</th>
-                                    <th scope="col">Compliancy</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <a href="">DANE [3]</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 2</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 3</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 5</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 6</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div>
+                        <h4>E-emailserver</h4>
+                        <p>
+                            Er zijn geen problemen aangetroffen bij de mailservers op het gebied van Safe Connections. In deze tabel is te zien welke checks er zijn uitgevoerd.
+                        </p>
+                        <div class="horizontal-scroll">
+                            <table>
+                                <caption class="visually-hidden">Overzicht Handmatig gevrijwaarde gescande assets:</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Check</th>
+                                        <th scope="col">Compliancy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <a href="">DANE [3]</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 2</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 3</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 5</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 6</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/6 mailservers complient
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <h3>Web server</h3>
-                    <p>
-                        In de tabel is te zien welke checks er zijn uitgevoerd. Daaropvolgend de compliancy issues, weergegeven per webserver.
-                    </p>
-                    <div class="horizontal-scroll">
-                        <table>
-                            <caption class="visually-hidden">Overzicht Handmatig gevrijwaarde gescande assets:</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Check</th>
-                                    <th scope="col">Compliancy</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 3</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i>8/8 webservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 4</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 8/8 webservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 5</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 8/8 webservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Veilige ciphers check</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 7/8 webservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">HSTS policy check</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 7/8 webservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 1</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 5/8 webservers complient
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <a href="">Lorem Ipsum 2</a>
-                                    </td>
-                                    <td>
-                                        <i class="icon positive">Positief icoon</i> 6/8 webservers complient
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div>
+                        <h4>Web server</h4>
+                        <p>
+                            In de tabel is te zien welke checks er zijn uitgevoerd. Daaropvolgend de compliancy issues, weergegeven per webserver.
+                        </p>
+                        <div class="horizontal-scroll">
+                            <table>
+                                <caption class="visually-hidden">Overzicht Handmatig gevrijwaarde gescande assets:</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Check</th>
+                                        <th scope="col">Compliancy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 3</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i>8/8 webservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 4</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 8/8 webservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 5</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 8/8 webservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Veilige ciphers check</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 7/8 webservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">HSTS policy check</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 7/8 webservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 1</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 5/8 webservers complient
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="">Lorem Ipsum 2</a>
+                                        </td>
+                                        <td>
+                                            <i class="icon positive">Positief icoon</i> 6/8 webservers complient
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <h5>192.0.2.5 (sub.example.com)</h5>
+                        <p>Lorem ipsum dolor set amet.</p>
                     </div>
-                    <h4>192.0.2.5 (sub.example.com)</h4>
                 </div>
             </section>
         </div>

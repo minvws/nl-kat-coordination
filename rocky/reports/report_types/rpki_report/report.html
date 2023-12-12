@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<h2>{% translate "Resource Public Key Infrastructure" %}</h2>
+<h2>{% translate "Resource Public Key Infrastructure" %} {{ type }}</h2>
 {% if data.rpki_ips %}
     <div class="horizontal-scroll">
         <table>
@@ -24,7 +24,7 @@
     </div>
     {% for ip, info in data.rpki_ips.items %}
         {% if not info.valid %}
-            <p>{% translate "RPKI record does is not valid for" %} {{ ip }}.</p>
+            <p>{% translate "RPKI record is not valid for" %} {{ ip }}.</p>
         {% endif %}
         {% if not info.exists %}
             <p>{% translate "RPKI record does not exist for" %} {{ ip }}.</p>
