@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-08 16:37+0000\n"
+"POT-Creation-Date: 2023-12-12 15:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2731,10 +2731,12 @@ msgid "Resource Public Key Infrastructure"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
 msgid "Check"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
 msgid "Compliance"
 msgstr ""
 
@@ -2766,6 +2768,36 @@ msgstr ""
 msgid ""
 "Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
 "the ip addresses and whether they are covered by a valid RPKI ROA."
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "Safe Connections"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "Only Safe Ciphers"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "services are compliant"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "Compliance issue"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Risk level"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.py
+msgid "Safe Connections Report"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.py
+msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
@@ -4868,11 +4900,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #, python-format
 msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Risk level"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
