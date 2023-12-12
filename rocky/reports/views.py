@@ -6,8 +6,9 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from django_weasyprint import WeasyTemplateResponseMixin
 from katalogus.client import Plugin, get_katalogus
-from tools.view_helpers import BreadcrumbsMixin
+from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
 
 from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
@@ -204,4 +205,19 @@ class ReportView(BaseSelectionView, PluginSelectionView, TemplateView):
         context = super().get_context_data(**kwargs)
         context["report_types"] = self.get_report_types()
         context["report_data"] = self.generate_reports_for_oois()
+        context["report_download_url"] = url_with_querystring(
+            reverse("report_pdf", kwargs={"organization_code": self.organization.code}),
+            True,
+            **self.request.GET,
+        )
         return context
+
+
+class ReportPDFView(ReportView, WeasyTemplateResponseMixin):
+    template_name = "report_pdf.html"
+
+    pdf_filename = "report.pdf"
+    pdf_attachment = False
+    pdf_options = {
+        "pdf_variant": "pdf/ua-1",
+    }
