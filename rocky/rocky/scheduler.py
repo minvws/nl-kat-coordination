@@ -4,6 +4,7 @@ import datetime
 import uuid
 from enum import Enum
 from http import HTTPStatus
+from logging import getLogger
 from typing import Any, Dict, List, Optional, Union
 
 import requests
@@ -13,6 +14,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
+
+logger = getLogger(__name__)
 
 
 class Boefje(BaseModel):
@@ -180,6 +183,10 @@ class ConflictError(SchedulerError):
     message = _("Task already queued.")
 
 
+class TaskNotFoundError(SchedulerError):
+    message = _("Task not found.")
+
+
 class SchedulerClient:
     def __init__(self, base_uri: str):
         self.session = requests.Session()
@@ -215,10 +222,19 @@ class SchedulerClient:
             boefje_name=boefje_name,
         )
 
-    def get_task_details(self, task_id) -> Task:
+    def get_task_details(self, organization_code: str, task_id: str) -> Optional[Task]:
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
         res.raise_for_status()
-        return Task.model_validate_json(res.content)
+        task_details = Task.model_validate_json(res.content)
+
+        if task_details.type == "normalizer":
+            organization = task_details.p_item.data.raw_data.boefje_meta.organization
+        else:
+            organization = task_details.p_item.data.organization
+
+        if organization != organization_code:
+            raise TaskNotFoundError()
+        return task_details
 
     def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
         try:
