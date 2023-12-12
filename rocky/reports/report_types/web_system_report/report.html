@@ -1,37 +1,73 @@
 {% load i18n %}
 
 <p class="horizontal-scroll">
+    {{ data.web_checks }}
+    {{ data.web_checks.checks|length }}
     <p class="column-2">
         <table>
             <thead>
                 <tr>
-                    <th scope="col">{% translate "IP address" %}</th>
-                    <th scope="col">{% translate "Domain" %}</th>
-                    <th scope="col">{% translate "System type" %}</th>
+                    <th scope="col">{% translate "Check" %}</th>
+                    <th scope="col">{% translate "Compliance" %}</th>
                 </tr>
             </thead>
             <tbody>
-                {% for ip, ip_services in data.services.items %}
+                <tr>
+                    <td>CSP Present</td>
+                    <td>{{ data.web_checks.has_csp }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>Secure CSP Header</td>
+                    <td>
+                        {{ data.web_checks.has_csp_vulnerabilities }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Redirects HTTP to HTTPS</td>
+                    <td>{{ data.web_checks.redirects_http_https }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>Offers HTTPS</td>
+                    <td>{{ data.web_checks.offers_https }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>Has a Security.txt</td>
+                    <td>{{ data.web_checks.has_security_txt }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>No unnecessary ports open</td>
+                    <td>{{ data.web_checks.no_uncommon_ports }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>Has a certificate</td>
+                    <td>{{ data.web_checks.has_certificates }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>Certificate is not expired</td>
+                    <td>
+                        {{ data.web_checks.certificates_not_expired }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Certificate is not expiring soon</td>
+                    <td>{{ data.web_checks.has_csp }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p class="column-2">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "Compliance issue" %}</th>
+                    <th scope="col">{% translate "Risk level" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for finding_type in data.finding_types %}
                     <tr>
-                        <td>{{ ip }}</td>
-                        <td>
-                            {% for hostname in ip_services.hostnames %}
-                                {% if not forloop.last %}
-                                    {{ hostname }},
-                                {% else %}
-                                    {{ hostname }}
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% for service in ip_services.services %}
-                                {% if not forloop.last %}
-                                    {{ service }},
-                                {% else %}
-                                    {{ service }}
-                                {% endif %}
-                            {% endfor %}
-                        </td>
+                        <td>{{ finding_type.description }}</td>
+                        <td>{{ finding_type.risk_severity }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

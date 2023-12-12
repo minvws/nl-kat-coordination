@@ -202,23 +202,6 @@ def test_query_for_system_report(
 
     ip_services = {}
 
-    # while True:
-    #     if (
-    #         len(
-    #             [
-    #                 str(x.hostname)
-    #                 for x in octopoes_api_connector.query(
-    #                     "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
-    #                     valid_time,
-    #                     ips[0].reference,
-    #                 )
-    #                 if x.hostname == Reference.from_str("Hostname|test|c.example.com")
-    #             ]
-    #         )
-    #         == 1
-    #     ):
-    #         break
-    #     breakpoint()
 
     for ip in ips:
         ip_services[str(ip.address)] = {
