@@ -241,7 +241,7 @@ def format_id_short(id_: str) -> str:
 class PrimaryKeyToken(RootModel):
     root: Dict[str, Union[str, PrimaryKeyToken]]
 
-    def __getattr__(self, item):
+    def __getattr__(self, item) -> Union[str, PrimaryKeyToken]:
         return self.root[item]
 
     def __getitem__(self, item) -> Union[str, PrimaryKeyToken]:
