@@ -12,9 +12,8 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
-from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.repositories.origin_repository import XTDBOriginRepository
-from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
+from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
 from octopoes.xtdb.query import Query
 from tests.conftest import seed_system
