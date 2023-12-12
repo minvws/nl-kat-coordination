@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <section id="ipv6">
-    <div class="horizontal-scroll">
+    <div>
         {% if show_heading %}<h2>IPv6</h2>{% endif %}
         <p>
             {% blocktranslate trimmed %}
@@ -10,38 +10,40 @@
                 and its adoption can contribute to a more secure internet.
             {% endblocktranslate %}
         </p>
-        <table>
-            <caption class="visually-hidden">{% translate "Basic example table:" %}</caption>
-            <thead>
-                <tr>
-                    <th scope="col">{% translate "Domain" %}</th>
-                    <th scope="col">{% translate "System type" %}</th>
-                    <th scope="col">IPv6</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for hostname, info in data.items %}
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">{% translate "IPV6 overview:" %}</caption>
+                <thead>
                     <tr>
-                        <td>{{ hostname }}</td>
-                        <td>
-                            {% for system in info.systems %}
-                                {% if not forloop.last %}
-                                    {{ system }},
-                                {% else %}
-                                    {{ system }}
-                                {% endif %}
-                            {% endfor %}
-                        </td>
-                        <td>
-                            {% if info.enabled %}
-                                <span class="icon positive"></span>
-                            {% else %}
-                                <span class="icon negative"></span>
-                            {% endif %}
-                        </td>
+                        <th scope="col">{% translate "Domain" %}</th>
+                        <th scope="col">{% translate "System type" %}</th>
+                        <th scope="col">IPv6</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for hostname, info in data.items %}
+                        <tr>
+                            <td>{{ hostname }}</td>
+                            <td>
+                                {% for system in info.systems %}
+                                    {% if not forloop.last %}
+                                        {{ system }},
+                                    {% else %}
+                                        {{ system }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if info.enabled %}
+                                    <span class="icon positive"></span>
+                                {% else %}
+                                    <span class="icon incomplete"></span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </section>

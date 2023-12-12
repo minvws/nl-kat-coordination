@@ -1,22 +1,17 @@
 {% load i18n %}
 
-<main id="main-content" tabindex="-1" class="sidemenu choose-report">
+<main id="main-content"
+      tabindex="-1"
+      class="sidemenu choose-report report"
+      lang="nl">
     {% include "partials/report_sidemenu.html" %}
 
-    <section class="report" lang="nl">
-        <div class="horizontal-view toolbar">
-            <a href="{{ report_download_url }}"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="button">{% translate "Download report" %}</a>
-        </div>
-        <div>
-            {% include "aggregate_organisation_report/introduction.html" %}
+    <article>
+        {% include "aggregate_organisation_report/introduction.html" %}
+        {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
+        {% include "aggregate_organisation_report/term_overview.html" %}
 
-        </div>
-        <div class="chapter-numbers">
-            {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
-            {% include "aggregate_organisation_report/term_overview.html" %}
+        <div class="chapter-numbers report-content">
             {% include "aggregate_organisation_report/recommendations.html" %}
             {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
 
@@ -33,18 +28,18 @@
             {% if data.system_specific %}
                 <section id="rpki">
                     <div>
-                        <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+                        <h2>{% translate "Resource Public Key Infrastructure" %}</h2>
                         {% for system_type, system in data.system_specific.items %}
                             {% if system %}
                                 {% include "rpki_report/report.html" with data=system.rpki type=system_type %}
 
                             {% endif %}
                         {% endfor %}
-                    {% endif %}
-                </div>
-            </section>
-            <section>
-                <div id="vulnerabilities">
+                    </div>
+                </section>
+            {% endif %}
+            <section id="vulnerabilities">
+                <div>
                     <h2>{% translate "Vulnerabilities" %}</h2>
                     <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
                     {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
@@ -58,5 +53,5 @@
                 </div>
             </section>
         </div>
-    </section>
+    </article>
 </main>

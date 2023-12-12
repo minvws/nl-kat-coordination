@@ -145,7 +145,7 @@
             </div>
         </section>
         <div class="chapter-numbers report-content">
-            <section id="general-recommendations">
+            <section id="recommendations">
                 <div>
                     <h2>General recommendations</h2>
                     <p>
@@ -361,6 +361,20 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </section>
+            <section id="vulnerabilities">
+                <div>
+                    <h2>{% translate "Vulnerabilities" %}</h2>
+                    <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                        <h3>{{ input_ooi }}</h3>
+                        <p>
+                            <strong>{{ vulnerabilities.summary.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
+                        </p>
+                        {% include "vulnerability_report/report.html" with data=vulnerabilities %}
+
+                    {% endfor %}
                 </div>
             </section>
             <section id="basic-security">

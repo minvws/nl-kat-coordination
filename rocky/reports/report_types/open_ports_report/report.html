@@ -29,7 +29,7 @@
                         <td>
                             {% for port, is_open in detailed_data.ports.items %}
                                 {% if is_open %}
-                                    <span class="open">{{ port }}</span>
+                                    <strong><span class="visually-hidden">(startpunt)</span>{{ port }}</strong>
                                 {% else %}
                                     {{ port }}
                                     {{ meta_data.ports|length }}
