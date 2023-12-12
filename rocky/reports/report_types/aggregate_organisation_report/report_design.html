@@ -9,11 +9,13 @@
     {% include "partials/report_sidemenu.html" %}
 
     <article>
-        <section class="introduction">
+        <section class="introduction" id="introduction">
             <div>
                 <div class="horizontal-view toolbar">
                     <h1>Mockup rapportage OpenKAT</h1>
-                    <button>Save report</button>
+                    <button>
+                        Save report <span class="icon ti-chevron-down">Chevron down icoon</span>
+                    </button>
                 </div>
                 <div>
                     <p>Dit is het OpenKAT rapport voor organisatie Organisatienaam.</p>
@@ -28,7 +30,7 @@
                 </div>
             </div>
         </section>
-        <section>
+        <section id="summary">
             <div>
                 <h2>{% translate "Summary" %}</h2>
                 <dl>
@@ -89,7 +91,7 @@
                 </dl>
             </div>
         </section>
-        <section>
+        <section id="term-overview">
             <div>
                 <h2>Term overview</h2>
                 <p>Onderstaand overzicht bevat definities van begrippen die in deze rapportage worden gebruikt.</p>
@@ -172,6 +174,7 @@
                                     <th scope="col">IP address</th>
                                     <th scope="col">Domain</th>
                                     <th scope="col">System type</th>
+                                    <th scope="col">Vulnerabilities</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -181,10 +184,11 @@
                                     </td>
                                     <td>example.com, sub.example.com</td>
                                     <td>Mail, web</td>
+                                    <td>-</td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i class="icon cancelled"></i> 192.0.2.5
+                                        192.0.2.5
                                         <span class="nowrap">
                                             <span class="new">New</span>
                                             <span class="de-emphasized">since Oct. 8, 2023</span>
@@ -192,21 +196,27 @@
                                     </td>
                                     <td>sub.example.com</td>
                                     <td>Web</td>
+                                    <td class="nowrap">
+                                        <i class="icon cancelled"></i> Vulnerability found
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>192.0.2.8</td>
                                     <td>-</td>
                                     <td>Nameserver (DNS)</td>
+                                    <td>-</td>
                                 </tr>
                                 <tr>
                                     <td>198.51.100.125</td>
                                     <td>a.example.com, b.example.com, c.example.com, d.example.com, e.example.com, f.example.com</td>
                                     <td>Web, mail, dicom</td>
+                                    <td>-</td>
                                 </tr>
                                 <tr>
                                     <td>2001:db8:ffff:ffff:ffff:ffff:ffff:ffff</td>
                                     <td>ipv6.example.com</td>
                                     <td>Web</td>
+                                    <td>-</td>
                                 </tr>
                             </tbody>
                         </table>
