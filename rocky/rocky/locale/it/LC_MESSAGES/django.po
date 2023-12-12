@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-24 15:30+0000\n"
+"POT-Creation-Date: 2023-11-30 15:14+0000\n"
 "PO-Revision-Date: 2023-11-16 20:05+0000\n"
 "Last-Translator: Luca Racchetti <razzo1987@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -3194,6 +3194,26 @@ msgstr ""
 msgid "Combine IP addresses, hostnames and services into systems."
 msgstr ""
 
+#: reports/report_types/systems_report/report.py
+msgid "Web"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Mail"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Dicom"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "DNS"
+msgstr ""
+
+#: reports/report_types/systems_report/report.py
+msgid "Other"
+msgstr ""
+
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/partials/task_history.html
@@ -4321,6 +4341,7 @@ msgstr "Imposta filtri"
 
 #: rocky/templates/findings/findings_filter.html
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
+#: rocky/templates/tasks/partials/task_filter.html
 msgid "Clear filters"
 msgstr "Cancella filtri"
 
