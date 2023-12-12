@@ -38,16 +38,31 @@ Pre-commit
 
 Continuous Integration will run several checks as mentioned above, like ``black``, ``ruff`` and more using pre-commit hooks.
 Any warnings from these checks will cause the Continuous Integration to fail; therefore, it is helpful to run the check yourself before submitting code.
-This can be done by `installing pre-commit <https://pre-commit.com/#install>`_::
+This can be done automatically by `installing pre-commit <https://pre-commit.com/#install>`_. We recommend that you first
+`install pipx <https://pipx.pypa.io/stable/installation/>`_ and then use pipx to install pre-commit:
 
-    pip install pre-commit
+    pipx install pre-commit
 
-and then running::
+If you already use homebrew you can also use it to install pre-commit:
+
+    brew install pre-commit
+
+Note that using apt to install pre-commit is not recommended because that will give you an old pre-commit version that might
+not work. After pre-commit is installed, run::
 
     pre-commit install
 
 from the root directory of a repository. Now all of the checks will be run each time you commit changes without your needing to run each one manually.
 In addition, using pre-commit will also allow you to more easily remain up-to-date with our code checks as they change.
+
+Signed commits
+==============
+
+The OpenKAT github project is configured to require all commits of a PR to be
+signed. The easiest way to do this is to configure git to automatically sign all
+commits by default. See the `GitHub documentation
+<https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits>`_
+how to do this.
 
 Type Hinting
 ============
