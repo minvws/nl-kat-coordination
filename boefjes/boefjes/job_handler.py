@@ -83,9 +83,12 @@ def serialize_ooi(ooi: OOI):
 
 def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str]) -> Dict[str, str]:
     try:
-        environment = requests.get(
-            f"{settings.katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
-        ).json()
+        katalogus_api = str(settings.katalogus_api).rstrip("/")
+        response = requests.get(
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
+        )
+        response.raise_for_status()
+        environment = response.json()
 
         # Add prefixed BOEFJE_* global environment variables
         for key, value in os.environ.items():
