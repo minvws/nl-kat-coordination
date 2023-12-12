@@ -1,6 +1,6 @@
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from requests import HTTPError
@@ -12,6 +12,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
+from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
@@ -150,6 +151,25 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     assert xtdb_session.client.query(query) == []
 
     assert len(xtdb_session.client.query(str(Query(Network)))) == 2
+
+
+def test_entity_history(xtdb_session: XTDBSession, valid_time: datetime):
+    network = Network(name="testnetwork")
+    xtdb_session.put(XTDBOOIRepository.serialize(network), datetime.now(timezone.utc))
+    xtdb_session.commit()
+
+    xtdb_session.add((OperationType.DELETE, str(network.reference), datetime.now(timezone.utc)))
+    xtdb_session.commit()
+
+    xtdb_session.put(XTDBOOIRepository.serialize(network), datetime.now(timezone.utc))
+    xtdb_session.commit()
+
+    history = xtdb_session.client.get_entity_history(str(network.reference), with_docs=True)
+    assert len(history) == 3
+
+    assert history[0].document is not None
+    assert history[1].document is None
+    assert history[2].document is not None
 
 
 def test_query_for_system_report(

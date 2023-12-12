@@ -70,8 +70,7 @@ def run(org_num: int = 1):
         print("data.csv file not found")
         return
 
-    data_file = Path("data.csv").open(newline="", encoding="utf-8")
-    with data_file as csv_file:
+    with Path("data.csv").open(newline="", encoding="utf-8") as csv_file:
         csv_reader = csv.DictReader(csv_file, delimiter=",", quotechar='"')
         for row in csv_reader:
             name = row["name"]
