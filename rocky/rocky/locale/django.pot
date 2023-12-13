@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-12 15:04+0000\n"
+"POT-Creation-Date: 2023-12-13 11:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2728,19 +2728,13 @@ msgstr ""
 
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
 msgid "Check"
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
-msgid "Check"
-msgstr ""
-
-#: reports/report_types/rpki_report/report.html
-#: reports/report_types/safe_connections_report/report.html
-msgid "Compliance"
-
 msgid "Compliance"
 msgstr ""
 
@@ -2749,10 +2743,12 @@ msgid "mailservers compliant"
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
+#: reports/report_types/safe_connections_report/report.html
 msgid "Compliance issue"
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
+#: reports/report_types/safe_connections_report/report.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Risk level"
@@ -2811,16 +2807,6 @@ msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
 msgid "services are compliant"
-msgstr ""
-
-#: reports/report_types/safe_connections_report/report.html
-msgid "Compliance issue"
-msgstr ""
-
-#: reports/report_types/safe_connections_report/report.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Risk level"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.py
@@ -2955,7 +2941,7 @@ msgid ""
 "of critical data and resources."
 msgstr ""
 
-#: reports/templates/report.html
+#: reports/templates/report.html reports/templates/report_pdf.html
 msgid "for"
 msgstr ""
 

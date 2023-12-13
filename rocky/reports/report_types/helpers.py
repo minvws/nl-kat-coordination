@@ -9,7 +9,6 @@ from reports.report_types.safe_connections_report.report import SafeConnectionsR
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.tls_report.report import TLSReport
 
-
 REPORTS = [DNSReport, TLSReport, SystemReport, RPKIReport, MailReport, SafeConnectionsReport]
 
 
