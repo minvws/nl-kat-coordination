@@ -1,8 +1,10 @@
 /* Accordion - Variables */
 
 :root {
+  --accordion-gap: 0;
+
   /* Button */
-  --accordion-button-padding: 0;
+  --accordion-button-padding: 0.75rem 0;
   --accordion-button-justify-content: flex-start;
   --accordion-button-background-color: transparent;
   --accordion-button-text-color: #006fb3;
@@ -34,11 +36,34 @@
   --accordion-content-border-color: #cccccc;
   --accordion-content-background-color: #ffffff;
   --accordion-content-text-color: #000000;
+  --accordion-content-padding: 1.5rem 2rem 2rem 2rem;
 }
 
-.accordion button {
-  border-width: 0 0 1px;
-  border-radius: 0;
-  border-color: #d4d4d4;
-  max-width: 100%;
+.accordion {
+  padding: 0;
+
+  > li {
+    padding: 0;
+
+    button {
+      border-width: 0 0 1px;
+      border-radius: 0;
+      border-color: #d4d4d4;
+      max-width: 100%;
+
+      &[aria-expanded="true"] {
+        border-width: 0;
+
+        + div {
+          border-bottom-width: 2px;
+        }
+      }
+    }
+
+    &:first-child {
+      button {
+        border-top-width: 1px;
+      }
+    }
+  }
 }
