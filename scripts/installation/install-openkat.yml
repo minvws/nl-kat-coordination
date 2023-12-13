@@ -22,6 +22,8 @@
 #                     current stable standard Ansible
 # 2023-09-16 J. Baten Inject variables for version numbers, and prepare for MR.
 # 2023-11-19 J. Baten Handling MR feedback.
+# 2023-12-06 J. Baten Handling more MR feedback.
+# 2023-10-13 J. Baten Handling more MR feedback.
 
 # Usage: Make sure you can ssh to the root account on the remote server using
 #        authorized_keys. After that run the following command (and don't forget
@@ -67,6 +69,20 @@
       # Generate a safe password for the KAT user in rabbitmq. You can use the /dev/urandom method again and put it in a shell variable to use it later:
       # rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20). Well, you can, but this works too. :-)
       kat_mq_password: "{{ lookup('password', '/dev/null length=20 chars=ascii_letters') }}"
+
+  # If you will be running the database on the same machine as KAT, you can install Postgres:
+  # sudo apt install postgresql
+  - name: Install needed packages
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - python3-psycopg2
+      - python3-pexpect
+      - postgresql
+      - postgresql-client
+      - rabbitmq-server
+      - sudo
 
   # Downloading and installing
   # Download the packages for all the components of KAT from GitHub. Also download the XTDB multinode package from GitHub.
@@ -117,20 +133,6 @@
 
   # Set up the databases
   # OpenKAT needs three databases for its components. One for rocky, KAT-alogus and bytes. The following steps will guide you through the creation of these databases.
-  # If you will be running the database on the same machine as KAT, you can install Postgres:
-  # sudo apt install postgresql
-  - name: Install other needed packages
-    ansible.builtin.apt:
-      name: "{{ item }}"
-      state: present
-    loop:
-      - python3-psycopg2
-      - python3-pexpect
-      - postgresql
-      - postgresql-client
-      - rabbitmq-server
-      - sudo
-
   # To configure rocky to use this password, open /etc/kat/rocky.conf and fill in this password for ROCKY_DB_PASSWORD.
   - name: Store password in /etc/kat/rocky.conf
     ansible.builtin.lineinfile:
