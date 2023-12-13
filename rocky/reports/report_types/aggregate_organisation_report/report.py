@@ -91,13 +91,22 @@ class AggregateOrganisationReport(AggregateReport):
             for service in services:
                 if service not in system_specific:
                     system_specific[service] = {
-                        "rpki": {"rpki_ips": {}, "number_of_available": 0, "number_of_valid": 0, "number_of_ips": 0}
+                        "rpki": {
+                            "rpki_ips": {},
+                            "number_of_available": 0,
+                            "number_of_valid": 0,
+                            "number_of_ips": 0,
+                            "number_of_compliant": 0,
+                        }
                     }
                 if ip not in system_specific[service]["rpki"]["rpki_ips"]:
                     system_specific[service]["rpki"]["rpki_ips"][ip] = compliance
                     system_specific[service]["rpki"]["number_of_ips"] += 1
                     system_specific[service]["rpki"]["number_of_available"] += 1 if compliance["exists"] else 0
                     system_specific[service]["rpki"]["number_of_valid"] += 1 if compliance["valid"] else 0
+                    system_specific[service]["rpki"]["number_of_compliant"] += (
+                        1 if compliance["exists"] and compliance["valid"] else 0
+                    )
 
         summary = {
             _("General recommendations"): "",
