@@ -2726,10 +2726,12 @@ msgid ""
 "weaknesses."
 msgstr ""
 
+#: reports/report_types/mail_report/report.html
 #: reports/report_types/rpki_report/report.html
-msgid "Resource Public Key Infrastructure"
+msgid "Check"
 msgstr ""
 
+#: reports/report_types/mail_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 msgid "Check"
@@ -2738,6 +2740,35 @@ msgstr ""
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 msgid "Compliance"
+
+msgid "Compliance"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid "mailservers compliant"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid "Compliance issue"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Risk level"
+msgstr ""
+
+#: reports/report_types/mail_report/report.py
+msgid "Mail Report"
+msgstr ""
+
+#: reports/report_types/mail_report/report.py
+msgid ""
+"System specific mail report that focusses on IP addresses and hostnames."
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Resource Public Key Infrastructure"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
