@@ -16,7 +16,7 @@ jobs:
         cache: pip
 
     - name: Install pre-commit
-      run: pip install pre-commit==3.5.0
+      run: pip install pre-commit==3.6.0
 
     - uses: actions/cache@v3
       with:

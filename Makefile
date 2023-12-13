@@ -132,7 +132,7 @@ poetry-dependencies:
 	done
 
 fix-poetry-merge-conflict:
-	for path in `git diff --staged --name-only | grep -q "pyproject.toml" | cut -d / -f 1`; do \
+	for path in `git diff --staged --name-only | grep "pyproject.toml" | cut -d / -f 1`; do \
 		echo $$path; \
 		git restore --staged $$path/poetry.lock $$path/requirements*; \
 		git checkout --theirs $$path/poetry.lock $$path/requirements*; \
