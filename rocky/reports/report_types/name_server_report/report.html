@@ -1,0 +1,52 @@
+{% load i18n %}
+
+<p class="horizontal-scroll">
+    <p class="column-2">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "Check" %}</th>
+                    <th scope="col">{% translate "Compliance" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{% translate "DNSSEC Present" %}</td>
+                    <td>
+                        {{ data.name_server_checks.has_dnssec }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% translate "Valid DNSSEC" %}</td>
+                    <td>
+                        {{ data.name_server_checks.has_valid_dnssec }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% translate "No unnecessary ports open" %}</td>
+                    <td>
+                        {{ data.name_server_checks.no_uncommon_ports }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    <p class="column-2">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "Compliance issue" %}</th>
+                    <th scope="col">{% translate "Risk level" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for finding_type in data.finding_types %}
+                    <tr>
+                        <td>{{ finding_type.description }}</td>
+                        <td>{{ finding_type.risk_severity }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </p>
+</p>
