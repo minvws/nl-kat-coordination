@@ -189,7 +189,7 @@ def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) 
         return
 
     if not task:
-        messages.error(request, _("Task not found"))
+        messages.error(request, _("Task not found."))
         return
 
     # Remove id from task data, this should be created by the scheduler
