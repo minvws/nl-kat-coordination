@@ -18,6 +18,17 @@ class AggregateOrganisationReport(AggregateReport):
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report, RPKIReport]}
     template_path = "aggregate_organisation_report/report.html"
+    summary = {
+        _("General recommendations"): "",
+        _("Critical vulnerabilities"): 0,
+        _("Assets (IP/domains) scanned"): 0,
+        _("Sector of organisation"): "",
+        _("Basic security score compared to sector"): "",
+        _("Sector defined"): "",
+        _("Lowest security score in organisation"): "",
+        _("Newly discovered items since last week, october 8th 2023"): "",
+        _("Terms in report"): "",
+    }
 
     def post_process_data(self, data):
         systems = {"services": {}}
