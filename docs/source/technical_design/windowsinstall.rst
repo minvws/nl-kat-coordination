@@ -1,6 +1,6 @@
-===================================
-Installation of OpenKAT on Windows
-===================================
+================================
+Development: make kat on Windows
+================================
 
 This manual helps you to install and run OpenKAT on your Windows with the use of WSL2.
 
