@@ -6,8 +6,8 @@ from reports.report_types.aggregate_organisation_report.report import AggregateO
 from reports.report_types.definitions import Report
 from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.ipv6_report.report import IPv6Report
-from reports.report_types.open_ports_report.report import OpenPortsReport
 from reports.report_types.mail_report.report import MailReport
+from reports.report_types.open_ports_report.report import OpenPortsReport
 from reports.report_types.rpki_report.report import RPKIReport
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.tls_report.report import TLSReport
