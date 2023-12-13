@@ -116,20 +116,30 @@ docs:
 	sphinx-build -b html docs/source docs/_build
 
 poetry-dependencies:
-	for path in . keiko octopoes boefjes bytes mula rocky; do \
-		echo $$path; \
-		poetry check --lock -C $$path; \
-		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt; \
-		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt; \
+	files=$$(find . -name pyproject.toml -maxdepth 2); \
+	for path in $$files; do \
+		project_dir=$$(dirname $$path); \
+		echo "Processing $$path..."; \
+		poetry check --lock -C $$project_dir; \
+		echo "Exporting main dependencies..."; \
+		poetry export -C $$project_dir --only main -f requirements.txt -o $$project_dir/requirements.txt; \
+		if grep -q "tool.poetry.group.dev.dependencies" $$path; then \
+			echo "Exporting dev dependencies..."; \
+			poetry export -C $$project_dir --with dev -f requirements.txt -o $$project_dir/requirements-dev.txt; \
+		else \
+			echo "No dev group, skipping requirements-dev.txt..."; \
+		fi; \
 	done
 
 fix-poetry-merge-conflict:
-	for path in `git diff --staged --name-only | grep pyproject | cut -d / -f 1`;do \
+	for path in `git diff --staged --name-only | grep "pyproject.toml" | cut -d / -f 1`; do \
 		echo $$path; \
 		git restore --staged $$path/poetry.lock $$path/requirements*; \
 		git checkout --theirs $$path/poetry.lock $$path/requirements*; \
 		poetry lock --no-update -C $$path; \
-		poetry export -C $$path --without=dev -f requirements.txt -o $$path/requirements.txt; \
-		poetry export -C $$path --with=dev -f requirements.txt -o $$path/requirements-dev.txt; \
+		poetry export -C $$path --only main -f requirements.txt -o $$path/requirements.txt; \
+		if grep -q "tool.poetry.group.dev.dependencies" $$path; then \
+			poetry export -C $$path --with dev -f requirements.txt -o $$path/requirements-dev.txt; \
+		fi; \
 		git add $$path/poetry.lock $$path/requirements*; \
 	done

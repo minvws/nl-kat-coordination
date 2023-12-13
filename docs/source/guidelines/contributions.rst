@@ -25,8 +25,8 @@ See :ref:`Development` for our code style, coding conventions, and overall workf
     - This branch should be in the following format:
     - ``[feature|enhancement|bug|hotfix]/random-cat-popup-on-screen``
 - Commit and push the code
-    - Make sure the code is linted, formatted and has correct typing
-    - The code must pass ``pre-commit`` locally
+    - Make sure the code is linted, formatted and has correct typing. Use ``pre-commit`` locally for this, see :ref:`Pre-commit`.
+    - All commits must be signed, see :ref:`Signed commits`.
 - Submit Pull Request
     - Make sure your code is tested and the PR has a good title and description
     - Use the PR template
