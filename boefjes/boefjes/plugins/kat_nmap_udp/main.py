@@ -33,7 +33,7 @@ def build_nmap_arguments(host: str, top_ports: int) -> List[str]:
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     """Build Nmap arguments and return results to normalizer."""
-    top_ports = int(getenv("TOP_PORTS", TOP_PORTS_DEFAULT))
+    top_ports = int(getenv("TOP_PORTS_UDP", TOP_PORTS_DEFAULT))
 
     return [
         (
