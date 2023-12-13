@@ -18,7 +18,7 @@
   h3 {
     &::before {
       counter-increment: subchapter;
-      content: counter(chapter) "." counter(subchapter) ". ";
+      content: counter(chapter) "." counter(subchapter) " ";
     }
   }
 }
@@ -44,7 +44,7 @@ ol.chapter-numbers {
 
         &::before {
           counter-increment: subchapter;
-          content: counter(chapter) "." counter(subchapter) ". ";
+          content: counter(chapter) "." counter(subchapter) " ";
         }
       }
     }

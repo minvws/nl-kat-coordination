@@ -35,7 +35,7 @@
                 <h2>{% translate "Summary" %}</h2>
                 <dl>
                     <div>
-                        <dt>General recommendations</dt>
+                        <dt>Recommendations</dt>
                         <dd>
                             3
                         </dd>
@@ -147,7 +147,7 @@
         <div class="chapter-numbers report-content">
             <section id="recommendations">
                 <div>
-                    <h2>General recommendations</h2>
+                    <h2>Recommendations</h2>
                     <p>
                         Er zijn <i>n</i> kwetsbaarheden gevonden op <i>m</i> systemen. <i>O</i> systemen missen belangrijke basisbeveiligingsmaatregelen.
                     </p>
@@ -361,20 +361,6 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </section>
-            <section id="vulnerabilities">
-                <div>
-                    <h2>{% translate "Vulnerabilities" %}</h2>
-                    <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
-                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                        <h3>{{ input_ooi }}</h3>
-                        <p>
-                            <strong>{{ vulnerabilities.summary.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
-                        </p>
-                        {% include "vulnerability_report/report.html" with data=vulnerabilities %}
-
-                    {% endfor %}
                 </div>
             </section>
             <section id="basic-security">
@@ -610,6 +596,20 @@
                         <h5>192.0.2.5 (sub.example.com)</h5>
                         <p>Lorem ipsum dolor set amet.</p>
                     </div>
+                </div>
+            </section>
+            <section id="vulnerabilities">
+                <div>
+                    <h2>{% translate "Vulnerabilities" %}</h2>
+                    <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                        <h3>{{ input_ooi }}</h3>
+                        <p>
+                            <strong>{{ vulnerabilities.summary.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
+                        </p>
+                        {% include "vulnerability_report/report.html" with data=vulnerabilities %}
+
+                    {% endfor %}
                 </div>
             </section>
         </div>
