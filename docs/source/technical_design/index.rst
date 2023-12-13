@@ -13,6 +13,7 @@ Contains documentation for developers and contributors.
    scripts
    hardening
    localinstall
+   windowsinstall
    gitpod
    nginx
    debuggingtroubleshooting
