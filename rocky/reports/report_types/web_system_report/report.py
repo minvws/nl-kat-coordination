@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
@@ -101,7 +102,7 @@ class WebSystemReport(Report):
             )
 
         web_checks = WebChecks(checks=[])
-        finding_types = []
+        finding_types = {}
 
         for web_hostname in hostnames:
             check = WebCheck()
@@ -171,7 +172,8 @@ class WebSystemReport(Report):
             ]
 
             web_checks.checks.append(check)
-            finding_types.extend(
+
+            new_types = (
                 resource_finding_types
                 + header_finding_types
                 + url_finding_types
@@ -180,8 +182,14 @@ class WebSystemReport(Report):
                 + certificate_finding_types
             )
 
+            for finding_type in new_types:
+                if finding_type.risk_severity in [None, RiskLevelSeverity.PENDING] or not finding_type.description:
+                    continue
+
+                finding_types[finding_type.id] = finding_type
+
         return {
             "input_ooi": input_ooi,
             "web_checks": web_checks,
-            "finding_types": finding_types,
+            "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
         }
