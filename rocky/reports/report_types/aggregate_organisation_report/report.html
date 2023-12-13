@@ -8,10 +8,10 @@
 
     <article>
         {% include "aggregate_organisation_report/introduction.html" %}
-        {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
-        {% include "aggregate_organisation_report/term_overview.html" %}
 
         <div class="chapter-numbers report-content">
+            {% include "aggregate_organisation_report/summary.html" with data=data.summary %}
+            {% include "aggregate_organisation_report/term_overview.html" %}
             {% include "aggregate_organisation_report/recommendations.html" with data=data.recommendations total_findings=data.total_findings total_systems=data.total_systems %}
             {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
 
@@ -28,7 +28,7 @@
             {% if data.system_specific %}
                 <section id="rpki">
                     <div>
-                        <h2>{% translate "Resource Public Key Infrastructure" %}</h2>
+                        <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
                         {% for system_type, system in data.system_specific.items %}
                             {% if system %}
                                 {% include "rpki_report/report.html" with data=system.rpki type=system_type %}

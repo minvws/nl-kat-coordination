@@ -54,10 +54,11 @@ class AggregateOrganisationReport(AggregateReport):
                     total_hostnames += data["data"]["summary"]["total_domains"]
 
                 if report == "Open Ports Report":
-                    open_ports[data["data"]["ip"]] = {
-                        "ports": data["data"]["ports"],
-                        "hostnames": data["data"]["hostnames"],
-                    }
+                    for ip, details in data["data"].items():
+                        open_ports[ip] = {
+                            "ports": details["ports"],
+                            "hostnames": details["hostnames"],
+                        }
 
                 if report == "IPv6 Report":
                     for hostname, info in data["data"].items():

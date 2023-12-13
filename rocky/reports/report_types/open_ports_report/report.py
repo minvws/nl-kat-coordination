@@ -45,4 +45,4 @@ class OpenPortsReport(Report):
             found_by_nmap = len(nmap_origin) > 0
             port_numbers[port.port] = found_by_nmap
 
-        return {"ports": port_numbers, "hostnames": hostnames, "ip": ref.tokenized.address}
+        return {ref.tokenized.address: {"ports": port_numbers, "hostnames": hostnames}}
