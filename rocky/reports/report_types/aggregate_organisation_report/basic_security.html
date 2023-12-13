@@ -20,4 +20,34 @@
             {% endblocktranslate %}
         </p>
     </div>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">{% translate "IPV6 overview:" %}</caption>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "System type" %}</th>
+                    <th scope="col">{% translate "Safe connections" %}</th>
+                    <th scope="col">{% translate "System Specific" %}</th>
+                    <th scope="col">{% translate "RPKI" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for system_type, system in data.system_specific.items %}
+                    <tr>
+                        <td>{{ system_type }} {% translate "server" %} ({{ system.rpki.number_of_ips }})</td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            {% if system.rpki.number_of_compliant != system.rpki.number_of_ips %}
+                                <span class="icon negative"></span>
+                            {% else %}
+                                <span class="icon positive"></span>
+                            {% endif %}
+                            {{ system.rpki.number_of_compliant }}/{{ system.rpki.number_of_ips }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </section>
