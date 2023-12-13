@@ -66,7 +66,7 @@ class Settings(BaseSettings):
 
     json_logging: bool = Field(
         False,
-        description="Enables/disables structured logging",
+        description="Enables/disables structured logging in json format",
     )
 
     # Server settings

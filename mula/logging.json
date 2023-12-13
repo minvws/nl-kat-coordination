@@ -21,6 +21,21 @@
         ]
     },
     "loggers": {
+        "alembic.runtime.migration": {
+            "level": "CRITICAL",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        },
+
+        "urllib3.connectionpool": {
+            "level": "CRITICAL",
+            "handlers": [
+                "console"
+            ],
+            "propagate": 0
+        },
         "uvicorn.error": {
             "level": "CRITICAL",
             "handlers": [
