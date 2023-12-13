@@ -35,7 +35,10 @@ class SafeConnectionsReport(Report):
 
         for ip in ips:
             finding_types = self.octopoes_api_connector.query(
-                "IPAddress.<ooi[is Finding].finding_type", valid_time, ip.reference
+                "IPAddress.<address[is IPPort].<ip_port [is IPService]"
+                ".<ip_service [is TLSCipher].<ooi[is Finding].finding_type",
+                valid_time,
+                ip.reference,
             )
 
             cipher_findings = list(filter(lambda finding: finding.id in CIPHER_FINDINGS, finding_types))
