@@ -25,24 +25,30 @@ class OpenPortsReport(Report):
         ref = Reference.from_str(input_ooi)
         if ref.class_type == Hostname:
             path = Path.parse("Hostname.<hostname [is ResolvedHostname].address")
-            ip = self.octopoes_api_connector.query(path=path, source=ref, valid_time=valid_time)
-            if not ip:
+            ips = self.octopoes_api_connector.query(path=path, source=ref, valid_time=valid_time)
+            if not ips:
                 return {"data": "No IP address found for hostname"}
+            references = [ip.reference for ip in ips]
+        else:
+            references = [ref]
 
-            ref = ip[0].reference
+        results = {}
+        for ref in references:
+            ports_path = Path.parse("IPAddress.<address [is IPPort]")
+            ports = self.octopoes_api_connector.query(path=ports_path, source=ref, valid_time=valid_time)
 
-        ports_path = Path.parse("IPAddress.<address [is IPPort]")
-        ports = self.octopoes_api_connector.query(path=ports_path, source=ref, valid_time=valid_time)
+            hostnames_path = Path.parse("IPAddress.<address [is ResolvedHostname].hostname")
+            hostnames = self.octopoes_api_connector.query(path=hostnames_path, source=ref, valid_time=valid_time)
+            hostnames = [h.name for h in hostnames]
 
-        hostnames_path = Path.parse("IPAddress.<address [is ResolvedHostname].hostname")
-        hostnames = self.octopoes_api_connector.query(path=hostnames_path, source=ref, valid_time=valid_time)
-        hostnames = [h.name for h in hostnames]
+            port_numbers = {}
 
-        port_numbers = {}
-        for port in ports:
-            origin = self.octopoes_api_connector.list_origins(result=port.reference, valid_time=valid_time)
-            nmap_origin = [o for o in origin if o.method == "kat_nmap_normalize"]
-            found_by_nmap = len(nmap_origin) > 0
-            port_numbers[port.port] = found_by_nmap
+            for port in ports:
+                origin = self.octopoes_api_connector.list_origins(result=port.reference, valid_time=valid_time)
+                nmap_origin = [o for o in origin if o.method == "kat_nmap_normalize"]
+                found_by_nmap = len(nmap_origin) > 0
+                port_numbers[port.port] = found_by_nmap
 
-        return {ref.tokenized.address: {"ports": port_numbers, "hostnames": hostnames}}
+            results[ref.tokenized.address] = {"ports": port_numbers, "hostnames": hostnames}
+
+        return results
