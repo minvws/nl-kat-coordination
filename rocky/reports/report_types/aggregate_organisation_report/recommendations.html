@@ -4,14 +4,15 @@
     <div>
         <h2>{% translate "Recommendations" %}</h2>
         <p>
-            Er zijn <i>n</i> kwetsbaarheden gevonden op <i>m</i> systemen. <i>O</i> systemen missen belangrijke basisbeveiligingsmaatregelen.
+            {% blocktranslate count total_systems as count trimmed %}
+                There are <i>{{ total_findings }}</i> vulnerabilities found on <i>{{ total_systems }}</i>
+                system. <i>O</i> systems lack important basic security measures.
+            {% plural %}
+                systems. <i>O</i> systems lack important basic security measures.
+            {% endblocktranslate %}
         </p>
         <ul>
-            <li>Update the web server of system IP (domain name)</li>
-            <li>Install the firewall in the OS of system IP (domain name)</li>
-            <li>
-                Check if <a href="">SPF [1]</a> is properly installed on all mail servers
-            </li>
+            {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
         </ul>
     </div>
 </section>

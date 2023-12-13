@@ -18,17 +18,6 @@ class AggregateOrganisationReport(AggregateReport):
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report, RPKIReport]}
     template_path = "aggregate_organisation_report/report.html"
-    summary = {
-        _("General recommendations"): "",
-        _("Critical vulnerabilities"): 0,
-        _("Assets (IP/domains) scanned"): 0,
-        _("Sector of organisation"): "",
-        _("Basic security score compared to sector"): "",
-        _("Sector defined"): "",
-        _("Lowest security score in organisation"): "",
-        _("Newly discovered items since last week, october 8th 2023"): "",
-        _("Terms in report"): "",
-    }
 
     def post_process_data(self, data):
         systems = {"services": {}}
@@ -42,6 +31,7 @@ class AggregateOrganisationReport(AggregateReport):
         terms = []
         rpki = {"rpki_ips": {}}
         system_specific = {}
+        recommendations = []
 
         # input oois
         for input_ooi, report_data in data.items():
@@ -64,7 +54,10 @@ class AggregateOrganisationReport(AggregateReport):
                     total_hostnames += data["data"]["summary"]["total_domains"]
 
                 if report == "Open Ports Report":
-                    open_ports.update(data["data"])
+                    open_ports[data["data"]["ip"]] = {
+                        "ports": data["data"]["ports"],
+                        "hostnames": data["data"]["hostnames"],
+                    }
 
                 if report == "IPv6 Report":
                     for hostname, info in data["data"].items():
@@ -80,6 +73,7 @@ class AggregateOrganisationReport(AggregateReport):
                     total_criticals += data["data"]["summary"]["total_criticals"]
                     total_findings += data["data"]["summary"]["total_findings"]
                     terms.extend(data["data"]["summary"]["terms"])
+                    recommendations.extend(data["data"]["summary"]["recommendations"])
                     vulnerabilities[input_ooi] = data["data"]
 
                 if report == "RPKI Report":
@@ -125,4 +119,7 @@ class AggregateOrganisationReport(AggregateReport):
             "vulnerabilities": vulnerabilities,
             "system_specific": system_specific,
             "summary": summary,
+            "recommendations": recommendations,
+            "total_findings": total_findings,
+            "total_systems": total_ips,
         }
