@@ -18,7 +18,7 @@ from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification
 from tools.ooi_helpers import format_display
-from tools.view_helpers import schedule_task
+from tools.view_helpers import reschedule_task
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
@@ -62,7 +62,7 @@ class OOIDetailView(
         try:
             if action == PageActions.RESCHEDULE_TASK.value:
                 task_id = self.request.POST.get("task_id")
-                schedule_task(self.request, self.organization.code, task_id)
+                reschedule_task(self.request, self.organization.code, task_id)
 
             if action == PageActions.START_SCAN.value:
                 boefje_id = self.request.POST.get("boefje_id")

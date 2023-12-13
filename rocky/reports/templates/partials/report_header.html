@@ -5,7 +5,9 @@
 {% get_current_timezone as TIME_ZONE %}
 <section class="centered">
     <div class="centered">
+        {# Weasyprint ignores presentational hints so we also need to specify width using CSS. #}
         <img width="320"
+             style="width: 320px"
              src="{% static 'img/kat_logo.png' %}"
              alt="{% translate "OpenKAT" %}" />
         <h1>{% translate "Report for organization" %} {{ organization.name }}</h1>
