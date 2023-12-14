@@ -187,18 +187,15 @@ def test_query_for_system_report(
     result = xtdb_session.client.query(query)
 
     assert len(result) == 10
+    pks = [x[0]["Hostname/primary_key"] for x in result]
 
-    # TODO: is this what we want?
-    assert result[0][0]["Hostname/primary_key"] == "Hostname|test|a.example.com"
-    assert result[1][0]["Hostname/primary_key"] == "Hostname|test|b.example.com"
-    assert result[2][0]["Hostname/primary_key"] == "Hostname|test|c.example.com"
-    assert result[3][0]["Hostname/primary_key"] == "Hostname|test|c.example.com"  # Duplicated through ipv6
-    assert result[4][0]["Hostname/primary_key"] == "Hostname|test|d.example.com"
-    assert result[5][0]["Hostname/primary_key"] == "Hostname|test|d.example.com"  # Duplicated through ipv6
-    assert result[6][0]["Hostname/primary_key"] == "Hostname|test|e.example.com"
-    assert result[7][0]["Hostname/primary_key"] == "Hostname|test|example.com"
-    assert result[8][0]["Hostname/primary_key"] == "Hostname|test|example.com"  # Duplicated through ipv6
-    assert result[9][0]["Hostname/primary_key"] == "Hostname|test|f.example.com"  # Through ipv6
+    assert pks.count("Hostname|test|a.example.com") == 1
+    assert pks.count("Hostname|test|b.example.com") == 1
+    assert pks.count("Hostname|test|c.example.com") == 2  # Duplicated through ipv6
+    assert pks.count("Hostname|test|d.example.com") == 2  # Duplicated through ipv6
+    assert pks.count("Hostname|test|e.example.com") == 1
+    assert pks.count("Hostname|test|f.example.com") == 1
+    assert pks.count("Hostname|test|example.com") == 2  # Duplicated through ipv6
 
     # Find all services attached to the hostnames ip address
     query = Query.from_path(
@@ -209,14 +206,12 @@ def test_query_for_system_report(
     result = xtdb_session.client.query(query)
     assert len(result) == 4
 
-    assert result[0][0]["Service/primary_key"] == "Service|ssh"
-    assert result[1][0]["Service/primary_key"] == "Service|smtp"
-    assert result[2][0]["Service/primary_key"] == "Service|https"
-    assert result[3][0]["Service/primary_key"] == "Service|http"  # Through ipv6
+    pks = {x[0]["Service/primary_key"] for x in result}
+    assert pks == {"Service|ssh", "Service|smtp", "Service|https", "Service|http"}
 
     # Queries performed in Rocky's system report
     ips = octopoes_api_connector.query(
-        "Hostname.<hostname[is ResolvedHostname].address", valid_time, Reference.from_str("Hostname|test|c.example.com")
+        "Hostname.<hostname[is ResolvedHostname].address", valid_time, "Hostname|test|c.example.com"
     )
 
     ip_services = {}
