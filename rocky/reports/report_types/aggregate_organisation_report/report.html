@@ -23,35 +23,39 @@
                 {% include "ipv6_report/report.html" with data=data.ipv6 show_heading="yes" %}
 
             {% endif %}
-            {% include "aggregate_organisation_report/basic_security.html" %}
+            {% if data.basic_security %}
+                {% include "aggregate_organisation_report/basic_security.html" %}
 
-            {% if data.system_specific %}
-                <section id="rpki">
+                {% if data.basic_security.rpki %}
+                    <section id="rpki">
+                        <div>
+                            <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+                            {% for system_type, system in data.basic_security.rpki.items %}
+                                {% if system %}
+                                    {% include "rpki_report/report.html" with data=system type=system_type %}
+
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endif %}
+            {% endif %}
+            {% if data.vulnerabilities %}
+                <section id="vulnerabilities">
                     <div>
-                        <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
-                        {% for system_type, system in data.system_specific.items %}
-                            {% if system %}
-                                {% include "rpki_report/report.html" with data=system.rpki type=system_type %}
+                        <h2>{% translate "Vulnerabilities" %}</h2>
+                        <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                        {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                            <h3>{{ input_ooi }}</h3>
+                            <p>
+                                <strong>{{ vulnerabilities.summary.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
+                            </p>
+                            {% include "vulnerability_report/report.html" with data=vulnerabilities %}
 
-                            {% endif %}
                         {% endfor %}
                     </div>
                 </section>
             {% endif %}
-            <section id="vulnerabilities">
-                <div>
-                    <h2>{% translate "Vulnerabilities" %}</h2>
-                    <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
-                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                        <h3>{{ input_ooi }}</h3>
-                        <p>
-                            <strong>{{ vulnerabilities.summary.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
-                        </p>
-                        {% include "vulnerability_report/report.html" with data=vulnerabilities %}
-
-                    {% endfor %}
-                </div>
-            </section>
         </div>
     </article>
 </main>

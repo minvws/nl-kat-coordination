@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-13 16:15+0000\n"
+"POT-Creation-Date: 2023-12-14 08:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1071,7 +1071,6 @@ msgstr ""
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
-#: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_summary.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
@@ -2824,7 +2823,11 @@ msgid "Critical vulnerabilities"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
-msgid "Assets (IP/domains) scanned"
+msgid "IPs scanned"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Domains scanned"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
@@ -2851,16 +2854,7 @@ msgstr ""
 msgid "Terms in report"
 msgstr ""
 
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "IPs scanned"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Domains scanned"
-msgstr ""
-
 #: reports/report_types/aggregate_organisation_report/term_overview.html
-#: reports/templates/partials/report_sidemenu.html
 msgid "Term overview"
 msgstr ""
 
