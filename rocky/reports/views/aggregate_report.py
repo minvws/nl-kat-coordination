@@ -148,7 +148,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
                         report = report_type(self.octopoes_api_connector)
                         data = report.generate_data(ooi, valid_time=self.valid_time)
                         template = report.template_path
-                        report_data[ooi][report_type.name] = {"data": data, "template": template}
+                        report_data[ooi][report_type.id] = {"data": data, "template": template}
         post_processed_data = aggregate_report.post_process_data(report_data)
 
         return aggregate_template, post_processed_data, report_data
