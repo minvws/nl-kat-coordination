@@ -25,7 +25,7 @@
             {% endif %}
             <section id="basic-security">
                 <div>
-                    {% if data.basic_security %}
+                    {% if data.basic_security.safe_connections or data.basic_security.system_specific or data.basic_security.rpki %}
                         {% include "aggregate_organisation_report/basic_security.html" %}
 
                     {% endif %}
@@ -54,6 +54,9 @@
                         {% include "vulnerability_report/report.html" with data=vulnerabilities %}
 
                     {% endfor %}
+                    {% if not data.vulnerabilities %}
+                        <p>{% translate "No CVEs have been found." %}</p>
+                    {% endif %}
                 </div>
             </section>
         </div>

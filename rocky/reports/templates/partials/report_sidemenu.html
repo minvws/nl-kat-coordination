@@ -22,10 +22,13 @@
                     <a href="#ipv6">IPv6</a>
                 </li>
             {% endif %}
-            {% if data.basic_security %}
+            {% if data.basic_security.safe_connections or data.basic_security.system_specific or data.basic_security.rpki %}
                 <li>
                     <a href="#basic-security">{% translate "Basic security" %}</a>
                     <ol>
+                        <li>
+                            <a href="basic-security-overview">{% translate "Overview" %}</a>
+                        </li>
                         {% if data.basic_security.safe_connections %}
                             <li>
                                 <a href="#safe-connections">{% translate "Safe connections" %}</a>
@@ -44,11 +47,9 @@
                     </ol>
                 </li>
             {% endif %}
-            {% if data.vulnerabilities %}
-                <li>
-                    <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
-                </li>
-            {% endif %}
+            <li>
+                <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
+            </li>
         </ol>
         <ol type="A">
             <li>
