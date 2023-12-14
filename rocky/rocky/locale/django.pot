@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-14 10:36+0000\n"
+"POT-Creation-Date: 2023-12-14 14:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2801,10 +2801,10 @@ msgstr[1] ""
 #: reports/report_types/aggregate_organisation_report/recommendations.html
 #, python-format
 msgid ""
-"<i>%(total_systems_basic_securtiy)s</i> system lack important basic security "
+"<i>%(total_systems_basic_security)s</i> system lack important basic security "
 "measures."
 msgid_plural ""
-"<i>%(total_systems_basic_securtiy)s</i> systems lack important basic "
+"<i>%(total_systems_basic_security)s</i> systems lack important basic "
 "security measures."
 msgstr[0] ""
 msgstr[1] ""
@@ -2830,6 +2830,10 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
 msgid "vulnerabilities on this system"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+msgid "No CVEs have been found."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
@@ -3394,6 +3398,11 @@ msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Table of contents"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
+#: rocky/templates/oois/ooi_page_tabs.html
+msgid "Overview"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
@@ -4703,10 +4712,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_page_tabs.html
 msgid "List of views for OOI"
-msgstr ""
-
-#: rocky/templates/oois/ooi_page_tabs.html
-msgid "Overview"
 msgstr ""
 
 #: rocky/templates/oois/ooi_past_due_warning.html
