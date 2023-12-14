@@ -6,10 +6,11 @@ from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
 from reports.report_types.rpki_report.report import RPKIReport
+from reports.report_types.safe_connections_report.report import SafeConnectionsReport
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.tls_report.report import TLSReport
 
-REPORTS = [DNSReport, TLSReport, SystemReport, RPKIReport, MailReport, NameServerSystemReport]
+REPORTS = [DNSReport, TLSReport, SystemReport, RPKIReport, MailReport, NameServerSystemReport, SafeConnectionsReport]
 
 
 def get_ooi_types_with_report() -> Set[Type[OOI]]:
