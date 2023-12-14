@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from logging import getLogger
 from typing import Any, Dict, List
@@ -23,7 +23,7 @@ class NameServerCheck:
 
 @dataclass
 class NameServerChecks:
-    checks: List[NameServerCheck]
+    checks: List[NameServerCheck] = field(default_factory=list)
 
     @property
     def no_uncommon_ports(self):
@@ -68,7 +68,7 @@ class NameServerSystemReport(Report):
                 "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
             )
 
-        name_server_checks = NameServerChecks(checks=[])
+        name_server_checks = NameServerChecks()
         finding_types = {}
 
         for hostname in hostnames:
