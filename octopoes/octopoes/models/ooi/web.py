@@ -301,7 +301,7 @@ class SecurityTXT(OOI):
     redirects_to: Optional[Reference] = ReferenceField(
         "SecurityTXT", max_issue_scan_level=2, max_inherit_scan_level=0, default=None
     )
-    security_txt: Optional[str]
+    security_txt: Optional[str] = None
 
     _natural_key_attrs = ["website", "url"]
     _reverse_relation_names = {
