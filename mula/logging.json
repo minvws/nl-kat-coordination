@@ -28,7 +28,6 @@
             ],
             "propagate": 0
         },
-
         "urllib3.connectionpool": {
             "level": "CRITICAL",
             "handlers": [

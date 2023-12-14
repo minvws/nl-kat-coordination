@@ -155,7 +155,7 @@ class RabbitMQ(Listener):
         """Callback function that is called when a message is received on the
         queue.
         """
-        self.logger.debug("Received message on queue %s, message: %r", method.routing_key, body)
+        self.logger.debug("Received message on queue %s", method.routing_key, routing_key=method.routing_key, message=body)
 
         # Submit the message to the thread pool executor
         self.executor.submit(self.dispatch, channel, method.delivery_tag, body)

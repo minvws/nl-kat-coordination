@@ -40,9 +40,13 @@ class PrioritizedItemDB(Base):
     __tablename__ = "items"
 
     id = Column(GUID, primary_key=True)
+
     scheduler_id = Column(String)
+
     hash = Column(String(32), index=True)
+
     priority = Column(Integer)
+
     data = Column(JSONB, nullable=False)
 
     created_at = Column(

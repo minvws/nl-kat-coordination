@@ -81,10 +81,10 @@ class App:
         katalogus_orgs: Set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
-        self.logger.debug("Organisations to add: %s", len(additions))
+        self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
 
         removals = scheduler_orgs.difference(katalogus_orgs)
-        self.logger.debug("Organisations to remove: %s", len(removals))
+        self.logger.debug("Organisations to remove: %s", len(removals), removals=sorted(removals))
 
         # We need to get scheduler ids of the schedulers that are associated
         # with the removed organisations
@@ -103,9 +103,9 @@ class App:
 
         if removals:
             self.logger.debug(
-                "Removed %s organisations from scheduler [org_ids=%s]",
+                "Removed %s organisations from scheduler",
                 len(removals),
-                removals,
+                removals=sorted(removals),
             )
 
         # Add schedulers for organisation
@@ -138,9 +138,9 @@ class App:
             self.ctx.services.katalogus.flush_caches()
 
             self.logger.debug(
-                "Added %s organisations to scheduler [org_ids=%s]",
+                "Added %s organisations to scheduler",
                 len(additions),
-                additions,
+                additions=sorted(additions),
             )
 
     @tracer.start_as_current_span("collect_metrics")

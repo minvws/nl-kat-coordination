@@ -68,7 +68,7 @@ class ThreadRunner(threading.Thread):
                 self.stop_event.wait(self.interval)
             except Exception as exc:
                 self.exception = exc
-                self.logger.exception("Exception in thread: %s", self.name)
+                self.logger.exception("Exception in thread: %s", self.name, exc_info=exc)
                 self.stop_event.set()
                 raise exc
 
@@ -81,7 +81,7 @@ class ThreadRunner(threading.Thread):
             self._target()
         except Exception as exc:
             self.exception = exc
-            self.logger.exception("Exception in thread: %s", self.name)
+            self.logger.exception("Exception in thread: %s", self.name, exc_info=exc)
             self.stop_event.set()
             raise exc
 
@@ -89,7 +89,7 @@ class ThreadRunner(threading.Thread):
             self.callback(*self.callback_args)
 
     def run(self) -> None:
-        self.logger.debug("Starting thread: %s", self.name)
+        self.logger.debug("Starting thread: %s", self.name, thread_name=self.name)
         if self.loop:
             self.run_forever()
         else:
@@ -98,12 +98,12 @@ class ThreadRunner(threading.Thread):
         self.logger.debug("Thread stopped: %s", self.name)
 
     def join(self, timeout: Optional[float] = None) -> None:
-        self.logger.debug("Stopping thread: %s", self.name)
+        self.logger.debug("Stopping thread: %s", self.name, thread_name=self.name)
 
         self.stop_event.set()
         super().join(timeout)
 
-        self.logger.debug("Thread stopped: %s", self.name)
+        self.logger.debug("Thread stopped: %s", self.name, thread_name=self.name)
 
     def stop(self) -> None:
         self.stop_event.set()

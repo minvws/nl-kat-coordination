@@ -116,10 +116,10 @@ class HTTPService(Connector):
             timeout=self.timeout,
         )
         self.logger.debug(
-            "Made GET request to %s. [name=%s, url=%s]",
+            "Made GET request to %s.",
             url,
-            self.name,
-            url,
+            name=self.name,
+            url=url,
         )
 
         return response
@@ -149,11 +149,11 @@ class HTTPService(Connector):
             timeout=self.timeout,
         )
         self.logger.debug(
-            "Made POST request to %s. [name=%s, url=%s, data=%s]",
+            "Made POST request to %s.",
             url,
-            self.name,
-            url,
-            payload,
+            name=self.name,
+            url=url,
+            payload=payload,
         )
 
         self._verify_response(response)
@@ -166,6 +166,10 @@ class HTTPService(Connector):
 
     def _do_checks(self) -> None:
         """Do checks whether a host is available and healthy."""
+        if not self.host:
+            self.logger.warning("No host defined for service %s", self.name)
+            return
+
         parsed_url = urllib.parse.urlparse(self.host)
         hostname, port = parsed_url.hostname, parsed_url.port
 
@@ -174,33 +178,17 @@ class HTTPService(Connector):
 
         if hostname is None or port is None:
             self.logger.warning(
-                "Not able to parse hostname and port from %s [host=%s]",
+                "Not able to parse hostname and port from %s",
                 self.host,
-                self.host,
+                host=self.host,
             )
             return
 
         if self.host is not None and self.retry(self.is_host_available, hostname, port) is False:
             raise RuntimeError(f"Host {self.host} is not available.")
 
-        if self.health_endpoint is not None and self.retry(self.is_healthy) is False:
+        if self.health_endpoint is not None and self.retry(self.is_host_healthy, self.host, self.health_endpoint) is False:
             raise RuntimeError(f"Service {self.name} is not running.")
-
-    def is_healthy(self) -> bool:
-        """Check if host is healthy by inspecting the host's health endpoint.
-
-        Returns:
-            A boolean
-        """
-        if self.host is None:
-            self.logger.warning("Host is not set.")
-            return False
-
-        if self.health_endpoint is None:
-            self.logger.warning("Health endpoint is not set.")
-            return False
-
-        return self.is_host_healthy(self.host, self.health_endpoint)
 
     def _verify_response(self, response: requests.Response) -> None:
         """Verify the received response from a request.
@@ -212,10 +200,10 @@ class HTTPService(Connector):
             response.raise_for_status()
         except requests.exceptions.HTTPError as e:
             self.logger.error(
-                "Received bad response from %s. [name=%s, url=%s, response=%s]",
+                "Received bad response from %s.",
                 response.url,
-                self.name,
-                response.url,
-                str(response.content),
+                name=self.name,
+                url=response.url,
+                response=str(response.content),
             )
             raise e

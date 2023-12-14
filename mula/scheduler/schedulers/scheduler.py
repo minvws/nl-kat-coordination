@@ -2,7 +2,6 @@ import abc
 import logging
 import threading
 import time
-import traceback
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
@@ -124,10 +123,14 @@ class Scheduler(abc.ABC):
         task = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task is None:
             self.logger.warning(
-                "Task %s not found in datastore, not updating status [task_id=%s, queue_id=%s]",
+                "PrioritizedItem %s popped from %s, task %s not found in datastore, could not update task status",
+                p_item.id,
+                queue.pq_id,
                 p_item.data.get("id"),
-                p_item.data.get("id"),
-                self.queue.pq_id,
+                p_item_id=p_item.id,
+                task_id=p_item.data.get("id"),
+                queue_id=self.queue.pq_id,
+                scheduler_id=scheduler_id,
             )
             return
 
@@ -135,7 +138,6 @@ class Scheduler(abc.ABC):
         self.ctx.datastores.task_store.update_task(task)
 
         self.set_last_activity()
-
 
     def pop_item_from_queue(
         self, filters: Optional[storage.filters.FilterRequest] = None
@@ -151,9 +153,10 @@ class Scheduler(abc.ABC):
         """
         if not self.is_enabled():
             self.logger.warning(
-                "Scheduler is disabled, not popping item from queue [queue_id=%s, qsize=%d]",
-                self.queue.pq_id,
-                self.queue.qsize(),
+                "Scheduler is disabled, not popping item from queue",
+                queue_id=self.queue.pq_id,
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
             )
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
@@ -175,9 +178,11 @@ class Scheduler(abc.ABC):
         """
         if not self.is_enabled():
             self.logger.warning(
-                "Scheduler is disabled, not pushing item to queue [queue_id=%s, qsize=%d]",
+                "Scheduler is disabled, not pushing item to queue %s",
                 self.queue.pq_id,
-                self.queue.qsize(),
+                p_item_id=p_item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
             )
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
@@ -185,39 +190,42 @@ class Scheduler(abc.ABC):
             self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
             self.logger.warning(
-                "Not allowed to push to queue %s [queue_id=%s, qsize=%d]",
+                "Not allowed to push to queue %s",
                 self.queue.pq_id,
-                self.queue.pq_id,
-                self.queue.qsize(),
+                p_item_id=p_item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
             )
             raise exc
         except queues.errors.QueueFullError as exc:
             self.logger.warning(
-                "Queue %s is full, not populating new tasks [queue_id=%s, qsize=%d]",
+                "Queue %s is full, not pushing new items",
                 self.queue.pq_id,
-                self.queue.pq_id,
-                self.queue.qsize(),
+                p_item_id=p_item.id,
+                queue_id=self.queue.pq_id,
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
             )
             raise exc
         except queues.errors.InvalidPrioritizedItemError as exc:
             self.logger.warning(
-                "Invalid prioritized item %s [queue_id=%s, qsize=%d]",
-                p_item,
-                self.queue.pq_id,
-                self.queue.qsize(),
+                "Invalid prioritized item %s",
+                p_item.id,
+                p_item_id=p_item.id,
+                queue_id=self.queue.pq_id,
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
             )
             raise exc
 
         self.logger.debug(
-            "Pushed item (%s) to queue %s with priority %s "
-            "[p_item_id=%s, p_item_hash=%s, queue_pq_id=%s, queue_qsize=%d]",
+            "Pushed item %s to queue %s with priority %s ",
             p_item.id,
             self.queue.pq_id,
             p_item.priority,
-            p_item.id,
-            p_item.hash,
-            self.queue.pq_id,
-            self.queue.qsize(),
+            p_item_id=p_item.id,
+            queue_id=self.queue.pq_id,
+            scheduler_id=self.scheduler_id,
         )
 
         self.post_push(p_item)
@@ -238,21 +246,22 @@ class Scheduler(abc.ABC):
                 queues.errors.InvalidPrioritizedItemError,
             ):
                 self.logger.debug(
-                    "Unable to push item to queue %s [queue_id=%s, qsize=%d, item=%s, exc=%s]",
+                    "Unable to push item %s to queue %s",
+                    p_item.id,
                     self.queue.pq_id,
-                    self.queue.pq_id,
-                    self.queue.qsize(),
-                    p_item,
-                    traceback.format_exc(),
+                    p_item_id=p_item.id,
+                    queue_id=self.queue.pq_id,
+                    scheduler_id=self.scheduler_id,
                 )
                 continue
             except Exception as exc:
                 self.logger.error(
-                    "Unable to push item to queue %s [queue_id=%s, qsize=%d, item=%s]",
+                    "Unable to push item %s to queue %s",
+                    p_item.id,
                     self.queue.pq_id,
-                    self.queue.pq_id,
-                    self.queue.qsize(),
-                    p_item,
+                    p_item_id=p_item.id,
+                    queue_id=self.queue.pq_id,
+                    scheduler_id=self.scheduler_id,
                 )
                 raise exc
 
@@ -277,10 +286,10 @@ class Scheduler(abc.ABC):
         tries = 0
         while not self.is_space_on_queue() and (tries < max_tries or max_tries == -1):
             self.logger.debug(
-                "Queue %s is full, waiting for space [queue_id=%s, qsize=%d]",
-                self.queue.pq_id,
-                self.queue.pq_id,
-                self.queue.qsize(),
+                "Queue %s is full, waiting for space",
+                queue_id=self.queue.pq_id,
+                queue_qsize=self.queue.qsize(),
+                scheduler_id=self.scheduler_id,
             )
             time.sleep(timeout)
             tries += 1
@@ -342,7 +351,7 @@ class Scheduler(abc.ABC):
         tasks that were on the queue will be set to CANCELLED.
         """
         if not self.is_enabled():
-            self.logger.warning("Scheduler is already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+            self.logger.warning("Scheduler already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
             return
 
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)

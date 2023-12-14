@@ -59,22 +59,22 @@ class Connector:
         for i in range(10):
             if func(*args, **kwargs):
                 self.logger.info(
-                    "Function %s, executed successfully. Retry count: %d [name=%s, args=%s, kwargs=%s]",
+                    "Function %s, executed successfully. Retry count: %d",
                     func.__name__,
                     i,
-                    func.__name__,
-                    args,
-                    kwargs,
+                    name=func.__name__,
+                    args=args,
+                    kwargs=kwargs,
                 )
                 return True
 
             self.logger.warning(
-                "Function %s, failed. Retry count: %d [name=%s, args=%s, kwargs=%s]",
+                "Function %s, failed. Retry count: %d",
                 func.__name__,
                 i,
-                func.__name__,
-                args,
-                kwargs,
+                name=func.__name__,
+                args=args,
+                kwargs=kwargs,
             )
 
             time.sleep(10)
