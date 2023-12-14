@@ -12,7 +12,7 @@
         {% include "aggregate_organisation_report/term_overview.html" %}
 
         <div class="chapter-numbers report-content">
-            {% include "aggregate_organisation_report/recommendations.html" with data=data.recommendations total_findings=data.total_findings total_systems=data.total_systems total_systems_basic_security=data.total_systems_basic_securtiy %}
+            {% include "aggregate_organisation_report/recommendations.html" with data=data.recommendations total_findings=data.total_findings total_systems=data.total_systems total_systems_basic_security=data.total_systems_basic_security %}
             {% include "aggregate_organisation_report/asset_overview.html" with data=data.systems %}
 
             {% if data.open_ports %}
