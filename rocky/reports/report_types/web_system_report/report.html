@@ -53,22 +53,24 @@
             </tbody>
         </table>
     </p>
-    <p class="column-2">
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col">{% translate "Compliance issue" %}</th>
-                    <th scope="col">{% translate "Risk level" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for finding_type in data.finding_types %}
+    {% if data.finding_types %}
+        <p class="column-2">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ finding_type.description }}</td>
-                        <td>{{ finding_type.risk_severity }}</td>
+                        <th scope="col">{% translate "Compliance issue" %}</th>
+                        <th scope="col">{% translate "Risk level" %}</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </p>
+                </thead>
+                <tbody>
+                    {% for finding_type in data.finding_types %}
+                        <tr>
+                            <td>{{ finding_type.description }}</td>
+                            <td>{{ finding_type.risk_severity }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </p>
+    {% endif %}
 </p>

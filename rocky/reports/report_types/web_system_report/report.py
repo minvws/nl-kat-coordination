@@ -151,13 +151,7 @@ class WebSystemReport(Report):
                 or "KAT-OPEN-SYSADMIN-PORT" in [x.id for x in port_finding_types]
                 or "KAT-OPEN-DATABASE-PORT" in [x.id for x in port_finding_types]
             )
-            check.has_certificates = bool(
-                self.octopoes_api_connector.query(
-                    "Hostname.<hostname[is Website].certificate",
-                    valid_time,
-                    web_hostname.reference,
-                )
-            )
+            check.has_certificates = "KAT-NO-CERTIFICATE" not in [x.id for x in website_finding_types]
 
             certificate_finding_types = self.octopoes_api_connector.query(
                 "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type",
