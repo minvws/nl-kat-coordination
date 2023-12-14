@@ -74,16 +74,24 @@ class NameServerSystemReport(Report):
         for hostname in hostnames:
             check = NameServerCheck()
 
-            port_finding_types = [x for x in self.octopoes_api_connector.query(
-                "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type",
-                valid_time,
-                hostname.reference,
-            ) if x.id in ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"]]
+            port_finding_types = [
+                x
+                for x in self.octopoes_api_connector.query(
+                    "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type",
+                    valid_time,
+                    hostname.reference,
+                )
+                if x.id in ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"]
+            ]
             check.no_uncommon_ports = not any(port_finding_types)
 
-            hostname_finding_types = [x for x in self.octopoes_api_connector.query(
-                "Hostname.<ooi[is Finding].finding_type", valid_time, hostname.reference
-            ) if x.id in ["KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC"]]
+            hostname_finding_types = [
+                x
+                for x in self.octopoes_api_connector.query(
+                    "Hostname.<ooi[is Finding].finding_type", valid_time, hostname.reference
+                )
+                if x.id in ["KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC"]
+            ]
             check.has_dnssec = "KAT-NO-DNSSEC" not in [x.id for x in hostname_finding_types]
             check.has_valid_dnssec = check.has_dnssec and "KAT-INVALID-DNSSEC" not in [
                 x.id for x in hostname_finding_types
