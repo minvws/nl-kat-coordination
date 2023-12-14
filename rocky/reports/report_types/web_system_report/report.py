@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from logging import getLogger
 from typing import Any, Dict, List
@@ -29,7 +29,7 @@ class WebCheck:
 
 @dataclass
 class WebChecks:
-    checks: List[WebCheck]
+    checks: List[WebCheck] = field(default_factory=list)
 
     @property
     def has_csp(self):
@@ -101,7 +101,7 @@ class WebSystemReport(Report):
                 "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
             )
 
-        web_checks = WebChecks(checks=[])
+        web_checks = WebChecks()
         finding_types = {}
 
         for web_hostname in hostnames:
