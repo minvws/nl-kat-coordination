@@ -16,8 +16,9 @@ This Nmap has the following hardcoded options:
 |`-v10` |use verbosity level 10 |
 |`-sV` |probe open ports to determine version info |
 |`-oX` |Output in XML |
+|`-sU` |UDP scan |
 
-A TCP scan uses `-sS` (TCP SYN), a UDP scan uses `-sU`. TOP_PORTS defaults to `250`.
+`TOP_PORTS_UDP` defaults to `250`.
 
 ### Input OOIs
 

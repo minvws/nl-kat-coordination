@@ -1,0 +1,76 @@
+{% load i18n %}
+
+<p class="horizontal-scroll">
+    <p class="column-2">
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "Check" %}</th>
+                    <th scope="col">{% translate "Compliance" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{% translate "CSP Present" %}</td>
+                    <td>{{ data.web_checks.has_csp }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>{% translate "Secure CSP Header" %}</td>
+                    <td>
+                        {{ data.web_checks.has_csp_vulnerabilities }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% translate "Redirects HTTP to HTTPS" %}</td>
+                    <td>{{ data.web_checks.redirects_http_https }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>{% translate "Offers HTTPS" %}</td>
+                    <td>{{ data.web_checks.offers_https }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>{% translate "Has a Security.txt" %}</td>
+                    <td>{{ data.web_checks.has_security_txt }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>{% translate "No unnecessary ports open" %}</td>
+                    <td>{{ data.web_checks.no_uncommon_ports }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>{% translate "Has a certificate" %}</td>
+                    <td>{{ data.web_checks.has_certificates }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+                <tr>
+                    <td>{% translate "Certificate is not expired" %}</td>
+                    <td>
+                        {{ data.web_checks.certificates_not_expired }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>{% translate "Certificate is not expiring soon" %}</td>
+                    <td>{{ data.web_checks.has_csp }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </p>
+    {% if data.finding_types %}
+        <p class="column-2">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Compliance issue" %}</th>
+                        <th scope="col">{% translate "Risk level" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for finding_type in data.finding_types %}
+                        <tr>
+                            <td>{{ finding_type.description }}</td>
+                            <td>{{ finding_type.risk_severity }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </p>
+    {% endif %}
+</p>

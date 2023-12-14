@@ -97,13 +97,11 @@ class SystemReport(Report):
                 ),
             }
             if bool(
-                [
-                    self.octopoes_api_connector.query(
-                        "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
-                        valid_time,
-                        ip.reference,
-                    )
-                ]
+                self.octopoes_api_connector.query(
+                    "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
+                    valid_time,
+                    ip.reference,
+                )
             ):
                 ip_services[str(ip.address)]["services"].append(WEB)
 
