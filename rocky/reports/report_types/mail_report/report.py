@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models import Reference, OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
