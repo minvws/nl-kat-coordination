@@ -27,7 +27,7 @@ class OpenPortsReport(Report):
             path = Path.parse("Hostname.<hostname [is ResolvedHostname].address")
             ips = self.octopoes_api_connector.query(path=path, source=ref, valid_time=valid_time)
             if not ips:
-                return {"data": "No IP address found for hostname"}
+                return {}
             references = [ip.reference for ip in ips]
         else:
             references = [ref]
