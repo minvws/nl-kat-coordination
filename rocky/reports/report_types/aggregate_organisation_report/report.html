@@ -33,9 +33,9 @@
                 {% if data.basic_security.rpki %}
                     <div id="rpki">
                         <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
-                        {% for system_type, system in data.system_specific.items %}
+                        {% for system_type, system in data.basic_security.rpki.items %}
                             {% if system %}
-                                {% include "rpki_report/report.html" with data=system.rpki type=system_type %}
+                                {% include "rpki_report/report.html" with data=system type=system_type %}
 
                             {% endif %}
                         {% endfor %}
