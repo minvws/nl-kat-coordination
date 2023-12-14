@@ -98,7 +98,7 @@ class WebSystemReport(Report):
 
         elif reference.class_type in (IPAddressV4, IPAddressV6):
             hostnames = self.octopoes_api_connector.query(
-                "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
+                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
             )
 
         web_checks = WebChecks(checks=[])
@@ -106,33 +106,32 @@ class WebSystemReport(Report):
 
         for web_hostname in hostnames:
             check = WebCheck()
-            resource_finding_types = self.octopoes_api_connector.query(
+            csp_finding_types = [x for x in self.octopoes_api_connector.query(
                 "Hostname.<hostname[is Website].<website[is HTTPResource].<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
-            )
-            check.has_csp = "KAT-NO-CSP" not in [x.id for x in resource_finding_types]
-            header_finding_types = self.octopoes_api_connector.query(
+            ) if x.id == "KAT-NO-CSP"]
+            check.has_csp = not any(csp_finding_types)
+            csp_vulnerabilities_finding_types = [x for x in self.octopoes_api_connector.query(
                 "Hostname.<hostname[is Website].<website[is HTTPResource].<resource[is HTTPHeader]."
                 "<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
-            )
-            check.has_no_csp_vulnerabilities = check.has_csp and "KAT-CSP-VULNERABILITIES" not in [
-                x.id for x in header_finding_types
-            ]
-            url_finding_types = self.octopoes_api_connector.query(
+            ) if x.id == "KAT-CSP-VULNERABILITIES"]
+            check.has_no_csp_vulnerabilities = check.has_csp and not any(csp_vulnerabilities_finding_types)
+            url_finding_types = [x for x in self.octopoes_api_connector.query(
                 "Hostname.<netloc[is HostnameHTTPURL].<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
-            )
-            check.redirects_http_https = "KAT-NO-HTTPS-REDIRECT" not in [x.id for x in url_finding_types]
-            website_finding_types = self.octopoes_api_connector.query(
+            ) if x.id == "KAT-NO-HTTPS-REDIRECT"]
+            check.redirects_http_https = not any(url_finding_types)
+
+            no_certificate_finding_types = [x for x in self.octopoes_api_connector.query(
                 "Hostname.<hostname[is Website].<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
-            )
-            check.offers_https = "KAT-NO-CERTIFICATE" not in [x.id for x in website_finding_types]
+            ) if x.id == "KAT-NO-CERTIFICATE"]
+            check.offers_https = not any(no_certificate_finding_types)
             check.has_security_txt = bool(
                 self.octopoes_api_connector.query(
                     "Hostname.<hostname[is Website].<website[is SecurityTXT]",
@@ -141,23 +140,19 @@ class WebSystemReport(Report):
                 )
             )
 
-            port_finding_types = self.octopoes_api_connector.query(
+            port_finding_types = [x for x in self.octopoes_api_connector.query(
                 "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
-            )
-            check.no_uncommon_ports = not (
-                "KAT-UNCOMMON-OPEN-PORT" in [x.id for x in port_finding_types]
-                or "KAT-OPEN-SYSADMIN-PORT" in [x.id for x in port_finding_types]
-                or "KAT-OPEN-DATABASE-PORT" in [x.id for x in port_finding_types]
-            )
-            check.has_certificates = "KAT-NO-CERTIFICATE" not in [x.id for x in website_finding_types]
+            ) if x.id in ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"]]
+            check.no_uncommon_ports = not any(port_finding_types)
+            check.has_certificates = check.offers_https
 
-            certificate_finding_types = self.octopoes_api_connector.query(
+            certificate_finding_types = [x for x in self.octopoes_api_connector.query(
                 "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type",
                 valid_time,
                 web_hostname.reference,
-            )
+            ) if x.id in ["KAT-CERTIFICATE-EXPIRED", "KAT-CERTIFICATE-EXPIRING-SOON"]]
             check.certificates_not_expired = check.has_certificates and "KAT-CERTIFICATE-EXPIRED" not in [
                 x.id for x in certificate_finding_types
             ]
@@ -168,10 +163,10 @@ class WebSystemReport(Report):
             web_checks.checks.append(check)
 
             new_types = (
-                resource_finding_types
-                + header_finding_types
+                csp_finding_types
+                + csp_vulnerabilities_finding_types
                 + url_finding_types
-                + website_finding_types
+                + no_certificate_finding_types
                 + port_finding_types
                 + certificate_finding_types
             )
