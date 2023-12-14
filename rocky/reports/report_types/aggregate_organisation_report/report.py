@@ -34,13 +34,12 @@ class AggregateOrganisationReport(AggregateReport):
         recommendations = []
         total_systems_basic_security = 0
 
-        # input oois
-        for input_ooi, report_data in data.items():
-            # reports
-            for report, data in report_data.items():
-                # data in report, specifically we use system to couple reports
-                if report == SystemReport.id:
-                    for ip, system in data["data"]["services"].items():
+        for input_ooi, reports_data in data.items():
+            for report_id, report_specific_data in reports_data.items():
+                # data in report, specifically we use systems to couple reports
+
+                if report_id == SystemReport.id:
+                    for ip, system in report_specific_data["services"].items():
                         if ip not in systems["services"]:
                             systems["services"][ip] = system
                         else:
@@ -51,18 +50,15 @@ class AggregateOrganisationReport(AggregateReport):
                             systems["services"][ip]["services"] = list(
                                 set(systems["services"][ip]["services"]) | set(system["services"])
                             )
-                    total_ips += data["data"]["summary"]["total_systems"]
-                    total_hostnames += data["data"]["summary"]["total_domains"]
+                    total_ips += report_specific_data["summary"]["total_systems"]
+                    total_hostnames += report_specific_data["summary"]["total_domains"]
 
-                if report == OpenPortsReport.id:
-                    for ip, details in data["data"].items():
-                        open_ports[ip] = {
-                            "ports": details["ports"],
-                            "hostnames": details["hostnames"],
-                        }
+                if report_id == OpenPortsReport.id:
+                    for ip, details in report_specific_data.items():
+                        open_ports[ip] = details
 
-                if report == IPv6Report.id:
-                    for hostname, info in data["data"].items():
+                if report_id == IPv6Report.id:
+                    for hostname, info in report_specific_data.items():
                         ipv6[hostname] = {"enabled": info["enabled"], "systems": []}
 
                         for ip, system in systems["services"].items():
@@ -71,18 +67,18 @@ class AggregateOrganisationReport(AggregateReport):
                                     set(ipv6[hostname]["systems"]).union(set(system["services"]))
                                 )
 
-                if report == VulnerabilityReport.id:
-                    total_criticals += data["data"]["summary"]["total_criticals"]
-                    total_findings += data["data"]["summary"]["total_findings"]
-                    terms.extend(data["data"]["summary"]["terms"])
-                    recommendations.extend(data["data"]["summary"]["recommendations"])
-                    vulnerabilities[input_ooi] = data["data"]
+                if report_id == VulnerabilityReport.id:
+                    total_criticals += report_specific_data["summary"]["total_criticals"]
+                    total_findings += report_specific_data["summary"]["total_findings"]
+                    terms.extend(report_specific_data["summary"]["terms"])
+                    recommendations.extend(report_specific_data["summary"]["recommendations"])
+                    vulnerabilities[input_ooi] = report_specific_data
 
-                if report == RPKIReport.id:
-                    rpki["rpki_ips"].update(data["data"]["rpki_ips"])
+                if report_id == RPKIReport.id:
+                    rpki["rpki_ips"].update(report_specific_data["rpki_ips"])
 
-        for ip, data in ipv6.items():
-            for system in data["systems"]:
+        for ip, ipv6_data in ipv6.items():
+            for system in ipv6_data["systems"]:
                 terms.append(str(system))
 
         # Basic security cleanup
