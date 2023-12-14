@@ -107,8 +107,8 @@ class AutonomousSystem(OOI):
 class NetBlock(OOI):
     network: Reference = ReferenceField(Network)
 
-    name: Optional[str]
-    description: Optional[str]
+    name: Optional[str] = None
+    description: Optional[str] = None
 
     announced_by: Optional[Reference] = ReferenceField(AutonomousSystem, default=None)
     parent: Optional[Reference] = ReferenceField("NetBlock", default=None)
