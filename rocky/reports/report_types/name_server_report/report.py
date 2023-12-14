@@ -65,7 +65,7 @@ class NameServerSystemReport(Report):
 
         elif reference.class_type in (IPAddressV4, IPAddressV6):
             hostnames = self.octopoes_api_connector.query(
-                "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
+                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
             )
 
         name_server_checks = NameServerChecks(checks=[])
