@@ -121,7 +121,7 @@ class AggregateOrganisationReport(AggregateReport):
             _("Sector defined"): "",
             _("Lowest security score in organisation"): "",
             _("Newly discovered items since last week, october 8th 2023"): "",
-            _("Terms in report"): ", ".join(terms),
+            _("Terms in report"): ", ".join(str(term.id) for term in terms),
         }
 
         return {
