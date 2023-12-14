@@ -274,7 +274,7 @@ class OctopoesAPIConnector:
     ) -> List[OOI]:
         params = {
             "path": path,
-            "source": str(source),
+            "source": source,
             "valid_time": valid_time,
             "offset": offset,
             "limit": limit,
