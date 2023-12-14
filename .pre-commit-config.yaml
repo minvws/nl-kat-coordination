@@ -100,7 +100,8 @@ repos:
       ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
       ^rocky/tests/stubs |
       ^docs/source/_static |
-      ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
+      ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/ |
+      ^boefjes/boefjes/plugins/kat_rpki/rpki.json
       )
 
 - repo: https://github.com/Riverside-Healthcare/djLint
