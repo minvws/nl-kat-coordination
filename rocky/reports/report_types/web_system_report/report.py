@@ -79,6 +79,7 @@ class WebSystemReport(Report):
         "required": [
             "nmap",
             "dns-records",
+            "security_txt_downloader",
             "testssl-sh-ciphers",
             "ssl-version",
             "ssl-certificates",
