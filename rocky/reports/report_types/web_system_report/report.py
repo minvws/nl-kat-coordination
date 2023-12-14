@@ -77,7 +77,7 @@ class WebSystemReport(Report):
     description = _("Web system reports check web systems on basic security standards.")
     plugins = {
         "required": [
-            "nmap-tcp",
+            "nmap",
             "dns-records",
             "testssl-sh-ciphers",
             "ssl-version",

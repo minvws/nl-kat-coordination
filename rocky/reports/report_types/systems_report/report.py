@@ -23,7 +23,7 @@ class SystemReport(Report):
     id = "systems-report"
     name = _("System Report")
     description = _("Combine IP addresses, hostnames and services into systems.")
-    plugins = {"required": ["nmap-tcp"], "optional": []}
+    plugins = {"required": ["nmap"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "systems_report/report.html"
 
