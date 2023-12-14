@@ -15,7 +15,7 @@ class SafeConnectionsReport(Report):
     id = "safe-connections-report"
     name = _("Safe Connections Report")
     description: str = _("Shows whether the IPService contains safe ciphers.")
-    plugins = {"required": ["dns-records", "testssl-sh-ciphers", "nmap-tcp"], "optional": []}
+    plugins = {"required": ["dns-records", "testssl-sh-ciphers", "nmap"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "safe_connections_report/report.html"
 
