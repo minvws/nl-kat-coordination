@@ -32,7 +32,7 @@ class AggregateOrganisationReport(AggregateReport):
         rpki = {"rpki_ips": {}}
         basic_security = {"rpki": {}}
         recommendations = []
-        total_systems_basic_securtiy = 0
+        total_systems_basic_security = 0
 
         # input oois
         for input_ooi, report_data in data.items():
@@ -135,5 +135,5 @@ class AggregateOrganisationReport(AggregateReport):
             "recommendations": recommendations,
             "total_findings": total_findings,
             "total_systems": total_ips,
-            "total_systems_basic_securtiy": total_systems_basic_securtiy,
+            "total_systems_basic_security": total_systems_basic_security,
         }
