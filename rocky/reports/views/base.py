@@ -111,7 +111,7 @@ class BaseReportView(OctopoesView):
                 enabled_plugins.append(plugin.enabled)
         return all(enabled_plugins)
 
-    def get_report_types_from_choice(self) -> List[type[Report]]:
+    def get_report_types_from_choice(self) -> List[Type[Report]]:
         return [get_report_by_id(report_type) for report_type in self.selected_report_types]
 
     def get_report_types(self) -> List[ReportType]:
