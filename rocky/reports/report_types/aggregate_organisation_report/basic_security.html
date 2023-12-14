@@ -29,18 +29,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for system_type, system in data.system_specific.items %}
+            {% for system_type, system in data.basic_security.rpki.items %}
                 <tr>
-                    <td>{{ system_type }} {% translate "server" %} ({{ system.rpki.number_of_ips }})</td>
+                    <td>{{ system_type }} {% translate "server" %} ({{ system.number_of_ips }})</td>
                     <td></td>
                     <td></td>
                     <td>
-                        {% if system.rpki.number_of_compliant != system.rpki.number_of_ips %}
+                        {% if system.number_of_compliant != system.number_of_ips %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ system.rpki.number_of_compliant }}/{{ system.rpki.number_of_ips }}
+                        {{ system.number_of_compliant }}/{{ system.number_of_ips }}
                     </td>
                 </tr>
             {% endfor %}

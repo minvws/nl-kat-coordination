@@ -25,10 +25,12 @@
             {% endif %}
             <section id="basic-security">
                 <div>
-                    {% include "aggregate_organisation_report/basic_security.html" %}
+                    {% if data.basic_security %}
+                        {% include "aggregate_organisation_report/basic_security.html" %}
 
+                    {% endif %}
                 </div>
-                {% if data.system_specific %}
+                {% if data.basic_security.rpki %}
                     <div id="rpki">
                         <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
                         {% for system_type, system in data.system_specific.items %}
