@@ -17,7 +17,7 @@ class OpenPortsReport(Report):
     id = "open-ports-report"
     name = _("Open Ports Report")
     description = _("Find open ports of IP addresses")
-    plugins = {"required": ["nmap-ports", "nmap-tcp", "nmap-udp"], "optional": ["shodan"]}
+    plugins = {"required": ["nmap-ports", "nmap", "nmap-udp"], "optional": ["shodan"]}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "open_ports_report/report.html"
 
