@@ -39,7 +39,7 @@ class AggregateOrganisationReport(AggregateReport):
             # reports
             for report, data in report_data.items():
                 # data in report, specifically we use system to couple reports
-                if report == "System Report":
+                if report == SystemReport.id:
                     for ip, system in data["data"]["services"].items():
                         if ip not in systems["services"]:
                             systems["services"][ip] = system
@@ -54,14 +54,14 @@ class AggregateOrganisationReport(AggregateReport):
                     total_ips += data["data"]["summary"]["total_systems"]
                     total_hostnames += data["data"]["summary"]["total_domains"]
 
-                if report == "Open Ports Report":
+                if report == OpenPortsReport.id:
                     for ip, details in data["data"].items():
                         open_ports[ip] = {
                             "ports": details["ports"],
                             "hostnames": details["hostnames"],
                         }
 
-                if report == "IPv6 Report":
+                if report == IPv6Report.id:
                     for hostname, info in data["data"].items():
                         ipv6[hostname] = {"enabled": info["enabled"], "systems": []}
 
@@ -71,15 +71,14 @@ class AggregateOrganisationReport(AggregateReport):
                                     set(ipv6[hostname]["systems"]).union(set(system["services"]))
                                 )
 
-                if report == "Vulnerability Report":
+                if report == VulnerabilityReport.id:
                     total_criticals += data["data"]["summary"]["total_criticals"]
                     total_findings += data["data"]["summary"]["total_findings"]
                     terms.extend(data["data"]["summary"]["terms"])
                     recommendations.extend(data["data"]["summary"]["recommendations"])
                     vulnerabilities[input_ooi] = data["data"]
 
-                if report == "RPKI Report":
-                    logger.error(data["data"])
+                if report == RPKIReport.id:
                     rpki["rpki_ips"].update(data["data"]["rpki_ips"])
 
         for ip, data in ipv6.items():
