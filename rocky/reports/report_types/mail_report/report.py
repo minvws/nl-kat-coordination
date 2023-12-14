@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models import Reference
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
@@ -57,8 +57,7 @@ class MailReport(Report):
             "number_of_dkim": number_of_dkim,
         }
 
-    def _get_measures(self, valid_time: datetime, hostname) -> List[Dict[str, Any]]:
-        finding_types = []
+    def _get_measures(self, valid_time: datetime, hostname) -> List[OOI]:
         measures = []
         finding_types = self.octopoes_api_connector.query(
             "Hostname.<ooi[is Finding].finding_type", valid_time, hostname

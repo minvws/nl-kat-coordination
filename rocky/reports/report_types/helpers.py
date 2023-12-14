@@ -9,8 +9,18 @@ from reports.report_types.rpki_report.report import RPKIReport
 from reports.report_types.safe_connections_report.report import SafeConnectionsReport
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.tls_report.report import TLSReport
+from reports.report_types.web_system_report.report import WebSystemReport
 
-REPORTS = [DNSReport, TLSReport, SystemReport, RPKIReport, MailReport, NameServerSystemReport, SafeConnectionsReport]
+REPORTS = [
+    DNSReport,
+    TLSReport,
+    SystemReport,
+    RPKIReport,
+    MailReport,
+    WebSystemReport,
+    NameServerSystemReport,
+    SafeConnectionsReport,
+]
 
 
 def get_ooi_types_with_report() -> Set[Type[OOI]]:
