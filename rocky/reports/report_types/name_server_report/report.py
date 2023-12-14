@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
@@ -68,7 +69,7 @@ class NameServerSystemReport(Report):
             )
 
         name_server_checks = NameServerChecks(checks=[])
-        finding_types = []
+        finding_types = {}
 
         for hostname in hostnames:
             check = NameServerCheck()
@@ -92,10 +93,15 @@ class NameServerSystemReport(Report):
             ]
 
             name_server_checks.checks.append(check)
-            finding_types.extend(port_finding_types + hostname_finding_types)
+
+            for finding_type in port_finding_types + hostname_finding_types:
+                if finding_type.risk_severity in [None, RiskLevelSeverity.PENDING] or not finding_type.description:
+                    continue
+
+                finding_types[finding_type.id] = finding_type
 
         return {
             "input_ooi": input_ooi,
             "name_server_checks": name_server_checks,
-            "finding_types": finding_types,
+            "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
         }
