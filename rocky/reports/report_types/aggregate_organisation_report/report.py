@@ -18,17 +18,6 @@ class AggregateOrganisationReport(AggregateReport):
     description = "Aggregate Organisation Report"
     reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report, RPKIReport]}
     template_path = "aggregate_organisation_report/report.html"
-    summary = {
-        _("General recommendations"): "",
-        _("Critical vulnerabilities"): 0,
-        _("Assets (IP/domains) scanned"): 0,
-        _("Sector of organisation"): "",
-        _("Basic security score compared to sector"): "",
-        _("Sector defined"): "",
-        _("Lowest security score in organisation"): "",
-        _("Newly discovered items since last week, october 8th 2023"): "",
-        _("Terms in report"): "",
-    }
 
     def post_process_data(self, data):
         systems = {"services": {}}
@@ -43,6 +32,7 @@ class AggregateOrganisationReport(AggregateReport):
         rpki = {"rpki_ips": {}}
         system_specific = {}
         recommendations = []
+        total_systems_basic_securtiy = 0
 
         # input oois
         for input_ooi, report_data in data.items():
@@ -120,6 +110,9 @@ class AggregateOrganisationReport(AggregateReport):
                         1 if compliance["exists"] and compliance["valid"] else 0
                     )
 
+        terms = list(set(terms))
+        recommendations = list(set(recommendations))
+
         summary = {
             _("General recommendations"): "",
             _("Critical vulnerabilities"): total_criticals,
@@ -143,4 +136,5 @@ class AggregateOrganisationReport(AggregateReport):
             "recommendations": recommendations,
             "total_findings": total_findings,
             "total_systems": total_ips,
+            "total_systems_basic_securtiy": total_systems_basic_securtiy,
         }

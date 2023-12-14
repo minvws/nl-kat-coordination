@@ -32,15 +32,14 @@
                                     <strong><span class="visually-hidden">(startpunt)</span>{{ port }}</strong>
                                 {% else %}
                                     {{ port }}
-                                    {{ meta_data.ports|length }}
                                 {% endif %}
-                                {% if meta_data.ports|length > 1 and not forloop.last %},{% endif %}
+                                {% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
                             {% endfor %}
                         </td>
                         <td>
                             {% for hostnames in detailed_data.hostnames %}
                                 {{ hostnames }}
-                                {% if meta_data.hostnames|length > 1 and not forloop.last %},{% endif %}
+                                {% if detailed_data.hostnames|length > 1 and not forloop.last %},{% endif %}
                             {% endfor %}
                         </td>
                     </tr>

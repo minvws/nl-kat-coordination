@@ -3,16 +3,29 @@
 <section id="recommendations">
     <div>
         <h2>{% translate "Recommendations" %}</h2>
-        <p>
-            {% blocktranslate count total_systems as count trimmed %}
-                There are <i>{{ total_findings }}</i> vulnerabilities found on <i>{{ total_systems }}</i>
-                system. <i>O</i> systems lack important basic security measures.
-            {% plural %}
-                systems. <i>O</i> systems lack important basic security measures.
-            {% endblocktranslate %}
-        </p>
-        <ul>
-            {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
-        </ul>
+        {% if total_findings == 0 %}
+            <p>{% translate "There are no recommendations" %}</p>
+        {% else %}
+            <p>
+                {% blocktranslate count total_findings as count trimmed %}
+                    There is <i>{{ total_findings }}</i> vulnerability
+                {% plural %}
+                    There are <i>{{ total_findings }}</i> vulnerabilities
+                {% endblocktranslate %}
+                {% blocktranslate count total_systems as count trimmed %}
+                    found on <i>{{ total_systems }}</i> system.
+                {% plural %}
+                    found on <i>{{ total_systems }}</i> systems.
+                {% endblocktranslate %}
+                {% blocktranslate count total_systems_basic_securtiy as count trimmed %}
+                    <i>{{ total_systems_basic_securtiy }}</i> system lack important basic security measures.
+                {% plural %}
+                    <i>{{ total_systems_basic_securtiy }}</i> systems lack important basic security measures.
+                {% endblocktranslate %}
+            </p>
+            <ul>
+                {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
+            </ul>
+        {% endif %}
     </div>
 </section>

@@ -1,53 +1,49 @@
 {% load i18n %}
 
-<section id="basic-security">
-    <div>
-        <h2>{% translate "Basic security" %}</h2>
-        <p>
-            {% blocktranslate trimmed %}
-                In this chapter, first a table of compliance checks is displayed, followed by a
-                detailed examination of compliance issues for each component.
-                For each of these components, two percentages are provided: one indicating the
-                level of basic security in place (higher is better), and the other showing
-                how well this compares to other scanned organizations in the sector (median).
-            {% endblocktranslate %}
-        </p>
-        <h3>{% translate "Overview of the basic security status" %}</h3>
-        <p>
-            {% blocktranslate trimmed %}
-                This table provides an overview of the basic security status of the known assets.
-                Basic security in order. In principle, all values in this table should be checked off.
-            {% endblocktranslate %}
-        </p>
-    </div>
-    <div class="horizontal-scroll">
-        <table>
-            <caption class="visually-hidden">{% translate "IPV6 overview:" %}</caption>
-            <thead>
+<h2>{% translate "Basic security" %}</h2>
+<p>
+    {% blocktranslate trimmed %}
+        In this chapter, first a table of compliance checks is displayed, followed by a
+        detailed examination of compliance issues for each component.
+        For each of these components, two percentages are provided: one indicating the
+        level of basic security in place (higher is better), and the other showing
+        how well this compares to other scanned organizations in the sector (median).
+    {% endblocktranslate %}
+</p>
+<h3>{% translate "Overview of the basic security status" %}</h3>
+<p>
+    {% blocktranslate trimmed %}
+        This table provides an overview of the basic security status of the known assets.
+        Basic security in order. In principle, all values in this table should be checked off.
+    {% endblocktranslate %}
+</p>
+<div class="horizontal-scroll">
+    <table>
+        <caption class="visually-hidden">{% translate "IPV6 overview:" %}</caption>
+        <thead>
+            <tr>
+                <th scope="col">{% translate "System type" %}</th>
+                <th scope="col">{% translate "Safe connections" %}</th>
+                <th scope="col">{% translate "System Specific" %}</th>
+                <th scope="col">{% translate "RPKI" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for system_type, system in data.system_specific.items %}
                 <tr>
-                    <th scope="col">{% translate "System type" %}</th>
-                    <th scope="col">{% translate "Safe connections" %}</th>
-                    <th scope="col">{% translate "System Specific" %}</th>
-                    <th scope="col">{% translate "RPKI" %}</th>
+                    <td>{{ system_type }} {% translate "server" %} ({{ system.rpki.number_of_ips }})</td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        {% if system.rpki.number_of_compliant != system.rpki.number_of_ips %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ system.rpki.number_of_compliant }}/{{ system.rpki.number_of_ips }}
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for system_type, system in data.system_specific.items %}
-                    <tr>
-                        <td>{{ system_type }} {% translate "server" %} ({{ system.rpki.number_of_ips }})</td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            {% if system.rpki.number_of_compliant != system.rpki.number_of_ips %}
-                                <span class="icon negative"></span>
-                            {% else %}
-                                <span class="icon positive"></span>
-                            {% endif %}
-                            {{ system.rpki.number_of_compliant }}/{{ system.rpki.number_of_ips }}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</section>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

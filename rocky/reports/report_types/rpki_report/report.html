@@ -19,7 +19,7 @@
                     <td>{% translate "RPKI Available" %}</td>
                     <td>
                         {% if data.number_of_available != data.number_of_ips %}
-                            <span class="icon negative"></span>
+                            <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
@@ -30,7 +30,7 @@
                     <td>{% translate "RPKI Valid" %}</td>
                     <td>
                         {% if data.number_of_valid != data.number_of_ips %}
-                            <span class="icon negative"></span>
+                            <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
