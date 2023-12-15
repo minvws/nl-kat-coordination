@@ -17,7 +17,10 @@ class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
-    reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report, RPKIReport, MailReport]}
+    reports = {
+        "required": [SystemReport],
+        "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report, RPKIReport, MailReport],
+    }
     template_path = "aggregate_organisation_report/report.html"
 
     def post_process_data(self, data):
@@ -26,6 +29,7 @@ class AggregateOrganisationReport(AggregateReport):
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
+        vulnerabilities_summary = {}
         total_criticals = 0
         total_findings = 0
         total_ips = 0
@@ -76,11 +80,11 @@ class AggregateOrganisationReport(AggregateReport):
                                 )
 
                 if report_id == VulnerabilityReport.id:
-                    total_criticals += report_specific_data["summary"]["total_criticals"]
-                    total_findings += report_specific_data["summary"]["total_findings"]
-                    terms.extend(report_specific_data["summary"]["terms"])
-                    recommendations.extend(report_specific_data["summary"]["recommendations"])
-                    vulnerabilities[input_ooi] = report_specific_data
+                    for ip, summary in report_specific_data["summary"].items():
+                        vulnerabilities_summary[ip] = summary
+                        total_findings += summary["total_findings"]
+                    for ip, vulnerabilities in report_specific_data["vulnerabilities"].items():
+                        vulnerabilities[ip] = vulnerabilities
 
                 if report_id == RPKIReport.id:
                     rpki["rpki_ips"].update({str(ip): value for ip, value in report_specific_data["rpki_ips"].items()})
@@ -170,9 +174,9 @@ class AggregateOrganisationReport(AggregateReport):
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,
+            "vulnerabilities_summary": vulnerabilities_summary,
             "basic_security": basic_security,
             "summary": summary,
-            "recommendations": recommendations,
             "total_findings": total_findings,
             "total_systems": total_ips,
             "total_systems_basic_security": total_systems_basic_security,
