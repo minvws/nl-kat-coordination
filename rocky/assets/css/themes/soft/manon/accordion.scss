@@ -50,6 +50,7 @@
       border-radius: 0;
       border-color: #d4d4d4;
       max-width: 100%;
+      word-wrap: break-word;
 
       &[aria-expanded="true"] {
         border-width: 0;
@@ -63,6 +64,14 @@
     &:first-child {
       button {
         border-top-width: 1px;
+      }
+    }
+  }
+
+  &.break-title {
+    > li {
+      button {
+        word-break: break-all;
       }
     }
   }
