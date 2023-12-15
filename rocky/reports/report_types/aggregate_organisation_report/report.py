@@ -9,6 +9,7 @@ from reports.report_types.mail_report.report import MailReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
 from reports.report_types.open_ports_report.report import OpenPortsReport
 from reports.report_types.rpki_report.report import RPKIReport
+from reports.report_types.safe_connections_report.report import SafeConnectionsReport
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
@@ -21,7 +22,7 @@ class AggregateOrganisationReport(AggregateReport):
     id = "aggregate-organisation-report"
     name = "Aggregate Organisation Report"
     description = "Aggregate Organisation Report"
-    reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report, RPKIReport, MailReport, WebSystemReport, NameServerSystemReport]}
+    reports = {"required": [SystemReport], "optional": [OpenPortsReport, VulnerabilityReport, IPv6Report, RPKIReport, MailReport, WebSystemReport, NameServerSystemReport, SafeConnectionsReport]}
     template_path = "aggregate_organisation_report/report.html"
 
     def post_process_data(self, data):
@@ -36,6 +37,7 @@ class AggregateOrganisationReport(AggregateReport):
         total_hostnames = 0
         terms = []
         rpki = {"rpki_ips": {}}
+        safe_connections = {"sc_ips": {}}
         recommendations = []
         total_systems_basic_security = 0
 
@@ -86,12 +88,15 @@ class AggregateOrganisationReport(AggregateReport):
                 if report_id == RPKIReport.id:
                     rpki["rpki_ips"].update({ip: value for ip, value in report_specific_data["rpki_ips"].items()})
 
+                if report_id == SafeConnectionsReport.id:
+                    safe_connections["sc_ips"].update({ip: value for ip, value in report_specific_data["sc_ips"].items()})
+
         for ip, ipv6_data in ipv6.items():
             for system in ipv6_data["systems"]:
                 terms.append(str(system))
 
         # Basic security cleanup
-        basic_security = {"rpki": {}, "system_specific": {}}
+        basic_security = {"rpki": {}, "system_specific": {}, "safe_connections": {}}
 
         # RPKI
         for ip, compliance in rpki["rpki_ips"].items():
@@ -121,6 +126,7 @@ class AggregateOrganisationReport(AggregateReport):
         # System Specific
         basic_security["system_specific"][SystemType.MAIL] = mail_report_data
         basic_security["system_specific"][SystemType.WEB] = web_report_data
+        basic_security["system_specific"][SystemType.DNS] = dns_report_data
 
         # Summary
         basic_security["summary"] = {}
@@ -141,6 +147,15 @@ class AggregateOrganisationReport(AggregateReport):
                     1 if rpki["rpki_ips"][ip]["exists"] and rpki["rpki_ips"][ip]["valid"] else 0
                 )
                 basic_security["summary"][service]["rpki"]["total"] += 1
+
+            for ip in systems_for_service:
+                if ip not in safe_connections["sc_ips"]:
+                    continue
+
+                basic_security["summary"][service]["safe_connections"]["number_of_compliant"] += (
+                    1 if not safe_connections["sc_ips"][ip] else 0
+                )
+                basic_security["summary"][service]["safe_connections"]["total"] += 1
 
             if service == SystemType.MAIL and mail_report_data:
                 basic_security["summary"][service]["system_specific"] = {
