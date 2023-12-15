@@ -122,7 +122,7 @@ class AggregateOrganisationReport(AggregateReport):
 
         basic_security["summary"] = {}
 
-        for service, systems in services.items():
+        for service, systems_for_service in services.items():
             # Defaults
             basic_security["summary"][service] = {
                 "rpki": {"number_of_compliant": 0, "total": 0},
@@ -130,7 +130,7 @@ class AggregateOrganisationReport(AggregateReport):
                 "safe_connections": {"number_of_compliant": 0, "total": 0},
             }
 
-            for ip, system in systems.items():
+            for ip, system in systems_for_service.items():
                 if ip not in rpki["rpki_ips"]:
                     continue
 
