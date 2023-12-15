@@ -29,18 +29,32 @@
             </tr>
         </thead>
         <tbody>
-            {% for system_type, system in data.basic_security.rpki.items %}
+            {% for service, compliance in data.basic_security.summary.items %}
                 <tr>
-                    <td>{{ system_type }} {% translate "server" %} ({{ system.number_of_ips }})</td>
-                    <td></td>
-                    <td></td>
+                    <td>{{ service }} {% translate "server" %} ({{ data.services|get_item:service|length }})</td>
                     <td>
-                        {% if system.number_of_compliant != system.number_of_ips %}
+                        {% if compliance.safe_connections.number_of_compliant != compliance.safe_connections.total %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ system.number_of_compliant }}/{{ system.number_of_ips }}
+                        {{ compliance.safe_connections.number_of_compliant }}/{{ compliance.safe_connections.total }}
+                    </td>
+                    <td>
+                        {% if compliance.system_specific.number_of_compliant != compliance.system_specific.total %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ compliance.system_specific.number_of_compliant }}/{{ compliance.system_specific.total }}
+                    </td>
+                    <td>
+                        {% if compliance.rpki.number_of_compliant != compliance.rpki.total %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ compliance.rpki.number_of_compliant }}/{{ compliance.rpki.total }}
                     </td>
                 </tr>
             {% endfor %}

@@ -25,9 +25,10 @@
             {% endif %}
             <section id="basic-security">
                 <div>
-                    {% if data.basic_security.safe_connections or data.basic_security.system_specific or data.basic_security.rpki %}
+                    {% if data.basic_security.summary %}
+                      <div id="basic-security-overview">
                         {% include "aggregate_organisation_report/basic_security.html" %}
-
+                      </div>
                     {% endif %}
                 </div>
                 {% if data.basic_security.rpki %}
@@ -36,7 +37,6 @@
                         {% for system_type, system in data.basic_security.rpki.items %}
                             {% if system %}
                                 {% include "rpki_report/report.html" with data=system type=system_type %}
-
                             {% endif %}
                         {% endfor %}
                     </div>

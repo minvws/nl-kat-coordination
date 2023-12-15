@@ -22,12 +22,12 @@
                     <a href="#ipv6">IPv6</a>
                 </li>
             {% endif %}
-            {% if data.basic_security.safe_connections or data.basic_security.system_specific or data.basic_security.rpki %}
+            {% if data.basic_security.summary %}
                 <li>
                     <a href="#basic-security">{% translate "Basic security" %}</a>
                     <ol>
                         <li>
-                            <a href="basic-security-overview">{% translate "Overview" %}</a>
+                            <a href="#basic-security-overview">{% translate "Overview" %}</a>
                         </li>
                         {% if data.basic_security.safe_connections %}
                             <li>
