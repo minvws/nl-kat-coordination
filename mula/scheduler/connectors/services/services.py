@@ -1,4 +1,3 @@
-import logging
 import urllib.parse
 from typing import Any, Dict, MutableMapping, Optional, Union
 
@@ -67,7 +66,7 @@ class HTTPService(Connector):
         """
         super().__init__()
 
-        self.logger: logging.Logger = structlog.getLogger(self.__class__.__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(self.__class__.__name__)
         self.session: requests.Session = requests.Session()
         self.host: str = host
         self.timeout: int = timeout

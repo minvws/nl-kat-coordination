@@ -1,5 +1,4 @@
 import datetime
-import logging
 from typing import Any, Dict, List, Optional
 
 import fastapi
@@ -26,7 +25,7 @@ class Server:
     """Server that exposes API endpoints for the scheduler.
 
     Attributes:
-        logger: A logging.Logger object used for logging.
+        logger: A structlog.BoundLogger object used for logging.
         ctx: A context.AppContext object used for sharing data between modules.
         schedulers: A dict containing all the schedulers.
         config: A settings.Settings object containing the configuration settings.
@@ -45,7 +44,7 @@ class Server:
             s: A dict containing all the schedulers.
         """
 
-        self.logger: logging.Logger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.schedulers: Dict[str, schedulers.Scheduler] = s
         self.config: settings.Settings = settings.Settings()

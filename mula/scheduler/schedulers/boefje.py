@@ -737,7 +737,6 @@ class BoefjeScheduler(Scheduler):
             self.logger.error(
                 "Failed to get last run boefje from bytes",
                 boefje_id=task.boefje.id,
-                input_ooi_primary_key=task.input_ooi.primary_key,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc_bytes,

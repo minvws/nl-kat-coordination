@@ -1,5 +1,4 @@
 import abc
-import logging
 import threading
 import time
 from datetime import datetime, timezone
@@ -62,7 +61,7 @@ class Scheduler(abc.ABC):
                 the queue.
         """
 
-        self.logger: logging.Logger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.enabled: bool = True
         self.scheduler_id: str = scheduler_id

@@ -1,4 +1,3 @@
-import logging
 import threading
 from typing import Any, Callable, Optional
 
@@ -47,7 +46,7 @@ class ThreadRunner(threading.Thread):
             daemon: A boolean describing whether the thread should be a daemon
             loop: A boolean describing whether the thread should run in a loop.
         """
-        self.logger: logging.Logger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self._target: Callable[[], Any] = target
         self.stop_event: threading.Event = stop_event
         self.interval: Optional[float] = interval

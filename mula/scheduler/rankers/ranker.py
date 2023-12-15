@@ -1,5 +1,4 @@
 import abc
-import logging
 from typing import Any
 
 import structlog
@@ -25,7 +24,7 @@ class Ranker(abc.ABC):
     """
 
     def __init__(self, ctx: context.AppContext) -> None:
-        self.logger: logging.Logger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
 
     @abc.abstractmethod

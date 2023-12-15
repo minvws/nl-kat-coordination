@@ -1,4 +1,3 @@
-import logging
 import os
 import threading
 from typing import Dict, Optional, Set, Union
@@ -52,7 +51,7 @@ class App:
                 external services connections).
         """
 
-        self.logger: logging.Logger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
 
         threading.excepthook = self.unhandled_exception  # type: ignore
