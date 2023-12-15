@@ -30,9 +30,9 @@ class MailReport(Report):
         if reference.class_type == Hostname:
             hostnames = [reference]
         elif reference.class_type in (IPAddressV4, IPAddressV6):
-            hostnames = self.octopoes_api_connector.query(
+            hostnames = [x.reference for x in self.octopoes_api_connector.query(
                 "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
-            )
+            )]
 
         number_of_hostnames = len(hostnames)
         number_of_spf = number_of_hostnames
@@ -41,11 +41,7 @@ class MailReport(Report):
 
         for hostname in hostnames:
             measures = self._get_measures(valid_time, hostname)
-
-            if reference.class_type == Hostname:
-                mail_security_measures = {"hostname": hostnames[0].tokenized.name, "measures": measures}
-            else:
-                mail_security_measures.update({"hostname": hostname.name, "measures": measures})
+            mail_security_measures.update({"hostname": hostname.tokenized.name, "measures": measures})
 
             number_of_spf -= (
                 1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures["measures"])) else 0
