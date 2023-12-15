@@ -137,6 +137,7 @@
         min-height: 0;
         min-width: 0;
         color: #000000;
+        position: static;
 
         &::before {
           font-size: 1.5rem;
@@ -145,9 +146,11 @@
       }
     }
 
-    &.sidemenu-closed {
-      .sticky {
-        display: none;
+    &.sidemenu-closed > nav {
+      overflow: visible;
+
+      > div {
+        overflow: hidden;
       }
     }
   }
