@@ -65,7 +65,7 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
-    id: uuid.UUID
+    id: Optional[uuid.UUID]
     normalizer: Normalizer
     raw_data: RawData
     type: str = "normalizer"
@@ -74,7 +74,7 @@ class NormalizerTask(BaseModel):
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
-    id: uuid.UUID
+    id: Optional[uuid.UUID] = None
     boefje: Boefje
     input_ooi: Optional[str]
     organization: str
@@ -87,7 +87,7 @@ class QueuePrioritizedItem(BaseModel):
     representation.
     """
 
-    id: uuid.UUID
+    id: Optional[uuid.UUID]
     priority: int
     hash: Optional[str]
     data: Union[BoefjeTask, NormalizerTask]
@@ -105,7 +105,7 @@ class TaskStatus(Enum):
 
 
 class Task(BaseModel):
-    id: uuid.UUID
+    id: Optional[uuid.UUID] = None
     scheduler_id: str
     type: str
     p_item: QueuePrioritizedItem
@@ -227,7 +227,7 @@ class SchedulerClient:
     def get_task_details(self, organization_code: str, task_id: str) -> Optional[Task]:
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
         res.raise_for_status()
-        task_details = Task.model_validate_json(res.content)
+        task_details = Task.parse_raw(res.content)
 
         if task_details.type == "normalizer":
             organization = task_details.p_item.data.raw_data.boefje_meta.organization

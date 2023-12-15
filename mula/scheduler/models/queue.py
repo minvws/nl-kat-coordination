@@ -20,16 +20,16 @@ class PrioritizedItem(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4)
 
     scheduler_id: Optional[str] = None
 
     # A unique generated identifier for the object contained in data
     hash: Optional[str] = Field(None, max_length=32)
 
-    priority: Optional[int]
+    priority: Optional[int] = 0
 
-    data: Dict
+    data: Dict = Field(default_factory=dict)
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
