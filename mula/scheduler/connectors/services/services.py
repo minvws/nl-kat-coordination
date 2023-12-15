@@ -187,7 +187,10 @@ class HTTPService(Connector):
         if self.host is not None and self.retry(self.is_host_available, hostname, port) is False:
             raise RuntimeError(f"Host {self.host} is not available.")
 
-        if self.health_endpoint is not None and self.retry(self.is_host_healthy, self.host, self.health_endpoint) is False:
+        if (
+            self.health_endpoint is not None
+            and self.retry(self.is_host_healthy, self.host, self.health_endpoint) is False
+        ):
             raise RuntimeError(f"Service {self.name} is not running.")
 
     def _verify_response(self, response: requests.Response) -> None:

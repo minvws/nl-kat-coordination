@@ -125,12 +125,12 @@ class Scheduler(abc.ABC):
             self.logger.warning(
                 "PrioritizedItem %s popped from %s, task %s not found in datastore, could not update task status",
                 p_item.id,
-                queue.pq_id,
+                self.queue.pq_id,
                 p_item.data.get("id"),
                 p_item_id=p_item.id,
                 task_id=p_item.data.get("id"),
                 queue_id=self.queue.pq_id,
-                scheduler_id=scheduler_id,
+                scheduler_id=self.scheduler_id,
             )
             return
 
@@ -449,5 +449,5 @@ class Scheduler(abc.ABC):
                 "allow_updates": self.queue.allow_updates,
                 "allow_priority_updates": self.queue.allow_priority_updates,
             },
-            "last_activity": self.last_activity
+            "last_activity": self.last_activity,
         }

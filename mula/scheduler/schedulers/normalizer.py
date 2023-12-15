@@ -253,7 +253,7 @@ class NormalizerScheduler(Scheduler):
             task.id,
             raw_data.id,
             task_id=task.id,
-            boefje_id=boefje.id,
+            normalizer_id=normalizer.id,
             raw_data_id=raw_data.id,
             organisation_id=self.organisation.id,
             scheduler_id=self.scheduler_id,
