@@ -189,7 +189,7 @@
         "recommendation": "Make sure both IPv6 and IPv4 addresses point to the same web content."
     },
     "KAT-NO-DNSSEC": {
-        "description": "The provided domain is not DNSSEC signed.",
+        "description": "The provided domain does not have DNSSEC enabled.",
         "source": null,
         "risk": "medium",
         "impact": null,
