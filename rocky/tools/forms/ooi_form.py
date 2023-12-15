@@ -75,7 +75,8 @@ class OOIForm(BaseRockyForm):
                 if name in self.ooi_class.__annotations__ and self.ooi_class.__annotations__[name] == Dict[str, str]:
                     fields[name] = forms.JSONField(**default_attrs)
                 else:
-                    fields[name] = forms.CharField(max_length=256, **default_attrs)
+                    fields[name] = forms.CharField(max_length=256, **default_attrs,
+                                                   empty_value=None if not field.is_required() else "")
 
         return fields
 
@@ -113,7 +114,6 @@ def generate_select_ooi_field(
     return forms.CharField(widget=forms.Select(choices=select_options), **default_attrs)
 
 
-# todo: name?
 def generate_select_ooi_type(name: str, enumeration: Enum, field: FieldInfo) -> forms.fields.Field:
     """OOI Type (enum) fields will have a select input"""
     default_attrs = default_field_options(name, field)
