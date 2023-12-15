@@ -25,7 +25,7 @@ endef
 kat: env-if-empty build up
 	@echo
 	@echo "The KAT frontend is running at http://localhost:8000,"
-	@echo "An inital superuser has been created"
+	@echo "An initial superuser has been created"
 	@echo "The username is stored in DJANGO_SUPERUSER_EMAIL in the .env-default file."
         @echo "run `grep 'DJANGO_SUPERUSER_EMAIL' .env` to find it."
 	@echo "The related password can be found as DJANGO_SUPERUSER_PASSWORD in the .env file."
