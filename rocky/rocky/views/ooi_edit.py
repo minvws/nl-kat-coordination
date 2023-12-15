@@ -26,7 +26,7 @@ class OOIEditView(BaseOOIFormView):
                 # Config OOIs use dicts for their values
                 initial[attr] = value
             else:
-                initial[attr] = str(value)
+                initial[attr] = str(value) if value is not None else None
 
         return initial
 
