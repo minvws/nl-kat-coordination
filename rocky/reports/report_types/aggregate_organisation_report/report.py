@@ -83,7 +83,7 @@ class AggregateOrganisationReport(AggregateReport):
                     vulnerabilities[input_ooi] = report_specific_data
 
                 if report_id == RPKIReport.id:
-                    rpki["rpki_ips"].update(report_specific_data["rpki_ips"])
+                    rpki["rpki_ips"].update({str(ip): value for ip, value in report_specific_data["rpki_ips"].items()})
 
                 if report_id == MailReport.id:
                     mail_report_data.append(report_specific_data)
