@@ -11,6 +11,14 @@
 }
 
 %dl-styling {
+  width: 100%;
+
+  > div {
+    dd {
+      max-width: var(--max-line-length-max-width);
+    }
+  }
+
   @media (width >= 35rem) {
     > div {
       flex-wrap: nowrap;
@@ -32,6 +40,8 @@ main section,
 main article,
 main section > div,
 main article > div {
+  box-sizing: border-box;
+
   dl,
   form dl,
   form fieldset dl {

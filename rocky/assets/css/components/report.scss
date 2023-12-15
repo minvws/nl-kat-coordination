@@ -2,6 +2,10 @@
   gap: var(--spacing-grid-500);
   padding: 0;
 
+  > div {
+    width: 100%;
+  }
+
   &.introduction {
     > div {
       width: 100%;
@@ -30,6 +34,8 @@
 }
 
 .report {
+  --max-line-length-breakpoint-hyphens: initial;
+
   article {
     gap: var(--spacing-grid-500);
 
@@ -75,6 +81,16 @@
             }
           }
         }
+      }
+    }
+
+    table {
+      caption {
+        --table-base-caption-font-size: var(--heading-normal-font-size);
+        --table-base-caption-text-color: var(--text-color-dark);
+
+        font-family: var(--headings-base-set-font-family);
+        font-weight: 600;
       }
     }
   }
