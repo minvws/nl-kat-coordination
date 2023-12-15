@@ -11,11 +11,8 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models.types import OOI_TYPES
 from rocky.scheduler import (
-    BadRequestError,
-    ConflictError,
+    QueuePrioritizedItem,
     SchedulerError,
-    TaskNotFoundError,
-    TooManyRequestsError,
     client,
 )
 
@@ -165,11 +162,10 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         ]
 
 
-def schedule_task(request: HttpRequest, organization_code: str, task_id: str) -> None:
+def schedule_task(request: HttpRequest, organization_code: str, p_item: QueuePrioritizedItem) -> None:
     try:
-        task = client.get_task_details(organization_code, task_id)
-        client.push_task(f"{task.p_item.data.type}-{organization_code}", task.p_item)
-    except (TaskNotFoundError, BadRequestError, TooManyRequestsError, ConflictError, SchedulerError) as error:
+        client.push_task(f"{p_item.data.type}-{organization_code}", p_item)
+    except SchedulerError as error:
         messages.error(request, error.message)
     else:
         messages.success(
@@ -180,3 +176,33 @@ def schedule_task(request: HttpRequest, organization_code: str, task_id: str) ->
                 "It may take some time, a refresh of the page may be needed to show the results."
             ),
         )
+
+
+# FIXME: Tasks should be (re)created with supplied data, not by fetching prior
+# task info from the scheduler. Task data should be available from the context
+# from which the task is created.
+def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) -> None:
+    try:
+        task = client.get_task_details(organization_code, task_id)
+    except SchedulerError as error:
+        messages.error(request, error.message)
+        return
+
+    if not task:
+        messages.error(request, _("Task not found."))
+        return
+
+    # Remove id from task data, this should be created by the scheduler
+    new_task = task.p_item.data
+    delattr(new_task, "id")
+
+    try:
+        new_p_item = QueuePrioritizedItem(
+            data=new_task,
+            priority=1,
+        )
+
+        schedule_task(request, organization_code, new_p_item)
+    except SchedulerError as error:
+        messages.error(request, error.message)
+        return

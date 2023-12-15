@@ -1,0 +1,43 @@
+{% load i18n %}
+
+<h2>{% translate "Safe Connections" %}</h2>
+{% if data.sc_ips %}
+    <div class="horizontal-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Check" %}</th>
+                    <th>{% translate "Compliance" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{% translate "Only Safe Ciphers" %}</td>
+                    <td>{{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "services are compliant" %}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% if data.sc_ips.cipher_findings %}
+        <p class="column-2">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Compliance issue" %}</th>
+                        <th scope="col">{% translate "Risk level" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for finding in data.sc_ips.cipher_findings %}
+                        <tr>
+                            <td>{{ finding.description }}</td>
+                            <td>{{ finding.risk_severity }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </p>
+    {% endif %}
+{% else %}
+    <p>{% translate "No connections found" %}</p>
+{% endif %}
