@@ -9,7 +9,6 @@ from bits.runner import BitRunner
 from requests.adapters import HTTPAdapter, Retry
 
 from octopoes.api.api import app
-from octopoes.api.models import Declaration, Observation
 from octopoes.api.router import settings
 from octopoes.config.settings import Settings, XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -17,8 +16,12 @@ from octopoes.core.app import get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
+from octopoes.models.ooi.certificate import X509Certificate
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV6
 from octopoes.models.ooi.software import Software, SoftwareInstance
+from octopoes.models.ooi.web import URL, HTTPHeader, SecurityTXT
+from octopoes.models.origin import Origin, OriginType
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import (
     DNSZone,
@@ -254,6 +257,11 @@ def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository
 
 
 @pytest.fixture
+def xtdb_origin_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
 def mock_xtdb_session():
     return XTDBSession(Mock())
 
@@ -263,9 +271,8 @@ def origin_repository(mock_xtdb_session):
     yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)
 
 
-def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
+def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: XTDBOriginRepository, valid_time):
     network = Network(name="test")
-    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     hostnames = [
         Hostname(network=network.reference, name="example.com"),
@@ -307,17 +314,89 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ResolvedHostname(hostname=hostnames[4].reference, address=addresses[1].reference),
         ResolvedHostname(hostname=hostnames[6].reference, address=addresses[1].reference),
     ]
-
+    certificates = [
+        X509Certificate(
+            subject="example.com",
+            valid_from="2022-11-15T08:52:57",
+            valid_until="2030-11-15T08:52:57",
+            serial_number="abc123",
+        )
+    ]
     websites = [
-        Website(ip_service=ip_services[0].reference, hostname=hostnames[0].reference),
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[0].reference, certificates=certificates[0]),
         Website(ip_service=ip_services[0].reference, hostname=hostnames[1].reference),
     ]
     software = [Software(name="DICOM")]
     instance = [SoftwareInstance(ooi=ports[0].reference, software=software[0].reference)]
 
-    oois = hostnames + addresses + ports + services + ip_services + resolved_hostnames + websites + software + instance
-    octopoes_api_connector.save_observation(
-        Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
+    web_urls = [
+        HostnameHTTPURL(netloc=hostnames[0].reference, path="/", scheme="http", network=network.reference, port=80),
+        HostnameHTTPURL(netloc=hostnames[0].reference, path="/", scheme="https", network=network.reference, port=443),
+    ]
+    urls = [URL(network=network.reference, raw="https://test.com/security", web_url=web_urls[1].reference)]
+    resources = [
+        HTTPResource(website=websites[0].reference, web_url=web_urls[0].reference),
+        HTTPResource(website=websites[0].reference, web_url=web_urls[1].reference),
+    ]
+    headers = [HTTPHeader(resource=resources[1].reference, key="test key", value="test value")]
+    security_txts = [SecurityTXT(website=websites[1].reference, url=urls[0].reference, security_txt="test text")]
+    finding_types = [
+        KATFindingType(id="KAT-NO-CSP"),
+        KATFindingType(id="KAT-CSP-VULNERABILITIES"),
+        KATFindingType(id="KAT-NO-HTTPS-REDIRECT"),
+        KATFindingType(id="KAT-NO-CERTIFICATE"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRED"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
+    ]
+    findings = [
+        Finding(finding_type=finding_types[0].reference, ooi=resources[0].reference),
+        Finding(finding_type=finding_types[2].reference, ooi=web_urls[0].reference),
+        Finding(finding_type=finding_types[3].reference, ooi=websites[1].reference),
+        Finding(finding_type=finding_types[4].reference, ooi=certificates[0].reference),
+    ]
+
+    oois = (
+        hostnames
+        + addresses
+        + ports
+        + services
+        + ip_services
+        + resolved_hostnames
+        + websites
+        + software
+        + instance
+        + web_urls
+        + resources
+        + headers
+        + finding_types
+        + findings
+        + urls
+        + security_txts
+        + certificates
     )
 
-    octopoes_api_connector.recalculate_bits()
+    network_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=network.reference,
+        result=[network.reference],
+        task_id=uuid.uuid4(),
+    )
+    xtdb_ooi_repository.save(network, valid_time=valid_time)
+    xtdb_origin_repository.save(network_origin, valid_time=valid_time)
+
+    origin = Origin(
+        origin_type=OriginType.OBSERVATION,
+        method="",
+        source=network.reference,
+        result=[ooi.reference for ooi in oois],
+        task_id=uuid.uuid4(),
+    )
+
+    for ooi in oois:
+        xtdb_ooi_repository.save(ooi, valid_time=valid_time)
+
+    xtdb_origin_repository.save(origin, valid_time=valid_time)
+
+    xtdb_origin_repository.commit()
+    xtdb_ooi_repository.commit()
