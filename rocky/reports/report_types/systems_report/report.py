@@ -1,3 +1,5 @@
+from enum import StrEnum
+
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
@@ -12,6 +14,13 @@ from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
 
+
+class SystemType(StrEnum):
+    WEB = "Web"
+    MAIL = "Mail"
+    DICOM = "Dicom"
+    DNS = "DNS"
+    OTHER = "Other"
 
 @dataclass
 class System:
@@ -40,32 +49,26 @@ class SystemReport(Report):
 
         ip_services = {}
 
-        WEB = _("Web")
-        MAIL = _("Mail")
-        DICOM = _("Dicom")
-        DNS = _("DNS")
-        OTHER = _("Other")
-
         service_mapping = {
             # "http-alt": WEB,
-            "domain": DNS,
-            "tsdns": DNS,
-            "mdns": DNS,
-            "smtp": MAIL,
-            "smtp-stats": MAIL,
-            "smtp-proxy": MAIL,
-            "mail-admin": MAIL,
-            "mailq": MAIL,
-            "dicom": DICOM,
+            "domain": SystemType.DNS,
+            "tsdns": SystemType.DNS,
+            "mdns": SystemType.DNS,
+            "smtp": SystemType.MAIL,
+            "smtp-stats": SystemType.MAIL,
+            "smtp-proxy": SystemType.MAIL,
+            "mail-admin": SystemType.MAIL,
+            "mailq": SystemType.MAIL,
+            "dicom": SystemType.DICOM,
         }
         software_mapping = {
-            "DICOM": DICOM,
+            "DICOM": SystemType.DICOM,
         }
 
         for ip in ips:
-            ip_services[str(ip.address)] = {
+            ip_services[ip.reference] = {
                 "hostnames": [
-                    str(x.name)
+                    x.reference
                     for x in self.octopoes_api_connector.query(
                         "IPAddress.<address[is ResolvedHostname].hostname",
                         valid_time,
@@ -75,7 +78,7 @@ class SystemReport(Report):
                 "services": list(
                     set(
                         [
-                            service_mapping.get(str(x.name), OTHER)
+                            service_mapping.get(str(x.name), SystemType.OTHER)
                             for x in self.octopoes_api_connector.query(
                                 "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
                                 valid_time,
@@ -85,7 +88,7 @@ class SystemReport(Report):
                     ).union(
                         set(
                             [
-                                software_mapping.get(str(x.name), OTHER)
+                                software_mapping.get(str(x.name), SystemType.OTHER)
                                 for x in self.octopoes_api_connector.query(
                                     "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
                                     valid_time,
@@ -103,7 +106,7 @@ class SystemReport(Report):
                     ip.reference,
                 )
             ):
-                ip_services[str(ip.address)]["services"].append(WEB)
+                ip_services[ip.reference]["services"].append(SystemType.WEB)
 
         total_systems = 0
         total_domains = 0
