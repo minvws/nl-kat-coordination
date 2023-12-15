@@ -18,7 +18,7 @@
             </tbody>
         </table>
     </div>
-    {% if data.sc_ips.cipher_findings %}
+    {% if data.finding_types %}
         <p class="column-2">
             <table>
                 <thead>
@@ -28,10 +28,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for finding in data.sc_ips.cipher_findings %}
+                    {% for finding_type in data.finding_types %}
                         <tr>
-                            <td>{{ finding.description }}</td>
-                            <td>{{ finding.risk_severity }}</td>
+                            <td>{{ finding_type.description }}</td>
+                            <td>{{ finding_type.risk_severity }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

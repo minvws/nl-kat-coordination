@@ -26,6 +26,18 @@ class WebCheck:
     certificates_not_expired: bool = False
     certificates_not_expiring_soon: bool = False
 
+    def __bool__(self):
+        return (
+            self.has_csp
+            and self.has_no_csp_vulnerabilities
+            and self.redirects_http_https
+            and self.offers_https
+            and self.has_security_txt
+            and self.no_uncommon_ports
+            and self.has_certificates
+            and self.certificates_not_expired
+            and self.certificates_not_expiring_soon
+        )
 
 @dataclass
 class WebChecks:
@@ -67,8 +79,14 @@ class WebChecks:
     def certificates_not_expiring_soon(self):
         return sum([check.certificates_not_expiring_soon for check in self.checks])
 
+    def __bool__(self):
+        return all(bool(check) for check in self.checks)
+
     def __len__(self):
         return len(self.checks)
+
+    def __add__(self, other: "WebChecks"):
+        return WebChecks(checks=self.checks + other.checks)
 
 
 class WebSystemReport(Report):

@@ -42,7 +42,7 @@
     </div>
     {% for ip, info in data.rpki_ips.items %}
         {% if not info.valid or not info.exists %}
-            <h5>{{ ip }}</h5>
+            <h5>{{ ip.address }}</h5>
             <table>
                 <thead>
                     <tr>
