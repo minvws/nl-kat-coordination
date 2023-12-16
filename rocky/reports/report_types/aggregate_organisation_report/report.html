@@ -48,16 +48,11 @@
                 <div>
                     <h2>{% translate "Vulnerabilities" %}</h2>
                     <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
-                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                        <h3>{{ input_ooi }}</h3>
-                        <p>
-                            <strong>{{ data.vulnerabilities_summary.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
-                        </p>
-                        {% include "vulnerability_report/report.html" with data=vulnerabilities %}
-
-                    {% endfor %}
                     {% if not data.vulnerabilities %}
                         <p>{% translate "No CVEs have been found." %}</p>
+                    {% else %}
+                        {% include "vulnerability_report/report.html" with data=data.vulnerabilities show_heading="yes" %}
+
                     {% endif %}
                 </div>
             </section>
