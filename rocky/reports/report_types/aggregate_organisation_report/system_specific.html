@@ -1,0 +1,32 @@
+{% load i18n %}
+
+{% if show_heading %}
+    <h2>{% translate "System specific checks" %}</h2>
+{% endif %}
+<h4>{{ type }}</h4>
+<div class="horizontal-scroll">
+    <table>
+        <caption class="visually-hidden">{% translate "Check overview:" %}</caption>
+        <thead>
+            <tr>
+                <th>{% translate "Check" %}</th>
+                <th>{% translate "Compliance" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for check, value in data.checks.items %}
+            <tr>
+                <td>{{ check }}</td>
+                <td>
+                    {% if value != data.total %}
+                        <span class="icon incomplete"></span>
+                    {% else %}
+                        <span class="icon positive"></span>
+                    {% endif %}
+                    {{ value }}/{{ data.total }} {% translate "IPs are compliant" %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
