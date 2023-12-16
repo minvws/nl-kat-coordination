@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
@@ -65,7 +65,7 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
-    id: uuid.UUID
+    id: Optional[uuid.UUID]
     normalizer: Normalizer
     raw_data: RawData
     type: str = "normalizer"
@@ -74,7 +74,7 @@ class NormalizerTask(BaseModel):
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
-    id: uuid.UUID
+    id: Optional[uuid.UUID] = None
     boefje: Boefje
     input_ooi: Optional[str] = None
     organization: str
@@ -87,10 +87,10 @@ class QueuePrioritizedItem(BaseModel):
     representation.
     """
 
-    id: uuid.UUID
-    priority: int
+    id: Optional[uuid.UUID] = None
     hash: Optional[str] = None
-    data: Union[BoefjeTask, NormalizerTask]
+    priority: int
+    data: SerializeAsAny[Union[BoefjeTask, NormalizerTask]]
 
 
 class TaskStatus(Enum):
@@ -105,7 +105,7 @@ class TaskStatus(Enum):
 
 
 class Task(BaseModel):
-    id: uuid.UUID
+    id: Optional[uuid.UUID] = None
     scheduler_id: str
     type: str
     p_item: QueuePrioritizedItem

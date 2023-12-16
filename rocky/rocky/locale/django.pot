@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-14 17:37+0000\n"
+"POT-Creation-Date: 2023-12-15 14:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3972,6 +3972,10 @@ msgid ""
 "refresh of the page may be needed to show the results."
 msgstr ""
 
+#: tools/view_helpers.py rocky/scheduler.py
+msgid "Task not found."
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -3993,10 +3997,6 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task already queued."
-msgstr ""
-
-#: rocky/scheduler.py
-msgid "Task not found."
 msgstr ""
 
 #: rocky/settings.py
@@ -5516,7 +5516,7 @@ msgstr ""
 
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
-msgid "Failure"
+msgid "Failed"
 msgstr ""
 
 #: rocky/templates/partials/task_history.html
