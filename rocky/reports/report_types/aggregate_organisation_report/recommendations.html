@@ -23,9 +23,13 @@
                     <i>{{ total_systems_basic_security }}</i> systems lack important basic security measures.
                 {% endblocktranslate %}
             </p>
-            <ul>
-                {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
-            </ul>
+            {% if recommendation %}
+                <ul>
+                    {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
+                </ul>
+            {% else %}
+                <p>{% translate "There are no recommendations" %}</p>
+            {% endif %}
         {% endif %}
     </div>
 </section>
