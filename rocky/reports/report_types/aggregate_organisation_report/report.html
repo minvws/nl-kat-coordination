@@ -28,21 +28,30 @@
                     {% if data.basic_security.summary %}
                         <div id="basic-security-overview">
                             {% include "aggregate_organisation_report/basic_security.html" %}
-
                         </div>
                     {% endif %}
-                </div>
-                {% if data.basic_security.rpki %}
-                    <div id="rpki">
-                        <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
-                        {% for system_type, system in data.basic_security.rpki.items %}
-                            {% if system %}
-                                {% include "rpki_report/report.html" with data=system type=system_type %}
 
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
+                    {% if data.basic_security.system_specific %}
+                        <div id="system_specific">
+                            <h3>{% translate "System specific" %}</h3>
+                            {% for check, system in data.basic_security.summary.items %}
+                                {% include "aggregate_organisation_report/system_specific.html" with data=system.system_specific type=check %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}            
+
+                    {% if data.basic_security.rpki %}
+                        <div id="rpki">
+                            <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+                            {% for system_type, system in data.basic_security.rpki.items %}
+                                {% if system %}
+                                    {% include "rpki_report/report.html" with data=system type=system_type %}
+    
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>  
             </section>
             <section id="vulnerabilities">
                 <div>
