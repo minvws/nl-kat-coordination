@@ -42,7 +42,6 @@ class AggregateOrganisationReport(AggregateReport):
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
-        vulnerabilities_summary = {}
         total_criticals = 0
         total_findings = 0
         total_ips = 0
@@ -91,11 +90,8 @@ class AggregateOrganisationReport(AggregateReport):
                                 )
 
                 if report_id == VulnerabilityReport.id:
-                    for ip, summary in report_specific_data["summary"].items():
-                        vulnerabilities_summary[ip] = summary
-                        total_findings += summary["total_findings"]
-                    for ip, vulnerabilities in report_specific_data["vulnerabilities"].items():
-                        vulnerabilities[ip] = vulnerabilities
+                    for ip, vulnerabilities_data in report_specific_data.items():
+                        vulnerabilities[ip] = vulnerabilities_data
 
                 if report_id == RPKIReport.id:
                     rpki["rpki_ips"].update({ip: value for ip, value in report_specific_data["rpki_ips"].items()})
@@ -216,7 +212,6 @@ class AggregateOrganisationReport(AggregateReport):
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,
-            "vulnerabilities_summary": vulnerabilities_summary,
             "basic_security": basic_security,
             "summary": summary,
             "total_findings": total_findings,
