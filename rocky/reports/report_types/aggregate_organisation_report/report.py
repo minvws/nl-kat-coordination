@@ -198,15 +198,15 @@ class AggregateOrganisationReport(AggregateReport):
         recommendations = list(set(recommendations))
 
         summary = {
-            _("General recommendations"): "",
+            #_("General recommendations"): "",
             _("Critical vulnerabilities"): total_criticals,
             _("IPs scanned"): total_ips,
             _("Domains scanned"): total_hostnames,
-            _("Sector of organisation"): "",
-            _("Basic security score compared to sector"): "",
-            _("Sector defined"): "",
-            _("Lowest security score in organisation"): "",
-            _("Newly discovered items since last week, october 8th 2023"): "",
+            #_("Sector of organisation"): "",
+            #_("Basic security score compared to sector"): "",
+            #_("Sector defined"): "",
+            #_("Lowest security score in organisation"): "",
+            #_("Newly discovered items since last week, october 8th 2023"): "",
             _("Terms in report"): ", ".join(terms),
         }
 
