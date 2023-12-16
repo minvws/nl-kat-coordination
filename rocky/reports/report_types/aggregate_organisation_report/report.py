@@ -1,3 +1,4 @@
+from dataclasses import fields
 from functools import reduce
 from logging import getLogger
 
@@ -168,26 +169,50 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["summary"][service]["safe_connections"]["total"] += 1
 
             if service == SystemType.MAIL and mail_report_data:
+                check_summary = {}
+                for host in mail_report_data:
+                    for check in fields(host):
+                        if check.name not in check_summary:
+                            check_summary[check.name] = 0
+                        checkvalue = int(getattr(host, check.name))
+                        check_summary[check.name] += checkvalue
                 basic_security["summary"][service]["system_specific"] = {
                     "number_of_compliant": sum(
                         m["number_of_hostnames"] == m["number_of_spf"] == m["number_of_dkim"] == m["number_of_dmarc"]
                         for m in mail_report_data
                     ),
                     "total": sum([mail_data["number_of_hostnames"] for mail_data in mail_report_data]),
+                    "checks": check_summary,
                 }
 
             if service == SystemType.WEB and web_report_data:
                 web_checks = reduce(lambda x, y: x + y, [x["web_checks"] for x in web_report_data])
+                check_summary = {}
+                for host in web_checks.checks:
+                    for check in fields(host):
+                        if check.name not in check_summary:
+                            check_summary[check.name] = 0
+                        checkvalue = int(getattr(host, check.name))
+                        check_summary[check.name] += checkvalue
                 basic_security["summary"][service]["system_specific"] = {
                     "number_of_compliant": sum(bool(check) for check in web_checks.checks),
                     "total": len(web_checks.checks),
+                    "checks": check_summary,
                 }
 
             if service == SystemType.DNS and dns_report_data:
                 name_server_checks = reduce(lambda x, y: x + y, [x["name_server_checks"] for x in dns_report_data])
+                check_summary = {}
+                for host in name_server_checks.checks:
+                    for check in fields(host):
+                        if check.name not in check_summary:
+                            check_summary[check.name] = 0
+                        checkvalue = int(getattr(host, check.name))
+                        check_summary[check.name] += checkvalue
                 basic_security["summary"][service]["system_specific"] = {
                     "number_of_compliant": sum(bool(check) for check in name_server_checks.checks),
                     "total": len(name_server_checks.checks),
+                    "checks": check_summary,
                 }
 
         terms = list(set(terms))
