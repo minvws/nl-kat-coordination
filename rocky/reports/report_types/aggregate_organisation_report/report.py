@@ -126,7 +126,7 @@ class AggregateOrganisationReport(AggregateReport):
                 if ip in basic_security["rpki"][service]["rpki_ips"]:
                     continue  # We already processed data from this ip for this service
 
-                basic_security["rpki"][service]["rpki_ips"][ip] = compliance
+                basic_security["rpki"][service]["rpki_ips"][ip.tokenized.address] = compliance
                 basic_security["rpki"][service]["number_of_ips"] += 1
                 basic_security["rpki"][service]["number_of_available"] += 1 if compliance["exists"] else 0
                 basic_security["rpki"][service]["number_of_valid"] += 1 if compliance["valid"] else 0
