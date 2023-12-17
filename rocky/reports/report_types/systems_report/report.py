@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import StrEnum
 from logging import getLogger
 from typing import Any, Dict
 
 from django.utils.translation import gettext_lazy as _
+from strenum import StrEnum
 
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
