@@ -17,5 +17,5 @@
       "type": "string",
       "description": "Source url with RPKI information. The boefje expects the same format as used in the default url."
     }
-  }  
+  }
 }
