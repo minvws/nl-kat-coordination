@@ -45,7 +45,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 def validate_age() -> Bool:
     now = datetime.utcnow()
     maxage = getenv("RPKI_CACHE_TIMEOUT") or RPKI_CACHE_TIMEOUT
-     with open(RPKI_META_PATH) as meta_file:
+    with open(RPKI_META_PATH) as meta_file:
         meta = json.load(meta_file)
     cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
     return (now - cached_file_timestamp).total_seconds()) > maxage
