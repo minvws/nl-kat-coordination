@@ -1,7 +1,6 @@
-from enum import StrEnum
-
 from dataclasses import dataclass
 from datetime import datetime
+from enum import StrEnum
 from logging import getLogger
 from typing import Any, Dict
 
@@ -22,6 +21,7 @@ class SystemType(StrEnum):
     DNS = "DNS"
     OTHER = "Other"
 
+
 @dataclass
 class System:
     system_types: list
@@ -32,7 +32,7 @@ class SystemReport(Report):
     id = "systems-report"
     name = _("System Report")
     description = _("Combine IP addresses, hostnames and services into systems.")
-    plugins = {"required": ["dns-records", "nmap-udp", "nmap"], "optional": []}
+    plugins = {"required": ["dns-records", "nmap"], "optional": ["nmap-udp"]}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "systems_report/report.html"
 
@@ -50,16 +50,21 @@ class SystemReport(Report):
         ip_services = {}
 
         service_mapping = {
-            # "http-alt": WEB,
+            "http": SystemType.WEB,
+            "http-alt": SystemType.WEB,
+            "https": SystemType.WEB,
+            "https-alt": SystemType.WEB,
             "domain": SystemType.DNS,
-            "tsdns": SystemType.DNS,
-            "mdns": SystemType.DNS,
             "smtp": SystemType.MAIL,
-            "smtp-stats": SystemType.MAIL,
-            "smtp-proxy": SystemType.MAIL,
-            "mail-admin": SystemType.MAIL,
-            "mailq": SystemType.MAIL,
+            "smtps": SystemType.MAIL,
+            "submission": SystemType.MAIL,
+            "imap": SystemType.MAIL,
+            "imaps": SystemType.MAIL,
+            "pop3": SystemType.MAIL,
+            "pop3s": SystemType.MAIL,
             "dicom": SystemType.DICOM,
+            "dicom-tls": SystemType.DICOM,
+            "dicom-iscl": SystemType.DICOM,
         }
         software_mapping = {
             "DICOM": SystemType.DICOM,
@@ -88,31 +93,34 @@ class SystemReport(Report):
                     ).union(
                         set(
                             [
-                                software_mapping.get(str(x.name), SystemType.OTHER)
+                                software_mapping[str(x.name)]
                                 for x in self.octopoes_api_connector.query(
                                     "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
                                     valid_time,
                                     ip.reference,
                                 )
+                                if str(x.name) in software_mapping
                             ]
                         )
-                    )
+                    ),
                 ),
             }
-            if bool(
+            if (
                 self.octopoes_api_connector.query(
                     "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
                     valid_time,
                     ip.reference,
                 )
+                and SystemType.WEB not in ip_services[ip.reference]["services"]
             ):
                 ip_services[ip.reference]["services"].append(SystemType.WEB)
 
-        total_systems = 0
+            ip_services[ip.reference]["services"].sort()
+
+        total_systems = len(ip_services)
         total_domains = 0
 
-        for system, data in ip_services.items():
-            total_systems += 1
+        for data in ip_services.values():
             total_domains += len(data["hostnames"])
 
         summary = {"total_systems": total_systems, "total_domains": total_domains}
