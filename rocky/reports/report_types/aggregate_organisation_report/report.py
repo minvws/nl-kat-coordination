@@ -45,8 +45,9 @@ class AggregateOrganisationReport(AggregateReport):
         vulnerabilities = {}
         total_criticals = 0
         total_findings = 0
-        total_ips = 0
-        total_hostnames = 0
+        total_systems = 0
+        unique_ips = set()
+        unique_hostnames = set()
         terms = []
         rpki = {"rpki_ips": {}}
         safe_connections = {"sc_ips": {}}
@@ -63,18 +64,19 @@ class AggregateOrganisationReport(AggregateReport):
 
                 if report_id == SystemReport.id:
                     for ip, system in report_specific_data["services"].items():
+                        unique_ips.add(ip)
                         if ip not in systems["services"]:
                             systems["services"][ip] = system
                         else:
                             # makes sure that there are no duplicates in the list
-                            systems["services"][ip]["hostnames"] = list(
+                            systems["services"][ip]["hostnames"] = sorted(
                                 set(systems["services"][ip]["hostnames"]) | set(system["hostnames"])
                             )
-                            systems["services"][ip]["services"] = list(
+                            unique_hostnames.update(systems["services"][ip]["hostnames"])
+                            systems["services"][ip]["services"] = sorted(
                                 set(systems["services"][ip]["services"]) | set(system["services"])
                             )
-                    total_ips += report_specific_data["summary"]["total_systems"]
-                    total_hostnames += report_specific_data["summary"]["total_domains"]
+                    total_systems += report_specific_data["summary"]["total_systems"]
 
                 if report_id == OpenPortsReport.id:
                     for ip, details in report_specific_data.items():
@@ -86,7 +88,7 @@ class AggregateOrganisationReport(AggregateReport):
 
                         for ip, system in systems["services"].items():
                             if hostname in [x.tokenized.name for x in system["hostnames"]]:
-                                ipv6[hostname]["systems"] = list(
+                                ipv6[hostname]["systems"] = sorted(
                                     set(ipv6[hostname]["systems"]).union(set(system["services"]))
                                 )
 
@@ -237,17 +239,21 @@ class AggregateOrganisationReport(AggregateReport):
         terms = list(set(terms))
         recommendations = list(set(recommendations))
 
+        total_ips = len(unique_ips)
+        total_hostnames = len(unique_hostnames)
+
         summary = {
             # _("General recommendations"): "",
             _("Critical vulnerabilities"): total_criticals,
             _("IPs scanned"): total_ips,
-            _("Domains scanned"): total_hostnames,
+            _("Hostnames scanned"): total_hostnames,
+            _("Systems found"): total_systems,
             # _("Sector of organisation"): "",
             # _("Basic security score compared to sector"): "",
             # _("Sector defined"): "",
             # _("Lowest security score in organisation"): "",
             # _("Newly discovered items since last week, october 8th 2023"): "",
-            _("Terms in report"): ", ".join(terms),
+            _("Terms in report"): ", ".join(sorted(terms)),
         }
 
         return {
@@ -259,7 +265,7 @@ class AggregateOrganisationReport(AggregateReport):
             "basic_security": basic_security,
             "summary": summary,
             "total_findings": total_findings,
-            "total_systems": total_ips,
+            "total_systems": total_systems,
             "total_systems_basic_security": total_systems_basic_security,
         }
 
