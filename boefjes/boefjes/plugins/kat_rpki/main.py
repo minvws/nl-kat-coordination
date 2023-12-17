@@ -48,7 +48,7 @@ def validate_age() -> Bool:
     with open(RPKI_META_PATH) as meta_file:
         meta = json.load(meta_file)
     cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
-    return (now - cached_file_timestamp).total_seconds()) > maxage
+    return (now - cached_file_timestamp.total_seconds()) > maxage
 
 def refresh_rpki() -> Dict:
     source_url = getenv("RPKI_SOURCE_URL") or RPKI_SOURCE_URL
