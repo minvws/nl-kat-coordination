@@ -1,6 +1,9 @@
 {% load i18n %}
 
-<h2>{% translate "Safe Connections" %}</h2>
+{% if show_heading %}
+    <h2>{% translate "Safe Connections" %}</h2>
+{% endif %}
+{% if type %}<h4>{{ type }}</h4>{% endif %}
 {% if data.sc_ips %}
     <div class="horizontal-scroll">
         <table>
@@ -13,13 +16,21 @@
             <tbody>
                 <tr>
                     <td>{% translate "Only Safe Ciphers" %}</td>
-                    <td>{{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "services are compliant" %}</td>
+                    <td>
+                        {% if data.number_of_available != data.number_of_ips %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "services are compliant" %}
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    {% if data.finding_types %}
-        <p class="column-2">
+    {% for ip, findings in data.sc_ips.items %}
+        {% if findings %}
+            <h5>{{ ip }}</h5>
             <table>
                 <thead>
                     <tr>
@@ -28,16 +39,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for finding_type in data.finding_types %}
+                    {% for finding_type in findings %}
                         <tr>
-                            <td>{{ finding_type.description }}</td>
-                            <td>{{ finding_type.risk_severity }}</td>
+                            <td>
+                                <span class="icon negative"></span>{{ finding_type.description }}
+                            </td>
+                            <td>
+                                <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-        </p>
-    {% endif %}
-{% else %}
-    <p>{% translate "No connections found" %}</p>
+        {% endif %}
+    {% endfor %}
 {% endif %}

@@ -3,7 +3,7 @@
 {% if show_heading %}
     <h2>{% translate "Resource Public Key Infrastructure" %}</h2>
 {% endif %}
-<h4>{{ type }}</h4>
+{% if type %}<h4>{{ type }}</h4>{% endif %}
 {% if data.rpki_ips %}
     <div class="horizontal-scroll">
         <table>

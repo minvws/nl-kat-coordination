@@ -109,6 +109,25 @@ class AggregateOrganisationReport(AggregateReport):
         # Basic security cleanup
         basic_security = {"rpki": {}, "system_specific": {}, "safe_connections": {}}
 
+        # Safe connections
+        for ip, findings in safe_connections["sc_ips"].items():
+            ip_services = systems["services"][str(ip)]["services"]
+
+            for service in ip_services:
+                if service not in basic_security["safe_connections"]:  # Set initial value
+                    basic_security["safe_connections"][service] = {
+                        "sc_ips": {},
+                        "number_of_available": 0,
+                        "number_of_ips": 0,
+                    }
+
+                if ip in basic_security["safe_connections"][service]["sc_ips"]:
+                    continue  # We already processed data from this ip for this service
+
+                basic_security["safe_connections"][service]["sc_ips"][ip.tokenized.address] = findings
+                basic_security["safe_connections"][service]["number_of_ips"] += 1
+                basic_security["safe_connections"][service]["number_of_available"] += 1 if not findings else 0
+
         # RPKI
         for ip, compliance in rpki["rpki_ips"].items():
             ip_services = systems["services"][str(ip)]["services"]

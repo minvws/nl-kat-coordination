@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-15 14:25+0000\n"
+"POT-Creation-Date: 2023-12-17 15:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2734,6 +2734,7 @@ msgid "System type"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/report_types/aggregate_organisation_report/report.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Safe connections"
 msgstr ""
@@ -2810,6 +2811,11 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "System specific"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Resource Public Key Infrastructure"
@@ -2828,16 +2834,7 @@ msgid "Vulnerabilities found are grouped per system."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-msgid "vulnerabilities on this system"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.html
 msgid "No CVEs have been found."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "General recommendations"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
@@ -2853,27 +2850,43 @@ msgid "Domains scanned"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
-msgid "Sector of organisation"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Basic security score compared to sector"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Sector defined"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Lowest security score in organisation"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Newly discovered items since last week, october 8th 2023"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
 msgid "Terms in report"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/vulnerability_report/report.html
+msgid "vulnerabilities on this system"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+msgid "System specific checks"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+msgid "Check overview:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Check"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Compliance"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/rpki_report/report.html
+msgid "IPs are compliant"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3016,22 +3029,6 @@ msgid "Check whether hostnames point to ipv6 addresses."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/rpki_report/report.html
-#: reports/report_types/safe_connections_report/report.html
-#: reports/report_types/web_system_report/report.html
-msgid "Check"
-msgstr ""
-
-#: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/rpki_report/report.html
-#: reports/report_types/safe_connections_report/report.html
-#: reports/report_types/web_system_report/report.html
-msgid "Compliance"
-msgstr ""
-
-#: reports/report_types/mail_report/report.html
 msgid "mailservers compliant"
 msgstr ""
 
@@ -3127,10 +3124,6 @@ msgid "RPKI Available"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
-msgid "IPs are compliant"
-msgstr ""
-
-#: reports/report_types/rpki_report/report.html
 msgid "RPKI Valid"
 msgstr ""
 
@@ -3164,10 +3157,6 @@ msgstr ""
 msgid "services are compliant"
 msgstr ""
 
-#: reports/report_types/safe_connections_report/report.html
-msgid "No connections found"
-msgstr ""
-
 #: reports/report_types/safe_connections_report/report.py
 msgid "Safe Connections Report"
 msgstr ""
@@ -3186,26 +3175,6 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Web"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Mail"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Dicom"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "DNS"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Other"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3508,10 +3477,6 @@ msgstr ""
 #: reports/templates/partials/report_sidemenu.html
 #: rocky/templates/oois/ooi_page_tabs.html
 msgid "Overview"
-msgstr ""
-
-#: reports/templates/partials/report_sidemenu.html
-msgid "System specific"
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
