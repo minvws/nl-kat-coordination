@@ -6,8 +6,9 @@ from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.rpki_report.report import RPKIReport
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.tls_report.report import TLSReport
+from reports.report_types.vulnerability_report.report import VulnerabilityReport
 
-REPORTS = [DNSReport, TLSReport, SystemReport, RPKIReport]
+REPORTS = [DNSReport, TLSReport, SystemReport, RPKIReport, VulnerabilityReport]
 
 
 def get_ooi_types_with_report() -> Set[Type[OOI]]:
