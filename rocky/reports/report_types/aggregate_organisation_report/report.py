@@ -190,13 +190,10 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["summary"][service]["safe_connections"]["total"] += 1
 
             if service == SystemType.MAIL and mail_report_data:
-                check_summary = {}
+                check_summary = {"spf": 0, "dkim": 0, "dmarc": 0}
                 for host in mail_report_data:
-                    for check in fields(host):
-                        if check.name not in check_summary:
-                            check_summary[check.name] = 0
-                        checkvalue = int(getattr(host, check.name))
-                        check_summary[check.name] += checkvalue
+                    for check in check_summary.keys():
+                        check_summary[check] += host["number_of_%s" % check]
                 basic_security["summary"][service]["system_specific"] = {
                     "number_of_compliant": sum(
                         m["number_of_hostnames"] == m["number_of_spf"] == m["number_of_dkim"] == m["number_of_dmarc"]
