@@ -1,5 +1,5 @@
     {
-        "id": "nmap-tcp",
+        "id": "nmap",
         "name": "Nmap TCP",
         "description": "Defaults to top 250 TCP ports. Includes service detection.",
         "consumes": [
@@ -7,7 +7,7 @@
             "IPAddressV6"
         ],
         "environment_keys": [
-            "TOP_PORTS_TCP"
+            "TOP_PORTS"
         ],
         "scan_level": 2
     }

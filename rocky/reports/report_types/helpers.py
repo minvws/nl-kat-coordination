@@ -3,12 +3,26 @@ from typing import Dict, List, Set, Type
 from octopoes.models import OOI, Reference
 from reports.report_types.definitions import Report
 from reports.report_types.dns_report.report import DNSReport
+from reports.report_types.mail_report.report import MailReport
+from reports.report_types.name_server_report.report import NameServerSystemReport
 from reports.report_types.rpki_report.report import RPKIReport
+from reports.report_types.safe_connections_report.report import SafeConnectionsReport
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.tls_report.report import TLSReport
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
+from reports.report_types.web_system_report.report import WebSystemReport
 
-REPORTS = [DNSReport, TLSReport, SystemReport, RPKIReport, VulnerabilityReport]
+REPORTS = [
+    DNSReport,
+    TLSReport,
+    SystemReport,
+    RPKIReport,
+    MailReport,
+    WebSystemReport,
+    NameServerSystemReport,
+    SafeConnectionsReport,
+    VulnerabilityReport,
+]
 
 
 def get_ooi_types_with_report() -> Set[Type[OOI]]:

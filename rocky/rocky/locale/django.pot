@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-08 16:37+0000\n"
+"POT-Creation-Date: 2023-12-15 14:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2726,16 +2726,78 @@ msgid ""
 "weaknesses."
 msgstr ""
 
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
-msgid "Resource Public Key Infrastructure"
-msgstr ""
-
-#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
 msgid "Check"
 msgstr ""
 
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
 msgid "Compliance"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid "mailservers compliant"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Compliance issue"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Risk level"
+msgstr ""
+
+#: reports/report_types/mail_report/report.py
+msgid "Mail Report"
+msgstr ""
+
+#: reports/report_types/mail_report/report.py
+msgid ""
+"System specific mail report that focusses on IP addresses and hostnames."
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "DNSSEC Present"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "name servers compliant"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "Valid DNSSEC"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "No unnecessary ports open"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.py
+msgid "Name server Report"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.py
+msgid "Name server report checks name servers on basic security standards."
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "Resource Public Key Infrastructure"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
@@ -2766,6 +2828,30 @@ msgstr ""
 msgid ""
 "Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
 "the ip addresses and whether they are covered by a valid RPKI ROA."
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "Safe Connections"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "Only Safe Ciphers"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "services are compliant"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "No connections found"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.py
+msgid "Safe Connections Report"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.py
+msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
@@ -2869,6 +2955,50 @@ msgid ""
 "protocols."
 msgstr ""
 
+#: reports/report_types/web_system_report/report.html
+msgid "CSP Present"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "webservers compliant"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Secure CSP Header"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Redirects HTTP to HTTPS"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Offers HTTPS"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Has a Security.txt"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Has a certificate"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Certificate is not expired"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Certificate is not expiring soon"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.py
+msgid "Web System Report"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.py
+msgid "Web system reports check web systems on basic security standards."
+msgstr ""
+
 #: reports/templates/partials/report_header.html
 msgid "Report for organization"
 msgstr ""
@@ -2892,7 +3022,7 @@ msgid ""
 "of critical data and resources."
 msgstr ""
 
-#: reports/templates/report.html
+#: reports/templates/report.html reports/templates/report_pdf.html
 msgid "for"
 msgstr ""
 
@@ -3425,6 +3555,10 @@ msgid ""
 "refresh of the page may be needed to show the results."
 msgstr ""
 
+#: tools/view_helpers.py rocky/scheduler.py
+msgid "Task not found."
+msgstr ""
+
 #: rocky/messaging.py
 msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
@@ -3446,10 +3580,6 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task already queued."
-msgstr ""
-
-#: rocky/scheduler.py
-msgid "Task not found."
 msgstr ""
 
 #: rocky/settings.py
@@ -4871,11 +5001,6 @@ msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Risk level"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Open finding details"
 msgstr ""
 
@@ -5009,7 +5134,7 @@ msgstr ""
 
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
-msgid "Failure"
+msgid "Failed"
 msgstr ""
 
 #: rocky/templates/partials/task_history.html
