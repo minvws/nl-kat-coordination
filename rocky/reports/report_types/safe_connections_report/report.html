@@ -1,0 +1,56 @@
+{% load i18n %}
+
+{% if show_heading %}
+    <h2>{% translate "Safe Connections" %}</h2>
+{% endif %}
+{% if type %}<h4>{{ type }}</h4>{% endif %}
+{% if data.sc_ips %}
+    <div class="horizontal-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Check" %}</th>
+                    <th>{% translate "Compliance" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{% translate "Only Safe Ciphers" %}</td>
+                    <td>
+                        {% if data.number_of_available != data.number_of_ips %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "services are compliant" %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    {% for ip, findings in data.sc_ips.items %}
+        {% if findings %}
+            <h5>{{ ip }}</h5>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Compliance issue" %}</th>
+                        <th scope="col">{% translate "Risk level" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for finding_type in findings %}
+                        <tr>
+                            <td>
+                                <span class="icon negative"></span>{{ finding_type.description }}
+                            </td>
+                            <td>
+                                <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% endfor %}
+{% endif %}

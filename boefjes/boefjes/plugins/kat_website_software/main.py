@@ -4,7 +4,7 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
-WAPPALYZER_IMAGE = "noamblitz/wappalyzer:latest"
+WAPPALYZER_IMAGE = "noamblitz/wappalyzer:MacM1"
 
 
 def run_wappalyzer(url: str) -> str:

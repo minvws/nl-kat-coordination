@@ -25,37 +25,54 @@
             {% endif %}
             <section id="basic-security">
                 <div>
-                    {% if data.basic_security.safe_connections or data.basic_security.system_specific or data.basic_security.rpki %}
-                        {% include "aggregate_organisation_report/basic_security.html" %}
+                    {% if data.basic_security.summary %}
+                        <div id="basic-security-overview">
+                            {% include "aggregate_organisation_report/basic_security.html" %}
 
+                        </div>
+                    {% endif %}
+                    {% if data.basic_security.safe_connections %}
+                        <div id="safe_connections">
+                            <h3>{% translate "Safe connections" %}</h3>
+                            {% for system_type, system in data.basic_security.safe_connections.items %}
+                                {% if system %}
+                                    {% include "safe_connections_report/report.html" with data=system type=system_type %}
+
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if data.basic_security.system_specific %}
+                        <div id="system_specific">
+                            <h3>{% translate "System specific" %}</h3>
+                            {% for check, system in data.basic_security.summary.items %}
+                                {% include "aggregate_organisation_report/system_specific.html" with data=system.system_specific type=check %}
+
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if data.basic_security.rpki %}
+                        <div id="rpki">
+                            <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+                            {% for system_type, system in data.basic_security.rpki.items %}
+                                {% if system %}
+                                    {% include "rpki_report/report.html" with data=system type=system_type %}
+
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     {% endif %}
                 </div>
-                {% if data.basic_security.rpki %}
-                    <div id="rpki">
-                        <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
-                        {% for system_type, system in data.basic_security.rpki.items %}
-                            {% if system %}
-                                {% include "rpki_report/report.html" with data=system type=system_type %}
-
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                {% endif %}
             </section>
             <section id="vulnerabilities">
                 <div>
                     <h2>{% translate "Vulnerabilities" %}</h2>
                     <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
-                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                        <h3>{{ input_ooi }}</h3>
-                        <p>
-                            <strong>{{ vulnerabilities.summary.total_findings }}</strong> {% translate "vulnerabilities on this system" %}
-                        </p>
-                        {% include "vulnerability_report/report.html" with data=vulnerabilities %}
-
-                    {% endfor %}
                     {% if not data.vulnerabilities %}
                         <p>{% translate "No CVEs have been found." %}</p>
+                    {% else %}
+                        {% include "vulnerability_report/report.html" with data=data.vulnerabilities show_heading="yes" %}
+
                     {% endif %}
                 </div>
             </section>

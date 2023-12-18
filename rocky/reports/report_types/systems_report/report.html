@@ -13,13 +13,13 @@
         <tbody>
             {% for ip, ip_services in data.services.items %}
                 <tr>
-                    <td>{{ ip }}</td>
+                    <td>{{ ip.tokenized.address }}</td>
                     <td>
                         {% for hostname in ip_services.hostnames %}
                             {% if not forloop.last %}
-                                {{ hostname }},
+                                {{ hostname.tokenized.name }},
                             {% else %}
-                                {{ hostname }}
+                                {{ hostname.tokenized.name }}
                             {% endif %}
                         {% endfor %}
                     </td>

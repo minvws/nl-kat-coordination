@@ -2,8 +2,9 @@
 
 <nav data-open-label="Zijbalknavigatie"
      data-close-label="Sluit zijbalknavigatie"
-     aria-label="Zijbalknavigatie">
-    <div class="sticky">
+     aria-label="Zijbalknavigatie"
+     class="sticky">
+    <div>
         <h2 class="heading-large">{% translate "Table of contents" %}</h2>
         <ol class="chapter-numbers">
             <li>
@@ -22,12 +23,12 @@
                     <a href="#ipv6">IPv6</a>
                 </li>
             {% endif %}
-            {% if data.basic_security.safe_connections or data.basic_security.system_specific or data.basic_security.rpki %}
+            {% if data.basic_security.summary %}
                 <li>
                     <a href="#basic-security">{% translate "Basic security" %}</a>
                     <ol>
                         <li>
-                            <a href="basic-security-overview">{% translate "Overview" %}</a>
+                            <a href="#basic-security-overview">{% translate "Overview" %}</a>
                         </li>
                         {% if data.basic_security.safe_connections %}
                             <li>
@@ -49,6 +50,13 @@
             {% endif %}
             <li>
                 <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
+                <ol>
+                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                        <li>
+                            <a href="#vulnerabilities">{{ input_ooi }}</a>
+                        </li>
+                    {% endfor %}
+                </ol>
             </li>
         </ol>
         <ol type="A">

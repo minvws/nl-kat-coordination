@@ -3,13 +3,23 @@
 :root {
   --sidemenu-nav-padding-right: 2rem;
   --sidemenu-nav-padding-left: 2rem;
+  --sidemenu-nav-width: 19rem;
 }
 
-.sidemenu nav {
-  ol,
-  ul {
-    a {
-      text-decoration: none;
+main.sidemenu {
+  position: relative;
+
+  > nav {
+    height: 100vh;
+    overflow: auto;
+    position: sticky;
+    padding-bottom: 6rem;
+
+    ol,
+    ul {
+      a {
+        text-decoration: none;
+      }
     }
   }
 }

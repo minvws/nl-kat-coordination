@@ -16,31 +16,33 @@
                 </tr>
                 <tr>
                     <td>DKIM</td>
-                    <td>{{ data.number_of_spf }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
+                    <td>{{ data.number_of_dkim }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
                 </tr>
                 <tr>
                     <td>DMARC</td>
-                    <td>{{ data.number_of_spf }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
+                    <td>{{ data.number_of_dmarc }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
                 </tr>
             </tbody>
         </table>
     </p>
-    <p class="column-2">
-        <table>
-            <thead>
-                <tr>
-                    <th scope="col">{% translate "Compliance issue" %}</th>
-                    <th scope="col">{% translate "Risk level" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for measure in data.mail_security_measures.measures %}
+    {% if data.mail_security_measures.measures %}
+        <p class="column-2">
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ measure.description }}</td>
-                        <td>{{ measure.risk_severity }}</td>
+                        <th scope="col">{% translate "Compliance issue" %}</th>
+                        <th scope="col">{% translate "Risk level" %}</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </p>
+                </thead>
+                <tbody>
+                    {% for measure in data.mail_security_measures.measures %}
+                        <tr>
+                            <td>{{ measure.description }}</td>
+                            <td>{{ measure.risk_severity }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </p>
+    {% endif %}
 </p>

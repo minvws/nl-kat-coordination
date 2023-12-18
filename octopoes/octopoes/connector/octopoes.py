@@ -268,7 +268,7 @@ class OctopoesAPIConnector:
         self,
         path: str,
         valid_time: datetime,
-        source: Optional[Reference] = None,
+        source: Optional[Union[Reference, str]] = None,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
     ) -> List[OOI]:
