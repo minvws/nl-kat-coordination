@@ -58,8 +58,8 @@ def refresh_rpki() -> Dict:
     response = requests.get(source_url, allow_redirects=True)
     response.raise_for_status()
     with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as temp_rpki_file:
-        temp_prki_file.write(response.content)
-        os.rename(temp_prki_file.name, RPKI_PATH)
+        temp_rpki_file.write(response.content)
+        os.rename(temp_rpki_file.name, RPKI_PATH)
     metadata = {"timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), "source": source_url}
     with open(RPKI_META_PATH, "w") as meta_file:
         meta_file.write(json.dump(metadata))
