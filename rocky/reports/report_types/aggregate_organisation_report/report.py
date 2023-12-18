@@ -13,7 +13,7 @@ from reports.report_types.rpki_report.report import RPKIReport
 from reports.report_types.safe_connections_report.report import SafeConnectionsReport
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
-from reports.report_types.web_system_report.report import WebSystemReport, WebChecks
+from reports.report_types.web_system_report.report import WebSystemReport
 
 logger = getLogger(__name__)
 
@@ -219,11 +219,11 @@ class AggregateOrganisationReport(AggregateReport):
                         "dkim": sum(all(dkim_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
                         "dmarc": sum(all(dmarc_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
                     },
-                    "ips": {ip: [  # Flattening the finding_types field of the mail report output
+                    "ips": {ip: sorted(set(   # Flattening the finding_types field of the mail report output
                         finding_type for mail_report in mail_report_data[ip]
                         for hostname, finding_types in mail_report["finding_types"].items()
                         for finding_type in finding_types
-                    ] for ip in mail_report_data}
+                    ), reverse=True, key=lambda x: x.risk_severity) for ip in mail_report_data}
                 }
 
             if service == SystemType.WEB and web_report_data:
@@ -241,10 +241,10 @@ class AggregateOrganisationReport(AggregateReport):
                         "Certificate is not expired": sum(all(w["web_checks"].certificates_not_expired for w in web_report_data[ip]) for ip in web_report_data),
                         "Certificate is not expiring soon": sum(all(w["web_checks"].certificates_not_expiring_soon for w in web_report_data[ip]) for ip in web_report_data),
                     },
-                    "ips": {ip: [  # Flattening the finding_types field of the web report output
+                    "ips": {ip: sorted(set(  # Flattening the finding_types field of the web report output
                         finding_type for web_report in web_report_data[ip]
                         for finding_type in web_report["finding_types"]
-                    ] for ip in web_report_data}
+                    ), reverse=True, key=lambda x: x.risk_severity) for ip in web_report_data}
                 }
 
             if service == SystemType.DNS and dns_report_data:
@@ -256,10 +256,10 @@ class AggregateOrganisationReport(AggregateReport):
                         "Valid DNSSEC": sum(all(n["name_server_checks"].has_dnssec for n in dns_report_data[ip]) for ip in dns_report_data),
                         "No unnecessary ports open": sum(all(n["name_server_checks"].has_valid_dnssec for n in dns_report_data[ip]) for ip in dns_report_data),
                     },
-                    "ips": {ip: [  # Flattening the finding_types field of the dns report output
+                    "ips": {ip: sorted(set(  # Flattening the finding_types field of the dns report output
                         finding_type for dns_report in dns_report_data[ip]
                         for finding_type in dns_report["finding_types"]
-                    ] for ip in dns_report_data}
+                    ), reverse=True, key=lambda x: x.risk_severity) for ip in dns_report_data}
                 }
 
         terms = list(set(terms))
