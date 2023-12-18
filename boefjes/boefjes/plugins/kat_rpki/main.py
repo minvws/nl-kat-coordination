@@ -1,6 +1,7 @@
 """Boefje script for validating vrps records based on code from @trideeindhoven"""
 import json
 import os
+import tempfile
 from datetime import datetime
 from os import getenv
 from typing import Bool, Dict, List, Tuple, Union
@@ -56,8 +57,9 @@ def refresh_rpki() -> Dict:
     source_url = getenv("RPKI_SOURCE_URL") or RPKI_SOURCE_URL
     response = requests.get(source_url, allow_redirects=True)
     response.raise_for_status()
-    with open(RPKI_PATH, "w") as prki_file:
-        prki_file.write(response.content)
+    with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as temp_rpki_file:
+        temp_prki_file.write(response.content)
+        os.rename(temp_prki_file.name, RPKI_PATH)
     metadata = {"timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), "source": source_url}
     with open(RPKI_META_PATH, "w") as meta_file:
         meta_file.write(json.dump(metadata))
