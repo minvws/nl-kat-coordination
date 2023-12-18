@@ -32,7 +32,7 @@
                         </div>
                     {% endif %}
                     {% if data.basic_security.safe_connections %}
-                        <div id="safe_connections">
+                        <div id="safe-connections">
                             <h3>{% translate "Safe connections" %}</h3>
                             {% for system_type, system in data.basic_security.safe_connections.items %}
                                 {% if system %}
@@ -43,7 +43,7 @@
                         </div>
                     {% endif %}
                     {% if data.basic_security.system_specific %}
-                        <div id="system_specific">
+                        <div id="system-specific">
                             <h3>{% translate "System specific" %}</h3>
                             {% for check, system in data.basic_security.summary.items %}
                                 {% include "aggregate_organisation_report/system_specific.html" with data=system.system_specific type=check %}
