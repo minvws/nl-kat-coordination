@@ -4,7 +4,7 @@ import os
 import tempfile
 from datetime import datetime
 from os import getenv
-from typing import Bool, Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import requests
 from netaddr import IPAddress, IPNetwork
@@ -44,7 +44,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     return [(set(), json.dumps(results))]
 
 
-def validate_age() -> Bool:
+def validate_age() -> bool:
     now = datetime.utcnow()
     maxage = getenv("RPKI_CACHE_TIMEOUT") or RPKI_CACHE_TIMEOUT
     with open(RPKI_META_PATH) as meta_file:
