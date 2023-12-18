@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-15 14:25+0000\n"
+"POT-Creation-Date: 2023-12-18 11:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -556,6 +556,7 @@ msgstr ""
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
+#: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_summary.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
@@ -1024,6 +1025,7 @@ msgid "Risk Class"
 msgstr ""
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
+#: reports/report_types/vulnerability_report/report.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -2756,6 +2758,7 @@ msgstr ""
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
@@ -2934,6 +2937,7 @@ msgid "No ciphers found for this IPService"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -2953,6 +2957,77 @@ msgstr ""
 msgid ""
 "TLS reports assess the security of data encryption and transmission "
 "protocols."
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "vulnerabilities on this system"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "Basic example table:"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "Vulnerabilities"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrences"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Close details"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Open details"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "Advice"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "Vulnerability Report"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "Vulnerabilities found are grouped for each system."
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+#: rocky/templates/oois/ooi_detail_origins_inference.html
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Source"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "First seen"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "Last seen"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "Evidence"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3828,32 +3903,7 @@ msgid "Total Findings"
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Close details"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Open details"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid " Finding Details"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrences"
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
@@ -4358,12 +4408,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_inference.html
 msgid "Bit"
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail_origins_inference.html
-#: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Source"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_inference.html
