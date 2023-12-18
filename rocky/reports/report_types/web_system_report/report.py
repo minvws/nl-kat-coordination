@@ -39,6 +39,7 @@ class WebCheck:
             and self.certificates_not_expiring_soon
         )
 
+
 @dataclass
 class WebChecks:
     checks: List[WebCheck] = field(default_factory=list)
@@ -48,7 +49,7 @@ class WebChecks:
         return sum([check.has_csp for check in self.checks])
 
     @property
-    def has_csp_vulnerabilities(self):
+    def has_no_csp_vulnerabilities(self):
         return sum([check.has_no_csp_vulnerabilities for check in self.checks])
 
     @property

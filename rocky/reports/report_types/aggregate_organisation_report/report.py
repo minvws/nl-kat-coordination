@@ -13,7 +13,7 @@ from reports.report_types.rpki_report.report import RPKIReport
 from reports.report_types.safe_connections_report.report import SafeConnectionsReport
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
-from reports.report_types.web_system_report.report import WebSystemReport
+from reports.report_types.web_system_report.report import WebSystemReport, WebChecks
 
 logger = getLogger(__name__)
 
@@ -39,7 +39,7 @@ class AggregateOrganisationReport(AggregateReport):
 
     def post_process_data(self, data):
         systems = {"services": {}}
-        services = self.collect_services_by_ip(data)
+        services = {}
         open_ports = {}
         ipv6 = {}
         vulnerabilities = {}
@@ -53,10 +53,6 @@ class AggregateOrganisationReport(AggregateReport):
         safe_connections = {"sc_ips": {}}
         recommendations = []
         total_systems_basic_security = 0
-
-        mail_report_data = self.collect_system_specific_data(data, services, SystemType.MAIL, MailReport.id)
-        web_report_data = self.collect_system_specific_data(data, services, SystemType.WEB, WebSystemReport.id)
-        dns_report_data = self.collect_system_specific_data(data, services, SystemType.DNS, NameServerSystemReport.id)
 
         for input_ooi, reports_data in data.items():
             for report_id, report_specific_data in reports_data.items():
@@ -76,6 +72,13 @@ class AggregateOrganisationReport(AggregateReport):
                             systems["services"][ip]["services"] = sorted(
                                 set(systems["services"][ip]["services"]) | set(system["services"])
                             )
+
+                        for service in system["services"]:
+                            if service not in services:
+                                services[service] = {str(ip): systems["services"][ip]}
+                            else:
+                                services[service][str(ip)] = systems["services"][ip]
+
                     total_systems += report_specific_data["summary"]["total_systems"]
 
                 if report_id == OpenPortsReport.id:
@@ -103,6 +106,10 @@ class AggregateOrganisationReport(AggregateReport):
                     safe_connections["sc_ips"].update(
                         {ip: value for ip, value in report_specific_data["sc_ips"].items()}
                     )
+
+        mail_report_data = self.collect_system_specific_data(data, services, SystemType.MAIL, MailReport.id)
+        web_report_data = self.collect_system_specific_data(data, services, SystemType.WEB, WebSystemReport.id)
+        dns_report_data = self.collect_system_specific_data(data, services, SystemType.DNS, NameServerSystemReport.id)
 
         for ip, ipv6_data in ipv6.items():
             for system in ipv6_data["systems"]:
@@ -156,9 +163,9 @@ class AggregateOrganisationReport(AggregateReport):
                 )
 
         # System Specific
-        basic_security["system_specific"][SystemType.MAIL] = mail_report_data
-        basic_security["system_specific"][SystemType.WEB] = web_report_data
-        basic_security["system_specific"][SystemType.DNS] = dns_report_data
+        basic_security["system_specific"][SystemType.MAIL] = [report for ip in mail_report_data for report in mail_report_data[ip]]
+        basic_security["system_specific"][SystemType.WEB] = [report for ip in web_report_data for report in web_report_data[ip]]
+        basic_security["system_specific"][SystemType.DNS] = [report for ip in dns_report_data for report in dns_report_data[ip]]
 
         # Summary
         basic_security["summary"] = {}
@@ -190,47 +197,56 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["summary"][service]["safe_connections"]["total"] += 1
 
             if service == SystemType.MAIL and mail_report_data:
-                check_summary = {"spf": 0, "dkim": 0, "dmarc": 0}
-                for host in mail_report_data:
-                    for check in check_summary.keys():
-                        check_summary[check] += host["number_of_%s" % check]
+                def spf_compliant(result):
+                    return result["number_of_hostnames"] == result["number_of_spf"]
+
+                def dkim_compliant(result):
+                    return result["number_of_hostnames"] == result["number_of_dkim"]
+
+                def dmarc_compliant(result):
+                    return result["number_of_hostnames"] == result["number_of_dmarc"]
+
+                def is_mail_compliant(result):
+                    return all(check(result) for check in [spf_compliant, dkim_compliant, dmarc_compliant])
+
                 basic_security["summary"][service]["system_specific"] = {
                     "number_of_compliant": sum(
-                        m["number_of_hostnames"] == m["number_of_spf"] == m["number_of_dkim"] == m["number_of_dmarc"]
-                        for m in mail_report_data
+                        all(is_mail_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data
                     ),
-                    "total": sum([mail_data["number_of_hostnames"] for mail_data in mail_report_data]),
-                    "checks": check_summary,
+                    "total": len(mail_report_data),
+                    "checks": {
+                        "spf": sum(all(spf_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
+                        "dkim": sum(all(dkim_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
+                        "dmarc": sum(all(dmarc_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
+                    },
                 }
 
             if service == SystemType.WEB and web_report_data:
-                web_checks = reduce(lambda x, y: x + y, [x["web_checks"] for x in web_report_data])
-                check_summary = {}
-                for host in web_checks.checks:
-                    for check in fields(host):
-                        if check.name not in check_summary:
-                            check_summary[check.name] = 0
-                        checkvalue = int(getattr(host, check.name))
-                        check_summary[check.name] += checkvalue
                 basic_security["summary"][service]["system_specific"] = {
-                    "number_of_compliant": sum(bool(check) for check in web_checks.checks),
-                    "total": len(web_checks.checks),
-                    "checks": check_summary,
+                    "number_of_compliant": sum(all(result["web_checks"] for result in web_report_data[ip]) for ip in web_report_data),
+                    "total": len(web_report_data),
+                    "checks": {
+                        "CSP Present": sum(all(w["web_checks"].has_csp for w in web_report_data[ip]) for ip in web_report_data),
+                        "Secure CSP Header": sum(all(w["web_checks"].has_no_csp_vulnerabilities for w in web_report_data[ip]) for ip in web_report_data),
+                        "Redirects HTTP to HTTPS": sum(all(w["web_checks"].redirects_http_https for w in web_report_data[ip]) for ip in web_report_data),
+                        "Offers HTTPS": sum(all(w["web_checks"].offers_https for w in web_report_data[ip]) for ip in web_report_data),
+                        "Has a Security.txt": sum(all(w["web_checks"].has_security_txt for w in web_report_data[ip]) for ip in web_report_data),
+                        "No unnecessary ports open": sum(all(w["web_checks"].no_uncommon_ports for w in web_report_data[ip]) for ip in web_report_data),
+                        "Has a certificate": sum(all(w["web_checks"].has_certificates for w in web_report_data[ip]) for ip in web_report_data),
+                        "Certificate is not expired": sum(all(w["web_checks"].certificates_not_expired for w in web_report_data[ip]) for ip in web_report_data),
+                        "Certificate is not expiring soon": sum(all(w["web_checks"].certificates_not_expiring_soon for w in web_report_data[ip]) for ip in web_report_data),
+                    },
                 }
 
             if service == SystemType.DNS and dns_report_data:
-                name_server_checks = reduce(lambda x, y: x + y, [x["name_server_checks"] for x in dns_report_data])
-                check_summary = {}
-                for host in name_server_checks.checks:
-                    for check in fields(host):
-                        if check.name not in check_summary:
-                            check_summary[check.name] = 0
-                        checkvalue = int(getattr(host, check.name))
-                        check_summary[check.name] += checkvalue
                 basic_security["summary"][service]["system_specific"] = {
-                    "number_of_compliant": sum(bool(check) for check in name_server_checks.checks),
-                    "total": len(name_server_checks.checks),
-                    "checks": check_summary,
+                    "number_of_compliant": sum(all(result["name_server_checks"] for result in dns_report_data[ip]) for ip in dns_report_data),
+                    "total": len(dns_report_data),
+                    "checks": {
+                        "DNSSEC Present": sum(all(n["name_server_checks"].no_uncommon_ports for n in dns_report_data[ip]) for ip in dns_report_data),
+                        "Valid DNSSEC": sum(all(n["name_server_checks"].has_dnssec for n in dns_report_data[ip]) for ip in dns_report_data),
+                        "No unnecessary ports open": sum(all(n["name_server_checks"].has_valid_dnssec for n in dns_report_data[ip]) for ip in dns_report_data),
+                    },
                 }
 
         terms = list(set(terms))
@@ -269,38 +285,24 @@ class AggregateOrganisationReport(AggregateReport):
     def collect_system_specific_data(self, data, services, system_type: SystemType, report_id: str):
         """Given a system, return a list of report data from the right sub-reports based on the related report_id"""
 
-        report_data = []
+        report_data = {}
 
         for service, systems_for_service in services.items():
             # Search for reports where the input ooi relates to the current service, based on ip or hostname
             for ip, system_for_service in systems_for_service.items():
                 # Assumes relevant hostnames have an ip address for now
+                if str(ip) not in report_data:
+                    report_data[str(ip)] = []
+
                 if str(ip) in data:
                     if report_id in data[str(ip)] and system_type == service:
-                        report_data.append(data[str(ip)][report_id])
-
-                    continue
+                        report_data[str(ip)].append(data[str(ip)][report_id])
 
                 for hostname in system_for_service["hostnames"]:
                     if str(hostname) in data:
                         if report_id in data[str(hostname)] and system_type == service:
-                            report_data.append(data[str(hostname)][report_id])
+                            report_data[str(ip)].append(data[str(hostname)][report_id])
 
-                        break
+        report_data = {key: value for key, value in report_data.items() if value}
 
         return report_data
-
-    def collect_services_by_ip(self, data):
-        services = {}
-
-        for input_ooi, reports_data in data.items():
-            for report_id, report_specific_data in reports_data.items():
-                if report_id == SystemReport.id:
-                    for ip, system in report_specific_data["services"].items():
-                        for service in system["services"]:
-                            if service not in services:
-                                services[service] = {str(ip): system}
-                            else:
-                                services[service][str(ip)] = system
-
-        return services
