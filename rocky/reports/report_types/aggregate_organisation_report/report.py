@@ -243,8 +243,7 @@ class AggregateOrganisationReport(AggregateReport):
                     },
                     "ips": {ip: [  # Flattening the finding_types field of the web report output
                         finding_type for web_report in web_report_data[ip]
-                        for finding_types in web_report["finding_types"]
-                        for finding_type in finding_types
+                        for finding_type in web_report["finding_types"]
                     ] for ip in web_report_data}
                 }
 
@@ -259,8 +258,7 @@ class AggregateOrganisationReport(AggregateReport):
                     },
                     "ips": {ip: [  # Flattening the finding_types field of the dns report output
                         finding_type for dns_report in dns_report_data[ip]
-                        for finding_types in dns_report["finding_types"]
-                        for finding_type in finding_types
+                        for finding_type in dns_report["finding_types"]
                     ] for ip in dns_report_data}
                 }
 

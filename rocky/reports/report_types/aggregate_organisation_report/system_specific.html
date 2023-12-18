@@ -15,18 +15,47 @@
         </thead>
         <tbody>
             {% for check, value in data.checks.items %}
-            <tr>
-                <td>{{ check }}</td>
-                <td>
-                    {% if value != data.total %}
-                        <span class="icon incomplete"></span>
-                    {% else %}
-                        <span class="icon positive"></span>
-                    {% endif %}
-                    {{ value }}/{{ data.total }} {% translate "IPs are compliant" %}
-                </td>
-            </tr>
+                <tr>
+                    <td>{{ check }}</td>
+                    <td>
+                        {% if value != data.total %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ value }}/{{ data.total }} {% translate "IPs are compliant" %}
+                    </td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+{% for ip, info in data.ips.items %}
+    <h5>{{ ip }}</h5>
+    <table>
+        <thead>
+            <tr>
+                <th>{% translate "Compliance issue" %}</th>
+                <th>{% translate "Risk level" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for finding in info %}
+                <tr>
+                    <td>
+                        <span class="icon negative"></span>{{ finding.description }}
+                    </td>
+                    <td>
+                        {% if finding.risk_severity.value == 'low' %}
+                            <span class="low">{% translate "Low" %}</span>
+                        {% elif finding.risk_severity.value == 'medium' %}
+                            <span class="medium">{% translate "Medium" %}</span>
+                        {% elif finding.risk_severity.value == 'high' %}
+                            <span class="high">{% translate "High" %}</span>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}

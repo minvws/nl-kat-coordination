@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-17 15:50+0000\n"
+"POT-Creation-Date: 2023-12-18 17:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2846,7 +2846,11 @@ msgid "IPs scanned"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
-msgid "Domains scanned"
+msgid "Hostnames scanned"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Systems found"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
@@ -2887,6 +2891,39 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/rpki_report/report.html
 msgid "IPs are compliant"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Compliance issue"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Risk level"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+msgid "Low"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+msgid "Medium"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+msgid "High"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3015,7 +3052,6 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
-#: reports/report_types/open_ports_report/report.html
 #: reports/report_types/systems_report/report.html
 msgid "Domain"
 msgstr ""
@@ -3030,25 +3066,6 @@ msgstr ""
 
 #: reports/report_types/mail_report/report.html
 msgid "mailservers compliant"
-msgstr ""
-
-#: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/rpki_report/report.html
-#: reports/report_types/safe_connections_report/report.html
-#: reports/report_types/web_system_report/report.html
-msgid "Compliance issue"
-msgstr ""
-
-#: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/rpki_report/report.html
-#: reports/report_types/safe_connections_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Risk level"
 msgstr ""
 
 #: reports/report_types/mail_report/report.py
@@ -3095,7 +3112,7 @@ msgid ""
 "See an overview of open ports found. <strong>Bold</strong> open ports are "
 "found through direct scans that the organization performs via OpenKAT. Other "
 "open ports were found outside by OpenKAT itself. Scans with the same "
-"domains, ports and IPs are merged."
+"hostnames, ports and IPs are merged."
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
@@ -3105,6 +3122,14 @@ msgstr ""
 #: reports/report_types/open_ports_report/report.html
 #: reports/report_types/systems_report/report.html
 msgid "IP address"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid "Hostnames"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid "Direct scan"
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.py
