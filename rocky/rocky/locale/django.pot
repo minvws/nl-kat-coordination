@@ -2799,6 +2799,43 @@ msgstr ""
 msgid "Name server report checks name servers on basic security standards."
 msgstr ""
 
+#: reports/report_types/open_ports_report/report.html
+msgid "Open ports"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid ""
+"See an overview of open ports found. <strong>Bold</strong> open ports are "
+"found through direct scans that the organization performs via OpenKAT. Other "
+"open ports were found outside by OpenKAT itself. Scans with the same "
+"hostnames, ports and IPs are merged."
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid "Overview of open ports found for the scanned assets."
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+#: reports/report_types/systems_report/report.html
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid "Hostnames"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid "Direct scan"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.py
+msgid "Open Ports Report"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.py
+msgid "Find open ports of IP addresses"
+msgstr ""
+
 #: reports/report_types/rpki_report/report.html
 msgid "Resource Public Key Infrastructure"
 msgstr ""
@@ -2858,10 +2895,6 @@ msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
-msgid "IP address"
-msgstr ""
-
-#: reports/report_types/systems_report/report.html
 msgid "Domain"
 msgstr ""
 
@@ -2875,26 +2908,6 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Web"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Mail"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Dicom"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "DNS"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Other"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
