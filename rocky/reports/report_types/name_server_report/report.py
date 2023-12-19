@@ -21,11 +21,8 @@ class NameServerCheck:
     has_valid_dnssec: bool = False
 
     def __bool__(self):
-        return (
-            self.no_uncommon_ports
-            and self.has_dnssec
-            and self.has_valid_dnssec
-        )
+        return self.no_uncommon_ports and self.has_dnssec and self.has_valid_dnssec
+
 
 @dataclass
 class NameServerChecks:
