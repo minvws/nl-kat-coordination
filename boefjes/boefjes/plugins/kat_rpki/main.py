@@ -11,8 +11,10 @@ from netaddr import IPAddress, IPNetwork
 
 from boefjes.job_models import BoefjeMeta
 
-RPKI_PATH = "boefjes/plugins/kat_rpki/rpki.json"
-RPKI_META_PATH = "boefjes/plugins/kat_rpki/rpki-meta.json"
+
+BASE_PATH = getenv("OPENKAT_CACHE_PATH", "boefjes/plugins/kat_rpki/")
+RPKI_PATH = BASE_PATH + "rpki.json"
+RPKI_META_PATH = BASE_PATH + "rpki-meta.json"
 RPKI_SOURCE_URL = "https://console.rpki-client.org/vrps.json"
 RPKI_CACHE_TIMEOUT = 1800  # in seconds
 
@@ -46,7 +48,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
 def validate_age() -> bool:
     now = datetime.utcnow()
-    maxage = getenv("RPKI_CACHE_TIMEOUT") or RPKI_CACHE_TIMEOUT
+    maxage = getenv("RPKI_CACHE_TIMEOUT", RPKI_CACHE_TIMEOUT)
     with open(RPKI_META_PATH) as meta_file:
         meta = json.load(meta_file)
     cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
@@ -54,7 +56,7 @@ def validate_age() -> bool:
 
 
 def refresh_rpki() -> Dict:
-    source_url = getenv("RPKI_SOURCE_URL") or RPKI_SOURCE_URL
+    source_url = getenv("RPKI_SOURCE_URL", RPKI_SOURCE_URL)
     response = requests.get(source_url, allow_redirects=True)
     response.raise_for_status()
     with tempfile.NamedTemporaryFile(mode="w", delete_on_close=False) as temp_rpki_file:
