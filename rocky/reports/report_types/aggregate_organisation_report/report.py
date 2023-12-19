@@ -333,14 +333,15 @@ class AggregateOrganisationReport(AggregateReport):
 
         terms = list(set(terms))
         recommendations = list(set(recommendations))
+        total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
 
         summary = {
             # _("General recommendations"): "",
             _("Critical vulnerabilities"): total_criticals,
-            # _("IPs scanned"): total_ips,
+            _("IPs scanned"): total_ips,
             _("Hostnames scanned"): total_hostnames,
-            _("Systems found"): total_systems,
+            # _("Systems found"): total_systems,
             # _("Sector of organisation"): "",
             # _("Basic security score compared to sector"): "",
             # _("Sector defined"): "",
@@ -358,7 +359,7 @@ class AggregateOrganisationReport(AggregateReport):
             "basic_security": basic_security,
             "summary": summary,
             "total_findings": total_findings,
-            "total_systems": total_systems,
+            "total_systems": total_ips,
             "total_systems_basic_security": total_systems_basic_security,
         }
 
