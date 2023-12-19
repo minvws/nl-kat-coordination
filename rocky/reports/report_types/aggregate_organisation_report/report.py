@@ -350,6 +350,12 @@ class AggregateOrganisationReport(AggregateReport):
             _("Terms in report"): ", ".join(sorted(terms)),
         }
 
+        all_findings = set()
+        for ip, ip_data in vulnerabilities.items():
+            for vulnerability, vulnerability_data in ip_data.get("vulnerabilities", {}).items():
+                for finding_key in vulnerability_data.get("findings", {}):
+                    all_findings.add(finding_key)
+
         return {
             "systems": systems,
             "services": services,
@@ -358,7 +364,7 @@ class AggregateOrganisationReport(AggregateReport):
             "vulnerabilities": vulnerabilities,
             "basic_security": basic_security,
             "summary": summary,
-            "total_findings": total_findings,
+            "total_findings": len(all_findings),
             "total_systems": total_ips,
             "total_systems_basic_security": total_systems_basic_security,
         }
