@@ -94,6 +94,9 @@ class AggregateOrganisationReport(AggregateReport):
 
                 if report_id == VulnerabilityReport.id:
                     for ip, vulnerabilities_data in report_specific_data.items():
+                        total_findings += vulnerabilities_data["summary"]["total_findings"]
+                        terms.extend(vulnerabilities_data["summary"]["terms"])
+                        recommendations.extend(vulnerabilities_data["summary"]["recommendations"])
                         vulnerabilities[ip] = vulnerabilities_data
 
                 if report_id == RPKIReport.id:
