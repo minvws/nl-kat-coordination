@@ -2,8 +2,24 @@
 
 {% if show_heading %}
     <h2>{% translate "Safe Connections" %}</h2>
+    <p>
+        {% blocktranslate trimmed %}
+            In this chapter we check if the connections of all the IP ports of the system are safe.
+            Safe connections are important to prevent unauthorised access and data breaches. Strong
+            ciphers are crucial because they ensure strong encryption which protects the data from
+            interception during communiction.
+        {% endblocktranslate %}
+    </p>
 {% endif %}
-{% if type %}<h4>{{ type }}</h4>{% endif %}
+{% if type %}
+    <h4>{{ type }}</h4>
+    <p>
+        {% blocktranslate trimmed %}
+            This table shows which checks were performed. Following that, the compliance
+            issues, if any, are shown for each {{ type }} Server.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
 {% if data.sc_ips %}
     <div class="horizontal-scroll">
         <table>

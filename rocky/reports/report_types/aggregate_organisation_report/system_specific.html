@@ -2,8 +2,21 @@
 
 {% if show_heading %}
     <h2>{% translate "System specific checks" %}</h2>
+    <p>
+        {% blocktranslate trimmed %}
+            This is where checks are done that are specific to system types. Different security
+            and compliance issues come into play for different systems. They are listed here
+            under each other.
+        {% endblocktranslate %}
+    </p>
 {% endif %}
 <h4>{{ type }}</h4>
+<p>
+    {% blocktranslate trimmed %}
+        This table shows which checks were performed. Following that, the compliance
+        issues, if any, are shown for each {{ type }} Server.
+    {% endblocktranslate %}
+</p>
 <div class="horizontal-scroll">
     <table>
         <caption class="visually-hidden">{% translate "Check overview:" %}</caption>
