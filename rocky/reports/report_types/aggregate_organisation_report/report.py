@@ -224,9 +224,9 @@ class AggregateOrganisationReport(AggregateReport):
                     ),
                     "total": len(mail_report_data),
                     "checks": {
-                        "spf": sum(all(spf_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
-                        "dkim": sum(all(dkim_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
-                        "dmarc": sum(all(dmarc_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
+                        "SPF": sum(all(spf_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
+                        "DKIM": sum(all(dkim_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
+                        "DMARC": sum(all(dmarc_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
                     },
                     "ips": {
                         ip: sorted(
