@@ -206,7 +206,7 @@ class WebSystemReport(Report):
             check.certificates_not_expired = check.has_certificates and "KAT-CERTIFICATE-EXPIRED" not in [
                 x.id for x in certificate_finding_types
             ]
-            check.certificates_not_expiring_soon = check.has_certificates and "KAT-CERTIFICATE-EXPIRING-SOON" in [
+            check.certificates_not_expiring_soon = check.has_certificates and "KAT-CERTIFICATE-EXPIRING-SOON" not in [
                 x.id for x in certificate_finding_types
             ]
 
