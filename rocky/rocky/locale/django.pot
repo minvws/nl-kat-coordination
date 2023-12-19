@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 11:14+0000\n"
+"POT-Creation-Date: 2023-12-19 13:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2799,17 +2799,6 @@ msgid_plural "found on <i>%(total_systems)s</i> systems."
 msgstr[0] ""
 msgstr[1] ""
 
-#: reports/report_types/aggregate_organisation_report/recommendations.html
-#, python-format
-msgid ""
-"<i>%(total_systems_basic_security)s</i> system lack important basic security "
-"measures."
-msgid_plural ""
-"<i>%(total_systems_basic_security)s</i> systems lack important basic "
-"security measures."
-msgstr[0] ""
-msgstr[1] ""
-
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 msgid ""
@@ -2875,10 +2864,6 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Hostnames scanned"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/report.py
-msgid "Systems found"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
