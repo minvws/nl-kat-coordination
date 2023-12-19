@@ -11,7 +11,6 @@ from netaddr import IPAddress, IPNetwork
 
 from boefjes.job_models import BoefjeMeta
 
-
 BASE_PATH = getenv("OPENKAT_CACHE_PATH", "boefjes/plugins/kat_rpki/")
 RPKI_PATH = BASE_PATH + "rpki.json"
 RPKI_META_PATH = BASE_PATH + "rpki-meta.json"
