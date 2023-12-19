@@ -142,7 +142,7 @@ fix-poetry-merge-conflict:
 		git checkout --theirs $$path/poetry.lock $$path/requirements*; \
 		poetry lock --no-update -C $$path; \
 		poetry export -C $$path --only main -f requirements.txt -o $$path/requirements.txt; \
-		if grep -q "tool.poetry.group.dev.dependencies" $$path; then \
+		if grep -q "tool.poetry.group.dev.dependencies" $$path/pyproject.toml; then \
 			poetry export -C $$path --with dev -f requirements.txt -o $$path/requirements-dev.txt; \
 		fi; \
 		git add $$path/poetry.lock $$path/requirements*; \
