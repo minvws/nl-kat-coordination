@@ -48,6 +48,7 @@
                             {% for check, system in data.basic_security.summary.items %}
                                 {% if system.system_specific.checks or system.system_specific.ips %}
                                     {% include "aggregate_organisation_report/system_specific.html" with data=system.system_specific type=check %}
+
                                 {% endif %}
                             {% endfor %}
                         </div>

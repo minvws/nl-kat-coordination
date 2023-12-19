@@ -30,9 +30,12 @@ class MailReport(Report):
         if reference.class_type == Hostname:
             hostnames = [reference]
         elif reference.class_type in (IPAddressV4, IPAddressV6):
-            hostnames = [x.reference for x in self.octopoes_api_connector.query(
-                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
-            )]
+            hostnames = [
+                x.reference
+                for x in self.octopoes_api_connector.query(
+                    "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
+                )
+            ]
 
         number_of_hostnames = len(hostnames)
         number_of_spf = number_of_hostnames
@@ -47,14 +50,10 @@ class MailReport(Report):
                 1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures[hostname])) else 0
             )
             number_of_dmarc -= (
-                1
-                if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", mail_security_measures[hostname]))
-                else 0
+                1 if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", mail_security_measures[hostname])) else 0
             )
             number_of_dkim -= (
-                1
-                if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", mail_security_measures[hostname]))
-                else 0
+                1 if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", mail_security_measures[hostname])) else 0
             )
 
         return {
