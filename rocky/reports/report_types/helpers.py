@@ -25,6 +25,7 @@ REPORTS = [
     WebSystemReport,
     NameServerSystemReport,
     SafeConnectionsReport,
+    VulnerabilityReport,
     OpenPortsReport,
     IPv6Report,
     VulnerabilityReport,
