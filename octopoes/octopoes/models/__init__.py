@@ -265,7 +265,7 @@ def build_token_tree(ooi_class: Type[OOI]) -> Dict:
         field = ooi_class.model_fields[attribute]
         value = ""
 
-        if field.annotation == Reference:
+        if field.annotation in (Reference, Optional[Reference]):
             from octopoes.models.types import related_object_type
 
             related_class = related_object_type(field)
