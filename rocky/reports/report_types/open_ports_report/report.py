@@ -17,7 +17,7 @@ class OpenPortsReport(Report):
     id = "open-ports-report"
     name = _("Open Ports Report")
     description = _("Find open ports of IP addresses")
-    plugins = {"required": ["nmap-ports", "nmap", "nmap-udp"], "optional": ["shodan"]}
+    plugins = {"required": ["nmap"], "optional": ["shodan", "nmap-udp", "nmap-ports", "nmap-ip-range", "masscan"]}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "open_ports_report/report.html"
 
@@ -45,9 +45,10 @@ class OpenPortsReport(Report):
 
             for port in ports:
                 origin = self.octopoes_api_connector.list_origins(result=port.reference, valid_time=valid_time)
-                nmap_origin = [o for o in origin if o.method == "kat_nmap_normalize"]
-                found_by_nmap = len(nmap_origin) > 0
-                port_numbers[port.port] = found_by_nmap
+                found_by_openkat = bool(
+                    [o for o in origin if o.method in ("kat_nmap_normalize", "kat_masscan_normalize")]
+                )
+                port_numbers[port.port] = found_by_openkat
 
             results[ref.tokenized.address] = {"ports": port_numbers, "hostnames": hostnames}
 

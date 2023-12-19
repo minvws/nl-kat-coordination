@@ -25,7 +25,7 @@
             </tbody>
         </table>
     </p>
-    {% if data.mail_security_measures.measures %}
+    {% if data.finding_types.measures %}
         <p class="column-2">
             <table>
                 <thead>
@@ -35,7 +35,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for measure in data.mail_security_measures.measures %}
+                    {% for measure in data.finding_types.values %}
                         <tr>
                             <td>{{ measure.description }}</td>
                             <td>{{ measure.risk_severity }}</td>

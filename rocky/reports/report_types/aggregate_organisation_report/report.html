@@ -46,8 +46,9 @@
                         <div id="system-specific">
                             <h3>{% translate "System specific" %}</h3>
                             {% for check, system in data.basic_security.summary.items %}
-                                {% include "aggregate_organisation_report/system_specific.html" with data=system.system_specific type=check %}
-
+                                {% if system.system_specific.checks or system.system_specific.ips %}
+                                    {% include "aggregate_organisation_report/system_specific.html" with data=system.system_specific type=check %}
+                                {% endif %}
                             {% endfor %}
                         </div>
                     {% endif %}
