@@ -99,6 +99,7 @@ repos:
       ^rocky/assets/js/vendor |
       ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
       ^rocky/tests/stubs |
+      ^rocky/reports/report_types/aggregate_organisation_report |
       ^docs/source/_static |
       ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/ |
       ^boefjes/boefjes/plugins/kat_rpki/rpki.json

@@ -11,6 +11,8 @@ from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
 
+MAIL_FINDINGS = ["KAT-NO-SPF", "KAT-NO-DMARC", "KAT-NO-DKIM"]
+
 
 class MailReport(Report):
     id = "mail-report"
@@ -27,30 +29,36 @@ class MailReport(Report):
 
         if reference.class_type == Hostname:
             hostnames = [reference]
-            measures = self._get_measures(valid_time, hostnames)
-            mail_security_measures = {"hostname": hostnames[0].tokenized.name, "measures": measures}
         elif reference.class_type in (IPAddressV4, IPAddressV6):
-            hostnames = self.octopoes_api_connector.query(
-                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
-            )
-            for hostname in hostnames:
-                measures = self._get_measures(valid_time, hostname)
-                mail_security_measures.update({"hostname": hostname.name, "measures": measures})
+            hostnames = [
+                x.reference
+                for x in self.octopoes_api_connector.query(
+                    "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
+                )
+            ]
 
         number_of_hostnames = len(hostnames)
-        number_of_spf = number_of_hostnames - len(
-            list(filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures["measures"]))
-        )
-        number_of_dmarc = number_of_hostnames - len(
-            list(filter(lambda finding: finding.id == "KAT-NO-DMARC", mail_security_measures["measures"]))
-        )
-        number_of_dkim = number_of_hostnames - len(
-            list(filter(lambda finding: finding.id == "KAT-NO-DKIM", mail_security_measures["measures"]))
-        )
+        number_of_spf = number_of_hostnames
+        number_of_dmarc = number_of_hostnames
+        number_of_dkim = number_of_hostnames
+
+        for hostname in hostnames:
+            measures = self._get_measures(valid_time, hostname)
+            mail_security_measures[hostname] = measures
+
+            number_of_spf -= (
+                1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures[hostname])) else 0
+            )
+            number_of_dmarc -= (
+                1 if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", mail_security_measures[hostname])) else 0
+            )
+            number_of_dkim -= (
+                1 if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", mail_security_measures[hostname])) else 0
+            )
 
         return {
             "input_ooi": input_ooi,
-            "mail_security_measures": mail_security_measures,
+            "finding_types": mail_security_measures,
             "number_of_hostnames": number_of_hostnames,
             "number_of_spf": number_of_spf,
             "number_of_dmarc": number_of_dmarc,
@@ -58,12 +66,9 @@ class MailReport(Report):
         }
 
     def _get_measures(self, valid_time: datetime, hostname) -> List[OOI]:
-        measures = []
         finding_types = self.octopoes_api_connector.query(
             "Hostname.<ooi[is Finding].finding_type", valid_time, hostname
         )
-        for finding in finding_types:
-            if finding.id == "KAT-NO-SPF" or finding.id == "KAT-NO-DMARC" or finding.id == "KAT-NO-DKIM":
-                measures.append(finding)
 
+        measures = list(filter(lambda finding: finding.id in MAIL_FINDINGS, finding_types))
         return measures

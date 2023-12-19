@@ -17,7 +17,7 @@
                 <tr>
                     <td>{% translate "Secure CSP Header" %}</td>
                     <td>
-                        {{ data.web_checks.has_csp_vulnerabilities }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}
+                        {{ data.web_checks.has_no_csp_vulnerabilities }}/{{ data.web_checks|length }} {% translate "webservers compliant" %}
                     </td>
                 </tr>
                 <tr>
