@@ -42,7 +42,7 @@
 .accordion {
   padding: 0;
 
-  >li {
+  > li {
     padding: 0;
 
     button {
@@ -55,7 +55,7 @@
       &[aria-expanded="true"] {
         border-width: 0;
 
-        +div {
+        + div {
           border-bottom-width: 2px;
         }
       }
@@ -69,7 +69,7 @@
   }
 
   &.break-title {
-    >li {
+    > li {
       button {
         word-break: break-all;
       }

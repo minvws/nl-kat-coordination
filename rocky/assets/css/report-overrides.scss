@@ -42,6 +42,7 @@ table thead {
   border-width: 0 0 2px;
 }
 
-table tr:first-of-type td, table tr:last-of-type td {
+table tr:first-of-type td,
+table tr:last-of-type td {
   border-width: 0 0 1px;
 }

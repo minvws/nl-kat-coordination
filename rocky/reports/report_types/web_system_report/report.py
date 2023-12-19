@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import RiskLevelSeverity
+from octopoes.models.ooi.findings import KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
@@ -26,6 +26,19 @@ class WebCheck:
     certificates_not_expired: bool = False
     certificates_not_expiring_soon: bool = False
 
+    def __bool__(self):
+        return (
+            self.has_csp
+            and self.has_no_csp_vulnerabilities
+            and self.redirects_http_https
+            and self.offers_https
+            and self.has_security_txt
+            and self.no_uncommon_ports
+            and self.has_certificates
+            and self.certificates_not_expired
+            and self.certificates_not_expiring_soon
+        )
+
 
 @dataclass
 class WebChecks:
@@ -36,7 +49,7 @@ class WebChecks:
         return sum([check.has_csp for check in self.checks])
 
     @property
-    def has_csp_vulnerabilities(self):
+    def has_no_csp_vulnerabilities(self):
         return sum([check.has_no_csp_vulnerabilities for check in self.checks])
 
     @property
@@ -67,8 +80,14 @@ class WebChecks:
     def certificates_not_expiring_soon(self):
         return sum([check.certificates_not_expiring_soon for check in self.checks])
 
+    def __bool__(self):
+        return all(bool(check) for check in self.checks)
+
     def __len__(self):
         return len(self.checks)
+
+    def __add__(self, other: "WebChecks"):
+        return WebChecks(checks=self.checks + other.checks)
 
 
 class WebSystemReport(Report):
@@ -156,6 +175,14 @@ class WebSystemReport(Report):
                     web_hostname.reference,
                 )
             )
+            security_txt_finding_types = [
+                KATFindingType(
+                    id="KAT-NO-SECURITY-TXT",
+                    description="This hostname does not have a Security.txt file.",
+                    risk_severity=RiskLevelSeverity.RECOMMENDATION,
+                    recommendation="Make sure there is a security.txt available.",
+                )
+            ]
 
             port_finding_types = [
                 x
@@ -181,7 +208,7 @@ class WebSystemReport(Report):
             check.certificates_not_expired = check.has_certificates and "KAT-CERTIFICATE-EXPIRED" not in [
                 x.id for x in certificate_finding_types
             ]
-            check.certificates_not_expiring_soon = check.has_certificates and "KAT-CERTIFICATE-EXPIRING-SOON" in [
+            check.certificates_not_expiring_soon = check.has_certificates and "KAT-CERTIFICATE-EXPIRING-SOON" not in [
                 x.id for x in certificate_finding_types
             ]
 
@@ -194,6 +221,7 @@ class WebSystemReport(Report):
                 + no_certificate_finding_types
                 + port_finding_types
                 + certificate_finding_types
+                + security_txt_finding_types
             )
 
             for finding_type in new_types:
