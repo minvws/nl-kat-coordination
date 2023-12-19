@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import RiskLevelSeverity, KATFindingType
+from octopoes.models.ooi.findings import KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
@@ -175,12 +175,14 @@ class WebSystemReport(Report):
                     web_hostname.reference,
                 )
             )
-            security_txt_finding_types = [KATFindingType(
-                id="KAT-NO-SECURITY-TXT",
-                description="This hostname does not have a Security.txt file.",
-                risk_severity=RiskLevelSeverity.RECOMMENDATION,
-                recommendation="Make sure there is a security.txt available."
-            )]
+            security_txt_finding_types = [
+                KATFindingType(
+                    id="KAT-NO-SECURITY-TXT",
+                    description="This hostname does not have a Security.txt file.",
+                    risk_severity=RiskLevelSeverity.RECOMMENDATION,
+                    recommendation="Make sure there is a security.txt available.",
+                )
+            ]
 
             port_finding_types = [
                 x
