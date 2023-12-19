@@ -1,5 +1,3 @@
-from dataclasses import fields
-from functools import reduce
 from logging import getLogger
 
 from django.utils.translation import gettext_lazy as _
@@ -166,9 +164,15 @@ class AggregateOrganisationReport(AggregateReport):
                 )
 
         # System Specific
-        basic_security["system_specific"][SystemType.MAIL] = [report for ip in mail_report_data for report in mail_report_data[ip]]
-        basic_security["system_specific"][SystemType.WEB] = [report for ip in web_report_data for report in web_report_data[ip]]
-        basic_security["system_specific"][SystemType.DNS] = [report for ip in dns_report_data for report in dns_report_data[ip]]
+        basic_security["system_specific"][SystemType.MAIL] = [
+            report for ip in mail_report_data for report in mail_report_data[ip]
+        ]
+        basic_security["system_specific"][SystemType.WEB] = [
+            report for ip in web_report_data for report in web_report_data[ip]
+        ]
+        basic_security["system_specific"][SystemType.DNS] = [
+            report for ip in dns_report_data for report in dns_report_data[ip]
+        ]
 
         # Summary
         basic_security["summary"] = {}
@@ -200,6 +204,7 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["summary"][service]["safe_connections"]["total"] += 1
 
             if service == SystemType.MAIL and mail_report_data:
+
                 def spf_compliant(result):
                     return result["number_of_hostnames"] == result["number_of_spf"]
 
@@ -222,47 +227,107 @@ class AggregateOrganisationReport(AggregateReport):
                         "dkim": sum(all(dkim_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
                         "dmarc": sum(all(dmarc_compliant(m) for m in mail_report_data[ip]) for ip in mail_report_data),
                     },
-                    "ips": {ip: sorted(set(   # Flattening the finding_types field of the mail report output
-                        finding_type for mail_report in mail_report_data[ip]
-                        for hostname, finding_types in mail_report["finding_types"].items()
-                        for finding_type in finding_types
-                    ), reverse=True, key=lambda x: x.risk_severity) for ip in mail_report_data}
+                    "ips": {
+                        ip: sorted(
+                            set(  # Flattening the finding_types field of the mail report output
+                                finding_type
+                                for mail_report in mail_report_data[ip]
+                                for hostname, finding_types in mail_report["finding_types"].items()
+                                for finding_type in finding_types
+                            ),
+                            reverse=True,
+                            key=lambda x: x.risk_severity,
+                        )
+                        for ip in mail_report_data
+                    },
                 }
 
             if service == SystemType.WEB and web_report_data:
                 basic_security["summary"][service]["system_specific"] = {
-                    "number_of_compliant": sum(all(result["web_checks"] for result in web_report_data[ip]) for ip in web_report_data),
+                    "number_of_compliant": sum(
+                        all(result["web_checks"] for result in web_report_data[ip]) for ip in web_report_data
+                    ),
                     "total": len(web_report_data),
                     "checks": {
-                        "CSP Present": sum(all(w["web_checks"].has_csp for w in web_report_data[ip]) for ip in web_report_data),
-                        "Secure CSP Header": sum(all(w["web_checks"].has_no_csp_vulnerabilities for w in web_report_data[ip]) for ip in web_report_data),
-                        "Redirects HTTP to HTTPS": sum(all(w["web_checks"].redirects_http_https for w in web_report_data[ip]) for ip in web_report_data),
-                        "Offers HTTPS": sum(all(w["web_checks"].offers_https for w in web_report_data[ip]) for ip in web_report_data),
-                        "Has a Security.txt": sum(all(w["web_checks"].has_security_txt for w in web_report_data[ip]) for ip in web_report_data),
-                        "No unnecessary ports open": sum(all(w["web_checks"].no_uncommon_ports for w in web_report_data[ip]) for ip in web_report_data),
-                        "Has a certificate": sum(all(w["web_checks"].has_certificates for w in web_report_data[ip]) for ip in web_report_data),
-                        "Certificate is not expired": sum(all(w["web_checks"].certificates_not_expired for w in web_report_data[ip]) for ip in web_report_data),
-                        "Certificate is not expiring soon": sum(all(w["web_checks"].certificates_not_expiring_soon for w in web_report_data[ip]) for ip in web_report_data),
+                        "CSP Present": sum(
+                            all(w["web_checks"].has_csp for w in web_report_data[ip]) for ip in web_report_data
+                        ),
+                        "Secure CSP Header": sum(
+                            all(w["web_checks"].has_no_csp_vulnerabilities for w in web_report_data[ip])
+                            for ip in web_report_data
+                        ),
+                        "Redirects HTTP to HTTPS": sum(
+                            all(w["web_checks"].redirects_http_https for w in web_report_data[ip])
+                            for ip in web_report_data
+                        ),
+                        "Offers HTTPS": sum(
+                            all(w["web_checks"].offers_https for w in web_report_data[ip]) for ip in web_report_data
+                        ),
+                        "Has a Security.txt": sum(
+                            all(w["web_checks"].has_security_txt for w in web_report_data[ip]) for ip in web_report_data
+                        ),
+                        "No unnecessary ports open": sum(
+                            all(w["web_checks"].no_uncommon_ports for w in web_report_data[ip])
+                            for ip in web_report_data
+                        ),
+                        "Has a certificate": sum(
+                            all(w["web_checks"].has_certificates for w in web_report_data[ip]) for ip in web_report_data
+                        ),
+                        "Certificate is not expired": sum(
+                            all(w["web_checks"].certificates_not_expired for w in web_report_data[ip])
+                            for ip in web_report_data
+                        ),
+                        "Certificate is not expiring soon": sum(
+                            all(w["web_checks"].certificates_not_expiring_soon for w in web_report_data[ip])
+                            for ip in web_report_data
+                        ),
                     },
-                    "ips": {ip: sorted(set(  # Flattening the finding_types field of the web report output
-                        finding_type for web_report in web_report_data[ip]
-                        for finding_type in web_report["finding_types"]
-                    ), reverse=True, key=lambda x: x.risk_severity) for ip in web_report_data}
+                    "ips": {
+                        ip: sorted(
+                            set(  # Flattening the finding_types field of the web report output
+                                finding_type
+                                for web_report in web_report_data[ip]
+                                for finding_type in web_report["finding_types"]
+                            ),
+                            reverse=True,
+                            key=lambda x: x.risk_severity,
+                        )
+                        for ip in web_report_data
+                    },
                 }
 
             if service == SystemType.DNS and dns_report_data:
                 basic_security["summary"][service]["system_specific"] = {
-                    "number_of_compliant": sum(all(result["name_server_checks"] for result in dns_report_data[ip]) for ip in dns_report_data),
+                    "number_of_compliant": sum(
+                        all(result["name_server_checks"] for result in dns_report_data[ip]) for ip in dns_report_data
+                    ),
                     "total": len(dns_report_data),
                     "checks": {
-                        "DNSSEC Present": sum(all(n["name_server_checks"].no_uncommon_ports for n in dns_report_data[ip]) for ip in dns_report_data),
-                        "Valid DNSSEC": sum(all(n["name_server_checks"].has_dnssec for n in dns_report_data[ip]) for ip in dns_report_data),
-                        "No unnecessary ports open": sum(all(n["name_server_checks"].has_valid_dnssec for n in dns_report_data[ip]) for ip in dns_report_data),
+                        "DNSSEC Present": sum(
+                            all(n["name_server_checks"].no_uncommon_ports for n in dns_report_data[ip])
+                            for ip in dns_report_data
+                        ),
+                        "Valid DNSSEC": sum(
+                            all(n["name_server_checks"].has_dnssec for n in dns_report_data[ip])
+                            for ip in dns_report_data
+                        ),
+                        "No unnecessary ports open": sum(
+                            all(n["name_server_checks"].has_valid_dnssec for n in dns_report_data[ip])
+                            for ip in dns_report_data
+                        ),
                     },
-                    "ips": {ip: sorted(set(  # Flattening the finding_types field of the dns report output
-                        finding_type for dns_report in dns_report_data[ip]
-                        for finding_type in dns_report["finding_types"]
-                    ), reverse=True, key=lambda x: x.risk_severity) for ip in dns_report_data}
+                    "ips": {
+                        ip: sorted(
+                            set(  # Flattening the finding_types field of the dns report output
+                                finding_type
+                                for dns_report in dns_report_data[ip]
+                                for finding_type in dns_report["finding_types"]
+                            ),
+                            reverse=True,
+                            key=lambda x: x.risk_severity,
+                        )
+                        for ip in dns_report_data
+                    },
                 }
 
         terms = list(set(terms))
@@ -310,14 +375,12 @@ class AggregateOrganisationReport(AggregateReport):
                 if str(ip) not in report_data:
                     report_data[str(ip)] = []
 
-                if str(ip) in data:
-                    if report_id in data[str(ip)] and system_type == service:
-                        report_data[str(ip)].append(data[str(ip)][report_id])
+                if str(ip) in data and report_id in data[str(ip)] and system_type == service:
+                    report_data[str(ip)].append(data[str(ip)][report_id])
 
                 for hostname in system_for_service["hostnames"]:
-                    if str(hostname) in data:
-                        if report_id in data[str(hostname)] and system_type == service:
-                            report_data[str(ip)].append(data[str(hostname)][report_id])
+                    if str(hostname) in data and report_id in data[str(hostname)] and system_type == service:
+                        report_data[str(ip)].append(data[str(hostname)][report_id])
 
         report_data = {key: value for key, value in report_data.items() if value}
 
