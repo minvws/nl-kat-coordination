@@ -27,3 +27,7 @@
   /* Nota bene */
   --form-horizontal-view-fieldset-nota-bene-required-margin-bottom: 0.5rem;
 }
+
+form fieldset .checkbox input[type="checkbox"] + label {
+  max-width: 40rem;
+}
