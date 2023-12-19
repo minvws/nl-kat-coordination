@@ -4,7 +4,7 @@
     <div>
         <h2>{% translate "Recommendations" %}</h2>
         {% if total_findings == 0 %}
-            <p>{% translate "There are no recommendations" %}</p>
+            <p>{% translate "There are no recommendations." %}</p>
         {% else %}
             <p>
                 {% blocktranslate count total_findings as count trimmed %}
@@ -28,7 +28,7 @@
                     {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
                 </ul>
             {% else %}
-                <p>{% translate "There are no recommendations" %}</p>
+                <p>{% translate "There are no recommendations." %}</p>
             {% endif %}
         {% endif %}
     </div>

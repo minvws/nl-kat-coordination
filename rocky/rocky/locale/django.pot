@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 08:03+0000\n"
+"POT-Creation-Date: 2023-12-19 10:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2692,9 +2692,9 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
 msgid ""
-"An overview of the manually released scanned assets. Assets in bold are "
-"taken as a starting point, assets that are not in bold were found by OpenKAT "
-"itself."
+"An overview of the manually released scanned assets. Assets in <strong>bold</"
+"strong> are taken as a starting point, assets that are not in bold were "
+"found by OpenKAT itself."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
@@ -2782,7 +2782,7 @@ msgid "Recommendations"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
-msgid "There are no recommendations"
+msgid "There are no recommendations."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -2914,22 +2914,6 @@ msgstr ""
 msgid "Risk level"
 msgstr ""
 
-#: reports/report_types/aggregate_organisation_report/system_specific.html
-msgid "Low"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/system_specific.html
-msgid "Medium"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/system_specific.html
-msgid "High"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/system_specific.html
-msgid "Critical"
-msgstr ""
-
 #: reports/report_types/aggregate_organisation_report/term_overview.html
 msgid "Term overview"
 msgstr ""
@@ -2953,14 +2937,14 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
 msgid ""
-"Multiple hostnames that resolve to one ip address where at least one of the "
-"hostnames or the ip address has a declared scan level that is at least L1. "
+"Multiple hostnames that resolve to one IP address where at least one of the "
+"hostnames or the IP address has a declared scan level that is at least L1. "
 "Type systemen zijn webservers, mailservers, en nameservers (DNS)."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
 msgid ""
-"A fundamental component of the client-server model, a web server uses "
+"A fundamental component of the client-server model. A web server uses "
 "protocols like HTTP or HTTPS to facilitate communication between clients and "
 "the server."
 msgstr ""

@@ -30,7 +30,7 @@
         </tbody>
     </table>
 </div>
-{% for ip, info in data.ips.items %}
+{% for ip, findings in data.ips.items %}
     <h5>{{ ip }}</h5>
     <table>
         <thead>
@@ -40,22 +40,14 @@
             </tr>
         </thead>
         <tbody>
-            {% for finding in info %}
+            {% for finding_type in findings %}
                 <tr>
                     <td>
-                        <span class="icon negative"></span>{{ finding.description }}
+                        <span class="icon negative"></span>{{ finding_type.description }}
                     </td>
                     <td>
-                        {% if finding.risk_severity.value == 'low' %}
-                            <span class="low">{% translate "Low" %}</span>
-                        {% elif finding.risk_severity.value == 'medium' %}
-                            <span class="medium">{% translate "Medium" %}</span>
-                        {% elif finding.risk_severity.value == 'high' %}
-                            <span class="high">{% translate "High" %}</span>
-                        {% elif finding.risk_severity.value == 'critical' %}
-                            <span class="critical">{% translate "Critical" %}</span>
-                        </td>
-                    {% endif %}
+                        <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
