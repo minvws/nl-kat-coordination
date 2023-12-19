@@ -10,6 +10,7 @@ from reports.report_types.rpki_report.report import RPKIReport
 from reports.report_types.safe_connections_report.report import SafeConnectionsReport
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.tls_report.report import TLSReport
+from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
 
 REPORTS = [
@@ -21,6 +22,7 @@ REPORTS = [
     WebSystemReport,
     NameServerSystemReport,
     SafeConnectionsReport,
+    VulnerabilityReport,
     OpenPortsReport,
 ]
 
