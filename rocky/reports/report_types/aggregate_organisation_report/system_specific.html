@@ -52,6 +52,8 @@
                             <span class="medium">{% translate "Medium" %}</span>
                         {% elif finding.risk_severity.value == 'high' %}
                             <span class="high">{% translate "High" %}</span>
+                        {% elif finding.risk_severity.value == 'critical' %}
+                            <span class="critical">{% translate "Critical" %}</span>
                         </td>
                     {% endif %}
                 </tr>
