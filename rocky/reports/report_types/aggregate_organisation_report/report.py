@@ -59,6 +59,7 @@ class AggregateOrganisationReport(AggregateReport):
                 if report_id == SystemReport.id:
                     for ip, system in report_specific_data["services"].items():
                         unique_ips.add(ip)
+
                         if ip not in systems["services"]:
                             systems["services"][ip] = system
                         else:
@@ -66,7 +67,7 @@ class AggregateOrganisationReport(AggregateReport):
                             systems["services"][ip]["hostnames"] = sorted(
                                 set(systems["services"][ip]["hostnames"]) | set(system["hostnames"])
                             )
-                            unique_hostnames.update(systems["services"][ip]["hostnames"])
+
                             systems["services"][ip]["services"] = sorted(
                                 set(systems["services"][ip]["services"]) | set(system["services"])
                             )
@@ -76,7 +77,7 @@ class AggregateOrganisationReport(AggregateReport):
                                 services[service] = {str(ip): systems["services"][ip]}
                             else:
                                 services[service][str(ip)] = systems["services"][ip]
-
+                        unique_hostnames.update(systems["services"][ip]["hostnames"])
                     total_systems += report_specific_data["summary"]["total_systems"]
 
                 if report_id == OpenPortsReport.id:
