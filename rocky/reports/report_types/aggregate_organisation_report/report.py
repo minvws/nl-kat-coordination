@@ -305,15 +305,15 @@ class AggregateOrganisationReport(AggregateReport):
                     "total": len(dns_report_data),
                     "checks": {
                         "DNSSEC Present": sum(
-                            all(n["name_server_checks"].no_uncommon_ports for n in dns_report_data[ip])
-                            for ip in dns_report_data
-                        ),
-                        "Valid DNSSEC": sum(
                             all(n["name_server_checks"].has_dnssec for n in dns_report_data[ip])
                             for ip in dns_report_data
                         ),
-                        "No unnecessary ports open": sum(
+                        "Valid DNSSEC": sum(
                             all(n["name_server_checks"].has_valid_dnssec for n in dns_report_data[ip])
+                            for ip in dns_report_data
+                        ),
+                        "No unnecessary ports open": sum(
+                            all(n["name_server_checks"].no_uncommon_ports for n in dns_report_data[ip])
                             for ip in dns_report_data
                         ),
                     },
