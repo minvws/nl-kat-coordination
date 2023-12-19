@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 11:05+0000\n"
+"POT-Creation-Date: 2023-12-19 11:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2811,14 +2811,42 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+msgid ""
+"In this chapter we check if the connections of all the IP ports of the "
+"system are safe. Safe connections are important to prevent unauthorised "
+"access and data breaches. Strong ciphers are crucial because they ensure "
+"strong encryption which protects the data from interception during "
+"communiction."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "System specific"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+msgid ""
+"This is where checks are done that are specific to system types. Different "
+"security and compliance issues come into play for different systems. They "
+"are listed here under each other."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Resource Public Key Infrastructure"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/rpki_report/report.html
+msgid ""
+"This section contains basic security information about resource public key "
+"infrastructure. If your web server employs RPKI for its IP addresses and "
+"associated nameservers, then it enhances visitor protection against "
+"misconfigurations and malicious route intercepts through verified route "
+"announcements, ensuring reliable server access and secure internet traffic."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
@@ -2864,6 +2892,15 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 msgid "System specific checks"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#, python-format
+msgid ""
+"This table shows which checks were performed. Following that, the compliance "
+"issues, if any, are shown for each %(type)s Server."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
