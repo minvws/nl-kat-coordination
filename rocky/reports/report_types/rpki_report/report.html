@@ -16,7 +16,7 @@
                     <td>{{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}</td>
                 </tr>
                 <tr>
-                    <td>{% translate "RPKI Valid" %}</td>
+                    <td>{% translate "RPKI Not expired" %}</td>
                     <td>{{ data.number_of_valid }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}</td>
                 </tr>
             </tbody>
@@ -24,7 +24,7 @@
     </div>
     {% for ip, info in data.rpki_ips.items %}
         {% if not info.valid %}
-            <p>{% translate "RPKI record does is not valid for" %} {{ ip }}.</p>
+            <p>{% translate "RPKI record is not valid for" %} {{ ip }}.</p>
         {% endif %}
         {% if not info.exists %}
             <p>{% translate "RPKI record does not exist for" %} {{ ip }}.</p>
