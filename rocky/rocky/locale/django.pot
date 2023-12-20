@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 13:30+0000\n"
+"POT-Creation-Date: 2023-12-20 12:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2748,6 +2748,9 @@ msgid "RPKI"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
 msgid "server"
 msgstr ""
 

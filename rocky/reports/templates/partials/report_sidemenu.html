@@ -53,7 +53,7 @@
                 <ol>
                     {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
                         <li>
-                            <a href="#vulnerabilities">{{ input_ooi }}</a>
+                            <a href="#vulnerabilities">{{ vulnerabilities.title }}</a>
                         </li>
                     {% endfor %}
                 </ol>
