@@ -19,6 +19,7 @@
 @use "@minvws/manon/de-emphasized";
 @use "@minvws/manon/link";
 @use "@minvws/manon/nota-bene";
+@use "@minvws/manon/max-line-length";
 
 /* Fundamentals */
 @use "@minvws/manon/checkbox";
@@ -82,6 +83,7 @@
 @use "@minvws/manon/hero";
 @use "@minvws/manon/pagination";
 @use "@minvws/manon/tabs";
+@use "@minvws/manon/sidemenu";
 
 /* Button */
 @use "@minvws/manon/button-base";

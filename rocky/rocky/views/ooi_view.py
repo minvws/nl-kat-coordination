@@ -120,11 +120,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         return self.ooi.__class__ if hasattr(self, "ooi") else None
 
     def get_form(self, form_class=None) -> BaseRockyForm:
-        if form_class is None:
-            form_class = self.get_form_class()
-
-        kwargs = self.get_form_kwargs()
-        form = form_class(**kwargs)
+        form = super().get_form(form_class)
 
         # Disable natural key attributes
         if self.get_readonly_fields():
