@@ -16,7 +16,6 @@
 @import "vendor_overrides/manon/nested-section";
 @import "vendor_overrides/manon/form-radio";
 @import "vendor_overrides/manon/form-fieldset-required";
-@import "vendor_overrides/manon/link";
 @import "vendor_overrides/manon/table";
 @import "vendor_overrides/manon/tile";
 
@@ -44,16 +43,20 @@
 @import "components/layout";
 @import "components/table-state-icons";
 @import "components/messages";
+@import "components/chapter-numbering";
 @import "components/notifications";
 @import "components/ooi-summary";
 @import "components/page-meta";
 @import "components/plugins";
 @import "components/pre";
 @import "components/qr-code";
+@import "components/report";
 @import "components/risk-level-indicator";
 @import "components/scan-level-indicator";
 @import "components/select";
 @import "components/stepper";
+@import "components/sticky";
+@import "components/state-tags";
 @import "components/table";
 @import "components/toolbar";
 @import "components/tree-tables";

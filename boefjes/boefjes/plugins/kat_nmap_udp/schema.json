@@ -2,12 +2,12 @@
     "title": "Arguments",
     "type": "object",
     "properties": {
-        "TOP_PORTS": {
+        "TOP_PORTS_UDP": {
             "title": "TOP_PORTS_UDP",
             "type": "integer",
             "minimum": 1,
             "maximum": 65535,
-            "description": "Scan TOP_PORTS most common ports. Defaults to 250."
+            "description": "Scan TOP_PORTS_UDP most common ports. Defaults to 250."
         }
     },
     "required": []

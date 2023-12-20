@@ -13,7 +13,7 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
-from tools.view_helpers import schedule_task
+from tools.view_helpers import reschedule_task
 
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
@@ -82,7 +82,7 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
-            schedule_task(self.request, self.organization.code, task_id)
+            reschedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
