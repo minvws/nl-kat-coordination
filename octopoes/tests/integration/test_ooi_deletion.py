@@ -27,7 +27,7 @@ XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 def printer(arg1, arg2):
     print(arg1)
     for i, k in enumerate(arg2):
-        print(">>{}: {}<<".format(i, k))
+        print(f">>{i}: {k}<<")
     print()
 
 
@@ -105,6 +105,7 @@ def test_events_created_through_crud(xtdb_octopoes_service: OctopoesService, eve
     call3 = event_manager.queue[2]
     assert isinstance(call3, OOIDBEvent)
     assert call3.operation_type.value == "delete"
+
 
 def test_events_created_in_worker_during_handling(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
