@@ -194,7 +194,8 @@ def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) 
 
     # Remove id from task data, this should be created by the scheduler
     new_task = task.p_item.data
-    delattr(new_task, "id")
+    if hasattr(new_task, "id"):
+        delattr(new_task, "id")
 
     try:
         new_p_item = QueuePrioritizedItem(
