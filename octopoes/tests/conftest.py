@@ -251,11 +251,16 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
 
     return connector
 
+class MockEventManager:
+    def __init__(self):
+        self.queue = []
+
+    def publish(self, event) -> None:
+        self.queue.append(event)
 
 @pytest.fixture
 def event_manager(xtdb_session: XTDBSession) -> Mock:
-    return Mock(spec=EventManager)
-    # return MockEventManager()
+    return MockEventManager()
 
 
 @pytest.fixture

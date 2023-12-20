@@ -26,8 +26,8 @@ XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 
 def printer(arg1, arg2):
     print(arg1)
-    for k in arg2:
-        print(k)
+    for i, k in enumerate(arg2):
+        print(">>{}: {}<<".format(i, k))
     print()
 
 
@@ -61,7 +61,7 @@ def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_ti
 
     # This sleep is here because otherwise on some systems this test will fail
     # Delete when issue #2083 is resolved...
-    time.sleep(1)
+    time.sleep(2)
     assert len(octopoes_api_connector.list_origins(task_id={})) < bits_size
 
     octopoes_api_connector.recalculate_bits()
@@ -82,30 +82,29 @@ def test_events_created_through_crud(xtdb_octopoes_service: OctopoesService, eve
     xtdb_octopoes_service.save_origin(origin, [network], valid_time)
     xtdb_octopoes_service.commit()
 
-    assert event_manager.publish.call_count == 2
+    assert len(event_manager.queue) == 2
 
-    call1 = event_manager.publish.call_args_list[0]
-    call2 = event_manager.publish.call_args_list[1]
+    call1 = event_manager.queue[0]
+    call2 = event_manager.queue[1]
 
-    assert isinstance(call1.args[0], OOIDBEvent)
-    assert isinstance(call2.args[0], OriginDBEvent)
+    assert isinstance(call1, OOIDBEvent)
+    assert isinstance(call2, OriginDBEvent)
 
-    assert call1.args[0].old_data is None
-    assert call1.args[0].new_data == network
-    assert call1.args[0].operation_type.value == "create"
+    assert call1.old_data is None
+    assert call1.new_data == network
+    assert call1.operation_type.value == "create"
 
-    assert call2.args[0].old_data is None
-    assert call2.args[0].new_data == origin
-    assert call2.args[0].operation_type.value == "create"
+    assert call2.old_data is None
+    assert call2.new_data == origin
+    assert call2.operation_type.value == "create"
 
     xtdb_octopoes_service.ooi_repository.delete(network.reference, valid_time)
     xtdb_octopoes_service.commit()
 
-    assert event_manager.publish.call_count == 3  # Origin will be deleted by the worker due to the OOI delete event
-    call3 = event_manager.publish.call_args_list[2]
-    assert isinstance(call3.args[0], OOIDBEvent)
-    assert call3.args[0].operation_type.value == "delete"
-
+    assert len(event_manager.queue) == 3  # Origin will be deleted by the worker due to the OOI delete event
+    call3 = event_manager.queue[2]
+    assert isinstance(call3, OOIDBEvent)
+    assert call3.operation_type.value == "delete"
 
 def test_events_created_in_worker_during_handling(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
@@ -124,17 +123,19 @@ def test_events_created_in_worker_during_handling(
     xtdb_octopoes_service.ooi_repository.delete(network.reference, valid_time)
     xtdb_octopoes_service.commit()
 
-    assert event_manager.publish.call_count == 3
-    event = event_manager.publish.call_args_list[2].args[0]  # OOIDelete event
+    assert len(event_manager.queue) == 3
+    event = event_manager.queue[2]  # OOIDelete event
 
-    # for event in event_manager.get_events():
-    #     xtdb_octopoes_service.process_event(event)
+    assert isinstance(event, OOIDBEvent)
+    assert event.operation_type.value == "delete"
 
-    xtdb_octopoes_service.process_event(event)
+    for event in event_manager.queue:
+        xtdb_octopoes_service.process_event(event)
     xtdb_octopoes_service.commit()
 
-    assert event_manager.publish.call_count == 4  # Handling OOI delete event triggers Origin delete event
+    assert len(event_manager.queue) == 6  # Handling OOI delete event triggers Origin delete event
 
-    call = event_manager.publish.call_args_list[3]
-    assert isinstance(call.args[0], OriginDBEvent)
-    assert call.args[0].operation_type.value == "delete"
+    event = event_manager.queue[5]  # OOIDelete event
+
+    assert isinstance(event, OriginDBEvent)
+    assert event.operation_type.value == "delete"
