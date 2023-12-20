@@ -1,0 +1,70 @@
+{% load i18n %}
+
+{% if show_heading %}
+    <h2>{% translate "System specific checks" %}</h2>
+    <p>
+        {% blocktranslate trimmed %}
+            This is where checks are done that are specific to system types. Different security
+            and compliance issues come into play for different systems. They are listed here
+            under each other.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
+<h4>{{ type }}</h4>
+<p>
+    {% blocktranslate trimmed %}
+        This table shows which checks were performed. Following that, the compliance
+        issues, if any, are shown for each {{ type }} Server.
+    {% endblocktranslate %}
+</p>
+<div class="horizontal-scroll">
+    <table>
+        <caption class="visually-hidden">{% translate "Check overview:" %}</caption>
+        <thead>
+            <tr>
+                <th>{% translate "Check" %}</th>
+                <th>{% translate "Compliance" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for check, value in data.checks.items %}
+                <tr>
+                    <td>{{ check }}</td>
+                    <td>
+                        {% if value != data.total %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ value }}/{{ data.total }} {% translate "IPs are compliant" %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% for ip, findings in data.ips.items %}
+    {% if findings %}
+        <h5>{{ ip }}</h5>
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Compliance issue" %}</th>
+                    <th>{% translate "Risk level" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for finding_type in findings %}
+                    <tr>
+                        <td>
+                            <span class="icon negative"></span>{{ finding_type.description }}
+                        </td>
+                        <td>
+                            <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endfor %}

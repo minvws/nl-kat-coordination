@@ -27,9 +27,9 @@ kat: env-if-empty build up
 	@echo "The KAT frontend is running at http://localhost:8000,"
 	@echo "An initial superuser has been created"
 	@echo "The username is stored in DJANGO_SUPERUSER_EMAIL in the .env-default file."
-	@echo "run `grep 'DJANGO_SUPERUSER_EMAIL' .env` to find it."
+	@echo "run 'grep 'DJANGO_SUPERUSER_EMAIL' .env-default' to find it."
 	@echo "The related password can be found as DJANGO_SUPERUSER_PASSWORD in the .env file."
-	@echo "run `grep 'DJANGO_SUPERUSER_PASSWORD' .env` to find it."
+	@echo "run 'grep 'DJANGO_SUPERUSER_PASSWORD' .env' to find it."
 	@echo
 	@echo "WARNING: This is a development environment, do not use in production!"
 	@echo "See https://docs.openkat.nl/technical_design/install.html for production"
@@ -142,7 +142,7 @@ fix-poetry-merge-conflict:
 		git checkout --theirs $$path/poetry.lock $$path/requirements*; \
 		poetry lock --no-update -C $$path; \
 		poetry export -C $$path --only main -f requirements.txt -o $$path/requirements.txt; \
-		if grep -q "tool.poetry.group.dev.dependencies" $$path; then \
+		if grep -q "tool.poetry.group.dev.dependencies" $$path/pyproject.toml; then \
 			poetry export -C $$path --with dev -f requirements.txt -o $$path/requirements-dev.txt; \
 		fi; \
 		git add $$path/poetry.lock $$path/requirements*; \

@@ -20,6 +20,9 @@ class NameServerCheck:
     has_dnssec: bool = False
     has_valid_dnssec: bool = False
 
+    def __bool__(self):
+        return self.no_uncommon_ports and self.has_dnssec and self.has_valid_dnssec
+
 
 @dataclass
 class NameServerChecks:
@@ -37,8 +40,14 @@ class NameServerChecks:
     def has_valid_dnssec(self):
         return sum([check.has_valid_dnssec for check in self.checks])
 
+    def __bool__(self):
+        return all(bool(check) for check in self.checks)
+
     def __len__(self):
         return len(self.checks)
+
+    def __add__(self, other: "NameServerChecks"):
+        return NameServerChecks(checks=self.checks + other.checks)
 
 
 class NameServerSystemReport(Report):

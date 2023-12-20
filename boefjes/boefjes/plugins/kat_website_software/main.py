@@ -1,10 +1,15 @@
+import platform
 from typing import List, Tuple, Union
 
 import docker
 
 from boefjes.job_models import BoefjeMeta
 
-WAPPALYZER_IMAGE = "noamblitz/wappalyzer:latest"
+# FIXME: We should build a multi-platform image
+if platform.processor() == "arm":
+    WAPPALYZER_IMAGE = "noamblitz/wappalyzer:MacM1"
+else:
+    WAPPALYZER_IMAGE = "noamblitz/wappalyzer:latest"
 
 
 def run_wappalyzer(url: str) -> str:
