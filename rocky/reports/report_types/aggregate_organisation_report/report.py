@@ -99,6 +99,7 @@ class AggregateOrganisationReport(AggregateReport):
                         total_findings += vulnerabilities_data["summary"]["total_findings"]
                         terms.extend(vulnerabilities_data["summary"]["terms"])
                         recommendations.extend(vulnerabilities_data["summary"]["recommendations"])
+                        vulnerabilities_data["title"] = "'" + ip.split("|")[2] + "'"
                         vulnerabilities[ip] = vulnerabilities_data
 
                 if report_id == RPKIReport.id:
