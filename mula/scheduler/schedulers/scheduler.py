@@ -167,6 +167,16 @@ class Scheduler(abc.ABC):
         if p_item is not None:
             self.post_pop(p_item)
 
+        self.logger.debug(
+            "Popped item %s from queue %s with priority %s",
+            p_item.id,
+            self.queue.pq_id,
+            p_item.priority,
+            p_item_id=p_item.id,
+            queue_id=self.queue.pq_id,
+            scheduler_id=self.scheduler_id,
+        )
+
         return p_item
 
     def push_item_to_queue(self, p_item: models.PrioritizedItem) -> None:

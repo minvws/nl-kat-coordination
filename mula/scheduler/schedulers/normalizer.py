@@ -248,7 +248,7 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        self.logger.debug(
+        self.logger.info(
             "Created normalizer task: %s for raw data: %s",
             task.id,
             raw_data.id,

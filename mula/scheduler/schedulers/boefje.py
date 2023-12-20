@@ -675,7 +675,7 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        self.logger.debug(
+        self.logger.info(
             "Created boefje task: %s for ooi: %s",
             task.id,
             ooi.primary_key,
