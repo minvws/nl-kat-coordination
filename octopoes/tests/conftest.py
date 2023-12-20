@@ -37,8 +37,9 @@ from octopoes.models.types import (
     Website,
 )
 from octopoes.repositories.ooi_repository import OOIRepository, XTDBOOIRepository
+from octopoes.repositories.origin_parameter_repository import XTDBOriginParameterRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
-from octopoes.repositories.scan_profile_repository import ScanProfileRepository
+from octopoes.repositories.scan_profile_repository import ScanProfileRepository, XTDBScanProfileRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
 
@@ -252,13 +253,41 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
 
 
 @pytest.fixture
-def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+def event_manager(xtdb_session: XTDBSession) -> Mock:
+    return Mock(spec=EventManager)
+    # return MockEventManager()
 
 
 @pytest.fixture
-def xtdb_origin_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+def xtdb_ooi_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOOIRepository(event_manager, xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def xtdb_origin_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginRepository(event_manager, xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def xtdb_origin_parameter_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginParameterRepository(event_manager, xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def xtdb_scan_profile_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBScanProfileRepository(event_manager, xtdb_session, XTDBType.XTDB_MULTINODE)
+
+
+@pytest.fixture
+def xtdb_octopoes_service(
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_origin_repository: XTDBOriginRepository,
+    xtdb_origin_parameter_repository: XTDBOriginParameterRepository,
+    xtdb_scan_profile_repository: XTDBScanProfileRepository,
+) -> OctopoesService:
+    return OctopoesService(
+        xtdb_ooi_repository, xtdb_origin_repository, xtdb_origin_parameter_repository, xtdb_scan_profile_repository
+    )
 
 
 @pytest.fixture
