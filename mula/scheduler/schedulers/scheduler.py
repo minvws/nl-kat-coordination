@@ -165,17 +165,17 @@ class Scheduler(abc.ABC):
             raise exc
 
         if p_item is not None:
-            self.post_pop(p_item)
+            self.logger.debug(
+                "Popped item %s from queue %s with priority %s",
+                p_item.id,
+                self.queue.pq_id,
+                p_item.priority,
+                p_item_id=p_item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
 
-        self.logger.debug(
-            "Popped item %s from queue %s with priority %s",
-            p_item.id,
-            self.queue.pq_id,
-            p_item.priority,
-            p_item_id=p_item.id,
-            queue_id=self.queue.pq_id,
-            scheduler_id=self.scheduler_id,
-        )
+            self.post_pop(p_item)
 
         return p_item
 
