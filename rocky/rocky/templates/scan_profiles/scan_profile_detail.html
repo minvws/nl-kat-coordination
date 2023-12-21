@@ -40,6 +40,7 @@
                     </p>
                 {% elif ooi.scan_profile.scan_profile_type == "inherited" %}
                     {% include "partials/explanations.html" %}
+
                 {% endif %}
                 {% if user.acknowledged_clearance_level > -1 and organization_indemnification and user.trusted_clearance_level > -1 %}
                     <h2>{% translate "Set clearance level" %}:</h2>
