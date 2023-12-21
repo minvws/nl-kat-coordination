@@ -44,25 +44,27 @@
     </table>
 </div>
 {% for ip, findings in data.ips.items %}
-    <h5>{{ ip }}</h5>
-    <table>
-        <thead>
-            <tr>
-                <th>{% translate "Compliance issue" %}</th>
-                <th>{% translate "Risk level" %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for finding_type in findings %}
+    {% if findings %}
+        <h5>{{ ip }}</h5>
+        <table>
+            <thead>
                 <tr>
-                    <td>
-                        <span class="icon negative"></span>{{ finding_type.description }}
-                    </td>
-                    <td>
-                        <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
-                    </td>
+                    <th>{% translate "Compliance issue" %}</th>
+                    <th>{% translate "Risk level" %}</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for finding_type in findings %}
+                    <tr>
+                        <td>
+                            <span class="icon negative"></span>{{ finding_type.description }}
+                        </td>
+                        <td>
+                            <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
 {% endfor %}

@@ -20,7 +20,7 @@ class PrioritizedItem(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
     scheduler_id: Optional[str] = None
 
