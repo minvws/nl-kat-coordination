@@ -127,7 +127,10 @@ class Scheduler(abc.ABC):
             )
             return None
 
+        from_status = task.status
         task.status = models.TaskStatus.DISPATCHED
+
+        self.ctx.datastore.task_store.log_event(task.id, models.TaskEventType.STATUS_CHANGE, {"from_status": from_status, "to_status": task.status})
         self.ctx.datastores.task_store.update_task(task)
 
         return None

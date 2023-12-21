@@ -7,9 +7,11 @@ import mmh3
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Column, DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
+from sqlalchemy.sql.schema import ForeignKey
 
 from scheduler.utils import GUID
 
@@ -44,6 +46,38 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
+class TaskEventType(str, enum.Enum):
+    STATUS_CHANGE = "status_change"
+
+
+class TaskEvent(BaseModel):
+    """TaskEvent represent an event that happened to a Task."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    task_id: uuid.UUID
+    event_type: str
+    event_data: dict
+
+
+class TaskEventDB(Base):
+    __tablename__ = "task_events"
+
+    id = Column(GUID, primary_key=True)
+
+    task_id = Column(GUID, ForeignKey("tasks.id"), nullable=False)
+    task = relationship("TaskDB", back_populates="events")
+
+    event_type = Column(String, nullable=False)
+    event_data = Column(JSONB, nullable=False)
+
+    timestamp = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+
 class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -57,12 +91,17 @@ class Task(BaseModel):
 
     status: TaskStatus
 
+    events: List[TaskEvent] = []
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __repr__(self):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
+
+    def model_dump_db(self):
+        return self.model_dump(exclude={"events"})
 
 
 class TaskDB(Base):
@@ -81,6 +120,8 @@ class TaskDB(Base):
         nullable=False,
         default=TaskStatus.PENDING,
     )
+
+    events = relationship("TaskEventDB", back_populates="task", cascade="all, delete-orphan", uselist=True)
 
     created_at = Column(
         DateTime(timezone=True),
@@ -104,12 +145,13 @@ class TaskDB(Base):
     )
 
 
+
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
     type: ClassVar[str] = "normalizer"
 
-    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     normalizer: Normalizer
     raw_data: RawData
 
@@ -128,7 +170,7 @@ class BoefjeTask(BaseModel):
 
     type: ClassVar[str] = "boefje"
 
-    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     boefje: Boefje
     input_ooi: Optional[str]
     organization: str
