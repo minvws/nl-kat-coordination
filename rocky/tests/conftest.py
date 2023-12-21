@@ -2,6 +2,9 @@ import binascii
 import io
 import json
 import logging
+import uuid
+from datetime import datetime, timezone
+from ipaddress import ip_address
 from os import urandom
 from pathlib import Path
 from typing import Dict
@@ -17,6 +20,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
 from requests import Response
+from requests.adapters import HTTPAdapter
 from tools.models import (
     GROUP_ADMIN,
     GROUP_CLIENT,
@@ -25,10 +29,18 @@ from tools.models import (
     Organization,
     OrganizationMember,
 )
+from urllib3 import Retry
 
+from octopoes.api.models import Declaration, Observation
+from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
+from octopoes.models.ooi.certificate import X509Certificate
+from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
-from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
+from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.software import Software, SoftwareInstance
+from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, SecurityTXT, Website
 from rocky.scheduler import Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
@@ -609,3 +621,131 @@ def mock_scheduler_client_task_list(mocker):
     mock_scheduler_client_session.get.return_value = response
 
     return mock_scheduler_client_session
+
+
+@pytest.fixture
+def valid_time():
+    return datetime.now(timezone.utc)
+
+
+@pytest.fixture
+def octopoes_api_connector(request) -> OctopoesAPIConnector:
+    test_node = f"test-{request.node.originalname}"
+
+    connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
+    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
+
+    connector.create_node()
+    yield connector
+    connector.delete_node()
+
+
+def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
+    network = Network(name="test")
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
+
+    hostnames = [
+        Hostname(network=network.reference, name="example.com"),
+        Hostname(network=network.reference, name="a.example.com"),
+        Hostname(network=network.reference, name="b.example.com"),
+        Hostname(network=network.reference, name="c.example.com"),
+        Hostname(network=network.reference, name="d.example.com"),
+        Hostname(network=network.reference, name="e.example.com"),
+        Hostname(network=network.reference, name="f.example.com"),
+    ]
+
+    addresses = [
+        IPAddressV4(network=network.reference, address=ip_address("192.0.2.3")),
+        IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230")),
+    ]
+    ports = [
+        IPPort(address=addresses[0].reference, protocol="tcp", port=25),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=443),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=22),
+        IPPort(address=addresses[1].reference, protocol="tcp", port=80),
+    ]
+    services = [Service(name="smtp"), Service(name="https"), Service(name="http"), Service(name="ssh")]
+    ip_services = [
+        IPService(ip_port=ports[0].reference, service=services[0].reference),
+        IPService(ip_port=ports[1].reference, service=services[1].reference),
+        IPService(ip_port=ports[2].reference, service=services[3].reference),
+        IPService(ip_port=ports[3].reference, service=services[2].reference),
+    ]
+
+    resolved_hostnames = [
+        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[0].reference),  # ipv4
+        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[1].reference),  # ipv6
+        ResolvedHostname(hostname=hostnames[1].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[2].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[5].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[1].reference),
+        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[1].reference),
+        ResolvedHostname(hostname=hostnames[6].reference, address=addresses[1].reference),
+    ]
+    certificates = [
+        X509Certificate(
+            subject="example.com",
+            valid_from="2022-11-15T08:52:57",
+            valid_until="2030-11-15T08:52:57",
+            serial_number="abc123",
+        )
+    ]
+    websites = [
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[0].reference, certificates=certificates[0]),
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[1].reference),
+    ]
+    software = [Software(name="DICOM")]
+    instance = [SoftwareInstance(ooi=ports[0].reference, software=software[0].reference)]
+
+    web_urls = [
+        HostnameHTTPURL(netloc=hostnames[0].reference, path="/", scheme="http", network=network.reference, port=80),
+        HostnameHTTPURL(netloc=hostnames[0].reference, path="/", scheme="https", network=network.reference, port=443),
+    ]
+    urls = [URL(network=network.reference, raw="https://test.com/security", web_url=web_urls[1].reference)]
+    resources = [
+        HTTPResource(website=websites[0].reference, web_url=web_urls[0].reference),
+        HTTPResource(website=websites[0].reference, web_url=web_urls[1].reference),
+    ]
+    headers = [HTTPHeader(resource=resources[1].reference, key="test key", value="test value")]
+    security_txts = [SecurityTXT(website=websites[1].reference, url=urls[0].reference, security_txt="test text")]
+    finding_types = [
+        KATFindingType(id="KAT-NO-CSP"),
+        KATFindingType(id="KAT-CSP-VULNERABILITIES"),
+        KATFindingType(id="KAT-NO-HTTPS-REDIRECT"),
+        KATFindingType(id="KAT-NO-CERTIFICATE"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRED"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
+    ]
+    findings = [
+        Finding(finding_type=finding_types[0].reference, ooi=resources[0].reference),
+        Finding(finding_type=finding_types[2].reference, ooi=web_urls[0].reference),
+        Finding(finding_type=finding_types[3].reference, ooi=websites[1].reference),
+        Finding(finding_type=finding_types[4].reference, ooi=certificates[0].reference),
+    ]
+
+    oois = (
+        hostnames
+        + addresses
+        + ports
+        + services
+        + ip_services
+        + resolved_hostnames
+        + websites
+        + software
+        + instance
+        + web_urls
+        + resources
+        + headers
+        + finding_types
+        + findings
+        + urls
+        + security_txts
+        + certificates
+    )
+
+    octopoes_api_connector.save_observation(
+        Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
+    )
+    octopoes_api_connector.recalculate_bits()
