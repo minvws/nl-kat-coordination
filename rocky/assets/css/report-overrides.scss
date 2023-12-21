@@ -1,0 +1,48 @@
+:root {
+  --text-set-font-size: 9pt;
+  --body-text-large-font-size: 11pt;
+  --heading-xxl-font-size: 20pt;
+  --heading-xl-font-size: 16pt;
+  --heading-large-font-size: 14pt;
+  --table-font-size: 8pt;
+  --table-head-cell-font-size: 8pt;
+}
+
+body > main > section.dividing-line {
+  border-top: 0;
+}
+
+/* Weasyprint flexbox rendering is very limited and not really usable.
+   https://github.com/Kozea/WeasyPrint/issues/1171#issuecomment-1549483312 */
+main section {
+  display: inline;
+}
+
+main section div {
+  display: inline;
+}
+
+body > main {
+  display: inline;
+}
+
+.centered {
+  display: block;
+  text-align: center;
+}
+
+/* There is a bug in weasyprint that parses the border-width with multiple
+   values wrong when using CSS variables, so we have to specify them here
+   without variables . */
+table td {
+  border-width: 0 0 1px;
+}
+
+table thead {
+  border-width: 0 0 2px;
+}
+
+table tr:first-of-type td,
+table tr:last-of-type td {
+  border-width: 0 0 1px;
+}

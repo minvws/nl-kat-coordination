@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 from octopoes.models import OOI
 from tools.forms.base import (
     BaseRockyForm,
-    CheckboxGroup,
     CheckboxTable,
     LabeledCheckboxInput,
     ObservedAtForm,
@@ -32,7 +31,7 @@ class OOIReportSettingsForm(ObservedAtForm):
 class OoiTreeSettingsForm(OOIReportSettingsForm):
     ooi_type = forms.MultipleChoiceField(
         label=_("Filter types"),
-        widget=CheckboxGroup(toggle_all_button=True),
+        widget=forms.CheckboxSelectMultiple(),
         required=False,
     )
 
@@ -44,8 +43,7 @@ class OoiTreeSettingsForm(OOIReportSettingsForm):
         if not ooi_types:
             self.fields.pop("ooi_type", None)
             return
-
-        ooi_types_choices = [(type_, _(type_)) for type_ in ooi_types]
+        ooi_types_choices = [(type_, type_) for type_ in ooi_types]
         self.set_choices_for_field("ooi_type", ooi_types_choices)
 
 

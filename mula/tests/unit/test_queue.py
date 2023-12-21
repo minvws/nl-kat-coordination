@@ -4,7 +4,6 @@ import threading
 import time
 import unittest
 import uuid
-from typing import Optional
 from unittest import mock
 
 from scheduler import config, models, queues, storage
@@ -16,11 +15,15 @@ from tests.utils import functions
 class PriorityQueueTestCase(unittest.TestCase):
     def setUp(self) -> None:
         cfg = config.settings.Settings()
+
+        # Database
         self.dbconn = storage.DBConn(str(cfg.db_uri))
+        models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
         self.pq_store = storage.PriorityQueueStore(self.dbconn)
 
+        # Priority Queue
         self.pq = mock_queue.MockPriorityQueue(
             pq_id="test",
             maxsize=10,
@@ -32,6 +35,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
     def tearDown(self) -> None:
         models.Base.metadata.drop_all(self.dbconn.engine)
+        self.dbconn.engine.dispose()
 
     def _check_queue_empty(self):
         self.assertEqual(0, self.pq.qsize())
@@ -392,11 +396,11 @@ class PriorityQueueTestCase(unittest.TestCase):
                 event.set()
                 time.sleep(5)
 
-                self.pq.remove(item)
+                self.pq_store.remove(self.pq.pq_id, item.id)
 
                 queue.put(item)
 
-        def second_pop(event) -> Optional[models.PrioritizedItem]:
+        def second_pop(event):
             # Wait for thread 1 to set the event before continuing
             event.wait()
 
@@ -441,11 +445,11 @@ class PriorityQueueTestCase(unittest.TestCase):
             event.set()
             time.sleep(5)
 
-            self.pq.remove(item)
+            self.pq_store.remove(self.pq.pq_id, item.id)
 
             queue.put(item)
 
-        def second_pop(event) -> Optional[models.PrioritizedItem]:
+        def second_pop(event):
             # Wait for thread 1 to set the event before continuing
             event.wait()
 

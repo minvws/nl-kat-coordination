@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains
-from requests import RequestException
+from requests import RequestException, Response
 from tools.models import DENY_ORGANIZATION_CODES, Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
@@ -103,8 +103,9 @@ def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
 
 def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker, mock_models_octopoes):
     mock_requests = mocker.patch("katalogus.client.requests")
-    mock_health_response = mocker.MagicMock()
-    mock_health_response.json.return_value = {"service": "test", "healthy": True}
+    mock_health_response = Response()
+    mock_health_response.status_code = 200
+    mock_health_response._content = b'{"service": "test", "healthy": true}'
 
     mock_organization_exists_response = mocker.MagicMock()
     mock_organization_exists_response.status_code = 404
@@ -128,9 +129,10 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
 
 def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
     mock_requests = mocker.patch("katalogus.client.requests")
-    mock_response = mocker.MagicMock()
+    mock_response = Response()
+    mock_response.status_code = 200
+    mock_response._content = b'{"service": "test", "healthy": false}'
     mock_requests.Session().get.return_value = mock_response
-    mock_response.json.return_value = {"service": "test", "healthy": False}
 
     request = setup_request(
         rf.post(

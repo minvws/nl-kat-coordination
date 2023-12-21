@@ -1,6 +1,5 @@
 from logging import getLogger
 from typing import List, Optional, Union
-from uuid import uuid4
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -86,11 +85,9 @@ class NormalizerMixin(OctopoesView):
     """
 
     def run_normalizer(self, normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
-        normalizer_task = NormalizerTask(
-            id=uuid4(), normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data
-        )
+        normalizer_task = NormalizerTask(normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data)
 
-        task = QueuePrioritizedItem(id=normalizer_task.id, priority=1, data=normalizer_task)
+        task = QueuePrioritizedItem(priority=1, data=normalizer_task)
 
         schedule_task(self.request, self.organization.code, task)
 
@@ -103,13 +100,12 @@ class BoefjeMixin(OctopoesView):
 
     def run_boefje(self, katalogus_boefje: KATalogusBoefje, ooi: Optional[OOI]) -> None:
         boefje_task = BoefjeTask(
-            id=uuid4().hex,
-            boefje=Boefje.parse_obj(katalogus_boefje.dict()),
+            boefje=Boefje.model_validate(katalogus_boefje.model_dump()),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )
 
-        task = QueuePrioritizedItem(id=boefje_task.id, priority=1, data=boefje_task)
+        task = QueuePrioritizedItem(priority=1, data=boefje_task)
         schedule_task(self.request, self.organization.code, task)
 
     def run_boefje_for_oois(

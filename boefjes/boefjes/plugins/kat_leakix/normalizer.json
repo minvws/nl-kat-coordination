@@ -1,7 +1,7 @@
 {
     "id": "kat_leakix_normalize",
     "consumes": [
-        "leakix"
+        "boefje/leakix"
     ],
     "produces": [
         "KATFindingType",

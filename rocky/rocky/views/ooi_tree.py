@@ -1,13 +1,8 @@
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
-from fmea.models import DEPARTMENTS
 from tools.forms.ooi import OoiTreeSettingsForm
-from tools.ooi_helpers import (
-    create_object_tree_item_from_ref,
-    filter_ooi_tree,
-    get_ooi_types_from_tree,
-)
+from tools.ooi_helpers import create_object_tree_item_from_ref, filter_ooi_tree, get_ooi_types_from_tree
 from tools.view_helpers import Breadcrumb, get_ooi_url
 
 from rocky.views.ooi_view import BaseOOIDetailView
@@ -26,15 +21,16 @@ class OOITreeView(BaseOOIDetailView):
 
     def get_connector_form_kwargs(self):
         tree_dict = self.get_tree_dict()
-        ooi_types = get_ooi_types_from_tree(tree_dict, False)
+
+        ooi_types = get_ooi_types_from_tree(tree_dict, True)
 
         kwargs = {
-            "initial": {"ooi_type": ooi_types},
             "ooi_types": ooi_types,
         }
 
         if "observed_at" in self.request.GET:
             kwargs.update({"data": self.request.GET})
+
         return kwargs
 
     def build_breadcrumbs(self) -> List[Breadcrumb]:
@@ -57,10 +53,6 @@ class OOITreeView(BaseOOIDetailView):
 
         return context
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.depth = self.get_depth()
-
 
 class OOISummaryView(OOITreeView):
     template_name = "oois/ooi_summary.html"
@@ -77,7 +69,6 @@ class OOIGraphView(OOITreeView):
 
     def get_filtered_tree(self, tree_dict):
         filtered_tree = super().get_filtered_tree(tree_dict)
-
         return hydrate_tree(filtered_tree, self.organization.code)
 
     def get_last_breadcrumb(self):
@@ -85,11 +76,6 @@ class OOIGraphView(OOITreeView):
             "url": get_ooi_url("ooi_graph", self.ooi.primary_key, self.organization.code),
             "text": _("Graph Visualisation"),
         }
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["departments"] = DEPARTMENTS
-        return context
 
 
 def hydrate_tree(tree, organization_code: str):

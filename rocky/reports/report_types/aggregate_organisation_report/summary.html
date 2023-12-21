@@ -1,0 +1,18 @@
+{% load i18n %}
+{% load static %}
+
+<section id="summary">
+    <div>
+        <h2>{% translate "Summary" %}</h2>
+        <dl>
+            {% for key, value in data.items %}
+                <div>
+                    <dt>{{ key }}</dt>
+                    <dd>
+                        {{ value }}
+                    </dd>
+                </div>
+            {% endfor %}
+        </dl>
+    </div>
+</section>

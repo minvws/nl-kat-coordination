@@ -11,9 +11,9 @@ from octopoes.models.persistence import ReferenceField
 class DNSSPFRecord(OOI):
     object_type: Literal["DNSSPFRecord"] = "DNSSPFRecord"
     value: str
-    ttl: Optional[int]
-    all: Optional[str]
-    exp: Optional[str]
+    ttl: Optional[int] = None
+    all: Optional[str] = None
+    exp: Optional[str] = None
     dns_txt_record: Reference = ReferenceField(DNSTXTRecord, max_inherit_scan_level=1)
 
     _natural_key_attrs = ["dns_txt_record", "value"]

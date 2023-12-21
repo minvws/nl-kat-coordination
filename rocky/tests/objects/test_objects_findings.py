@@ -61,7 +61,7 @@ MUTED_FINDING_TREE_DATA = {
 
 
 def test_ooi_finding_list(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     request = setup_request(rf.get("ooi_findings", {"ooi_id": "Network|testnetwork"}), client_member.user)
     response = OOIFindingListView.as_view()(request, organization_code=client_member.organization.code)
@@ -74,7 +74,7 @@ def test_ooi_finding_list(rf, client_member, mock_organization_view_octopoes):
 @pytest.mark.parametrize("member", ["superuser_member", "redteam_member"])
 def test_mute_finding_button_is_visible(request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker):
     mocker.patch("katalogus.client.KATalogusClientV1")
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     member = request.getfixturevalue(member)
 
@@ -92,7 +92,7 @@ def test_mute_finding_button_is_not_visible_without_perms(
     request, member, rf, mock_organization_view_octopoes, mock_scheduler, mocker
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(TREE_DATA)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
     member = request.getfixturevalue(member)
 
@@ -168,7 +168,7 @@ def test_mute_finding_post(
     mocker.patch("katalogus.client.KATalogusClientV1")
     resulted_request = setup_request(rf.get(response.url), redteam_member.user)
 
-    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.parse_obj(MUTED_FINDING_TREE_DATA)
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(MUTED_FINDING_TREE_DATA)
     mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     resulted_response = OOIDetailView.as_view()(resulted_request, organization_code=redteam_member.organization.code)

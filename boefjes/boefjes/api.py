@@ -6,7 +6,7 @@ from enum import Enum
 from typing import List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Response
-from pydantic import BaseModel, Extra, Field
+from pydantic import BaseModel, ConfigDict, Field
 from requests import HTTPError
 from uvicorn import Config, Server
 
@@ -21,7 +21,7 @@ from boefjes.job_handler import (
 )
 from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
-from boefjes.plugins.models import _default_meta_mime_types
+from boefjes.plugins.models import _default_mime_types
 from octopoes.models import Reference
 
 app = FastAPI(title="Boefje API")
@@ -52,9 +52,7 @@ class BoefjeInput(BaseModel):
     task_id: str
     output_url: str
     boefje_meta: BoefjeMeta
-
-    class Config:
-        extra = Extra.forbid
+    model_config = ConfigDict(extra="forbid")
 
 
 class StatusEnum(str, Enum):
@@ -63,18 +61,18 @@ class StatusEnum(str, Enum):
 
 
 class File(BaseModel):
-    name: Optional[str]
+    name: Optional[str] = None
     content: str = Field(..., contentEncoding="base64")
-    tags: Optional[List[str]]
+    tags: Optional[List[str]] = None
 
 
 class BoefjeOutput(BaseModel):
     status: StatusEnum
-    files: Optional[List[File]]
+    files: Optional[List[File]] = None
 
 
 def get_scheduler_client():
-    return SchedulerAPIClient(settings.scheduler_api)
+    return SchedulerAPIClient(str(settings.scheduler_api))
 
 
 def get_bytes_client():
@@ -103,7 +101,7 @@ async def boefje_input(
 
     boefje_meta = create_boefje_meta(task, local_repository)
 
-    output_url = settings.boefje_api + "/api/v0/tasks/" + task_id
+    output_url = str(settings.boefje_api).rstrip("/") + f"/api/v0/tasks/{task_id}"
     return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=boefje_meta)
 
 
@@ -128,7 +126,7 @@ async def boefje_output(
     bytes_client.save_boefje_meta(boefje_meta)
 
     if boefje_output.files:
-        mime_types = _default_meta_mime_types(task.p_item.data)
+        mime_types = _default_mime_types(task.p_item.data.boefje)
         for file in boefje_output.files:
             raw = base64.b64decode(file.content)
             # when supported, also save file.name to Bytes

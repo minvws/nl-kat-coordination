@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from ipaddress import ip_address
 from typing import List
 
@@ -33,7 +33,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
             valid_time=valid_time,
         )
     )
-    hostnames: List[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
+    hostnames = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
     task_id = uuid.uuid4()
 
     octopoes_api_connector.save_observation(
@@ -70,6 +70,45 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
     # Delete even-numbered test hostnames
     octopoes_api_connector.delete_many([Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)])
     assert octopoes_api_connector.list(types={Network, Hostname}).count == 6
+
+
+def test_history(octopoes_api_connector: OctopoesAPIConnector):
+    network = Network(name="test")
+    first_seen = datetime(year=2020, month=10, day=10, tzinfo=timezone.utc)  # XTDB only returns a precision of seconds
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=network,
+            valid_time=first_seen,
+        )
+    )
+    octopoes_api_connector.delete(network.reference, datetime(year=2020, month=10, day=11, tzinfo=timezone.utc))
+    last_seen = datetime(year=2020, month=10, day=12, tzinfo=timezone.utc)
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=network,
+            valid_time=last_seen,
+        )
+    )
+
+    history = octopoes_api_connector.get_history(network.reference, with_docs=True)
+    assert len(history) == 3
+    assert history[0].document is not None
+    assert history[1].document is None
+    assert history[2].document is not None
+
+    assert len(octopoes_api_connector.get_history(network.reference, has_doc=False)) == 1
+
+    with_doc = octopoes_api_connector.get_history(network.reference, has_doc=True)
+    assert len(with_doc) == 2
+    assert not all([x.document for x in with_doc])
+
+    assert len(octopoes_api_connector.get_history(network.reference, offset=1)) == 2
+    assert len(octopoes_api_connector.get_history(network.reference, limit=2)) == 2
+
+    first_and_last = octopoes_api_connector.get_history(network.reference, has_doc=True, indices=[1, -1])
+    assert len(first_and_last) == 2
+    assert first_and_last[0].valid_time == first_seen
+    assert first_and_last[1].valid_time == last_seen
 
 
 def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):

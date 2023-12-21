@@ -203,6 +203,7 @@ class Server:
             path="/queues/{queue_id}/push",
             endpoint=self.push_queue,
             methods=["POST"],
+            response_model=Optional[models.PrioritizedItem],
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
@@ -523,7 +524,7 @@ class Server:
 
         return models.PrioritizedItem(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.PrioritizedItem) -> Any:
+    def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -532,15 +533,23 @@ class Server:
             )
 
         try:
-            p_item = models.PrioritizedItem(**item.model_dump())
+            # Load default values
+            p_item = models.PrioritizedItem()
+
+            # Set values
             if p_item.scheduler_id is None:
                 p_item.scheduler_id = s.scheduler_id
 
+            p_item.priority = item.priority
+
             if s.queue.item_type == models.BoefjeTask:
-                p_item.data = models.BoefjeTask(**p_item.data).dict()
+                p_item.data = models.BoefjeTask(**item.data).dict()
             elif s.queue.item_type == models.NormalizerTask:
-                p_item.data = models.NormalizerTask(**p_item.data).dict()
+                p_item.data = models.NormalizerTask(**item.data).dict()
+            else:
+                p_item.data = item.data
         except Exception as exc:
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=str(exc),
@@ -565,7 +574,7 @@ class Server:
                 detail=str(exc_not_allowed),
             ) from exc_not_allowed
 
-        return models.PrioritizedItem(**p_item.model_dump())
+        return p_item
 
     def run(self) -> None:
         uvicorn.run(

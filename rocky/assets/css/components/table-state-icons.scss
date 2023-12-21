@@ -27,6 +27,13 @@ table td .icon {
     }
   }
 
+  &.incomplete {
+    &::before {
+      content: "\ea6a"; // $ti-icon-circle-x
+      color: var(--colors-grey-11);
+    }
+  }
+
   &.running {
     &::before {
       content: "\ed27"; // $ti-icon-circle-dashed (should become ti-icon-progress, when we have it)

@@ -9,8 +9,8 @@
 
   /* Active tab */
   --tabs-item-active-text-color: var(--application-base-text-color);
-  --tabs-item-active-border-color: var(--kat-purrple-6);
-  --tabs-item-active-hover-border-color: var(--kat-purrple-6);
+  --tabs-item-active-border-color: var(--colors-purrple-6);
+  --tabs-item-active-hover-border-color: var(--colors-purrple-6);
   --tabs-item-active-hover-text-color: var(--application-base-text-color);
   --tabs-item-active-border-width: 0 0 4px 0;
 
@@ -22,5 +22,5 @@
 .tabs ul li > a:focus,
 ul.tabs li > a:focus {
   border: 0 0 4px 0;
-  border-color: var(--kat-purrple-6);
+  border-color: var(--colors-purrple-6);
 }

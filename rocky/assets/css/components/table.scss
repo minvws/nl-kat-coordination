@@ -1,5 +1,9 @@
 td,
 tr {
+  .icon {
+    margin-right: 0.5rem;
+  }
+
   &.confirmation {
     background-color: var(--notification-confirmation-background-color);
     border-width: var(--notification-confirmation-border-width);
