@@ -22,6 +22,19 @@ class TestModel(pydantic.BaseModel):
             self.categories = []
 
 
+def create_p_item_request(priority: int, data: Optional[TestModel] = None) -> models.PrioritizedItemRequest:
+    if data is None:
+        data = TestModel(
+            id=uuid.uuid4().hex,
+            name=uuid.uuid4().hex,
+        )
+
+    return models.PrioritizedItemRequest(
+        priority=priority,
+        data=data.model_dump(),
+    )
+
+
 def create_p_item(scheduler_id: str, priority: int, data: Optional[TestModel] = None) -> models.PrioritizedItem:
     if data is None:
         data = TestModel(
