@@ -709,7 +709,10 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         HTTPResource(website=websites[0].reference, web_url=web_urls[1].reference),
     ]
     headers = [HTTPHeader(resource=resources[1].reference, key="test key", value="test value")]
-    security_txts = [SecurityTXT(website=websites[1].reference, url=urls[0].reference, security_txt="test text")]
+    security_txts = [
+        SecurityTXT(website=websites[0].reference, url=urls[0].reference, security_txt="test text"),
+        SecurityTXT(website=websites[1].reference, url=urls[0].reference, security_txt="test text"),
+    ]
     finding_types = [
         KATFindingType(id="KAT-NO-CSP"),
         KATFindingType(id="KAT-CSP-VULNERABILITIES"),

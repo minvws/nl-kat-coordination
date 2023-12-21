@@ -35,12 +35,14 @@ test:
 	python3 manage.py test
 
 utest: ## Run the integration tests.
-	docker-compose -f base.yml  -f .ci/docker-compose.yml down
+	docker-compose -f base.yml  -f .ci/docker-compose.yml kill
+	docker-compose -f base.yml  -f .ci/docker-compose.yml down --remove-orphans
 	docker-compose -f base.yml -f .ci/docker-compose.yml build
 	docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_tests
 
 itest: ## Run the integration tests.
-	docker-compose -f base.yml  -f .ci/docker-compose.yml down
+	docker-compose -f base.yml  -f .ci/docker-compose.yml kill
+	docker-compose -f base.yml  -f .ci/docker-compose.yml down --remove-orphans
 	docker-compose -f base.yml -f .ci/docker-compose.yml build
 	docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration_tests
 

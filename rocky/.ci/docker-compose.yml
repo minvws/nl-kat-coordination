@@ -7,6 +7,7 @@ services:
       dockerfile: rocky/Dockerfile
       args:
         ENVIRONMENT: dev
+      target: dev
     command: bash /app/run_rocky.sh
     depends_on:
       - ci_rocky-db
@@ -23,6 +24,7 @@ services:
       dockerfile: rocky/Dockerfile
       args:
         ENVIRONMENT: dev
+      target: dev
     command: python -m pytest tests/integration
     depends_on:
       - ci_rocky-db
