@@ -5,7 +5,7 @@ from reports.report_types.web_system_report.report import WebSystemReport
 from tests.conftest import seed_system
 
 
-def test_account_detail_perms(octopoes_api_connector, valid_time):
+def test_web_report(octopoes_api_connector, valid_time):
     seed_system(octopoes_api_connector, valid_time)
 
     report = WebSystemReport(octopoes_api_connector)
