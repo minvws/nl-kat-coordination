@@ -36,16 +36,12 @@ test:
 
 utest: ## Run the integration tests.
 	docker-compose -f base.yml  -f .ci/docker-compose.yml down
-ifneq ($(build),)
 	docker-compose -f base.yml -f .ci/docker-compose.yml build
-endif
 	docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_tests
 
 itest: ## Run the integration tests.
 	docker-compose -f base.yml  -f .ci/docker-compose.yml down
-ifneq ($(build),)
 	docker-compose -f base.yml -f .ci/docker-compose.yml build
-endif
 	docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration_tests
 
 export_migrations:
