@@ -156,7 +156,7 @@ class OOIDetailView(
             context["enabled_boefjes_available"] = True
 
         max_level = self.organization_member.acknowledged_clearance_level
-        if filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
+        if self.ooi.scan_profile and filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
             max_level = min(max_level, self.ooi.scan_profile.level)
 
         context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
