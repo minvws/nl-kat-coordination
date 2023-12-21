@@ -148,22 +148,18 @@ class OOIDetailView(
         filter_form = PossibleBoefjesFilterForm(self.request.GET)
 
         # List from katalogus
-        boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
+        boefjes = []
+        if self.get_organization_indemnification():
+            boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
 
         if boefjes:
             context["enabled_boefjes_available"] = True
 
-        # Filter boefjes on scan level <= OOI clearance level when not "show all"
-        # or when not "acknowledged clearance level > 0"
+        max_level = self.organization_member.acknowledged_clearance_level
+        if filter_form.is_valid() and not filter_form.cleaned_data["show_all"]: 
+            max_level = min(max_level, self.ooi.scan_profile.level)        
 
-        if (
-            (filter_form.is_valid() and not filter_form.cleaned_data["show_all"])
-            or self.organization_member.acknowledged_clearance_level <= 0
-            or self.get_organization_indemnification()
-        ):
-            boefjes = [boefje for boefje in boefjes if boefje.scan_level.value <= self.ooi.scan_profile.level]
-
-        context["boefjes"] = boefjes
+        context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
         context["ooi"] = self.ooi
 
         declarations, observations, inferences = self.get_origins(
