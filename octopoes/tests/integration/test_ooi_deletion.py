@@ -11,7 +11,7 @@ from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.service import OctopoesService
 from octopoes.events.events import OOIDBEvent, OriginDBEvent
-from octopoes.models import ScanLevel
+from octopoes.models import OOI, ScanLevel
 from octopoes.models.ooi.dns.records import NXDOMAIN
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
@@ -34,8 +34,8 @@ def printer(arg1, arg2):
 def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="internet")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time, level=ScanLevel.L2))
-    dns = "mispo.es"
-    hostname = Hostname(network=network.reference, name=dns)
+    url = "mispo.es"
+    hostname = Hostname(network=network.reference, name=url)
     octopoes_api_connector.save_declaration(Declaration(ooi=hostname, valid_time=valid_time, level=ScanLevel.L2))
 
     original_size = len(octopoes_api_connector.list_origins(task_id={}))
@@ -136,7 +136,49 @@ def test_events_created_in_worker_during_handling(
 
     assert len(event_manager.queue) == 6  # Handling OOI delete event triggers Origin delete event
 
-    event = event_manager.queue[5]  # OOIDelete event
+    event = event_manager.queue[5]  # OOID]elete event
 
     assert isinstance(event, OriginDBEvent)
     assert event.operation_type.value == "delete"
+
+
+def test_events_deletion_after_bits(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    network = Network(name="internet")
+
+    origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=network.reference,
+        result=[network.reference],
+        task_id=str(uuid.uuid4()),
+    )
+
+    url = "mispo.es"
+    hostname = Hostname(network=network.reference, name=url)
+
+    xtdb_octopoes_service.save_origin(origin, [network], valid_time)
+    xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
+    print(1)
+    print(f"PROCESSED {event_manager.complete_process_events(xtdb_octopoes_service)}")
+    printer("OOIS", xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).items)
+    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list(valid_time))
+    printer("EVENTS", event_manager.queue)
+
+    xtdb_octopoes_service.recalculate_bits()
+
+    print(2)
+    print(f"PROCESSED {event_manager.complete_process_events(xtdb_octopoes_service)}")
+    printer("OOIS", xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).items)
+    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list(valid_time))
+    printer("EVENTS", event_manager.queue)
+
+    xtdb_octopoes_service.ooi_repository.delete(network.reference, valid_time)
+    xtdb_octopoes_service.ooi_repository.delete(hostname.reference, valid_time)
+
+    print(3)
+    print(f"PROCESSED {event_manager.complete_process_events(xtdb_octopoes_service)}")
+    printer("OOIS", xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).items)
+    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list(valid_time))
+    printer("EVENTS", event_manager.queue)
+
+    print(f"TOTAL PROCESSED {event_manager.processed}")

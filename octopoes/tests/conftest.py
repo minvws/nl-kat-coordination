@@ -255,9 +255,32 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
 class MockEventManager:
     def __init__(self):
         self.queue = []
+        self.processed = 0
 
     def publish(self, event) -> None:
         self.queue.append(event)
+
+    def unprocessed(self) -> list:
+        retval = self.queue[self.processed :]
+        self.processed = len(self.queue)
+        return retval
+
+    def process_events(self, xtdb_octopoes_service: OctopoesService) -> int:
+        targets = self.unprocessed()
+        for event in targets:
+            xtdb_octopoes_service.process_event(event)
+        xtdb_octopoes_service.commit()
+        return len(targets)
+
+    def complete_process_events(self, xtdb_octopoes_service: OctopoesService, repeat: int = 3) -> int:
+        retval = 0
+        for _ in range(repeat):
+            while True:
+                val = self.process_events(xtdb_octopoes_service)
+                if val == 0:
+                    break
+                retval += val
+        return retval
 
 
 @pytest.fixture
