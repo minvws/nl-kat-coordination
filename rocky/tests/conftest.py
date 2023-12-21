@@ -718,12 +718,6 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         KATFindingType(id="KAT-CERTIFICATE-EXPIRED"),
         KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
     ]
-    findings = [
-        Finding(finding_type=finding_types[0].reference, ooi=resources[0].reference),
-        Finding(finding_type=finding_types[2].reference, ooi=web_urls[0].reference),
-        Finding(finding_type=finding_types[3].reference, ooi=websites[1].reference),
-        Finding(finding_type=finding_types[4].reference, ooi=certificates[0].reference),
-    ]
 
     oois = (
         hostnames
@@ -739,7 +733,6 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         + resources
         + headers
         + finding_types
-        + findings
         + urls
         + security_txts
         + certificates
