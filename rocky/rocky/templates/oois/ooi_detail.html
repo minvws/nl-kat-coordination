@@ -46,7 +46,7 @@
                     <div class="horizontal-view">
                         <div>
                             {% if member.acknowledged_clearance_level > 0 and organization_indemnification %}
-                                <form method="get" class="inline">
+                                <form id="show_all_boefjes" method="get" action="#show_all_boefjes" class="inline">
                                     <input type="hidden" name="ooi_id" value="{{ ooi }}">
                                     {% include "partials/form/form_errors.html" with form=possible_boefjes_filter_form %}
 
