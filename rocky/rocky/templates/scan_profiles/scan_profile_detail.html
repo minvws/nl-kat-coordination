@@ -12,12 +12,12 @@
                 {% include "partials/ooi_head.html" with ooi=ooi view="scan_profile_detail" %}
 
                 <h1 rf-selector="clearance-header">
-                    {% translate "Clearance level" %}: {{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}
+                    {% translate "Clearance level" %}:
                 </h1>
+                    <p>{{ ooi.scan_profile.human_readable }}, {{ ooi.scan_profile.scan_profile_type }}</p>
                 {% if ooi.scan_profile.scan_profile_type == "declared" %}
-                    <h2>{% translate "Declared" %}</h2>
                     <p class="explanation">
-                        {% blocktranslate with scan_level=ooi.scan_profile.human_readable %}
+                        <span>{% translate "Declared" %}:</span>{% blocktranslate with scan_level=ooi.scan_profile.human_readable %}
               This means that this object will be scanned by Boefjes with scan level
               {{ scan_level }} and lower. Setting the clearance level from “declared”
               to “inherit” means that this object will inherit its level from neighbouring
@@ -33,20 +33,21 @@
                         </div>
                     {% endif %}
                 {% elif ooi.scan_profile.scan_profile_type == "empty" %}
-                    <h2>{% translate "Empty" %}</h2>
                     <p class="explanation">
-                        {% blocktranslate %}
+                        <span>{% translate "Empty" %}:</span> {% blocktranslate %}
                 This object has a clearance level of "L0". This means that this object will not be scanned by any Boefje until that
                 Boefje is run manually for this object again. Objects with a clearance level higher than "L0" will be scanned automatically by Boefjes with
                 corresponding scan levels.
             {% endblocktranslate %}
                     </p>
                 {% elif ooi.scan_profile.scan_profile_type == "inherited" %}
-                    <h2>{% translate "Inherited" %}</h2>
+                    {% include "partials/explanations.html" %}
                 {% endif %}
                 {% if user.acknowledged_clearance_level > -1 and organization_indemnification and user.trusted_clearance_level > -1 %}
-                    <form novalidate
-                          action="{% ooi_url "scan_profile_detail" ooi.primary_key organization.code %}"
+                    <h2>{% translate "Set clearance level" %}:</h2>
+                    <form id="set_clearance_level"
+                          novalidate
+                          action="{% ooi_url "scan_profile_detail" ooi.primary_key organization.code %}#set_clearance_level"
                           method="post"
                           class="horizontal-view help">
                         {% csrf_token %}
