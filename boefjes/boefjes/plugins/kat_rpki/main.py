@@ -24,10 +24,10 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     ip = input_["address"]
     now = datetime.utcnow()
 
-    if not RPKI_META_PATH.exists() or not validate_age():
+    if not RPKI_PATH.exists() or not validate_age():
         rpki_json = refresh_rpki()
     else:
-        with RPKI_META_PATH.open() as json_file:
+        with RPKI_PATH.open() as json_file:
             rpki_json = json.load(json_file)
 
     exists = False
