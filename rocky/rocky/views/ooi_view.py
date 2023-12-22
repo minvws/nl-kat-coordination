@@ -65,6 +65,7 @@ class BaseOOIListView(ConnectorFormMixin, OctopoesView, ListView):
         if not (self.filtered_ooi_types or self.clearance_level or self.clearance_type):
             return self.object_list
 
+        # A filtered OOI list
         return OOIList(
             self.octopoes_api_connector,
             ooi_types=self.get_ooi_types(),
@@ -90,6 +91,7 @@ class BaseOOIListView(ConnectorFormMixin, OctopoesView, ListView):
         context["observed_at"] = self.get_observed_at()
         context["total_oois"] = self.total_oois
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
+        context["active_filters"] = self.get_active_filters()
         return context
 
 
