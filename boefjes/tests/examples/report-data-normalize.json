@@ -1,0 +1,28 @@
+{
+    "id": "f50de284-d3c1-4f87-ba68-07b957b7a48f",
+    "raw_data": {
+        "id": "61962aee-e782-4632-b606-c51c559f425b",
+        "boefje_meta": {
+            "id": "c384d1f1-1bbb-4878-b818-a13bd55daf63",
+            "started_at": "2023-12-17T23:54:10.495434Z",
+            "ended_at": "2023-12-17T23:54:10.495439Z",
+            "boefje": {
+                "id": "manual",
+                "version": null
+            },
+            "input_ooi": null,
+            "arguments": {},
+            "organization": "multi",
+            "runnable_hash": null,
+            "environment": null
+        },
+        "mime_types": [
+            {
+            "value": "openkat/report-data"
+        }
+        ]
+    },
+    "normalizer": {
+        "id": "kat_report_data"
+    }
+}
