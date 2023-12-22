@@ -1,0 +1,45 @@
+/* Print Report */
+
+@media print {
+  main.report {
+    &.sidemenu {
+      flex-direction: column;
+
+      & > nav:first-child {
+        position: static;
+        width: 100%;
+        break-after: page;
+        border: 0;
+
+        .sidemenu-toggle {
+          display: none;
+        }
+      }
+
+      article {
+        padding: 0;
+      }
+
+      .accordion {
+        button {
+          border: 0;
+          width: auto;
+
+          /* Hide action button */
+          &::before {
+            content: none;
+          }
+
+          /* Show all accordion content */
+          &[aria-expanded="true"] + div,
+          &[aria-expanded="false"] + div {
+            display: flex;
+            padding: 0;
+            border: 0;
+            margin-bottom: 0.5rem;
+          }
+        }
+      }
+    }
+  }
+}
