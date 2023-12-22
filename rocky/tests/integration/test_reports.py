@@ -1,11 +1,11 @@
 from dataclasses import asdict
+
+from reports.report_types.web_system_report.report import WebSystemReport
+
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding
-
-from reports.report_types.web_system_report.report import WebSystemReport
-
 from tests.conftest import seed_system
 
 
@@ -46,4 +46,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ooi=Reference.from_str("Website|test|192.0.2.3|tcp|25|smtp|test|example.com"),
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
-    assert report.generate_data(input_ooi, valid_time)["web_checks"].checks[0].offers_https is False
+    data = report.generate_data(input_ooi, valid_time)
+    assert data["web_checks"].checks[0].offers_https is False
+
+    assert len(data["finding_types"]) == 3

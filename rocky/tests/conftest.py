@@ -714,12 +714,12 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         SecurityTXT(website=websites[1].reference, url=urls[0].reference, security_txt="test text"),
     ]
     finding_types = [
-        KATFindingType(id="KAT-NO-CSP"),
-        KATFindingType(id="KAT-CSP-VULNERABILITIES"),
-        KATFindingType(id="KAT-NO-HTTPS-REDIRECT"),
-        KATFindingType(id="KAT-NO-CERTIFICATE"),
-        KATFindingType(id="KAT-CERTIFICATE-EXPIRED"),
-        KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
+        KATFindingType(id="KAT-NO-CSP", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
+        KATFindingType(id="KAT-CSP-VULNERABILITIES", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
+        KATFindingType(id="KAT-NO-HTTPS-REDIRECT", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
+        KATFindingType(id="KAT-NO-CERTIFICATE", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRED", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
     ]
 
     oois = (
