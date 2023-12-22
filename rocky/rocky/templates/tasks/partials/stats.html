@@ -19,27 +19,27 @@
                 <tbody>
                     {% for timestamp, values in  stats.items %}
                         <tr>
-                            <th scope="row"> {{timestamp}}: </th> 
-                            <td style="--size: calc({{ values.pending}} / 150);">
-                                <span class="data">{{ values.pending}}</span>
+                            <th scope="row">{{timestamp}}:</th> 
+                            <td style="--size: calc({{ values.pending }} / 150);">
+                                <span class="data">{{ values.pending }}</span>
                             </td>
-                            <td style="--size: calc({{ values.queued}} / 150);">
-                                <span class="data">{{ values.queued}}</span>
+                            <td style="--size: calc({{ values.queued }} / 150);">
+                                <span class="data">{{ values.queued }}</span>
                             </td>
-                            <td style="--size: calc({{ values.dispatched}} / 150);">
-                                <span class="data">{{ values.dispatched}}</span>
+                            <td style="--size: calc({{ values.dispatched }} / 150);">
+                                <span class="data">{{ values.dispatched }}</span>
                             </td>
-                            <td style="--size: calc({{ values.running}} / 150);">
-                                <span class="data">{{ values.running}}</span>
+                            <td style="--size: calc({{ values.running }} / 150);">
+                                <span class="data">{{ values.running }}</span>
                             </td>
-                            <td style="--size: calc({{ values.completed}} / 150);">
-                                <span class="data">{{ values.completed}}</span>
+                            <td style="--size: calc({{ values.completed }} / 150);">
+                                <span class="data">{{ values.completed }}</span>
                             </td>
-                            <td style="--size: calc({{ values.failed}} / 150);">
-                                <span class="data">{{ values.failed}}</span>
+                            <td style="--size: calc({{ values.failed }} / 150);">
+                                <span class="data">{{ values.failed }}</span>
                             </td>
-                            <td style="--size: calc({{ values.cancelled}} / 150);">
-                                <span class="data">{{ values.cancelled}}</span>
+                            <td style="--size: calc({{ values.cancelled }} / 150);">
+                                <span class="data">{{ values.cancelled }}</span>
                             </td>
                         </tr>
                     {% endfor %}
