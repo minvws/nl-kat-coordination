@@ -14,8 +14,6 @@ from tools.view_helpers import reschedule_task
 
 from rocky.scheduler import TaskNotFoundError, client
 
-TASK_LIMIT = 50
-
 
 class PageActions(Enum):
     RESCHEDULE_TASK = "reschedule_task"
