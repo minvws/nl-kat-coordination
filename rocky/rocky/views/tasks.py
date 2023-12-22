@@ -12,7 +12,7 @@ from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 from tools.view_helpers import reschedule_task
 
-from rocky.scheduler import TaskNotFoundError, client
+from rocky.scheduler import TaskNotFoundError, SchedulerError, client
 
 
 class PageActions(Enum):
@@ -81,7 +81,10 @@ class TaskListView(OrganizationView, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["stats"] = client.get_task_stats(self.organization.code, self.plugin_type)
+        try:
+            context["stats"] = client.get_task_stats(self.organization.code, self.plugin_type)
+        except SchedulerError:
+            context["stats"] = False
         context["breadcrumbs"] = [
             {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
         ]
