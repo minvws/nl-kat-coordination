@@ -1,5 +1,6 @@
 from dataclasses import asdict
 
+from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.web_system_report.report import WebSystemReport
 
 from octopoes.api.models import Declaration
@@ -50,3 +51,36 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     assert data["web_checks"].checks[0].offers_https is False
 
     assert len(data["finding_types"]) == 3
+
+
+def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
+    seed_system(octopoes_api_connector, valid_time)
+
+    report = SystemReport(octopoes_api_connector)
+    input_ooi = "Hostname|test|example.com"
+    data = report.generate_data(input_ooi, valid_time)
+
+    assert data["input_ooi"] == input_ooi
+    assert data["summary"] == {"total_domains": 10, "total_systems": 2}
+    assert data["services"] == {
+        "IPAddressV4|test|192.0.2.3": {
+            "hostnames": [
+                "Hostname|test|a.example.com",
+                "Hostname|test|b.example.com",
+                "Hostname|test|c.example.com",
+                "Hostname|test|d.example.com",
+                "Hostname|test|e.example.com",
+                "Hostname|test|example.com",
+            ],
+            "services": [SystemType.DICOM, SystemType.MAIL, SystemType.OTHER, SystemType.WEB],
+        },
+        "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
+            "hostnames": [
+                "Hostname|test|c.example.com",
+                "Hostname|test|d.example.com",
+                "Hostname|test|example.com",
+                "Hostname|test|f.example.com",
+            ],
+            "services": [SystemType.WEB],
+        },
+    }
