@@ -256,5 +256,11 @@ class SchedulerClient:
         health_endpoint.raise_for_status()
         return ServiceHealth.model_validate_json(health_endpoint.content)
 
+    def get_task_stats(self, organization_code: str, task_type: str) -> Dict:
+        res = self.session.get(f"{self._base_uri}/tasks/stats/{task_type}-{organization_code}")
+        res.raise_for_status()
+        task_stats = json.loads(res.content)
+        return task_stats
+
 
 client = SchedulerClient(settings.SCHEDULER_API)
