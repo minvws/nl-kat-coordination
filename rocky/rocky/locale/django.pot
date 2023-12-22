@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 13:30+0000\n"
+"POT-Creation-Date: 2023-12-22 13:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2756,8 +2756,13 @@ msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/generate_report.html
-msgid "Download report"
+#: rocky/templates/oois/ooi_report.html
+#: rocky/templates/partials/findings_list_toolbar.html
+msgid "Download PDF"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+msgid "Download JSON"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -3379,6 +3384,10 @@ msgstr ""
 
 #: reports/report_types/web_system_report/report.py
 msgid "Web system reports check web systems on basic security standards."
+msgstr ""
+
+#: reports/templates/generate_report.html
+msgid "Download report"
 msgstr ""
 
 #: reports/templates/generate_report.html
@@ -4851,11 +4860,6 @@ msgstr ""
 msgid ""
 "You will not be able to add Findings or other OOI's, this object has been "
 "deleted and is no longer available."
-msgstr ""
-
-#: rocky/templates/oois/ooi_report.html
-#: rocky/templates/partials/findings_list_toolbar.html
-msgid "Download PDF"
 msgstr ""
 
 #: rocky/templates/oois/ooi_report.html
