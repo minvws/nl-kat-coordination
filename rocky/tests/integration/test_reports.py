@@ -6,7 +6,7 @@ from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding
-from tests.conftest import seed_system
+from tests.integration.conftest import seed_system
 
 
 def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
