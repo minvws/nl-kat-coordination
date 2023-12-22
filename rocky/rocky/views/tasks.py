@@ -12,7 +12,7 @@ from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 from tools.view_helpers import reschedule_task
 
-from rocky.scheduler import TaskNotFoundError, SchedulerError, client
+from rocky.scheduler import SchedulerError, TaskNotFoundError, client
 
 
 class PageActions(Enum):
