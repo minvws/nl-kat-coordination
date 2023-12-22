@@ -61,7 +61,10 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
     data = report.generate_data(input_ooi, valid_time)
 
     assert data["input_ooi"] == input_ooi
-    assert data["summary"] == {"total_domains": 10, "total_systems": 2}
+    assert data["summary"] == {
+        "total_domains": 10,  # TODO: this is not deduplicated, should it be?
+        "total_systems": 2,
+    }
     assert data["services"] == {
         "IPAddressV4|test|192.0.2.3": {
             "hostnames": [
