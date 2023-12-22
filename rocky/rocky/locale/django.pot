@@ -5519,6 +5519,7 @@ msgid "Success"
 msgstr ""
 
 #: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/stats.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Failed"
 msgstr ""
@@ -5668,28 +5669,56 @@ msgstr ""
 msgid "Boefje input OOI"
 msgstr ""
 
+#: rocky/templates/tasks/partials/stats.html
+msgid "Stats - Last 24 hours"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "All times in UTC, blocks of 1 hour."
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Timeslot"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Pending"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Queued"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Dispatched"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Running"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Completed"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Cancelled"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Could not load stats, Scheduler error."
+msgstr ""
+
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
 msgstr ""
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "all"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Pending"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Queued"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Dispatched"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Completed"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
