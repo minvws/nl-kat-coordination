@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Set, Type, TypedDict
+from typing import Any, Dict, List, Optional, Set, Type, TypedDict, Union
 
 from account.mixins import OrganizationView
 from django.forms import Form
@@ -28,8 +28,11 @@ class ReportType(TypedDict):
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     current_step: int = 1
 
-    def get_selection(self):
-        return "?" + urlencode(self.request.GET, True)
+    def get_selection(self, pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None) -> str:
+        selection = self.request.GET.copy().dict()
+        if pre_selection:
+            selection.update(pre_selection)
+        return "?" + urlencode(selection, True)
 
     def get_kwargs(self):
         return {"organization_code": self.organization.code}
@@ -81,7 +84,7 @@ class BaseReportView(OctopoesView):
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
                 sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]), self.request.GET
-            )
+            ),
         }
 
     def get_report_types_for_generate_report(self, reports: Set[Type[Report]]) -> List[Dict[str, str]]:

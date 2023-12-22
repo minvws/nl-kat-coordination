@@ -10,6 +10,9 @@
             {% endblocktranslate %}
         </h2>
         <p>{% translate "Select which objects you want to include in your report." %}</p>
+        <p class="de-emphasized">
+            {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
+        </p>
         {% translate "Filter" as filter_title %}
         {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
 

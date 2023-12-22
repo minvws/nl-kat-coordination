@@ -30,7 +30,7 @@ from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
-from octopoes.models.types import get_relations, type_by_name
+from octopoes.models.types import get_relations
 from rocky.bytes_client import get_bytes_client
 
 logger = logging.getLogger(__name__)
@@ -259,28 +259,6 @@ class FindingList:
             return hydrated_findings
 
         raise NotImplementedError("FindingList only supports slicing")
-
-
-_EXCLUDED_OOI_TYPES = ("Finding", "FindingType")
-
-
-class MultipleOOIMixin(OctopoesView):
-    ooi_types: Set[Type[OOI]] = None
-    filtered_ooi_types: List[str] = []
-
-    def get_list(
-        self, observed_at: datetime, scan_level: Set[ScanLevel], scan_profile_type: Set[ScanProfileType]
-    ) -> OOIList:
-        ooi_types = self.ooi_types
-        if self.filtered_ooi_types:
-            ooi_types = {type_by_name(t) for t in self.filtered_ooi_types if t not in _EXCLUDED_OOI_TYPES}
-        return OOIList(
-            self.octopoes_api_connector,
-            ooi_types,
-            observed_at,
-            scan_level=scan_level,
-            scan_profile_type=scan_profile_type,
-        )
 
 
 class ConnectorFormMixin:
