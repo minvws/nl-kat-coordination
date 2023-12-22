@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 import uuid
 from enum import Enum
 from http import HTTPStatus
@@ -255,6 +256,15 @@ class SchedulerClient:
         health_endpoint = self.session.get(f"{self._base_uri}/health")
         health_endpoint.raise_for_status()
         return ServiceHealth.model_validate_json(health_endpoint.content)
+
+    def get_task_stats(self, organization_code: str, task_type: str) -> Dict:
+        try:
+            res = self.session.get(f"{self._base_uri}/tasks/stats/{task_type}-{organization_code}")
+            res.raise_for_status()
+        except HTTPError:
+            raise SchedulerError()
+        task_stats = json.loads(res.content)
+        return task_stats
 
 
 client = SchedulerClient(settings.SCHEDULER_API)
