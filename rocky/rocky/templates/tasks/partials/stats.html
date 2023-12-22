@@ -1,50 +1,56 @@
+{% load i18n %}
+
 <section>
     <div>
-        <h2>Stats - Last 24 hours</h2>
-        <div id="stats-graph">
-            <table class="charts-css column hide-data show-heading show-labels show-primary-axis show-3-secondary-axes data-spacing-10 multiple stacked">
-                <caption>All times in UTC, blocks of 1 hour.</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Timeslot</th>
-                        <th scope="col">Pending</th>
-                        <th scope="col">Queued</th>
-                        <th scope="col">Dispatched</th>
-                        <th scope="col">Running</th>
-                        <th scope="col">Completed</th>
-                        <th scope="col">Failed</th>
-                        <th scope="col">Cancelled</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for timestamp, values in  stats.items %}
+        <h2>{% translate "Stats - Last 24 hours" %}</h2>
+        {% if stats %}
+            <div id="stats-graph">
+                <table class="charts-css column hide-data show-heading show-labels show-primary-axis show-3-secondary-axes data-spacing-10 multiple stacked">
+                    <caption>{% translate "All times in UTC, blocks of 1 hour." %}</caption>
+                    <thead>
                         <tr>
-                            <th scope="row">{{timestamp}}:</th> 
-                            <td style="--size: calc({{ values.pending }} / 150);">
-                                <span class="data">{{ values.pending }}</span>
-                            </td>
-                            <td style="--size: calc({{ values.queued }} / 150);">
-                                <span class="data">{{ values.queued }}</span>
-                            </td>
-                            <td style="--size: calc({{ values.dispatched }} / 150);">
-                                <span class="data">{{ values.dispatched }}</span>
-                            </td>
-                            <td style="--size: calc({{ values.running }} / 150);">
-                                <span class="data">{{ values.running }}</span>
-                            </td>
-                            <td style="--size: calc({{ values.completed }} / 150);">
-                                <span class="data">{{ values.completed }}</span>
-                            </td>
-                            <td style="--size: calc({{ values.failed }} / 150);">
-                                <span class="data">{{ values.failed }}</span>
-                            </td>
-                            <td style="--size: calc({{ values.cancelled }} / 150);">
-                                <span class="data">{{ values.cancelled }}</span>
-                            </td>
+                            <th scope="col">{% translate "Timeslot" %}</th>
+                            <th scope="col">{% translate "Pending" %}</th>
+                            <th scope="col">{% translate "Queued" %}</th>
+                            <th scope="col">{% translate "Dispatched" %}</th>
+                            <th scope="col">{% translate "Running" %}</th>
+                            <th scope="col">{% translate "Completed" %}</th>
+                            <th scope="col">{% translate "Failed" %}</th>
+                            <th scope="col">{% translate "Cancelled" %}</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for timestamp, values in  stats.items %}
+                            <tr>
+                                <th scope="row">{{timestamp}}:</th> 
+                                <td style="--size: calc({{ values.pending }} / 150);">
+                                    <span class="data">{{ values.pending }}</span>
+                                </td>
+                                <td style="--size: calc({{ values.queued }} / 150);">
+                                    <span class="data">{{ values.queued }}</span>
+                                </td>
+                                <td style="--size: calc({{ values.dispatched }} / 150);">
+                                    <span class="data">{{ values.dispatched }}</span>
+                                </td>
+                                <td style="--size: calc({{ values.running }} / 150);">
+                                    <span class="data">{{ values.running }}</span>
+                                </td>
+                                <td style="--size: calc({{ values.completed }} / 150);">
+                                    <span class="data">{{ values.completed }}</span>
+                                </td>
+                                <td style="--size: calc({{ values.failed }} / 150);">
+                                    <span class="data">{{ values.failed }}</span>
+                                </td>
+                                <td style="--size: calc({{ values.cancelled }} / 150);">
+                                    <span class="data">{{ values.cancelled }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="error">{% translate "Could not load stats, Scheduler error." %}</p>
+        {% endif %}
     </div>
 </section>
