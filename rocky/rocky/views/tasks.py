@@ -84,7 +84,7 @@ class TaskListView(OrganizationView, ListView):
         try:
             context["stats"] = client.get_task_stats(self.organization.code, self.plugin_type)
         except SchedulerError:
-            context["stats"] = False
+            context["stats"] = None
         context["breadcrumbs"] = [
             {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
         ]
