@@ -22,7 +22,7 @@
                     <tbody>
                         {% for timestamp, values in  stats.items %}
                             <tr>
-                                <th scope="row">{{ timestamp }}:</th> 
+                                <th scope="row">{{ timestamp }}:</th>
                                 <td style="--size: calc({{ values.pending }} / 150);">
                                     <span class="data">{{ values.pending }}</span>
                                 </td>
