@@ -4,20 +4,27 @@
     <div>
         <div class="horizontal-view toolbar">
             <h1>{% translate "OpenKAT Aggregate Report" %}</h1>
-        <a href="{{ report_download_url }}"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="button">{% translate "Download report" %} <span class="icon ti-chevron-down">Chevron down icoon</span>
-    </a>
-</div>
-<div>
-    <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
-    <p>
-        {% translate "Observed at:" %} <strong>{{ observed_at }} {{ TIME_ZONE }}</strong>
-    </p>
-    <p>
-        {% translate "Created by:" %} <strong>{{ organization_member.user.full_name }}</strong>
-    </p>
-</div>
-</div>
+            <a href="{{ report_download_pdf_url }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="button">
+                {% translate "Download PDF" %} <span class="icon ti-chevron-down">Chevron down icoon</span>
+            </a>
+            <a href="{{ report_download_json_url }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="button">
+                {% translate "Download JSON" %} <span class="icon ti-chevron-down">Chevron down icoon</span>
+            </a>
+        </div>
+        <div>
+            <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}</p>
+            <p>
+                {% translate "Observed at:" %} <strong>{{ observed_at }} {{ TIME_ZONE }}</strong>
+            </p>
+            <p>
+                {% translate "Created by:" %} <strong>{{ organization_member.user.full_name }}</strong>
+            </p>
+        </div>
+    </div>
 </section>
