@@ -12,11 +12,11 @@ $breakpoint: 24rem !default;
     box-sizing: border-box;
     width: 100%;
     display: inline-block;
+    border-bottom: 1px solid #cccccc;
 
     dd,
     dt {
       float: left;
-      border-bottom: 1px solid #cccccc;
     }
 
     dt {
