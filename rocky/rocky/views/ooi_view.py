@@ -1,5 +1,5 @@
 from time import sleep
-from typing import Any, Dict, List, Set, Tuple, Type
+from typing import Any, Dict, List, Set, Type
 
 from django import http
 from django.shortcuts import redirect
@@ -30,7 +30,7 @@ class BaseOOIListView(ConnectorFormMixin, OctopoesView, ListView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.total_oois, self.object_list = self.get_all_oois_and_count()
+        self.oois = self.get_all_oois()
         self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
         self.clearance_level = request.GET.getlist("clearance_level", [])
         self.clearance_type = request.GET.getlist("clearance_type", [])
@@ -63,7 +63,7 @@ class BaseOOIListView(ConnectorFormMixin, OctopoesView, ListView):
 
     def get_queryset(self) -> OOIList:
         if not (self.filtered_ooi_types or self.clearance_level or self.clearance_type):
-            return self.object_list
+            return self.oois
 
         # A filtered OOI list
         return OOIList(
@@ -74,22 +74,21 @@ class BaseOOIListView(ConnectorFormMixin, OctopoesView, ListView):
             scan_profile_type=self.get_ooi_profile_types(),
         )
 
-    def get_all_oois_and_count(self) -> Tuple[int, OOIList]:
-        all_oois = OOIList(
+    def get_all_oois(self) -> OOIList:
+        return OOIList(
             octopoes_connector=self.octopoes_api_connector,
             ooi_types=self.ooi_types,
             valid_time=self.get_observed_at(),
             scan_level=self.scan_levels,
             scan_profile_type=self.scan_profile_types,
         )
-        return (len(all_oois), all_oois)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["observed_at_form"] = self.get_connector_form()
         context["observed_at"] = self.get_observed_at()
-        context["total_oois"] = self.total_oois
+        context["total_oois"] = len(self.oois)
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
         context["active_filters"] = self.get_active_filters()
         return context
