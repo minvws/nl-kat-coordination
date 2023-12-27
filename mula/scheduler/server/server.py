@@ -1,9 +1,9 @@
 import datetime
-import logging
 from typing import Any, Dict, List, Optional
 
 import fastapi
 import prometheus_client
+import structlog
 import uvicorn
 from fastapi import status
 from opentelemetry import trace
@@ -25,7 +25,7 @@ class Server:
     """Server that exposes API endpoints for the scheduler.
 
     Attributes:
-        logger: A logging.Logger object used for logging.
+        logger: A structlog.BoundLogger object used for logging.
         ctx: A context.AppContext object used for sharing data between modules.
         schedulers: A dict containing all the schedulers.
         config: A settings.Settings object containing the configuration settings.
@@ -44,7 +44,7 @@ class Server:
             s: A dict containing all the schedulers.
         """
 
-        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.schedulers: Dict[str, schedulers.Scheduler] = s
         self.config: settings.Settings = settings.Settings()
@@ -65,7 +65,7 @@ class Server:
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 
-            self.logger.debug("Finished setting up instrumentation")
+            self.logger.debug("Finished setting up OpenTelemetry instrumentation")
 
         self.api.add_api_route(
             path="/",

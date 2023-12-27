@@ -1,16 +1,16 @@
-import logging
 import socket
 import time
 from typing import Callable
 
 import requests
+import structlog
 
 
 class Connector:
     """A class that provides methods to check if a host is available and healthy."""
 
     def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = structlog.getLogger(self.__class__.__name__)
 
     def is_host_available(self, hostname: str, port: int) -> bool:
         """Check if the host is available.
@@ -59,22 +59,22 @@ class Connector:
         for i in range(10):
             if func(*args, **kwargs):
                 self.logger.info(
-                    "Function %s, executed successfully. Retry count: %d [name=%s, args=%s, kwargs=%s]",
+                    "Function %s, executed successfully. Retry count: %d",
                     func.__name__,
                     i,
-                    func.__name__,
-                    args,
-                    kwargs,
+                    name=func.__name__,
+                    args=args,
+                    kwargs=kwargs,
                 )
                 return True
 
             self.logger.warning(
-                "Function %s, failed. Retry count: %d [name=%s, args=%s, kwargs=%s]",
+                "Function %s, failed. Retry count: %d",
                 func.__name__,
                 i,
-                func.__name__,
-                args,
-                kwargs,
+                name=func.__name__,
+                args=args,
+                kwargs=kwargs,
             )
 
             time.sleep(10)
