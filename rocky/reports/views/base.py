@@ -29,10 +29,9 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     current_step: int = 1
 
     def get_selection(self, pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None) -> str:
-        selection = self.request.GET.copy().dict()
         if pre_selection:
-            selection.update(pre_selection)
-        return "?" + urlencode(selection, True)
+            return "?" + urlencode(pre_selection, True)
+        return "?" + urlencode(self.request.GET, True)
 
     def get_kwargs(self):
         return {"organization_code": self.organization.code}
