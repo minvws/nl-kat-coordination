@@ -139,6 +139,9 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["safe_connections"][service]["number_of_ips"] += 1
                 basic_security["safe_connections"][service]["number_of_available"] += 1 if not findings else 0
 
+                # Collect recommendations from findings
+                recommendations.extend(set(finding_type.recommendation for finding_type in findings))
+
         # RPKI
         for ip, compliance in rpki["rpki_ips"].items():
             ip_services = systems["services"][str(ip)]["services"]
