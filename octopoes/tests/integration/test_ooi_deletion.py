@@ -14,10 +14,10 @@ from octopoes.events.events import OOIDBEvent, OriginDBEvent
 from octopoes.models import OOI, ScanLevel
 from octopoes.models.ooi.dns.records import NXDOMAIN
 from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import Network
 from octopoes.models.origin import Origin, OriginType
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
-from octopoes.models.ooi.findings import Finding, KATFindingType
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
@@ -184,7 +184,10 @@ def test_events_deletion_after_bits(xtdb_octopoes_service: OctopoesService, even
 
     print(f"TOTAL PROCESSED {event_manager.processed}")
 
-def test_deletion_events_after_nxdomain(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+
+def test_deletion_events_after_nxdomain(
+    xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
+):
     network = Network(name="internet")
 
     origin = Origin(
@@ -226,5 +229,7 @@ def test_deletion_events_after_nxdomain(xtdb_octopoes_service: OctopoesService, 
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     xtdb_octopoes_service.recalculate_bits()
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) > 0
