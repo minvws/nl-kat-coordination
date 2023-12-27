@@ -14,6 +14,14 @@ will be used. And it's contents are as follows:
 # Default is: "../../../logging.json"
 SCHEDULER_LOG_CFG=
 
+# Enables/disables global debugging mode
+# Default is: False
+SCHEDULER_DEBUG=
+
+# Enables/disables structured logging in json format
+# Default is: False
+SCHEDULER_JSON_LOGGING=
+
 # Host address of the scheduler api server
 # Default: localhost
 SCHEDULER_API_HOST=
