@@ -193,7 +193,7 @@ class NormalizerScheduler(Scheduler):
                     caller=caller,
                 )
                 return
-        except Exception as exc_running:
+        except Exception:
             self.logger.warning(
                 "Could not check if task is running: %s",
                 task.id,
@@ -201,7 +201,7 @@ class NormalizerScheduler(Scheduler):
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
-                exc_info=exc_running,
+                exc_info=True,
             )
             return
 

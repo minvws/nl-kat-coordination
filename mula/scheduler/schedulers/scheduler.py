@@ -68,7 +68,7 @@ class Scheduler(abc.ABC):
         self.queue: queues.PriorityQueue = queue
         self.max_tries: int = max_tries
         self.callback: Optional[Callable[[], Any]] = callback
-        self.last_activity: Optional[datetime] = None
+        self._last_activity: Optional[datetime] = None
 
         # Listeners
         self.listeners: Dict[str, connectors.listeners.Listener] = {}
@@ -108,7 +108,7 @@ class Scheduler(abc.ABC):
 
         self.ctx.datastores.task_store.create_task(task)
 
-        self.set_last_activity()
+        self.last_activity = datetime.now(timezone.utc)
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
@@ -136,7 +136,7 @@ class Scheduler(abc.ABC):
         task.status = models.TaskStatus.DISPATCHED
         self.ctx.datastores.task_store.update_task(task)
 
-        self.set_last_activity()
+        self.last_activity = datetime.now(timezone.utc)
 
     def pop_item_from_queue(
         self, filters: Optional[storage.filters.FilterRequest] = None
@@ -440,9 +440,17 @@ class Scheduler(abc.ABC):
 
         self.threads = []
 
-    def set_last_activity(self) -> None:
+    @property
+    def last_activity(self) -> Optional[datetime]:
+        """Get the last activity of the scheduler."""
         with self.lock:
-            self.last_activity = datetime.now(timezone.utc)
+            return self._last_activity
+
+    @last_activity.setter
+    def last_activity(self, value: datetime) -> None:
+        """Set the last activity of the scheduler."""
+        with self.lock:
+            self._last_activity = value
 
     def dict(self) -> Dict[str, Any]:
         """Get a dict representation of the scheduler."""

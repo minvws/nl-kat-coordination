@@ -42,28 +42,6 @@ class AppContext:
         with Path(self.config.log_cfg).open("rt", encoding="utf-8") as f:
             logging.config.dictConfig(json.load(f))
 
-        structlog.configure(
-            processors=[
-                structlog.contextvars.merge_contextvars,
-                structlog.processors.add_log_level,
-                structlog.processors.StackInfoRenderer(),
-                structlog.dev.set_exc_info,
-                structlog.stdlib.PositionalArgumentsFormatter(),
-                structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
-                structlog.dev.ConsoleRenderer(),
-            ],
-            context_class=dict,
-            # `logger_factory` is used to create wrapped loggers that are used
-            # for OUTPUT. This one returns a `logging.Logger`.
-            logger_factory=structlog.stdlib.LoggerFactory(),
-            # `wrapper_class` is the bound logger that you get back from
-            # get_logger(). This one imitates the API of `logging.Logger`.
-            wrapper_class=structlog.stdlib.BoundLogger,
-            # Effectively freeze configuration after creating the first bound
-            # logger.
-            cache_logger_on_first_use=True,
-        )
-
         # Check if we enabled structured logging in the configuration
         if self.config.json_logging:
             structlog.configure(
@@ -104,6 +82,28 @@ class AppContext:
                 # (a JSON string) from the final processor (`JSONRenderer`) will
                 # be passed to the method of the same name as that you've called on
                 # the bound logger.
+                logger_factory=structlog.stdlib.LoggerFactory(),
+                # `wrapper_class` is the bound logger that you get back from
+                # get_logger(). This one imitates the API of `logging.Logger`.
+                wrapper_class=structlog.stdlib.BoundLogger,
+                # Effectively freeze configuration after creating the first bound
+                # logger.
+                cache_logger_on_first_use=True,
+            )
+        else:
+            structlog.configure(
+                processors=[
+                    structlog.contextvars.merge_contextvars,
+                    structlog.processors.add_log_level,
+                    structlog.processors.StackInfoRenderer(),
+                    structlog.dev.set_exc_info,
+                    structlog.stdlib.PositionalArgumentsFormatter(),
+                    structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=False),
+                    structlog.dev.ConsoleRenderer(),
+                ],
+                context_class=dict,
+                # `logger_factory` is used to create wrapped loggers that are used
+                # for OUTPUT. This one returns a `logging.Logger`.
                 logger_factory=structlog.stdlib.LoggerFactory(),
                 # `wrapper_class` is the bound logger that you get back from
                 # get_logger(). This one imitates the API of `logging.Logger`.
