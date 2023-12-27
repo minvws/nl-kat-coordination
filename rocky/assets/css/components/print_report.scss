@@ -21,6 +21,10 @@
       }
 
       .accordion {
+        li {
+          break-inside: avoid;
+        }
+
         button {
           border: 0;
           width: auto;

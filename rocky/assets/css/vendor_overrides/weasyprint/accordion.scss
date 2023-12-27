@@ -30,11 +30,31 @@ ul.accordion {
     > button {
       display: inline;
       font-weight: bold;
+
+      /* Show all accordion content */
+      &[aria-expanded="true"] + div,
+      &[aria-expanded="false"] + div {
+        width: 100%;
+        display: block;
+      }
     }
 
     > div {
       border: 0;
       display: inline;
+    }
+  }
+}
+
+/* Override report specific styling */
+main.report.sidemenu {
+  .accordion {
+    button {
+      /* Show all accordion content */
+      &[aria-expanded="true"] + div,
+      &[aria-expanded="false"] + div {
+        display: block;
+      }
     }
   }
 }
