@@ -46,5 +46,5 @@ urlpatterns += [
     ),
     path("aggregate-report/setup-scan/", SetupScanAggregateReportView.as_view(), name="aggregate_report_setup_scan"),
     path("aggregate-report/view/", AggregateReportView.as_view(), name="aggregate_report_view"),
-    path("aggregate-report/view/pdf", AggregateReportPDFView.as_view(), name="aggregate_report_pdf"),
+    path("aggregate-report/view/pdf/", AggregateReportPDFView.as_view(), name="aggregate_report_pdf"),
 ]
