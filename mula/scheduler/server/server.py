@@ -544,8 +544,10 @@ class Server:
 
             if s.queue.item_type == models.BoefjeTask:
                 p_item.data = models.BoefjeTask(**item.data).dict()
+                p_item.id = p_item.data["id"]
             elif s.queue.item_type == models.NormalizerTask:
                 p_item.data = models.NormalizerTask(**item.data).dict()
+                p_item.id = p_item.data["id"]
             else:
                 p_item.data = item.data
         except Exception as exc:
