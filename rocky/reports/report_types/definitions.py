@@ -48,3 +48,9 @@ class AggregateReport(ABC):
 
     def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
         raise NotImplementedError
+
+
+class ReportType(TypedDict):
+    id: str
+    name: str
+    description: str
