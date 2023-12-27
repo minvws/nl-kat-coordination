@@ -35,6 +35,18 @@ def octopoes_api_connector(request) -> OctopoesAPIConnector:
     connector.delete_node()
 
 
+@pytest.fixture
+def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
+    test_node = f"test-{request.node.originalname}-2"
+
+    connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
+    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
+
+    connector.create_node()
+    yield connector
+    connector.delete_node()
+
+
 def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))

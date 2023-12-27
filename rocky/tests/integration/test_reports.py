@@ -1,6 +1,7 @@
 from dataclasses import asdict
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.web_system_report.report import WebSystemReport
 
@@ -8,6 +9,7 @@ from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.reports import ReportData
 from tests.integration.conftest import seed_system
 
 
@@ -203,3 +205,33 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         "system_specific": {"number_of_compliant": 0, "total": 0},
         "safe_connections": {"number_of_compliant": 1, "total": 1},
     }
+
+
+def test_multi_report(
+    octopoes_api_connector: OctopoesAPIConnector, octopoes_api_connector_2: OctopoesAPIConnector, valid_time
+):
+    seed_system(octopoes_api_connector, valid_time)
+    seed_system(octopoes_api_connector_2, valid_time)
+
+    reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+    report_types = [{"id": x.id, "name": "", "description": ""} for x in reports]
+    _, data, _ = aggregate_reports(octopoes_api_connector, ["Hostname|test|example.com"], report_types, valid_time)
+    _, data_2, _ = aggregate_reports(octopoes_api_connector_2, ["Hostname|test|example.com"], report_types, valid_time)
+
+    report_data = ReportData(
+        organization_code=octopoes_api_connector.client, organization_name="Test name", organization_tags=[], data=data
+    )
+    report_data_2 = ReportData(
+        organization_code=octopoes_api_connector_2.client, organization_name="Name2", organization_tags=[], data=data_2
+    )
+
+    # Save second organization info in the first organization
+    octopoes_api_connector.save_declaration(Declaration(ooi=report_data, valid_time=valid_time))
+    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_2, valid_time=valid_time))
+
+    multi_report = MultiOrganizationReport(octopoes_api_connector)
+    multi_report_data = collect_report_data(
+        octopoes_api_connector, [str(report_data.reference), str(report_data_2.reference)]
+    )
+    multi_data = multi_report.post_process_data(multi_report_data)
+    assert multi_data

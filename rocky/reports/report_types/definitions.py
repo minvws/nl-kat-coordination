@@ -50,6 +50,21 @@ class AggregateReport(ABC):
         raise NotImplementedError
 
 
+class MultiReport(ABC):
+    id: str
+    name: str
+    description: str
+    plugins: ReportPlugins
+    input_ooi_types: Set[OOIType]
+    template_path: str = "report.html"
+
+    def __init__(self, octopoes_api_connector):
+        self.octopoes_api_connector = octopoes_api_connector
+
+    def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        raise NotImplementedError
+
+
 class ReportType(TypedDict):
     id: str
     name: str

@@ -9,8 +9,7 @@ from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
-from octopoes.models import Reference
-from reports.report_types.multi_organization_report.report import MultiOrganizationReport
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import (
     BaseReportView,
     ReportBreadcrumbs,
@@ -114,30 +113,23 @@ class SetupScanMultiReportView(BreadcrumbsMultiReportView, BaseReportView, Templ
 
 class MultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView):
     """
-    Shows the report multid from OOIS and report types.
+    Shows the multi report from OOIS and report types.
     """
 
     template_name = "multi_report.html"
     current_step = 6
 
-    def multi_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
-        report_data = {}
-        for ooi in self.selected_oois:
-            report_data[ooi] = {}
-            for report_type in [MultiOrganizationReport]:
-                if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
-                    report = report_type(self.octopoes_api_connector)
-                    data = report.generate_data(ooi, valid_time=self.valid_time)
-                    template = report.template_path
-                    report_data[ooi][report_type.name] = {"data": data, "template": template}
-        return template, report_data
+    def multi_reports_for_oois(self) -> Dict[str, Dict[str, Any]]:
+        report = MultiOrganizationReport(self.octopoes_api_connector)
+
+        return report.post_process_data(collect_report_data(self.octopoes_api_connector, self.selected_oois))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.get_oois()
         context["report_types"] = [MultiOrganizationReport]
-        template, report_data = self.multi_reports_for_oois()
-        context["template"] = template
+        report_data = self.multi_reports_for_oois()
+        context["template"] = MultiOrganizationReport.template_path
         context["report_data"] = report_data
         context["report_download_url"] = url_with_querystring(
             reverse("multi_report_pdf", kwargs={"organization_code": self.organization.code}),
