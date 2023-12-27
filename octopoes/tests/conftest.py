@@ -255,14 +255,14 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
 class MockEventManager:
     def __init__(self):
         self.queue = []
-        self.processed = 0
+        self.processed = [0]
 
     def publish(self, event) -> None:
         self.queue.append(event)
 
     def unprocessed(self) -> list:
-        retval = self.queue[self.processed :]
-        self.processed = len(self.queue)
+        retval = self.queue[self.processed[-1] :]
+        self.processed.append(len(self.queue))
         return retval
 
     def process_events(self, xtdb_octopoes_service: OctopoesService) -> int:
