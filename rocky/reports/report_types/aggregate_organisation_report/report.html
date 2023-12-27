@@ -90,18 +90,22 @@
                     {% endif %}
                 </div>
             </section>
-            <section id="vulnerabilities">
-                <div>
-                    <h2>{% translate "Vulnerabilities" %}</h2>
-                    <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
-                    {% if not data.vulnerabilities %}
-                        <p>{% translate "No CVEs have been found." %}</p>
-                    {% else %}
-                        {% include "vulnerability_report/report.html" with data=data.vulnerabilities show_heading="yes" %}
+            {% if data.vulnerabilities %}
+                <section id="vulnerabilities">
+                    <div>
+                        <h2>{% translate "Vulnerabilities" %}</h2>
+                        <p>{% translate "Vulnerabilities found are grouped per system." %}</p>
+                        {% if not data.vulnerabilities %}
+                            <p>{% translate "No CVEs have been found." %}</p>
+                        {% else %}
+                            {% include "vulnerability_report/report.html" with data=data.vulnerabilities show_heading="yes" %}
 
-                    {% endif %}
-                </div>
-            </section>
+                        {% endif %}
+                    </div>
+                </section>
+            {% endif %}
+            {% include "aggregate_organisation_report/appendix.html" %}
+
         </div>
     </article>
 </main>

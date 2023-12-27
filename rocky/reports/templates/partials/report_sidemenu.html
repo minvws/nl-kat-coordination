@@ -47,14 +47,24 @@
                     </ol>
                 </li>
             {% endif %}
+            {% if data.vulnerabilities %}
+                <li>
+                    <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
+                    <ol>
+                        {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                            <li>
+                                <a href="#vulnerabilities">{{ input_ooi }}</a>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </li>
+            {% endif %}
             <li>
-                <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
+                <a href="#appendix">{% translate "Appendix" %}</a>
                 <ol>
-                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                        <li>
-                            <a href="#vulnerabilities">{{ input_ooi }}</a>
-                        </li>
-                    {% endfor %}
+                    <li>{% translate "Selected OOIs" %}</li>
+                    <li>{% translate "Selected Report Types" %}</li>
+                    <li>{% translate "Selected Plugins" %}</li>
                 </ol>
             </li>
         </ol>
