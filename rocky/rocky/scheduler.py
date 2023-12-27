@@ -80,7 +80,7 @@ class BoefjeTask(BaseModel):
     type: str = "boefje"
 
 
-class QueuePrioritizedItem(BaseModel):
+class PrioritizedItem(BaseModel):
     """Representation of a queue.PrioritizedItem on the priority queue. Used
     for unmarshalling of priority queue prioritized items to a JSON
     representation.
@@ -107,7 +107,7 @@ class Task(BaseModel):
     id: Optional[uuid.UUID] = None
     scheduler_id: str
     type: str
-    p_item: QueuePrioritizedItem
+    p_item: PrioritizedItem
     status: TaskStatus
     created_at: datetime.datetime
     modified_at: datetime.datetime
@@ -235,7 +235,7 @@ class SchedulerClient:
             raise TaskNotFoundError()
         return task_details
 
-    def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
+    def push_task(self, queue_name: str, prioritized_item: PrioritizedItem) -> None:
         try:
             res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
             res.raise_for_status()

@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models.types import OOI_TYPES
 from rocky.scheduler import (
-    QueuePrioritizedItem,
+    PrioritizedItem,
     SchedulerError,
     client,
 )
@@ -162,7 +162,7 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         ]
 
 
-def schedule_task(request: HttpRequest, organization_code: str, p_item: QueuePrioritizedItem) -> None:
+def schedule_task(request: HttpRequest, organization_code: str, p_item: PrioritizedItem) -> None:
     try:
         client.push_task(f"{p_item.data.type}-{organization_code}", p_item)
     except SchedulerError as error:
@@ -198,7 +198,7 @@ def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) 
         delattr(new_task, "id")
 
     try:
-        new_p_item = QueuePrioritizedItem(
+        new_p_item = PrioritizedItem(
             data=new_task,
             priority=1,
         )
