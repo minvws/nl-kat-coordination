@@ -66,6 +66,7 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
+    id: Optional[uuid.UUID] = None
     normalizer: Normalizer
     raw_data: RawData
     type: str = "normalizer"
@@ -74,6 +75,7 @@ class NormalizerTask(BaseModel):
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
+    id: Optional[uuid.UUID] = None
     boefje: Boefje
     input_ooi: Optional[str] = None
     organization: str
