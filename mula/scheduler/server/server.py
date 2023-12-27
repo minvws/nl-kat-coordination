@@ -203,6 +203,7 @@ class Server:
             path="/queues/{queue_id}/push",
             endpoint=self.push_queue,
             methods=["POST"],
+            response_model=Optional[models.PrioritizedItem],
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
@@ -523,7 +524,7 @@ class Server:
 
         return models.PrioritizedItem(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.PrioritizedItem) -> Any:
+    def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -535,7 +536,7 @@ class Server:
             # Load default values
             p_item = models.PrioritizedItem()
 
-            # Set default values
+            # Set values
             if p_item.scheduler_id is None:
                 p_item.scheduler_id = s.scheduler_id
 
