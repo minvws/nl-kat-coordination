@@ -1,7 +1,8 @@
 from typing import Any, Dict, Tuple
 
+from django.conf import settings
 from django.contrib import messages
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -16,6 +17,7 @@ from reports.report_types.helpers import (
     get_plugins_for_report_ids,
     get_report_types_from_aggregate_report,
 )
+from reports.utils import JSONEncoder, debug_json_keys
 from reports.views.base import (
     BaseReportView,
     ReportBreadcrumbs,
@@ -140,6 +142,35 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     template_name = "aggregate_report.html"
     current_step = 6
 
+    def get(self, request, *args, **kwargs):
+        if "json" in self.request.GET and self.request.GET["json"] == "true":
+            template, post_processed_data, report_data = self.generate_reports_for_oois()
+
+            response = {
+                "organization_code": self.organization.code,
+                "organization_name": self.organization.name,
+                "organization_tags": list(self.organization.tags.all()),
+                "data": {
+                    "report_data": report_data,
+                    "post_processed_data": post_processed_data,
+                },
+            }
+
+            try:
+                response = JsonResponse(response, encoder=JSONEncoder)
+            except TypeError:
+                # We can't use translated strings as keys in JSON. This
+                # debugging code makes it easy to spot where the problem is.
+                if settings.DEBUG:
+                    debug_json_keys(report_data, [])
+                    debug_json_keys(post_processed_data, [])
+                raise
+            else:
+                response["Content-Disposition"] = f"attachment; filename=report-{self.organization.code}.json"
+                return response
+
+        return super().get(request, *args, **kwargs)
+
     def generate_reports_for_oois(self) -> Tuple[Any, Any, Dict[Any, Dict[Any, Any]]]:
         report_data = {}
         aggregate_report = AggregateOrganisationReport(self.octopoes_api_connector)
@@ -165,10 +196,15 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         context["template"] = template
         context["post_processed_data"] = post_processed_data
         context["report_data"] = report_data
-        context["report_download_url"] = url_with_querystring(
+        context["report_download_pdf_url"] = url_with_querystring(
             reverse("aggregate_report_pdf", kwargs={"organization_code": self.organization.code}),
             True,
             **self.request.GET,
+        )
+        context["report_download_json_url"] = url_with_querystring(
+            reverse("aggregate_report_view", kwargs={"organization_code": self.organization.code}),
+            True,
+            **dict(json="true", **self.request.GET),
         )
         return context
 
