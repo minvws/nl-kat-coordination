@@ -164,6 +164,17 @@ class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
 
 def schedule_task(request: HttpRequest, organization_code: str, p_item: PrioritizedItem) -> None:
     try:
+        # Remove id attribute of both p_item and p_item.data, since the
+        # scheduler will create a new task with new id's. However, pydantic
+        # requires an id attribute to be present in its definition and the
+        # default set to None when the attribute is optional, otherwise it
+        # will not serialize the id if it is not present in the definition.
+        if hasattr(p_item, "id"):
+            delattr(p_item, "id")
+
+        if hasattr(p_item.data, "id"):
+            delattr(p_item.data, "id")
+
         client.push_task(f"{p_item.data.type}-{organization_code}", p_item)
     except SchedulerError as error:
         messages.error(request, error.message)
@@ -192,14 +203,9 @@ def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) 
         messages.error(request, _("Task not found."))
         return
 
-    # Remove id from task data, this should be created by the scheduler
-    new_task = task.p_item.data
-    if hasattr(new_task, "id"):
-        delattr(new_task, "id")
-
     try:
         new_p_item = PrioritizedItem(
-            data=new_task,
+            data=task.p_item.data,
             priority=1,
         )
 
