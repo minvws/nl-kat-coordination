@@ -83,7 +83,7 @@ class BaseReportView(OctopoesView):
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
                 sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]), self.request.GET
-            ),
+            )
         }
 
     def get_report_types_for_generate_report(self, reports: Set[Type[Report]]) -> List[Dict[str, str]]:
