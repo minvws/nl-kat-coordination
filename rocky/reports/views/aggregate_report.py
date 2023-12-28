@@ -63,7 +63,7 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, TemplateView):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         kwargs = self.get_kwargs()
         pre_selection = {
-            "clearance_level": ["1", "2", "3", "4"],
+            "clearance_level": ["2", "3", "4"],
             "clearance_type": "declared",
         }
         selection = self.get_selection(pre_selection)
