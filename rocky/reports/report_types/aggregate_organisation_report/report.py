@@ -379,7 +379,7 @@ class AggregateOrganisationReport(AggregateReport):
                 for finding_key in vulnerability_data.get("findings", {}):
                     all_findings.add(finding_key)
 
-        config_oois = self.octopoes_api_connector.list(types={Config}, valid_time=valid_time)
+        config_oois = self.octopoes_api_connector.list(types={Config}, valid_time=valid_time).items
 
         return {
             "systems": systems,
@@ -394,7 +394,7 @@ class AggregateOrganisationReport(AggregateReport):
             "total_systems": total_ips,
             "total_systems_basic_security": total_systems_basic_security,
             "health": flatten_health(get_rocky_health(self.octopoes_api_connector)),
-            "config_oois": config_oois.items,
+            "config_oois": config_oois,
         }
 
     def collect_system_specific_data(self, data, services, system_type: SystemType, report_id: str):

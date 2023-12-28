@@ -96,7 +96,9 @@
                     <tr>
                         <td>{{ config.primary_key }}</td>
                         <td>{{ config.bit_id }}</td>
-                        <td>{{ config.config }}</td>
+                        <td>
+                            {% for key, value in config.config.items %}<p>{{ key }}: {{ value }}</p>{% endfor %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
