@@ -31,3 +31,14 @@ class ReportTypeMultiselectForm(BaseRockyForm):
         super().__init__(*args, **kwargs)
         report_types_choices = ((report_type.id, report_type.name) for report_type in report_types)
         self.fields["report_type"].choices = report_types_choices
+
+
+class ReportSelectAllOOIsForOrganization(BaseRockyForm):
+    select_all = forms.BooleanField(
+        label=_("Select all"),
+        required=False,
+        help_text=_(
+            "This option will select all OOIs that have a clearance type:'declared' and "
+            "clearance level: 'L2, L3, L4' for the current organization."
+        ),
+    )

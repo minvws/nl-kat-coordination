@@ -10,6 +10,11 @@
             {% endblocktranslate %}
         </h2>
         <p>{% translate "Select which objects you want to include in your report." %}</p>
+        <form method="post" class="inline help">
+            {% csrf_token %}
+            {% include "partials/form/fieldset.html" with fields=select_all_form %}
+
+        </form>
         {% translate "Filter" as filter_title %}
         {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
 
