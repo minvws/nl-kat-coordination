@@ -1,6 +1,7 @@
-import logging
 import threading
 from typing import Any, Callable, Optional
+
+import structlog
 
 
 class ThreadRunner(threading.Thread):
@@ -45,7 +46,7 @@ class ThreadRunner(threading.Thread):
             daemon: A boolean describing whether the thread should be a daemon
             loop: A boolean describing whether the thread should run in a loop.
         """
-        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self._target: Callable[[], Any] = target
         self.stop_event: threading.Event = stop_event
         self.interval: Optional[float] = interval
@@ -66,7 +67,7 @@ class ThreadRunner(threading.Thread):
                 self.stop_event.wait(self.interval)
             except Exception as exc:
                 self.exception = exc
-                self.logger.exception("Exception in thread: %s", self.name)
+                self.logger.exception("Exception in thread: %s", self.name, exc_info=exc)
                 self.stop_event.set()
                 raise exc
 
@@ -79,7 +80,7 @@ class ThreadRunner(threading.Thread):
             self._target()
         except Exception as exc:
             self.exception = exc
-            self.logger.exception("Exception in thread: %s", self.name)
+            self.logger.exception("Exception in thread: %s", self.name, exc_info=exc)
             self.stop_event.set()
             raise exc
 
@@ -87,7 +88,7 @@ class ThreadRunner(threading.Thread):
             self.callback(*self.callback_args)
 
     def run(self) -> None:
-        self.logger.debug("Starting thread: %s", self.name)
+        self.logger.debug("Starting thread: %s", self.name, thread_name=self.name)
         if self.loop:
             self.run_forever()
         else:
@@ -96,12 +97,12 @@ class ThreadRunner(threading.Thread):
         self.logger.debug("Thread stopped: %s", self.name)
 
     def join(self, timeout: Optional[float] = None) -> None:
-        self.logger.debug("Stopping thread: %s", self.name)
+        self.logger.debug("Stopping thread: %s", self.name, thread_name=self.name)
 
         self.stop_event.set()
         super().join(timeout)
 
-        self.logger.debug("Thread stopped: %s", self.name)
+        self.logger.debug("Thread stopped: %s", self.name, thread_name=self.name)
 
     def stop(self) -> None:
         self.stop_event.set()
