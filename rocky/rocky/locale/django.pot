@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-22 13:43+0000\n"
+"POT-Creation-Date: 2023-12-28 14:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -556,6 +556,7 @@ msgstr ""
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_summary.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
@@ -722,8 +723,10 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
-#: fmea/models.py reports/templates/summary/service_health.html
-#: rocky/templates/footer.html rocky/templates/health.html
+#: fmea/models.py
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
 msgid "Service"
 msgstr ""
 
@@ -1559,16 +1562,19 @@ msgid "Plugins overview:"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin name"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin type"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin description"
 msgstr ""
@@ -2685,6 +2691,88 @@ msgstr ""
 msgid "Report types"
 msgstr ""
 
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Appendix"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_summary.html
+msgid "Selected OOIs"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_summary.html
+msgid "Selected Report Types"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Report type"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Selected Plugins"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin options"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin scan level"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Service Versions and Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/health.html
+msgid "Version"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/footer.html rocky/views/health.py
+msgid "Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/health.html
+msgid "Healthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Unhealthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Used Config OOIs"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Primary Key"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Bit ID"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Config"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "No config OOIs found."
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Asset overview"
@@ -2787,10 +2875,6 @@ msgid "Recommendations"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
-msgid "There are no recommendations."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/recommendations.html
 #, python-format
 msgid "There is <i>%(total_findings)s</i> vulnerability"
 msgid_plural "There are <i>%(total_findings)s</i> vulnerabilities"
@@ -2803,6 +2887,10 @@ msgid "found on <i>%(total_systems)s</i> system."
 msgid_plural "found on <i>%(total_systems)s</i> systems."
 msgstr[0] ""
 msgstr[1] ""
+
+#: reports/report_types/aggregate_organisation_report/recommendations.html
+msgid "There are no recommendations."
+msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/safe_connections_report/report.html
@@ -2942,7 +3030,8 @@ msgid "Risk level"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
-msgid "Term overview"
+#: reports/templates/partials/report_sidemenu.html
+msgid "Term Overview"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3565,31 +3654,7 @@ msgid "Object"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
-msgid "Selected OOIs"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Selected Report Types"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Report type"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
 msgid "Selected Plugins for scans"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Plugin options"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Plugin scan level"
-msgstr ""
-
-#: reports/templates/summary/service_health.html rocky/templates/health.html
-msgid "Version"
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -3852,7 +3917,6 @@ msgid "Declared"
 msgstr ""
 
 #: tools/forms/settings.py
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Inherited"
 msgstr ""
 
@@ -4442,10 +4506,6 @@ msgstr ""
 msgid "Privacy Statement"
 msgstr ""
 
-#: rocky/templates/footer.html rocky/views/health.py
-msgid "Health"
-msgstr ""
-
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
 msgstr ""
@@ -4483,10 +4543,6 @@ msgstr ""
 
 #: rocky/templates/health.html
 msgid "Health Checks"
-msgstr ""
-
-#: rocky/templates/health.html
-msgid "Healthy"
 msgstr ""
 
 #: rocky/templates/health.html
