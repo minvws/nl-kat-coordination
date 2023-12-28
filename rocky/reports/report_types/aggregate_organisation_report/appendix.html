@@ -79,4 +79,27 @@
             {% endfor %}
         </tbody>
     </table>
+    <h3>{% translate "Used Config OOIs" %}</h3>
+    {% if data.config_oois %}
+        <table>
+            <thead>
+                <tr>
+                    <th>{% translate "Primary Key" %}</th>
+                    <th>{% translate "Bit ID" %}</th>
+                    <th>{% translate "Config" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for config in data.config_oois %}
+                    <tr>
+                        <td>{{ config.primary_key }}</td>
+                        <td>{{ config.bit_id }}</td>
+                        <td>{{ config.config }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>{% translate "No config OOIs found." %}</p>
+    {% endif %}
 </section>
