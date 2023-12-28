@@ -157,7 +157,7 @@ class OOIList:
         self.ooi_types = ooi_types
         self.valid_time = valid_time
         self.ordered = True
-        self._count = None
+        self._count = 0
         self.scan_level = scan_level
         self.scan_profile_type = scan_profile_type
 
@@ -174,16 +174,22 @@ class OOIList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key) -> List[OOI]:
+    def __getitem__(self, key: Union[int, slice]) -> List[OOI]:
         if isinstance(key, slice):
+            offset = key.start or 0
+            limit = OOIList.HARD_LIMIT
+            if key.stop:
+                limit = key.stop - offset
+
             return self.octopoes_connector.list(
                 self.ooi_types,
                 valid_time=self.valid_time,
-                offset=key.start or 0,
-                limit=key.stop - (key.start or 0),
+                offset=offset,
+                limit=limit,
                 scan_level=self.scan_level,
                 scan_profile_type=self.scan_profile_type,
             ).items
+
         elif isinstance(key, int):
             return self.octopoes_connector.list(
                 self.ooi_types,

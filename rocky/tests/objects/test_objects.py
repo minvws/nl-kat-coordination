@@ -55,7 +55,7 @@ def test_ooi_list_with_clearance_type_filter_and_clearance_level_filter(
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().list.call_count == 2
+    assert mock_organization_view_octopoes().list.call_count == 3
 
     list_call_0 = mock_organization_view_octopoes().list.call_args_list[0]
     assert list_call_0.kwargs["limit"] == 0
