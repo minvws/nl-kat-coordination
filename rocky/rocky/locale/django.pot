@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-22 16:48+0000\n"
+"POT-Creation-Date: 2023-12-28 12:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3437,6 +3437,13 @@ msgid "Select which objects you want to include in your report."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Filter"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
 msgstr ""
@@ -3445,13 +3452,6 @@ msgstr ""
 #: rocky/templates/oois/ooi_list.html
 #, python-format
 msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Filter"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
