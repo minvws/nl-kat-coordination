@@ -11,7 +11,7 @@ from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.findings import KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.findings import CVEFindingType, KATFindingType, RetireJSFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -104,12 +104,16 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         Website(ip_service=ip_services[0].reference, hostname=hostnames[1].reference),
     ]
     software = [Software(name="DICOM")]
-    instance = [SoftwareInstance(ooi=ports[0].reference, software=software[0].reference)]
 
     web_urls = [
         HostnameHTTPURL(netloc=hostnames[0].reference, path="/", scheme="http", network=network.reference, port=80),
         HostnameHTTPURL(netloc=hostnames[0].reference, path="/", scheme="https", network=network.reference, port=443),
     ]
+    instances = [
+        SoftwareInstance(ooi=ports[0].reference, software=software[0].reference),
+        SoftwareInstance(ooi=web_urls[0].reference, software=software[0].reference),
+    ]
+
     urls = [URL(network=network.reference, raw="https://test.com/security", web_url=web_urls[1].reference)]
     resources = [
         HTTPResource(website=websites[0].reference, web_url=web_urls[0].reference),
@@ -127,6 +131,11 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         KATFindingType(id="KAT-NO-CERTIFICATE", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
         KATFindingType(id="KAT-CERTIFICATE-EXPIRED", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
         KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
+        CVEFindingType(id="CVE-2019-8331", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
+        CVEFindingType(id="CVE-2018-20677", risk_severity=RiskLevelSeverity.MEDIUM, description="test"),
+        RetireJSFindingType(
+            id="RetireJS-jquerymigrate-f3a3", risk_severity=RiskLevelSeverity.MEDIUM, description="test"
+        ),
     ]
 
     oois = (
@@ -138,7 +147,7 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         + resolved_hostnames
         + websites
         + software
-        + instance
+        + instances
         + web_urls
         + resources
         + headers
@@ -152,3 +161,22 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         Observation(method="", source=network.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=oois)
     )
     octopoes_api_connector.recalculate_bits()
+
+    return {
+        "hostnames": hostnames,
+        "addresses": addresses,
+        "ports": ports,
+        "services": services,
+        "ip_services": ip_services,
+        "resolved_hostnames": resolved_hostnames,
+        "websites": websites,
+        "software": software,
+        "instances": instances,
+        "web_urls": web_urls,
+        "resources": resources,
+        "headers": headers,
+        "finding_types": finding_types,
+        "urls": urls,
+        "security_txts": security_txts,
+        "certificates": certificates,
+    }

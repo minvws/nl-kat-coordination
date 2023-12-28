@@ -1,0 +1,401 @@
+{% load i18n %}
+
+<div>
+    <h3>{% translate "Safe connections" %}</h3>
+    {#    <p>#}
+    {#        <strong><span class="tag critical">{% translate "Critical" %}</span> {% translate "Score" %}: 80%, {% translate "Sector" %}: 90%</strong>#}
+    {#    </p>#}
+    <p>
+        {% blocktranslate trimmed %}
+            In this chapter we check if the connections of all the IP ports of the system are safe.
+            Safe connections are important to prevent unauthorised access and data breaches. Strong
+            ciphers are crucial because they ensure strong encryption which protects the data from
+            interception during communiction.
+        {% endblocktranslate %}
+    </p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">{% translate "Overview of safe connections" %}</caption>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "Check" %}</th>
+                    <th scope="col">{% translate "Amount" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{% translate "Only Safe Ciphers" %}</td>
+                    <td>
+                        {% if report_data.basic_security.safe_connections.number_of_available != report_data.basic_security.safe_connections.number_of_ips %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ report_data.basic_security.safe_connections.number_of_available }}/{{ report_data.basic_security.safe_connections.number_of_ips }} {% translate "services are compliant" %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h3>{% translate "System specific" %}</h3>
+    {#    <p>#}
+    {#        <strong><span class="tag medium">Medium</span> Score: 80%, Sector: 90%</strong>#}
+    {#    </p>#}
+    <h4>E-emailserver</h4>
+    <p>
+        Er zijn geen problemen aangetroffen bij de authenticatie van de mailservers. In deze tabel is te zien welke checks er zijn uitgevoerd.
+    </p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">Overzicht van lorem ipsum</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Check</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="">SPF</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        600/600 mailservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">DKIM</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        600/600 mailservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">DMARC</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        600/600 mailservers complient
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h4>Web server</h4>
+    <p>
+        In de tabel is te zien welke checks er zijn uitgevoerd. Daaropvolgend de compliancy issues, weergegeven per asset.
+    </p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">Overzicht van lorem ipsum</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Check</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 4</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        800/800 webservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 5</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        800/800 webservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 6</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        800/800 webservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">CSP header check</a>
+                    </td>
+                    <td>
+                        <span class="icon incomplete">Incomplete</span>
+                        600/800 webservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">HSTS policy check</a>
+                    </td>
+                    <td>
+                        <span class="icon incomplete">Incomplete</span>
+                        600/800 webservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon incomplete">Incomplete</span>
+                        600/800 webservers complient
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h4>Nameserver</h4>
+    <p>
+        Er zijn geen problemen aangetroffen bij de mailservers. In deze tabel is te zien welke checks er zijn uitgevoerd.
+    </p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">Overzicht van lorem ipsum</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Check</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="">DNSSEC</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        200/200 nameservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">loremipsum1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        200/200 nameservers complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">loremipsum2</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        200/200 nameservers complient
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h4>Other</h4>
+    <p>
+        Er zijn geen problemen aangetroffen bij de servers in de categorie other. In de tabel is te zien welke checks er zijn uitgevoerd.
+    </p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">Overzicht van lorem ipsum</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Check</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>loremipsum 1</td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        100/100 nameservers complient
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h3>Resource Public Key Infrastructure</h3>
+    <p>
+        <strong><span class="tag secure">Secure</span> Score: 100%, Sector: 90%</strong>
+    </p>
+    <h4>E-emailserver</h4>
+    <p>Er zijn geen problemen aangetroffen bij de mailservers. In de tabel is te zien welke checks er zijn uitgevoerd.</p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">Lorem ipsum</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Check</th>
+                    <th scope="col">Compliancy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        600/600 webservers zijn complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        600/600 webservers zijn complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        600/600 webservers zijn complient
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h4>Web server</h4>
+    <p>Er zijn geen problemen aangetroffen bij de webservers. In de tabel is te zien welke checks er zijn uitgevoerd.</p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">Lorem ipsum</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Check</th>
+                    <th scope="col">Compliancy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        800/800 webservers zijn complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        800/800 webservers zijn complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        800/800 webservers zijn complient
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h4>Nameserver</h4>
+    <p>Er zijn geen problemen aangetroffen bij de nameservers. In de tabel is te zien welke checks er zijn uitgevoerd.</p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">Lorem ipsum</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Check</th>
+                    <th scope="col">Compliancy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        200/200 webservers zijn complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        200/200 webservers zijn complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        200/200 webservers zijn complient
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <h4>Other</h4>
+    <p>
+        Er zijn geen problemen aangetroffen bij de servers in de categorie other. In de tabel is te zien welke checks er zijn uitgevoerd.
+    </p>
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">Lorem ipsum</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Check</th>
+                    <th scope="col">Compliancy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        100/100 webservers zijn complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        100/100 webservers zijn complient
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="">Lorem Ipsum 1</a>
+                    </td>
+                    <td>
+                        <span class="icon positive">Voldoet</span>
+                        100/100 webservers zijn complient
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

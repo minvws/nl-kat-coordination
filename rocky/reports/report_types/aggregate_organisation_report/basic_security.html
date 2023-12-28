@@ -31,6 +31,7 @@
         <tbody>
             {% for service, compliance in data.basic_security.summary.items %}
                 <tr>
+                    {#For the multi report, "data.services|get_item:service" is a list to avoid deduplication #}
                     <td>{{ service }} {% translate "server" %} ({{ data.services|get_item:service|length }})</td>
                     <td>
                         {% if compliance.safe_connections.number_of_compliant != compliance.safe_connections.total %}

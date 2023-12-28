@@ -135,12 +135,14 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     assert len(data["services"]["Web"]["IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]["hostnames"]) == 4
 
     assert data["open_ports"] == {
-        "192.0.2.3": {
+        "IPAddressV4|test|192.0.2.3": {
             "ports": {22: False, 25: False, 443: False},
+            "services": {22: ["ssh"], 25: ["smtp"], 443: ["https"]},
             "hostnames": [x.replace("Hostname|test|", "") for x in v4_test_hostnames],
         },
-        "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
+        "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
             "ports": {80: False},
+            "services": {80: ["http"]},
             "hostnames": ["c.example.com", "d.example.com", "example.com", "f.example.com"],
         },
     }
@@ -210,8 +212,16 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
 def test_multi_report(
     octopoes_api_connector: OctopoesAPIConnector, octopoes_api_connector_2: OctopoesAPIConnector, valid_time
 ):
-    seed_system(octopoes_api_connector, valid_time)
+    seed = seed_system(octopoes_api_connector, valid_time)
     seed_system(octopoes_api_connector_2, valid_time)
+
+    findings = [
+        Finding(finding_type=seed["finding_types"][-3].reference, ooi=seed["instances"][1].reference),
+        Finding(finding_type=seed["finding_types"][-2].reference, ooi=seed["instances"][1].reference),
+        Finding(finding_type=seed["finding_types"][-1].reference, ooi=seed["instances"][1].reference),
+    ]
+    for finding in findings:
+        octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
 
     reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     report_types = [{"id": x.id, "name": "", "description": ""} for x in reports]
@@ -254,7 +264,71 @@ def test_multi_report(
     assert multi_data["basic_security_score"] == 100
     assert multi_data["median_vulnerabilities"] == 60
     assert multi_data["total_critical_vulnerabilities"] == 0
-    assert multi_data["total_findings"] == 0
+    assert multi_data["total_findings"] == 3
     assert multi_data["total_systems"] == 4
     assert multi_data["total_hostnames"] == 14
     assert multi_data["recommendations"] == []
+    assert multi_data["service_counts"] == {"Mail": 2, "Web": 4, "Dicom": 2, "Other": 2}
+    assert multi_data["open_ports"] == {
+        "total": 4,
+        "ports": {
+            "80": {"open": 2, "services": {"http"}},
+            "443": {"open": 2, "services": {"https"}},
+            "22": {"open": 2, "services": {"ssh"}},
+            "25": {"open": 2, "services": {"smtp"}},
+        },
+    }
+
+    assert multi_data["asset_vulnerabilities"] == [
+        {
+            "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
+            "vulnerabilities": ["CVE-2018-20677", "CVE-2019-8331", "RetireJS-jquerymigrate-f3a3"],
+            "organisation": "test-test_multi_report",
+        },
+        {
+            "asset": "IPAddressV4|test|192.0.2.3",
+            "vulnerabilities": ["CVE-2018-20677", "CVE-2019-8331", "RetireJS-jquerymigrate-f3a3"],
+            "organisation": "test-test_multi_report",
+        },
+        {
+            "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
+            "vulnerabilities": [],
+            "organisation": "test-test_multi_report-2",
+        },
+        {"asset": "IPAddressV4|test|192.0.2.3", "vulnerabilities": [], "organisation": "test-test_multi_report-2"},
+    ]
+    assert multi_data["services"] == {
+        "Mail": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
+        "Web": [
+            "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
+            "IPAddressV4|test|192.0.2.3",
+            "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
+            "IPAddressV4|test|192.0.2.3",
+        ],
+        "Dicom": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
+        "Other": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
+    }
+    assert multi_data["basic_security"] == {
+        "summary": {
+            "Mail": {
+                "rpki": {"number_of_compliant": 2, "total": 2},
+                "system_specific": {"number_of_compliant": 2, "total": 2},
+                "safe_connections": {"number_of_compliant": 2, "total": 2},
+            },
+            "Web": {
+                "rpki": {"number_of_compliant": 4, "total": 4},
+                "system_specific": {"number_of_compliant": 4, "total": 4},
+                "safe_connections": {"number_of_compliant": 4, "total": 4},
+            },
+            "Dicom": {
+                "rpki": {"number_of_compliant": 2, "total": 2},
+                "system_specific": {"number_of_compliant": 0, "total": 0},
+                "safe_connections": {"number_of_compliant": 2, "total": 2},
+            },
+            "Other": {
+                "rpki": {"number_of_compliant": 2, "total": 2},
+                "system_specific": {"number_of_compliant": 0, "total": 0},
+                "safe_connections": {"number_of_compliant": 2, "total": 2},
+            },
+        }
+    }

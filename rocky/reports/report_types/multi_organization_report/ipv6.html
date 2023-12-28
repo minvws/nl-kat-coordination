@@ -2,33 +2,41 @@
 
 <section id="ipv6">
     <div>
-        <h2>IPv6</h2>
-        <p>[Uitleg IPv6 en belang ervan] Waarom moet elk domein aan IPv4 en IPv6 voldoen.</p>
-        <p>9000/10000 systemen hebben een IPv6 verbinding</p>
+        <h2>{% translate "IPv6" %}</h2>
+        <p>
+            {% blocktranslate trimmed %}
+                IPv6 includes improvements in security features compared to IPv4.
+                While IPv4 can implement security measures, IPv6 was designed with security in mind,
+                and its adoption can contribute to a more secure internet.
+            {% endblocktranslate %}
+        </p>
+        <p>{% translate "In total " %} 9000/10000 {% translate " systems have an IPv6 connection." %}</p>
         <div class="horizontal-scroll">
             <table>
-                <caption class="visually-hidden">Overview of ip version compliance</caption>
+                <caption class="visually-hidden">{% translate "Overview of ip version compliance" %}</caption>
                 <thead>
                     <tr>
-                        <th scope="col">System type</th>
-                        <th scope="col">Amount</th>
+                        <th scope="col">{% translate "System type" %}</th>
+                        <th scope="col">{% translate "Amount" %}</th>
                         <th scope="col">IPv4</th>
                         <th scope="col">IPv6</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Mail</td>
-                        <td>
-                            <a href="">250</a>
-                        </td>
-                        <td>
-                            <span class="icon positive">Voldoet</span>
-                        </td>
-                        <td>
-                            <span class="icon positive">Voldoet</span>
-                        </td>
-                    </tr>
+                    {% for ip in ipv6 %}
+                        <tr>
+                            <td>Mail</td>
+                            <td>
+                                <a href="">250</a>
+                            </td>
+                            <td>
+                                <span class="icon positive">Voldoet</span>
+                            </td>
+                            <td>
+                                <span class="icon positive">Voldoet</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
                     <tr>
                         <td>Mail, web</td>
                         <td>

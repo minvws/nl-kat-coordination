@@ -86,7 +86,7 @@ class AggregateOrganisationReport(AggregateReport):
 
                 if report_id == OpenPortsReport.id:
                     for ip, details in report_specific_data.items():
-                        open_ports[str(ip)] = details
+                        open_ports[ip] = details
 
                 if report_id == IPv6Report.id:
                     for hostname, info in report_specific_data.items():

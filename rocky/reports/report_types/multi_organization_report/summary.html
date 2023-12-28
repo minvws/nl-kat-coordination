@@ -19,7 +19,7 @@
             <div>
                 <dt>Organisations in sector report</dt>
                 <dd>
-                    {{ organizations|length }}
+                    {{ report_data.organizations|length }}
                 </dd>
             </div>
             {% for tag, organizations in report_data.tags.items %}

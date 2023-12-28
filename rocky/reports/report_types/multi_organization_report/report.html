@@ -4,7 +4,7 @@
       tabindex="-1"
       class="sidemenu choose-report report"
       lang="nl">
-    {% include "partials/report_sidemenu.html" %}
+    {% include "partials/report_sidemenu.html" with data=report_data %}
 
     <article>
         {% include "multi_organization_report/introduction.html" %}
@@ -15,7 +15,57 @@
             {% include "multi_organization_report/asset_overview.html" %}
             {% include "multi_organization_report/open_ports.html" %}
             {% include "multi_organization_report/ipv6.html" %}
-            {% include "multi_organization_report/basic_security.html" %}
+
+            <section id="basic-security">
+                <div>
+                    {% if report_data.basic_security.summary %}
+                        <div id="basic-security-overview">
+                            {% include "aggregate_organisation_report/basic_security.html" with data=report_data %}
+
+                        </div>
+                    {% endif %}
+                    {% include "multi_organization_report/basic_security_details.html" %}
+
+                    {% if data.basic_security.system_specific %}
+                        <div id="system-specific">
+                            <h3>{% translate "System specific" %}</h3>
+                            <p>
+                                {% blocktranslate trimmed %}
+                                    This is where checks are done that are specific to system types. Different security
+                                    and compliance issues come into play for different systems. They are listed here
+                                    under each other.
+                                {% endblocktranslate %}
+                            </p>
+                            {% for check, system in data.basic_security.summary.items %}
+                                {% if system.system_specific.checks or system.system_specific.ips %}
+                                    {% include "aggregate_organisation_report/system_specific.html" with data=system.system_specific type=check %}
+
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if data.basic_security.rpki %}
+                        <div id="rpki">
+                            <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+                            <p>
+                                {% blocktranslate trimmed %}
+                                    This section contains basic security information about resource public key
+                                    infrastructure. If your web server employs RPKI for its IP addresses and
+                                    associated nameservers, then it enhances visitor protection against
+                                    misconfigurations and malicious route intercepts through verified route
+                                    announcements, ensuring reliable server access and secure internet traffic.
+                                {% endblocktranslate %}
+                            </p>
+                            {% for system_type, system in data.basic_security.rpki.items %}
+                                {% if system %}
+                                    {% include "rpki_report/report.html" with data=system type=system_type %}
+
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
             {% include "multi_organization_report/vulnerabilities.html" %}
             {% include "multi_organization_report/appendix.html" %}
 
