@@ -2787,10 +2787,6 @@ msgid "Recommendations"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
-msgid "There are no recommendations."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/recommendations.html
 #, python-format
 msgid "There is <i>%(total_findings)s</i> vulnerability"
 msgid_plural "There are <i>%(total_findings)s</i> vulnerabilities"
@@ -2803,6 +2799,10 @@ msgid "found on <i>%(total_systems)s</i> system."
 msgid_plural "found on <i>%(total_systems)s</i> systems."
 msgstr[0] ""
 msgstr[1] ""
+
+#: reports/report_types/aggregate_organisation_report/recommendations.html
+msgid "There are no recommendations."
+msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/safe_connections_report/report.html
