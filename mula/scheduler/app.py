@@ -1,8 +1,8 @@
-import logging
 import os
 import threading
 from typing import Dict, Optional, Set, Union
 
+import structlog
 from opentelemetry import trace
 
 from scheduler import context, schedulers, server
@@ -51,7 +51,7 @@ class App:
                 external services connections).
         """
 
-        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
 
         threading.excepthook = self.unhandled_exception  # type: ignore
@@ -80,10 +80,10 @@ class App:
         katalogus_orgs: Set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
-        self.logger.debug("Organisations to add: %s", len(additions))
+        self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
 
         removals = scheduler_orgs.difference(katalogus_orgs)
-        self.logger.debug("Organisations to remove: %s", len(removals))
+        self.logger.debug("Organisations to remove: %s", len(removals), removals=sorted(removals))
 
         # We need to get scheduler ids of the schedulers that are associated
         # with the removed organisations
@@ -101,10 +101,10 @@ class App:
             self.schedulers[scheduler_id].stop()
 
         if removals:
-            self.logger.info(
-                "Removed %s organisations from scheduler [org_ids=%s]",
+            self.logger.debug(
+                "Removed %s organisations from scheduler",
                 len(removals),
-                removals,
+                removals=sorted(removals),
             )
 
         # Add schedulers for organisation
@@ -136,10 +136,10 @@ class App:
             # Flush katalogus caches when new organisations are added
             self.ctx.services.katalogus.flush_caches()
 
-            self.logger.info(
-                "Added %s organisations to scheduler [org_ids=%s]",
+            self.logger.debug(
+                "Added %s organisations to scheduler",
                 len(additions),
-                additions,
+                additions=sorted(additions),
             )
 
     @tracer.start_as_current_span("collect_metrics")
