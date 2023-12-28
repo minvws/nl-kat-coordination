@@ -141,6 +141,9 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["safe_connections"][service]["number_of_ips"] += 1
                 basic_security["safe_connections"][service]["number_of_available"] += 1 if not findings else 0
 
+                # Collect recommendations from findings
+                recommendations.extend(set(finding_type.recommendation for finding_type in findings))
+
         # RPKI
         for ip, compliance in rpki["rpki_ips"].items():
             ip_services = systems["services"][str(ip)]["services"]
@@ -334,8 +337,25 @@ class AggregateOrganisationReport(AggregateReport):
                     },
                 }
 
+            # Collect recommendations from findings
+            if (
+                service == SystemType.MAIL
+                and mail_report_data
+                or service == SystemType.WEB
+                and web_report_data
+                or service == SystemType.DNS
+                and dns_report_data
+            ):
+                recommendations.extend(
+                    set(
+                        finding_type.recommendation
+                        for ip, finding in basic_security["summary"][service]["system_specific"]["ips"].items()
+                        for finding_type in finding
+                    )
+                )
+
         terms = list(set(terms))
-        recommendations = list(set(recommendations))
+        recommendations = list(set(filter(None, recommendations)))
         total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
 
@@ -364,6 +384,7 @@ class AggregateOrganisationReport(AggregateReport):
         return {
             "systems": systems,
             "services": services,
+            "recommendations": recommendations,
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,
