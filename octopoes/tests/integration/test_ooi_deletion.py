@@ -78,7 +78,7 @@ def test_events_created_through_crud(xtdb_octopoes_service: OctopoesService, eve
         method="manual",
         source=network.reference,
         result=[network.reference],
-        task_id=str(uuid.uuid4()),
+        task_id=uuid.uuid4(),
     )
     xtdb_octopoes_service.save_origin(origin, [network], valid_time)
     xtdb_octopoes_service.commit()
@@ -118,7 +118,7 @@ def test_events_created_in_worker_during_handling(
         method="manual",
         source=network.reference,
         result=[network.reference],
-        task_id=str(uuid.uuid4()),
+        task_id=uuid.uuid4(),
     )
     xtdb_octopoes_service.save_origin(origin, [network], valid_time)
     xtdb_octopoes_service.commit()
@@ -151,7 +151,7 @@ def test_events_deletion_after_bits(xtdb_octopoes_service: OctopoesService, even
         method="manual",
         source=network.reference,
         result=[network.reference],
-        task_id=str(uuid.uuid4()),
+        task_id=uuid.uuid4(),
     )
 
     url = "mispo.es"
@@ -195,7 +195,7 @@ def test_deletion_events_after_nxdomain(
         method="manual",
         source=network.reference,
         result=[network.reference],
-        task_id=str(uuid.uuid4()),
+        task_id=uuid.uuid4(),
     )
 
     url = "mispo.es"
@@ -214,22 +214,44 @@ def test_deletion_events_after_nxdomain(
 
     findings = [Finding(finding_type=ft.reference, ooi=hostname.reference) for ft in finding_types]
 
+    finding_origin = Origin(
+        origin_type=OriginType.OBSERVATION,
+        method="",
+        source=network.reference,
+        result=[finding.reference for finding in findings],
+        task_id=uuid.uuid4(),
+    )
+
     for finding in findings:
         xtdb_octopoes_service.ooi_repository.save(finding, valid_time)
+    xtdb_octopoes_service.save_origin(finding_origin, findings, valid_time)
 
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     xtdb_octopoes_service.recalculate_bits()
 
     event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) == 0
+    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 6
 
     nxd = NXDOMAIN(hostname=hostname.reference)
     xtdb_octopoes_service.ooi_repository.save(nxd, valid_time)
 
+    nxd_origin = Origin(
+        origin_type=OriginType.OBSERVATION,
+        method="",
+        source=network.reference,
+        result=[nxd.reference],
+        task_id=uuid.uuid4(),
+    )
+    xtdb_octopoes_service.save_origin(nxd_origin, [nxd], valid_time)
+
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     xtdb_octopoes_service.recalculate_bits()
 
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) > 0
+    assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
+    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 4
