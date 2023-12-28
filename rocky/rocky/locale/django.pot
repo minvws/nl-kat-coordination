@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 11:02+0000\n"
+"POT-Creation-Date: 2023-12-28 14:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2714,7 +2714,8 @@ msgid "Report type"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-msgid "Selected Plugins for Scans"
+#: reports/templates/partials/report_sidemenu.html
+msgid "Selected Plugins"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2728,6 +2729,7 @@ msgid "Plugin scan level"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
 msgstr ""
 
@@ -2748,6 +2750,27 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Unhealthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Used Config OOIs"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Primary Key"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Bit ID"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Config"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "No config OOIs found."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
@@ -3007,7 +3030,8 @@ msgid "Risk level"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
-msgid "Term overview"
+#: reports/templates/partials/report_sidemenu.html
+msgid "Term Overview"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3586,14 +3610,6 @@ msgstr ""
 #: reports/templates/partials/report_sidemenu.html
 #: rocky/templates/oois/ooi_page_tabs.html
 msgid "Overview"
-msgstr ""
-
-#: reports/templates/partials/report_sidemenu.html
-msgid "Selected Plugins"
-msgstr ""
-
-#: reports/templates/partials/report_sidemenu.html
-msgid "Service versions and health"
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
