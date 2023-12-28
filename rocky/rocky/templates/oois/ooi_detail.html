@@ -46,7 +46,10 @@
                     <div class="horizontal-view">
                         <div>
                             {% if member.acknowledged_clearance_level > 0 and organization_indemnification %}
-                                <form method="get" class="inline">
+                                <form id="show_all_boefjes"
+                                      method="get"
+                                      action="#show_all_boefjes"
+                                      class="inline">
                                     <input type="hidden" name="ooi_id" value="{{ ooi }}">
                                     {% include "partials/form/form_errors.html" with form=possible_boefjes_filter_form %}
 
@@ -103,15 +106,15 @@
                             </p>
                         {% else %}
                             <p>
-                                {% translate "There are no boefjes available within the current clearance level of" %} "{{ ooi.human_readable }}". {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
+                                {% translate "There are no boefjes available within the current clearance level of" %} "{{ ooi.scan_profile.human_readable }}".
+                                <br>
+                                {% translate "See" %} <a href="{% url "katalogus" organization.code %}">KAT-alogus</a> {% translate "to find and enable boefjes that can scan within the current level." %}
                             </p>
-                            <p>{% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".</p>
+                            <p>
+                                <a href="{% ooi_url 'scan_profile_detail' ooi.primary_key organization.code query=mandatory_fields %}">{% translate "Or if you have the authorization, upgrade the clearance level of" %} "{{ ooi.human_readable }}".</a>
+                            </p>
                         {% endif %}
                     </div>
-                {% endif %}
-                {% if ooi.scan_profile.scan_profile_type == 'inherited' %}
-                    {% include "partials/explanations.html" %}
-
                 {% endif %}
             </div>
         </section>

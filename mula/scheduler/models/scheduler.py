@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
@@ -10,3 +11,4 @@ class Scheduler(BaseModel):
     id: Optional[str] = None
     enabled: Optional[bool] = None
     priority_queue: Optional[Dict[str, Any]] = None
+    last_activity: Optional[datetime] = None
