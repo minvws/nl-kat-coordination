@@ -3,7 +3,7 @@
 <section id="recommendations">
     <div>
         <h2>{% translate "Recommendations" %}</h2>
-        {% if total_findings != 0 %}
+        {% if total_findings %}
             <p>
                 {% blocktranslate count total_findings as count trimmed %}
                     There is <i>{{ total_findings }}</i> vulnerability
