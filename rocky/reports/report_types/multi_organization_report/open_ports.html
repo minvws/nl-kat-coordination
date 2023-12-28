@@ -1,0 +1,52 @@
+{% load i18n %}
+
+<section id="open-ports">
+    <div>
+        <h2>Open ports</h2>
+        <p>
+            Overzicht van gevonden open poorten zien. <strong>Dikgedrukte</strong> open poorten zijn gevonden door directe scans die de organisatie uitvoert via KAT. Overige open poorten zijn daar buiten aangetroffen door KAT zelf. Scans met dezelfde domeinen, poorten en IPs zijn samengevoegd.
+        </p>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">Overview of detected open ports</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Open ports</th>
+                        <th scope="col">Occurrences (IP addressees)</th>
+                        <th scope="col">Services</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>80</td>
+                        <td>100/10.000</td>
+                        <td>
+                            <a href="">HTTP</a> <a href="">SSH</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>433</td>
+                        <td>200/10.000</td>
+                        <td>
+                            <a href="">SSH</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>8080</td>
+                        <td>10/10.000</td>
+                        <td>
+                            <a href="">SSH</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>1234</td>
+                        <td>2/10.000</td>
+                        <td>
+                            <a href="">DISCOM</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

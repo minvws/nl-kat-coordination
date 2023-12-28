@@ -66,6 +66,8 @@ class MultiOrganizationReport(MultiReport):
         #  - Lowest organisations in report
         #  - Lowest organisations in report per tag
         #  - Most common vulnerabilities
+        #  - Disclaimer
+        #  - Recommendations table
 
         return {
             "multi_data": data,

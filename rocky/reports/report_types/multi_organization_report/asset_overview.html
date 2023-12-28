@@ -1,0 +1,94 @@
+{% load i18n %}
+
+<section id="asset-overview">
+    <div>
+        <h2>Asset overview</h2>
+        <p>
+            Een overzicht van de handmatig gevrijwaarde gescande assets. <strong>Dikgedrukte</strong> assets zijn als startpunt genomen, niet dikgedrukte assets zijn door KAT zelf gevonden.
+        </p>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">Overview of included assets</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Asset</th>
+                        <th scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>IP addresses</td>
+                        <td>
+                            <a href="">10.000</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Domain names</td>
+                        <td>
+                            <a href="">7.600</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>IP-ranges</td>
+                        <td>
+                            <a href="">3</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Web server</td>
+                        <td>
+                            <a href="">1.000</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Mail server</td>
+                        <td>
+                            <a href="">2.000</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>DNS server</td>
+                        <td>
+                            <a href="">3.000</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">Assets with most critical vulnerabilities</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Asset</th>
+                        <th scope="col">Vulnerability</th>
+                        <th scope="col">Organisation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ipv6.example.com</td>
+                        <td>
+                            <a href="">CVE-1234-5678</a>, <a href="">CVE-4534-2323</a>
+                        </td>
+                        <td>Organisation A</td>
+                    </tr>
+                    <tr>
+                        <td>ipv7.example.com</td>
+                        <td>
+                            <a href="">CVE-2020-2020</a>
+                        </td>
+                        <td>Organisation A</td>
+                    </tr>
+                    <tr>
+                        <td>192.0.2.3</td>
+                        <td>
+                            <a href="">CVE-2012-1234</a>
+                        </td>
+                        <td>Organisation A</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

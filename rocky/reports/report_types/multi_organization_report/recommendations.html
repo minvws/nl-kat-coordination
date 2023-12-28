@@ -1,0 +1,61 @@
+{% load i18n %}
+
+<section id="recommendations">
+    <div>
+        <h2>{% translate "Recommendations" %}</h2>
+        {% if total_findings == 0 %}
+            <p>{% translate "There are no recommendations." %}</p>
+        {% else %}
+            <p>
+                {% blocktranslate count total_findings as count trimmed %}
+                    There is <i>{{ total_findings }}</i> vulnerability
+                {% plural %}
+                    There are <i>{{ total_findings }}</i> vulnerabilities
+                {% endblocktranslate %}
+                {% blocktranslate count total_systems as count trimmed %}
+                    found on <i>{{ total_systems }}</i> system.
+                {% plural %}
+                    found on <i>{{ total_systems }}</i> systems.
+                {% endblocktranslate %}
+            </p>
+            {% if recommendation %}
+                <ul>
+                    {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
+                </ul>
+            {% else %}
+                <p>{% translate "There are no recommendations." %}</p>
+            {% endif %}
+        {% endif %}
+    </div>
+    {#    <div class="horizontal-scroll">#}
+    {#      <table>#}
+    {#        <caption class="visually-hidden">Overzicht Handmatig gevrijwaarde gescande assets:</caption>#}
+    {#        <thead>#}
+    {#        <tr>#}
+    {#          <th scope="col">Recommendation</th>#}
+    {#          <th scope="col">Occurrence</th>#}
+    {#        </tr>#}
+    {#        </thead>#}
+    {#        <tbody>#}
+    {#        <tr>#}
+    {#          <td>#}
+    {#            Update de web server op <a href="">systeem IP (domeinnaam)</a>#}
+    {#          </td>#}
+    {#          <td>5x</td>#}
+    {#        </tr>#}
+    {#        <tr>#}
+    {#          <td>#}
+    {#            Stel de firewall in, in het os van <a href="">systeem IP</a>#}
+    {#          </td>#}
+    {#          <td>3x</td>#}
+    {#        </tr>#}
+    {#        <tr>#}
+    {#          <td>#}
+    {#            Check if <a href="">SPF</a> is properly installed on all mail servers#}
+    {#          </td>#}
+    {#          <td>1x</td>#}
+    {#        </tr>#}
+    {#        </tbody>#}
+    {#      </table>#}
+    {#    </div>#}
+</section>
