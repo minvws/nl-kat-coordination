@@ -40,6 +40,7 @@ class MultiOrganizationReport(MultiReport):
         services = {}
         basic_security_summary = {}
         safe_connections_summary = {"number_of_available": 0, "number_of_ips": 0}
+        system_specific = {}
 
         for report_data in data.values():
             basic_security = {"compliant": 0, "total": 0}
@@ -109,6 +110,16 @@ class MultiOrganizationReport(MultiReport):
                 safe_connections_summary["number_of_available"] += safe_connections["number_of_available"]
                 safe_connections_summary["number_of_ips"] += safe_connections["number_of_ips"]
 
+            for service, summary in aggregate_data["basic_security"]["summary"].items():
+                if service not in system_specific:
+                    system_specific[service] = {"checks": {}}
+
+                for title, count in summary["system_specific"]["checks"].items():
+                    if title not in system_specific[service]["checks"]:
+                        system_specific[service]["checks"][title] = 0
+
+                    system_specific[service]["checks"][title] += count
+
         # TODO:
         #  - Sectornaam
         #  - “Sector X”
@@ -141,7 +152,11 @@ class MultiOrganizationReport(MultiReport):
             "recommendations": [],  # TODO
             "asset_vulnerabilities": asset_vulnerabilities,
             "open_ports": open_ports,
-            "basic_security": {"summary": basic_security_summary, "safe_connections": safe_connections_summary},
+            "basic_security": {
+                "summary": basic_security_summary,
+                "safe_connections": safe_connections_summary,
+                "system_specific": system_specific,
+            },
             "services": services,
             "ipv6": ["test"],  # TODO
         }

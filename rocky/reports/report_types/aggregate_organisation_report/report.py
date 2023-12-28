@@ -187,7 +187,7 @@ class AggregateOrganisationReport(AggregateReport):
             # Defaults
             basic_security["summary"][service] = {
                 "rpki": {"number_of_compliant": 0, "total": 0},
-                "system_specific": {"number_of_compliant": 0, "total": 0},
+                "system_specific": {"number_of_compliant": 0, "total": 0, "checks": {}, "ips": {}},
                 "safe_connections": {"number_of_compliant": 0, "total": 0},
             }
 

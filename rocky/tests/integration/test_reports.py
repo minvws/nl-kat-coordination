@@ -160,7 +160,12 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
 
     assert data["basic_security"]["summary"]["Dicom"] == {
         "rpki": {"number_of_compliant": 1, "total": 1},
-        "system_specific": {"number_of_compliant": 0, "total": 0},
+        "system_specific": {
+            "number_of_compliant": 0,
+            "total": 0,
+            "checks": {},
+            "ips": {},
+        },
         "safe_connections": {"number_of_compliant": 1, "total": 1},
     }
     assert data["basic_security"]["summary"]["Mail"] == {
@@ -204,7 +209,12 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     }
     assert data["basic_security"]["summary"]["Other"] == {
         "rpki": {"number_of_compliant": 1, "total": 1},
-        "system_specific": {"number_of_compliant": 0, "total": 0},
+        "system_specific": {
+            "number_of_compliant": 0,
+            "total": 0,
+            "checks": {},
+            "ips": {},
+        },
         "safe_connections": {"number_of_compliant": 1, "total": 1},
     }
 
@@ -308,27 +318,47 @@ def test_multi_report(
         "Dicom": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
         "Other": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
     }
-    assert multi_data["basic_security"] == {
-        "summary": {
-            "Mail": {
-                "rpki": {"number_of_compliant": 2, "total": 2},
-                "system_specific": {"number_of_compliant": 2, "total": 2},
-                "safe_connections": {"number_of_compliant": 2, "total": 2},
-            },
-            "Web": {
-                "rpki": {"number_of_compliant": 4, "total": 4},
-                "system_specific": {"number_of_compliant": 4, "total": 4},
-                "safe_connections": {"number_of_compliant": 4, "total": 4},
-            },
-            "Dicom": {
-                "rpki": {"number_of_compliant": 2, "total": 2},
-                "system_specific": {"number_of_compliant": 0, "total": 0},
-                "safe_connections": {"number_of_compliant": 2, "total": 2},
-            },
-            "Other": {
-                "rpki": {"number_of_compliant": 2, "total": 2},
-                "system_specific": {"number_of_compliant": 0, "total": 0},
-                "safe_connections": {"number_of_compliant": 2, "total": 2},
-            },
-        }
+    assert multi_data["basic_security"]["summary"] == {
+        "Mail": {
+            "rpki": {"number_of_compliant": 2, "total": 2},
+            "system_specific": {"number_of_compliant": 2, "total": 2},
+            "safe_connections": {"number_of_compliant": 2, "total": 2},
+        },
+        "Web": {
+            "rpki": {"number_of_compliant": 4, "total": 4},
+            "system_specific": {"number_of_compliant": 4, "total": 4},
+            "safe_connections": {"number_of_compliant": 4, "total": 4},
+        },
+        "Dicom": {
+            "rpki": {"number_of_compliant": 2, "total": 2},
+            "system_specific": {"number_of_compliant": 0, "total": 0},
+            "safe_connections": {"number_of_compliant": 2, "total": 2},
+        },
+        "Other": {
+            "rpki": {"number_of_compliant": 2, "total": 2},
+            "system_specific": {"number_of_compliant": 0, "total": 0},
+            "safe_connections": {"number_of_compliant": 2, "total": 2},
+        },
+    }
+    assert multi_data["basic_security"]["safe_connections"] == {
+        "number_of_available": 10,
+        "number_of_ips": 10,
+    }
+    assert multi_data["basic_security"]["system_specific"] == {
+        "Dicom": {"checks": {}},
+        "Mail": {"checks": {"DKIM": 2, "DMARC": 2, "SPF": 2}},
+        "Other": {"checks": {}},
+        "Web": {
+            "checks": {
+                "CSP Present": 4,
+                "Certificate is not expired": 4,
+                "Certificate is not expiring soon": 4,
+                "Has a Security.txt": 4,
+                "Has a certificate": 4,
+                "No unnecessary ports open": 4,
+                "Offers HTTPS": 4,
+                "Redirects HTTP to HTTPS": 4,
+                "Secure CSP Header": 4,
+            }
+        },
     }

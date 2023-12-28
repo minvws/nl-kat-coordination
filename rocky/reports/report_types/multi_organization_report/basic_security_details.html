@@ -37,193 +37,23 @@
             </tbody>
         </table>
     </div>
-    <h3>{% translate "System specific" %}</h3>
+    <h3>{% translate "System specific checks" %}</h3>
     {#    <p>#}
     {#        <strong><span class="tag medium">Medium</span> Score: 80%, Sector: 90%</strong>#}
     {#    </p>#}
-    <h4>E-emailserver</h4>
     <p>
-        Er zijn geen problemen aangetroffen bij de authenticatie van de mailservers. In deze tabel is te zien welke checks er zijn uitgevoerd.
+        {% blocktranslate trimmed %}
+            This is where checks are done that are specific to system types. Different security
+            and compliance issues come into play for different systems. They are listed here
+            under each other.
+        {% endblocktranslate %}
     </p>
-    <div class="horizontal-scroll">
-        <table>
-            <caption class="visually-hidden">Overzicht van lorem ipsum</caption>
-            <thead>
-                <tr>
-                    <th scope="col">Check</th>
-                    <th scope="col">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <a href="">SPF</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        600/600 mailservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">DKIM</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        600/600 mailservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">DMARC</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        600/600 mailservers complient
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <h4>Web server</h4>
-    <p>
-        In de tabel is te zien welke checks er zijn uitgevoerd. Daaropvolgend de compliancy issues, weergegeven per asset.
-    </p>
-    <div class="horizontal-scroll">
-        <table>
-            <caption class="visually-hidden">Overzicht van lorem ipsum</caption>
-            <thead>
-                <tr>
-                    <th scope="col">Check</th>
-                    <th scope="col">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <a href="">Lorem Ipsum 4</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        800/800 webservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">Lorem Ipsum 5</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        800/800 webservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">Lorem Ipsum 6</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        800/800 webservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">CSP header check</a>
-                    </td>
-                    <td>
-                        <span class="icon incomplete">Incomplete</span>
-                        600/800 webservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">HSTS policy check</a>
-                    </td>
-                    <td>
-                        <span class="icon incomplete">Incomplete</span>
-                        600/800 webservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">Lorem Ipsum 1</a>
-                    </td>
-                    <td>
-                        <span class="icon incomplete">Incomplete</span>
-                        600/800 webservers complient
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <h4>Nameserver</h4>
-    <p>
-        Er zijn geen problemen aangetroffen bij de mailservers. In deze tabel is te zien welke checks er zijn uitgevoerd.
-    </p>
-    <div class="horizontal-scroll">
-        <table>
-            <caption class="visually-hidden">Overzicht van lorem ipsum</caption>
-            <thead>
-                <tr>
-                    <th scope="col">Check</th>
-                    <th scope="col">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <a href="">DNSSEC</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        200/200 nameservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">loremipsum1</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        200/200 nameservers complient
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a href="">loremipsum2</a>
-                    </td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        200/200 nameservers complient
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <h4>Other</h4>
-    <p>
-        Er zijn geen problemen aangetroffen bij de servers in de categorie other. In de tabel is te zien welke checks er zijn uitgevoerd.
-    </p>
-    <div class="horizontal-scroll">
-        <table>
-            <caption class="visually-hidden">Overzicht van lorem ipsum</caption>
-            <thead>
-                <tr>
-                    <th scope="col">Check</th>
-                    <th scope="col">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>loremipsum 1</td>
-                    <td>
-                        <span class="icon positive">Voldoet</span>
-                        100/100 nameservers complient
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    {% for check, specific in report_data.basic_security.system_specific.items %}
+        {% if specific.checks %}
+            {% include "aggregate_organisation_report/system_specific.html" with data=specific type=check %}
+
+        {% endif %}
+    {% endfor %}
     <h3>Resource Public Key Infrastructure</h3>
     <p>
         <strong><span class="tag secure">Secure</span> Score: 100%, Sector: 90%</strong>
