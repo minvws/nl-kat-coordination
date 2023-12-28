@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 13:30+0000\n"
+"POT-Creation-Date: 2023-12-28 11:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2756,8 +2756,13 @@ msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/generate_report.html
-msgid "Download report"
+#: rocky/templates/oois/ooi_report.html
+#: rocky/templates/partials/findings_list_toolbar.html
+msgid "Download PDF"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+msgid "Download JSON"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -2782,10 +2787,6 @@ msgid "Recommendations"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
-msgid "There are no recommendations."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/recommendations.html
 #, python-format
 msgid "There is <i>%(total_findings)s</i> vulnerability"
 msgid_plural "There are <i>%(total_findings)s</i> vulnerabilities"
@@ -2798,6 +2799,10 @@ msgid "found on <i>%(total_systems)s</i> system."
 msgid_plural "found on <i>%(total_systems)s</i> systems."
 msgstr[0] ""
 msgstr[1] ""
+
+#: reports/report_types/aggregate_organisation_report/recommendations.html
+msgid "There are no recommendations."
+msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/safe_connections_report/report.html
@@ -3382,6 +3387,10 @@ msgid "Web system reports check web systems on basic security standards."
 msgstr ""
 
 #: reports/templates/generate_report.html
+msgid "Download report"
+msgstr ""
+
+#: reports/templates/generate_report.html
 #: reports/templates/generate_report_pdf.html
 msgid "for"
 msgstr ""
@@ -3843,7 +3852,6 @@ msgid "Declared"
 msgstr ""
 
 #: tools/forms/settings.py
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Inherited"
 msgstr ""
 
@@ -4854,11 +4862,6 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/oois/ooi_report.html
-#: rocky/templates/partials/findings_list_toolbar.html
-msgid "Download PDF"
-msgstr ""
-
-#: rocky/templates/oois/ooi_report.html
 #, python-format
 msgid "Findings report for %(name)s"
 msgstr ""
@@ -5515,6 +5518,7 @@ msgid "Success"
 msgstr ""
 
 #: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/stats.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Failed"
 msgstr ""
@@ -5664,28 +5668,56 @@ msgstr ""
 msgid "Boefje input OOI"
 msgstr ""
 
+#: rocky/templates/tasks/partials/stats.html
+msgid "Stats - Last 24 hours"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "All times in UTC, blocks of 1 hour."
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Timeslot"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Pending"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Queued"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Dispatched"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Running"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Completed"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Cancelled"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Could not load stats, Scheduler error."
+msgstr ""
+
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
 msgstr ""
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "all"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Pending"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Queued"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Dispatched"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Completed"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html

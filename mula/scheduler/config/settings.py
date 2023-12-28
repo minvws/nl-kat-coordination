@@ -64,6 +64,11 @@ class Settings(BaseSettings):
         description="Enables/disables the collection of metrics to be used with tools like Prometheus",
     )
 
+    json_logging: bool = Field(
+        False,
+        description="Enables/disables structured logging in json format",
+    )
+
     # Server settings
     api_host: str = Field(
         "0.0.0.0",

@@ -1,0 +1,119 @@
+{
+  "organization_code": "test",
+  "organization_name": "Test",
+  "organization_tags": ["tag1", "tag2"],
+  "data": {
+    "report_data": {
+      "IPAddressV4|internet|192.0.2.0": {
+        "systems-report": {
+          "input_ooi": "IPAddressV4|internet|192.0.2.0",
+          "services": {
+            "IPAddressV4|internet|192.0.2.0": {
+              "hostnames": [
+                "Hostname|internet|example.com"
+              ],
+              "services": [
+                "Other",
+                "Web"
+              ]
+            }
+          },
+          "summary": {
+            "total_systems": 1,
+            "total_domains": 1
+          }
+        }
+      }
+    },
+    "post_processed_data": {
+      "systems": {
+        "services": {
+          "IPAddressV4|internet|192.0.2.0": {
+            "hostnames": [
+              "Hostname|internet|example.com"
+            ],
+            "services": [
+              "Other",
+              "Web"
+            ]
+          }
+        }
+      },
+      "services": {
+        "Other": {
+          "IPAddressV4|internet|192.0.2.0": {
+            "hostnames": [
+              "Hostname|internet|example.com"
+            ],
+            "services": [
+              "Other",
+              "Web"
+            ]
+          }
+        },
+        "Web": {
+          "IPAddressV4|internet|192.0.2.0": {
+            "hostnames": [
+              "Hostname|internet|example.com"
+            ],
+            "services": [
+              "Other",
+              "Web"
+            ]
+          }
+        }
+      },
+      "open_ports": {},
+      "ipv6": {},
+      "vulnerabilities": {},
+      "basic_security": {
+        "rpki": {},
+        "system_specific": {
+          "Mail": [],
+          "Web": [],
+          "DNS": []
+        },
+        "safe_connections": {},
+        "summary": {
+          "Other": {
+            "rpki": {
+              "number_of_compliant": 0,
+              "total": 0
+            },
+            "system_specific": {
+              "number_of_compliant": 0,
+              "total": 0
+            },
+            "safe_connections": {
+              "number_of_compliant": 0,
+              "total": 0
+            }
+          },
+          "Web": {
+            "rpki": {
+              "number_of_compliant": 0,
+              "total": 0
+            },
+            "system_specific": {
+              "number_of_compliant": 0,
+              "total": 0
+            },
+            "safe_connections": {
+              "number_of_compliant": 0,
+              "total": 0
+            }
+          }
+        }
+      },
+      "summary": {
+        "Critical vulnerabilities": 0,
+        "IPs scanned": 1,
+        "Hostnames scanned": 1,
+        "Terms in report": ""
+      },
+      "total_findings": 0,
+      "total_systems": 1,
+      "total_systems_basic_security": 0
+    }
+  }
+}
