@@ -371,6 +371,7 @@ class AggregateOrganisationReport(AggregateReport):
             "summary": summary,
             "total_findings": len(all_findings),
             "total_systems": total_ips,
+            "total_hostnames": total_hostnames,
             "total_systems_basic_security": total_systems_basic_security,
         }
 

@@ -215,14 +215,24 @@ def test_multi_report(
 
     reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     report_types = [{"id": x.id, "name": "", "description": ""} for x in reports]
-    _, data, _ = aggregate_reports(octopoes_api_connector, ["Hostname|test|example.com"], report_types, valid_time)
-    _, data_2, _ = aggregate_reports(octopoes_api_connector_2, ["Hostname|test|example.com"], report_types, valid_time)
+    _, data, report_data = aggregate_reports(
+        octopoes_api_connector, ["Hostname|test|example.com"], report_types, valid_time
+    )
+    _, data_2, report_data_2 = aggregate_reports(
+        octopoes_api_connector_2, ["Hostname|test|example.com"], report_types, valid_time
+    )
 
     report_data = ReportData(
-        organization_code=octopoes_api_connector.client, organization_name="Test name", organization_tags=[], data=data
+        organization_code=octopoes_api_connector.client,
+        organization_name="Test name",
+        organization_tags=["test1"],
+        data={"post_processed_data": data, "report_data": report_data},
     )
     report_data_2 = ReportData(
-        organization_code=octopoes_api_connector_2.client, organization_name="Name2", organization_tags=[], data=data_2
+        organization_code=octopoes_api_connector_2.client,
+        organization_name="Name2",
+        organization_tags=["test1", "test2", "test3"],
+        data={"post_processed_data": data_2, "report_data": report_data_2},
     )
 
     # Save second organization info in the first organization
@@ -234,4 +244,17 @@ def test_multi_report(
         octopoes_api_connector, [str(report_data.reference), str(report_data_2.reference)]
     )
     multi_data = multi_report.post_process_data(multi_report_data)
-    assert multi_data
+    assert multi_data["organizations"] == [octopoes_api_connector.client, octopoes_api_connector_2.client]
+    assert multi_data["tags"] == {
+        "test1": ["test-test_multi_report", "test-test_multi_report-2"],
+        "test2": ["test-test_multi_report-2"],
+        "test3": ["test-test_multi_report-2"],
+    }
+
+    assert multi_data["basic_security_score"] == 100
+    assert multi_data["median_vulnerabilities"] == 60
+    assert multi_data["total_critical_vulnerabilities"] == 0
+    assert multi_data["total_findings"] == 0
+    assert multi_data["total_systems"] == 4
+    assert multi_data["total_hostnames"] == 14
+    assert multi_data["recommendations"] == []

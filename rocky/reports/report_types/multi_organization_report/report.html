@@ -32,12 +32,29 @@
                         </p>
                     </div>
                     <p>
-                        In deze sector
-                        zitten {{ report_data.organizations|length }} gescande organisaties. Van deze organisaties hebben <i>m</i>
-                        organisaties tag <i>T</i> (bijv. ‘ziekenhuis’) en <i>o</i> organisatie tag <i>U</i>.
-                        De basisbeveiligingsscores liggen rond de 60%.
-                        De mediaan van het aantal gevonden kwetsbaarheden is 20 per organisatie.
-                        Er zijn in totaal 33 kritieke kwetsbaarheden gevonden.
+                        {% translate "This sector contains" %}
+                        {{ report_data.organizations|length }}
+                        {% translate "Scanned organizations." %}
+                        {% if report_data.tags %}
+                            {% translate "Of these organizations" %}
+                            {% for tag, organizations in report_data.tags.items %}
+                                {% if not forloop.last %}
+                                    <i>{{ organizations|length }}</i>
+                                    {% translate "organizations have tag" %}
+                                    <i>{{ tag }}</i>,
+                                {% else %}
+                                    and <i>{{ organizations|length }}</i>
+                                    {% translate "organizations have tag" %}
+                                    <i>{{ tag }}</i>.
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        {% translate "The basic security scores are around " %}{{ report_data.basic_security_score }}%.
+                        {% translate "The median number of vulnerabilities found is " %}
+                        {{ report_data.median_vulnerabilities }}
+                        {% translate " per organization." %}
+                        {% translate "A total of " %}{{ report_data.total_critical_vulnerabilities }}
+                        {% translate " critical vulnerabilities have been identified." %}
                     </p>
                 </div>
             </div>
@@ -45,19 +62,13 @@
         <section id="summary">
             <div>
                 <h2>{% translate "Summary" %}</h2>
-                <p>
-                    Er zijn 3 algemene aanbevelingen. Er is 1 systeem met kritieke kwetsbaarheden.
-                    Er zijn in totaal x assets (IP/domeinen) gescand. Ten op zichte
-                    van de rest van de sector is de basisbeveiligingscore voldoende. Laagste
-                    basisbeveiligingsscore heeft het onderdeel Systeemspecifiek. Er
-                    is 1 nieuw systeem ontdekt.
-                </p>
+                {% include "aggregate_organisation_report/recommendations.html" with data=report_data.recommendations total_findings=report_data.total_findings total_systems=report_data.total_systems %}
+
                 <dl>
                     <div>
                         <dt>Sector definition</dt>
                         <dd>
-                            <span>This is a sector definition to make it clear for the rest of the report what all
-                            the comparisons between percentages mean</span>
+                            <span>{% translate "This is a sector definition to make it clear for the rest of the report what all Zthe comparisons between percentages mean" %}</span>
                         </dd>
                     </div>
                     <div>
@@ -69,43 +80,39 @@
                     <div>
                         <dt>Organisations in sector report</dt>
                         <dd>
-                            78
+                            {{ organizations|length }}
                         </dd>
                     </div>
-                    <div>
-                        <dt>Tag U organisations (e.g. hospitals)</dt>
-                        <dd>
-                            60
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>Tag T organisations</dt>
-                        <dd>
-                            18
-                        </dd>
-                    </div>
+                    {% for tag, organizations in report_data.tags.items %}
+                        <div>
+                            <dt>Tag {{ tag }} organisations</dt>
+                            <dd>
+                                {{ organizations|length }}
+                            </dd>
+                        </div>
+                    {% endfor %}
                     <div>
                         <dt>IP addresses scanned</dt>
                         <dd>
-                            684
+                            {{ report_data.total_systems }}
                         </dd>
                     </div>
                     <div>
                         <dt>Domains scanned</dt>
                         <dd>
-                            684
+                            {{ report_data.total_hostnames }}
                         </dd>
                     </div>
                     <div>
                         <dt>General recommendations</dt>
                         <dd>
-                            3
+                            {{ report_data.recommendations|length }}
                         </dd>
                     </div>
                     <div>
                         <dt>Median critical vulnerabilities</dt>
                         <dd>
-                            1
+                            {{ report_data.median_vulnerabilities }}
                         </dd>
                     </div>
                     <div>

@@ -23,20 +23,64 @@ class MultiOrganizationReport(MultiReport):
         """
         The data is of the form:
            {
-               "ReportData|org_code": {...},
-               "ReportData|org_code_2": {...},
+               "ReportData|org_code": ReportData.dict(),
+               "ReportData|org_code_2": ReportData.dict(),
            }
         """
+
+        tags = {}
+        total_critical_vulnerabilities = 0
+        basic_securities = []
+        total_findings = 0
+        total_systems = 0
+        total_hostnames = 0
+
+        for report_data in data.values():
+            basic_security = {"compliant": 0, "total": 0}
+
+            for tag in report_data["organization_tags"]:
+                if tag not in tags:
+                    tags[tag] = []
+
+                tags[tag].append(report_data["organization_code"])
+
+            total_critical_vulnerabilities += report_data["data"]["post_processed_data"]["summary"][
+                "Critical vulnerabilities"
+            ]
+            total_findings += report_data["data"]["post_processed_data"]["total_findings"]
+            total_systems += report_data["data"]["post_processed_data"]["total_systems"]
+            total_hostnames += report_data["data"]["post_processed_data"]["total_hostnames"]
+
+            for compliance in report_data["data"]["post_processed_data"]["basic_security"]["summary"].values():
+                for counts in compliance.values():
+                    basic_security["total"] += counts["total"]
+                    basic_security["compliant"] += counts["number_of_compliant"]
+
+            basic_securities.append(basic_security)
 
         # TODO:
         #  - Sectornaam
         #  - “Sector X”
-        #  - 3 algemene aanbevelingen, 1 systeem
-        #  - ...
+        #  - Benchmark comparison X ?
+        #  - Best scoring security checks
+        #  - Lowest organisations in report
+        #  - Lowest organisations in report per tag
+        #  - Most common vulnerabilities
 
         return {
             "multi_data": data,
             "organizations": [value["organization_code"] for key, value in data.items()],
+            "tags": tags,
+            # Average score over organizations
+            "basic_security_score": round(
+                sum(x["compliant"] / x["total"] for x in basic_securities) / len(basic_securities) * 100
+            ),
+            "median_vulnerabilities": 60,  # TODO
+            "total_critical_vulnerabilities": total_critical_vulnerabilities,
+            "total_findings": total_findings,
+            "total_systems": total_systems,
+            "total_hostnames": total_hostnames,
+            "recommendations": [],  # TODO
         }
 
 
