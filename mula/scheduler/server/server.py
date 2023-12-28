@@ -466,7 +466,7 @@ class Server:
                     models.TaskEvent(
                         task_id=task_id,
                         event_type=models.TaskEventType.STATUS_CHANGE,
-                        event_data={"from": task_db.status, "to": item["status"]},
+                        event_data={"from_status": task_db.status, "to_status": item["status"]},
                     )
                 )
             except Exception as exc:
@@ -484,6 +484,16 @@ class Server:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="failed to update task",
+            ) from exc
+
+        # Retrieve updated task
+        try:
+            updated_task = self.ctx.datastores.task_store.get_task_by_id(task_id)
+        except Exception as exc:
+            self.logger.error(exc)
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to get updated task",
             ) from exc
 
         return updated_task

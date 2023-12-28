@@ -106,7 +106,17 @@ class Scheduler(abc.ABC):
             self.ctx.datastores.task_store.update_task(task)
             return
 
+        # Create task
         self.ctx.datastores.task_store.create_task(task)
+
+        # Create event
+        self.ctx.datastores.task_store.log_event(
+            models.TaskEvent(
+                task_id=task.id,
+                event_type=models.TaskEventType.STATUS_CHANGE,
+                event_data={"from_status": models.TaskStatus.PENDING, "to_status": task.status},
+            )
+        )
 
         self.last_activity = datetime.now(timezone.utc)
 
@@ -133,11 +143,16 @@ class Scheduler(abc.ABC):
             )
             return
 
-        from_status = task.status
         task.status = models.TaskStatus.DISPATCHED
-
-        self.ctx.datastore.task_store.log_event(task.id, models.TaskEventType.STATUS_CHANGE, {"from_status": from_status, "to_status": task.status})
         self.ctx.datastores.task_store.update_task(task)
+
+        self.ctx.datastores.task_store.log_event(
+            models.TaskEvent(
+                task_id=task.id,
+                event_type=models.TaskEventType.STATUS_CHANGE,
+                event_data={"from_status": models.TaskStatus.QUEUED, "to_status": task.status},
+            )
+        )
 
         self.last_activity = datetime.now(timezone.utc)
 

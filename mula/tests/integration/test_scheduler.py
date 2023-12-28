@@ -71,6 +71,11 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
+        # Event should be created
+        self.assertEqual(1, len(task_db.events))
+        self.assertEqual(task_db.events[0].event_type, models.TaskEventType.STATUS_CHANGE)
+        self.assertEqual(task_db.events[0].event_data["to_status"], models.TaskStatus.QUEUED)
+
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
         # Arrange
@@ -100,6 +105,11 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
+
+        # Assert: event should be created
+        self.assertEqual(2, len(task_db.events))
+        self.assertEqual(task_db.events[1].event_type, models.TaskEventType.STATUS_CHANGE)
+        self.assertEqual(task_db.events[1].event_data["to_status"], models.TaskStatus.DISPATCHED)
 
     def test_disable_scheduler(self):
         # Arrange: start scheduler

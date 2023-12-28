@@ -2,6 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 
 from sqlalchemy import exc, func
+from sqlalchemy.orm import joinedload
 
 from scheduler import models
 
@@ -61,7 +62,12 @@ class TaskStore:
     @retry()
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.dbconn.session.begin() as session:
-            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
+            task_orm = (
+                session.query(models.TaskDB)
+                .options(joinedload(models.TaskDB.events))
+                .filter(models.TaskDB.id == task_id)
+                .first()
+            )
             if task_orm is None:
                 return None
 
