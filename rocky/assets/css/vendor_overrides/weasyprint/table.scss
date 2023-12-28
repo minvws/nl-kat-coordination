@@ -1,0 +1,31 @@
+/* Weasyprint table overrides */
+
+/* There is a bug in weasyprint that parses the border-width with multiple
+   values wrong when using CSS variables, so we have to specify them here
+   without variables . */
+
+table {
+  caption {
+    color: #585858;
+  }
+
+  thead {
+    border-width: 0 0 2px;
+    border-color: #a89cdd;
+  }
+
+  td {
+    border-width: 0 0 1px;
+  }
+
+  tr {
+    /* Zebra striping with opacity to keep background color. e.g for warnings or errors */
+    &:first-of-type td {
+      border-width: 0 0 1px;
+    }
+
+    &:last-of-type td {
+      border-width: 0 0 1px;
+    }
+  }
+}
