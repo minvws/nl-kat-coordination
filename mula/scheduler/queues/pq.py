@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import abc
 import functools
-import logging
 import threading
 from typing import Any, Dict, Optional
 
 import pydantic
+import structlog
 
 from scheduler import models, storage
 
@@ -90,7 +90,7 @@ class PriorityQueue(abc.ABC):
                 A PriorityQueueStore instance that will be used to store the
                 items in a persistent way.
         """
-        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.pq_id: str = pq_id
         self.maxsize: int = maxsize
         self.item_type: Any = item_type
