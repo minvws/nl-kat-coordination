@@ -1,0 +1,19 @@
+/* Weasyprint tile overrides */
+
+.tile {
+  display: inline;
+}
+
+.tiles {
+  > div,
+  > nav,
+  > section {
+    display: inline;
+  }
+}
+
+ul.tiles {
+  > li {
+    display: inline;
+  }
+}

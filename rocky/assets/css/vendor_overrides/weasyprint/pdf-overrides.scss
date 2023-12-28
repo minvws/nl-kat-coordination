@@ -1,0 +1,41 @@
+/* Default component styling */
+@import "../../themes/soft/manon/accordion";
+@import "report-manon-components";
+@import "../../components/chapter-numbering";
+
+/* Print styles */
+@import "../../components/print";
+@import "../../components/print_report";
+
+/* Weasyprint flexbox rendering is very limited and not really usable.
+   https://github.com/Kozea/WeasyPrint/issues/1171#issuecomment-1549483312 */
+
+/* Weasypint overrides */
+@import "application-base";
+@import "accordion";
+@import "table";
+@import "layout-centered";
+@import "tile";
+@import "section";
+@import "section-wrapper";
+@import "description-list";
+@import "headings";
+@import "table-of-contents";
+
+:root {
+  --text-set-font-size: 12pt;
+  --body-text-large-font-size: 15pt;
+  --heading-xxl-font-size: 26pt;
+  --heading-xl-font-size: 20pt;
+  --heading-large-font-size: 18pt;
+  --table-font-size: 10pt;
+  --table-head-cell-font-size: 12pt;
+}
+
+body > main > section.dividing-line {
+  border-top: 0;
+}
+
+body > main > article > div.report-content > section > div {
+  padding: 0;
+}

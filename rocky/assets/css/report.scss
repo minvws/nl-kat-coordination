@@ -2,7 +2,6 @@
 @import "abstracts/alert-colors";
 
 /* Vendors */
-@import "report-manon-components";
 @import "vendor_overrides/manon/table";
 @import "vendor_overrides/manon/tile";
 @import "themes/soft/report";
@@ -12,4 +11,4 @@
 @import "components/scan-level-indicator";
 
 /* PDF report specific overrides */
-@import "report-overrides"
+@import "vendor_overrides/weasyprint/pdf-overrides";
