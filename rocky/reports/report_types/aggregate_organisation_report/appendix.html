@@ -64,18 +64,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>{{ data.health.service }}</td>
-                <td>{{ data.health.version }}</td>
-                <td>
-                    {% if data.health.healthy %}
-                        <span class="icon positive"></span>{% translate "Healthy" %}
-                    {% else %}
-                        <span class="icon negative"></span>{% translate "Unhealthy" %}
-                    {% endif %}
-                </td>
-            </tr>
-            {% for service in data.health.results %}
+            {% for service in data.health %}
                 <tr>
                     <td>{{ service.service }}</td>
                     <td>{{ service.version }}</td>
@@ -87,21 +76,6 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% if service.results %}
-                    {% for sub_service in service.results %}
-                        <tr>
-                            <td>{{ sub_service.service }}</td>
-                            <td>{{ sub_service.version }}</td>
-                            <td>
-                                {% if sub_service.healthy %}
-                                    <span class="icon positive"></span>{% translate "Healthy" %}
-                                {% else %}
-                                    <span class="icon negative"></span>{% translate "Unhealthy" %}
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}
             {% endfor %}
         </tbody>
     </table>

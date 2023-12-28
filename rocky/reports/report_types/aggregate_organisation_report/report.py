@@ -12,7 +12,7 @@ from reports.report_types.safe_connections_report.report import SafeConnectionsR
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
-from rocky.views.health import get_rocky_health
+from rocky.views.health import flatten_health, get_rocky_health
 
 logger = getLogger(__name__)
 
@@ -369,7 +369,7 @@ class AggregateOrganisationReport(AggregateReport):
             "total_findings": len(all_findings),
             "total_systems": total_ips,
             "total_systems_basic_security": total_systems_basic_security,
-            "health": get_rocky_health(self.octopoes_api_connector),
+            "health": flatten_health(get_rocky_health(self.octopoes_api_connector)),
         }
 
     def collect_system_specific_data(self, data, services, system_type: SystemType, report_id: str):
