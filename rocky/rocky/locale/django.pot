@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 14:00+0000\n"
+"POT-Creation-Date: 2023-12-28 11:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -723,8 +723,10 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
-#: fmea/models.py reports/templates/summary/service_health.html
-#: rocky/templates/footer.html rocky/templates/health.html
+#: fmea/models.py
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
 msgid "Service"
 msgstr ""
 
@@ -2712,8 +2714,7 @@ msgid "Report type"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
-msgid "Selected Plugins for scans"
+msgid "Selected Plugins for Scans"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2724,6 +2725,29 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin scan level"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Service Versions and Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/health.html
+msgid "Version"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/footer.html rocky/views/health.py
+msgid "Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/health.html
+msgid "Healthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Unhealthy"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
@@ -3568,6 +3592,10 @@ msgstr ""
 msgid "Selected Plugins"
 msgstr ""
 
+#: reports/templates/partials/report_sidemenu.html
+msgid "Service versions and health"
+msgstr ""
+
 #: reports/templates/partials/report_types_selection.html
 msgid "Choose report types"
 msgstr ""
@@ -3609,8 +3637,8 @@ msgstr ""
 msgid "Object"
 msgstr ""
 
-#: reports/templates/summary/service_health.html rocky/templates/health.html
-msgid "Version"
+#: reports/templates/summary/report_summary.html
+msgid "Selected Plugins for scans"
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -4462,10 +4490,6 @@ msgstr ""
 msgid "Privacy Statement"
 msgstr ""
 
-#: rocky/templates/footer.html rocky/views/health.py
-msgid "Health"
-msgstr ""
-
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
 msgstr ""
@@ -4503,10 +4527,6 @@ msgstr ""
 
 #: rocky/templates/health.html
 msgid "Health Checks"
-msgstr ""
-
-#: rocky/templates/health.html
-msgid "Healthy"
 msgstr ""
 
 #: rocky/templates/health.html
