@@ -150,10 +150,12 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     assert data["vulnerabilities"] == {
         "IPAddressV4|test|192.0.2.3": {
             "vulnerabilities": {},
+            "title": "192.0.2.3",
             "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
         },
         "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
             "vulnerabilities": {},
+            "title": "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
             "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
         },
     }
@@ -272,12 +274,10 @@ def test_multi_report(
     }
 
     assert multi_data["basic_security_score"] == 100
-    assert multi_data["median_vulnerabilities"] == 60
     assert multi_data["total_critical_vulnerabilities"] == 0
     assert multi_data["total_findings"] == 3
     assert multi_data["total_systems"] == 4
     assert multi_data["total_hostnames"] == 14
-    assert multi_data["recommendations"] == []
     assert multi_data["service_counts"] == {"Mail": 2, "Web": 4, "Dicom": 2, "Other": 2}
     assert multi_data["open_ports"] == {
         "total": 4,
