@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Set, Type, TypedDict, Union
+from typing import Any, Dict, List, Optional, Set, Type, Union
 
 from account.mixins import OrganizationView
 from django.forms import Form
@@ -14,15 +14,9 @@ from tools.view_helpers import BreadcrumbsMixin
 from octopoes.models import OOI
 from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import Report
+from reports.report_types.definitions import Report, ReportType
 from reports.report_types.helpers import get_report_by_id
 from rocky.views.mixins import OctopoesView
-
-
-class ReportType(TypedDict):
-    id: str
-    name: str
-    description: str
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
