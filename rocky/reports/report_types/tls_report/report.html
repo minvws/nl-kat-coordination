@@ -21,7 +21,7 @@
                         <tr>
                             <td>
                                 {% if suite.cipher_suite_name in data.suites_with_findings %}
-                                    <i class="icon negative"></i> {% translate "Phase out" %}
+                                    <i class="icon alert"></i> {% translate "Phase out" %}
                                 {% else %}
                                     <i class="icon positive"></i> {% translate "Good" %}
                                 {% endif %}
