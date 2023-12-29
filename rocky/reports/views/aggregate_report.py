@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 from django.conf import settings
 from django.contrib import messages
@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
-from octopoes.models import Reference
+from octopoes.models import Reference, ScanLevel, ScanProfileType
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
@@ -22,6 +22,7 @@ from reports.views.base import (
     BaseReportView,
     ReportBreadcrumbs,
 )
+from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -95,13 +96,16 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Ba
         )
 
     def get(self, request, *args, **kwargs):
-        if not self.selected_oois:
+        if not self.selected_oois and "all" not in self.selected_oois:
             messages.error(self.request, _("Select at least one OOI to proceed."))
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
+        if "all" not in self.selected_oois:
+            context["oois"] = self.get_oois()
+        else:
+            context["oois"] = "all"
         context["available_report_types_aggregate"] = self.available_report_types
         context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
             self.available_report_types["optional"]
@@ -136,6 +140,10 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     template_name = "aggregate_report.html"
     current_step = 6
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.selected_oois = self.get_oois()
+
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             template, post_processed_data, report_data = self.generate_reports_for_oois()
@@ -169,6 +177,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         report_data = {}
         aggregate_report = AggregateOrganisationReport(self.octopoes_api_connector)
         aggregate_template = aggregate_report.template_path
+
         for ooi in self.selected_oois:
             report_data[ooi] = {}
             for options, report_types in aggregate_report.reports.items():
@@ -182,6 +191,22 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         post_processed_data = aggregate_report.post_process_data(report_data, self.valid_time)
 
         return aggregate_template, post_processed_data, report_data
+
+    def get_oois(self) -> List:
+        if "all" in self.selected_oois:
+            scan_levels = {ScanLevel(int(s)) for s in ["2", "3", "4"]}
+            clearance_types = {ScanProfileType(s) for s in ["declared"]}
+            ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+            ooi_list = self.octopoes_api_connector.list(
+                ooi_types,
+                valid_time=self.valid_time,
+                limit=OOIList.HARD_LIMIT,
+                scan_level=scan_levels,
+                scan_profile_type=clearance_types,
+            ).items
+
+            return ooi_list
+        return super().get_oois()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -200,7 +225,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             True,
             **dict(json="true", **self.request.GET),
         )
-        context["oois"] = self.get_oois()
+        context["oois"] = self.selected_oois
         context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
         return context
 

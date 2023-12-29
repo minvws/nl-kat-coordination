@@ -6,8 +6,21 @@
         {% include "aggregate_organisation_report/term_overview.html" %}
 
         <h3 id="selected-oois">{% translate "Selected OOIs" %}</h3>
-        {% include "summary/ooi_selection.html" %}
+        {% if 'all' not in request.GET.ooi %}
+            {% include "summary/ooi_selection.html" %}
 
+        {% else %}
+            <p class="explanation"
+               role="group"
+               aria-label="{% translate "explanation select all" %}">
+                <span>{% translate "Explanation" %}:</span>
+                {% blocktrans trimmed %}
+                    You have selected all OOIs that have a
+                    clearance type:'declared' and clearance level: 'L2, L3, L4'
+                    for {{ organization }} organization.
+                {% endblocktrans %}
+            </p>
+        {% endif %}
     </div>
     <h3 id="selected-report-types">{% translate "Selected Report Types" %}</h3>
     <table>
