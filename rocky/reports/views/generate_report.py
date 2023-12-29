@@ -34,7 +34,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("generate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select OOIs"),
+                "text": _("Select Objects"),
             },
             {
                 "url": reverse("generate_report_select_report_types", kwargs=kwargs) + selection,
@@ -63,7 +63,7 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, TemplateView):
 
 class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):
     """
-    Select OOIs for the 'Generate Report' flow.
+    Select objects for the 'Generate Report' flow.
     """
 
     template_name = "generate_report/select_oois.html"

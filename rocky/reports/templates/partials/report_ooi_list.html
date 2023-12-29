@@ -4,9 +4,9 @@
     <div>
         <h2>
             {% blocktranslate trimmed count counter=object_list|length %}
-                Select OOI
+                Select object
             {% plural %}
-                Select OOIs
+                Select objects
             {% endblocktranslate %}
         </h2>
         <p>{% translate "Select which objects you want to include in your report." %}</p>
@@ -14,7 +14,7 @@
         {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
 
         {% if not object_list %}
-            <p>{% translate "No OOIs found." %}</p>
+            <p>{% translate "No objects found." %}</p>
             <div class="button-container">
                 <a class="button ghost"
                    href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
@@ -31,8 +31,8 @@
                         <th>
                             <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
                         </th>
-                        <th>{% translate "OOI" %}</th>
-                        <th>{% translate "OOI-Type" %}</th>
+                        <th>{% translate "Object" %}</th>
+                        <th>{% translate "Type" %}</th>
                         <th>{% translate "Clearance level" %}</th>
                         <th>{% translate "Clearance type" %}</th>
                     </thead>
