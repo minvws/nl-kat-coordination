@@ -16,6 +16,7 @@ from octopoes.models.ooi.dns.records import NXDOMAIN
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.origin import Origin, OriginType
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 
@@ -234,6 +235,103 @@ def test_deletion_events_after_nxdomain(
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) == 0
     assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 6
+
+    nxd = NXDOMAIN(hostname=hostname.reference)
+    xtdb_octopoes_service.ooi_repository.save(nxd, valid_time)
+
+    nxd_origin = Origin(
+        origin_type=OriginType.OBSERVATION,
+        method="",
+        source=network.reference,
+        result=[nxd.reference],
+        task_id=uuid.uuid4(),
+    )
+    xtdb_octopoes_service.save_origin(nxd_origin, [nxd], valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    xtdb_octopoes_service.recalculate_bits()
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
+    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 4
+
+def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
+    xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
+):
+    network = Network(name="internet")
+
+    origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=network.reference,
+        result=[network.reference],
+        task_id=uuid.uuid4(),
+    )
+
+    url = "mispo.es"
+    hostname = Hostname(network=network.reference, name=url)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    xtdb_octopoes_service.save_origin(origin, [network], valid_time)
+    xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
+
+    softwares = [
+        Software(name="Bootstrap", version= "3.3.7", cpe = "cpe:/a:getbootstrap:bootstrap"),
+        Software(name="Nginx", version= "1.18.0", cpe = "cpe:/a:nginx:nginx"),
+        Software(name="cdnjs"),
+        Software(name="jQuery Migrate", version= "1.0.0"),
+        Software(name="jQuery", version= "3.6.0",cpe = "cpe:/a:jquery:jquery"),
+    ]
+    instances = [SoftwareInstance(ooi=hostname.reference, software=software.reference) for software in softwares]
+
+    software_origin = Origin(
+        origin_type=OriginType.OBSERVATION,
+        method="",
+        source=network.reference,
+        result=[x.reference for x in (softwares + instances)],
+        task_id=uuid.uuid4(),
+    )
+
+    for software, instance in zip(softwares, instances):
+        xtdb_octopoes_service.ooi_repository.save(software, valid_time)
+        xtdb_octopoes_service.ooi_repository.save(instance, valid_time)
+    xtdb_octopoes_service.save_origin(software_origin, softwares + instances, valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    xtdb_octopoes_service.recalculate_bits()
+
+    finding_types = [
+        KATFindingType(id="KAT-NO-SPF"),
+        KATFindingType(id="KAT-NO-DMARC"),
+        KATFindingType(id="KAT-NO-DKIM"),
+    ]
+
+    findings = [Finding(finding_type=ft.reference, ooi=hostname.reference) for ft in finding_types]
+
+    finding_origin = Origin(
+        origin_type=OriginType.OBSERVATION,
+        method="",
+        source=network.reference,
+        result=[finding.reference for finding in findings],
+        task_id=uuid.uuid4(),
+    )
+
+    for finding in findings:
+        xtdb_octopoes_service.ooi_repository.save(finding, valid_time)
+    xtdb_octopoes_service.save_origin(finding_origin, findings, valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    xtdb_octopoes_service.recalculate_bits()
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) == 0
+    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 16
 
     nxd = NXDOMAIN(hostname=hostname.reference)
     xtdb_octopoes_service.ooi_repository.save(nxd, valid_time)
