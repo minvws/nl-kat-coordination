@@ -93,9 +93,7 @@ class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, Base
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context["oois"] = self.get_oois()
-
         context["available_report_types"] = self.get_report_types_for_generate_report(
             get_report_types_for_oois(self.selected_oois)
         )

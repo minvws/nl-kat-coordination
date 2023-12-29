@@ -13,7 +13,7 @@ from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI
 from octopoes.models.types import OOIType
-from reports.forms import OOITypeMultiCheckboxForReportForm, ReportSelectAllOOIsForOrganization
+from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import get_report_by_id
 from rocky.views.mixins import OctopoesView
@@ -81,8 +81,7 @@ class BaseReportView(OctopoesView):
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
                 sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]), self.request.GET
-            ),
-            "select_all_form": ReportSelectAllOOIsForOrganization(self.request.GET),
+            )
         }
 
     def get_report_types_for_generate_report(self, reports: Set[Type[Report]]) -> List[Dict[str, str]]:

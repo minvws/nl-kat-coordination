@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 17:08+0000\n"
+"POT-Creation-Date: 2023-12-29 14:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2703,6 +2703,25 @@ msgid "Selected OOIs"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_ooi_list.html
+msgid "explanation select all"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/partials/form/field_input_help_text.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/two_factor/core/login.html
+msgid "Explanation"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#, python-format
+msgid ""
+"You have selected all OOIs that have a clearance type:'declared' and "
+"clearance level: 'L2, L3, L4' for %(organization)s organization."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_summary.html
 msgid "Selected Report Types"
@@ -3572,6 +3591,20 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+msgid "Explanation 'Continue with all OOIs'"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid ""
+"This option will select all OOIs that have a clearance type:'declared' and "
+"clearance level: 'L2, L3, L4' for the current organization."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with all OOIs"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 msgid "Objects:"
 msgstr ""
@@ -3585,7 +3618,8 @@ msgid "Clearance type"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Setup report"
+#: reports/templates/partials/report_types_selection.html
+msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3669,6 +3703,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
+msgid "You have selected all OOIs in previous step."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
 msgstr ""
 
@@ -3678,10 +3716,6 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
-msgstr ""
-
-#: reports/templates/partials/report_types_selection.html
-msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/summary/ooi_selection.html
@@ -5329,12 +5363,6 @@ msgstr ""
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/two_factor/core/login.html
 msgid "explanation"
-msgstr ""
-
-#: rocky/templates/partials/form/field_input_help_text.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/two_factor/core/login.html
-msgid "Explanation"
 msgstr ""
 
 #: rocky/templates/partials/form/indemnification_add_form.html

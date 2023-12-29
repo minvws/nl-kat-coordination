@@ -197,7 +197,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             scan_levels = {ScanLevel(int(s)) for s in ["2", "3", "4"]}
             clearance_types = {ScanProfileType(s) for s in ["declared"]}
             ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
-            ooi_list = self.octopoes_api_connector.list(
+            return self.octopoes_api_connector.list(
                 ooi_types,
                 valid_time=self.valid_time,
                 limit=OOIList.HARD_LIMIT,
@@ -205,7 +205,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
                 scan_profile_type=clearance_types,
             ).items
 
-            return ooi_list
         return super().get_oois()
 
     def get_context_data(self, **kwargs):
