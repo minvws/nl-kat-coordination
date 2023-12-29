@@ -211,15 +211,16 @@ class Server:
     def root(self) -> Any:
         return None
 
-    def health(self) -> Any:
+    def health(self, externals: bool = False) -> Any:
         response = models.ServiceHealth(
             service="scheduler",
             healthy=True,
             version=version.__version__,
         )
 
-        for service in self.ctx.services.__dict__.values():
-            response.externals[service.name] = service.is_healthy()
+        if externals:
+            for service in self.ctx.services.__dict__.values():
+                response.externals[service.name] = service.is_healthy()
 
         return response
 
