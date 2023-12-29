@@ -1,4 +1,5 @@
 from urllib.parse import unquote
+
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.shortcuts import redirect
