@@ -410,4 +410,10 @@ def test_multi_report(
         "CVE-2019-8331": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
         "RetireJS-jquerymigrate-f3a3": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
     }
-    assert multi_data["ipv6"] == {'Dicom': {'total': 2, 'enabled': 2}, 'Mail': {'total': 2, 'enabled': 2}, 'Other': {'total': 2, 'enabled': 2}, 'Web': {'total': 2, 'enabled': 2}}
+    assert multi_data["ipv6"] == {
+        "Dicom": {"total": 2, "enabled": 2},
+        "Mail": {"total": 2, "enabled": 2},
+        "Other": {"total": 2, "enabled": 2},
+        "Web": {"total": 2, "enabled": 2},
+    }
+    assert multi_data["recommendation_counts"] == {"Make sure there is a security.txt available.": 2}

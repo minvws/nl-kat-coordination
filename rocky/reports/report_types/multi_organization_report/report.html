@@ -11,7 +11,7 @@
         {% include "multi_organization_report/summary.html" %}
 
         <div class="chapter-numbers report-content">
-            {% include "multi_organization_report/recommendations.html" with data=report_data.recommendations total_findings=report_data.total_findings total_systems=report_data.total_systems %}
+            {% include "multi_organization_report/recommendations.html" with total_findings=report_data.total_findings total_systems=report_data.total_systems %}
             {% include "multi_organization_report/asset_overview.html" %}
             {% include "multi_organization_report/open_ports.html" %}
             {% include "multi_organization_report/ipv6.html" %}

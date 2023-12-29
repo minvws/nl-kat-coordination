@@ -34,7 +34,7 @@ def get_bytes_health() -> ServiceHealth:
         bytes_health = ServiceHealth(
             service="bytes",
             healthy=False,
-            additional=_("Could not connect to Bytes. Service is possibly down"),
+            additional="Could not connect to Bytes. Service is possibly down",
         )
     return bytes_health
 
@@ -48,7 +48,7 @@ def get_octopoes_health(octopoes_api_connector: OctopoesAPIConnector) -> Service
         octopoes_health = ServiceHealth(
             service="octopoes",
             healthy=False,
-            additional=_("Could not connect to Octopoes. Service is possibly down"),
+            additional="Could not connect to Octopoes. Service is possibly down",
         )
     return octopoes_health
 
@@ -61,7 +61,7 @@ def get_scheduler_health() -> ServiceHealth:
         scheduler_health = ServiceHealth(
             service="scheduler",
             healthy=False,
-            additional=_("Could not connect to Scheduler. Service is possibly down"),
+            additional="Could not connect to Scheduler. Service is possibly down",
         )
     return scheduler_health
 
@@ -90,7 +90,7 @@ def get_rocky_health(octopoes_api_connector: OctopoesAPIConnector) -> ServiceHea
     services_healthy = all(service.healthy for service in services)
     additional = None
     if not services_healthy:
-        additional = _("Rocky will not function properly. Not all services are healthy.")
+        additional = "Rocky will not function properly. Not all services are healthy."
     rocky_health = ServiceHealth(
         service="rocky",
         healthy=services_healthy,

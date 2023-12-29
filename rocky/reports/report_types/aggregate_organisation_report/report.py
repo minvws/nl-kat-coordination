@@ -359,6 +359,15 @@ class AggregateOrganisationReport(AggregateReport):
                 )
 
         terms = list(set(terms))
+
+        recommendation_counts = {}
+
+        for recommendation in recommendations:
+            if recommendation not in recommendation_counts:
+                recommendation_counts[recommendation] = 0
+
+            recommendation_counts[recommendation] += 1
+
         recommendations = list(set(filter(None, recommendations)))
         total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
@@ -391,6 +400,7 @@ class AggregateOrganisationReport(AggregateReport):
             "systems": systems,
             "services": services,
             "recommendations": recommendations,
+            "recommendation_counts": recommendation_counts,
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,

@@ -11,7 +11,7 @@
             {% endblocktranslate %}
         </p>
         <p>
-            {% translate "In total " %} {{ report_data.ipv6.values|get_key:"enabled"|sum_list }}{%  translate " out of " %}{{ report_data.ipv6.values|get_key:"total"|sum_list }} {% translate " systems have an IPv6 connection." %}
+            {% translate "In total " %} {{ report_data.ipv6.values|get_key:"enabled"|sum_list }}{% translate " out of " %}{{ report_data.ipv6.values|get_key:"total"|sum_list }} {% translate " systems have an IPv6 connection." %}
         </p>
         <div class="horizontal-scroll">
             <table>
