@@ -22,8 +22,8 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         super().setup(request, *args, **kwargs)
         if not self.organization:
             self.add_error_notification(RAW_ERRORS["no_org"])
-        if kwargs.get('mime_types', False):
-            self.mime_types = unquote(kwargs['mime_types'])
+        if kwargs.get("mime_types"):
+            self.mime_types = unquote(kwargs["mime_types"])
 
     def get_initial(self):
         """
@@ -31,7 +31,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         """
         initial = super().get_initial()
         if self.mime_types:
-            initial['mime_types'] = self.mime_types
+            initial["mime_types"] = self.mime_types
         return initial
 
     def get_success_url(self):
