@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Set, Type
+from typing import Any, Dict, List, Optional, Set, Type, TypedDict, Union
 
 from account.mixins import OrganizationView
 from django.forms import Form
@@ -22,7 +22,9 @@ from rocky.views.mixins import OctopoesView
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     current_step: int = 1
 
-    def get_selection(self):
+    def get_selection(self, pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None) -> str:
+        if pre_selection:
+            return "?" + urlencode(pre_selection, True)
         return "?" + urlencode(self.request.GET, True)
 
     def get_kwargs(self):

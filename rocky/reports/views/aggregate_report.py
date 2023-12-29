@@ -36,7 +36,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("aggregate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select OOIs"),
+                "text": _("Select Objects"),
             },
             {
                 "url": reverse("aggregate_report_select_report_types", kwargs=kwargs) + selection,
@@ -60,12 +60,18 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, TemplateView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("aggregate_report_select_oois", kwargs=self.get_kwargs()))
+        kwargs = self.get_kwargs()
+        pre_selection = {
+            "clearance_level": ["2", "3", "4"],
+            "clearance_type": "declared",
+        }
+        selection = self.get_selection(pre_selection)
+        return redirect(reverse("aggregate_report_select_oois", kwargs=kwargs) + selection)
 
 
 class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):
     """
-    Select OOIs for the 'Aggregate Report' flow.
+    Select Objects for the 'Aggregate Report' flow.
     """
 
     template_name = "aggregate_report/select_oois.html"
@@ -80,7 +86,7 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOILis
 
 class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
     """
-    Shows all possible report types from a list of OOIs.
+    Shows all possible report types from a list of Objects.
     Chooses report types for the 'Aggregate Report' flow.
     """
 
