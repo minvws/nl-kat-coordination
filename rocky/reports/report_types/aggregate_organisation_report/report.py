@@ -385,6 +385,8 @@ class AggregateOrganisationReport(AggregateReport):
 
         config_oois = self.octopoes_api_connector.list(types={Config}, valid_time=valid_time).items
 
+        flattened_health = flatten_health(get_rocky_health(self.octopoes_api_connector))
+
         return {
             "systems": systems,
             "services": services,
@@ -398,7 +400,7 @@ class AggregateOrganisationReport(AggregateReport):
             "total_systems": total_ips,
             "total_hostnames": total_hostnames,
             "total_systems_basic_security": total_systems_basic_security,
-            "health": flatten_health(get_rocky_health(self.octopoes_api_connector)),
+            "health": [health.dict() for health in flattened_health],
             "config_oois": config_oois,
         }
 
