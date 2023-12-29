@@ -40,8 +40,6 @@
                     {% endfor %}
                 {% endif %}
                 {% translate "The basic security scores are around " %}{{ report_data.basic_security_score }}%.
-                {% translate "The median number of vulnerabilities found is " %}
-                {{ report_data.median_vulnerabilities }}
                 {% translate " per organization." %}
                 {% translate "A total of " %}{{ report_data.total_critical_vulnerabilities }}
                 {% translate " critical vulnerabilities have been identified." %}

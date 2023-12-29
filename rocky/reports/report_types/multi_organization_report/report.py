@@ -176,25 +176,6 @@ class MultiOrganizationReport(MultiReport):
 
         system_vulnerabilities = sorted(system_vulnerabilities.items(), key=lambda x: x[1]["cvss"] or 0, reverse=True)
 
-        # TODO:
-        #  - appendix -> Noam
-
-        # TODO (nice to haves):
-        #  - Most common vulnerabilities
-        #  - Median vulns
-        #  - Best scoring security checks
-        #  - Worst scoring security checks
-        #  - hrefs to appendix etc
-        #  - Disclaimers
-
-        # TODO (later):
-        #  - Sector name
-        #  - Sector definition
-        #  - Benchmark comparison
-        #  - Save report button
-        #  - total_ip_ranges
-        #  - safe connections score vs. sector
-
         return {
             "multi_data": data,
             "organizations": [value["organization_code"] for key, value in data.items()],
@@ -203,13 +184,11 @@ class MultiOrganizationReport(MultiReport):
             "basic_security_score": round(
                 sum(x["compliant"] / x["total"] for x in basic_securities) / len(basic_securities) * 100
             ),
-            "median_vulnerabilities": 60,  # TODO
             "total_critical_vulnerabilities": total_critical_vulnerabilities,
             "total_findings": total_findings,
             "total_systems": total_systems,
             "total_hostnames": total_hostnames,
             "service_counts": service_counts,
-            "recommendations": [],  # TODO
             "asset_vulnerabilities": asset_vulnerabilities,
             "system_vulnerabilities": dict(system_vulnerabilities),
             "system_vulnerability_totals": system_vulnerability_totals,
@@ -222,7 +201,7 @@ class MultiOrganizationReport(MultiReport):
             },
             "services": services,
             "recommendation_counts": recommendation_counts,
-            "ipv6": ipv6,  # TODO
+            "ipv6": ipv6,
         }
 
 

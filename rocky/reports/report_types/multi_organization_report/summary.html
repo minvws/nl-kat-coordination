@@ -35,33 +35,7 @@
             <div>
                 <dt>General recommendations</dt>
                 <dd>
-                    {{ report_data.recommendations|length }}
-                </dd>
-            </div>
-            <div>
-                <dt>Median critical vulnerabilities</dt>
-                <dd>
-                    {{ report_data.median_vulnerabilities }}
-                </dd>
-            </div>
-            <div>
-                <dt>Best scoring security checks</dt>
-                <dd>
-                    DANE configuration
-                    <br>
-                    DMARC security
-                </dd>
-            </div>
-            <div>
-                <dt>Most common vulnerabilities</dt>
-                <dd>
-                    <a href="">HTTP headers</a> <a href="">Onveilige ciphers</a>
-                </dd>
-            </div>
-            <div>
-                <dt>Median critical vulnerabilities</dt>
-                <dd>
-                    <a href="">Term overview (appendix)</a>
+                    {{ report_data.recommendation_counts.values|sum_list }}
                 </dd>
             </div>
         </dl>

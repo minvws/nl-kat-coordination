@@ -18,28 +18,16 @@
                 <tbody>
                     <tr>
                         <td>{% translate "IP addresses" %}</td>
-                        <td>
-                            <a href="">{{ report_data.total_systems }}</a>
-                        </td>
+                        <td>{{ report_data.total_systems }}</td>
                     </tr>
                     <tr>
                         <td>{% translate "Domain names" %}</td>
-                        <td>
-                            <a href="">{{ report_data.total_hostnames }}</a>
-                        </td>
+                        <td>{{ report_data.total_hostnames }}</td>
                     </tr>
-                    {#                    <tr>#}
-                    {#                        <td>{% translate "IP-ranges" %}</td>#}
-                    {#                        <td>#}
-                    {#                            <a href="">3</a>#}
-                    {#                        </td>#}
-                    {#                    </tr>#}
                     {% for service, count in report_data.service_counts.items %}
                         <tr>
                             <td>{{ service }} server</td>
-                            <td>
-                                <a href="">{{ count }}</a>
-                            </td>
+                            <td>{{ count }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -63,9 +51,9 @@
                                 <td>
                                     {% for vulnerability in asset_vulnerability.vulnerabilities %}
                                         {% if not forloop.last %}
-                                            <a href="">{{ vulnerability }}</a>,
+                                            {{ vulnerability }},
                                         {% else %}
-                                            <a href="">{{ vulnerability }}</a>
+                                            {{ vulnerability }}
                                         {% endif %}
                                     {% endfor %}
                                 </td>

@@ -22,9 +22,9 @@
                             <td>
                                 {% for service in port_info.services %}
                                     {% if not forloop.last %}
-                                        <a href="">{{ service|upper }}</a>,
+                                        {{ service|upper }},
                                     {% else %}
-                                        <a href="">{{ service|upper }}</a>
+                                        {{ service|upper }}
                                     {% endif %}
                                 {% endfor %}
                             </td>
