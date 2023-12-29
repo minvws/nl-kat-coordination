@@ -24,7 +24,7 @@
 {% if data.rpki_ips %}
     <div class="horizontal-scroll">
         <table>
-            <caption class="visually-hidden">{% translate "RPKI overview:" %}</caption>
+            <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Check" %}</th>
@@ -61,6 +61,7 @@
         {% if not info.valid or not info.exists %}
             <h5>{{ ip }}</h5>
             <table>
+                <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
                 <thead>
                     <tr>
                         <th>{% translate "Compliance issue" %}</th>
@@ -71,7 +72,7 @@
                     {% if not info.valid %}
                         <tr>
                             <td>
-                                <span class="icon negative"></span>{% translate "RPKI record is not valid." %}
+                                <span class="icon alert"></span>{% translate "RPKI record is not valid." %}
                             </td>
                             <td>
                                 <span class="low">Low</span>
@@ -81,7 +82,7 @@
                     {% if not info.exists %}
                         <tr>
                             <td>
-                                <span class="icon negative"></span>{% translate "RPKI record does not exist." %}
+                                <span class="icon alert"></span>{% translate "RPKI record does not exist." %}
                             </td>
                             <td>
                                 <span class="low">Low</span>
