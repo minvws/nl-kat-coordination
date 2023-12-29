@@ -1,3 +1,4 @@
+from urllib.parse import unquote
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -15,11 +16,23 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     template_name = "upload_raw.html"
     form_class = UploadRawForm
     permission_required = "tools.can_scan_organization"
+    mime_types = False
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if not self.organization:
             self.add_error_notification(RAW_ERRORS["no_org"])
+        if kwargs.get('mime_types', False):
+            self.mime_types = unquote(kwargs['mime_types'])
+
+    def get_initial(self):
+        """
+        Returns the initial data to use for forms on this view.
+        """
+        initial = super().get_initial()
+        if self.mime_types:
+            initial['mime_types'] = self.mime_types
+        return initial
 
     def get_success_url(self):
         return reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code})
