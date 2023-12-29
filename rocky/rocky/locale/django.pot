@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 15:58+0000\n"
+"POT-Creation-Date: 2023-12-29 16:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2694,6 +2694,7 @@ msgid "Report types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/multi_organization_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Appendix"
 msgstr ""
