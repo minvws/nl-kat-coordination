@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<section class="dividing-line">
+<section>
     <div>
         <h2>{% translate "Summary" %}</h2>
         <h3>{% translate "Selected OOIs" %}</h3>
@@ -8,6 +8,7 @@
 
         <h3>{% translate "Selected Report Types" %}</h3>
         <table>
+            <caption class="visually-hidden">{% translate "Selected Report Types" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Report type" %}</th>
@@ -25,6 +26,7 @@
         </table>
         <h3>{% translate "Selected Plugins for scans" %}</h3>
         <table>
+            <caption class="visually-hidden">{% translate "Selected Plugins for scans" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Plugin options" %}</th>
