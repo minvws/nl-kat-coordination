@@ -1309,7 +1309,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Scan OOI"
+msgid "Scan object"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -1321,13 +1321,14 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Selected OOIs:"
+msgid "Selected objects:"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/partials/explanations.html
-msgid "OOI"
+#: reports/templates/summary/ooi_selection.html
+#: rocky/templates/partials/task_history.html
+msgid "Object"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
@@ -1703,7 +1704,7 @@ msgid "No"
 msgstr ""
 
 #: katalogus/views/change_clearance_level.py
-msgid "Session has terminated, please select OOIs again."
+msgid "Session has terminated, please select objects again."
 msgstr ""
 
 #: katalogus/views/change_clearance_level.py
@@ -2344,6 +2345,7 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
@@ -2697,9 +2699,8 @@ msgid "Appendix"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_summary.html
-msgid "Selected OOIs"
+msgid "Selected objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2753,8 +2754,7 @@ msgid "Unhealthy"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/partials/report_sidemenu.html
-msgid "Used Config OOIs"
+msgid "Used Config objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2770,7 +2770,7 @@ msgid "Config"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-msgid "No config OOIs found."
+msgid "No config objects found."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
@@ -2835,6 +2835,9 @@ msgid "RPKI"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
 msgid "server"
 msgstr ""
 
@@ -3547,8 +3550,8 @@ msgid "Aggregate Report"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select OOI"
-msgid_plural "Select OOIs"
+msgid "Select object"
+msgid_plural "Select objects"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3564,18 +3567,7 @@ msgid "Filter"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-msgid "Currently filtered on:"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-msgid "No OOIs found."
+msgid "No objects found."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3585,10 +3577,6 @@ msgstr ""
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 msgid "Objects:"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-msgid "OOI-Type"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3659,6 +3647,14 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
+#: reports/templates/partials/report_sidemenu.html
+msgid "Selected Objects"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
+msgid "Used Config Objects"
+msgstr ""
+
 #: reports/templates/partials/report_types_selection.html
 msgid "Choose report types"
 msgstr ""
@@ -3695,11 +3691,6 @@ msgstr ""
 msgid "Continue with selection"
 msgstr ""
 
-#: reports/templates/summary/ooi_selection.html
-#: rocky/templates/partials/task_history.html
-msgid "Object"
-msgstr ""
-
 #: reports/templates/summary/report_summary.html
 msgid "Selected Plugins for scans"
 msgstr ""
@@ -3713,7 +3704,7 @@ msgid "Aggregate report"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select OOIs"
+msgid "Select Objects"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
@@ -5271,6 +5262,10 @@ msgstr ""
 
 #: rocky/templates/partials/explanations.html
 msgid "Clearance level inheritance"
+msgstr ""
+
+#: rocky/templates/partials/explanations.html
+msgid "OOI"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
