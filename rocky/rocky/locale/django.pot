@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 17:25+0000\n"
+"POT-Creation-Date: 2023-12-29 19:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3909,6 +3909,10 @@ msgstr ""
 
 #: reports/views/multi_report.py
 msgid "Multi report"
+msgstr ""
+
+#: reports/views/multi_report.py
+msgid "Select OOIs"
 msgstr ""
 
 #: tools/forms/base.py
