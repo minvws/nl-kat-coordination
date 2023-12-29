@@ -47,6 +47,7 @@
     {% if findings %}
         <h5>{{ ip }}</h5>
         <table>
+            <caption class="visually-hidden">{% translate "Findings:" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Compliance issue" %}</th>
@@ -57,7 +58,7 @@
                 {% for finding_type in findings %}
                     <tr>
                         <td>
-                            <span class="icon negative"></span>{{ finding_type.description }}
+                            <span class="icon alert"></span>{{ finding_type.description }}
                         </td>
                         <td>
                             <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>

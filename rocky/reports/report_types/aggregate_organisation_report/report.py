@@ -2,6 +2,7 @@ from logging import getLogger
 
 from django.utils.translation import gettext_lazy as _
 
+from octopoes.models.ooi.config import Config
 from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
@@ -12,6 +13,7 @@ from reports.report_types.safe_connections_report.report import SafeConnectionsR
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
+from rocky.views.health import flatten_health, get_rocky_health
 
 logger = getLogger(__name__)
 
@@ -35,7 +37,7 @@ class AggregateOrganisationReport(AggregateReport):
     }
     template_path = "aggregate_organisation_report/report.html"
 
-    def post_process_data(self, data):
+    def post_process_data(self, data, valid_time):
         systems = {"services": {}}
         services = {}
         open_ports = {}
@@ -378,6 +380,8 @@ class AggregateOrganisationReport(AggregateReport):
                 for finding_key in vulnerability_data.get("findings", {}):
                     all_findings.add(finding_key)
 
+        config_oois = self.octopoes_api_connector.list(types={Config}, valid_time=valid_time).items
+
         return {
             "systems": systems,
             "services": services,
@@ -390,6 +394,8 @@ class AggregateOrganisationReport(AggregateReport):
             "total_findings": len(all_findings),
             "total_systems": total_ips,
             "total_systems_basic_security": total_systems_basic_security,
+            "health": flatten_health(get_rocky_health(self.octopoes_api_connector)),
+            "config_oois": config_oois,
         }
 
     def collect_system_specific_data(self, data, services, system_type: SystemType, report_id: str):

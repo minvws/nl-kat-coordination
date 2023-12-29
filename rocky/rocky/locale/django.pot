@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 14:37+0000\n"
+"POT-Creation-Date: 2023-12-29 15:04+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -556,6 +556,7 @@ msgstr ""
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_summary.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
@@ -722,8 +723,10 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
-#: fmea/models.py reports/templates/summary/service_health.html
-#: rocky/templates/footer.html rocky/templates/health.html
+#: fmea/models.py
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
 msgid "Service"
 msgstr ""
 
@@ -1559,16 +1562,19 @@ msgid "Plugins overview:"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin name"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin type"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin description"
 msgstr ""
@@ -2685,6 +2691,88 @@ msgstr ""
 msgid "Report types"
 msgstr ""
 
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Appendix"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_summary.html
+msgid "Selected OOIs"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_summary.html
+msgid "Selected Report Types"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Report type"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Selected Plugins"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin options"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin scan level"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Service Versions and Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/health.html
+msgid "Version"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/footer.html rocky/views/health.py
+msgid "Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/health.html
+msgid "Healthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Unhealthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Used Config OOIs"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Primary Key"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Bit ID"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Config"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "No config OOIs found."
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Asset overview"
@@ -2723,8 +2811,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
-#: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview:"
+msgid "Basic security status:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
@@ -2926,6 +3013,13 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Findings:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/web_system_report/report.html
@@ -2945,7 +3039,8 @@ msgid "Risk level"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
-msgid "Term overview"
+#: reports/templates/partials/report_sidemenu.html
+msgid "Term Overview"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3070,6 +3165,10 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
+msgid "IPV6 overview:"
+msgstr ""
+
+#: reports/report_types/ipv6_report/report.html
 #: reports/report_types/systems_report/report.html
 msgid "Domain"
 msgstr ""
@@ -3083,6 +3182,10 @@ msgid "Check whether hostnames point to ipv6 addresses."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
+msgid "Mailserver compliance:"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
 msgid "mailservers compliant"
 msgstr ""
 
@@ -3093,6 +3196,10 @@ msgstr ""
 #: reports/report_types/mail_report/report.py
 msgid ""
 "System specific mail report that focusses on IP addresses and hostnames."
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "Name server compliance:"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
@@ -3159,7 +3266,7 @@ msgid "Find open ports of IP addresses"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
-msgid "RPKI overview:"
+msgid "RPKI compliance:"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
@@ -3193,6 +3300,10 @@ msgid "Safe Connections"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
+msgid "Safe connections compliance:"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
 msgid "Only Safe Ciphers"
 msgstr ""
 
@@ -3209,7 +3320,7 @@ msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
-msgid "Overzicht Handmatig gevrijwaarde gescande assets:"
+msgid "Selected assets:"
 msgstr ""
 
 #: reports/report_types/systems_report/report.py
@@ -3218,6 +3329,10 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Ciphers:"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3261,6 +3376,7 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -3283,7 +3399,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-msgid "Basic example table:"
+msgid "Vulnerabilities:"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
@@ -3343,6 +3459,10 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Evidence"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Web system compliance:"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3452,6 +3572,11 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Go to the object page"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html
+msgid "Objects:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3568,31 +3693,11 @@ msgid "Object"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
-msgid "Selected OOIs"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Selected Report Types"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Report type"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
 msgid "Selected Plugins for scans"
 msgstr ""
 
-#: reports/templates/summary/report_summary.html
-msgid "Plugin options"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Plugin scan level"
-msgstr ""
-
-#: reports/templates/summary/service_health.html rocky/templates/health.html
-msgid "Version"
+#: reports/templates/summary/service_health.html
+msgid "Services:"
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -4444,10 +4549,6 @@ msgstr ""
 msgid "Privacy Statement"
 msgstr ""
 
-#: rocky/templates/footer.html rocky/views/health.py
-msgid "Health"
-msgstr ""
-
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
 msgstr ""
@@ -4485,10 +4586,6 @@ msgstr ""
 
 #: rocky/templates/health.html
 msgid "Health Checks"
-msgstr ""
-
-#: rocky/templates/health.html
-msgid "Healthy"
 msgstr ""
 
 #: rocky/templates/health.html
@@ -5410,6 +5507,10 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Occurrence"
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
