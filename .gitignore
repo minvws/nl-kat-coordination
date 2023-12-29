@@ -438,3 +438,7 @@ nl-kat-*
 
 # Automatically generated markdown files for the environment variables
 /docs/source/technical_design/environment_settings/*.md
+
+# rpki cache
+/boefjes/boefjes/plugins/kat_rpki/rpki.json
+/boefjes/boefjes/plugins/kat_rpki/rpki-meta.json

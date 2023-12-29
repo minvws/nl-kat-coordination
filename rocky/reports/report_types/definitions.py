@@ -46,7 +46,7 @@ class AggregateReport(ABC):
     def __init__(self, octopoes_api_connector):
         self.octopoes_api_connector = octopoes_api_connector
 
-    def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def post_process_data(self, data: Dict[str, Any], valid_time: datetime) -> Dict[str, Any]:
         raise NotImplementedError
 
 

@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
+from octopoes.models.ooi.config import Config
 from reports.report_types.definitions import AggregateReport, ReportType
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
@@ -16,6 +17,7 @@ from reports.report_types.safe_connections_report.report import SafeConnectionsR
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
+from rocky.views.health import flatten_health, get_rocky_health
 
 logger = getLogger(__name__)
 
@@ -39,7 +41,7 @@ class AggregateOrganisationReport(AggregateReport):
     }
     template_path = "aggregate_organisation_report/report.html"
 
-    def post_process_data(self, data):
+    def post_process_data(self, data, valid_time):
         systems = {"services": {}}
         services = {}
         open_ports = {}
@@ -142,6 +144,9 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["safe_connections"][service]["sc_ips"][ip.tokenized.address] = findings
                 basic_security["safe_connections"][service]["number_of_ips"] += 1
                 basic_security["safe_connections"][service]["number_of_available"] += 1 if not findings else 0
+
+                # Collect recommendations from findings
+                recommendations.extend(set(finding_type.recommendation for finding_type in findings))
 
         # RPKI
         for ip, compliance in rpki["rpki_ips"].items():
@@ -336,8 +341,25 @@ class AggregateOrganisationReport(AggregateReport):
                     },
                 }
 
+            # Collect recommendations from findings
+            if (
+                service == SystemType.MAIL
+                and mail_report_data
+                or service == SystemType.WEB
+                and web_report_data
+                or service == SystemType.DNS
+                and dns_report_data
+            ):
+                recommendations.extend(
+                    set(
+                        finding_type.recommendation
+                        for ip, finding in basic_security["summary"][service]["system_specific"]["ips"].items()
+                        for finding_type in finding
+                    )
+                )
+
         terms = list(set(terms))
-        recommendations = list(set(recommendations))
+        recommendations = list(set(filter(None, recommendations)))
         total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
 
@@ -361,9 +383,12 @@ class AggregateOrganisationReport(AggregateReport):
                 for finding_key in vulnerability_data.get("findings", {}):
                     all_findings.add(finding_key)
 
+        config_oois = self.octopoes_api_connector.list(types={Config}, valid_time=valid_time).items
+
         return {
             "systems": systems,
             "services": services,
+            "recommendations": recommendations,
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,
@@ -373,6 +398,8 @@ class AggregateOrganisationReport(AggregateReport):
             "total_systems": total_ips,
             "total_hostnames": total_hostnames,
             "total_systems_basic_security": total_systems_basic_security,
+            "health": flatten_health(get_rocky_health(self.octopoes_api_connector)),
+            "config_oois": config_oois,
         }
 
     def collect_system_specific_data(self, data, services, system_type: SystemType, report_id: str):
@@ -419,6 +446,6 @@ def aggregate_reports(
                     data = report.generate_data(ooi, valid_time=valid_time)
                     report_data[ooi][report_type.id] = data
 
-    post_processed_data = aggregate_report.post_process_data(report_data)
+    post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
 
     return aggregate_report, post_processed_data, report_data
