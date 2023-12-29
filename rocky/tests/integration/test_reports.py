@@ -345,9 +345,9 @@ def test_multi_report(
         "number_of_ips": 10,
     }
     assert multi_data["basic_security"]["system_specific"] == {
-        "Dicom": {"checks": {}},
-        "Mail": {"checks": {"DKIM": 2, "DMARC": 2, "SPF": 2}},
-        "Other": {"checks": {}},
+        "Dicom": {"checks": {}, "total": 0},
+        "Mail": {"checks": {"DKIM": 2, "DMARC": 2, "SPF": 2}, "total": 2},
+        "Other": {"checks": {}, "total": 0},
         "Web": {
             "checks": {
                 "CSP Present": 4,
@@ -359,6 +359,33 @@ def test_multi_report(
                 "Offers HTTPS": 4,
                 "Redirects HTTP to HTTPS": 4,
                 "Secure CSP Header": 4,
-            }
+            },
+            "total": 4,
+        },
+    }
+    assert multi_data["basic_security"]["rpki"] == {
+        "Dicom": {
+            "number_of_available": 4,
+            "number_of_ips": 4,
+            "number_of_valid": 4,
+            "rpki_ips": True,
+        },
+        "Mail": {
+            "number_of_available": 4,
+            "number_of_ips": 4,
+            "number_of_valid": 4,
+            "rpki_ips": True,
+        },
+        "Other": {
+            "number_of_available": 4,
+            "number_of_ips": 4,
+            "number_of_valid": 4,
+            "rpki_ips": True,
+        },
+        "Web": {
+            "number_of_available": 4,
+            "number_of_ips": 4,
+            "number_of_valid": 4,
+            "rpki_ips": True,
         },
     }

@@ -41,6 +41,7 @@ class MultiOrganizationReport(MultiReport):
         basic_security_summary = {}
         safe_connections_summary = {"number_of_available": 0, "number_of_ips": 0}
         system_specific = {}
+        rpki_summary = {}
 
         for report_data in data.values():
             basic_security = {"compliant": 0, "total": 0}
@@ -112,13 +113,28 @@ class MultiOrganizationReport(MultiReport):
 
             for service, summary in aggregate_data["basic_security"]["summary"].items():
                 if service not in system_specific:
-                    system_specific[service] = {"checks": {}}
+                    system_specific[service] = {"checks": {}, "total": 0}
+
+                system_specific[service]["total"] += summary["system_specific"]["total"]
 
                 for title, count in summary["system_specific"]["checks"].items():
                     if title not in system_specific[service]["checks"]:
                         system_specific[service]["checks"][title] = 0
 
                     system_specific[service]["checks"][title] += count
+
+            for service, rpki in aggregate_data["basic_security"]["rpki"].items():
+                if service not in rpki_summary:
+                    rpki_summary[service] = {
+                        "number_of_available": 0,
+                        "number_of_ips": 0,
+                        "number_of_valid": 0,
+                        "rpki_ips": True,  # To trigger rendering (not the best solution)
+                    }
+
+                rpki_summary[service]["number_of_available"] += rpki["number_of_available"]
+                rpki_summary[service]["number_of_ips"] += rpki["number_of_ips"]
+                rpki_summary[service]["number_of_valid"] += rpki["number_of_valid"]
 
         # TODO:
         #  - Sectornaam
@@ -133,7 +149,7 @@ class MultiOrganizationReport(MultiReport):
         #  - total_ip_ranges
         #  - hrefs
         #  - safe connections score vs. sector
-        #  -
+        #  - rpki
 
         return {
             "multi_data": data,
@@ -156,6 +172,7 @@ class MultiOrganizationReport(MultiReport):
                 "summary": basic_security_summary,
                 "safe_connections": safe_connections_summary,
                 "system_specific": system_specific,
+                "rpki": rpki_summary,
             },
             "services": services,
             "ipv6": ["test"],  # TODO

@@ -43,7 +43,7 @@ utest: ## Run the integration tests.
 itest: ## Run the integration tests.
 	docker-compose -f base.yml  -f .ci/docker-compose.yml kill
 	docker-compose -f base.yml  -f .ci/docker-compose.yml down --remove-orphans
-	docker-compose -f base.yml -f .ci/docker-compose.yml build
+	#docker-compose -f base.yml -f .ci/docker-compose.yml build
 	docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration_tests
 
 export_migrations:
