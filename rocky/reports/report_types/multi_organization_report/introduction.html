@@ -12,7 +12,7 @@
             </div>
         </div>
         <div>
-            <p>Dit is het OpenKAT rapport voor sector Sectornaam.</p>
+            <p>{% translate "This is the OpenKAT Sector rapport." %}</p>
             <div>
                 <p>
                     <strong>{% translate "Observed at:" %}</strong> {{ observed_at }} {{ TIME_ZONE }}
@@ -40,7 +40,6 @@
                     {% endfor %}
                 {% endif %}
                 {% translate "The basic security scores are around " %}{{ report_data.basic_security_score }}%.
-                {% translate " per organization." %}
                 {% translate "A total of " %}{{ report_data.total_critical_vulnerabilities }}
                 {% translate " critical vulnerabilities have been identified." %}
             </p>

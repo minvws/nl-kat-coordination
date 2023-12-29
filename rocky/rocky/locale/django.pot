@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 15:49+0000\n"
+"POT-Creation-Date: 2023-12-29 15:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3266,6 +3266,10 @@ msgid "Download report"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
+msgid "This is the OpenKAT Sector rapport."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
 msgid "This sector contains"
 msgstr ""
 
@@ -3283,10 +3287,6 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
 msgid "The basic security scores are around "
-msgstr ""
-
-#: reports/report_types/multi_organization_report/introduction.html
-msgid " per organization."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
