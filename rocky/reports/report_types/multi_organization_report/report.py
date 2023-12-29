@@ -42,6 +42,7 @@ class MultiOrganizationReport(MultiReport):
         safe_connections_summary = {"number_of_available": 0, "number_of_ips": 0}
         system_specific = {}
         rpki_summary = {}
+        ipv6 = {}
 
         for report_data in data.values():
             basic_security = {"compliant": 0, "total": 0}
@@ -137,6 +138,14 @@ class MultiOrganizationReport(MultiReport):
                 rpki_summary[service]["number_of_ips"] += rpki["number_of_ips"]
                 rpki_summary[service]["number_of_valid"] += rpki["number_of_valid"]
 
+            for system, info in aggregate_data["ipv6"].items():
+                for system_type in info["systems"]:
+                    if system_type not in ipv6:
+                        ipv6[system_type] = {"total": 0, "enabled": 0}
+
+                    ipv6[system_type]["total"] += 1
+                    ipv6[system_type]["enabled"] += info["enabled"]
+
         system_vulnerabilities = {}
         system_vulnerability_totals = {}
 
@@ -158,7 +167,6 @@ class MultiOrganizationReport(MultiReport):
         system_vulnerabilities = sorted(system_vulnerabilities.items(), key=lambda x: x[1]["cvss"] or 0, reverse=True)
 
         # TODO:
-        #  - IPv6 -> per system
         #  - Recommendations table -> toevoegen
         #  - appendix -> Noam
 
@@ -204,7 +212,7 @@ class MultiOrganizationReport(MultiReport):
                 "rpki": rpki_summary,
             },
             "services": services,
-            "ipv6": ["test"],  # TODO
+            "ipv6": ipv6,  # TODO
         }
 
 

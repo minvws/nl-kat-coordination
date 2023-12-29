@@ -10,69 +10,32 @@
                 and its adoption can contribute to a more secure internet.
             {% endblocktranslate %}
         </p>
-        <p>{% translate "In total " %} 9000/10000 {% translate " systems have an IPv6 connection." %}</p>
+        <p>
+            {% translate "In total " %} {{ report_data.ipv6.values|get_key:"enabled"|sum_list }}{%  translate " out of " %}{{ report_data.ipv6.values|get_key:"total"|sum_list }} {% translate " systems have an IPv6 connection." %}
+        </p>
         <div class="horizontal-scroll">
             <table>
                 <caption class="visually-hidden">{% translate "Overview of ip version compliance" %}</caption>
                 <thead>
                     <tr>
                         <th scope="col">{% translate "System type" %}</th>
-                        <th scope="col">{% translate "Amount" %}</th>
-                        <th scope="col">IPv4</th>
                         <th scope="col">IPv6</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for ip in ipv6 %}
+                    {% for service, compliance in report_data.ipv6.items %}
                         <tr>
-                            <td>Mail</td>
+                            <td>{{ service }}</td>
                             <td>
-                                <a href="">250</a>
-                            </td>
-                            <td>
-                                <span class="icon positive">Voldoet</span>
-                            </td>
-                            <td>
-                                <span class="icon positive">Voldoet</span>
+                                {% if compliance.enabled != compliance.total %}
+                                    <span class="icon incomplete"></span>
+                                {% else %}
+                                    <span class="icon positive"></span>
+                                {% endif %}
+                                {{ compliance.enabled }}/{{ compliance.total }}
                             </td>
                         </tr>
                     {% endfor %}
-                    <tr>
-                        <td>Mail, web</td>
-                        <td>
-                            <a href="">600</a>
-                        </td>
-                        <td>
-                            <span class="icon incomplete">Incompleet</span>
-                        </td>
-                        <td>
-                            <span class="icon incomplete">Incompleet</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Mail, web</td>
-                        <td>
-                            <a href="">50</a>
-                        </td>
-                        <td>
-                            <span class="icon positive">Voldoet</span>
-                        </td>
-                        <td>
-                            <span class="icon positive">Voldoet</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Web</td>
-                        <td>
-                            <a href="">9000</a>
-                        </td>
-                        <td>
-                            <span class="icon positive">Voldoet</span>
-                        </td>
-                        <td>
-                            <span class="icon positive">Voldoet</span>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>

@@ -406,7 +406,8 @@ def test_multi_report(
         },
     }
     assert multi_data["system_vulnerabilities"] == {
-        "CVE-2018-20677": {'cvss': None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
-        "CVE-2019-8331": {'cvss': None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
-        "RetireJS-jquerymigrate-f3a3": {'cvss': None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
+        "CVE-2018-20677": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
+        "CVE-2019-8331": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
+        "RetireJS-jquerymigrate-f3a3": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
     }
+    assert multi_data["ipv6"] == {'Dicom': {'total': 2, 'enabled': 2}, 'Mail': {'total': 2, 'enabled': 2}, 'Other': {'total': 2, 'enabled': 2}, 'Web': {'total': 2, 'enabled': 2}}
