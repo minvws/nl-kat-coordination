@@ -257,6 +257,7 @@ def test_deletion_events_after_nxdomain(
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
     assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 4
 
+
 def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
 ):
@@ -278,27 +279,27 @@ def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
     xtdb_octopoes_service.save_origin(origin, [network], valid_time)
     xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
 
-    softwares = [
-        Software(name="Bootstrap", version= "3.3.7", cpe = "cpe:/a:getbootstrap:bootstrap"),
-        Software(name="Nginx", version= "1.18.0", cpe = "cpe:/a:nginx:nginx"),
+    software_oois = [
+        Software(name="Bootstrap", version="3.3.7", cpe="cpe:/a:getbootstrap:bootstrap"),
+        Software(name="Nginx", version="1.18.0", cpe="cpe:/a:nginx:nginx"),
         Software(name="cdnjs"),
-        Software(name="jQuery Migrate", version= "1.0.0"),
-        Software(name="jQuery", version= "3.6.0",cpe = "cpe:/a:jquery:jquery"),
+        Software(name="jQuery Migrate", version="1.0.0"),
+        Software(name="jQuery", version="3.6.0", cpe="cpe:/a:jquery:jquery"),
     ]
-    instances = [SoftwareInstance(ooi=hostname.reference, software=software.reference) for software in softwares]
+    instances = [SoftwareInstance(ooi=hostname.reference, software=software.reference) for software in software_oois]
 
     software_origin = Origin(
         origin_type=OriginType.OBSERVATION,
         method="",
         source=network.reference,
-        result=[x.reference for x in (softwares + instances)],
+        result=[x.reference for x in (software_oois + instances)],
         task_id=uuid.uuid4(),
     )
 
-    for software, instance in zip(softwares, instances):
+    for software, instance in zip(software_oois, instances):
         xtdb_octopoes_service.ooi_repository.save(software, valid_time)
         xtdb_octopoes_service.ooi_repository.save(instance, valid_time)
-    xtdb_octopoes_service.save_origin(software_origin, softwares + instances, valid_time)
+    xtdb_octopoes_service.save_origin(software_origin, software_oois + instances, valid_time)
 
     event_manager.complete_process_events(xtdb_octopoes_service)
 
