@@ -2,98 +2,41 @@
 
 <section id="vulnerabilities">
     <div>
-        <h2>Other vulnerabilities</h2>
-        <p>Gevonden kwetsbaarheden zijn gegroepeerd per systeem. UItleggen dat we hier alleen cve’s doen.</p>
-        <div class="horizontal-scroll">
-            <table>
-                <caption class="visually-hidden">Lorem ipsum</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">CVE</th>
-                        <th scope="col">CVSS</th>
-                        <th scope="col">Web</th>
-                        <th scope="col">Mail</th>
-                        <th scope="col">DNS</th>
-                        <th scope="col">Other</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2021-1234</td>
-                        <td>
-                            <a href="">3</a>
-                        </td>
-                        <td>
-                            <a href="">1</a>
-                        </td>
-                        <td>
-                            <a href="">2</a>
-                        </td>
-                        <td>
-                            <a href="">3</a>
-                        </td>
-                        <td>
-                            <a href="">4</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2021-1237</td>
-                        <td>
-                            <a href="">6</a>
-                        </td>
-                        <td>
-                            <a href="">0</a>
-                        </td>
-                        <td>
-                            <a href="">2</a>
-                        </td>
-                        <td>
-                            <a href="">0</a>
-                        </td>
-                        <td>
-                            <a href="">4</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2012-1227</td>
-                        <td>
-                            <a href="">9</a>
-                        </td>
-                        <td>
-                            <a href="">0</a>
-                        </td>
-                        <td>
-                            <a href="">12</a>
-                        </td>
-                        <td>
-                            <a href="">0</a>
-                        </td>
-                        <td>
-                            <a href="">24</a>
-                        </td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td>Gemiddeld/totaal</td>
-                        <td>
-                            <a href="">6</a>
-                        </td>
-                        <td>
-                            <a href="">1</a>
-                        </td>
-                        <td>
-                            <a href="">16</a>
-                        </td>
-                        <td>
-                            <a href="">3</a>
-                        </td>
-                        <td>
-                            <a href="">32</a>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+        <h2>{% translate "Vulnerabilities" %}</h2>
+        <p>{% translate "Vulnerabilities found are grouped per system. Here, we only consider CVE vulnerabilities." %}</p>
+        {% if not report_data.asset_vulnerabilities %}
+            <p>{% translate "No CVEs have been found." %}</p>
+        {% else %}
+            <div class="horizontal-scroll">
+                <table>
+                    <caption class="visually-hidden">{% translate "Vulnerabilities grouped per system." %}</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">CVE</th>
+                            <th scope="col">CVSS</th>
+                            {% for service in report_data.services %}<th scope="col">{{ service }}</th>{% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cve, row in report_data.system_vulnerabilities.items %}
+                            <tr>
+                                <td>{{ cve }}</td>
+                                <td>{{ row|get_item:"cvss" }}</td>
+                                {% for service in report_data.services %}<td>{{ row|get_item:service }}</td>{% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>{% translate "total" %}</td>
+                            <td>N/A</td>
+                            {% for service in report_data.services %}
+                                <td>{{ report_data.system_vulnerability_totals|get_item:service }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {% endif %}
     </div>
 </section>

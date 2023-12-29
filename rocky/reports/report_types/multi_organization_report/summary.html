@@ -5,18 +5,6 @@
         <h2>{% translate "Summary" %}</h2>
         <dl>
             <div>
-                <dt>Sector definition</dt>
-                <dd>
-                    <span>{% translate "This is a sector definition to make it clear for the rest of the report what all the comparisons between percentages mean" %}</span>
-                </dd>
-            </div>
-            <div>
-                <dt>Benchmark comparison x</dt>
-                <dd>
-                    Sector 80%, Other sector/country: 77,5%
-                </dd>
-            </div>
-            <div>
                 <dt>Organisations in sector report</dt>
                 <dd>
                     {{ report_data.organizations|length }}
@@ -24,7 +12,9 @@
             </div>
             {% for tag, organizations in report_data.tags.items %}
                 <div>
-                    <dt>Tag {{ tag }} organisations</dt>
+                    <dt>
+                        Organisations with tag <i>{{ tag }}</i>
+                    </dt>
                     <dd>
                         {{ organizations|length }}
                     </dd>
@@ -60,20 +50,6 @@
                     DANE configuration
                     <br>
                     DMARC security
-                </dd>
-            </div>
-            <div>
-                <dt>Lowest organisations in report</dt>
-                <dd>
-                    DANE configuration
-                    <br>
-                    DMARC security
-                </dd>
-            </div>
-            <div>
-                <dt>Lowest organisations in report</dt>
-                <dd>
-                    <a href="">Organisation group x (hospitals)</a> <a href="">Organisaton F</a>
                 </dd>
             </div>
             <div>

@@ -74,8 +74,9 @@ class MultiOrganizationReport(MultiReport):
             for system, vulnerabilities in aggregate_data["vulnerabilities"].items():
                 row = {
                     "asset": system,
-                    "vulnerabilities": vulnerabilities["summary"]["terms"],
+                    "vulnerabilities": {k: v["cvss"]["score"] for k, v in vulnerabilities["vulnerabilities"].items()},
                     "organisation": report_data["organization_code"],
+                    "services": aggregate_data["systems"]["services"][system]["services"],
                 }
                 asset_vulnerabilities.append(row)
 
@@ -136,20 +137,46 @@ class MultiOrganizationReport(MultiReport):
                 rpki_summary[service]["number_of_ips"] += rpki["number_of_ips"]
                 rpki_summary[service]["number_of_valid"] += rpki["number_of_valid"]
 
+        system_vulnerabilities = {}
+        system_vulnerability_totals = {}
+
+        for asset_vulnerability in asset_vulnerabilities:
+            for vulnerability, score in asset_vulnerability["vulnerabilities"].items():
+                if vulnerability not in system_vulnerabilities:
+                    system_vulnerabilities[vulnerability] = {"cvss": score}
+
+                for service in asset_vulnerability["services"]:
+                    if service not in system_vulnerabilities[vulnerability]:
+                        system_vulnerabilities[vulnerability][service] = 0
+
+                    if service not in system_vulnerability_totals:
+                        system_vulnerability_totals[service] = 0
+
+                    system_vulnerabilities[vulnerability][service] += 1
+                    system_vulnerability_totals[service] += 1
+
+        system_vulnerabilities = sorted(system_vulnerabilities.items(), key=lambda x: x[1]["cvss"] or 0, reverse=True)
+
         # TODO:
-        #  - Sectornaam
-        #  - “Sector X”
-        #  - Benchmark comparison X ?
-        #  - Best scoring security checks
-        #  - Lowest organisations in report
-        #  - Lowest organisations in report per tag
+        #  - IPv6 -> per system
+        #  - Recommendations table -> toevoegen
+        #  - appendix -> Noam
+
+        # TODO (nice to haves):
         #  - Most common vulnerabilities
-        #  - Disclaimer
-        #  - Recommendations table
+        #  - Median vulns
+        #  - Best scoring security checks
+        #  - Worst scoring security checks
+        #  - hrefs to appendix etc
+        #  - Disclaimers
+
+        # TODO (later):
+        #  - Sector name
+        #  - Sector definition
+        #  - Benchmark comparison
+        #  - Save report button
         #  - total_ip_ranges
-        #  - hrefs
         #  - safe connections score vs. sector
-        #  - rpki
 
         return {
             "multi_data": data,
@@ -167,6 +194,8 @@ class MultiOrganizationReport(MultiReport):
             "service_counts": service_counts,
             "recommendations": [],  # TODO
             "asset_vulnerabilities": asset_vulnerabilities,
+            "system_vulnerabilities": dict(system_vulnerabilities),
+            "system_vulnerability_totals": system_vulnerability_totals,
             "open_ports": open_ports,
             "basic_security": {
                 "summary": basic_security_summary,

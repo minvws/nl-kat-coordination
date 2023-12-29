@@ -292,20 +292,36 @@ def test_multi_report(
     assert multi_data["asset_vulnerabilities"] == [
         {
             "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "vulnerabilities": ["CVE-2018-20677", "CVE-2019-8331", "RetireJS-jquerymigrate-f3a3"],
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report",
+            "services": ["Web"],
         },
         {
             "asset": "IPAddressV4|test|192.0.2.3",
-            "vulnerabilities": ["CVE-2018-20677", "CVE-2019-8331", "RetireJS-jquerymigrate-f3a3"],
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report",
+            "services": ["Dicom", "Mail", "Other", "Web"],
         },
         {
             "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "vulnerabilities": [],
+            "vulnerabilities": {},
             "organisation": "test-test_multi_report-2",
+            "services": ["Web"],
         },
-        {"asset": "IPAddressV4|test|192.0.2.3", "vulnerabilities": [], "organisation": "test-test_multi_report-2"},
+        {
+            "asset": "IPAddressV4|test|192.0.2.3",
+            "vulnerabilities": {},
+            "organisation": "test-test_multi_report-2",
+            "services": ["Dicom", "Mail", "Other", "Web"],
+        },
     ]
     assert multi_data["services"] == {
         "Mail": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
@@ -388,4 +404,9 @@ def test_multi_report(
             "number_of_valid": 4,
             "rpki_ips": True,
         },
+    }
+    assert multi_data["system_vulnerabilities"] == {
+        "CVE-2018-20677": {'cvss': None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
+        "CVE-2019-8331": {'cvss': None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
+        "RetireJS-jquerymigrate-f3a3": {'cvss': None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
     }
