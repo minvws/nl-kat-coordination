@@ -13,6 +13,15 @@
         {% translate "Filter" as filter_title %}
         {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
 
+        <p class="de-emphasized">
+            {% if active_filters %}
+                <strong>{% translate "Currently filtered on:" %}</strong>
+                {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value|title }}&nbsp;{% endfor %}
+            {% endif %}
+        </p>
+        <p class="de-emphasized">
+            {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
+        </p>
         {% if not object_list %}
             <p>{% translate "No objects found." %}</p>
             <div class="button-container">

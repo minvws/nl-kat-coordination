@@ -61,7 +61,13 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, TemplateView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("aggregate_report_select_oois", kwargs=self.get_kwargs()))
+        kwargs = self.get_kwargs()
+        pre_selection = {
+            "clearance_level": ["2", "3", "4"],
+            "clearance_type": "declared",
+        }
+        selection = self.get_selection(pre_selection)
+        return redirect(reverse("aggregate_report_select_oois", kwargs=kwargs) + selection)
 
 
 class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):
