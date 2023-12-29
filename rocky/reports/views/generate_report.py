@@ -97,7 +97,6 @@ class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, Base
         context["available_report_types"] = self.get_report_types_for_generate_report(
             get_report_types_for_oois(self.selected_oois)
         )
-
         return context
 
 
