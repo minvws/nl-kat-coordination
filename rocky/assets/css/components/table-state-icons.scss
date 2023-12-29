@@ -6,6 +6,13 @@ table td .icon {
     -moz-osx-font-smoothing: grayscale;
   }
 
+  &.alert {
+    &::before {
+      content: "\ea05"; // $ti-alert-circle
+      color: var(--color-alert-negative);
+    }
+  }
+
   &.neutral {
     &::before {
       content: "\ea91"; // $ti-icon-dots-circle-horizontal
