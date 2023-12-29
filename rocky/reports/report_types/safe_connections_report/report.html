@@ -23,6 +23,7 @@
 {% if data.sc_ips %}
     <div class="horizontal-scroll">
         <table>
+            <caption class="visually-hidden">{% translate "Safe connections compliance:" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Check" %}</th>
@@ -48,6 +49,7 @@
         {% if findings %}
             <h5>{{ ip }}</h5>
             <table>
+                <caption class="visually-hidden">{% translate "Safe connections compliance:" %}</caption>
                 <thead>
                     <tr>
                         <th scope="col">{% translate "Compliance issue" %}</th>
