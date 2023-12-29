@@ -170,6 +170,7 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/objects/scans/", ScanListView.as_view(), name="scan_list"),
     path("<organization_code>/objects/upload/csv/", UploadCSV.as_view(), name="upload_csv"),
     path("<organization_code>/objects/upload/raw/", UploadRaw.as_view(), name="upload_raw"),
+    path("<organization_code>/objects/upload/raw/<mime_types>", UploadRaw.as_view(), name="upload_raw_typed"),
     path("<organization_code>/tasks/", BoefjesTaskListView.as_view(), name="task_list"),
     path("<organization_code>/tasks/boefjes", BoefjesTaskListView.as_view(), name="boefjes_task_list"),
     path(
