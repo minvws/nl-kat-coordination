@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-28 14:15+0000\n"
+"POT-Creation-Date: 2023-12-28 17:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2811,8 +2811,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
-#: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview:"
+msgid "Basic security status:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
@@ -3011,6 +3010,13 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Findings:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/web_system_report/report.html
@@ -3156,6 +3162,10 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
+msgid "IPV6 overview:"
+msgstr ""
+
+#: reports/report_types/ipv6_report/report.html
 #: reports/report_types/systems_report/report.html
 msgid "Domain"
 msgstr ""
@@ -3169,6 +3179,10 @@ msgid "Check whether hostnames point to ipv6 addresses."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
+msgid "Mailserver compliance:"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
 msgid "mailservers compliant"
 msgstr ""
 
@@ -3179,6 +3193,10 @@ msgstr ""
 #: reports/report_types/mail_report/report.py
 msgid ""
 "System specific mail report that focusses on IP addresses and hostnames."
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "Name server compliance:"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
@@ -3245,7 +3263,7 @@ msgid "Find open ports of IP addresses"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
-msgid "RPKI overview:"
+msgid "RPKI compliance:"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
@@ -3279,6 +3297,10 @@ msgid "Safe Connections"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
+msgid "Safe connections compliance:"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
 msgid "Only Safe Ciphers"
 msgstr ""
 
@@ -3295,7 +3317,7 @@ msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
-msgid "Overzicht Handmatig gevrijwaarde gescande assets:"
+msgid "Selected assets:"
 msgstr ""
 
 #: reports/report_types/systems_report/report.py
@@ -3304,6 +3326,10 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Ciphers:"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3347,6 +3373,7 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -3369,7 +3396,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-msgid "Basic example table:"
+msgid "Vulnerabilities:"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
@@ -3429,6 +3456,10 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Evidence"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Web system compliance:"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3538,6 +3569,11 @@ msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Go to the object page"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html
+msgid "Objects:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3655,6 +3691,10 @@ msgstr ""
 
 #: reports/templates/summary/report_summary.html
 msgid "Selected Plugins for scans"
+msgstr ""
+
+#: reports/templates/summary/service_health.html
+msgid "Services:"
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -5464,6 +5504,10 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Occurrence"
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
