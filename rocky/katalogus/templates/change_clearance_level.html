@@ -18,17 +18,17 @@
         </p>
         <section>
             <div>
-                <h1>{% translate "Scan OOI" %}</h1>
+                <h1>{% translate "Scan object" %}</h1>
                 <p class="emphasized">
                     {% blocktranslate trimmed with scan_level=plugin.scan_level %}
                         The following objects are not yet cleared for level {{ scan_level }}, please be advised that by continuing you will declare a level {{ scan_level }} on these objects.
                     {% endblocktranslate %}
                 </p>
                 <table>
-                    <caption>{% translate "Selected OOIs:" %}</caption>
+                    <caption>{% translate "Selected objects:" %}</caption>
                     <thead>
                         <tr>
-                            <th>{% translate "OOI" %}</th>
+                            <th>{% translate "Object" %}</th>
                             <th>{% translate "Clearance level" %}</th>
                         </tr>
                     </thead>

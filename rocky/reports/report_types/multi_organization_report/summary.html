@@ -1,0 +1,43 @@
+{% load i18n %}
+
+<section id="summary">
+    <div>
+        <h2>{% translate "Summary" %}</h2>
+        <dl>
+            <div>
+                <dt>Organisations in sector report</dt>
+                <dd>
+                    {{ report_data.organizations|length }}
+                </dd>
+            </div>
+            {% for tag, organizations in report_data.tags.items %}
+                <div>
+                    <dt>
+                        Organisations with tag <i>{{ tag }}</i>
+                    </dt>
+                    <dd>
+                        {{ organizations|length }}
+                    </dd>
+                </div>
+            {% endfor %}
+            <div>
+                <dt>IP addresses scanned</dt>
+                <dd>
+                    {{ report_data.total_systems }}
+                </dd>
+            </div>
+            <div>
+                <dt>Domains scanned</dt>
+                <dd>
+                    {{ report_data.total_hostnames }}
+                </dd>
+            </div>
+            <div>
+                <dt>General recommendations</dt>
+                <dd>
+                    {{ report_data.recommendation_counts.values|sum_list }}
+                </dd>
+            </div>
+        </dl>
+    </div>
+</section>

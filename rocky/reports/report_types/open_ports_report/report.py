@@ -42,6 +42,7 @@ class OpenPortsReport(Report):
             hostnames = [h.name for h in hostnames]
 
             port_numbers = {}
+            services = {}
 
             for port in ports:
                 origin = self.octopoes_api_connector.list_origins(result=port.reference, valid_time=valid_time)
@@ -50,6 +51,14 @@ class OpenPortsReport(Report):
                 )
                 port_numbers[port.port] = found_by_openkat
 
-            results[ref.tokenized.address] = {"ports": port_numbers, "hostnames": hostnames}
+                self.octopoes_api_connector.query("IPPort.<ip_port [is IPService].service", valid_time, port.reference)
+                services[port.port] = [
+                    service.name
+                    for service in self.octopoes_api_connector.query(
+                        "IPPort.<ip_port [is IPService].service", valid_time, port.reference
+                    )
+                ]
+
+            results[ref] = {"ports": port_numbers, "hostnames": hostnames, "services": services}
 
         return results
