@@ -2,7 +2,7 @@
 OpenKAT 1.14
 ============
 
-Out final release for 2023 introduces a whole slew of report types build using
+Our final release for 2023 introduces a whole slew of report types build using
 our new reporting functionality. These specific (TLS, mail, basic security,
 etc.) reports can be combined into aggregated reports for one or multiple assets
 from a single organisation. Another great addition is the first steps into what
