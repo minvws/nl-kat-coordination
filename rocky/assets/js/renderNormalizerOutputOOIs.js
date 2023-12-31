@@ -49,12 +49,12 @@ buttons.forEach((button) => {
       // Retrieve JSON containing yielded objects of task.
       getJson(json_url, function(data) {
         if(data['oois'].length > 0) {
-          const url = "/" + language + "/" + organization_code;
+          const url = "/" + language + "/" + escapeHTMLEntities(encodeURIComponent(organization_code));
           let object_list = "";
 
           // Build HTML snippet for every yielded object.
           data['oois'].forEach(object => {
-            object_list += `<li><a href='${url}/objects/detail/?observed_at=${data['valid_time']}&ooi_id=${encodeURIComponent(object)}'>${object}</a></li>`;
+            object_list += `<li><a href='${url}/objects/detail/?observed_at=${data['valid_time']}&ooi_id=${escapeHTMLEntities(encodeURIComponent(object))}'>${escapeHTMLEntities(object)}</a></li>`;
           });
           element.innerHTML = `<ul>${object_list}</ul>`;
         } else {
@@ -69,3 +69,11 @@ buttons.forEach((button) => {
     }
   });
 });
+
+function escapeHTMLEntities(input){
+  output = input.replace(/'/g, '&apos;');
+  output = output.replace(/"/g, '&quot;');
+  output = output.replace(/</g, '&lt;');
+  output = output.replace(/>/g, '&gt;');
+  return output;
+}
