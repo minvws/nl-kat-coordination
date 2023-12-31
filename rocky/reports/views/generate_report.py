@@ -34,7 +34,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("generate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select OOIs"),
+                "text": _("Select Objects"),
             },
             {
                 "url": reverse("generate_report_select_report_types", kwargs=kwargs) + selection,
@@ -58,12 +58,18 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, TemplateView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("generate_report_select_oois", kwargs=self.get_kwargs()) + self.get_selection())
+        kwargs = self.get_kwargs()
+        pre_selection = {
+            "clearance_level": ["2", "3", "4"],
+            "clearance_type": "declared",
+        }
+        selection = self.get_selection(pre_selection)
+        return redirect(reverse("generate_report_select_oois", kwargs=kwargs) + selection)
 
 
 class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):
     """
-    Select OOIs for the 'Generate Report' flow.
+    Select objects for the 'Generate Report' flow.
     """
 
     template_name = "generate_report/select_oois.html"

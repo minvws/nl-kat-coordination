@@ -1,0 +1,34 @@
+{% load i18n %}
+
+<main id="main-content"
+      tabindex="-1"
+      class="sidemenu choose-report report"
+      lang="nl">
+    {% include "partials/report_sidemenu.html" with data=report_data %}
+
+    <article>
+        {% include "multi_organization_report/introduction.html" %}
+        {% include "multi_organization_report/summary.html" %}
+
+        <div class="chapter-numbers report-content">
+            {% include "multi_organization_report/recommendations.html" with total_findings=report_data.total_findings total_systems=report_data.total_systems %}
+            {% include "multi_organization_report/asset_overview.html" %}
+            {% include "multi_organization_report/open_ports.html" %}
+            {% include "multi_organization_report/ipv6.html" %}
+
+            <section id="basic-security">
+                <div>
+                    <div id="basic-security-overview">
+                        {% include "aggregate_organisation_report/basic_security.html" with data=report_data %}
+
+                    </div>
+                    {% include "multi_organization_report/basic_security_details.html" %}
+
+                </div>
+            </section>
+            {% include "multi_organization_report/vulnerabilities.html" %}
+            {% include "multi_organization_report/appendix.html" %}
+
+        </div>
+    </article>
+</main>

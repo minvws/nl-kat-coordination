@@ -1,9 +1,13 @@
+from datetime import datetime
 from logging import getLogger
+from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
 from octopoes.models.ooi.config import Config
-from reports.report_types.definitions import AggregateReport
+from reports.report_types.definitions import AggregateReport, ReportType
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
@@ -84,7 +88,7 @@ class AggregateOrganisationReport(AggregateReport):
 
                 if report_id == OpenPortsReport.id:
                     for ip, details in report_specific_data.items():
-                        open_ports[str(ip)] = details
+                        open_ports[ip] = details
 
                 if report_id == IPv6Report.id:
                     for hostname, info in report_specific_data.items():
@@ -101,6 +105,7 @@ class AggregateOrganisationReport(AggregateReport):
                         total_findings += vulnerabilities_data["summary"]["total_findings"]
                         terms.extend(vulnerabilities_data["summary"]["terms"])
                         recommendations.extend(vulnerabilities_data["summary"]["recommendations"])
+                        vulnerabilities_data["title"] = ip.split("|")[2]
                         vulnerabilities[ip] = vulnerabilities_data
 
                 if report_id == RPKIReport.id:
@@ -188,7 +193,7 @@ class AggregateOrganisationReport(AggregateReport):
             # Defaults
             basic_security["summary"][service] = {
                 "rpki": {"number_of_compliant": 0, "total": 0},
-                "system_specific": {"number_of_compliant": 0, "total": 0},
+                "system_specific": {"number_of_compliant": 0, "total": 0, "checks": {}, "ips": {}},
                 "safe_connections": {"number_of_compliant": 0, "total": 0},
             }
 
@@ -355,6 +360,15 @@ class AggregateOrganisationReport(AggregateReport):
                 )
 
         terms = list(set(terms))
+
+        recommendation_counts = {}
+
+        for recommendation in recommendations:
+            if recommendation not in recommendation_counts:
+                recommendation_counts[recommendation] = 0
+
+            recommendation_counts[recommendation] += 1
+
         recommendations = list(set(filter(None, recommendations)))
         total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
@@ -381,10 +395,13 @@ class AggregateOrganisationReport(AggregateReport):
 
         config_oois = self.octopoes_api_connector.list(types={Config}, valid_time=valid_time).items
 
+        flattened_health = flatten_health(get_rocky_health(self.octopoes_api_connector))
+
         return {
             "systems": systems,
             "services": services,
             "recommendations": recommendations,
+            "recommendation_counts": recommendation_counts,
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,
@@ -392,8 +409,9 @@ class AggregateOrganisationReport(AggregateReport):
             "summary": summary,
             "total_findings": len(all_findings),
             "total_systems": total_ips,
+            "total_hostnames": total_hostnames,
             "total_systems_basic_security": total_systems_basic_security,
-            "health": flatten_health(get_rocky_health(self.octopoes_api_connector)),
+            "health": [health.dict() for health in flattened_health],
             "config_oois": config_oois,
         }
 
@@ -419,3 +437,28 @@ class AggregateOrganisationReport(AggregateReport):
         report_data = {key: value for key, value in report_data.items() if value}
 
         return report_data
+
+
+def aggregate_reports(
+    connector: OctopoesAPIConnector,
+    input_ooi_references: List[str],
+    selected_report_types: List[ReportType],
+    valid_time: datetime,
+):
+    aggregate_report = AggregateOrganisationReport(connector)
+    report_data = {}
+
+    for ooi in input_ooi_references:
+        report_data[ooi] = {}
+        for options, report_types in aggregate_report.reports.items():
+            for report_type in report_types:
+                if Reference.from_str(ooi).class_type in report_type.input_ooi_types and report_type.id in [
+                    report["id"] for report in selected_report_types
+                ]:
+                    report = report_type(connector)
+                    data = report.generate_data(ooi, valid_time=valid_time)
+                    report_data[ooi][report_type.id] = data
+
+    post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
+
+    return aggregate_report, post_processed_data, report_data

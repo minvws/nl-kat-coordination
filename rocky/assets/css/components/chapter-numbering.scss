@@ -21,6 +21,22 @@
       content: counter(chapter) "." counter(subchapter) " ";
     }
   }
+
+  &.type-a {
+    h2 {
+      &::before {
+        counter-increment: chapter;
+        content: counter(chapter, upper-alpha) ". ";
+      }
+    }
+
+    h3 {
+      &::before {
+        counter-increment: subchapter;
+        content: counter(chapter, upper-alpha) "." counter(subchapter) " ";
+      }
+    }
+  }
 }
 
 ol.chapter-numbers {
@@ -45,6 +61,24 @@ ol.chapter-numbers {
         &::before {
           counter-increment: subchapter;
           content: counter(chapter) "." counter(subchapter) " ";
+        }
+      }
+    }
+  }
+
+  &.type-a {
+    > li {
+      &::before {
+        counter-increment: chapter;
+        content: counter(chapter, upper-alpha) ". ";
+      }
+
+      > ol {
+        > li {
+          &::before {
+            counter-increment: subchapter;
+            content: counter(chapter, upper-alpha) "." counter(subchapter) " ";
+          }
         }
       }
     }
