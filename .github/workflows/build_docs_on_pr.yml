@@ -31,7 +31,7 @@ jobs:
         run: make docs
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "github-pages-no-deploy"
           path: 'docs/_build'
