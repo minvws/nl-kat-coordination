@@ -13,7 +13,7 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
 define build-settings-doc
-	echo "# $$(echo "$(3)" | sed 's/.*/\u&/')" > docs/source/technical_design/environment_settings/$(3).md
+	echo "# $(4)" > docs/source/technical_design/environment_settings/$(3).md
 	DOCS=True PYTHONPATH=./$(1) settings-doc generate \
 	-f markdown -m $(2) \
 	--templates docs/settings-doc-templates \
@@ -112,11 +112,11 @@ ubuntu22.04-build-image:
 	docker build -t kat-ubuntu22.04-build-image packaging/ubuntu22.04
 
 docs:
-	$(call build-settings-doc,keiko,keiko.settings,keiko)
-	$(call build-settings-doc,octopoes,octopoes.config.settings,octopoes)
-	$(call build-settings-doc,boefjes,boefjes.config,boefjes)
-	$(call build-settings-doc,bytes,bytes.config,bytes)
-	$(call build-settings-doc,mula/scheduler,config.settings,mula)
+	$(call build-settings-doc,keiko,keiko.settings,keiko,Keiko)
+	$(call build-settings-doc,octopoes,octopoes.config.settings,octopoes,Octopoes)
+	$(call build-settings-doc,boefjes,boefjes.config,boefjes,Boefjes)
+	$(call build-settings-doc,bytes,bytes.config,bytes,Bytes)
+	$(call build-settings-doc,mula/scheduler,config.settings,mula,Mula)
 	sphinx-build -b html docs/source docs/_build
 
 poetry-dependencies:
