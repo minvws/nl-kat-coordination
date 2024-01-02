@@ -25,10 +25,10 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
     now = datetime.utcnow()
-    hash_algorithm = getenv("HASHFUNC", HASHLIB)
+    hash_algorithm = getenv("HASHFUNC", HASHFUNC)
 
     if not RPKI_PATH.exists() or not validate_age():
-        rpki_json, rpki_meta = refresh_rpki()
+        rpki_json, rpki_meta = refresh_rpki(hash_algorithm)
     else:
         with RPKI_PATH.open() as json_file:
             rpki_json = json.load(json_file)
@@ -80,11 +80,10 @@ def refresh_rpki(algo: str) -> Tuple(Dict, Dict):
         temp_rpki_file.write(response.content)
         # atomic operation
         os.rename(temp_rpki_file.name, RPKI_PATH)
-    hash = create_hash(response.content.encode(), algo)
     metadata = {
         "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": source_url,
-        "hash": hash,
+        "hash": create_hash(response.content.encode(), algo),
         "hash_algorithm": algo,
     }
     with open(RPKI_META_PATH, "w") as meta_file:
