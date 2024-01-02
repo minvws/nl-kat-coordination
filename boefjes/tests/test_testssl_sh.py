@@ -2,14 +2,14 @@ from unittest import TestCase
 
 from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_testssl_sh_ciphers.normalize import run
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class TestsslSh(TestCase):
     maxDiff = None
 
     def test_cipherless_service(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("testssl-sh-cipherless-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("testssl-sh-cipherless-normalizer.json"))
 
         oois = list(
             run(
@@ -24,7 +24,7 @@ class TestsslSh(TestCase):
         self.assertEqual(expected, oois)
 
     def test_ciphered_service(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("testssl-sh-cipherless-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("testssl-sh-cipherless-normalizer.json"))
 
         oois = list(
             run(

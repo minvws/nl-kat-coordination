@@ -1,7 +1,7 @@
 {
     "id": "kat_shodan_normalize",
     "consumes": [
-        "shodan"
+        "boefje/shodan"
     ],
     "produces": [
         "Finding",

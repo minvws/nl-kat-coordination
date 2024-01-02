@@ -69,7 +69,7 @@ itest:
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml kill
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml build $(build_args)
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml  run --rm octopoes_integration
+	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml run --rm octopoes_integration
 
 rtest-crux:
 	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml kill

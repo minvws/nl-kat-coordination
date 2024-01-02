@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+{% load static %}
+{% load compress %}
+{% load i18n %}
+
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
+    <head>
+        <title>OpenKAT report</title>
+        <meta charset="UTF-8">
+        <link rel="shortcut icon" href="{% static "img/favicon.svg" %}" />
+        {% compress css %}
+            <link href="{% static "dist/report.css" %}" rel="stylesheet">
+        {% endcompress %}
+    </head>
+    <body>
+        {% include template %}
+
+    </body>
+</html>

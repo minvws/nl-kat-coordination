@@ -96,14 +96,14 @@ class SQLMetaDataRepository(MetaDataRepository):
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
         logger.debug("Querying normalizer meta: %s", query_filter.json())
 
+        query = self.session.query(NormalizerMetaInDB)
+
         if query_filter.raw_id is not None:
-            query = self.session.query(NormalizerMetaInDB).filter(
-                NormalizerMetaInDB.raw_file_id == str(query_filter.raw_id)
-            )
-        else:
+            query = query.filter(NormalizerMetaInDB.raw_file_id == str(query_filter.raw_id))
+
+        if query_filter.organization is not None:
             query = (
-                self.session.query(NormalizerMetaInDB)
-                .join(RawFileInDB)
+                query.join(RawFileInDB)
                 .join(BoefjeMetaInDB)
                 .filter(RawFileInDB.boefje_meta_id == BoefjeMetaInDB.id)
                 .filter(BoefjeMetaInDB.organization == query_filter.organization)
@@ -143,28 +143,8 @@ class SQLMetaDataRepository(MetaDataRepository):
 
     def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
         logger.debug("Querying raw data: %s", query_filter.json())
-
-        if query_filter.boefje_meta_id:
-            query = self.session.query(RawFileInDB).filter(
-                RawFileInDB.boefje_meta_id == str(query_filter.boefje_meta_id)
-            )
-        else:
-            query = (
-                self.session.query(RawFileInDB)
-                .join(BoefjeMetaInDB)
-                .filter(BoefjeMetaInDB.organization == query_filter.organization)
-            )
-
-        if query_filter.normalized:
-            query = query.join(NormalizerMetaInDB, isouter=False)
-
-        if query_filter.normalized is False:  # it can also be None, in which case we do not want a filter
-            query = query.join(NormalizerMetaInDB, isouter=True).filter(NormalizerMetaInDB.id.is_(None))
-
-        if query_filter.mime_types:
-            query = query.filter(RawFileInDB.mime_types.contains([m.value for m in query_filter.mime_types]))
-
-        query = query.offset(query_filter.offset).limit(query_filter.limit)
+        query = self.session.query(RawFileInDB)
+        query = query_filter.apply(query)
 
         return [to_raw_meta(raw_file_in_db) for raw_file_in_db in query]
 
@@ -204,6 +184,15 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return {organization_id: count for organization_id, count in query}
 
+    def get_raw_file_count_per_mime_type(self, query_filter: RawDataFilter) -> Dict[str, int]:
+        logger.debug("Querying count raw data per mime type: %s", query_filter.json())
+        query = self.session.query(func.unnest(RawFileInDB.mime_types), func.count()).group_by(
+            func.unnest(RawFileInDB.mime_types)
+        )
+        query = query_filter.apply(query)
+
+        return {mime_type: count for mime_type, count in query}
+
     def _to_raw(self, raw_file_in_db: RawFileInDB) -> RawData:
         boefje_meta = to_boefje_meta(raw_file_in_db.boefje_meta)
         data = self.raw_repository.get_raw(raw_file_in_db.id, boefje_meta)
@@ -227,7 +216,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 def create_meta_data_repository() -> Iterator[MetaDataRepository]:
     settings = get_settings()
 
-    session = sessionmaker(bind=get_engine(settings.db_uri))()
+    session = sessionmaker(bind=get_engine(str(settings.db_uri)))()
     repository = SQLMetaDataRepository(
         session, create_raw_repository(settings), create_hash_repository(settings), settings
     )

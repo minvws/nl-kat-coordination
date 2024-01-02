@@ -1,3 +1,4 @@
+import datetime
 import logging
 from functools import cached_property
 from typing import Iterable, Set
@@ -8,7 +9,7 @@ from django.contrib.auth.models import Group, Permission
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save, pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import KATalogusClientV1, get_katalogus
@@ -19,7 +20,9 @@ from katalogus.exceptions import (
 )
 from requests import RequestException
 
+from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models.ooi.web import Network
 from rocky.exceptions import (
     OctopoesDownException,
     OctopoesException,
@@ -168,6 +171,16 @@ class Organization(models.Model):
 
             raise OctopoesException("Failed creating organization in Octopoes") from e
 
+    @classmethod
+    def post_create(cls, sender, instance, *args, **kwargs):
+        octopoes_client = cls._get_healthy_octopoes(instance.code)
+
+        try:
+            valid_time = datetime.datetime.now(datetime.timezone.utc)
+            octopoes_client.save_declaration(Declaration(ooi=Network(name="internet"), valid_time=valid_time))
+        except Exception:
+            logger.exception("Could not seed internet for organization %s", sender)
+
     @staticmethod
     def _get_healthy_katalogus(organization_code: str) -> KATalogusClientV1:
         katalogus_client = get_katalogus(organization_code)
@@ -197,6 +210,7 @@ class Organization(models.Model):
 
 
 pre_save.connect(Organization.pre_create, sender=Organization)
+post_save.connect(Organization.post_create, sender=Organization)
 
 
 class OrganizationMember(models.Model):

@@ -2,42 +2,45 @@
 
 <h3>Ciphers</h3>
 {% if data.suites %}
-<table>
-    <thead>
-        <tr>
-            <th>{% translate "Status" %}</th>
-            <th>{% translate "Protocol" %}</th>
-            <th>{% translate "Name" %}</th>
-            <th>{% translate "Encryption Algorithm" %}</th>
-            <th>{% translate "Bits" %}</th>
-            <th>{% translate "Key Size" %}</th>
-            <th>{% translate "Code" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for protocol, suites in data.suites.items %}
-            {% for suite in suites %}
+    <div class="horizontal-scroll">
+        <table>
+            <caption class="visually-hidden">{% translate "Ciphers:" %}</caption>
+            <thead>
                 <tr>
-                    <td>
-                        {% if suite.cipher_suite_name in data.suites_with_findings %}
-                            <i class="icon negative"></i> {% translate "Phase out" %}
-                        {% else %}
-                            <i class="icon positive"></i> {% translate "Good" %}
-                        {% endif %}
-                    </td>
-                    <td>{{ protocol }}</td>
-                    <td>{{ suite.cipher_suite_alias }}</td>
-                    <td>{{ suite.encryption_algorithm }}</td>
-                    <td>{{ suite.bits }}</td>
-                    <td>{{ suite.key_size }}</td>
-                    <td>{{ suite.cipher_suite_code }}</td>
+                    <th>{% translate "Status" %}</th>
+                    <th>{% translate "Protocol" %}</th>
+                    <th>{% translate "Name" %}</th>
+                    <th>{% translate "Encryption Algorithm" %}</th>
+                    <th>{% translate "Bits" %}</th>
+                    <th>{% translate "Key Size" %}</th>
+                    <th>{% translate "Code" %}</th>
                 </tr>
-            {% endfor %}
-        {% endfor %}
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+                {% for protocol, suites in data.suites.items %}
+                    {% for suite in suites %}
+                        <tr>
+                            <td>
+                                {% if suite.cipher_suite_name in data.suites_with_findings %}
+                                    <i class="icon alert"></i> {% translate "Phase out" %}
+                                {% else %}
+                                    <i class="icon positive"></i> {% translate "Good" %}
+                                {% endif %}
+                            </td>
+                            <td>{{ protocol }}</td>
+                            <td>{{ suite.cipher_suite_alias }}</td>
+                            <td>{{ suite.encryption_algorithm }}</td>
+                            <td>{{ suite.bits }}</td>
+                            <td>{{ suite.key_size }}</td>
+                            <td>{{ suite.cipher_suite_code }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
-<p>{% translate "No ciphers found for this IPService" %}</p>
+    <p>{% translate "No ciphers found for this IPService" %}</p>
 {% endif %}
 {% if data.findings %}
     <h3>{% translate "Findings" %}</h3>

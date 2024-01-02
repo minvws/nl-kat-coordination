@@ -1,7 +1,7 @@
 {
     "id": "kat_fierce_normalize",
     "consumes": [
-        "fierce"
+        "boefje/fierce"
     ],
     "produces": [
         "IPAddressV6",

@@ -1,0 +1,39 @@
+{% load i18n %}
+
+<div class="horizontal-scroll">
+    <table>
+        <caption class="visually-hidden">{% translate "Selected assets:" %}</caption>
+        <thead>
+            <tr>
+                <th scope="col">{% translate "IP address" %}</th>
+                <th scope="col">{% translate "Domain" %}</th>
+                <th scope="col">{% translate "System type" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ip, ip_services in data.services.items %}
+                <tr>
+                    <td>{{ ip.tokenized.address }}</td>
+                    <td>
+                        {% for hostname in ip_services.hostnames %}
+                            {% if not forloop.last %}
+                                {{ hostname.tokenized.name }},
+                            {% else %}
+                                {{ hostname.tokenized.name }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for service in ip_services.services %}
+                            {% if not forloop.last %}
+                                {{ service }},
+                            {% else %}
+                                {{ service }}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

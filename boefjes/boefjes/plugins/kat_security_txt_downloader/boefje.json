@@ -5,11 +5,5 @@
     "consumes": [
         "Website"
     ],
-    "produces": [
-        "SecurityTXT",
-        "Website",
-        "URL"
-    ],
-    "environment_keys": [],
     "scan_level": 2
 }

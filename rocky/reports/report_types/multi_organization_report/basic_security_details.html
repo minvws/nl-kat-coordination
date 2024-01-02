@@ -1,0 +1,83 @@
+{% load i18n %}
+
+<div>
+    <div id="safe-connections">
+        <h3>{% translate "Safe connections" %}</h3>
+        {#    <p>#}
+        {#        <strong><span class="tag critical">{% translate "Critical" %}</span> {% translate "Score" %}: 80%, {% translate "Sector" %}: 90%</strong>#}
+        {#    </p>#}
+        <p>
+            {% blocktranslate trimmed %}
+                In this chapter we check if the connections of all the IP ports of the system are safe.
+                Safe connections are important to prevent unauthorised access and data breaches. Strong
+                ciphers are crucial because they ensure strong encryption which protects the data from
+                interception during communiction.
+            {% endblocktranslate %}
+        </p>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">{% translate "Overview of safe connections" %}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Check" %}</th>
+                        <th scope="col">{% translate "Amount" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{% translate "Only Safe Ciphers" %}</td>
+                        <td>
+                            {% if report_data.basic_security.safe_connections.number_of_available != report_data.basic_security.safe_connections.number_of_ips %}
+                                <span class="icon incomplete"></span>
+                            {% else %}
+                                <span class="icon positive"></span>
+                            {% endif %}
+                            {{ report_data.basic_security.safe_connections.number_of_available }}/{{ report_data.basic_security.safe_connections.number_of_ips }} {% translate "services are compliant" %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div id="system-specific">
+        <h3>{% translate "System specific checks" %}</h3>
+        {#    <p>#}
+        {#        <strong><span class="tag medium">Medium</span> Score: 80%, Sector: 90%</strong>#}
+        {#    </p>#}
+        <p>
+            {% blocktranslate trimmed %}
+                This is where checks are done that are specific to system types. Different security
+                and compliance issues come into play for different systems. They are listed here
+                under each other.
+            {% endblocktranslate %}
+        </p>
+        {% for check, specific in report_data.basic_security.system_specific.items %}
+            {% if specific.checks %}
+                {% include "aggregate_organisation_report/system_specific.html" with data=specific type=check %}
+
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div id="rpki">
+        <h3>{% translate "Resource Public Key Infrastructure" %}</h3>
+        <p>
+            {% blocktranslate trimmed %}
+                This section contains basic security information about resource public key
+                infrastructure. If your web server employs RPKI for its IP addresses and
+                associated nameservers, then it enhances visitor protection against
+                misconfigurations and malicious route intercepts through verified route
+                announcements, ensuring reliable server access and secure internet traffic.
+            {% endblocktranslate %}
+        </p>
+        {#    #}
+        {#    <p>#}
+        {#        <strong><span class="tag secure">Secure</span> Score: 100%, Sector: 90%</strong>#}
+        {#    </p>#}
+        {% for service, rpki in report_data.basic_security.rpki.items %}
+            {% if rpki %}
+                {% include "rpki_report/report.html" with data=rpki type=service %}
+
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

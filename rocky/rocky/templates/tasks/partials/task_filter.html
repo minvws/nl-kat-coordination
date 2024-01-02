@@ -45,7 +45,7 @@
                 </option>
                 <option value="failed"
                         {% if request.GET.scan_history_status == 'failed' %}selected{% endif %}>
-                    {% translate "Failure" %}
+                    {% translate "Failed" %}
                 </option>
             </select>
         </fieldset>
@@ -61,7 +61,7 @@
             {% endfor %}
         </fieldset>
         <input type="submit"
-               value='{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}' />
-        <a href="../tasks">Clear filters</a>
+               value="{% if submit_text %}{{ submit_text }}{% else %}{% translate "Set filters" %}{% endif %}" />
+        <a href="{{ request.path }}">{% translate "Clear filters" %}</a>
     </form>
 </div>

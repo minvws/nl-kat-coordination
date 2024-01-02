@@ -2,6 +2,17 @@
     max-width: fit-content;
 }
 
+.wy-table-responsive table td, .wy-table-responsive table th {
+    vertical-align: top !important;
+    white-space: normal;
+}
+
+.wy-table-responsive {
+    margin-bottom: 24px;
+    max-width: 100%;
+    overflow: visible;
+}
+
 .wy-side-nav-search > div.version {
     color: hsl(0deg 0% 100% / 60%);
 }

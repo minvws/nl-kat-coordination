@@ -27,9 +27,9 @@ class PrioritizedItem(BaseModel):
     # A unique generated identifier for the object contained in data
     hash: Optional[str] = Field(None, max_length=32)
 
-    priority: Optional[int]
+    priority: Optional[int] = 0
 
-    data: Dict
+    data: Dict = Field(default_factory=dict)
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -40,9 +40,13 @@ class PrioritizedItemDB(Base):
     __tablename__ = "items"
 
     id = Column(GUID, primary_key=True)
+
     scheduler_id = Column(String)
+
     hash = Column(String(32), index=True)
+
     priority = Column(Integer)
+
     data = Column(JSONB, nullable=False)
 
     created_at = Column(

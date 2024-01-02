@@ -1,9 +1,9 @@
 import datetime
-import logging
 from typing import Any, Dict, List, Optional
 
 import fastapi
 import prometheus_client
+import structlog
 import uvicorn
 from fastapi import status
 from opentelemetry import trace
@@ -15,7 +15,7 @@ from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
-from scheduler import context, models, queues, schedulers, version
+from scheduler import context, models, queues, schedulers, storage, version
 from scheduler.config import settings
 
 from .pagination import PaginatedResponse, paginate
@@ -25,7 +25,7 @@ class Server:
     """Server that exposes API endpoints for the scheduler.
 
     Attributes:
-        logger: A logging.Logger object used for logging.
+        logger: A structlog.BoundLogger object used for logging.
         ctx: A context.AppContext object used for sharing data between modules.
         schedulers: A dict containing all the schedulers.
         config: A settings.Settings object containing the configuration settings.
@@ -44,7 +44,7 @@ class Server:
             s: A dict containing all the schedulers.
         """
 
-        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.schedulers: Dict[str, schedulers.Scheduler] = s
         self.config: settings.Settings = settings.Settings()
@@ -65,7 +65,7 @@ class Server:
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 
-            self.logger.debug("Finished setting up instrumentation")
+            self.logger.debug("Finished setting up OpenTelemetry instrumentation")
 
         self.api.add_api_route(
             path="/",
@@ -131,7 +131,7 @@ class Server:
         self.api.add_api_route(
             path="/tasks",
             endpoint=self.list_tasks,
-            methods=["GET"],
+            methods=["GET", "POST"],
             response_model=PaginatedResponse,
             status_code=status.HTTP_200_OK,
             description="List all tasks",
@@ -203,6 +203,7 @@ class Server:
             path="/queues/{queue_id}/push",
             endpoint=self.push_queue,
             methods=["POST"],
+            response_model=Optional[models.PrioritizedItem],
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
@@ -210,15 +211,16 @@ class Server:
     def root(self) -> Any:
         return None
 
-    def health(self) -> Any:
+    def health(self, externals: bool = False) -> Any:
         response = models.ServiceHealth(
             service="scheduler",
             healthy=True,
             version=version.__version__,
         )
 
-        for service in self.ctx.services.__dict__.values():
-            response.externals[service.name] = service.is_healthy()
+        if externals:
+            for service in self.ctx.services.__dict__.values():
+                response.externals[service.name] = service.is_healthy()
 
         return response
 
@@ -287,8 +289,9 @@ class Server:
         limit: int = 10,
         min_created_at: Optional[datetime.datetime] = None,
         max_created_at: Optional[datetime.datetime] = None,
-        input_ooi: Optional[str] = None,
-        plugin_id: Optional[str] = None,
+        input_ooi: Optional[str] = None,  # FIXME: deprecated
+        plugin_id: Optional[str] = None,  # FIXME: deprecated
+        filters: Optional[storage.filters.FilterRequest] = None,
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
@@ -296,8 +299,93 @@ class Server:
                 detail="min_date must be less than max_date",
             )
 
+        # FIXME: deprecated; backwards compatibility for rocky that uses the
+        # input_ooi and plugin_id parameters.
+        f_req = filters or storage.filters.FilterRequest(filters={})
+        if input_ooi is not None:
+            if task_type == "boefje":
+                f_ooi = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        )
+                    ]
+                }
+            elif task_type == "normalizer":
+                f_ooi = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        )
+                    ]
+                }
+            else:
+                f_ooi = {
+                    "or": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        ),
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__input_ooi",
+                            operator="eq",
+                            value=input_ooi,
+                        ),
+                    ]
+                }
+
+            f_req.filters.update(f_ooi)  # type: ignore
+
+        if plugin_id is not None:
+            if task_type == "boefje":
+                f_plugin = {
+                    "and": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__boefje__id",
+                            operator="eq",
+                            value=plugin_id,
+                        )
+                    ]
+                }
+            elif task_type == "normalizer":
+                f_plugin = storage.filters.Filter(
+                    column="p_item",
+                    field="data__raw_data__boefje_meta__id",
+                    operator="eq",
+                    value=plugin_id,
+                )
+            else:
+                f_plugin = {
+                    "or": [
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__boefje__id",
+                            operator="eq",
+                            value=plugin_id,
+                        ),
+                        storage.filters.Filter(
+                            column="p_item",
+                            field="data__raw_data__boefje_meta__id",
+                            operator="eq",
+                            value=plugin_id,
+                        ),
+                    ]
+                }
+
+            f_req.filters.update(f_plugin)  # type: ignore
+
         try:
-            results, count = self.ctx.datastores.task_store.api_list_tasks(
+            results, count = self.ctx.datastores.task_store.get_tasks(
                 scheduler_id=scheduler_id,
                 task_type=task_type,
                 status=status,
@@ -305,9 +393,13 @@ class Server:
                 limit=limit,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
-                input_ooi=input_ooi,
-                plugin_id=plugin_id,
+                filters=f_req,
             )
+        except storage.filters.errors.FilterError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -412,7 +504,7 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str, filters: Optional[List[models.Filter]] = None) -> Any:
+    def pop_queue(self, queue_id: str, filters: Optional[storage.filters.FilterRequest] = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -433,7 +525,7 @@ class Server:
 
         return models.PrioritizedItem(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.PrioritizedItem) -> Any:
+    def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -442,15 +534,25 @@ class Server:
             )
 
         try:
-            p_item = models.PrioritizedItem(**item.model_dump())
+            # Load default values
+            p_item = models.PrioritizedItem()
+
+            # Set values
             if p_item.scheduler_id is None:
                 p_item.scheduler_id = s.scheduler_id
 
+            p_item.priority = item.priority
+
             if s.queue.item_type == models.BoefjeTask:
-                p_item.data = models.BoefjeTask(**p_item.data).dict()
+                p_item.data = models.BoefjeTask(**item.data).dict()
+                p_item.id = p_item.data["id"]
             elif s.queue.item_type == models.NormalizerTask:
-                p_item.data = models.NormalizerTask(**p_item.data).dict()
+                p_item.data = models.NormalizerTask(**item.data).dict()
+                p_item.id = p_item.data["id"]
+            else:
+                p_item.data = item.data
         except Exception as exc:
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=str(exc),
@@ -475,7 +577,7 @@ class Server:
                 detail=str(exc_not_allowed),
             ) from exc_not_allowed
 
-        return models.PrioritizedItem(**p_item.model_dump())
+        return p_item
 
     def run(self) -> None:
         uvicorn.run(

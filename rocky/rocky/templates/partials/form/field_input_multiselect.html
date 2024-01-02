@@ -8,7 +8,7 @@
                        value="{{ choice.data.value }}"
                        id="id_{{ field.name }}_{{ forloop.counter0 }}"
                        {% if choice.data.attrs.disabled %}disabled{% endif %}
-                       {% if choice.data.attrs.checked %}checked{% endif %} />
+                       {% if choice.data.selected or choice.data.attrs.checked or choice.data.attrs.required %}checked{% endif %} />
                 <label for="id_{{ field.name }}_{{ forloop.counter0 }}">{{ choice.choice_label|capfirst }}</label>
             </div>
         {% endfor %}

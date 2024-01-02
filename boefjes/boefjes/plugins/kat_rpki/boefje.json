@@ -1,0 +1,10 @@
+{
+    "id": "rpki",
+    "name": "RPKI",
+    "description": "Check if an IPV4 or IPV6 address has a valid VRPS record.",
+    "consumes": [
+        "IPAddressV4",
+        "IPAddressV6"
+    ],
+    "scan_level": 1
+}

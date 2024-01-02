@@ -1,3 +1,4 @@
+import threading
 import typing
 from functools import wraps
 from typing import Any, Callable, Dict, Optional
@@ -33,7 +34,7 @@ class Bytes(HTTPService):
 
     name = "bytes"
 
-    def __init__(self, host: str, source: str, user: str, password: str, timeout: int = 5):
+    def __init__(self, host: str, source: str, user: str, password: str, timeout: int, pool_connections: int):
         """Initialize the Bytes service.
 
         Args:
@@ -48,16 +49,19 @@ class Bytes(HTTPService):
             "password": password,
         }
 
-        super().__init__(host=host, source=source, timeout=timeout)
+        self.lock: threading.Lock = threading.Lock()
+
+        super().__init__(host, source, timeout, pool_connections)
 
     def login(self) -> None:
-        self.headers.update({"Authorization": f"bearer {self._get_token()}"})
+        with self.lock:
+            self.headers.update({"Authorization": f"bearer {self.get_token()}"})
 
     @staticmethod
     def _verify_response(response: requests.Response) -> None:
         response.raise_for_status()
 
-    def _get_token(self) -> str:
+    def get_token(self) -> str:
         url = f"{self.host}/token"
         response = self.post(
             url=url,

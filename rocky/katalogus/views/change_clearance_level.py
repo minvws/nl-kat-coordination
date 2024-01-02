@@ -20,7 +20,9 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
 
     def get(self, request, *args, **kwargs):
         if "selected_oois" not in request.session:
-            messages.add_message(self.request, messages.ERROR, _("Session has terminated, please select OOIs again."))
+            messages.add_message(
+                self.request, messages.ERROR, _("Session has terminated, please select objects again.")
+            )
             return redirect(
                 reverse(
                     "boefje_detail",
@@ -47,7 +49,7 @@ class ChangeClearanceLevel(OrganizationPermissionRequiredMixin, BoefjeMixin, Sin
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["oois"] = self.oois
         context["breadcrumbs"] = [
             {

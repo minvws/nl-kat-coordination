@@ -5,12 +5,12 @@ from boefjes.job_models import NormalizerMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
 from octopoes.models.ooi.monitoring import Application
-from tests.test_snyk import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class CalvinTest(TestCase):
     def test_parse_user_changed(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("calvin-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("calvin-normalizer.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
@@ -74,7 +74,7 @@ class CalvinTest(TestCase):
         )
 
     def test_parse_admin_login_failure(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("calvin-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("calvin-normalizer.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
@@ -112,7 +112,7 @@ class CalvinTest(TestCase):
         )
 
     def test_parse_user_login_failure(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("calvin-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("calvin-normalizer.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)

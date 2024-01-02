@@ -21,13 +21,13 @@ class Organisation(BaseModel):
 class Plugin(BaseModel):
     id: str
     repository_id: str = RESERVED_LOCAL_ID
-    name: Optional[str]
-    version: Optional[str]
-    authors: Optional[List[str]]
-    created: Optional[datetime.datetime]
-    description: Optional[str]
+    name: Optional[str] = None
+    version: Optional[str] = None
+    authors: Optional[List[str]] = None
+    created: Optional[datetime.datetime] = None
+    description: Optional[str] = None
     environment_keys: List[str] = Field(default_factory=list)
-    related: Optional[List[str]]
+    related: Optional[List[str]] = None
     enabled: bool = False
 
     def __str__(self):
@@ -38,10 +38,10 @@ class Boefje(Plugin):
     type: Literal["boefje"] = "boefje"
     scan_level: int = 1
     consumes: Set[str] = Field(default_factory=set)
-    produces: List[str] = Field(default_factory=list)
-    options: Optional[List[str]]
-    runnable_hash: Optional[str]
-    oci_image: Optional[str]
+    produces: Set[str] = Field(default_factory=set)
+    options: Optional[List[str]] = None
+    runnable_hash: Optional[str] = None
+    oci_image: Optional[str] = None
 
 
 class Normalizer(Plugin):

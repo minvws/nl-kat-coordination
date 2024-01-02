@@ -5,9 +5,5 @@
         "consumes": [
             "Hostname"
         ],
-        "produces": [
-            "Hostname"
-        ],
-        "environment_keys": [],
         "scan_level": 2
     }

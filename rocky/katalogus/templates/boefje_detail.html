@@ -65,13 +65,13 @@
                     {% endblocktranslate %}
                 </p>
                 <p>
-                    {% for ooi in plugin.produces %}
-                        <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
-                        {% if ooi != plugin.produces|last %}-{% endif %}
-                    {% endfor %}
+                    {{ plugin.produce }}
+                    <ul>
+                        {% for mime_type in plugin.produces %}<li>{{ mime_type }}</li>{% endfor %}
+                    </ul>
                 </p>
                 <p>
-                    {% include "partials/task_history.html" %}
+                    {% include "tasks/partials/boefje_task_history.html" %}
 
                 </p>
             </div>

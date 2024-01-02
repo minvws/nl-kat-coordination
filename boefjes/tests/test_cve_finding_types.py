@@ -6,14 +6,14 @@ from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.types import (
     CVEFindingType,
 )
-from tests.stubs import get_dummy_data
+from tests.loading import get_dummy_data
 
 
 class CVETest(TestCase):
     maxDiff = None
 
     def test_cve_with_cvss(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("cve-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("cve-normalizer.json"))
 
         oois = list(
             run(
@@ -37,7 +37,7 @@ class CVETest(TestCase):
         self.assertEqual(expected, oois)
 
     def test_cve_with_cvss2(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("cve-normalizer-cvss2.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("cve-normalizer-cvss2.json"))
 
         oois = list(
             run(
@@ -62,7 +62,7 @@ class CVETest(TestCase):
         self.assertEqual(expected, oois)
 
     def test_cve_without_cvss(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("cve-normalizer.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("cve-normalizer.json"))
 
         oois = list(
             run(

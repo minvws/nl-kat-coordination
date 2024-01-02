@@ -3,7 +3,7 @@ import os
 import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -18,6 +18,7 @@ from boefjes.job_models import (
     NormalizerPlainOOI,
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
+from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -26,8 +27,9 @@ from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.types import OOIType
 
 logger = logging.getLogger(__name__)
+
 bytes_api_client = BytesAPIClient(
-    settings.bytes_api,
+    str(settings.bytes_api),
     username=settings.bytes_username,
     password=settings.bytes_password,
 )
@@ -56,10 +58,10 @@ def _serialize_value(value: Any, required: bool) -> Any:
         return [_serialize_value(item, required) for item in value]
     if isinstance(value, Reference):
         try:
-            return value.tokenized.dict()["__root__"]
-        except IndexError as error:
+            return value.tokenized.root
+        except AttributeError:
             if required:
-                raise error
+                raise
 
             return None
     if isinstance(value, Enum):
@@ -73,17 +75,20 @@ def _serialize_value(value: Any, required: bool) -> Any:
 def serialize_ooi(ooi: OOI):
     serialized_oois = {}
     for key, value in ooi:
-        if key not in ooi.__fields__:
+        if key not in ooi.model_fields:
             continue
-        serialized_oois[key] = _serialize_value(value, ooi.__fields__[key].required)
+        serialized_oois[key] = _serialize_value(value, ooi.model_fields[key].is_required())
     return serialized_oois
 
 
 def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str]) -> Dict[str, str]:
     try:
-        environment = requests.get(
-            f"{settings.katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
-        ).json()
+        katalogus_api = str(settings.katalogus_api).rstrip("/")
+        response = requests.get(
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
+        )
+        response.raise_for_status()
+        environment = response.json()
 
         # Add prefixed BOEFJE_* global environment variables
         for key, value in os.environ.items():
@@ -98,28 +103,6 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
     except RequestException:
         logger.exception("Error getting environment settings")
         raise
-
-    return {}
-
-
-def _collect_default_mime_types(boefje_meta: BoefjeMeta) -> Set[str]:
-    boefje_id = boefje_meta.boefje.id
-
-    mime_types = {
-        boefje_id,
-        f"boefje/{boefje_id}",
-        f"boefje/{boefje_id}-{boefje_meta.parameterized_arguments_hash}",
-    }
-
-    if boefje_meta.boefje.version is not None:
-        mime_types = mime_types.union(
-            {
-                f"boefje/{boefje_id}-{boefje_meta.boefje.version}",
-                f"boefje/{boefje_id}-{boefje_meta.parameterized_arguments_hash}-{boefje_meta.boefje.version}",
-            }
-        )
-
-    return mime_types
 
 
 class BoefjeHandler(Handler):
@@ -155,7 +138,7 @@ class BoefjeHandler(Handler):
         boefje_meta.runnable_hash = boefje_resource.runnable_hash
         boefje_meta.environment = get_environment_settings(boefje_meta, env_keys) if env_keys else {}
 
-        mime_types = _collect_default_mime_types(boefje_meta)
+        mime_types = _default_mime_types(boefje_meta.boefje)
 
         logger.info("Starting boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
@@ -174,7 +157,6 @@ class BoefjeHandler(Handler):
             boefje_meta.ended_at = datetime.now(timezone.utc)
             logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
-            bytes_api_client.login()
             bytes_api_client.save_boefje_meta(boefje_meta)
 
             if boefje_results:
@@ -196,7 +178,6 @@ class NormalizerHandler(Handler):
     def handle(self, normalizer_meta: NormalizerMeta) -> None:
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
-        bytes_api_client.login()
         raw = bytes_api_client.get_raw(normalizer_meta.raw_data.id)
 
         normalizer_meta.started_at = datetime.now(timezone.utc)
@@ -234,8 +215,8 @@ class NormalizerHandler(Handler):
 
     @staticmethod
     def _parse_ooi(result: NormalizerPlainOOI):
-        return parse_obj_as(OOIType, result.dict())
+        return parse_obj_as(OOIType, result.model_dump())
 
 
 def get_octopoes_api_connector(org_code: str):
-    return OctopoesAPIConnector(settings.octopoes_api, org_code)
+    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)

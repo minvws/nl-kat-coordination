@@ -61,7 +61,7 @@
                     {% for ooi in plugin.produces %}{{ ooi }}{% endfor %}
                 </p>
                 <p>
-                    {% include "partials/task_history.html" %}
+                    {% include "tasks/partials/normalizer_task_history.html" %}
 
                 </p>
             </div>
@@ -70,6 +70,7 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    <script src="{% static "/js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
-    <script src="{% static "/js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/autoSubmit.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/renderNormalizerOutputOOIs.js" %}" type="module" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

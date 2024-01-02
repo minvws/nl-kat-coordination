@@ -25,8 +25,8 @@ See :ref:`Development` for our code style, coding conventions, and overall workf
     - This branch should be in the following format:
     - ``[feature|enhancement|bug|hotfix]/random-cat-popup-on-screen``
 - Commit and push the code
-    - Make sure the code is linted, formatted and has correct typing
-    - The code must pass ``pre-commit`` locally
+    - Make sure the code is linted, formatted and has correct typing. Use ``pre-commit`` locally for this, see :ref:`Pre-commit`.
+    - All commits must be signed, see :ref:`Signed commits`.
 - Submit Pull Request
     - Make sure your code is tested and the PR has a good title and description
     - Use the PR template
@@ -82,6 +82,19 @@ Any translation updates in Weblate will be automatically submitted as a GitHub P
 If you contribute to the translation effort, you will receive a mention in the source code.
 
 Note that editing the English localization requires changing the source string in Django, which must be done through a GitHub PR manually.
+In addition, take care not to edit the ``.po`` files through GitHub directly, as this may cause merge conflicts when Weblate has pending translations.
+
+Adding a new language
+---------------------
+You can add a new language to OpenKAT by following these steps:
+
+1. Add a new language through Weblate's interface
+    Alternatively: create a new ``rocky/rocky/locale/$LANGUAGE_CODE/LC_MESSAGES/django.po`` file directly in the repository.
+    You can use ``rocky/rocky/locale/django.pot`` as a template.
+2. Add the language code to the ``LANGUAGES`` list in ``rocky/rocky/settings.py``
+    Note that languages not supported by Django require that you also add a custom dictionary entry in ``EXTRA_LANG_INFO``.
+
+The new language should be automatically picked up by both Weblate and Django.
 
 Contributor Social Contract
 ===========================
