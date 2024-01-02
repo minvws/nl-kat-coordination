@@ -1,0 +1,89 @@
+/* Tooltip */
+
+.tooltip {
+  --tooltip-icon-height: 1.25rem;
+  --tooltip-icon-width: 1.25rem;
+
+  display: inline-block;
+  position: relative;
+  height: var(--tooltip-icon-height);
+  line-height: 0;
+
+  button {
+    background-color: transparent;
+    padding: 0;
+    border: 0;
+    min-height: 0;
+    min-width: 0;
+    height: var(--tooltip-icon-height);
+    width: var(--tooltip-icon-width);
+
+    &::before {
+      min-height: 0;
+      min-width: 0;
+      height: var(--tooltip-icon-height);
+      width: var(--tooltip-icon-width);
+    }
+
+    /* Tooltip content */
+    + [role="tooltip"] {
+      --arrow-size: 0.75rem;
+      --tooltip-padding: 0.5rem;
+      --tooltip-arrow-x-0: calc(
+        ((var(--arrow-size) / 2) + var(--tooltip-padding)) * -1
+      );
+
+      /* Duplicated padding right to insure spacing between
+      the tooltip and the side of the screen equal to the padding
+      used on the page */
+      --page-padding: calc(
+        (var(--section-padding-right) * 2) + var(--section-padding-left)
+      );
+
+      background-color: var(--colors-grey-11);
+      color: #ffffff;
+      font-size: var(--body-text-small-font-size);
+      font-family: var(--application-base-font-family);
+      line-height: var(--application-base-line-height);
+      font-weight: normal;
+      padding: var(--tooltip-padding);
+      position: absolute;
+      bottom: calc(100% + var(--arrow-size));
+
+      /* Centering the arrow above the icon */
+      left: calc(var(--tooltip-arrow-x-0) + (var(--tooltip-icon-width) / 2));
+      box-sizing: border-box;
+      max-width: calc(100vw - var(--page-padding));
+      width: calc(100vw - var(--page-padding));
+      text-align: center;
+      border-radius: 0.25rem;
+      text-wrap: balance;
+      visibility: hidden;
+
+      @media (width >= 24rem) {
+        width: 100vw;
+        max-width: 15rem;
+      }
+
+      &::before {
+        content: "";
+        background-color: var(--colors-grey-11);
+        position: absolute;
+        bottom: -0.375rem;
+        left: 0.5rem;
+        width: var(--arrow-size);
+        height: var(--arrow-size);
+        display: block;
+        transform: rotate(45deg);
+      }
+    }
+
+    /* Show tooltip content */
+    &:hover,
+    &:focus {
+      + [role="tooltip"] {
+        visibility: initial;
+      }
+    }
+  }
+}

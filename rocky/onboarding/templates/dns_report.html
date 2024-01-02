@@ -10,13 +10,26 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "OpenKAT introduction" %}</h1>
+                <h1>
+                    {% translate "OpenKAT introduction" %}
+                    <span class="tooltip">
+                        <button class="icon-only ti-help" aria-describedby="tooltip-content">More information</button>
+                        <span id="tooltip-content" role="tooltip">This is the page title. It describes the content of this page.</span>
+                    </span>
+                </h1>
                 <h2>{% translate "DNS Report" %}</h2>
                 <p>
                     {% blocktranslate trimmed %}
                         These are the findings of a OpenKAT-analysis ({{ observed_at }}).
                         Click a finding for more detailed information about the issue, its origin, severity and possible solutions.
                     {% endblocktranslate %}
+                </p>
+                <p>
+                    testing
+                    <span class="tooltip">
+                        <button class="icon-only ti-help" aria-describedby="tooltip-content">More information</button>
+                        <span id="tooltip-content" role="tooltip">This is a testing element. To see if the tooltip works.</span>
+                    </span>
                 </p>
                 {% include "partials/ooi_report_severity_totals.html" %}
                 {% include "partials/ooi_report_findings_block.html" %}
