@@ -155,6 +155,7 @@ class AppContext:
             **{
                 storage.TaskStore.name: storage.TaskStore(dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
+                storage.JobStore.name: storage.JobStore(dbconn),
             }
         )
 

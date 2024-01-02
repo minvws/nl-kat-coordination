@@ -5,8 +5,9 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
@@ -57,6 +58,8 @@ class Task(BaseModel):
 
     status: TaskStatus
 
+    job_id: Optional[uuid.UUID] = None
+
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -75,6 +78,9 @@ class TaskDB(Base):
     type = Column(String)
 
     p_item = Column(JSONB, nullable=False)
+
+    job_id = Column(GUID, ForeignKey("jobs.id", nullable=True))
+    job = relationship("JobDB", back_populates="tasks")
 
     status = Column(
         Enum(TaskStatus),

@@ -106,10 +106,10 @@ class BoefjeScheduler(Scheduler):
             interval=60.0,
         )
 
-        # Random OOI's from Octopoes
+        # Rescheduling
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-random",
-            target=self.push_tasks_for_random_objects,
+            name=f"scheduler-{self.scheduler_id}-reschedule",
+            target=self.push_tasks_for_rescheduling,
             interval=60.0,
         )
 
@@ -265,6 +265,129 @@ class BoefjeScheduler(Scheduler):
                         self.push_tasks_for_new_boefjes.__name__,
                     )
 
+    @tracer.start_as_current_span("boefje_push_tasks_for_rescheduling")
+    def push_tasks_for_rescheduling(self):
+        if self.queue.full():
+            self.logger.warning(
+                "Boefjes queue is full, not populating with new tasks",
+                queue_qsize=self.queue.qsize(),
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return
+
+        try:
+            jobs, _ = self.ctx.datastores.job_store.get_jobs(
+                scheduler_id=self.scheduler_id,
+                enabled=True,
+                max_deadline=datetime.now(timezone.utc),
+            )
+        except Exception as exc_db:
+            self.logger.error(
+                "Could not get jobs for scheduler: %s",
+                self.scheduler_id,
+                scheduler_id=self.scheduler_id,
+                organisation_id=self.organisation.id,
+                exc_info=exc_db,
+            )
+            raise exc_db
+
+        if not jobs:
+            self.logger.debug(
+                "No jobs found for scheduler: %s",
+                self.scheduler_id,
+                scheduler_id=self.scheduler_id,
+                organisation_id=self.organisation.id,
+            )
+            return
+
+        with futures.ThreadPoolExecutor() as executor:
+            for job in jobs:
+                # Create task from a prior task, persisted as p_item
+                # on the job.
+                try:
+                    task = BoefjeTask.parse_obj(job.p_item.data)
+                except Exception as exc:
+                    self.logger.error(
+                        "Could not parse task from job: %s",
+                        job.id,
+                        job_id=job.id,
+                        organisation_id=self.organisation.id,
+                        scheduler_id=self.scheduler_id,
+                        exc_info=exc,
+                    )
+                    continue
+
+                # Boefje still exists?
+                boefje = self.ctx.services.katalogus.get_boefje(task.boefje.id)
+                if not boefje:
+                    self.logger.debug(
+                        "Boefje does not exist anymore, skipping",
+                        boefje_id=task.boefje.id,
+                        organisation_id=self.organisation.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                    continue
+
+                # Boefje still enabled?
+                if not boefje.enabled:
+                    self.logger.debug(
+                        "Boefje is disabled, skipping",
+                        boefje_id=task.boefje.id,
+                        organisation_id=self.organisation.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                    continue
+
+                # We check if the task has an input_ooi, since it is possible
+                # that task can have no ooi's
+                ooi = None
+                if task.input_ooi:
+                    # OOI still exists?
+                    ooi = self.ctx.services.octopoes.get_object(task.organization, task.input_ooi)
+                    if not ooi:
+                        self.logger.debug(
+                            "OOI does not exist anymore, skipping",
+                            ooi_primary_key=task.input_ooi,
+                            organisation_id=self.organisation.id,
+                            scheduler_id=self.scheduler_id,
+                        )
+                        self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                        continue
+
+                    # Boefje still consuming ooi?
+                    if ooi.object_type not in boefje.consumes:
+                        self.logger.debug(
+                            "Boefje does not consume ooi anymore, skipping",
+                            boefje_id=task.boefje.id,
+                            ooi_primary_key=ooi.primary_key,
+                            organisation_id=self.organisation.id,
+                            scheduler_id=self.scheduler_id,
+                        )
+                        self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+
+                    # Boefje allowed to scan ooi?
+                    if not self.is_task_allowed_to_run(boefje, ooi):
+                        self.logger.debug(
+                            "Boefje not allowed to scan ooi, skipping",
+                            boefje_id=task.boefje.id,
+                            ooi_primary_key=ooi.primary_key,
+                            organisation_id=self.organisation.id,
+                            scheduler_id=self.scheduler_id,
+                        )
+                        self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                        continue
+
+                executor.submit(
+                    self.push_task,
+                    boefje,
+                    ooi,
+                    self.push_tasks_for_rescheduling.__name__,
+                )
+
+    # FIXME: deprecated
     @tracer.start_as_current_span("boefje_push_tasks_for_random_objects")
     def push_tasks_for_random_objects(self) -> None:
         """Push tasks for random ooi's from octopoes to the queue."""
@@ -528,7 +651,7 @@ class BoefjeScheduler(Scheduler):
         return False
 
     @tracer.start_as_current_span("boefje_push_task")
-    def push_task(self, boefje: Plugin, ooi: OOI, caller: str = "") -> None:
+    def push_task(self, boefje: Plugin, ooi: Optional[OOI], caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -540,9 +663,11 @@ class BoefjeScheduler(Scheduler):
         """
         task = BoefjeTask(
             boefje=Boefje.parse_obj(boefje.dict()),
-            input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
+
+        if ooi:
+            task.input_ooi = ooi.primary_key
 
         if not self.is_task_allowed_to_run(boefje, ooi):
             self.logger.debug(
