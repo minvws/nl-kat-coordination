@@ -18,7 +18,8 @@ RPKI_PATH = BASE_PATH / "rpki.json"
 RPKI_META_PATH = BASE_PATH / "rpki-meta.json"
 RPKI_SOURCE_URL = "https://console.rpki-client.org/vrps.json"
 RPKI_CACHE_TIMEOUT = 1800  # in seconds
-HASHFUNC = 'sha256'
+HASHFUNC = "sha256"
+
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
@@ -46,7 +47,15 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
     results = {"vrps_records": roas, "valid": valid, "exists": exists}
 
-    return [(set(), json.dumps(results)), (set('rpki/cache-meta',), json.dumps(rpki_meta))]
+    return [
+        (set(), json.dumps(results)), 
+        (
+            set(
+                'rpki/cache-meta',
+            ), 
+            json.dumps(rpki_meta)
+        ),
+    ]
 
 
 def create_hash(data: bytes, algo: str) -> str:
@@ -76,7 +85,7 @@ def refresh_rpki(algo: str) -> Tuple(Dict, Dict):
         "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": source_url,
         "hash": hash,
-        "hash_algorithm": algo
+        "hash_algorithm": algo,
     }
     with open(RPKI_META_PATH, "w") as meta_file:
         json.dump(metadata, meta_file)
