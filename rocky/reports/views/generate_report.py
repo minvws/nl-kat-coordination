@@ -52,19 +52,18 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingGenerateReportView(BreadcrumbsGenerateReportView, TemplateView):
+class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
     """
     Landing page to start the 'Generate Report' flow.
     """
 
+    pre_selection = {
+        "clearance_level": ["2", "3", "4"],
+        "clearance_type": "declared",
+    }
+
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        kwargs = self.get_kwargs()
-        pre_selection = {
-            "clearance_level": ["2", "3", "4"],
-            "clearance_type": "declared",
-        }
-        selection = self.get_selection(pre_selection)
-        return redirect(reverse("generate_report_select_oois", kwargs=kwargs) + selection)
+        return redirect(reverse("generate_report_select_oois", kwargs=self.get_kwargs()) + self.get_selection())
 
 
 class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):

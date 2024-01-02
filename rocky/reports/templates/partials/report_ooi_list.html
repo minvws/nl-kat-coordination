@@ -40,9 +40,8 @@
                        aria-label="{% translate "explanation select all" %}">
                         <span>{% translate "Explanation 'Continue with all OOIs'" %}:</span>
                         {% blocktrans trimmed %}
-                            This option will select all OOIs that have a
-                            clearance type:'declared' and clearance level: 'L2, L3, L4'
-                            for the current organization.
+                            This option will select all OOIs (+ current filters)
+                            for {{ organization }} organization.
                         {% endblocktrans %}
                     </p>
                     <button type="submit" class="button" name="ooi" value="all">

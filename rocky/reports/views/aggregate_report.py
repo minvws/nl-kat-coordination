@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
-from octopoes.models import ScanLevel, ScanProfileType
+from octopoes.models import OOI
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
@@ -56,19 +56,18 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingAggregateReportView(BreadcrumbsAggregateReportView, TemplateView):
+class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView):
     """
     Landing page to start the 'Aggregate Report' flow.
     """
 
+    pre_selection = {
+        "clearance_level": ["2", "3", "4"],
+        "clearance_type": "declared",
+    }
+
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        kwargs = self.get_kwargs()
-        pre_selection = {
-            "clearance_level": ["2", "3", "4"],
-            "clearance_type": "declared",
-        }
-        selection = self.get_selection(pre_selection)
-        return redirect(reverse("aggregate_report_select_oois", kwargs=kwargs) + selection)
+        return redirect(reverse("aggregate_report_select_oois", kwargs=self.get_kwargs()) + self.get_selection())
 
 
 class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):
@@ -102,7 +101,7 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Ba
         )
 
     def get(self, request, *args, **kwargs):
-        if not self.selected_oois and "all" not in self.selected_oois:
+        if not self.selected_oois:
             messages.error(self.request, _("Select at least one OOI to proceed."))
         return super().get(request, *args, **kwargs)
 
@@ -145,6 +144,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     template_name = "aggregate_report.html"
     current_step = 6
+    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -186,17 +186,14 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
         return aggregate_report, post_processed_data, report_data
 
-    def get_oois(self) -> List:
+    def get_oois(self) -> List[OOI]:
         if "all" in self.selected_oois:
-            scan_levels = {ScanLevel(int(s)) for s in ["2", "3", "4"]}
-            clearance_types = {ScanProfileType(s) for s in ["declared"]}
-            ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
             return self.octopoes_api_connector.list(
-                ooi_types,
+                self.get_ooi_types(),
                 valid_time=self.valid_time,
                 limit=OOIList.HARD_LIMIT,
-                scan_level=scan_levels,
-                scan_profile_type=clearance_types,
+                scan_level=self.get_ooi_scan_levels(),
+                scan_profile_type=self.get_ooi_profile_types(),
             ).items
 
         return super().get_oois()
@@ -218,6 +215,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             True,
             **dict(json="true", **self.request.GET),
         )
+
         context["oois"] = self.selected_oois
         context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
         return context

@@ -16,16 +16,11 @@ from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import Report, ReportType
 from reports.report_types.helpers import get_report_by_id
-from rocky.views.mixins import OctopoesView
+from rocky.views.ooi_view import OOIFilterView
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     current_step: int = 1
-
-    def get_selection(self, pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None) -> str:
-        if pre_selection:
-            return "?" + urlencode(pre_selection, True)
-        return "?" + urlencode(self.request.GET, True)
 
     def get_kwargs(self):
         return {"organization_code": self.organization.code}
@@ -63,12 +58,18 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return context
 
 
-class BaseReportView(OctopoesView):
+class BaseReportView(OOIFilterView):
+    pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.valid_time = self.get_observed_at()
         self.selected_oois = request.GET.getlist("ooi", [])
         self.selected_report_types = request.GET.getlist("report_type", [])
+
+    def get_selection(self) -> str:
+        if self.pre_selection is not None:
+            return "?" + urlencode(self.pre_selection, True)
+        return "?" + urlencode(self.request.GET, True)
 
     def get_oois(self) -> List[OOI]:
         return [self.get_single_ooi(ooi_id) for ooi_id in self.selected_oois]
@@ -118,9 +119,9 @@ class BaseReportView(OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observed_at"] = self.valid_time
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
+        context["selection"] = self.get_selection()
         return context
 
 

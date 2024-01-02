@@ -47,7 +47,7 @@ class BreadcrumbsMultiReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingMultiReportView(BreadcrumbsMultiReportView, TemplateView):
+class LandingMultiReportView(BreadcrumbsMultiReportView, BaseReportView):
     """
     Landing page to start the 'Multi Report' flow.
     """
