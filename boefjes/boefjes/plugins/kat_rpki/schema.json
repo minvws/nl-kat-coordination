@@ -22,7 +22,7 @@
       "default": "sha256",
       "type": "string",
       "enum": ["sha256", "sha384", "sha512", "sha3_224", "sha3_256", "sha3_384", "sha3_512"],
-      "descirption": "The hashing function used to compute the hash over the downloaded source data."
+      "description": "The hashing function used to compute the hash over the downloaded source data."
     }
   }
 }
