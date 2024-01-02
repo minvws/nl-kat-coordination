@@ -1,8 +1,13 @@
+from datetime import datetime
 from logging import getLogger
+from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
-from reports.report_types.definitions import AggregateReport
+from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
+from octopoes.models.ooi.config import Config
+from reports.report_types.definitions import AggregateReport, ReportType
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
@@ -12,6 +17,7 @@ from reports.report_types.safe_connections_report.report import SafeConnectionsR
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
+from rocky.views.health import flatten_health, get_rocky_health
 
 logger = getLogger(__name__)
 
@@ -35,7 +41,7 @@ class AggregateOrganisationReport(AggregateReport):
     }
     template_path = "aggregate_organisation_report/report.html"
 
-    def post_process_data(self, data):
+    def post_process_data(self, data, valid_time):
         systems = {"services": {}}
         services = {}
         open_ports = {}
@@ -82,7 +88,7 @@ class AggregateOrganisationReport(AggregateReport):
 
                 if report_id == OpenPortsReport.id:
                     for ip, details in report_specific_data.items():
-                        open_ports[str(ip)] = details
+                        open_ports[ip] = details
 
                 if report_id == IPv6Report.id:
                     for hostname, info in report_specific_data.items():
@@ -99,6 +105,7 @@ class AggregateOrganisationReport(AggregateReport):
                         total_findings += vulnerabilities_data["summary"]["total_findings"]
                         terms.extend(vulnerabilities_data["summary"]["terms"])
                         recommendations.extend(vulnerabilities_data["summary"]["recommendations"])
+                        vulnerabilities_data["title"] = ip.split("|")[2]
                         vulnerabilities[ip] = vulnerabilities_data
 
                 if report_id == RPKIReport.id:
@@ -138,6 +145,9 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["safe_connections"][service]["sc_ips"][ip.tokenized.address] = findings
                 basic_security["safe_connections"][service]["number_of_ips"] += 1
                 basic_security["safe_connections"][service]["number_of_available"] += 1 if not findings else 0
+
+                # Collect recommendations from findings
+                recommendations.extend(set(finding_type.recommendation for finding_type in findings))
 
         # RPKI
         for ip, compliance in rpki["rpki_ips"].items():
@@ -183,7 +193,7 @@ class AggregateOrganisationReport(AggregateReport):
             # Defaults
             basic_security["summary"][service] = {
                 "rpki": {"number_of_compliant": 0, "total": 0},
-                "system_specific": {"number_of_compliant": 0, "total": 0},
+                "system_specific": {"number_of_compliant": 0, "total": 0, "checks": {}, "ips": {}},
                 "safe_connections": {"number_of_compliant": 0, "total": 0},
             }
 
@@ -332,8 +342,34 @@ class AggregateOrganisationReport(AggregateReport):
                     },
                 }
 
+            # Collect recommendations from findings
+            if (
+                service == SystemType.MAIL
+                and mail_report_data
+                or service == SystemType.WEB
+                and web_report_data
+                or service == SystemType.DNS
+                and dns_report_data
+            ):
+                recommendations.extend(
+                    set(
+                        finding_type.recommendation
+                        for ip, finding in basic_security["summary"][service]["system_specific"]["ips"].items()
+                        for finding_type in finding
+                    )
+                )
+
         terms = list(set(terms))
-        recommendations = list(set(recommendations))
+
+        recommendation_counts = {}
+
+        for recommendation in recommendations:
+            if recommendation not in recommendation_counts:
+                recommendation_counts[recommendation] = 0
+
+            recommendation_counts[recommendation] += 1
+
+        recommendations = list(set(filter(None, recommendations)))
         total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
 
@@ -357,9 +393,15 @@ class AggregateOrganisationReport(AggregateReport):
                 for finding_key in vulnerability_data.get("findings", {}):
                     all_findings.add(finding_key)
 
+        config_oois = self.octopoes_api_connector.list(types={Config}, valid_time=valid_time).items
+
+        flattened_health = flatten_health(get_rocky_health(self.octopoes_api_connector))
+
         return {
             "systems": systems,
             "services": services,
+            "recommendations": recommendations,
+            "recommendation_counts": recommendation_counts,
             "open_ports": open_ports,
             "ipv6": ipv6,
             "vulnerabilities": vulnerabilities,
@@ -367,7 +409,10 @@ class AggregateOrganisationReport(AggregateReport):
             "summary": summary,
             "total_findings": len(all_findings),
             "total_systems": total_ips,
+            "total_hostnames": total_hostnames,
             "total_systems_basic_security": total_systems_basic_security,
+            "health": [health.dict() for health in flattened_health],
+            "config_oois": config_oois,
         }
 
     def collect_system_specific_data(self, data, services, system_type: SystemType, report_id: str):
@@ -392,3 +437,28 @@ class AggregateOrganisationReport(AggregateReport):
         report_data = {key: value for key, value in report_data.items() if value}
 
         return report_data
+
+
+def aggregate_reports(
+    connector: OctopoesAPIConnector,
+    input_ooi_references: List[str],
+    selected_report_types: List[ReportType],
+    valid_time: datetime,
+):
+    aggregate_report = AggregateOrganisationReport(connector)
+    report_data = {}
+
+    for ooi in input_ooi_references:
+        report_data[ooi] = {}
+        for options, report_types in aggregate_report.reports.items():
+            for report_type in report_types:
+                if Reference.from_str(ooi).class_type in report_type.input_ooi_types and report_type.id in [
+                    report["id"] for report in selected_report_types
+                ]:
+                    report = report_type(connector)
+                    data = report.generate_data(ooi, valid_time=valid_time)
+                    report_data[ooi][report_type.id] = data
+
+    post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
+
+    return aggregate_report, post_processed_data, report_data

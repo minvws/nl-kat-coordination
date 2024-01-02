@@ -47,14 +47,41 @@
                     </ol>
                 </li>
             {% endif %}
+            {% if data.vulnerabilities %}
+                <li>
+                    <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
+                    <ol>
+                        {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                            <li class="object">
+                                <a href="#vulnerabilities">{{ vulnerabilities.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </li>
+            {% endif %}
+        </ol>
+        <ol class="chapter-numbers type-a">
             <li>
-                <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
+                <a href="#appendix">{% translate "Appendix" %}</a>
                 <ol>
-                    {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                        <li>
-                            <a href="#vulnerabilities">{{ input_ooi }}</a>
-                        </li>
-                    {% endfor %}
+                    <li>
+                        <a href="#term-overview">{% translate "Term Overview" %}</a>
+                    </li>
+                    <li>
+                        <a href="#selected-oois">{% translate "Selected Objects" %}</a>
+                    </li>
+                    <li>
+                        <a href="#selected-report-types">{% translate "Selected Report Types" %}</a>
+                    </li>
+                    <li>
+                        <a href="#selected-plugins">{% translate "Selected Plugins" %}</a>
+                    </li>
+                    <li>
+                        <a href="#service-versions-and-health">{% translate "Service Versions and Health" %}</a>
+                    </li>
+                    <li>
+                        <a href="#used-config-oois">{% translate "Used Config Objects" %}</a>
+                    </li>
                 </ol>
             </li>
         </ol>

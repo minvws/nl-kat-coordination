@@ -21,6 +21,16 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 
+@register.filter
+def get_key(array, key):
+    return [x[key] for x in array]
+
+
+@register.filter
+def sum_list(array):
+    return sum(array)
+
+
 @register.simple_tag()
 def get_scan_levels() -> List[str]:
     return list(map(str, range(1, 5)))

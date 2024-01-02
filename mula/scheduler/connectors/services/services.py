@@ -192,6 +192,22 @@ class HTTPService(Connector):
         ):
             raise RuntimeError(f"Service {self.name} is not running.")
 
+    def is_healthy(self) -> bool:
+        """Check if host is healthy by inspecting the host's health endpoint.
+
+        Returns:
+            A boolean
+        """
+        if self.host is None:
+            self.logger.warning("Host is not set.")
+            return False
+
+        if self.health_endpoint is None:
+            self.logger.warning("Health endpoint is not set.")
+            return False
+
+        return self.is_host_healthy(self.host, self.health_endpoint)
+
     def _verify_response(self, response: requests.Response) -> None:
         """Verify the received response from a request.
 

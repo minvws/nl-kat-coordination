@@ -1,0 +1,27 @@
+/* Weasyprint Table of contents */
+
+main.report {
+  &.sidemenu {
+    padding-left: 0;
+
+    & > nav:first-child {
+      padding-left: 0;
+      display: block;
+
+      ol {
+        padding-left: 0;
+        list-style-position: inside;
+
+        li ol,
+        li ul {
+          padding-left: 1rem;
+        }
+      }
+
+      a {
+        color: #006fb3;
+        text-decoration: none;
+      }
+    }
+  }
+}
