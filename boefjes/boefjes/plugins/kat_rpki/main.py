@@ -23,7 +23,7 @@ HASHFUNC = 'sha256'
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
-    now = datetime.utcnow()    
+    now = datetime.utcnow()
     hash_algorithm = getenv("HASHFUNC", HASHLIB)
 
     if not RPKI_PATH.exists() or not validate_age():
@@ -45,7 +45,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
                 valid = True
 
     results = {"vrps_records": roas, "valid": valid, "exists": exists}
-    
+
     return [(set(), json.dumps(results)), (set('rpki/cache-meta',), json.dumps(rpki_meta))]
 
 
