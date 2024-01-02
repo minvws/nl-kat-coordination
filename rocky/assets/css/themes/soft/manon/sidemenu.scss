@@ -12,13 +12,13 @@ main.sidemenu {
   --sidemenu-nav-padding-bottom: 6rem;
 
   position: relative;
+  align-items: stretch;
 
   > nav {
     /* Layout */
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    height: 100%;
     left: 0;
     width: var(--sidemenu-nav-width);
     padding-top: var(--sidemenu-nav-padding-top);
@@ -28,18 +28,18 @@ main.sidemenu {
     box-sizing: border-box;
     background-color: #ffffff;
     border-right: 1px solid var(--sidemenu-nav-border-color);
+    height: 100%;
 
     /* Behaviour */
-    overflow: auto;
-    position: sticky;
     position: absolute;
 
     /* Transition */
     transition: left 1s;
 
     @media (width >= 55rem) {
-      position: sticky;
-      height: 100vh;
+      position: relative;
+      height: unset;
+      overflow: unset;
     }
 
     ol,
@@ -57,10 +57,22 @@ main.sidemenu {
           color: #000000;
           text-decoration: none;
         }
+
+        &.object {
+          a,
+          a:visited,
+          a:focus,
+          a:active {
+            color: #000000;
+            text-decoration: none;
+            font-style: italic;
+          }
+        }
       }
     }
 
     .sticky {
+      position: sticky;
       top: 4.5rem;
     }
 
@@ -73,7 +85,7 @@ main.sidemenu {
       /* Layout */
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 0;
       min-width: var(--sidemenu-toggle-button-min-width);
       min-height: var(--sidemenu-toggle-button-min-height);
@@ -84,7 +96,6 @@ main.sidemenu {
       padding-left: 0;
 
       /* Needed to keep the button to stick to the top */
-      top: var(--sidemenu-button-margin-top);
       z-index: 2;
 
       /* Styling */
@@ -95,7 +106,7 @@ main.sidemenu {
 
       /* Behaviour */
       position: sticky;
-      position: static;
+      top: 1rem;
 
       /* Transition */
       transition: margin-left 1s;
@@ -126,6 +137,7 @@ main.sidemenu {
 
   &.sidemenu-closed > nav {
     position: absolute;
+    border-right: 1px solid #cccccc;
 
     /* Needed to show the button */
     overflow: visible;
@@ -134,14 +146,11 @@ main.sidemenu {
     left: calc(var(--sidemenu-nav-width) * -1);
 
     @media (width >= 55rem) {
-      position: absolute;
-
       /* Layout */
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      height: 100vh;
-      left: calc(var(--sidemenu-nav-width) * -1);
+      height: 100%;
       width: var(--sidemenu-nav-width);
       padding-top: var(--sidemenu-nav-padding-top);
       padding-right: var(--sidemenu-nav-padding-right);

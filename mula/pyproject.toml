@@ -19,6 +19,7 @@ python-dotenv = "^1.0.0"
 requests = "^2.31.0"
 retry2 = "^0.9.5"
 sqlalchemy = "^2.0.23"
+structlog = "^23.2.0"
 typing-extensions = "^4.8.0"
 uvicorn = "^0.24.0"
 

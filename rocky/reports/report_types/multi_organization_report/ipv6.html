@@ -1,0 +1,43 @@
+{% load i18n %}
+
+<section id="ipv6">
+    <div>
+        <h2>{% translate "IPv6" %}</h2>
+        <p>
+            {% blocktranslate trimmed %}
+                IPv6 includes improvements in security features compared to IPv4.
+                While IPv4 can implement security measures, IPv6 was designed with security in mind,
+                and its adoption can contribute to a more secure internet.
+            {% endblocktranslate %}
+        </p>
+        <p>
+            {% translate "In total " %} {{ report_data.ipv6.values|get_key:"enabled"|sum_list }}{% translate " out of " %}{{ report_data.ipv6.values|get_key:"total"|sum_list }} {% translate " systems have an IPv6 connection." %}
+        </p>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">{% translate "Overview of ip version compliance" %}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "System type" %}</th>
+                        <th scope="col">IPv6</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service, compliance in report_data.ipv6.items %}
+                        <tr>
+                            <td>{{ service }}</td>
+                            <td>
+                                {% if compliance.enabled != compliance.total %}
+                                    <span class="icon incomplete"></span>
+                                {% else %}
+                                    <span class="icon positive"></span>
+                                {% endif %}
+                                {{ compliance.enabled }}/{{ compliance.total }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

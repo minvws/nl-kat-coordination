@@ -56,6 +56,7 @@ from octopoes.models.ooi.network import (
     Network,
 )
 from octopoes.models.ooi.question import Question
+from octopoes.models.ooi.reports import ReportData
 from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
@@ -142,6 +143,7 @@ EmailSecurityType = Union[
 ]
 MonitoringType = Union[Application, Incident]
 ConfigType = Union[Config]
+ReportsType = Union[ReportData]
 
 OOIType = Union[
     CertificateType,
@@ -162,6 +164,7 @@ OOIType = Union[
     FindingTypeType,
     ConfigType,
     Question,
+    ReportsType,
 ]
 
 

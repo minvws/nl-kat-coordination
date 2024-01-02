@@ -1,7 +1,8 @@
 from typing import Any, Dict, Tuple
 
+from django.conf import settings
 from django.contrib import messages
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -9,13 +10,13 @@ from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
-from octopoes.models import Reference
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
     get_plugins_for_report_ids,
     get_report_types_from_aggregate_report,
 )
+from reports.utils import JSONEncoder, debug_json_keys
 from reports.views.base import (
     BaseReportView,
     ReportBreadcrumbs,
@@ -35,7 +36,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("aggregate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select OOIs"),
+                "text": _("Select Objects"),
             },
             {
                 "url": reverse("aggregate_report_select_report_types", kwargs=kwargs) + selection,
@@ -59,12 +60,18 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, TemplateView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("aggregate_report_select_oois", kwargs=self.get_kwargs()))
+        kwargs = self.get_kwargs()
+        pre_selection = {
+            "clearance_level": ["2", "3", "4"],
+            "clearance_type": "declared",
+        }
+        selection = self.get_selection(pre_selection)
+        return redirect(reverse("aggregate_report_select_oois", kwargs=kwargs) + selection)
 
 
 class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):
     """
-    Select OOIs for the 'Aggregate Report' flow.
+    Select Objects for the 'Aggregate Report' flow.
     """
 
     template_name = "aggregate_report/select_oois.html"
@@ -79,7 +86,7 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOILis
 
 class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
     """
-    Shows all possible report types from a list of OOIs.
+    Shows all possible report types from a list of Objects.
     Chooses report types for the 'Aggregate Report' flow.
     """
 
@@ -134,36 +141,61 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     template_name = "aggregate_report.html"
     current_step = 6
 
-    def generate_reports_for_oois(self) -> Tuple[Any, Any, Dict[Any, Dict[Any, Any]]]:
-        report_data = {}
-        aggregate_report = AggregateOrganisationReport(self.octopoes_api_connector)
-        aggregate_template = aggregate_report.template_path
-        for ooi in self.selected_oois:
-            report_data[ooi] = {}
-            for options, report_types in aggregate_report.reports.items():
-                for report_type in report_types:
-                    if Reference.from_str(ooi).class_type in report_type.input_ooi_types and report_type.id in [
-                        report["id"] for report in self.get_report_types()
-                    ]:
-                        report = report_type(self.octopoes_api_connector)
-                        data = report.generate_data(ooi, valid_time=self.valid_time)
-                        report_data[ooi][report_type.id] = data
-        post_processed_data = aggregate_report.post_process_data(report_data)
+    def get(self, request, *args, **kwargs):
+        if "json" in self.request.GET and self.request.GET["json"] == "true":
+            aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
 
-        return aggregate_template, post_processed_data, report_data
+            response = {
+                "organization_code": self.organization.code,
+                "organization_name": self.organization.name,
+                "organization_tags": list(self.organization.tags.all()),
+                "data": {
+                    "report_data": report_data,
+                    "post_processed_data": post_processed_data,
+                },
+            }
+
+            try:
+                response = JsonResponse(response, encoder=JSONEncoder)
+            except TypeError:
+                # We can't use translated strings as keys in JSON. This
+                # debugging code makes it easy to spot where the problem is.
+                if settings.DEBUG:
+                    debug_json_keys(report_data, [])
+                    debug_json_keys(post_processed_data, [])
+                raise
+            else:
+                response["Content-Disposition"] = f"attachment; filename=report-{self.organization.code}.json"
+                return response
+
+        return super().get(request, *args, **kwargs)
+
+    def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
+        aggregate_report, post_processed_data, report_data = aggregate_reports(
+            self.octopoes_api_connector, self.selected_oois, self.get_report_types(), self.valid_time
+        )
+
+        return aggregate_report, post_processed_data, report_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["report_types"] = self.get_report_types()
-        template, post_processed_data, report_data = self.generate_reports_for_oois()
-        context["template"] = template
+        aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
+        context["template"] = aggregate_report.template_path
         context["post_processed_data"] = post_processed_data
         context["report_data"] = report_data
-        context["report_download_url"] = url_with_querystring(
+        context["report_download_pdf_url"] = url_with_querystring(
             reverse("aggregate_report_pdf", kwargs={"organization_code": self.organization.code}),
             True,
             **self.request.GET,
         )
+        context["report_download_json_url"] = url_with_querystring(
+            reverse("aggregate_report_view", kwargs={"organization_code": self.organization.code}),
+            True,
+            **dict(json="true", **self.request.GET),
+        )
+        context["oois"] = self.get_oois()
+        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
         return context
 
 
