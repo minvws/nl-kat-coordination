@@ -207,8 +207,6 @@ direction RL
     OOIAddView <|-- BaseOOIFormView
     FindingAddView <|-- BaseOOIFormView
 
-    MultipleOOIMixin <|-- OctopoesView
-    BaseOOIListView <|-- MultipleOOIMixin
     BaseOOIListView <|-- ConnectorFormMixin
     OOIListView <|-- BaseOOIListView
     FindingListView <|-- BaseOOIListView

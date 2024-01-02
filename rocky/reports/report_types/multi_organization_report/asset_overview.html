@@ -1,0 +1,68 @@
+{% load i18n %}
+
+<section id="asset-overview">
+    <div>
+        <h2>{% translate "Asset overview" %}</h2>
+        <p>
+            {% translate "An overview of the manually released scanned assets. Assets in <strong>bold</strong> are taken as a starting point, assets that are not in bold were found by OpenKAT itself." %}
+        </p>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">{% translate "Overview of included assets" %}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Asset" %}</th>
+                        <th scope="col">{% translate "Amount" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{% translate "IP addresses" %}</td>
+                        <td>{{ report_data.total_systems }}</td>
+                    </tr>
+                    <tr>
+                        <td>{% translate "Domain names" %}</td>
+                        <td>{{ report_data.total_hostnames }}</td>
+                    </tr>
+                    {% for service, count in report_data.service_counts.items %}
+                        <tr>
+                            <td>{{ service }} server</td>
+                            <td>{{ count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">{% translate "Assets with most critical vulnerabilities" %}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Asset" %}</th>
+                        <th scope="col">{% translate "Vulnerability" %}</th>
+                        <th scope="col">{% translate "Organisation" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asset_vulnerability in report_data.asset_vulnerabilities %}
+                        {% if asset_vulnerability.vulnerabilities %}
+                            <tr>
+                                <td>{{ asset_vulnerability.asset }}</td>
+                                <td>
+                                    {% for vulnerability in asset_vulnerability.vulnerabilities %}
+                                        {% if not forloop.last %}
+                                            {{ vulnerability }},
+                                        {% else %}
+                                            {{ vulnerability }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>{% translate "Organisation" %} {{ asset_vulnerability.organisation }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
