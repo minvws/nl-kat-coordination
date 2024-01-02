@@ -1,4 +1,5 @@
 """Boefje script for validating vrps records based on code from @trideeindhoven"""
+import hashlib
 import json
 import os
 import tempfile
@@ -17,19 +18,21 @@ RPKI_PATH = BASE_PATH / "rpki.json"
 RPKI_META_PATH = BASE_PATH / "rpki-meta.json"
 RPKI_SOURCE_URL = "https://console.rpki-client.org/vrps.json"
 RPKI_CACHE_TIMEOUT = 1800  # in seconds
-
+HASHFUNC = 'sha256'
 
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
-    now = datetime.utcnow()
+    now = datetime.utcnow()    
+    hash_algorithm = getenv("HASHFUNC", HASHLIB)
 
     if not RPKI_PATH.exists() or not validate_age():
-        rpki_json = refresh_rpki()
+        rpki_json, rpki_meta = refresh_rpki()
     else:
         with RPKI_PATH.open() as json_file:
             rpki_json = json.load(json_file)
-
+        with RPKI_META_PATH.open() as json_meta_file:
+            rpki_meta = json.load(json_meta_file)
     exists = False
     valid = False
     roas = []
@@ -42,8 +45,13 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
                 valid = True
 
     results = {"vrps_records": roas, "valid": valid, "exists": exists}
+    
+    return [(set(), json.dumps(results)), (set('rpki/cache-meta',), json.dumps(rpki_meta))]
 
-    return [(set(), json.dumps(results))]
+
+def create_hash(data: bytes, algo: str) -> str
+    hashfunc = getattr(hashlib, algo)
+    return hashfunc(data).hexdigest()
 
 
 def validate_age() -> bool:
@@ -55,7 +63,7 @@ def validate_age() -> bool:
     return (now - cached_file_timestamp).total_seconds() > maxage
 
 
-def refresh_rpki() -> Dict:
+def refresh_rpki(algo: str) -> Tuple(Dict, Dict):
     source_url = getenv("RPKI_SOURCE_URL", RPKI_SOURCE_URL)
     response = requests.get(source_url, allow_redirects=True)
     response.raise_for_status()
@@ -63,7 +71,13 @@ def refresh_rpki() -> Dict:
         temp_rpki_file.write(response.content)
         # atomic operation
         os.rename(temp_rpki_file.name, RPKI_PATH)
-    metadata = {"timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), "source": source_url}
+    hash = create_hash(response.content.encode(), algo)
+    metadata = {
+        "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"), 
+        "source": source_url,
+        "hash": hash,
+        "hash_algorithm": algo
+    }
     with open(RPKI_META_PATH, "w") as meta_file:
         json.dump(metadata, meta_file)
-    return json.loads(response.content)
+    return (json.loads(response.content), metadata)
