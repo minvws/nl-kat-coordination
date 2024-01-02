@@ -1,30 +1,77 @@
+{#
+    The `--heading-offset` command line parameter is exposed as `heading_offset` variable.
 
----
+    See https://github.com/samuelcolvin/pydantic/blob/master/pydantic/fields.py for field structure.
+    Each `field` in `fields` is instance of `FieldInfo`.
+    Extra parameters unknown to pydantic are stored in `field.json_schema_extra`.
 
-{% for field in fields %}{% if not loop.first %}
+    To see all possible values, run this generator with `--format debug`.
+#}
+{% macro heading(level) -%}
+    {{ '#' * (heading_offset + level) }}
+{%- endmacro %}
+{% for env_name, field in fields %}{% if not loop.first %}
 
-{% else %}{% endif %}## `{{ field.field_info.extra["env_names"]|list|first|upper }}`
+{% else %}{% endif %}{{ heading(2) }} `{{ env_name|upper }}`
 
-*{% if field.required %}*Required*{% else %}Optional{% endif %}* `{{  field.type_.__name__ }}`{% if field.default != None %}, default value: `{{ field.default }}`{% endif %}
+*{% if field.is_required() %}*Required*{% else %}Optional{% endif %}*{% if has_default_value(field) %}, default value: `{{ field.default }}`{% endif %}
 
-{% if field.field_info.description %}
+{% if field.description %}
 
-{{ field.field_info.description }}
+{{ field.description }}
 {% endif %}
-    {% if field.field_info.extra["example"] %}
+    {# Example values #}
+    {% if field.json_schema_extra and "examples" in field.json_schema_extra %}
+    {# `field.json_schema_extra.examples` has no pre-defined structure, so it is more flexible #}
+    {% set examples_values = field.json_schema_extra.examples %}
 
-### Examples
+{{ heading(3) }} Examples
 
-{{ field.field_info.extra["example"] }}
+        {% if examples_values is string %}
+{{ examples_values }}
+        {% elif not is_values_with_descriptions(examples_values) %}
+            {% if examples_values|join("`, `")|length + 2 <= 75 %}
+`{{ examples_values|join("`, `") }}`
+            {% else %}
+                {% for value in examples_values %}
+- `{{ value }}`
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            {% for value in examples_values %}
+                {% if value.__class__.__name__ == "tuple" and value|length <= 2 %}
+                    {% if value|length == 2 %}
+- `{{ value[0] }}`: {{ value[1] }}
+                    {% else %}
+- `{{ value[0] }}`
+                    {% endif %}
+                {% else %}
+- `{{ value }}`
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% elif field.examples %}
+    {# `field.examples` is limited to a list of only example values #}
+
+{{ heading(3) }} Examples
+
+        {% if field.examples|join("`, `")|length + 2 <= 75 %}
+`{{ field.examples|join("`, `") }}`
+        {% else %}
+            {% for value in field.examples %}
+- `{{ value }}`
+            {% endfor %}
+        {% endif %}
     {% endif %}
-    {% if field.field_info.extra["possible_values"] %}
-        {% set possible_values = field.field_info.extra["possible_values"] %}
-    {% elif field.type_.__class__.__name__ == "_LiteralGenericAlias" %}
-        {% set possible_values = field.type_.__args__ %}
+    {# Possible values #}
+    {% if field.json_schema_extra and "possible_values" in field.json_schema_extra %}
+        {% set possible_values = field.json_schema_extra.possible_values %}
+    {% elif is_typing_literal(field) %}
+        {% set possible_values = field.annotation.__args__ %}
     {% endif %}
     {% if possible_values %}
 
-### Possible values
+{{ heading(3) }} Possible values
 
         {% if not is_values_with_descriptions(possible_values) %}
             {% if possible_values|join("`, `")|length + 2 <= 75 %}
@@ -46,10 +93,6 @@
 - `{{ value }}`
                 {% endif %}
             {% endfor %}
-
         {% endif %}
     {% endif %}
-
----
-
 {% endfor %}
