@@ -49,7 +49,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     return [(set(), json.dumps(results)), (set('rpki/cache-meta',), json.dumps(rpki_meta))]
 
 
-def create_hash(data: bytes, algo: str) -> str
+def create_hash(data: bytes, algo: str) -> str:
     hashfunc = getattr(hashlib, algo)
     return hashfunc(data).hexdigest()
 
