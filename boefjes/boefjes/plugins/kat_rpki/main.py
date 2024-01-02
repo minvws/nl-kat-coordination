@@ -48,10 +48,10 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     results = {"vrps_records": roas, "valid": valid, "exists": exists}
 
     return [
-        (set(), json.dumps(results)), 
+        (set(), json.dumps(results)),
         (
             set(
-                'rpki/cache-meta',
+                "rpki/cache-meta",
             ), 
             json.dumps(rpki_meta)
         ),
