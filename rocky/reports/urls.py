@@ -17,6 +17,14 @@ from reports.views.generate_report import (
     ReportTypesSelectionGenerateReportView,
     SetupScanGenerateReportView,
 )
+from reports.views.multi_report import (
+    LandingMultiReportView,
+    MultiReportPDFView,
+    MultiReportView,
+    OOISelectionMultiReportView,
+    ReportTypesSelectionMultiReportView,
+    SetupScanMultiReportView,
+)
 
 # Generate report urls
 urlpatterns = [
@@ -47,4 +55,18 @@ urlpatterns += [
     path("aggregate-report/setup-scan/", SetupScanAggregateReportView.as_view(), name="aggregate_report_setup_scan"),
     path("aggregate-report/view/", AggregateReportView.as_view(), name="aggregate_report_view"),
     path("aggregate-report/view/pdf/", AggregateReportPDFView.as_view(), name="aggregate_report_pdf"),
+]
+
+# Generate report urls
+urlpatterns += [
+    path("multi-report/", LandingMultiReportView.as_view(), name="multi_report_landing"),
+    path("multi-report/select/oois/", OOISelectionMultiReportView.as_view(), name="multi_report_select_oois"),
+    path(
+        "multi-report/select/report-types/",
+        ReportTypesSelectionMultiReportView.as_view(),
+        name="multi_report_select_report_types",
+    ),
+    path("multi-report/setup-scan/", SetupScanMultiReportView.as_view(), name="multi_report_setup_scan"),
+    path("multi-report/view/", MultiReportView.as_view(), name="multi_report_view"),
+    path("multi-report/view/pdf/", MultiReportPDFView.as_view(), name="multi_report_pdf"),
 ]

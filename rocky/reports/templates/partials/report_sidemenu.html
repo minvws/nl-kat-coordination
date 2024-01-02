@@ -52,13 +52,15 @@
                     <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
                     <ol>
                         {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                            <li>
-                                <a href="#vulnerabilities">{{ input_ooi }}</a>
+                            <li class="object">
+                                <a href="#vulnerabilities">{{ vulnerabilities.title }}</a>
                             </li>
                         {% endfor %}
                     </ol>
                 </li>
             {% endif %}
+        </ol>
+        <ol class="chapter-numbers type-a">
             <li>
                 <a href="#appendix">{% translate "Appendix" %}</a>
                 <ol>
@@ -66,7 +68,7 @@
                         <a href="#term-overview">{% translate "Term Overview" %}</a>
                     </li>
                     <li>
-                        <a href="#selected-oois">{% translate "Selected OOIs" %}</a>
+                        <a href="#selected-oois">{% translate "Selected Objects" %}</a>
                     </li>
                     <li>
                         <a href="#selected-report-types">{% translate "Selected Report Types" %}</a>
@@ -78,7 +80,7 @@
                         <a href="#service-versions-and-health">{% translate "Service Versions and Health" %}</a>
                     </li>
                     <li>
-                        <a href="#used-config-oois">{% translate "Used Config OOIs" %}</a>
+                        <a href="#used-config-oois">{% translate "Used Config Objects" %}</a>
                     </li>
                 </ol>
             </li>

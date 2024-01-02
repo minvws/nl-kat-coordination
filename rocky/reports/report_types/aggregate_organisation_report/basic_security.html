@@ -5,9 +5,6 @@
     {% blocktranslate trimmed %}
         In this chapter, first a table of compliance checks is displayed, followed by a
         detailed examination of compliance issues for each component.
-        For each of these components, two percentages are provided: one indicating the
-        level of basic security in place (higher is better), and the other showing
-        how well this compares to other scanned organizations in the sector (median).
     {% endblocktranslate %}
 </p>
 <h3>{% translate "Overview of the basic security status" %}</h3>
@@ -31,6 +28,7 @@
         <tbody>
             {% for service, compliance in data.basic_security.summary.items %}
                 <tr>
+                    {#For the multi report, "data.services|get_item:service" is a list to avoid deduplication #}
                     <td>{{ service }} {% translate "server" %} ({{ data.services|get_item:service|length }})</td>
                     <td>
                         {% if compliance.safe_connections.number_of_compliant != compliance.safe_connections.total %}
