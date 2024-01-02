@@ -23,6 +23,10 @@ The pydantic version used by OpenKAT has been updated to version 2. Pydantic v2
 has big improvements in performance which should also result in OpenKAT speed
 improvements.
 
+In line with our policy this will be the last release to have Debian 11
+packages. If you are still running Debian 11 you need to upgrade to Debian 12 to
+be able to upgrade to 1.15.
+
 New Features
 ============
 
