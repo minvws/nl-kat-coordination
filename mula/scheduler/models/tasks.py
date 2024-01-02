@@ -67,7 +67,7 @@ class TaskEventDB(Base):
 
     id = Column(GUID, primary_key=True)
 
-    task_id = Column(GUID, ForeignKey("tasks.id"), nullable=False)
+    task_id = Column(GUID, ForeignKey("tasks.id"), index=True, nullable=False)
     task = relationship("TaskDB", back_populates="events")
 
     event_type = Column(String, nullable=False)

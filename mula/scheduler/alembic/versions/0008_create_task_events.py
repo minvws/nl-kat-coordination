@@ -1,8 +1,8 @@
-"""Add task events
+"""Create task events
 
 Revision ID: 0008
 Revises: 0007
-Create Date: 2023-12-21 12:42:55.902140
+Create Date: 2024-01-02 11:17:29.273133
 
 """
 import sqlalchemy as sa
@@ -33,6 +33,7 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint("id"),
     )
+    op.create_index(op.f("ix_task_events_task_id"), "task_events", ["task_id"], unique=False)
     op.drop_index("ix_tasks_p_item_hash", table_name="tasks")
     op.create_index("ix_p_item_hash", "tasks", [sa.text("(p_item->>'hash')"), sa.text("created_at DESC")], unique=False)
     # ### end Alembic commands ###
@@ -47,5 +48,6 @@ def downgrade():
         [sa.text("(p_item ->> 'hash'::text)"), sa.text("created_at DESC")],
         unique=False,
     )
+    op.drop_index(op.f("ix_task_events_task_id"), table_name="task_events")
     op.drop_table("task_events")
     # ### end Alembic commands ###
