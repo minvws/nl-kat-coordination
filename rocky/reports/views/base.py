@@ -16,6 +16,7 @@ from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import Report, ReportType
 from reports.report_types.helpers import get_report_by_id
+from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import OOIFilterView
 
 
@@ -72,7 +73,20 @@ class BaseReportView(OOIFilterView):
         return "?" + urlencode(self.request.GET, True)
 
     def get_oois(self) -> List[OOI]:
+        if "all" in self.selected_oois:
+            return self.octopoes_api_connector.list(
+                self.get_ooi_types(),
+                valid_time=self.valid_time,
+                limit=OOIList.HARD_LIMIT,
+                scan_level=self.get_ooi_scan_levels(),
+                scan_profile_type=self.get_ooi_profile_types(),
+            ).items
         return [self.get_single_ooi(ooi_id) for ooi_id in self.selected_oois]
+
+    def get_pk_oois(self) -> List[str]:
+        if "all" in self.selected_oois:
+            return [ooi.primary_key for ooi in self.get_oois()]
+        return self.selected_oois
 
     def get_ooi_filter_forms(self, ooi_types: Set[OOIType]) -> Dict[str, Form]:
         return {

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Tuple
 
 from django.conf import settings
 from django.contrib import messages
@@ -10,7 +10,6 @@ from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
-from octopoes.models import OOI
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
@@ -22,7 +21,6 @@ from reports.views.base import (
     BaseReportView,
     ReportBreadcrumbs,
 )
-from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -146,10 +144,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     current_step = 6
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.selected_oois = self.get_oois()
-
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
@@ -181,22 +175,10 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data = aggregate_reports(
-            self.octopoes_api_connector, self.selected_oois, self.get_report_types(), self.valid_time
+            self.octopoes_api_connector, self.get_pk_oois(), self.get_report_types(), self.valid_time
         )
 
         return aggregate_report, post_processed_data, report_data
-
-    def get_oois(self) -> List[OOI]:
-        if "all" in self.selected_oois:
-            return self.octopoes_api_connector.list(
-                self.get_ooi_types(),
-                valid_time=self.valid_time,
-                limit=OOIList.HARD_LIMIT,
-                scan_level=self.get_ooi_scan_levels(),
-                scan_profile_type=self.get_ooi_profile_types(),
-            ).items
-
-        return super().get_oois()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -216,7 +198,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             **dict(json="true", **self.request.GET),
         )
 
-        context["oois"] = self.selected_oois
+        context["oois"] = self.get_oois()
         context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
         return context
 
