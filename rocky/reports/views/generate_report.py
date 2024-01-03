@@ -158,16 +158,32 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
+        
+        try:
+            context["oois"] = self.get_oois()
+        except:
+            messages.error(
+                self.request,
+                _("The report could not be generated, because an object could not be found."),
+            )
+            return None
+
+        try:
+            context["report_data"] = self.generate_reports_for_oois()
+        except:
+            messages.error(
+                self.request,
+                _("The report could not be generated, because no data could been found for the selected date (" + str(self.valid_time.date()) + ")."),
+            )
+            return None
+
         context["plugins"] = self.plugins
         context["report_types"] = self.get_report_types()
-        context["report_data"] = self.generate_reports_for_oois()
         context["report_download_url"] = url_with_querystring(
             reverse("generate_report_pdf", kwargs={"organization_code": self.organization.code}),
             True,
             **self.request.GET,
         )
-        return context
 
 
 class GenerateReportPDFView(GenerateReportView, WeasyTemplateResponseMixin):
