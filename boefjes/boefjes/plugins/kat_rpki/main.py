@@ -35,7 +35,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         with RPKI_META_PATH.open() as json_meta_file:
             rpki_meta = json.load(json_meta_file)
     exists = False
-    valid = False
+    notexpired = False
     roas = []
     for roa in rpki_json["roas"]:
         if IPAddress(ip) in IPNetwork(roa["prefix"]):
@@ -43,9 +43,9 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
             expires = datetime.fromtimestamp(roa["expires"])
             roas.append({"prefix": roa["prefix"], "expires": expires.strftime("%Y-%m-%dT%H:%M"), "ta": roa["ta"]})
             if expires > now:
-                valid = True
+                notexpired = True
 
-    results = {"vrps_records": roas, "valid": valid, "exists": exists}
+    results = {"vrps_records": roas, "notexpired": notexpired, "exists": exists}
 
     return [
         (set(), json.dumps(results)),
