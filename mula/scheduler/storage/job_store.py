@@ -27,7 +27,7 @@ class JobStore:
         limit: Optional[int] = 100,
     ) -> Tuple[List[models.Job], int]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.PrioritizedItemDB)
+            query = session.query(models.JobDB)
 
             if scheduler_id is not None:
                 query.filter(models.JobDB.scheduler_id == scheduler_id)
@@ -36,10 +36,10 @@ class JobStore:
                 query.filter(models.JobDB.enabled == enabled)
 
             if min_deadline is not None:
-                query.filter(models.JobDB.deadline >= min_deadline)
+                query.filter(models.JobDB.deadline_at >= min_deadline)
 
             if max_deadline is not None:
-                query.filter(models.JobDB.deadline <= max_deadline)
+                query.filter(models.JobDB.deadline_at <= max_deadline)
 
             if filters is not None:
                 query = apply_filter(models.JobDB, query, filters)
@@ -58,6 +58,17 @@ class JobStore:
     def get_job_by_id(self, job_id: str) -> Optional[models.Job]:
         with self.dbconn.session.begin() as session:
             job_orm = session.query(models.JobDB).filter(models.JobDB.id == job_id).first()
+            if job_orm is None:
+                return None
+
+            job = models.Job.model_validate(job_orm)
+
+            return job
+
+    def get_job_by_hash(self, hash: str) -> Optional[models.Job]:
+        with self.dbconn.session.begin() as session:
+            job_orm = session.query(models.JobDB).filter(models.JobDB.p_item["hash"].as_string() == hash).first()
+
             if job_orm is None:
                 return None
 

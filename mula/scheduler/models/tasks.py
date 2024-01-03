@@ -79,7 +79,7 @@ class TaskDB(Base):
 
     p_item = Column(JSONB, nullable=False)
 
-    job_id = Column(GUID, ForeignKey("jobs.id", nullable=True))
+    job_id = Column(GUID, ForeignKey("jobs.id"), nullable=True)
     job = relationship("JobDB", back_populates="tasks")
 
     status = Column(
@@ -136,7 +136,7 @@ class BoefjeTask(BaseModel):
 
     id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4)
     boefje: Boefje
-    input_ooi: Optional[str]
+    input_ooi: Optional[str] = None
     organization: str
 
     dispatches: List[Normalizer] = Field(default_factory=list)

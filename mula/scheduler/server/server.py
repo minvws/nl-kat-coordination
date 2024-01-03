@@ -470,6 +470,17 @@ class Server:
                 detail="failed to update task",
             ) from exc
 
+        # FIXME: perhaps handle this in the background?
+        # Send signal event
+        s = self.schedulers.get(updated_task.scheduler_id)
+        if s is None:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="scheduler not found",
+            )
+
+        s.signal_handler_task(updated_task)
+
         return updated_task
 
     def get_task_stats(self, scheduler_id: Optional[str] = None) -> Optional[Dict[str, Dict[str, int]]]:

@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, List, Optional
 
 import structlog
 
-from scheduler import connectors, context, models, queues, storage, utils
+from scheduler import connectors, context, models, queues, rankers, storage, utils
 from scheduler.utils import thread
 
 
@@ -69,6 +69,7 @@ class Scheduler(abc.ABC):
         self.max_tries: int = max_tries
         self.callback: Optional[Callable[[], Any]] = callback
         self._last_activity: Optional[datetime] = None
+        self.job_ranker = rankers.JobDeadlineRanker(ctx=self.ctx)
 
         # Listeners
         self.listeners: Dict[str, connectors.listeners.Listener] = {}
@@ -89,6 +90,22 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The prioritized item from the priority queue.
         """
+        # Create Job
+        #
+        # Do we have a job for this task?
+        job_db = self.ctx.datastores.job_store.get_job_by_hash(p_item.hash)
+        if job_db is None:
+            job_db = self.ctx.datastores.job_store.create_job(
+                models.Job(
+                    scheduler_id=self.scheduler_id,
+                    p_item=p_item,
+                    created_at=datetime.now(timezone.utc),
+                    modified_at=datetime.now(timezone.utc),
+                )
+            )
+
+        # Create Task
+        #
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
         task = models.Task(
@@ -97,6 +114,7 @@ class Scheduler(abc.ABC):
             type=self.queue.item_type.type,
             p_item=p_item,
             status=models.TaskStatus.QUEUED,
+            job_id=job_db.id,
             created_at=datetime.now(timezone.utc),
             modified_at=datetime.now(timezone.utc),
         )
@@ -108,6 +126,7 @@ class Scheduler(abc.ABC):
 
         self.ctx.datastores.task_store.create_task(task)
 
+        # Set last activity of scheduler
         self.last_activity = datetime.now(timezone.utc)
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
@@ -117,8 +136,7 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The prioritized item from the priority queue.
         """
-        # NOTE: we set the id of the task the same as the p_item, for easier
-        # lookup.
+        # Update Task
         task = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task is None:
             self.logger.warning(
@@ -136,6 +154,7 @@ class Scheduler(abc.ABC):
         task.status = models.TaskStatus.DISPATCHED
         self.ctx.datastores.task_store.update_task(task)
 
+        # Set last activity of scheduler
         self.last_activity = datetime.now(timezone.utc)
 
     def pop_item_from_queue(
@@ -336,6 +355,18 @@ class Scheduler(abc.ABC):
         t.start()
 
         self.threads.append(t)
+
+    def signal_handler_task(self, task: models.Task) -> None:
+        """Handle a task that has been completed or failed."""
+        if task.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
+            return
+
+        job = self.ctx.datastores.job_store.get_job_by_hash(task.p_item.hash)
+        if job is None:
+            return
+
+        job.deadline_at = datetime.fromtimestamp(self.job_ranker.rank(job))
+        self.ctx.datastores.job_store.update_job(job)
 
     def is_space_on_queue(self) -> bool:
         """Check if there is space on the queue.

@@ -2,12 +2,13 @@ from .base import Base
 from .boefje import Boefje, BoefjeMeta
 from .events import RawData, RawDataReceivedEvent
 from .health import ServiceHealth
-from .jobs import Job, JobDB
+from .job import Job, JobDB
 from .normalizer import Normalizer
 from .ooi import OOI, MutationOperationType, ScanProfile, ScanProfileMutation
 from .organisation import Organisation
 from .plugin import Plugin
 from .queue import PrioritizedItem, PrioritizedItemDB, Queue
+from .rate_limit import RateLimit
 from .request import PrioritizedItemRequest
 from .scheduler import Scheduler
 from .tasks import BoefjeTask, NormalizerTask, Task, TaskDB, TaskStatus

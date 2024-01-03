@@ -4,9 +4,9 @@ from types import SimpleNamespace
 from unittest import mock
 
 import requests
-from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
+from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -61,6 +61,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.JobStore.name: storage.JobStore(self.dbconn),
             }
         )
 
@@ -805,6 +806,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Job should be in datastore
+        job_db = self.mock_ctx.datastores.job_store.get_job_by_hash(task.hash)
+        self.assertEqual(job_db.p_item.hash, task.hash)
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
@@ -1640,3 +1645,46 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+
+class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.mock_is_task_running = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_running",
+            return_value=False,
+        ).start()
+
+        self.mock_is_task_allowed_to_run = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_allowed_to_run",
+            return_value=True,
+        ).start()
+
+        self.mock_has_grace_period_passed = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
+            return_value=True,
+        ).start()
+
+        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
+
+    def test_push_tasks_for_rescheduling(self):
+        self.fail("Not implemented")
+
+    def test_push_tasks_for_rescheduling_no_ooi(self):
+        self.fail("Not implemented")
+
+    def test_push_tasks_fore_rescheduling_ooi_not_found(self):
+        self.fail("Not implemented")
+
+    def test_push_tasks_for_rescheduling_boefje_not_found(self):
+        self.fail("Not implemented")
+
+    def test_push_tasks_for_rescheduling_boefje_disabled(self):
+        self.fail("Not implemented")
+
+    def test_push_tasks_for_rescheduling_boefje_doesnt_consume_ooi(self):
+        self.fail("Not implemented")
+
+    def test_push_tasks_for_rescheduling_cannot_scan_ooi(self):
+        self.fail("Not implemented")
