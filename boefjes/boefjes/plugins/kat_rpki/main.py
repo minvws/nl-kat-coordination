@@ -72,7 +72,7 @@ def validate_age() -> bool:
     return (now - cached_file_timestamp).total_seconds() > maxage
 
 
-def refresh_rpki(algo: str) -> Tuple(Dict, Dict):
+def refresh_rpki(algo: str) -> Tuple[Dict, Dict]:
     source_url = getenv("RPKI_SOURCE_URL", RPKI_SOURCE_URL)
     response = requests.get(source_url, allow_redirects=True)
     response.raise_for_status()
