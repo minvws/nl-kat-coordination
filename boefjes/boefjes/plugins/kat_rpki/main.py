@@ -83,7 +83,7 @@ def refresh_rpki(algo: str) -> Tuple[Dict, Dict]:
     metadata = {
         "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
         "source": source_url,
-        "hash": create_hash(response.content.encode(), algo),
+        "hash": create_hash(response.content, algo),
         "hash_algorithm": algo,
     }
     with open(RPKI_META_PATH, "w") as meta_file:
