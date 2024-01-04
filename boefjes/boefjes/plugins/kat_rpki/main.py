@@ -27,7 +27,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     now = datetime.utcnow()
     hash_algorithm = getenv("HASHFUNC", HASHFUNC)
 
-    if not RPKI_PATH.exists() or not validate_age():
+    if not RPKI_PATH.exists() or cache_out_of_date():
         rpki_json, rpki_meta = refresh_rpki(hash_algorithm)
     else:
         with RPKI_PATH.open() as json_file:
@@ -63,13 +63,14 @@ def create_hash(data: bytes, algo: str) -> str:
     return hashfunc(data).hexdigest()
 
 
-def validate_age() -> bool:
+def cache_out_of_date() -> bool:
+    """Returns True if the file is older than the allowed cache_timout"""
     now = datetime.utcnow()
     maxage = getenv("RPKI_CACHE_TIMEOUT", RPKI_CACHE_TIMEOUT)
     with RPKI_META_PATH.open() as meta_file:
         meta = json.load(meta_file)
     cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
-    return (now - cached_file_timestamp).total_seconds() < maxage
+    return (now - cached_file_timestamp).total_seconds() > maxage
 
 
 def refresh_rpki(algo: str) -> Tuple[Dict, Dict]:
