@@ -319,7 +319,7 @@ class BoefjeScheduler(Scheduler):
                     continue
 
                 # Boefje still exists?
-                boefje = self.ctx.services.katalogus.get_boefje(task.boefje.id)
+                boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(task.boefje.id, self.organisation.id)
                 if not boefje:
                     self.logger.debug(
                         "Boefje does not exist anymore, skipping",

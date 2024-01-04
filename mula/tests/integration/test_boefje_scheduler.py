@@ -1666,10 +1666,66 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             return_value=True,
         ).start()
 
-        self.mock_get_boefjes_for_ooi = mock.patch("scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi").start()
+        self.mock_get_jobs = mock.patch(
+            "scheduler.context.AppContext.datastores.job_store.get_jobs",
+        ).start()
+
+        self.mock_get_object = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_object",
+        ).start()
+
+        self.mock_get_plugin = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id",
+        ).start()
 
     def test_push_tasks_for_rescheduling(self):
-        self.fail("Not implemented")
+        """When the dealine of jobs have pased, the resulting task should be added to the queue"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        job = models.Job(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+
+        # Mocks
+        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: new item should be on queue
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: new item is created with a similar task
+        peek = self.scheduler.queue.peek(0)
+        self.assertEqual(job_db.p_item.hash, peek.hash)
+
+        # Assert: task should be created, and should be the one that is queued
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(peek.id)
+        self.assertIsNotNone(task_db)
+        self.assertEqual(peek.id, task_db.id)
 
     def test_push_tasks_for_rescheduling_no_ooi(self):
         self.fail("Not implemented")
