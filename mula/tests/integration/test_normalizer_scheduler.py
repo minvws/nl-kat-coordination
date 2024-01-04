@@ -5,6 +5,7 @@ from unittest import mock
 
 import requests
 from scheduler import config, models, schedulers, storage
+from structlog.testing import capture_logs
 
 from tests.factories import (
     BoefjeFactory,
@@ -27,7 +28,9 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
 
         # Database
         self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
+        models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
+
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
@@ -543,8 +546,8 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         # Assert
         self.assertEqual(1, self.scheduler.queue.qsize())
 
-        with self.assertLogs("scheduler.schedulers", level="DEBUG") as cm:
+        with capture_logs() as cm:
             self.scheduler.push_tasks_for_received_raw_data(events[1])
 
-        self.assertIn("Could not add task to queue, queue was full", cm.output[-1])
+        self.assertIn("Could not add task to queue, queue was full", cm[-1].get("event"))
         self.assertEqual(1, self.scheduler.queue.qsize())

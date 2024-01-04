@@ -48,6 +48,8 @@ a.button,
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
+  --link-icon-text-color: var(--button-base-text-color);
+
   font-family: var(--button-base-font-family);
   max-width: 18rem;
 

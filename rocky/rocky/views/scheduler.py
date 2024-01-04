@@ -1,15 +1,14 @@
 import logging
+from typing import List, Optional
 
 from django.contrib import messages
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from rocky.scheduler import (
-    BadRequestError,
-    ConflictError,
-    LazyTaskList,
-    QueuePrioritizedItem,
+    PrioritizedItem,
     SchedulerError,
+    SchedulerTaskList,
     Task,
     TaskNotFoundError,
     TooManyRequestsError,
@@ -19,51 +18,73 @@ from rocky.scheduler import (
 logger = logging.getLogger(__name__)
 
 
-def schedule_task(request: HttpRequest, organization_code: str, task: QueuePrioritizedItem) -> None:
-    plugin_name = ""
-    input_ooi = ""
-    plugin_type = task.data.type
-
-    if plugin_type == "boefje":
-        plugin_name = task.data.boefje.name
-        input_ooi = task.data.input_ooi
-    elif plugin_type == "normalizer":
-        plugin_name = task.data.normalizer.id  # name not set yet, is None for name
-        input_ooi = task.data.raw_data.boefje_meta.input_ooi
-    else:
-        plugin_name = _("'Plugin not found'")
-        input_ooi = _("'OOI not found'")
+def get_list_of_tasks(request: HttpRequest, organization_code: str, **params) -> List[Task]:
     try:
-        get_scheduler().push_task(f"{task.data.type}-{organization_code}", task)
-    except (BadRequestError, TooManyRequestsError, ConflictError) as task_error:
-        error_message = (
-            _("Scheduling {} {} with input object {} failed. ").format(plugin_type.title(), plugin_name, input_ooi)
-            + task_error.message
-        )
-        messages.error(request, error_message)
+        client = get_scheduler(organization_code)
+        return SchedulerTaskList(client, **params)
+    except SchedulerError as error:
+        messages.error(request, error.message)
+    return []
+
+
+def get_details_of_task(request: HttpRequest, organization_code: str, task_id: str) -> Optional[Task]:
+    try:
+        return get_scheduler(organization_code).get_task_details(task_id)
+    except (TaskNotFoundError, TooManyRequestsError, SchedulerError) as error:
+        messages.error(request, error.message)
+
+
+def schedule_task(request: HttpRequest, organization_code: str, p_item: PrioritizedItem) -> None:
+    try:
+        # Remove id attribute of both p_item and p_item.data, since the
+        # scheduler will create a new task with new id's. However, pydantic
+        # requires an id attribute to be present in its definition and the
+        # default set to None when the attribute is optional, otherwise it
+        # will not serialize the id if it is not present in the definition.
+        if hasattr(p_item, "id"):
+            delattr(p_item, "id")
+
+        if hasattr(p_item.data, "id"):
+            delattr(p_item.data, "id")
+
+        scheduler_client = get_scheduler(organization_code)
+        scheduler_client.push_task(p_item)
+
     except SchedulerError as error:
         messages.error(request, error.message)
     else:
         messages.success(
             request,
             _(
-                "Task of {} {} with input object {} is scheduled and will soon be started in the background. "
+                "Your task is scheduled and will soon be started in the background. "
                 "Results will be added to the object list when they are in. "
                 "It may take some time, a refresh of the page may be needed to show the results."
-            ).format(plugin_type.title(), plugin_name, input_ooi),
+            ),
         )
 
 
-def get_list_of_tasks_lazy(request: HttpRequest, **params) -> LazyTaskList:
+# FIXME: Tasks should be (re)created with supplied data, not by fetching prior
+# task info from the scheduler. Task data should be available from the context
+# from which the task is created.
+def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) -> None:
     try:
-        return get_scheduler().get_lazy_task_list(**params)
+        scheduler_client = get_scheduler(organization_code)
+        task = scheduler_client.get_task_details(task_id)
     except SchedulerError as error:
         messages.error(request, error.message)
-        return []
+        return
 
+    if not task:
+        messages.error(request, _("Task not found."))
+        return
 
-def get_details_of_task(request: HttpRequest, task_id: str) -> Task:
     try:
-        return get_scheduler().get_task_details(task_id)
-    except (TaskNotFoundError, TooManyRequestsError, SchedulerError) as error:
+        new_p_item = PrioritizedItem(
+            data=task.p_item.data,
+            priority=1,
+        )
+
+        schedule_task(request, organization_code, new_p_item)
+    except SchedulerError as error:
         messages.error(request, error.message)
+        return

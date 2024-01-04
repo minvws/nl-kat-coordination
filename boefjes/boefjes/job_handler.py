@@ -29,7 +29,7 @@ from octopoes.models.types import OOIType
 logger = logging.getLogger(__name__)
 
 bytes_api_client = BytesAPIClient(
-    settings.bytes_api,
+    str(settings.bytes_api),
     username=settings.bytes_username,
     password=settings.bytes_password,
 )
@@ -58,10 +58,10 @@ def _serialize_value(value: Any, required: bool) -> Any:
         return [_serialize_value(item, required) for item in value]
     if isinstance(value, Reference):
         try:
-            return value.tokenized.dict()["__root__"]
-        except IndexError as error:
+            return value.tokenized.root
+        except AttributeError:
             if required:
-                raise error
+                raise
 
             return None
     if isinstance(value, Enum):
@@ -75,17 +75,20 @@ def _serialize_value(value: Any, required: bool) -> Any:
 def serialize_ooi(ooi: OOI):
     serialized_oois = {}
     for key, value in ooi:
-        if key not in ooi.__fields__:
+        if key not in ooi.model_fields:
             continue
-        serialized_oois[key] = _serialize_value(value, ooi.__fields__[key].required)
+        serialized_oois[key] = _serialize_value(value, ooi.model_fields[key].is_required())
     return serialized_oois
 
 
 def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str]) -> Dict[str, str]:
     try:
-        environment = requests.get(
-            f"{settings.katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
-        ).json()
+        katalogus_api = str(settings.katalogus_api).rstrip("/")
+        response = requests.get(
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
+        )
+        response.raise_for_status()
+        environment = response.json()
 
         # Add prefixed BOEFJE_* global environment variables
         for key, value in os.environ.items():
@@ -212,8 +215,8 @@ class NormalizerHandler(Handler):
 
     @staticmethod
     def _parse_ooi(result: NormalizerPlainOOI):
-        return parse_obj_as(OOIType, result.dict())
+        return parse_obj_as(OOIType, result.model_dump())
 
 
 def get_octopoes_api_connector(org_code: str):
-    return OctopoesAPIConnector(settings.octopoes_api, org_code)
+    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)

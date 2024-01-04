@@ -11,7 +11,7 @@ from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataM
 class BoefjeMetaFilter(BaseModel):
     organization: str
 
-    boefje_id: Optional[str]
+    boefje_id: Optional[str] = None
     input_ooi: Optional[str] = "*"
     limit: int = 1
     offset: int = 0
@@ -19,18 +19,18 @@ class BoefjeMetaFilter(BaseModel):
 
 
 class NormalizerMetaFilter(BaseModel):
-    organization: Optional[str]
-    normalizer_id: Optional[str]
-    raw_id: Optional[UUID]
+    organization: Optional[str] = None
+    normalizer_id: Optional[str] = None
+    raw_id: Optional[UUID] = None
     limit: int = 1
     offset: int = 0
     descending: bool = True
 
 
 class RawDataFilter(BaseModel):
-    organization: Optional[str]
-    boefje_meta_id: Optional[UUID]
-    normalized: Optional[bool]
+    organization: Optional[str] = None
+    boefje_meta_id: Optional[UUID] = None
+    normalized: Optional[bool] = None
     mime_types: List[MimeType] = Field(default_factory=list)
     limit: Optional[int] = 1
     offset: Optional[int] = 0

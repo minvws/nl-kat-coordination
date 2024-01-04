@@ -16,7 +16,8 @@ from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.plugin_settings_list import PluginSettingsListView
-from rocky.views.scheduler import get_list_of_tasks_lazy
+from rocky.views.ooi_detail import PageActions
+from rocky.views.scheduler import get_list_of_tasks, reschedule_task
 
 logger = getLogger(__name__)
 
@@ -52,8 +53,9 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
 
         page = int(self.request.GET.get("task_history_page", 1))
 
-        task_history = get_list_of_tasks_lazy(
+        task_history = get_list_of_tasks(
             self.request,
+            self.organization.code,
             scheduler_id=scheduler_id,
             task_type=plugin_type,
             plugin_id=plugin_id,
@@ -62,13 +64,26 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
             min_created_at=min_created_at,
             max_created_at=max_created_at,
         )
-
         return Paginator(task_history, self.task_history_limit).page(page)
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST["action"]
+
+        if action:
+            self.handle_page_action(action)
+            return redirect(request.path)
+        else:
+            return self.get(request, *args, **kwargs)
+
+    def handle_page_action(self, action: str) -> None:
+        if action == PageActions.RESCHEDULE_TASK.value:
+            task_id = self.request.POST.get("task_id")
+            reschedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["task_history"] = self.get_task_history()
         context["task_history_form_fields"] = [
             "task_history_from",
@@ -124,7 +139,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
             context["select_oois_form"] = SelectOOIForm(
                 oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),

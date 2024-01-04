@@ -1,9 +1,9 @@
-import uuid
 from datetime import datetime
 from enum import Enum
 from typing import Optional
 
 from account.mixins import OrganizationView
+from django.contrib import messages
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -11,7 +11,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 
-from rocky.views.scheduler import get_details_of_task, get_list_of_tasks_lazy, schedule_task
+from rocky.scheduler import SchedulerError, TaskNotFoundError, get_scheduler
+from rocky.views.scheduler import get_details_of_task, get_list_of_tasks, reschedule_task
 
 TASK_LIMIT = 50
 
@@ -27,12 +28,16 @@ class PageActions(Enum):
 
 class DownloadTaskDetail(OrganizationView):
     def get(self, request, *args, **kwargs):
-        task_id = kwargs["task_id"]
-        filename = "task_" + task_id + ".json"
-        task_details = get_details_of_task(request, task_id)
-        response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
-        response["Content-Disposition"] = "attachment; filename=" + filename
-        return response
+        try:
+            task_id = kwargs["task_id"]
+            filename = "task_" + task_id + ".json"
+            task_details = get_details_of_task(request, self.organization.code, task_id)
+            response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
+            response["Content-Disposition"] = "attachment; filename=" + filename
+            return response
+        except TaskNotFoundError as error:
+            messages.error(self.request, error.message)
+        return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
 class TaskListView(OrganizationView, ListView):
@@ -50,8 +55,9 @@ class TaskListView(OrganizationView, ListView):
         self.max_created_at = get_date_time(self.request.GET.get("scan_history_to", None))
 
     def get_queryset(self):
-        return get_list_of_tasks_lazy(
+        return get_list_of_tasks(
             self.request,
+            self.organization.code,
             scheduler_id=self.scheduler_id,
             task_type=self.task_type,
             status=self.status,
@@ -67,19 +73,15 @@ class TaskListView(OrganizationView, ListView):
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
-            task = get_details_of_task(self.request, task_id)
-
-            # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-            new_id = uuid.uuid4()
-
-            task.p_item.id = new_id
-            task.p_item.data.id = new_id
-
-            schedule_task(self.request, self.organization.code, task.p_item)
+            reschedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        try:
+            scheduler_client = get_scheduler(self.organization.code)
+            context["stats"] = scheduler_client.get_task_stats(self.plugin_type)
+        except SchedulerError:
+            context["stats"] = None
         context["breadcrumbs"] = [
             {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
         ]

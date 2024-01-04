@@ -1,5 +1,4 @@
 import json
-import uuid
 from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
@@ -24,7 +23,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
-from rocky.views.scheduler import get_details_of_task, get_list_of_tasks_lazy, schedule_task
+from rocky.views.scheduler import get_list_of_tasks, reschedule_task
 
 
 class PageActions(Enum):
@@ -57,15 +56,7 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
         try:
             if action == PageActions.RESCHEDULE_TASK.value:
                 task_id = self.request.POST.get("task_id")
-                task = get_details_of_task(task_id)
-
-                # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-                new_id = uuid.uuid4()
-
-                task.p_item.id = new_id
-                task.p_item.data.id = new_id
-
-                schedule_task(self.request, self.organization.code, task.p_item)
+                reschedule_task(self.request, self.organization.code, task_id)
 
             if action == PageActions.START_SCAN.value:
                 boefje_id = self.request.POST.get("boefje_id")
@@ -133,8 +124,9 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
         else:
             max_created_at = None
 
-        task_history = get_list_of_tasks_lazy(
+        task_history = get_list_of_tasks(
             self.request,
+            self.organization.code,
             scheduler_id=scheduler_id,
             status=status,
             min_created_at=min_created_at,
@@ -143,7 +135,6 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
             input_ooi=self.get_ooi_id(),
             plugin_id=plugin_id,
         )
-
         return Paginator(task_history, self.task_history_limit).page(page)
 
     def get_context_data(self, **kwargs):
@@ -152,22 +143,18 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
         filter_form = PossibleBoefjesFilterForm(self.request.GET)
 
         # List from katalogus
-        boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
+        boefjes = []
+        if self.get_organization_indemnification():
+            boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
 
         if boefjes:
             context["enabled_boefjes_available"] = True
 
-        # Filter boefjes on scan level <= OOI clearance level when not "show all"
-        # or when not "acknowledged clearance level > 0"
+        max_level = self.organization_member.acknowledged_clearance_level
+        if self.ooi.scan_profile and filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
+            max_level = min(max_level, self.ooi.scan_profile.level)
 
-        if (
-            (filter_form.is_valid() and not filter_form.cleaned_data["show_all"])
-            or self.organization_member.acknowledged_clearance_level <= 0
-            or self.get_organization_indemnification()
-        ):
-            boefjes = [boefje for boefje in boefjes if boefje.scan_level.value <= self.ooi.scan_profile.level]
-
-        context["boefjes"] = boefjes
+        context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
         context["ooi"] = self.ooi
 
         declarations, observations, inferences = self.get_origins(

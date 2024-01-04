@@ -1,12 +1,36 @@
+from abc import ABCMeta
 from typing import Dict, List, Set, Type
 
 from octopoes.models import OOI, Reference
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import Report
 from reports.report_types.dns_report.report import DNSReport
+from reports.report_types.ipv6_report.report import IPv6Report
+from reports.report_types.mail_report.report import MailReport
+from reports.report_types.name_server_report.report import NameServerSystemReport
+from reports.report_types.open_ports_report.report import OpenPortsReport
+from reports.report_types.rpki_report.report import RPKIReport
+from reports.report_types.safe_connections_report.report import SafeConnectionsReport
 from reports.report_types.systems_report.report import SystemReport
 from reports.report_types.tls_report.report import TLSReport
+from reports.report_types.vulnerability_report.report import VulnerabilityReport
+from reports.report_types.web_system_report.report import WebSystemReport
 
-REPORTS = [DNSReport, TLSReport, SystemReport]
+REPORTS = [
+    DNSReport,
+    TLSReport,
+    SystemReport,
+    RPKIReport,
+    MailReport,
+    WebSystemReport,
+    NameServerSystemReport,
+    SafeConnectionsReport,
+    VulnerabilityReport,
+    OpenPortsReport,
+    IPv6Report,
+    VulnerabilityReport,
+]
+AGGREGATE_REPORTS = [AggregateOrganisationReport]
 
 
 def get_ooi_types_with_report() -> Set[Type[OOI]]:
@@ -60,3 +84,21 @@ def get_plugins_for_report_ids(reports: List[str]) -> Dict[str, Set[str]]:
         optional_boefjes.update(report.plugins["optional"])
 
     return {"required": required_boefjes, "optional": optional_boefjes}
+
+
+def get_report_types_from_aggregate_report(aggregate_report: ABCMeta) -> Dict[str, Set[Type[Report]]]:
+    required_reports = set()
+    optional_reports = set()
+
+    required_reports.update(aggregate_report.reports["required"])
+    optional_reports.update(aggregate_report.reports["optional"])
+
+    return {"required": required_reports, "optional": optional_reports}
+
+
+def get_ooi_types_from_aggregate_report(aggregate_report: ABCMeta) -> Set[Type[OOI]]:
+    ooi_types = set()
+    for reports in aggregate_report.reports.values():
+        for report in reports:
+            ooi_types.update(report.input_ooi_types)
+    return ooi_types
