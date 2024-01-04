@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-03 14:28+0000\n"
+"POT-Creation-Date: 2024-01-04 09:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3908,14 +3908,7 @@ msgid "This report may not show all the data as some plugins are not enabled."
 msgstr ""
 
 #: reports/views/generate_report.py
-msgid ""
-"The report could not be generated, because an object could not be found."
-msgstr ""
-
-#: reports/views/generate_report.py
-msgid ""
-"The report could not be generated, because no data could been found for the "
-"selected date ("
+msgid "No data could be found for , "
 msgstr ""
 
 #: reports/views/multi_report.py

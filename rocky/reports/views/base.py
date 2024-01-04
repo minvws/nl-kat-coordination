@@ -1,3 +1,4 @@
+from logging import getLogger
 from typing import Any, Dict, List, Optional, Set, Type, Union
 
 from account.mixins import OrganizationView
@@ -17,6 +18,8 @@ from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import Report, ReportType
 from reports.report_types.helpers import get_report_by_id
 from rocky.views.mixins import OctopoesView
+
+logger = getLogger(__name__)
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
@@ -71,7 +74,13 @@ class BaseReportView(OctopoesView):
         self.selected_report_types = request.GET.getlist("report_type", [])
 
     def get_oois(self) -> List[OOI]:
-        return [self.get_single_ooi(ooi_id) for ooi_id in self.selected_oois]
+        oois = []
+        for ooi_id in self.selected_oois:
+            try:
+                oois.append(self.get_single_ooi(ooi_id))
+            except Exception:
+                logger.warning("No data could be found for OOI ", ooi_id)
+        return oois
 
     def get_ooi_filter_forms(self, ooi_types: Set[OOIType]) -> Dict[str, Form]:
         return {

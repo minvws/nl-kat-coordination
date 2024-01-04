@@ -146,37 +146,36 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
         report_data = {}
+        error_oois = []
         for ooi in self.selected_oois:
             report_data[ooi] = {}
-            for report_type in self.get_report_types_from_choice():
-                if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
-                    report = report_type(self.octopoes_api_connector)
-                    data = report.generate_data(ooi, valid_time=self.valid_time)
-                    template = report.template_path
-                    report_data[ooi][report_type.name] = {"data": data, "template": template}
+            try:
+                for report_type in self.get_report_types_from_choice():
+                    if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
+                        report = report_type(self.octopoes_api_connector)
+                        data = report.generate_data(ooi, valid_time=self.valid_time)
+                        template = report.template_path
+                        report_data[ooi][report_type.name] = {"data": data, "template": template}
+            except Exception:
+                error_oois.append(ooi)
+        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
+        if error_oois:
+            messages.error(
+                self.request,
+                _(
+                    "No data could be found for "
+                    + ", ".join(list(set(error_oois)))
+                    + ". Object(s) did not exist on "
+                    + str(self.valid_time.date())
+                    + "."
+                ),
+            )
         return report_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
-        try:
-            context["oois"] = self.get_oois()
-        except:
-            messages.error(
-                self.request,
-                _("The report could not be generated, because an object could not be found."),
-            )
-            return None
-
-        try:
-            context["report_data"] = self.generate_reports_for_oois()
-        except:
-            messages.error(
-                self.request,
-                _("The report could not be generated, because no data could been found for the selected date (" + str(self.valid_time.date()) + ")."),
-            )
-            return None
-
+        context["oois"] = self.get_oois()
+        context["report_data"] = self.generate_reports_for_oois()
         context["plugins"] = self.plugins
         context["report_types"] = self.get_report_types()
         context["report_download_url"] = url_with_querystring(
@@ -184,6 +183,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             True,
             **self.request.GET,
         )
+        return context
 
 
 class GenerateReportPDFView(GenerateReportView, WeasyTemplateResponseMixin):
