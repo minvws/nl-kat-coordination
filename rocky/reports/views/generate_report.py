@@ -164,10 +164,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             date = str(self.valid_time.date())
             messages.error(
                 self.request,
-                _(
-                    "No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
-                    % {"oois": oois, "date": date}
-                ),
+                _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.")
+                % {"oois": oois, "date": date},
             )
         return report_data
 
