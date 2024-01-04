@@ -79,7 +79,7 @@ class BaseReportView(OctopoesView):
             try:
                 oois.append(self.get_single_ooi(ooi_id))
             except Exception:
-                logger.warning("No data could be found for OOI ", ooi_id)
+                logger.warning("No data could be found for '%s' ", ooi_id)
         return oois
 
     def get_ooi_filter_forms(self, ooi_types: Set[OOIType]) -> Dict[str, Form]:

@@ -160,14 +160,13 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                 error_oois.append(ooi)
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_oois:
+            oois = ", ".join(list(set(error_oois)))
+            date = str(self.valid_time.date())
             messages.error(
                 self.request,
                 _(
-                    "No data could be found for "
-                    + ", ".join(list(set(error_oois)))
-                    + ". Object(s) did not exist on "
-                    + str(self.valid_time.date())
-                    + "."
+                    "No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+                    % {"oois": oois, "date": date}
                 ),
             )
         return report_data
