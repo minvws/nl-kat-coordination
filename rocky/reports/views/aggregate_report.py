@@ -75,6 +75,7 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOILis
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_ooi_filter_forms(self.ooi_types))
+        context["channel"] = "aggregate_report"
         return context
 
 

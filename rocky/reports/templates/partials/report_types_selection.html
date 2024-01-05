@@ -13,7 +13,7 @@
                 improvements are needed.
             {% endblocktranslate %}
         </p>
-        {% if not oois and not 'all' in oois %}
+        {% if not oois %}
             <a class="button ghost" href="{{ previous }}">
                 <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
             </a>
@@ -26,7 +26,7 @@
                 {% endblocktranslate %}
             </h2>
             {% if 'all' in oois %}
-                <p class="emphasized">{% translate "You have selected all OOIs in previous step." %}</p>
+                <p class="emphasized">{% translate "You have selected all objects in previous step." %}</p>
             {% else %}
                 {% include "summary/ooi_selection.html" %}
 
