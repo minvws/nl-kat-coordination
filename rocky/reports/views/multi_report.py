@@ -10,10 +10,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
-from reports.views.base import (
-    BaseReportView,
-    ReportBreadcrumbs,
-)
+from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -21,7 +18,7 @@ class BreadcrumbsMultiReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
-        selection = self.get_selection()
+        selection = get_selection(self.request)
         breadcrumbs += [
             {
                 "url": reverse("multi_report_landing", kwargs=kwargs) + selection,
@@ -53,7 +50,10 @@ class LandingMultiReportView(BreadcrumbsMultiReportView, BaseReportView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("multi_report_select_oois", kwargs=self.get_kwargs()) + self.get_selection())
+        return redirect(
+            reverse("multi_report_select_oois", kwargs=self.get_kwargs())
+            + get_selection(self.request, REPORTS_PRE_SELECTION)
+        )
 
 
 class OOISelectionMultiReportView(BreadcrumbsMultiReportView, BaseReportView, BaseOOIListView):
