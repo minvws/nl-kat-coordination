@@ -4,6 +4,7 @@ from typing import Dict, Iterable, List, Union
 
 from dns.message import Message, from_text
 from dns.rdata import Rdata
+from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
 from dns.rdtypes.ANY.MX import MX
 from dns.rdtypes.ANY.NS import NS
@@ -24,6 +25,7 @@ from octopoes.models.ooi.dns.records import (
     DNSRecord,
     DNSSOARecord,
     DNSTXTRecord,
+    DNSCAARecord,
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
@@ -152,6 +154,10 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
                         )
                     )
 
+                if isinstance(rr, CAA):
+                    default_args["value"] = str(rr).strip('"').replace('" "', "")
+                    register_record(DNSCAARecord(**default_args))
+    
     # link the hostnames to their discovered zones
     for hostname_, zone in zone_links.items():
         hostname_store[hostname_].dns_zone = zone.reference
