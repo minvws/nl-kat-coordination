@@ -1,6 +1,7 @@
 <input type="hidden"
        name="observed_at"
        value="{{ observed_at|date:"Y-m-d" }}">
+{% for ooi in selected_oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
 {% for ooi_type in ooi_types_selection %}<input type="hidden" name="ooi_type" value="{{ ooi_type }}">{% endfor %}
 {% for clearance_level in clearance_levels_selection %}
     <input type="hidden" name="clearance_level" value="{{ clearance_level }}">

@@ -15,10 +15,7 @@ from reports.report_types.helpers import (
     get_plugins_for_report_ids,
     get_report_types_for_oois,
 )
-from reports.views.base import (
-    BaseReportView,
-    ReportBreadcrumbs,
-)
+from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -26,7 +23,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
-        selection = self.get_selection()
+        selection = get_selection(self.request)
         breadcrumbs += [
             {
                 "url": reverse("generate_report_landing", kwargs=kwargs) + selection,
@@ -57,13 +54,11 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
     Landing page to start the 'Generate Report' flow.
     """
 
-    pre_selection = {
-        "clearance_level": ["2", "3", "4"],
-        "clearance_type": "declared",
-    }
-
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("generate_report_select_oois", kwargs=self.get_kwargs()) + self.get_selection())
+        return redirect(
+            reverse("generate_report_select_oois", kwargs=self.get_kwargs())
+            + get_selection(request, REPORTS_PRE_SELECTION)
+        )
 
 
 class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):

@@ -17,10 +17,7 @@ from reports.report_types.helpers import (
     get_report_types_from_aggregate_report,
 )
 from reports.utils import JSONEncoder, debug_json_keys
-from reports.views.base import (
-    BaseReportView,
-    ReportBreadcrumbs,
-)
+from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -28,7 +25,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
-        selection = self.get_selection()
+        selection = get_selection(self.request)
         breadcrumbs += [
             {
                 "url": reverse("aggregate_report_landing", kwargs=kwargs) + selection,
@@ -59,13 +56,11 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
     Landing page to start the 'Aggregate Report' flow.
     """
 
-    pre_selection = {
-        "clearance_level": ["2", "3", "4"],
-        "clearance_type": "declared",
-    }
-
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("aggregate_report_select_oois", kwargs=self.get_kwargs()) + self.get_selection())
+        return redirect(
+            reverse("aggregate_report_select_oois", kwargs=self.get_kwargs())
+            + get_selection(request, REPORTS_PRE_SELECTION)
+        )
 
 
 class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):

@@ -19,6 +19,17 @@ from reports.report_types.helpers import get_report_by_id
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import OOIFilterView
 
+REPORTS_PRE_SELECTION = {
+    "clearance_level": ["2", "3", "4"],
+    "clearance_type": "declared",
+}
+
+
+def get_selection(request: HttpRequest, pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None) -> str:
+    if pre_selection is not None:
+        return "?" + urlencode(pre_selection, True)
+    return "?" + urlencode(request.GET, True)
+
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     current_step: int = 1
@@ -28,7 +39,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 
     def build_breadcrumbs(self):
         kwargs = self.get_kwargs()
-        selection = self.get_selection()
+        selection = get_selection(self.request)
 
         breadcrumbs = [
             {
@@ -60,17 +71,10 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 
 
 class BaseReportView(OOIFilterView):
-    pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None
-
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.selected_oois = request.GET.getlist("ooi", [])
         self.selected_report_types = request.GET.getlist("report_type", [])
-
-    def get_selection(self) -> str:
-        if self.pre_selection is not None:
-            return "?" + urlencode(self.pre_selection, True)
-        return "?" + urlencode(self.request.GET, True)
 
     def get_oois(self) -> List[OOI]:
         if "all" in self.selected_oois:
@@ -135,7 +139,6 @@ class BaseReportView(OOIFilterView):
         context = super().get_context_data(**kwargs)
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
-        context["selection"] = self.get_selection()
         return context
 
 

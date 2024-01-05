@@ -42,7 +42,8 @@
             <p>{% translate "All report types that are available for your selection." %}</p>
             <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
             <form class="inline layout-wide" method="get" action="{{ next }}">
-                {% for ooi in selected_oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
+                {% include "forms/report_form_fields.html" %}
+
                 <div class="column-4 tiles">
                     {% if available_report_types_aggregate %}
                         {% include "partials/report_types_tiles_required_optional.html" with report_types=available_report_types_aggregate %}
@@ -52,8 +53,6 @@
 
                     {% endif %}
                 </div>
-                {% include "forms/report_form_fields.html" %}
-
                 <button type="submit">
                     {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
                 </button>
