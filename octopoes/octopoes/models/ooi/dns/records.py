@@ -10,7 +10,7 @@ from octopoes.models.persistence import ReferenceField
 
 class DNSRecord(OOI, abc.ABC):
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=2)
-    dns_record_type: Literal["A", "AAAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
+    dns_record_type: Literal["A", "AAAA", "CAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
     value: str
     ttl: Optional[int] = None  # todo: validation
 
@@ -155,3 +155,20 @@ class DNSPTRRecord(DNSRecord):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"{reference.tokenized.address.address} -> {reference.tokenized.hostname.name}"
+
+
+class DNSCAARecord(DNSRecord):
+    object_type: Literal["DNSCAARecord"] = "DNSCAARecord"
+    dns_record_type: Literal["CAA"] = "CAA"
+
+    # https://datatracker.ietf.org/doc/html/rfc8659#name-canonical-presentation-form
+    # An unsigned integer between 0 and 255.
+    flags: Optional[int] = None
+
+    # A non-zero-length sequence of ASCII letters and numbers in lowercase.
+    tag: = Literal["issue", "issuewild", "iodef", "contactemail", "contactphone"]
+
+    # The Value field, expressed as either (1) a contiguous set of characters without interior spaces or (2) a quoted string.
+    value: str = None
+
+    _reverse_relation_names = {"hostname": "dns_caa_records"}
