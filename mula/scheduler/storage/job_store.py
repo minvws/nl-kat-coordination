@@ -79,7 +79,7 @@ class JobStore:
     @retry()
     def create_job(self, job: models.Job) -> Optional[models.Job]:
         with self.dbconn.session.begin() as session:
-            job_orm = models.JobDB(**job.model_dump())
+            job_orm = models.JobDB(**job.model_dump(exclude={"tasks"}))
             session.add(job_orm)
 
             created_job = models.Job.model_validate(job_orm)
@@ -89,7 +89,7 @@ class JobStore:
     @retry()
     def update_job(self, job: models.Job) -> None:
         with self.dbconn.session.begin() as session:
-            (session.query(models.JobDB).filter(models.JobDB.id == job.id).update(job.model_dump()))
+            (session.query(models.JobDB).filter(models.JobDB.id == job.id).update(job.model_dump(exclude={"tasks"})))
 
     def update_job_enabled(self, job_id: str, enabled: bool) -> None:
         with self.dbconn.session.begin() as session:

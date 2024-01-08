@@ -1,7 +1,7 @@
 import abc
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 import structlog
@@ -90,6 +90,9 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The prioritized item from the priority queue.
         """
+        # Set last activity of scheduler
+        self.last_activity = datetime.now(timezone.utc)
+
         # Create Job
         #
         # Do we have a job for this task?
@@ -99,10 +102,22 @@ class Scheduler(abc.ABC):
                 models.Job(
                     scheduler_id=self.scheduler_id,
                     p_item=p_item,
+                    deadline_at=datetime.now(timezone.utc) + timedelta(seconds=self.ctx.config.pq_grace_period),
                     created_at=datetime.now(timezone.utc),
                     modified_at=datetime.now(timezone.utc),
                 )
             )
+
+        # FIXME: what if we want to explicitly disable a job, e.g. we just want
+        # to have a one-off? We disable a job for the boefje scheduler when a
+        # ooi is deleted, or when a boefje is disabled.
+
+        # Was job disabled? If so, re-abled it. When we get here all checks
+        # have been done for the p_item, so we can assume that the job is
+        # can be marked for rescheduling.
+        if not job_db.enabled:
+            job_db.enabled = True
+            self.ctx.datastores.job_store.update_job(job_db)
 
         # Create Task
         #
@@ -125,9 +140,6 @@ class Scheduler(abc.ABC):
             return
 
         self.ctx.datastores.task_store.create_task(task)
-
-        # Set last activity of scheduler
-        self.last_activity = datetime.now(timezone.utc)
 
     def post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We

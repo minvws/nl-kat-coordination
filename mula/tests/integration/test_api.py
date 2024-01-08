@@ -6,8 +6,8 @@ from types import SimpleNamespace
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, server, storage
 
+from scheduler import config, models, server, storage
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -30,6 +30,7 @@ class APITemplateTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.JobStore.name: storage.JobStore(self.dbconn),
             }
         )
 

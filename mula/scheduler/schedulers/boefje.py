@@ -367,6 +367,7 @@ class BoefjeScheduler(Scheduler):
                             scheduler_id=self.scheduler_id,
                         )
                         self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                        continue
 
                     # Boefje allowed to scan ooi?
                     if not self.is_task_allowed_to_run(boefje, ooi):
@@ -474,6 +475,21 @@ class BoefjeScheduler(Scheduler):
             )
             return False
 
+        boefje_scan_level = boefje.scan_level
+        if boefje_scan_level is None:
+            self.logger.warning(
+                "No scan level found for boefje: %s",
+                boefje.id,
+                boefje_id=boefje.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return False
+
+        # We allow boefjes without an ooi to run.
+        if not ooi:
+            return True
+
         if ooi.scan_profile is None:
             self.logger.debug(
                 "No scan_profile found for ooi: %s",
@@ -490,17 +506,6 @@ class BoefjeScheduler(Scheduler):
                 "No scan level found for ooi: %s",
                 ooi.primary_key,
                 ooi_primary_key=ooi.primary_key,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return False
-
-        boefje_scan_level = boefje.scan_level
-        if boefje_scan_level is None:
-            self.logger.warning(
-                "No scan level found for boefje: %s",
-                boefje.id,
-                boefje_id=boefje.id,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
             )

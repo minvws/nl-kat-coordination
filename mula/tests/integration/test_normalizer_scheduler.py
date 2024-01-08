@@ -4,9 +4,9 @@ from types import SimpleNamespace
 from unittest import mock
 
 import requests
-from scheduler import config, models, schedulers, storage
 from structlog.testing import capture_logs
 
+from scheduler import config, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -35,6 +35,7 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.JobStore.name: storage.JobStore(self.dbconn),
             }
         )
 
@@ -202,6 +203,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
+        # Arrange: create the BoefjeTask
         p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
@@ -212,6 +214,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             input_ooi=ooi.primary_key,
         )
 
+        # Arrange: create the RawDataReceivedEvent
         raw_data_event = models.RawDataReceivedEvent(
             raw_data=RawDataFactory(
                 boefje_meta=boefje_meta,

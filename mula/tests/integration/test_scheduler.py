@@ -14,10 +14,10 @@ class SchedulerTestCase(unittest.TestCase):
     def setUp(self):
         # Application Context
         self.mock_ctx = mock.patch("scheduler.context.AppContext").start()
-        cfg = config.settings.Settings()
+        self.mock_ctx.config = config.settings.Settings()
 
         # Database
-        self.dbconn = storage.DBConn(str(cfg.db_uri))
+        self.dbconn = storage.DBConn(str(self.mock_ctx.config.db_uri))
         models.Base.metadata.drop_all(self.dbconn.engine)
         models.Base.metadata.create_all(self.dbconn.engine)
 
@@ -25,6 +25,7 @@ class SchedulerTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.JobStore.name: storage.JobStore(self.dbconn),
             }
         )
 
@@ -32,7 +33,7 @@ class SchedulerTestCase(unittest.TestCase):
 
         queue = mock_queue.MockPriorityQueue(
             pq_id=identifier,
-            maxsize=cfg.pq_maxsize,
+            maxsize=self.mock_ctx.config.pq_maxsize,
             item_type=mock_task.MockTask,
             allow_priority_updates=True,
             pq_store=self.mock_ctx.datastores.pq_store,
@@ -69,6 +70,10 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Job should be in datastore
+        job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
+        self.assertEqual(job_db.id, task_db.job_id)
 
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
@@ -205,4 +210,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.stop()
 
     def test_calculate_deadline(self):
+        self.fail("Not implemented")
+
+    def test_signal_handler_task(self):
         self.fail("Not implemented")
