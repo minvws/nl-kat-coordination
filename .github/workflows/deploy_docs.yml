@@ -36,7 +36,7 @@ jobs:
           cache: 'pip' # caching pip dependencies
 
       - name: Install pip dependencies
-        run: pip install -r requirements.txt
+        run: grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin
 
       - name: Compile static HTML
         run: make docs

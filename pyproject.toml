@@ -105,5 +105,5 @@ sphinx = "<8"
 sphinx_rtd_theme = "2.0.0"
 sphinxcontrib-mermaid = "^0.9.2"
 myst-parser = "^2.0.0"
-settings-doc = "^3.0.0"
+settings-doc = { git = "https://github.com/dekkers/settings-doc", rev = "47158a06df6252c7b6a45e8b6fa526136a59cc77" }
 colorama = "0.4.6" # Required on all platforms, not just win32
