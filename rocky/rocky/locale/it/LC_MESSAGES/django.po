@@ -1505,17 +1505,11 @@ msgstr "Clona"
 
 #: katalogus/templates/katalogus.html
 #, fuzzy
-#| msgid "Available plugins"
 msgid "All plugins"
 msgstr "Plugin disponibili"
 
 #: katalogus/templates/katalogus.html
 #, fuzzy
-#| msgid ""
-#| "\n"
-#| "                            Accept level L%(tcl)s clearance and "
-#| "responsibility\n"
-#| "                        "
 msgid ""
 "\n"
 "                            Plugin available\n"
@@ -1594,7 +1588,6 @@ msgstr "Vedi dettagli"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 #, fuzzy
-#| msgid "Enabled"
 msgid "Enable"
 msgstr "Abilitato"
 
@@ -1609,13 +1602,11 @@ msgstr "Non hai il permesso di abilitare "
 
 #: katalogus/templates/partials/katalogus_filter.html
 #, fuzzy
-#| msgid "Filter options"
 msgid "Filter plugins"
 msgstr "Opzioni di filtro"
 
 #: katalogus/templates/partials/katalogus_filter.html
 #, fuzzy
-#| msgid "Clear filters"
 msgid "Clear filter"
 msgstr "Cancella filtri"
 
@@ -1631,7 +1622,6 @@ msgstr "KAT-alogus"
 
 #: katalogus/templates/partials/katalogus_header.html
 #, fuzzy
-#| msgid "Available plugins"
 msgid "An overview of all available plugins."
 msgstr "Plugin disponibili"
 
@@ -1729,7 +1719,6 @@ msgstr "Aggiungi"
 
 #: katalogus/templates/partials/plugins.html
 #, fuzzy
-#| msgid "User overview:"
 msgid "Plugins overview:"
 msgstr "Panoramica utente:"
 
@@ -1737,7 +1726,6 @@ msgstr "Panoramica utente:"
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 #, fuzzy
-#| msgid "Plugin"
 msgid "Plugin name"
 msgstr "Plugin"
 
@@ -1745,7 +1733,6 @@ msgstr "Plugin"
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 #, fuzzy
-#| msgid "Plugin"
 msgid "Plugin type"
 msgstr "Plugin"
 
@@ -1753,7 +1740,6 @@ msgstr "Plugin"
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 #, fuzzy
-#| msgid "Description"
 msgid "Plugin description"
 msgstr "Descrizione"
 
@@ -1764,7 +1750,6 @@ msgstr "Azioni"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #, fuzzy
-#| msgid "Main navigation"
 msgid "Plugins Navigation"
 msgstr "Navigazione principale"
 
@@ -1978,7 +1963,6 @@ msgstr "Seleziona un OOI per avviare la scansione."
 
 #: katalogus/views/plugin_enable_disable.py
 #, fuzzy
-#| msgid "{} '{}' enabled."
 msgid "{} '{}' disabled."
 msgstr ""
 "Recupero delle impostazioni del boefje {boefje_name} non riuscito. Katalogus "
@@ -2009,7 +1993,6 @@ msgstr ""
 
 #: katalogus/views/plugin_enable_disable.py
 #, fuzzy
-#| msgid "You are about to set the clearance level from \\"
 msgid "To enable {} you need at least a clearance level of L{}. "
 msgstr "Stai per impostare il livello di autorizzazione da \\"
 
@@ -4531,7 +4514,6 @@ msgstr "Livello di autorizzazione"
 
 #: tools/forms/ooi.py
 #, fuzzy
-#| msgid "Show objects that don't meet the Boefjes scan level"
 msgid "Show objects that don't meet the Boefjes scan level."
 msgstr "Mostra gli oggetti che non soddisfano il livello di scansione Boefjes"
 
@@ -4556,13 +4538,11 @@ msgstr "Scegli un {option_label}"
 
 #: tools/forms/ooi_form.py
 #, fuzzy
-#| msgid "Set clearance level"
 msgid "Filter by clearance level"
 msgstr "Imposta il livello di autorizzazione"
 
 #: tools/forms/ooi_form.py
 #, fuzzy
-#| msgid "Filter by OOI types"
 msgid "Filter by clearance type"
 msgstr "Filtra per tipi di OOI"
 
@@ -6031,7 +6011,6 @@ msgstr "Riproduzione"
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html
 #, fuzzy
-#| msgid "Please enable plugin to start scanning"
 msgid "Please enable plugin to start scanning."
 msgstr "Abilita il plugin per avviare la scansione"
 
@@ -6112,7 +6091,6 @@ msgstr "Mostra solo oggetti di tipo %(type)s"
 
 #: rocky/templates/partials/language-switcher.html
 #, fuzzy
-#| msgid "Select organization"
 msgid "Select your language"
 msgstr "Seleziona organizzazione"
 
@@ -6220,6 +6198,7 @@ msgid "Upload CSV"
 msgstr "Carica CSV"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
+#: reports/report_types/aggregate_organisation_report/introduction.html
 msgid "Export"
 msgstr "Esporta"
 
@@ -6305,7 +6284,6 @@ msgstr "Seleziona organizzazione"
 
 #: rocky/templates/partials/organizations_menu_dropdown.html
 #, fuzzy
-#| msgid "My organizations"
 msgid "All organizations"
 msgstr "Le mie organizzazioni"
 
@@ -6319,7 +6297,6 @@ msgstr "primo"
 
 #: rocky/templates/partials/pagination.html
 #, fuzzy
-#| msgid "Previous"
 msgid "previous"
 msgstr "Precedente"
 
@@ -6695,7 +6672,6 @@ msgstr "Utilizza il Token di Backup"
 
 #: rocky/templates/two_factor/core/otp_required.html
 #, fuzzy
-#| msgid "Permission"
 msgid "Permission Denied"
 msgstr "Autorizzazione"
 
