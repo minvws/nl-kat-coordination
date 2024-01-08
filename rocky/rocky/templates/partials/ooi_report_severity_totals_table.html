@@ -5,7 +5,13 @@
         <caption class="visually-hidden">{% translate "Total per severity overview:" %}</caption>
         <thead>
             <tr>
-                <th>{% translate "Severity" %}</th>
+                <th>
+                    {% translate "Severity" %}
+                    <span class="tooltip">
+                        <button class="icon-only ti-help" aria-describedby="tooltip-content">More information</button>
+                        <span id="tooltip-content" role="tooltip">This is the page title. It describes the content of this page.</span>
+                    </span>
+                </th>
                 <th>{% translate "Unique" %}</th>
                 <th>{% translate "Total occurrences" %}</th>
             </tr>
