@@ -20,6 +20,7 @@ from octopoes.models.ooi.dns.records import (
     DNSMXRecord,
     DNSNSRecord,
     DNSSOARecord,
+    DNSCAARecord,
 )
 from octopoes.models.ooi.dns.zone import Hostname
 from rocky.keiko import (
@@ -201,10 +202,12 @@ class DNSReport(Report):
         DNSMXRecord,
         DNSNSRecord,
         DNSSOARecord,
+        DNSCAARecord,
         Hostname,
     ]
     allowed_finding_types = [
         "KAT-WEBSERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-TWO-IPV6",
+        "KAT-NO-CAA",
     ]
