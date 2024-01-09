@@ -106,6 +106,18 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Assert
         self.assertTrue(allowed_to_run)
 
+    def test_is_allowed_to_run_no_ooi(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Act
+        allowed_to_run = self.scheduler.is_task_allowed_to_run(ooi=None, boefje=boefje)
+
+        # Assert
+        self.assertTrue(allowed_to_run)
+
     def test_is_not_allowed_to_run(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
