@@ -1,4 +1,5 @@
 import abc
+from enum import Enum
 import hashlib
 from typing import Literal, Optional
 
@@ -157,18 +158,27 @@ class DNSPTRRecord(DNSRecord):
         return f"{reference.tokenized.address.address} -> {reference.tokenized.hostname.name}"
 
 
+class CAATAGS(Enum):
+    ISSUE = "issue"
+    ISSUEWILD = "issuewild"
+    IODEF = "iodef"
+    CONTACTEMAIL = "contactemail"
+    CONACTPHONE = "contactphone"
+
+    def __str__(self):
+        return self.value
+
 class DNSCAARecord(DNSRecord):
     object_type: Literal["DNSCAARecord"] = "DNSCAARecord"
     dns_record_type: Literal["CAA"] = "CAA"
-    dnszone: Reference = ReferenceField(DNSZone)
+
     # https://datatracker.ietf.org/doc/html/rfc8659#name-canonical-presentation-form
     # An unsigned integer between 0 and 255.
     flags: Optional[int] = None
 
     # A non-zero-length sequence of ASCII letters and numbers in lowercase.
-    tag: Literal["issue", "issuewild", "iodef", "contactemail", "contactphone"] = None
+    tag: CAATAGS = None
 
     # The Value field, expressed as either (1) a contiguous set of characters without interior spaces or (2) a quoted string.
     value: str = None
-
-    _reverse_relation_names = {"hostname": "dns_caa_records"}
+    _natural_key_attrs = ["hostname", "flags", "tag", "value"]
