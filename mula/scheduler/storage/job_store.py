@@ -30,16 +30,16 @@ class JobStore:
             query = session.query(models.JobDB)
 
             if scheduler_id is not None:
-                query.filter(models.JobDB.scheduler_id == scheduler_id)
+                query = query.filter(models.JobDB.scheduler_id == scheduler_id)
 
             if enabled is not None:
-                query.filter(models.JobDB.enabled == enabled)
+                query = query.filter(models.JobDB.enabled == enabled)
 
             if min_deadline is not None:
-                query.filter(models.JobDB.deadline_at >= min_deadline)
+                query = query.filter(models.JobDB.deadline_at >= min_deadline)
 
             if max_deadline is not None:
-                query.filter(models.JobDB.deadline_at <= max_deadline)
+                query = query.filter(models.JobDB.deadline_at <= max_deadline)
 
             if filters is not None:
                 query = apply_filter(models.JobDB, query, filters)
@@ -65,6 +65,7 @@ class JobStore:
 
             return job
 
+    @retry()
     def get_job_by_hash(self, hash: str) -> Optional[models.Job]:
         with self.dbconn.session.begin() as session:
             job_orm = session.query(models.JobDB).filter(models.JobDB.p_item["hash"].as_string() == hash).first()
@@ -91,6 +92,7 @@ class JobStore:
         with self.dbconn.session.begin() as session:
             (session.query(models.JobDB).filter(models.JobDB.id == job.id).update(job.model_dump(exclude={"tasks"})))
 
+    @retry()
     def update_job_enabled(self, job_id: str, enabled: bool) -> None:
         with self.dbconn.session.begin() as session:
             (session.query(models.JobDB).filter(models.JobDB.id == job_id).update({"enabled": enabled}))
