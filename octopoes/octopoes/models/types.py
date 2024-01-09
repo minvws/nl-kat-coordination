@@ -20,6 +20,7 @@ from octopoes.models.ooi.dns.records import (
     DNSPTRRecord,
     DNSSOARecord,
     DNSTXTRecord,
+    DNSCAARecord,
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname, ResolvedHostname
 from octopoes.models.ooi.email_security import (
@@ -91,6 +92,7 @@ DnsRecordType = Union[
     DNSPTRRecord,
     DNSSOARecord,
     DNSCNAMERecord,
+    DNSCAARecord,
     ResolvedHostname,
     NXDOMAIN,
 ]
