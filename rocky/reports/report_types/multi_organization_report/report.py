@@ -182,7 +182,9 @@ class MultiOrganizationReport(MultiReport):
             "tags": tags,
             # Average score over organizations
             "basic_security_score": round(
-                sum(x["compliant"] / x["total"] for x in basic_securities) / len(basic_securities) * 100
+                sum(x["compliant"] / x["total"] if x["total"] > 0 else 0 for x in basic_securities)
+                / len(basic_securities)
+                * 100
             ),
             "total_critical_vulnerabilities": total_critical_vulnerabilities,
             "total_findings": total_findings,
