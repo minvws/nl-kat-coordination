@@ -21,7 +21,7 @@ _Please add some proof in the form of screenshots or screen recordings to show (
 ### Communication
 - [ ] I have informed others of any required `.env` changes files if required and changed the `.env-dist` accordingly.
 - [ ] I have made corresponding changes to the documentation, if necessary.
-- [ ] I have included comments in the code to elaborate on what is not self-evident from the code itself, including references to issues and discussions online, or implicit behaviour of an interface.
+- [ ] I have included comments in the code to elaborate on what is not self-evident from the code itself, including references to issues and discussions online, or implicit behavior of an interface.
 
 ---
 ## Checklist for code reviewers:
