@@ -119,7 +119,6 @@ class MultiOrganizationReport(MultiReport):
                     system_specific[service] = {"checks": {}, "total": 0}
 
                 system_specific[service]["total"] += summary["system_specific"]["total"]
-
                 for title, count in summary["system_specific"]["checks"].items():
                     if title not in system_specific[service]["checks"]:
                         system_specific[service]["checks"][title] = 0
@@ -176,6 +175,39 @@ class MultiOrganizationReport(MultiReport):
 
         system_vulnerabilities = sorted(system_vulnerabilities.items(), key=lambda x: x[1]["cvss"] or 0, reverse=True)
 
+        # Calculate security score
+        lowest_percentage = None
+        highest_percentage = None
+
+        ## Safe Connections
+        safe_cipher_percentage = (
+            safe_connections_summary["number_of_available"] / safe_connections_summary["number_of_ips"] * 100
+        )
+        scores = set_security_score(lowest_percentage, highest_percentage, safe_cipher_percentage, "Safe Ciphers")
+        lowest_percentage = scores[0]
+        highest_percentage = scores[1]
+
+        ## System Specific
+        for value in system_specific.values():
+            for check, count in value["checks"].items():
+                percentage = count / value["total"] * 100
+                scores = set_security_score(lowest_percentage, highest_percentage, percentage, check)
+                lowest_percentage = scores[0]
+                highest_percentage = scores[1]
+
+        ## RPKI
+        for value in rpki_summary.values():
+            percentage_available = value["number_of_available"] / value["number_of_ips"] * 100
+            percentage_valid = value["number_of_valid"] / value["number_of_ips"] * 100
+            score_available = set_security_score(
+                lowest_percentage, highest_percentage, percentage_available, "RPKI available"
+            )
+            lowest_percentage = score_available[0]
+            highest_percentage = score_available[1]
+            score_valid = set_security_score(lowest_percentage, highest_percentage, percentage_valid, "RPKI valid")
+            lowest_percentage = score_valid[0]
+            highest_percentage = score_valid[1]
+
         return {
             "multi_data": data,
             "organizations": [value["organization_code"] for key, value in data.items()],
@@ -214,3 +246,12 @@ def collect_report_data(
         report_data[ooi] = connector.get(Reference.from_str(ooi)).dict()
 
     return report_data
+
+
+def set_security_score(lowest_percentage, highest_percentage, percentage, check):
+    if lowest_percentage is None or percentage < lowest_percentage[1]:
+        lowest_percentage = (check, percentage)
+    if highest_percentage is None or percentage > highest_percentage[1]:
+        highest_percentage = (check, percentage)
+
+    return lowest_percentage, highest_percentage

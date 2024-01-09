@@ -38,6 +38,12 @@
                     {{ report_data.recommendation_counts.values|sum_list }}
                 </dd>
             </div>
+            <div>
+                <dt>{% translate "Best scoring security checks" %}</dt>
+                <dd>
+                    {{ report_data.best_scoring }}
+                </dd>
+            </div>
         </dl>
     </div>
 </section>
