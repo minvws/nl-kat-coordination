@@ -3,7 +3,7 @@ import hashlib
 from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.dns.zone import Hostname, DNSZone
 from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
 from octopoes.models.persistence import ReferenceField
 
@@ -160,13 +160,13 @@ class DNSPTRRecord(DNSRecord):
 class DNSCAARecord(DNSRecord):
     object_type: Literal["DNSCAARecord"] = "DNSCAARecord"
     dns_record_type: Literal["CAA"] = "CAA"
-
+    dnszone: Reference = ReferenceField(DNSZone)
     # https://datatracker.ietf.org/doc/html/rfc8659#name-canonical-presentation-form
     # An unsigned integer between 0 and 255.
     flags: Optional[int] = None
 
     # A non-zero-length sequence of ASCII letters and numbers in lowercase.
-    tag: = Literal["issue", "issuewild", "iodef", "contactemail", "contactphone"]
+    tag: Literal["issue", "issuewild", "iodef", "contactemail", "contactphone"] = None
 
     # The Value field, expressed as either (1) a contiguous set of characters without interior spaces or (2) a quoted string.
     value: str = None
