@@ -1,7 +1,6 @@
 from bits.definitions import BitDefinition, BitParameterDefinition
-from octopoes.models.ooi.dns.records import NXDOMAIN
+from octopoes.models.ooi.dns.records import NXDOMAIN, DNSCAARecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.email_security import DNSCAARecord
 
 BIT = BitDefinition(
     id="missing-caa",
