@@ -96,3 +96,8 @@ class JobStore:
     def update_job_enabled(self, job_id: str, enabled: bool) -> None:
         with self.dbconn.session.begin() as session:
             (session.query(models.JobDB).filter(models.JobDB.id == job_id).update({"enabled": enabled}))
+
+    @retry()
+    def delete_job(self, job_id: str) -> None:
+        with self.dbconn.session.begin() as session:
+            session.query(models.JobDB).filter(models.JobDB.id == job_id).delete()

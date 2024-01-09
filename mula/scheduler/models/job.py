@@ -48,7 +48,7 @@ class JobDB(Base):
     scheduler_id = Column(String)
     enabled = Column(Boolean, nullable=False, default=True)
     p_item = Column(JSONB, nullable=False)
-    tasks = relationship("TaskDB", back_populates="job", order_by="TaskDB.created_at")
+    tasks = relationship("TaskDB", back_populates="job", order_by="TaskDB.created_at", cascade="all,delete-orphan")
     rate_limit = Column(JSONB, nullable=True)
     crontab = Column(String, nullable=True)
 

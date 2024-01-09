@@ -1017,7 +1017,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertFalse(is_allowed)
 
 
-class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
+class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 

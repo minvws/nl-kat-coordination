@@ -112,7 +112,7 @@ class Scheduler(abc.ABC):
         # to have a one-off? We disable a job for the boefje scheduler when a
         # ooi is deleted, or when a boefje is disabled.
 
-        # Was job disabled? If so, re-abled it. When we get here all checks
+        # Was job disabled? If so, re-enable it. When we get here all checks
         # have been done for the p_item, so we can assume that the job is
         # can be marked for rescheduling.
         if not job_db.enabled:

@@ -77,7 +77,7 @@ class JobStore(unittest.TestCase):
         self.assertEqual(5, len(jobs_scheduler_two))
         self.assertEqual(5, jobs_scheduler_two_count)
 
-    def get_job_by_id(self):
+    def test_get_job_by_id(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
         job = models.Job(
@@ -88,15 +88,12 @@ class JobStore(unittest.TestCase):
         job_db = self.mock_ctx.datastores.job_store.create_job(job)
 
         # Act
-        job = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
+        job_by_id = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
 
         # Assert
-        self.assertEqual(job_db.id, job.id)
-        self.assertEqual(job_db.scheduler_id, job.scheduler_id)
-        self.assertEqual(job_db.hash, job.hash)
-        self.assertEqual(job_db.p_item, job.p_item)
+        self.assertEqual(job_by_id.id, job_db.id)
 
-    def get_job_by_hash(self):
+    def test_get_job_by_hash(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
         job = models.Job(
@@ -107,13 +104,12 @@ class JobStore(unittest.TestCase):
         job_db = self.mock_ctx.datastores.job_store.create_job(job)
 
         # Act
-        job = self.mock_ctx.datastores.job_store.get_job_by_hash(job_db.hash)
+        job_by_hash = self.mock_ctx.datastores.job_store.get_job_by_hash(job_db.p_item.hash)
 
         # Assert
-        self.assertEqual(job_db.id, job.id)
-        self.assertEqual(job_db.scheduler_id, job.scheduler_id)
-        self.assertEqual(job_db.hash, job.hash)
-        self.assertEqual(job_db.p_item, job.p_item)
+        self.assertEqual(job_by_hash.id, job_db.id)
+        self.assertEqual(job_by_hash.p_item, job_db.p_item)
+        self.assertEqual(job_by_hash.p_item.hash, job_db.p_item.hash)
 
     def test_update_job(self):
         # Arrange
@@ -136,7 +132,7 @@ class JobStore(unittest.TestCase):
         job_db_updated = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
         self.assertEqual(job_db_updated.enabled, False)
 
-    def update_job_enabled(self):
+    def test_update_job_enabled(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
         job = models.Job(
@@ -155,3 +151,84 @@ class JobStore(unittest.TestCase):
         # Assert
         job_db_updated = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
         self.assertEqual(job_db_updated.enabled, False)
+
+    def test_delete_job(self):
+        # Arrange
+        p_item = functions.create_p_item("test_scheduler_id", 1)
+
+        job = models.Job(
+            scheduler_id=p_item.scheduler_id,
+            hash=p_item.hash,
+            p_item=p_item,
+        )
+        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+
+        # Act
+        self.mock_ctx.datastores.job_store.delete_job(job_db.id)
+
+        # Assert
+        is_job_deleted = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
+        self.assertEqual(is_job_deleted, None)
+
+    def test_delete_job_cascade(self):
+        """When a job is deleted, its tasks should NOT be deleted."""
+        # Arrange
+        p_item = functions.create_p_item("test_scheduler_id", 1)
+
+        job = models.Job(
+            scheduler_id=p_item.scheduler_id,
+            hash=p_item.hash,
+            p_item=p_item,
+        )
+        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+
+        task = models.Task(
+            id=p_item.id,
+            hash=p_item.hash,
+            type=functions.TestModel.type,
+            status=models.TaskStatus.QUEUED,
+            scheduler_id=p_item.scheduler_id,
+            p_item=p_item,
+            job_id=job_db.id,
+        )
+        task_db = self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        self.mock_ctx.datastores.job_store.delete_job(job_db.id)
+
+        # Assert
+        is_job_deleted = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
+        self.assertEqual(is_job_deleted, None)
+
+        is_task_deleted = self.mock_ctx.datastores.task_store.get_task_by_id(task_db.id)
+        self.assertIsNotNone(is_task_deleted)
+        self.assertIsNone(is_task_deleted.job_id)
+
+    def test_relationship_job_tasks(self):
+        # Arrange
+        p_item = functions.create_p_item("test_scheduler_id", 1)
+
+        job = models.Job(
+            scheduler_id=p_item.scheduler_id,
+            hash=p_item.hash,
+            p_item=p_item,
+        )
+        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+
+        task = models.Task(
+            id=p_item.id,
+            hash=p_item.hash,
+            type=functions.TestModel.type,
+            status=models.TaskStatus.QUEUED,
+            scheduler_id=p_item.scheduler_id,
+            p_item=p_item,
+            job_id=job_db.id,
+        )
+        task_db = self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        job_tasks = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id).tasks
+
+        # Assert
+        self.assertEqual(len(job_tasks), 1)
+        self.assertEqual(job_tasks[0].id, task_db.id)

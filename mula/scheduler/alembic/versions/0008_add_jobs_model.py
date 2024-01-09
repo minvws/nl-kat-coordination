@@ -2,7 +2,7 @@
 
 Revision ID: 0008
 Revises: 0007
-Create Date: 2024-01-03 15:05:27.305213
+Create Date: 2024-01-09 15:00:50.975252
 
 """
 import sqlalchemy as sa
@@ -37,7 +37,7 @@ def upgrade():
     op.add_column("tasks", sa.Column("job_id", scheduler.utils.datastore.GUID(), nullable=True))
     op.drop_index("ix_tasks_p_item_hash", table_name="tasks")
     op.create_index("ix_p_item_hash", "tasks", [sa.text("(p_item->>'hash')"), sa.text("created_at DESC")], unique=False)
-    op.create_foreign_key(None, "tasks", "jobs", ["job_id"], ["id"])
+    op.create_foreign_key(None, "tasks", "jobs", ["job_id"], ["id"], ondelete="SET NULL")
     # ### end Alembic commands ###
 
 

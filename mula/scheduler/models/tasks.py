@@ -79,7 +79,7 @@ class TaskDB(Base):
 
     p_item = Column(JSONB, nullable=False)
 
-    job_id = Column(GUID, ForeignKey("jobs.id"), nullable=True)
+    job_id = Column(GUID, ForeignKey("jobs.id", ondelete="SET NULL"), nullable=True)
     job = relationship("JobDB", back_populates="tasks")
 
     status = Column(
