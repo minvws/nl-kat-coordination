@@ -12,7 +12,7 @@ _Please add some proof in the form of screenshots or screen recordings to show (
 ---
 
 ### Code Checklist
-- [ ] All the commits in this PR are properly PGP-signed and verified;
+- [ ] All the commits in this PR are properly PGP-signed and verified.
 - [ ] This PR only contains functionality relevant to the issue; tickets have been created for newly discovered issues.
 - [ ] I have written unit tests for the changes or fixes I made.
 - [ ] For any non-trivial functionality, I have added integration and/or end-to-end tests.
@@ -21,6 +21,7 @@ _Please add some proof in the form of screenshots or screen recordings to show (
 ### Communication
 - [ ] I have informed others of any required `.env` changes files if required and changed the `.env-dist` accordingly.
 - [ ] I have made corresponding changes to the documentation, if necessary.
+- [ ] I have included comments in the code to elaborate on what is not self-evident from the code itself, including references to issues and discussions online, or implicit behaviour of an interface.
 
 ---
 ## Checklist for code reviewers:
