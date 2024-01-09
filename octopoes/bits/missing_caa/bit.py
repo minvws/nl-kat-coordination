@@ -6,7 +6,7 @@ BIT = BitDefinition(
     id="missing-caa",
     consumes=Hostname,
     parameters=[
-        BitParameterDefinition(ooi_type=DNSCAARecord, relation_path="dns_caa_record.hostname"),
+        BitParameterDefinition(ooi_type=DNSCAARecord, relation_path="hostname"),
         BitParameterDefinition(ooi_type=NXDOMAIN, relation_path="hostname"),
     ],
     module="bits.missing_caa.missing_caa",
