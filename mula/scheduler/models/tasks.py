@@ -54,6 +54,7 @@ class Task(BaseModel):
 
     type: str
 
+    # Item that was pushed onto the queue
     p_item: PrioritizedItem
 
     status: TaskStatus

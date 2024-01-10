@@ -33,7 +33,6 @@ class JobStore(unittest.TestCase):
         scheduler_id = "test_scheduler_id"
         job = models.Job(
             scheduler_id=scheduler_id,
-            hash="test_hash",
             p_item=functions.create_p_item(scheduler_id=scheduler_id, priority=1),
         )
 
@@ -49,7 +48,6 @@ class JobStore(unittest.TestCase):
         for i in range(5):
             job = models.Job(
                 scheduler_id=scheduler_one,
-                hash=f"test_hash_{i}",
                 p_item=functions.create_p_item(scheduler_id=scheduler_one, priority=i),
             )
             self.mock_ctx.datastores.job_store.create_job(job)
@@ -58,7 +56,6 @@ class JobStore(unittest.TestCase):
         for i in range(5):
             job = models.Job(
                 scheduler_id=scheduler_two,
-                hash=f"test_hash_{i}",
                 p_item=functions.create_p_item(scheduler_id=scheduler_two, priority=i),
             )
             self.mock_ctx.datastores.job_store.create_job(job)
@@ -82,7 +79,6 @@ class JobStore(unittest.TestCase):
         scheduler_id = "test_scheduler_id"
         job = models.Job(
             scheduler_id=scheduler_id,
-            hash="test_hash",
             p_item=functions.create_p_item(scheduler_id=scheduler_id, priority=1),
         )
         job_db = self.mock_ctx.datastores.job_store.create_job(job)
@@ -98,7 +94,6 @@ class JobStore(unittest.TestCase):
         scheduler_id = "test_scheduler_id"
         job = models.Job(
             scheduler_id=scheduler_id,
-            hash="test_hash",
             p_item=functions.create_p_item(scheduler_id=scheduler_id, priority=1),
         )
         job_db = self.mock_ctx.datastores.job_store.create_job(job)
@@ -116,7 +111,6 @@ class JobStore(unittest.TestCase):
         scheduler_id = "test_scheduler_id"
         job = models.Job(
             scheduler_id=scheduler_id,
-            hash="test_hash",
             p_item=functions.create_p_item(scheduler_id=scheduler_id, priority=1),
         )
         job_db = self.mock_ctx.datastores.job_store.create_job(job)
@@ -137,7 +131,6 @@ class JobStore(unittest.TestCase):
         scheduler_id = "test_scheduler_id"
         job = models.Job(
             scheduler_id=scheduler_id,
-            hash="test_hash",
             p_item=functions.create_p_item(scheduler_id=scheduler_id, priority=1),
         )
         job_db = self.mock_ctx.datastores.job_store.create_job(job)
@@ -158,7 +151,6 @@ class JobStore(unittest.TestCase):
 
         job = models.Job(
             scheduler_id=p_item.scheduler_id,
-            hash=p_item.hash,
             p_item=p_item,
         )
         job_db = self.mock_ctx.datastores.job_store.create_job(job)
@@ -177,7 +169,6 @@ class JobStore(unittest.TestCase):
 
         job = models.Job(
             scheduler_id=p_item.scheduler_id,
-            hash=p_item.hash,
             p_item=p_item,
         )
         job_db = self.mock_ctx.datastores.job_store.create_job(job)
@@ -210,7 +201,6 @@ class JobStore(unittest.TestCase):
 
         job = models.Job(
             scheduler_id=p_item.scheduler_id,
-            hash=p_item.hash,
             p_item=p_item,
         )
         job_db = self.mock_ctx.datastores.job_store.create_job(job)

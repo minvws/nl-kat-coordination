@@ -1,4 +1,5 @@
 import copy
+import json
 import unittest
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -11,7 +12,7 @@ from scheduler import config, models, server, storage
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
-from tests.utils import functions
+from tests.utils import UUIDEncoder, functions
 from tests.utils.functions import create_p_item_request
 
 
@@ -139,6 +140,12 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(1, self.scheduler.queue.qsize())
         self.assertIsNotNone(response.json().get("id"))
+
+        # TODO: task should be created
+        self.fail("TODO: task should be created")
+
+        # TODO: job should be created
+        self.fail("TODO: job should be created")
 
     def test_push_incorrect_item_type(self):
         response = self.client.post(
@@ -484,6 +491,12 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         response_get = self.client.get(f"/tasks/{initial_item_id}")
         self.assertEqual(200, response_get.status_code)
 
+        # TODO: task should be created
+        self.fail("TODO: task should be created")
+
+        # TODO: job should be created
+        self.fail("TODO: job should be created")
+
     def test_get_tasks(self):
         response = self.client.get("/tasks")
         self.assertEqual(200, response.status_code)
@@ -624,3 +637,26 @@ class APITasksEndpointTestCase(APITemplateTestCase):
 
         response = self.client.get(f"/tasks/stats/{self.first_item_api.get('scheduler_id')}")
         self.assertEqual(200, response.status_code)
+
+
+class APIJobsEndpointTestCase(APITemplateTestCase):
+    def setUp(self):
+        super().setUp()
+
+    def test_create_job(self):
+        p_item = functions.create_p_item("test_scheduler_id", 1)
+
+        job = models.Job(
+            scheduler_id=self.scheduler.scheduler_id,
+            p_item=p_item,
+        )
+
+        response_post = self.client.post(
+            "/jobs", data=json.dumps({"job": job.model_dump()}, cls=UUIDEncoder, default=str)
+        )
+        breakpoint()
+        self.assertEqual(201, response_post.status_code)
+
+        initial_job_id = response_post.json().get("id")
+        response_get = self.client.get(f"/jobs/{initial_job_id}")
+        self.assertEqual(200, response_get.status_code)

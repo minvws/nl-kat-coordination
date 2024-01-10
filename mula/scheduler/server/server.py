@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import fastapi
 import prometheus_client
@@ -126,6 +126,41 @@ class Server:
             response_model=PaginatedResponse,
             status_code=status.HTTP_200_OK,
             description="List all tasks for a scheduler",
+        )
+
+        self.api.add_api_route(
+            path="/jobs",
+            endpoint=self.list_jobs,
+            methods=["GET", "POST"],
+            response_model=Union[PaginatedResponse, models.Job],
+            status_code=status.HTTP_200_OK,
+            description="List all jobs",
+        )
+
+        self.api.add_api_route(
+            path="/jobs/{job_id}",
+            endpoint=self.get_job,
+            methods=["GET"],
+            response_model=models.Job,
+            status_code=status.HTTP_200_OK,
+            description="Get a job",
+        )
+
+        self.api.add_api_route(
+            path="/jobs/{job_id}",
+            endpoint=self.patch_job,
+            methods=["GET"],
+            response_model=models.Job,
+            status_code=status.HTTP_200_OK,
+            description="Update a job",
+        )
+
+        self.api.add_api_route(
+            path="/jobs/{job_id}",
+            endpoint=self.delete_job,
+            methods=["DELETE"],
+            status_code=status.HTTP_204_NO_CONTENT,
+            description="Delete a job",
         )
 
         self.api.add_api_route(
@@ -278,6 +313,141 @@ class Server:
             s.disable()
 
         return updated_scheduler
+
+    def list_jobs(
+        self,
+        request: fastapi.Request,
+        scheduler_id: Optional[str] = None,
+        enabled: Optional[bool] = None,
+        min_deadline: Optional[datetime.datetime] = None,
+        max_deadline: Optional[datetime.datetime] = None,
+        offset: int = 0,
+        limit: int = 10,
+        filters: Optional[storage.filters.FilterRequest] = None,
+        job: Optional[models.JobRequest] = None,
+    ) -> Any:
+        if job is not None and request.method == "POST":
+            breakpoint()
+            try:
+                created_job = self.ctx.datastores.job_store.create_job(job)
+                return fastapi.responses.JSONResponse(
+                    status_code=status.HTTP_201_CREATED,
+                    content=created_job.model_dump_json(),
+                )
+            except Exception as exc:
+                self.logger.exception(exc)
+                raise fastapi.HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=str(exc),
+                ) from exc
+
+        if (min_deadline is not None and max_deadline is not None) and min_deadline > max_deadline:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail="min_deadline must be less than max_deadline",
+            )
+
+        try:
+            results, count = self.ctx.datastores.job_store.get_jobs(
+                scheduler_id=scheduler_id,
+                enabled=enabled,
+                min_deadline=min_deadline,
+                max_deadline=max_deadline,
+                offset=offset,
+                limit=limit,
+                filters=filters,
+            )
+        except storage.filters.errors.FilterError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except ValueError as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to get tasks",
+            ) from exc
+
+        return paginate(request, results, count=count, offset=offset, limit=limit)
+
+    def get_job(self, job_id: str) -> Any:
+        try:
+            job = self.ctx.datastores.job_store.get_job_by_id(job_id)
+        except ValueError as exc:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to get job",
+            ) from exc
+
+        if job is None:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="job not found",
+            )
+
+        return models.Job(**job.model_dump())
+
+    def patch_job(self, job_id: str, item: Dict) -> Any:
+        if len(item) == 0:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="no data to patch",
+            )
+
+        try:
+            job_db = self.ctx.datastores.job_store.get_job_by_id(job_id)
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"failed to get job [exception: {exc}]",
+            ) from exc
+
+        if job_db is None:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="job not found",
+            )
+
+        updated_job = job_db.model_copy(update=item)
+
+        # Update job in database
+        try:
+            self.ctx.datastores.job_store.update_job(updated_job)
+        except Exception as exc:
+            self.logger.error(exc)
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to update job",
+            ) from exc
+
+        return updated_job
+
+    def delete_job(self, job_id: str):
+        try:
+            self.ctx.datastores.job_store.delete_job(job_id)
+        except ValueError as exc:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to delete job",
+            ) from exc
 
     def list_tasks(
         self,

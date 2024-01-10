@@ -25,6 +25,11 @@ class Job(BaseModel):
 
     enabled: bool = True
 
+    # TODO: maybe remove the p_item definition, it should be a definition
+    # of a BoefjeTask, NormalizerTask, etc. the scheduler should make
+    # a p_item for it. Think about creating a new Job from the UI
+    # we don't have a p_item there with priority etc. We just want
+    # to say: create a recurring job with this Boefje/Normalizer task.
     p_item: PrioritizedItem
 
     tasks: List[Task] = []
@@ -39,6 +44,8 @@ class Job(BaseModel):
     evaluated_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    # TODO: index on the p_item.hash
 
 
 class JobDB(Base):
