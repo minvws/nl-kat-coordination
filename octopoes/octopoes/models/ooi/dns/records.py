@@ -1,10 +1,10 @@
 import abc
-from enum import Enum
 import hashlib
+from enum import Enum
 from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.dns.zone import Hostname, DNSZone
+from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, IPAddressV4, IPAddressV6
 from octopoes.models.persistence import ReferenceField
 
@@ -167,6 +167,7 @@ class CAATAGS(Enum):
 
     def __str__(self):
         return self.value
+
 
 class DNSCAARecord(DNSRecord):
     object_type: Literal["DNSCAARecord"] = "DNSCAARecord"
