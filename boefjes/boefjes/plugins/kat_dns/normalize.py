@@ -161,7 +161,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
                     default_args["tag"] = recordvalue[1]
                     default_args["value"] = recordvalue[2]
                     register_record(DNSCAARecord(**default_args))
-    
+
     # link the hostnames to their discovered zones
     for hostname_, zone in zone_links.items():
         hostname_store[hostname_].dns_zone = zone.reference
