@@ -52,10 +52,13 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
             risk_score = cvss[0]["cvssData"]["baseScore"]
         risk_severity = get_risk_level(risk_score)
 
-    yield CVEFindingType(
-        id=cve_finding_type_id,
-        description=english_description["value"],
-        source=f"https://cve.circl.lu/cve/{cve_finding_type_id}",
-        risk_severity=risk_severity,
-        risk_score=risk_score,
-    )
+    yield {
+        "type": "declaration",
+        "ooi": CVEFindingType(
+            id=cve_finding_type_id,
+            description=english_description["value"],
+            source=f"https://cve.circl.lu/cve/{cve_finding_type_id}",
+            risk_severity=risk_severity,
+            risk_score=risk_score,
+        ).dict(),
+    }

@@ -63,9 +63,12 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     risk_severity = RiskLevelSeverity(finding[0]["severity"].lower())
     risk_score = SEVERITY_SCORE_LOOKUP[risk_severity]
 
-    yield RetireJSFindingType(
-        id=retirejs_finding_type_id,
-        description=_create_description(finding[0]),
-        risk_severity=risk_severity,
-        risk_score=risk_score,
-    )
+    yield {
+        "type": "declaration",
+        "ooi": RetireJSFindingType(
+            id=retirejs_finding_type_id,
+            description=_create_description(finding[0]),
+            risk_severity=risk_severity,
+            risk_score=risk_score,
+        ).dict(),
+    }

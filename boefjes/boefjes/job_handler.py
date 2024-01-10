@@ -194,7 +194,11 @@ class NormalizerHandler(Handler):
                         source=reference,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
-                        result=[self._parse_ooi(result) for result in observation.results],
+                        result=[
+                            self._parse_ooi(result)
+                            for result in observation.results
+                            if self._parse_ooi(result).primary_key != observation.input_ooi
+                        ],
                     )
                 )
 

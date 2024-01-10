@@ -16,10 +16,13 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     risk_severity = RiskLevelSeverity.UNKNOWN
     risk_score = None
 
-    yield CWEFindingType(
-        id=cwe_finding_type_id,
-        description=f"{data['name']} - {data['description']}",
-        source=f'https://cwe.mitre.org/data/definitions/{cwe_finding_type_id.split("-")[1]}.html',
-        risk_severity=risk_severity,
-        risk_score=risk_score,
-    )
+    yield {
+        "type": "declaration",
+        "ooi": CWEFindingType(
+            id=cwe_finding_type_id,
+            description=f"{data['name']} - {data['description']}",
+            source=f'https://cwe.mitre.org/data/definitions/{cwe_finding_type_id.split("-")[1]}.html',
+            risk_severity=risk_severity,
+            risk_score=risk_score,
+        ).dict(),
+    }

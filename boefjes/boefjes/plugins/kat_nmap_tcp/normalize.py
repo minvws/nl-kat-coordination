@@ -26,7 +26,6 @@ def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Referen
             if host.ipv4
             else IPAddressV6(network=network.reference, address=host.address, netblock=netblock)
         )
-        yield ip
 
         for port, protocol in open_ports:
             service: NmapService = host.get_service(port, protocol)

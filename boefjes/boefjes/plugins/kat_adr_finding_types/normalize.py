@@ -28,9 +28,12 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     risk_score = SEVERITY_SCORE_LOOKUP[risk_severity]
 
-    yield ADRFindingType(
-        id=adr_finding_type_id,
-        description=finding_type_information["description"],
-        risk_severity=risk_severity,
-        risk_score=risk_score,
-    )
+    yield {
+        "type": "declaration",
+        "ooi": ADRFindingType(
+            id=adr_finding_type_id,
+            description=finding_type_information["description"],
+            risk_severity=risk_severity,
+            risk_score=risk_score,
+        ).dict(),
+    }

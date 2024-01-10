@@ -31,6 +31,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     for type_ in dns_record_types:
         try:
             resolver = dns.resolver.Resolver()
+            # The following one line overrides the local DNS server
             resolver.nameservers = [str(settings.remote_ns)]
             answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)

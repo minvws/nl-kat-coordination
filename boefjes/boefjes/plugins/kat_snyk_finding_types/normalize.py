@@ -32,10 +32,13 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     risk_score = data.get("risk")
     risk_severity = get_risk_level(float(risk_score))
 
-    yield SnykFindingType(
-        id=snyk_finding_type_id,
-        description=data.get("summary"),
-        source=f"https://snyk.io/vuln/{snyk_finding_type_id}",
-        risk_severity=risk_severity,
-        risk_score=risk_score,
-    )
+    yield {
+        "type": "declaration",
+        "ooi": SnykFindingType(
+            id=snyk_finding_type_id,
+            description=data.get("summary"),
+            source=f"https://snyk.io/vuln/{snyk_finding_type_id}",
+            risk_severity=risk_severity,
+            risk_score=risk_score,
+        ).dict(),
+    }
