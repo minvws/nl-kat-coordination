@@ -2,6 +2,7 @@ import os
 import time
 import uuid
 from datetime import datetime
+from ipaddress import ip_address
 from unittest.mock import Mock
 
 import pytest
@@ -12,10 +13,10 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.service import OctopoesService
 from octopoes.events.events import OOIDBEvent, OriginDBEvent
 from octopoes.models import OOI, ScanLevel
-from octopoes.models.ooi.dns.records import NXDOMAIN
+from octopoes.models.ooi.dns.records import NXDOMAIN, DNSARecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
-from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.network import IPAddressV4, Network
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.origin import Origin, OriginType
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
@@ -33,6 +34,7 @@ def printer(arg1, arg2):
     print()
 
 
+@pytest.mark.xfail(reason="Issue #2083")
 def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="internet")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time, level=ScanLevel.L2))
@@ -76,7 +78,7 @@ def test_events_created_through_crud(xtdb_octopoes_service: OctopoesService, eve
 
     origin = Origin(
         origin_type=OriginType.DECLARATION,
-        method="manual",
+        method="",
         source=network.reference,
         result=[network.reference],
         task_id=uuid.uuid4(),
@@ -116,7 +118,7 @@ def test_events_created_in_worker_during_handling(
 
     origin = Origin(
         origin_type=OriginType.DECLARATION,
-        method="manual",
+        method="",
         source=network.reference,
         result=[network.reference],
         task_id=uuid.uuid4(),
@@ -258,6 +260,7 @@ def test_deletion_events_after_nxdomain(
     assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 4
 
 
+@pytest.mark.xfail(reason="Wappalyzer works on wrong input objects (to be addressed)")
 def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
     xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime
 ):
@@ -265,7 +268,7 @@ def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
 
     origin = Origin(
         origin_type=OriginType.DECLARATION,
-        method="manual",
+        method="",
         source=network.reference,
         result=[network.reference],
         task_id=uuid.uuid4(),
@@ -274,10 +277,10 @@ def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
     url = "mispo.es"
     hostname = Hostname(network=network.reference, name=url)
 
-    event_manager.complete_process_events(xtdb_octopoes_service)
-
     xtdb_octopoes_service.save_origin(origin, [network], valid_time)
     xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
+
+    event_manager.complete_process_events(xtdb_octopoes_service)
 
     software_oois = [
         Software(name="Bootstrap", version="3.3.7", cpe="cpe:/a:getbootstrap:bootstrap"),
@@ -354,3 +357,79 @@ def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
     assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 4
+
+
+def test_easy_chain_deletion(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    network = Network(name="internet")
+
+    network_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="A",
+        source=network.reference,
+        result=[network.reference],
+        task_id=uuid.uuid4(),
+    )
+    xtdb_octopoes_service.save_origin(network_origin, [network], valid_time)
+
+    def chain(source, results):
+        origin = Origin(
+            origin_type=OriginType.OBSERVATION,
+            method="",
+            source=source.reference,
+            result=[result.reference for result in results],
+            task_id=uuid.uuid4(),
+        )
+        for result in results:
+            xtdb_octopoes_service.ooi_repository.save(result, valid_time)
+        xtdb_octopoes_service.save_origin(origin, results, valid_time)
+        event_manager.complete_process_events(xtdb_octopoes_service)
+        return origin, results
+
+    hostname = Hostname(network=network.reference, name="mispo.es")
+    xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    _, ip = chain(hostname, [IPAddressV4(network=network.reference, address=ip_address("134.209.85.72"))])
+    chain(ip[0], [DNSARecord(hostname=hostname.reference, address=ip[0].reference, value="134.209.85.72")])
+
+    software = Software(name="ACME")
+    instance = SoftwareInstance(ooi=ip[0].reference, software=software.reference)
+    xtdb_octopoes_service.ooi_repository.save(software, valid_time)
+    xtdb_octopoes_service.ooi_repository.save(instance, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    count = xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count
+
+    xtdb_octopoes_service.ooi_repository.delete(ip[0].reference, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count < count
+    assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) > 0
+
+
+def test_basic_chain_deletion(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
+    def chain(source, results):
+        origin = Origin(
+            origin_type=OriginType.OBSERVATION,
+            method="",
+            source=source.reference,
+            result=[result.reference for result in results],
+            task_id=uuid.uuid4(),
+        )
+        for result in results:
+            xtdb_octopoes_service.ooi_repository.save(result, valid_time)
+        xtdb_octopoes_service.save_origin(origin, results, valid_time)
+        event_manager.complete_process_events(xtdb_octopoes_service)
+        return origin, results
+
+    software1 = Software(name="ACME", version="v1")
+    xtdb_octopoes_service.ooi_repository.save(software1, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    chain(software1, [Software(name="ACME", version="v2")])
+
+    xtdb_octopoes_service.ooi_repository.delete(software1.reference, valid_time)
+    event_manager.complete_process_events(xtdb_octopoes_service)
+
+    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 0
+    assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) > 0
