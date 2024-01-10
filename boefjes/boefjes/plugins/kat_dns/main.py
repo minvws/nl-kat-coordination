@@ -30,7 +30,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         zone_soa_record,
     ]
 
-    dns_record_types = ["A", "AAAA", "CAA", "CERT", "PR", "SRV" "TXT", "MX", "NS", "CNAME", "DNAME"]
+    dns_record_types = ["A", "AAAA", "CAA", "CERT", "RP", "SRV" "TXT", "MX", "NS", "CNAME", "DNAME"]
     for type_ in dns_record_types:
         try:
             answer: Answer = resolver.resolve(hostname, type_)
