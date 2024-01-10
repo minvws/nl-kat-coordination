@@ -180,6 +180,7 @@ class DNSCAARecord(DNSRecord):
     # A non-zero-length sequence of ASCII letters and numbers in lowercase.
     tag: CAATAGS = None
 
-    # The Value field, expressed as either (1) a contiguous set of characters without interior spaces or (2) a quoted string.
+    # The Value field, expressed as either (1) a contiguous set of characters 
+    # without interior spaces or (2) a quoted string.
     value: str = None
     _natural_key_attrs = ["hostname", "flags", "tag", "value"]
