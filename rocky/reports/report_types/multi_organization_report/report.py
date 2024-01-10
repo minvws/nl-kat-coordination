@@ -233,6 +233,8 @@ class MultiOrganizationReport(MultiReport):
             },
             "services": services,
             "recommendation_counts": recommendation_counts,
+            "best_scoring": highest_percentage[0],
+            "worst_scoring": lowest_percentage[0],
             "ipv6": ipv6,
         }
 

@@ -39,9 +39,15 @@
                 </dd>
             </div>
             <div>
-                <dt>{% translate "Best scoring security checks" %}</dt>
+                <dt>{% translate "Best scoring security check" %}</dt>
                 <dd>
                     {{ report_data.best_scoring }}
+                </dd>
+            </div>
+            <div>
+                <dt>{% translate "Worst scoring security check" %}</dt>
+                <dd>
+                    {{ report_data.worst_scoring }}
                 </dd>
             </div>
         </dl>
