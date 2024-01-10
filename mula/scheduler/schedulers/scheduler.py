@@ -108,17 +108,6 @@ class Scheduler(abc.ABC):
                 )
             )
 
-        # FIXME: what if we want to explicitly disable a job, e.g. we just want
-        # to have a one-off? We disable a job for the boefje scheduler when a
-        # ooi is deleted, or when a boefje is disabled.
-
-        # Was job disabled? If so, re-enable it. When we get here all checks
-        # have been done for the p_item, so we can assume that the job is
-        # can be marked for rescheduling.
-        if not job_db.enabled:
-            job_db.enabled = True
-            self.ctx.datastores.job_store.update_job(job_db)
-
         # Create Task
         #
         # NOTE: we set the id of the task the same as the p_item, for easier
