@@ -20,13 +20,13 @@ from octopoes.models.ooi.dns.records import (
     NXDOMAIN,
     DNSAAAARecord,
     DNSARecord,
+    DNSCAARecord,
     DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSRecord,
     DNSSOARecord,
     DNSTXTRecord,
-    DNSCAARecord,
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
@@ -157,7 +157,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
                 if isinstance(rr, CAA):
                     recordvalue = str(rr)
-                    recordvalue = recordvalue.split(' ', 2)
+                    recordvalue = recordvalue.split(" ", 2)
                     default_args["flags"] = min(max(0, int(recordvalue[0])), 255)
                     default_args["tag"] = re.sub("[^\\w]", "", recordvalue[1].lower())
                     default_args["value"] = recordvalue[2]
