@@ -1,4 +1,5 @@
 import json
+import re
 from ipaddress import IPv4Address, IPv6Address
 from typing import Dict, Iterable, List, Union
 
@@ -157,8 +158,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
                 if isinstance(rr, CAA):
                     recordvalue = str(rr)
                     recordvalue = recordvalue.split(' ', 2)
-                    default_args["flag"] = int(recordvalue[0])
-                    default_args["tag"] = recordvalue[1]
+                    default_args["flags"] = min(max(0, int(recordvalue[0])), 255)
+                    default_args["tag"] = re.sub("[^\\w]", "", recordvalue[1].lower())
                     default_args["value"] = recordvalue[2]
                     register_record(DNSCAARecord(**default_args))
 
