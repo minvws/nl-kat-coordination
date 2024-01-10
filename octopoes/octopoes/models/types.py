@@ -14,13 +14,13 @@ from octopoes.models.ooi.dns.records import (
     NXDOMAIN,
     DNSAAAARecord,
     DNSARecord,
+    DNSCAARecord,
     DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSPTRRecord,
     DNSSOARecord,
     DNSTXTRecord,
-    DNSCAARecord,
 )
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname, ResolvedHostname
 from octopoes.models.ooi.email_security import (
