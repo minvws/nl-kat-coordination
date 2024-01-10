@@ -17,10 +17,10 @@ from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSAAAARecord,
     DNSARecord,
+    DNSCAARecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSSOARecord,
-    DNSCAARecord,
 )
 from octopoes.models.ooi.dns.zone import Hostname
 from rocky.keiko import (
