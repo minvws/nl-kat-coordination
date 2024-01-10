@@ -539,10 +539,10 @@
             "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
     },
     "KAT-NO-CAA": {
-        "description": "This hostname does not support a CAA record.",
+        "description": "This zone does not carry at least one CAA record.",
         "source": null,
         "risk": "low",
         "impact": null,
         "recommendation": "Set a CAA record to limit which CA's are allowed to issue certs."
-    },
+    }
 }
