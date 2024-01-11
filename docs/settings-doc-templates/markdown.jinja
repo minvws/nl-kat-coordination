@@ -10,9 +10,12 @@
 {% macro heading(level) -%}
     {{ '#' * (heading_offset + level) }}
 {%- endmacro %}
-{% for env_name, field in fields %}{% if not loop.first %}
 
-{% else %}{% endif %}{{ heading(2) }} `{{ env_name|upper }}`
+{% for cls, fields in classes.items() %}
+
+{% for env_name, field in cls.model_fields.items() %}{% if not loop.first %}
+
+{% else %}{% endif %}{{ heading(2) }} `{% if field.validation_alias %}{{ field.validation_alias }}{% else %}{{ cls.model_config.env_prefix }}{{ env_name|upper }}{% endif %}`
 
 *{% if field.is_required() %}*Required*{% else %}Optional{% endif %}*{% if has_default_value(field) %}, default value: `{{ field.default }}`{% endif %}
 
@@ -95,4 +98,6 @@
             {% endfor %}
         {% endif %}
     {% endif %}
+{% endfor %}
+
 {% endfor %}
