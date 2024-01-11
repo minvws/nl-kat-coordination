@@ -10,6 +10,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from reports.report_types.helpers import (
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
@@ -156,12 +157,12 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                         data = report.generate_data(ooi, valid_time=self.valid_time)
                         template = report.template_path
                         report_data[ooi][report_type.name] = {"data": data, "template": template}
-            except Exception:
+            except ObjectNotFoundException:
                 error_oois.append(ooi)
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_oois:
-            oois = ", ".join(list(set(error_oois)))
-            date = str(self.valid_time.date())
+            oois = ", ".join(set(error_oois))
+            date = self.valid_time.date()
             messages.error(
                 self.request,
                 _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.")
