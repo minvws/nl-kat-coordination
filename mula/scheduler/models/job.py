@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field, constr
 from sqlalchemy import Boolean, Column, DateTime, String
@@ -25,11 +25,7 @@ class Job(BaseModel):
 
     enabled: bool = True
 
-    # TODO: maybe remove the p_item definition, it should be a definition
-    # of a BoefjeTask, NormalizerTask, etc. the scheduler should make
-    # a p_item for it. Think about creating a new Job from the UI
-    # we don't have a p_item there with priority etc. We just want
-    # to say: create a recurring job with this Boefje/Normalizer task.
+    # Priority item specification
     p_item: PrioritizedItem
 
     tasks: List[Task] = []

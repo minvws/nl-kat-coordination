@@ -149,7 +149,7 @@ class Server:
         self.api.add_api_route(
             path="/jobs/{job_id}",
             endpoint=self.patch_job,
-            methods=["GET"],
+            methods=["PATCH"],
             response_model=models.Job,
             status_code=status.HTTP_200_OK,
             description="Update a job",
@@ -327,19 +327,12 @@ class Server:
         job: Optional[models.JobRequest] = None,
     ) -> Any:
         if job is not None and request.method == "POST":
-            breakpoint()
-            try:
-                created_job = self.ctx.datastores.job_store.create_job(job)
-                return fastapi.responses.JSONResponse(
-                    status_code=status.HTTP_201_CREATED,
-                    content=created_job.model_dump_json(),
-                )
-            except Exception as exc:
-                self.logger.exception(exc)
-                raise fastapi.HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=str(exc),
-                ) from exc
+            created_job = fastapi.encoders.jsonable_encoder(self.create_job(job))
+
+            return fastapi.responses.JSONResponse(
+                status_code=status.HTTP_201_CREATED,
+                content=created_job,
+            )
 
         if (min_deadline is not None and max_deadline is not None) and min_deadline > max_deadline:
             raise fastapi.HTTPException(
@@ -375,6 +368,26 @@ class Server:
             ) from exc
 
         return paginate(request, results, count=count, offset=offset, limit=limit)
+
+    def create_job(self, job: models.JobRequest) -> Any:
+        try:
+            job = models.Job(**job.dict())
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            ) from exc
+
+        try:
+            created_job = self.ctx.datastores.job_store.create_job(job)
+        except Exception as exc:
+            self.logger.exception(exc)
+            raise fastapi.HTTPException(
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to create event",
+            ) from exc
+
+        return created_job
 
     def get_job(self, job_id: str) -> Any:
         try:

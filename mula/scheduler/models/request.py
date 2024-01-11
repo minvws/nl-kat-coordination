@@ -19,7 +19,7 @@ class JobRequest(BaseModel):
 
     enabled: bool = True
 
-    p_item: PrioritizedItem
+    p_item: Dict = Field(default_factory=dict)
 
     # TODO: not yet implemented, added as proof of concept
     rate_limit: Optional[RateLimit] = None

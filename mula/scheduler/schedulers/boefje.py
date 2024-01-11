@@ -303,8 +303,11 @@ class BoefjeScheduler(Scheduler):
 
         with futures.ThreadPoolExecutor() as executor:
             for job in jobs:
-                # Create task from a prior task, persisted as p_item
-                # on the job.
+                # TODO: if we're not able to parse it because a faulty
+                # type of task was pushed by for instance the jobs endpoint
+                # we need to disable the job.
+
+                # Create a new task from the p_item spec of a job
                 try:
                     task = BoefjeTask.parse_obj(job.p_item.data)
                 except Exception as exc:
