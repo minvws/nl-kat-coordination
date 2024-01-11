@@ -13,7 +13,7 @@
     </p>
 {% endif %}
 {% if type %}
-    <h4>{{ type }} {% translate "server" %}</h4>
+    <h4 id="rpki-{{ type }}">{{ type }} {% translate "server" %}</h4>
     <p>
         {% blocktranslate trimmed %}
             This table shows which checks were performed. Following that, the compliance

@@ -36,7 +36,11 @@
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ compliance.safe_connections.number_of_compliant }}/{{ compliance.safe_connections.total }}
+                        {% if compliance.safe_connections.total == 0 %}
+                            {{ compliance.safe_connections.number_of_compliant }}/{{ compliance.safe_connections.total }}
+                        {% else %}
+                            <a href="#safe-connections-{{ service }}">{{ compliance.safe_connections.number_of_compliant }}/{{ compliance.safe_connections.total }}</a>
+                        {% endif %}
                     </td>
                     <td>
                         {% if compliance.system_specific.number_of_compliant != compliance.system_specific.total %}
@@ -44,7 +48,11 @@
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ compliance.system_specific.number_of_compliant }}/{{ compliance.system_specific.total }}
+                        {% if compliance.system_specific.total == 0 %}
+                            {{ compliance.system_specific.number_of_compliant }}/{{ compliance.system_specific.total }}
+                        {% else %}
+                            <a href="#system-specific-{{ service }}">{{ compliance.system_specific.number_of_compliant }}/{{ compliance.system_specific.total }}</a>
+                        {% endif %}
                     </td>
                     <td>
                         {% if compliance.rpki.number_of_compliant != compliance.rpki.total %}
@@ -52,7 +60,11 @@
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ compliance.rpki.number_of_compliant }}/{{ compliance.rpki.total }}
+                        {% if compliance.rpki.total == 0 %}
+                            {{ compliance.rpki.number_of_compliant }}/{{ compliance.rpki.total }}
+                        {% else %}
+                            <a href="#rpki-{{ service }}">{{ compliance.rpki.number_of_compliant }}/{{ compliance.rpki.total }}</a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
