@@ -52,6 +52,14 @@ Upgrading
 The normal instructions for upgrading :ref:`Debian packages<Upgrading Debian>`
 or upgrading :ref:`containers <Upgrading_Containers>` should be followed.
 
+Debian packages
+---------------
+
+Because of the switch to Granian, we can't listen on both 8000 and 8443 anymore,
+and we will default listen only on port 8000 on 127.0.0.1. If you were
+previously accessing OpenKAT using https on port 8443 you need to change the
+configuration as described on the :ref:`Debian installation page<Configure
+reverse proxy>`.
 
 Full Changelog
 ==============
