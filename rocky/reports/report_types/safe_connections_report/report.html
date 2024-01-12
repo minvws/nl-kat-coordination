@@ -12,7 +12,7 @@
     </p>
 {% endif %}
 {% if type %}
-    <h4>{{ type }}</h4>
+    <h4>{{ type }} {% translate "server" %}</h4>
     <p>
         {% blocktranslate trimmed %}
             This table shows which checks were performed. Following that, the compliance
@@ -23,6 +23,7 @@
 {% if data.sc_ips %}
     <div class="horizontal-scroll">
         <table>
+            <caption class="visually-hidden">{% translate "Safe connections compliance:" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Check" %}</th>
@@ -48,6 +49,7 @@
         {% if findings %}
             <h5>{{ ip }}</h5>
             <table>
+                <caption class="visually-hidden">{% translate "Safe connections compliance:" %}</caption>
                 <thead>
                     <tr>
                         <th scope="col">{% translate "Compliance issue" %}</th>
@@ -58,7 +60,7 @@
                     {% for finding_type in findings %}
                         <tr>
                             <td>
-                                <span class="icon negative"></span>{{ finding_type.description }}
+                                <span class="icon alert"></span>{{ finding_type.description }}
                             </td>
                             <td>
                                 <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>

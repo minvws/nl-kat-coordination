@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Set, Type, TypedDict
+from typing import Any, Dict, List, Optional, Set, Type, Union
 
 from account.mixins import OrganizationView
 from django.forms import Form
@@ -14,21 +14,17 @@ from tools.view_helpers import BreadcrumbsMixin
 from octopoes.models import OOI
 from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import Report
+from reports.report_types.definitions import Report, ReportType
 from reports.report_types.helpers import get_report_by_id
 from rocky.views.mixins import OctopoesView
-
-
-class ReportType(TypedDict):
-    id: str
-    name: str
-    description: str
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     current_step: int = 1
 
-    def get_selection(self):
+    def get_selection(self, pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None) -> str:
+        if pre_selection:
+            return "?" + urlencode(pre_selection, True)
         return "?" + urlencode(self.request.GET, True)
 
     def get_kwargs(self):

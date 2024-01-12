@@ -3,9 +3,7 @@
 <section id="recommendations">
     <div>
         <h2>{% translate "Recommendations" %}</h2>
-        {% if total_findings == 0 %}
-            <p>{% translate "There are no recommendations." %}</p>
-        {% else %}
+        {% if total_findings %}
             <p>
                 {% blocktranslate count total_findings as count trimmed %}
                     There is <i>{{ total_findings }}</i> vulnerability
@@ -18,13 +16,13 @@
                     found on <i>{{ total_systems }}</i> systems.
                 {% endblocktranslate %}
             </p>
-            {% if recommendation %}
-                <ul>
-                    {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
-                </ul>
-            {% else %}
-                <p>{% translate "There are no recommendations." %}</p>
-            {% endif %}
+        {% endif %}
+        {% if data %}
+            <ul>
+                {% for recommendation in data %}<li>{{ recommendation }}</li>{% endfor %}
+            </ul>
+        {% else %}
+            <p>{% translate "There are no recommendations." %}</p>
         {% endif %}
     </div>
 </section>

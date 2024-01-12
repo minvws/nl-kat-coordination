@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-30 15:14+0000\n"
+"POT-Creation-Date: 2023-12-29 19:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -589,6 +589,8 @@ msgstr "Failure mode"
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_summary.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
@@ -760,8 +762,10 @@ msgstr "Research & Development"
 msgid "Administration"
 msgstr "Indemnizashon"
 
-#: fmea/models.py reports/templates/summary/service_health.html
-#: rocky/templates/footer.html rocky/templates/health.html
+#: fmea/models.py
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
 msgid "Service"
 msgstr "Sèrvicio"
 
@@ -1077,6 +1081,7 @@ msgid "Risk Class"
 msgstr "Nivel di rísiko"
 
 #: fmea/templates/fmea/fmea_failure_mode_list.html
+#: reports/report_types/vulnerability_report/report.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -1126,6 +1131,9 @@ msgid "Failure mode report"
 msgstr "No por decodifica e archivo"
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/aggregate_organisation_report/summary.html
+#: reports/report_types/multi_organization_report/summary.html
 #: reports/templates/summary/report_summary.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
@@ -1381,8 +1389,8 @@ msgstr ""
 "adequa di <strong>L%(scan_level)s</strong> òf mas haltu."
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Scan OOI"
-msgstr "Skèn OOI"
+msgid "Scan object"
+msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
 #, python-format
@@ -1396,16 +1404,18 @@ msgstr ""
 "autorisashon di %(scan_level)s riba e ophetonan."
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Selected OOIs:"
-msgstr "OOI's selektá:"
+msgid "Selected objects:"
+msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-#: rocky/templates/partials/explanations.html
-msgid "OOI"
-msgstr "OOI"
+#: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html
+#: rocky/templates/partials/task_history.html
+msgid "Object"
+msgstr "Opheto"
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
-#: reports/templates/report_oois_selection.html
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
@@ -1493,8 +1503,8 @@ msgstr ""
 "di plugin."
 
 #: katalogus/templates/katalogus_settings.html
-#: reports/templates/report_setup_scan.html
-#: reports/templates/report_types_selection.html
+#: reports/templates/partials/report_setup_scan.html
+#: reports/templates/partials/report_types_selection.html
 #: rocky/templates/two_factor/core/otp_required.html
 msgid "Go back"
 msgstr "Bai bèk"
@@ -1598,12 +1608,6 @@ msgstr "Lista di opheto"
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, fuzzy, python-format
-#| msgid ""
-#| "This boefje will only scan objects with a corresponding clearance level "
-#| "of <strong>L%(scan_level)s</strong> or higher. There is no "
-#| "indemnification for this boefje to scan an OOI with a lower clearance "
-#| "level than <strong>L%(scan_level)s</strong>. Use the filter to show OOI's "
-#| "with a lower clearance level."
 msgid ""
 "This Boefje will only scan objects with a corresponding clearance level of "
 "<strong>L%(scan_level)s</strong> or higher. There is no indemnification for "
@@ -1619,16 +1623,6 @@ msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, fuzzy
-#| msgid ""
-#| "\n"
-#| "          <span>Warning scan level:</span>\n"
-#| "          Scanning OOI's with a lower clearance level will result in "
-#| "OpenKAT increasing the clearance level on that OOI,\n"
-#| "          not only for this scan but from now on out, until it manually "
-#| "gets set to something else again.\n"
-#| "          This means that all other enabled Boefjes will use this higher "
-#| "clearance level aswel.\n"
-#| "        "
 msgid ""
 "<span>Warning scan level:</span> Scanning OOI's with a lower clearance level "
 "will result in OpenKAT increasing the clearance level on that OOI, not only "
@@ -1648,13 +1642,6 @@ msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "          You currently don't have any objects that meet the scan level "
-#| "of %(name)s.\n"
-#| "          Add objects with a complying clearance level, or alter the "
-#| "clearance level of existing objects.\n"
-#| "        "
 msgid ""
 "You currently don't have any objects that meet the scan level of %(name)s. "
 "Add objects with a complying clearance level, or alter the clearance level "
@@ -1669,12 +1656,6 @@ msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, fuzzy, python-format
-#| msgid ""
-#| "\n"
-#| "          You currently don't have scannable objects for %(name)s.\n"
-#| "          Add objects to use this boefje. This boefje is able to scan "
-#| "objects of the following types:\n"
-#| "        "
 msgid ""
 "You currently don't have scannable objects for %(name)s. Add objects to use "
 "this Boefje. This Boefje is able to scan objects of the following types:"
@@ -1705,16 +1686,19 @@ msgid "Plugins overview:"
 msgstr "Resumen di Plug-innan:"
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin name"
 msgstr "Nombre di Plug-in"
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin type"
 msgstr "Tipo di Plug-in"
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin description"
 msgstr "Deskripshon di Plug-in"
@@ -1867,8 +1851,8 @@ msgid "No"
 msgstr "Nò"
 
 #: katalogus/views/change_clearance_level.py
-msgid "Session has terminated, please select OOIs again."
-msgstr "Seshon a wòrdu tèrminá. Por fabor selekta OOIs dinobo."
+msgid "Session has terminated, please select objects again."
+msgstr ""
 
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
@@ -2386,7 +2370,7 @@ msgid "Choose a report - Introduction"
 msgstr "Skohé un rapòrt - Introduskhon"
 
 #: onboarding/templates/step_2a_choose_report_info.html
-#: reports/templates/report_oois_selection.html reports/views.py
+#: reports/templates/partials/main_navigation.html reports/views/base.py
 #: rocky/templates/header.html
 msgid "Reports"
 msgstr "Rapport"
@@ -2504,6 +2488,8 @@ msgstr "DNS Rapòrt"
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Setup scan"
 msgstr "Setup skan"
 
@@ -2607,7 +2593,7 @@ msgstr ""
 "ta guia'bu dor di e processo pa kreanan manualmente."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
-#: reports/templates/report_oois_selection.html
+#: reports/templates/partials/report_ooi_list.html
 msgid "Create object"
 msgstr "Krea opheto"
 
@@ -2625,7 +2611,7 @@ msgstr "URL"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
-#: reports/templates/report_oois_selection.html
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
@@ -2946,7 +2932,7 @@ msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr "Laga nos ban setup e skan dor di aktivá e plugins di bo eskoho abou."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: reports/templates/report_setup_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "Suggested plugins"
 msgstr "Plugins sugerí"
 
@@ -3064,6 +3050,440 @@ msgstr "Filtra pa tiponan di OOI"
 msgid "Report types"
 msgstr ""
 
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/multi_organization_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Appendix"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Selected objects"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_summary.html
+msgid "Selected Report Types"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Report type"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Selected Plugins"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin options"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin scan level"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Service Versions and Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/health.html
+msgid "Version"
+msgstr "Vershon"
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/footer.html rocky/views/health.py
+msgid "Health"
+msgstr "Salú"
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/health.html
+msgid "Healthy"
+msgstr "Salú"
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Unhealthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Used Config objects"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Primary Key"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Bit ID"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Config"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "No config objects found."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/asset_overview.html
+#: reports/report_types/multi_organization_report/asset_overview.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Asset overview"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/asset_overview.html
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid ""
+"An overview of the manually released scanned assets. Assets in <strong>bold</"
+"strong> are taken as a starting point, assets that are not in bold were "
+"found by OpenKAT itself."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Basic security"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+msgid ""
+"In this chapter, first a table of compliance checks is displayed, followed "
+"by a detailed examination of compliance issues for each component."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+msgid "Overview of the basic security status"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+msgid ""
+"This table provides an overview of the basic security status of the known "
+"assets. Basic security in order. In principle, all values in this table "
+"should be checked off."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+msgid "Basic security status:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/report_types/ipv6_report/report.html
+#: reports/report_types/multi_organization_report/ipv6.html
+#: reports/report_types/systems_report/report.html
+msgid "System type"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Safe connections"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+msgid "System Specific"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+msgid "RPKI"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+msgid "server"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+msgid "OpenKAT Aggregate Report"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+#: rocky/templates/oois/ooi_report.html
+#: rocky/templates/partials/findings_list_toolbar.html
+msgid "Download PDF"
+msgstr "Download PDF"
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+msgid "Download JSON"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+msgid "This is the OpenKAT report for organization"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/multi_organization_report/introduction.html
+#: reports/templates/partials/report_header.html
+msgid "Observed at:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/multi_organization_report/introduction.html
+#: reports/templates/partials/report_header.html
+msgid "Created by:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/recommendations.html
+#: reports/report_types/multi_organization_report/recommendations.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Recommendations"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/recommendations.html
+#: reports/report_types/multi_organization_report/recommendations.html
+#, python-format
+msgid "There is <i>%(total_findings)s</i> vulnerability"
+msgid_plural "There are <i>%(total_findings)s</i> vulnerabilities"
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/report_types/aggregate_organisation_report/recommendations.html
+#: reports/report_types/multi_organization_report/recommendations.html
+#, python-format
+msgid "found on <i>%(total_systems)s</i> system."
+msgid_plural "found on <i>%(total_systems)s</i> systems."
+msgstr[0] ""
+msgstr[1] ""
+
+#: reports/report_types/aggregate_organisation_report/recommendations.html
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "There are no recommendations."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/report_types/safe_connections_report/report.html
+msgid ""
+"In this chapter we check if the connections of all the IP ports of the "
+"system are safe. Safe connections are important to prevent unauthorised "
+"access and data breaches. Strong ciphers are crucial because they ensure "
+"strong encryption which protects the data from interception during "
+"communiction."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "System specific"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid ""
+"This is where checks are done that are specific to system types. Different "
+"security and compliance issues come into play for different systems. They "
+"are listed here under each other."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/report_types/rpki_report/report.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Resource Public Key Infrastructure"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/report_types/rpki_report/report.html
+msgid ""
+"This section contains basic security information about resource public key "
+"infrastructure. If your web server employs RPKI for its IP addresses and "
+"associated nameservers, then it enhances visitor protection against "
+"misconfigurations and malicious route intercepts through verified route "
+"announcements, ensuring reliable server access and secure internet traffic."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Vulnerabilities"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Vulnerabilities found are grouped per system."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+msgid "No CVEs have been found."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Critical vulnerabilities"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "IPs scanned"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Hostnames scanned"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report.py
+msgid "Terms in report"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/vulnerability_report/report.html
+msgid "vulnerabilities on this system"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid "System specific checks"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#, python-format
+msgid ""
+"This table shows which checks were performed. Following that, the compliance "
+"issues, if any, are shown for each %(type)s Server."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+msgid "Check overview:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Check"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Compliance"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/rpki_report/report.html
+msgid "IPs are compliant"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Findings:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Compliance issue"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Risk level"
+msgstr "Nivél di rièsgo"
+
+#: reports/report_types/aggregate_organisation_report/term_overview.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Term Overview"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/term_overview.html
+msgid "For definitions of terms used in this chapter, see the glossary below."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/term_overview.html
+msgid ""
+"Web servers and domains are examples of digital assets within this "
+"framework. Web servers are essential for hosting and serving websites or web "
+"applications, while domains represent the online addresses used to access "
+"these resources. Other examples of assets in the IT realm include databases, "
+"user accounts, software applications, and networking infrastructure. Asset "
+"management is a critical aspect of cybersecurity, involving the "
+"identification, classification, and protection of these assets to safeguard "
+"against threats and ensure the overall security and functionality of an "
+"organization's IT environment."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/term_overview.html
+msgid ""
+"Multiple hostnames that resolve to one IP address where at least one of the "
+"hostnames or the IP address has a declared scan level that is at least L1. "
+"Type systemen zijn webservers, mailservers, en nameservers (DNS)."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/term_overview.html
+msgid ""
+"A fundamental component of the client-server model. A web server uses "
+"protocols like HTTP or HTTPS to facilitate communication between clients and "
+"the server."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/term_overview.html
+msgid ""
+"A mail server is a specialized software application or hardware device that "
+"facilitates the sending, receiving, and storage of emails within a computer "
+"network. Operating on the Simple Mail Transfer Protocol (SMTP) for outgoing "
+"messages and either Internet Message Access Protocol (IMAP) or Post Office "
+"Protocol (POP) for incoming messages, a mail server manages email "
+"communication by routing messages between users and storing them until they "
+"are retrieved. The server ensures the efficient and secure transfer of "
+"emails, handling tasks such as authentication, spam filtering, and message "
+"storage."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/term_overview.html
+msgid ""
+"A nameserver, or Domain Name System (DNS) server, is a critical component of "
+"the internet infrastructure responsible for translating human-readable "
+"domain names into IP addresses, enabling the seamless navigation of the web. "
+"When a user enters a domain name in a web browser, the nameserver is queried "
+"to obtain the corresponding IP address of the server hosting the associated "
+"website or service."
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/term_overview.html
+msgid ""
+"A DICOM server, which stands for Digital Imaging and Communications in "
+"Medicine, is a specialized server designed for the storage, retrieval, and "
+"exchange of medical images and related information in the healthcare "
+"industry. DICOM is a widely adopted standard that ensures interoperability "
+"and consistency in the communication of medical images and associated data "
+"among different devices and systems, such as medical imaging equipment, "
+"picture archiving and communication systems (PACS), and radiology "
+"information systems (RIS). DICOM servers store and manage patient-specific "
+"medical images, like X-rays, CT scans, and MRIs, utilizing a standardized "
+"format."
+msgstr ""
+
 #: reports/report_types/dns_report/report.html
 msgid "IP address lookup"
 msgstr ""
@@ -3110,16 +3530,317 @@ msgid ""
 "weaknesses."
 msgstr ""
 
-#: reports/report_types/systems_report/report.html
-msgid "IP address"
+#: reports/report_types/ipv6_report/report.html
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid ""
+"IPv6 includes improvements in security features compared to IPv4. While IPv4 "
+"can implement security measures, IPv6 was designed with security in mind, "
+"and its adoption can contribute to a more secure internet."
 msgstr ""
 
+#: reports/report_types/ipv6_report/report.html
+msgid "IPV6 overview:"
+msgstr ""
+
+#: reports/report_types/ipv6_report/report.html
 #: reports/report_types/systems_report/report.html
 msgid "Domain"
 msgstr ""
 
+#: reports/report_types/ipv6_report/report.py
+msgid "IPv6 Report"
+msgstr ""
+
+#: reports/report_types/ipv6_report/report.py
+msgid "Check whether hostnames point to ipv6 addresses."
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid "Mailserver compliance:"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid "mailservers compliant"
+msgstr ""
+
+#: reports/report_types/mail_report/report.py
+msgid "Mail Report"
+msgstr ""
+
+#: reports/report_types/mail_report/report.py
+msgid ""
+"System specific mail report that focusses on IP addresses and hostnames."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Overview of included assets"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Asset"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid "Amount"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "IP addresses"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Domain names"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Assets with most critical vulnerabilities"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Vulnerability"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Organisation"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid "Overview of safe connections"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/report_types/safe_connections_report/report.html
+msgid "Only Safe Ciphers"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/report_types/safe_connections_report/report.html
+msgid "services are compliant"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+#: reports/templates/generate_report.html
+msgid "Download report"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "This is the OpenKAT Sector rapport."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "This sector contains"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "Scanned organizations."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "Of these organizations"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "organizations have tag"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "The basic security scores are around "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "A total of "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid " critical vulnerabilities have been identified."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid "IPv6"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid "In total "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid " out of "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid " systems have an IPv6 connection."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid "Overview of ip version compliance"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid ""
+"See an overview of open ports found over all systems and the services these "
+"systems provide."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid "Overview of detected open ports"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+#: reports/report_types/open_ports_report/report.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Open ports"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid "Occurrences (IP addressees)"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid "Services"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Overview of recommendations"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Recommendation"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/recommendations.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrence"
+msgstr "Occurencia"
+
+#: reports/report_types/multi_organization_report/report.py
+msgid "Multi Organization Report"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+msgid ""
+"Vulnerabilities found are grouped per system. Here, we only consider CVE "
+"vulnerabilities."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+msgid "Vulnerabilities grouped per system."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+msgid "total"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "Name server compliance:"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "DNSSEC Present"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "name servers compliant"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "Valid DNSSEC"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "No unnecessary ports open"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.py
+msgid "Name server Report"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.py
+msgid "Name server report checks name servers on basic security standards."
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid ""
+"See an overview of open ports found. <strong>Bold</strong> open ports are "
+"found through direct scans that the organization performs via OpenKAT. Other "
+"open ports were found outside by OpenKAT itself. Scans with the same "
+"hostnames, ports and IPs are merged."
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid "Overview of open ports found for the scanned assets."
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
 #: reports/report_types/systems_report/report.html
-msgid "System type"
+msgid "IP address"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid "Hostnames"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.html
+msgid "Direct scan"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.py
+msgid "Open Ports Report"
+msgstr ""
+
+#: reports/report_types/open_ports_report/report.py
+msgid "Find open ports of IP addresses"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI compliance:"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI Available"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI Not expired"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI record is not valid."
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI record does not exist."
+msgstr ""
+
+#: reports/report_types/rpki_report/report.py
+msgid "RPKI Report"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.py
+msgid ""
+"Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
+"the ip addresses and whether they are covered by a valid RPKI ROA."
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "Safe Connections"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "Safe connections compliance:"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.py
+msgid "Safe Connections Report"
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.py
+msgid "Shows whether the IPService contains safe ciphers."
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Selected assets:"
 msgstr ""
 
 #: reports/report_types/systems_report/report.py
@@ -3130,24 +3851,8 @@ msgstr ""
 msgid "Combine IP addresses, hostnames and services into systems."
 msgstr ""
 
-#: reports/report_types/systems_report/report.py
-msgid "Web"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Mail"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Dicom"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "DNS"
-msgstr ""
-
-#: reports/report_types/systems_report/report.py
-msgid "Other"
+#: reports/report_types/tls_report/report.html
+msgid "Ciphers:"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3190,6 +3895,8 @@ msgid "No ciphers found for this IPService"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -3211,16 +3918,128 @@ msgid ""
 "protocols."
 msgstr ""
 
+#: reports/report_types/vulnerability_report/report.html
+msgid "Vulnerabilities:"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrences"
+msgstr "Occurencianan"
+
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Close details"
+msgstr "Sera detayes"
+
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Open details"
+msgstr "Habri detayes"
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "Advice"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "Vulnerability Report"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "Vulnerabilities found are grouped for each system."
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+#: rocky/templates/oois/ooi_detail_origins_inference.html
+#: rocky/templates/oois/ooi_detail_origins_observations.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Source"
+msgstr "Orígen"
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "First seen"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "Last seen"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.py
+msgid "Evidence"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Web system compliance:"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "CSP Present"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "webservers compliant"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Secure CSP Header"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Redirects HTTP to HTTPS"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Offers HTTPS"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Has a Security.txt"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Has a certificate"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Certificate is not expired"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Certificate is not expiring soon"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.py
+msgid "Web System Report"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.py
+msgid "Web system reports check web systems on basic security standards."
+msgstr ""
+
+#: reports/templates/generate_report.html
+#: reports/templates/generate_report_pdf.html
+msgid "for"
+msgstr ""
+
+#: reports/templates/partials/main_navigation.html
+msgid "Overview of reports"
+msgstr ""
+
 #: reports/templates/partials/report_header.html
 msgid "Report for organization"
-msgstr ""
-
-#: reports/templates/partials/report_header.html
-msgid "Observed at:"
-msgstr ""
-
-#: reports/templates/partials/report_header.html
-msgid "Created by:"
 msgstr ""
 
 #: reports/templates/partials/report_introduction.html
@@ -3234,103 +4053,144 @@ msgid ""
 "of critical data and resources."
 msgstr ""
 
-#: reports/templates/report.html
-msgid "for"
+#: reports/templates/partials/report_navigation.html
+msgid "Report Navigation"
 msgstr ""
 
-#: reports/templates/report_oois_selection.html
-msgid "Overview of reports"
+#: reports/templates/partials/report_navigation.html
+msgid "Generate Report"
 msgstr ""
 
-#: reports/templates/report_oois_selection.html
-msgid "Select OOI"
-msgid_plural "Select OOIs"
+#: reports/templates/partials/report_navigation.html
+msgid "Aggregate Report"
+msgstr ""
+
+#: reports/templates/partials/report_navigation.html
+msgid "Multi Report"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Select object"
+msgid_plural "Select objects"
 msgstr[0] ""
 msgstr[1] ""
 
-#: reports/templates/report_oois_selection.html
+#: reports/templates/partials/report_ooi_list.html
 msgid "Select which objects you want to include in your report."
 msgstr ""
 
-#: reports/templates/report_oois_selection.html
+#: reports/templates/partials/report_ooi_list.html
 #: rocky/templates/admin/change_list.html rocky/templates/oois/ooi_list.html
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Filter"
 msgstr "Filtrá"
 
-#: reports/templates/report_oois_selection.html
-msgid "No OOIs found."
+#: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+msgid "Currently filtered on:"
+msgstr "Aktuálmente filtrá riba:"
+
+#: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
+msgstr "Mustrando %(length)s di %(total)s ophetonan"
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "No objects found."
 msgstr ""
 
-#: reports/templates/report_oois_selection.html
+#: reports/templates/partials/report_ooi_list.html
 msgid "Go to the object page"
 msgstr ""
 
-#: reports/templates/report_oois_selection.html
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
-#: rocky/templates/partials/task_history.html
-msgid "Object"
-msgstr "Opheto"
+msgid "Objects:"
+msgstr ""
 
-#: reports/templates/report_oois_selection.html
+#: reports/templates/partials/report_ooi_list.html
+msgid "Clearance type"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 msgid "Setup report"
 msgstr ""
 
-#: reports/templates/report_setup_scan.html rocky/views/organization_add.py
+#: reports/templates/partials/report_setup_scan.html
+#: rocky/views/organization_add.py
 msgid "Setup"
 msgstr "Setup"
 
-#: reports/templates/report_setup_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "Set up the required plugins for this report."
 msgstr ""
 
-#: reports/templates/report_setup_scan.html
-#: reports/templates/report_types_selection.html
+#: reports/templates/partials/report_setup_scan.html
+#: reports/templates/partials/report_types_selection.html
 msgid "Change selection"
 msgstr ""
 
-#: reports/templates/report_setup_scan.html reports/views.py
+#: reports/templates/partials/report_setup_scan.html
 msgid "Set up scan"
 msgstr ""
 
-#: reports/templates/report_setup_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid ""
 "KAT will be able to generate a full report when all the required and "
 "suggested boefjes are enabled."
 msgstr ""
 
-#: reports/templates/report_setup_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid ""
 "If you choose not to give a plugin permission to run, the data that plugin "
 "would collect or produce will be left out of the report which will then be "
 "generated based on the available data collected by the enabled plugins."
 msgstr ""
 
-#: reports/templates/report_setup_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "Required plugins"
 msgstr ""
 
-#: reports/templates/report_setup_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
-#: reports/templates/report_setup_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid ""
 "This report requires at least one of the following plugins to be enabled to "
 "generate the report:"
 msgstr ""
 
-#: reports/templates/report_setup_scan.html
+#: reports/templates/partials/report_setup_scan.html
+#: reports/views/generate_report.py
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate report"
 msgstr "Generá rapòrt"
 
-#: reports/templates/report_types_selection.html reports/views.py
+#: reports/templates/partials/report_sidemenu.html
+msgid "Table of contents"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
+#: rocky/templates/oois/ooi_page_tabs.html
+msgid "Overview"
+msgstr "Resúmen"
+
+#: reports/templates/partials/report_sidemenu.html
+msgid "Selected Objects"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
+msgid "Used Config Objects"
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
 msgid "Choose report types"
 msgstr ""
 
-#: reports/templates/report_types_selection.html
+#: reports/templates/partials/report_types_selection.html
 msgid ""
 "Various types of reports, such as DNS reports and TLS reports, are essential "
 "for identifying vulnerabilities in different aspects of a system's security. "
@@ -3340,70 +4200,74 @@ msgid ""
 "improvements are needed."
 msgstr ""
 
-#: reports/templates/report_types_selection.html
+#: reports/templates/partials/report_types_selection.html
 msgid "Selected object"
 msgid_plural "Selected objects"
 msgstr[0] ""
 msgstr[1] ""
 
-#: reports/templates/report_types_selection.html
+#: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
 msgstr ""
 
-#: reports/templates/report_types_selection.html
+#: reports/templates/partials/report_types_selection.html
 msgid "All report types that are available for your selection."
 msgstr ""
 
-#: reports/templates/report_types_selection.html
+#: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
 msgstr ""
 
-#: reports/templates/report_types_selection.html
+#: reports/templates/partials/report_types_selection.html
 msgid "Continue with selection"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Selected OOIs"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Selected Report Types"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Report type"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
 msgid "Selected Plugins for scans"
 msgstr ""
 
-#: reports/templates/summary/report_summary.html
-msgid "Plugin options"
+#: reports/templates/summary/service_health.html
+msgid "Services:"
 msgstr ""
 
-#: reports/templates/summary/report_summary.html
-msgid "Plugin scan level"
+#: reports/views/aggregate_report.py
+msgid "Aggregate report"
 msgstr ""
 
-#: reports/templates/summary/service_health.html rocky/templates/health.html
-msgid "Version"
-msgstr "Vershon"
-
-#: reports/views.py
-msgid "View Report"
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "Select Objects"
 msgstr ""
 
-#: reports/views.py
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
+msgid "Select report types"
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
+msgid "View report"
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Select at least one OOI to proceed."
 msgstr ""
 
-#: reports/views.py
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
-#: reports/views.py
+#: reports/views/generate_report.py
 msgid "This report may not show all the data as some plugins are not enabled."
+msgstr ""
+
+#: reports/views/multi_report.py
+msgid "Multi report"
+msgstr ""
+
+#: reports/views/multi_report.py
+msgid "Select OOIs"
 msgstr ""
 
 #: tools/forms/base.py
@@ -3573,13 +4437,11 @@ msgstr "Nivél di Autorisashon"
 
 #: tools/forms/ooi.py
 #, fuzzy
-#| msgid "Show objects that don't meet the Boefjes scan level"
 msgid "Show objects that don't meet the Boefjes scan level."
 msgstr "Mustra ophetonan ku no tin nivel di skan pa Boefjes"
 
 #: tools/forms/ooi.py
 #, fuzzy
-#| msgid "Show Boefjes that exceed the objects clearance level"
 msgid "Show Boefjes that exceed the objects clearance level."
 msgstr "Mustra Boefjes ku ku a surpasa OOI's su nivel di autorisashon"
 
@@ -3643,7 +4505,6 @@ msgid "Declared"
 msgstr "Deklará"
 
 #: tools/forms/settings.py
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Inherited"
 msgstr "Heredá"
 
@@ -3782,6 +4643,10 @@ msgid ""
 "Your task is scheduled and will soon be started in the background. Results "
 "will be added to the object list when they are in. It may take some time, a "
 "refresh of the page may be needed to show the results."
+msgstr ""
+
+#: tools/view_helpers.py rocky/scheduler.py
+msgid "Task not found."
 msgstr ""
 
 #: rocky/messaging.py
@@ -4061,33 +4926,8 @@ msgid "Total Findings"
 msgstr "Diskubrimentu Totál"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Close details"
-msgstr "Sera detayes"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Open details"
-msgstr "Habri detayes"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid " Finding Details"
 msgstr "Detayes di diskubrimentu"
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrences"
-msgstr "Occurencianan"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
@@ -4163,15 +5003,11 @@ msgstr "Diskubrimentu"
 
 #: rocky/templates/findings/finding_list.html
 #, fuzzy
-#| msgid "Findings"
 msgid "Findings @ "
 msgstr "Diskubrimentu"
 
 #: rocky/templates/findings/finding_list.html
 #, fuzzy, python-format
-#| msgid ""
-#| "An overview of all findings OpenKAT found on %(date)s. Each finding "
-#| "relates to an object. Click a finding for additional information."
 msgid ""
 "An overview of all findings OpenKAT found for organization "
 "<strong>%(organization_name)s</strong>. Each finding relates to an object. "
@@ -4282,10 +5118,6 @@ msgstr "Kita filters"
 msgid "Privacy Statement"
 msgstr "Deklarashon di privasidat"
 
-#: rocky/templates/footer.html rocky/views/health.py
-msgid "Health"
-msgstr "Salú"
-
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
 msgstr "E vèld aki ta obligatorio"
@@ -4326,10 +5158,6 @@ msgstr "Enkargonan"
 #: rocky/templates/health.html
 msgid "Health Checks"
 msgstr "Checknan di salubridat"
-
-#: rocky/templates/health.html
-msgid "Healthy"
-msgstr "Salú"
 
 #: rocky/templates/health.html
 msgid "Additional"
@@ -4633,12 +5461,6 @@ msgid "Bit"
 msgstr "Bit"
 
 #: rocky/templates/oois/ooi_detail_origins_inference.html
-#: rocky/templates/oois/ooi_detail_origins_observations.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Source"
-msgstr "Orígen"
-
-#: rocky/templates/oois/ooi_detail_origins_inference.html
 msgid "Parameters"
 msgstr "Parameternan"
 
@@ -4670,9 +5492,6 @@ msgstr "Aktualmente no a diskubri nada pa OOI"
 
 #: rocky/templates/oois/ooi_list.html
 #, fuzzy, python-format
-#| msgid ""
-#| "An overview of your object list. Objects can be added manually or by "
-#| "running boefjes. </br> Click an object for additional information."
 msgid ""
 "An overview of objects found for organization <strong>%(organization_name)s</"
 "strong>. Objects can be added manually or by running Boefjes. Click an "
@@ -4681,15 +5500,6 @@ msgstr ""
 "Un bista general di bo lista di ophetonan. Ophetonan por wòrdu añadí "
 "manualmente òf dor di ehekutá boefjes. </br> Klik riba un opheto pa mas "
 "informashon."
-
-#: rocky/templates/oois/ooi_list.html
-msgid "Currently filtered on:"
-msgstr "Aktuálmente filtrá riba:"
-
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
-msgstr "Mustrando %(length)s di %(total)s ophetonan"
 
 #: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
@@ -4710,10 +5520,6 @@ msgstr "Muta"
 #: rocky/templates/oois/ooi_page_tabs.html
 msgid "List of views for OOI"
 msgstr "Lista di resulatadonan pa OOI"
-
-#: rocky/templates/oois/ooi_page_tabs.html
-msgid "Overview"
-msgstr "Resúmen"
 
 #: rocky/templates/oois/ooi_past_due_warning.html
 msgid "This object is past due"
@@ -4752,11 +5558,6 @@ msgid ""
 msgstr ""
 "Bo no por añadi diskubrimentunan òf otro OOI's, e opheto aki a wordu kita i "
 "no ta aktualmente disponibel."
-
-#: rocky/templates/oois/ooi_report.html
-#: rocky/templates/partials/findings_list_toolbar.html
-msgid "Download PDF"
-msgstr "Download PDF"
 
 #: rocky/templates/oois/ooi_report.html
 #, python-format
@@ -5098,6 +5899,10 @@ msgid "Clearance level inheritance"
 msgstr "Herensia di nivel di autorisashon"
 
 #: rocky/templates/partials/explanations.html
+msgid "OOI"
+msgstr "OOI"
+
+#: rocky/templates/partials/explanations.html
 msgid "Origin"
 msgstr "Origen"
 
@@ -5111,7 +5916,6 @@ msgstr "Reprodusí"
 
 #: rocky/templates/partials/form/checkbox_group_table_form.html
 #, fuzzy
-#| msgid "Please enable plugin to start scanning"
 msgid "Please enable plugin to start scanning."
 msgstr "Por fabor sende plugin prome ku kuminsa start ku skan"
 
@@ -5294,6 +6098,7 @@ msgid "Upload CSV"
 msgstr "Subi CSV"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
+#: reports/report_types/aggregate_organisation_report/introduction.html
 msgid "Export"
 msgstr "Exportá"
 
@@ -5314,11 +6119,6 @@ msgstr "%(total)s diskubrimentunan na %(name)s"
 #, python-format
 msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
 msgstr "Diskubrimentu pa %(type)s %(name)s na %(observed_at)s:"
-
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Risk level"
-msgstr "Nivél di rièsgo"
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Open finding details"
@@ -5342,9 +6142,9 @@ msgstr ""
 msgid "Total occurrences"
 msgstr "Occurencianan totál"
 
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrence"
-msgstr "Occurencia"
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
+msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Unique"
@@ -5455,9 +6255,10 @@ msgid "Success"
 msgstr "Èxito"
 
 #: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/stats.html
 #: rocky/templates/tasks/partials/task_filter.html
-msgid "Failure"
-msgstr "Failure"
+msgid "Failed"
+msgstr ""
 
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/task_filter.html
@@ -5628,6 +6429,50 @@ msgstr "Normalizer"
 msgid "Boefje input OOI"
 msgstr "Opheto di Entrada \"Boefje\""
 
+#: rocky/templates/tasks/partials/stats.html
+msgid "Stats - Last 24 hours"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "All times in UTC, blocks of 1 hour."
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Timeslot"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Pending"
+msgstr "Pendiente"
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Queued"
+msgstr "Enfila"
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Dispatched"
+msgstr "Despachá"
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Running"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Completed"
+msgstr "Kompletá"
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Cancelled"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Could not load stats, Scheduler error."
+msgstr ""
+
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
 msgstr "Lista di tareanan"
@@ -5635,22 +6480,6 @@ msgstr "Lista di tareanan"
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "all"
 msgstr "tur"
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Pending"
-msgstr "Pendiente"
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Queued"
-msgstr "Enfila"
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Dispatched"
-msgstr "Despachá"
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Completed"
-msgstr "Kompletá"
 
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Log in"
@@ -5938,22 +6767,6 @@ msgstr ""
 #: rocky/views/finding_add.py
 msgid "Add Finding"
 msgstr "Añadí Diskubrimentu"
-
-#: rocky/views/health.py
-msgid "Could not connect to Bytes. Service is possibly down"
-msgstr "No por konektá ku Bytes. Servicio ta down"
-
-#: rocky/views/health.py
-msgid "Could not connect to Octopoes. Service is possibly down"
-msgstr "No por konektá ku Octopoes. Servicio ta down"
-
-#: rocky/views/health.py
-msgid "Could not connect to Scheduler. Service is possibly down"
-msgstr "No por konektá ku Scheduler. Servicio ta down"
-
-#: rocky/views/health.py
-msgid "Rocky will not function properly. Not all services are healthy."
-msgstr "Rocky no lo functiona mane debe ser. No tur servicio ta saludabel."
 
 #: rocky/views/health.py
 msgid "Beautified"
@@ -6272,10 +7085,6 @@ msgid "Reset"
 msgstr "Resèt"
 
 #: rocky/views/tasks.py
-msgid "Task details not found."
-msgstr "Detayes di tarea no por wordu haña."
-
-#: rocky/views/tasks.py
 msgid "Fetching tasks failed: no connection with scheduler"
 msgstr "No por haña tarea: no tin konekshon ku scheduler"
 
@@ -6319,6 +7128,33 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "Scan OOI"
+#~ msgstr "Skèn OOI"
+
+#~ msgid "Selected OOIs:"
+#~ msgstr "OOI's selektá:"
+
+#~ msgid "Session has terminated, please select OOIs again."
+#~ msgstr "Seshon a wòrdu tèrminá. Por fabor selekta OOIs dinobo."
+
+#~ msgid "Could not connect to Bytes. Service is possibly down"
+#~ msgstr "No por konektá ku Bytes. Servicio ta down"
+
+#~ msgid "Could not connect to Octopoes. Service is possibly down"
+#~ msgstr "No por konektá ku Octopoes. Servicio ta down"
+
+#~ msgid "Could not connect to Scheduler. Service is possibly down"
+#~ msgstr "No por konektá ku Scheduler. Servicio ta down"
+
+#~ msgid "Rocky will not function properly. Not all services are healthy."
+#~ msgstr "Rocky no lo functiona mane debe ser. No tur servicio ta saludabel."
+
+#~ msgid "Failure"
+#~ msgstr "Failure"
+
+#~ msgid "Task details not found."
+#~ msgstr "Detayes di tarea no por wordu haña."
 
 #~ msgid "This name we will use to communicate with you."
 #~ msgstr "E nomber aki nos lo huza pa komuniká ku bo."

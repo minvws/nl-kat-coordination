@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-19 13:30+0000\n"
+"POT-Creation-Date: 2024-01-03 13:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -556,6 +556,7 @@ msgstr ""
 #: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_summary.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
@@ -722,8 +723,10 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
-#: fmea/models.py reports/templates/summary/service_health.html
-#: rocky/templates/footer.html rocky/templates/health.html
+#: fmea/models.py
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
 msgid "Service"
 msgstr ""
 
@@ -1071,6 +1074,7 @@ msgstr ""
 #: fmea/templates/fmea/fmea_failure_mode_report.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
+#: reports/report_types/multi_organization_report/summary.html
 #: reports/templates/summary/report_summary.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
@@ -1306,7 +1310,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Scan OOI"
+msgid "Scan object"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -1318,13 +1322,14 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Selected OOIs:"
+msgid "Selected objects:"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/partials/explanations.html
-msgid "OOI"
+#: reports/templates/summary/ooi_selection.html
+#: rocky/templates/partials/task_history.html
+msgid "Object"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
@@ -1559,16 +1564,19 @@ msgid "Plugins overview:"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin name"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin type"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Plugin description"
 msgstr ""
@@ -1697,7 +1705,7 @@ msgid "No"
 msgstr ""
 
 #: katalogus/views/change_clearance_level.py
-msgid "Session has terminated, please select OOIs again."
+msgid "Session has terminated, please select objects again."
 msgstr ""
 
 #: katalogus/views/change_clearance_level.py
@@ -2240,6 +2248,7 @@ msgstr ""
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Setup scan"
 msgstr ""
 
@@ -2338,6 +2347,7 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/explanations.html
@@ -2685,12 +2695,95 @@ msgstr ""
 msgid "Report types"
 msgstr ""
 
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/multi_organization_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Appendix"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Selected objects"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_summary.html
+msgid "Selected Report Types"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Report type"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Selected Plugins"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin options"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_summary.html
+msgid "Plugin scan level"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Service Versions and Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/health.html
+msgid "Version"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/footer.html rocky/views/health.py
+msgid "Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: rocky/templates/health.html
+msgid "Healthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Unhealthy"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Used Config objects"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Primary Key"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Bit ID"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Config"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "No config objects found."
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
+#: reports/report_types/multi_organization_report/asset_overview.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Asset overview"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
+#: reports/report_types/multi_organization_report/asset_overview.html
 msgid ""
 "An overview of the manually released scanned assets. Assets in <strong>bold</"
 "strong> are taken as a starting point, assets that are not in bold were "
@@ -2705,10 +2798,7 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 msgid ""
 "In this chapter, first a table of compliance checks is displayed, followed "
-"by a detailed examination of compliance issues for each component. For each "
-"of these components, two percentages are provided: one indicating the level "
-"of basic security in place (higher is better), and the other showing how "
-"well this compares to other scanned organizations in the sector (median)."
+"by a detailed examination of compliance issues for each component."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
@@ -2723,18 +2813,19 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
-#: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview:"
+msgid "Basic security status:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 #: reports/report_types/ipv6_report/report.html
+#: reports/report_types/multi_organization_report/ipv6.html
 #: reports/report_types/systems_report/report.html
 msgid "System type"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Safe connections"
 msgstr ""
@@ -2748,6 +2839,9 @@ msgid "RPKI"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
 msgid "server"
 msgstr ""
 
@@ -2756,8 +2850,18 @@ msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/templates/generate_report.html
-msgid "Download report"
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Export"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+#: rocky/templates/oois/ooi_report.html
+#: rocky/templates/partials/findings_list_toolbar.html
+msgid "Download PDF"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+msgid "Download JSON"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -2766,26 +2870,26 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
 msgid "Observed at:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
 msgid "Created by:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
+#: reports/report_types/multi_organization_report/recommendations.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Recommendations"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
-msgid "There are no recommendations."
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/recommendations.html
+#: reports/report_types/multi_organization_report/recommendations.html
 #, python-format
 msgid "There is <i>%(total_findings)s</i> vulnerability"
 msgid_plural "There are <i>%(total_findings)s</i> vulnerabilities"
@@ -2793,13 +2897,20 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
+#: reports/report_types/multi_organization_report/recommendations.html
 #, python-format
 msgid "found on <i>%(total_systems)s</i> system."
 msgid_plural "found on <i>%(total_systems)s</i> systems."
 msgstr[0] ""
 msgstr[1] ""
 
+#: reports/report_types/aggregate_organisation_report/recommendations.html
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "There are no recommendations."
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/report_types/safe_connections_report/report.html
 msgid ""
 "In this chapter we check if the connections of all the IP ports of the "
@@ -2816,6 +2927,7 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
 msgid ""
 "This is where checks are done that are specific to system types. Different "
 "security and compliance issues come into play for different systems. They "
@@ -2823,12 +2935,14 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/report_types/rpki_report/report.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Resource Public Key Infrastructure"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/report_types/rpki_report/report.html
 msgid ""
 "This section contains basic security information about resource public key "
@@ -2840,6 +2954,7 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/multi_organization_report/vulnerabilities.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Vulnerabilities"
@@ -2851,6 +2966,7 @@ msgid "Vulnerabilities found are grouped per system."
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
+#: reports/report_types/multi_organization_report/vulnerabilities.html
 msgid "No CVEs have been found."
 msgstr ""
 
@@ -2876,6 +2992,7 @@ msgid "vulnerabilities on this system"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
 msgid "System specific checks"
 msgstr ""
 
@@ -2894,6 +3011,7 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/mail_report/report.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
@@ -2918,6 +3036,13 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
+#: reports/report_types/web_system_report/report.html
+msgid "Findings:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/web_system_report/report.html
@@ -2937,7 +3062,8 @@ msgid "Risk level"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
-msgid "Term overview"
+#: reports/templates/partials/report_sidemenu.html
+msgid "Term Overview"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/term_overview.html
@@ -3055,10 +3181,15 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
+#: reports/report_types/multi_organization_report/ipv6.html
 msgid ""
 "IPv6 includes improvements in security features compared to IPv4. While IPv4 "
 "can implement security measures, IPv6 was designed with security in mind, "
 "and its adoption can contribute to a more secure internet."
+msgstr ""
+
+#: reports/report_types/ipv6_report/report.html
+msgid "IPV6 overview:"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -3075,6 +3206,10 @@ msgid "Check whether hostnames point to ipv6 addresses."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
+msgid "Mailserver compliance:"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
 msgid "mailservers compliant"
 msgstr ""
 
@@ -3085,6 +3220,169 @@ msgstr ""
 #: reports/report_types/mail_report/report.py
 msgid ""
 "System specific mail report that focusses on IP addresses and hostnames."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Overview of included assets"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Asset"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid "Amount"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "IP addresses"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Domain names"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Assets with most critical vulnerabilities"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Vulnerability"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid "Organisation"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/basic_security_details.html
+msgid "Overview of safe connections"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/report_types/safe_connections_report/report.html
+msgid "Only Safe Ciphers"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/basic_security_details.html
+#: reports/report_types/safe_connections_report/report.html
+msgid "services are compliant"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+#: reports/templates/generate_report.html
+msgid "Download report"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "This is the OpenKAT Sector rapport."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "This sector contains"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "Scanned organizations."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "Of these organizations"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "organizations have tag"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "The basic security scores are around "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "A total of "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid " critical vulnerabilities have been identified."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid "IPv6"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid "In total "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid " out of "
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid " systems have an IPv6 connection."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid "Overview of ip version compliance"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid ""
+"See an overview of open ports found over all systems and the services these "
+"systems provide."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid "Overview of detected open ports"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+#: reports/report_types/open_ports_report/report.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Open ports"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid "Occurrences (IP addressees)"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/open_ports.html
+msgid "Services"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Overview of recommendations"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Recommendation"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/recommendations.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrence"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/report.py
+msgid "Multi Organization Report"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+msgid ""
+"Vulnerabilities found are grouped per system. Here, we only consider CVE "
+"vulnerabilities."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+msgid "Vulnerabilities grouped per system."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/vulnerabilities.html
+msgid "total"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "Name server compliance:"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
@@ -3110,11 +3408,6 @@ msgstr ""
 
 #: reports/report_types/name_server_report/report.py
 msgid "Name server report checks name servers on basic security standards."
-msgstr ""
-
-#: reports/report_types/open_ports_report/report.html
-#: reports/templates/partials/report_sidemenu.html
-msgid "Open ports"
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
@@ -3151,7 +3444,7 @@ msgid "Find open ports of IP addresses"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
-msgid "RPKI overview:"
+msgid "RPKI compliance:"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
@@ -3185,11 +3478,7 @@ msgid "Safe Connections"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
-msgid "Only Safe Ciphers"
-msgstr ""
-
-#: reports/report_types/safe_connections_report/report.html
-msgid "services are compliant"
+msgid "Safe connections compliance:"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.py
@@ -3201,7 +3490,7 @@ msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
-msgid "Overzicht Handmatig gevrijwaarde gescande assets:"
+msgid "Selected assets:"
 msgstr ""
 
 #: reports/report_types/systems_report/report.py
@@ -3210,6 +3499,10 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Ciphers:"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3253,6 +3546,7 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -3275,7 +3569,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-msgid "Basic example table:"
+msgid "Vulnerabilities:"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
@@ -3335,6 +3629,10 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Evidence"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Web system compliance:"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3417,9 +3715,13 @@ msgstr ""
 msgid "Aggregate Report"
 msgstr ""
 
+#: reports/templates/partials/report_navigation.html
+msgid "Multi Report"
+msgstr ""
+
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select OOI"
-msgid_plural "Select OOIs"
+msgid "Select object"
+msgid_plural "Select objects"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3435,7 +3737,18 @@ msgid "Filter"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "No OOIs found."
+#: rocky/templates/oois/ooi_list.html
+msgid "Currently filtered on:"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "No objects found."
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3443,7 +3756,8 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "OOI-Type"
+#: reports/templates/summary/ooi_selection.html
+msgid "Objects:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3514,6 +3828,14 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
+#: reports/templates/partials/report_sidemenu.html
+msgid "Selected Objects"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
+msgid "Used Config Objects"
+msgstr ""
+
 #: reports/templates/partials/report_types_selection.html
 msgid "Choose report types"
 msgstr ""
@@ -3550,37 +3872,12 @@ msgstr ""
 msgid "Continue with selection"
 msgstr ""
 
-#: reports/templates/summary/ooi_selection.html
-#: rocky/templates/partials/task_history.html
-msgid "Object"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Selected OOIs"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Selected Report Types"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Report type"
-msgstr ""
-
 #: reports/templates/summary/report_summary.html
 msgid "Selected Plugins for scans"
 msgstr ""
 
-#: reports/templates/summary/report_summary.html
-msgid "Plugin options"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Plugin scan level"
-msgstr ""
-
-#: reports/templates/summary/service_health.html rocky/templates/health.html
-msgid "Version"
+#: reports/templates/summary/service_health.html
+msgid "Services:"
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -3588,27 +3885,39 @@ msgid "Aggregate report"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select OOIs"
+msgid "Select Objects"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Select report types"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "View report"
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Select at least one OOI to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/generate_report.py
 msgid "This report may not show all the data as some plugins are not enabled."
+msgstr ""
+
+#: reports/views/multi_report.py
+msgid "Multi report"
+msgstr ""
+
+#: reports/views/multi_report.py
+msgid "Select OOIs"
 msgstr ""
 
 #: tools/forms/base.py
@@ -3843,7 +4152,6 @@ msgid "Declared"
 msgstr ""
 
 #: tools/forms/settings.py
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Inherited"
 msgstr ""
 
@@ -4433,10 +4741,6 @@ msgstr ""
 msgid "Privacy Statement"
 msgstr ""
 
-#: rocky/templates/footer.html rocky/views/health.py
-msgid "Health"
-msgstr ""
-
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
 msgstr ""
@@ -4474,10 +4778,6 @@ msgstr ""
 
 #: rocky/templates/health.html
 msgid "Health Checks"
-msgstr ""
-
-#: rocky/templates/health.html
-msgid "Healthy"
 msgstr ""
 
 #: rocky/templates/health.html
@@ -4791,15 +5091,6 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
-msgid "Currently filtered on:"
-msgstr ""
-
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
-
-#: rocky/templates/oois/ooi_list.html
 msgid "Delete object(s)"
 msgstr ""
 
@@ -4851,11 +5142,6 @@ msgstr ""
 msgid ""
 "You will not be able to add Findings or other OOI's, this object has been "
 "deleted and is no longer available."
-msgstr ""
-
-#: rocky/templates/oois/ooi_report.html
-#: rocky/templates/partials/findings_list_toolbar.html
-msgid "Download PDF"
 msgstr ""
 
 #: rocky/templates/oois/ooi_report.html
@@ -5172,6 +5458,10 @@ msgid "Clearance level inheritance"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
+msgid "OOI"
+msgstr ""
+
+#: rocky/templates/partials/explanations.html
 msgid "Origin"
 msgstr ""
 
@@ -5361,10 +5651,6 @@ msgid "Upload CSV"
 msgstr ""
 
 #: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Export"
-msgstr ""
-
-#: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Download as JSON"
 msgstr ""
 
@@ -5402,8 +5688,8 @@ msgstr ""
 msgid "Total occurrences"
 msgstr ""
 
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrence"
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
@@ -5515,6 +5801,7 @@ msgid "Success"
 msgstr ""
 
 #: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/stats.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Failed"
 msgstr ""
@@ -5664,28 +5951,56 @@ msgstr ""
 msgid "Boefje input OOI"
 msgstr ""
 
+#: rocky/templates/tasks/partials/stats.html
+msgid "Stats - Last 24 hours"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "All times in UTC, blocks of 1 hour."
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Timeslot"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Pending"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Queued"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Dispatched"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Running"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+#: rocky/templates/tasks/partials/task_filter.html
+msgid "Completed"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Cancelled"
+msgstr ""
+
+#: rocky/templates/tasks/partials/stats.html
+msgid "Could not load stats, Scheduler error."
+msgstr ""
+
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
 msgstr ""
 
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "all"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Pending"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Queued"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Dispatched"
-msgstr ""
-
-#: rocky/templates/tasks/partials/task_filter.html
-msgid "Completed"
 msgstr ""
 
 #: rocky/templates/two_factor/_wizard_actions.html
@@ -5937,22 +6252,6 @@ msgstr ""
 
 #: rocky/views/finding_add.py
 msgid "Add Finding"
-msgstr ""
-
-#: rocky/views/health.py
-msgid "Could not connect to Bytes. Service is possibly down"
-msgstr ""
-
-#: rocky/views/health.py
-msgid "Could not connect to Octopoes. Service is possibly down"
-msgstr ""
-
-#: rocky/views/health.py
-msgid "Could not connect to Scheduler. Service is possibly down"
-msgstr ""
-
-#: rocky/views/health.py
-msgid "Rocky will not function properly. Not all services are healthy."
 msgstr ""
 
 #: rocky/views/health.py
