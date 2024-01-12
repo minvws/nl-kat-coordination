@@ -40,7 +40,7 @@ class DockerBoefjesRunner:
         self.boefje_meta.started_at = datetime.now(timezone.utc)
 
         try:
-            input_url = settings.boefje_api + "/api/v0/tasks/" + task_id
+            input_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
             container_logs = self.docker_client.containers.run(
                 image=self.boefje_resource.oci_image,
                 name="kat_boefje_" + task_id,
@@ -48,7 +48,7 @@ class DockerBoefjesRunner:
                 stdout=False,
                 stderr=True,
                 remove=True,
-                network=settings.boefje_docker_network,
+                network=settings.docker_network,
             )
 
             # save container log (stderr) to bytes
