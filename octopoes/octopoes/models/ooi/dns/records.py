@@ -164,7 +164,9 @@ class CAATAGS(Enum):
     IODEF = "iodef"
     CONTACTEMAIL = "contactemail"
     CONACTPHONE = "contactphone"
-
+    ISSUEVMC = "issuevmc"
+    ISSUEMAIL = "issuemail"
+    
     def __str__(self):
         return self.value
 
