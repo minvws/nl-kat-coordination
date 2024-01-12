@@ -1,6 +1,7 @@
 """Boefje script for getting dns records"""
 import json
 import logging
+import re
 from typing import List, Tuple, Union
 
 import dns.resolver
@@ -17,21 +18,28 @@ class ZoneNotFoundException(Exception):
     pass
 
 
+def get_record_types() -> List[str]:
+    dns_record_types = ["A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME"]
+    requested_record_types = getenv("RECORD_TYPES", False)
+    if not requested_record_types:
+        return dns_record_types
+    requested_record_types = re.sub("[^A-Za-z,]", requested_record_types.upper()).split(',')
+    return list(set(requested_record_types).intersection(set(dns_record_types))
+
+                
 def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     hostname = boefje_meta.arguments["input"]["name"]
 
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
-    resolver.nameservers = [str(settings.remote_ns)]
-
-    zone_soa_record = get_parent_zone_soa(resolver, requested_dns_name)
+    nameserver = getenv("REMOTE_NS", str(settings.remote_ns))
+    resolver.nameservers = [nameserver]
 
     answers = [
-        zone_soa_record,
+        get_parent_zone_soa(resolver, requested_dns_name),
     ]
 
-    dns_record_types = ["A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME"]
-    for type_ in dns_record_types:
+    for type_ in get_record_types():
         try:
             answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)
