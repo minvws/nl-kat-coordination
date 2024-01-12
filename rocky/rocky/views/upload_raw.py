@@ -27,7 +27,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             self.mime_types = unquote(kwargs["mime_type"])
         elif kwargs.get("mime_types"):
             self.mime_types = unquote(kwargs["mime_types"])
-    
+
     def get_initial(self):
         """
         Returns the initial data to use for forms on this view.
