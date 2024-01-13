@@ -1,10 +1,20 @@
 # Use this playbook to create an initial install of OpenKAT on Debian 12 (amd64 only at this time).
 # Please change the default_pw below, this is used for all internally used database connections
+#
+# Tested procedure:
+#   - Order Debian12 VM (hetzner)
+#   - apt update; apt install git ansible
+#   - git clone git@github.com:minvws/nl-kat-coordination.git (or https://github.com/minvws/nl-kat-coordination.git )
+#   - cd nl-kat-coordination/scripts/installation
+#   - ansible-playbook openkat.yaml
+#  Wait
+#  Create admin user with specified command
+#  visit http://127.0.0.1:8000/
 
 ---
 
 - name: OpenKat install on debian-12
-  hosts: all
+  hosts: localhost
   become: true
   become_user: root
   vars:
