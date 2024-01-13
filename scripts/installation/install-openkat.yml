@@ -1,6 +1,5 @@
-#
 # Copyright (C) 2023  Jeroen Baten <jbaten@i2rs.nl>
-#
+# Copyright 2024: Mark Janssen -- Sig-I/O Automatisering
 #
 # Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the
 # European Commission - subsequent versions of the EUPL (the "Licence");
@@ -14,17 +13,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the Licence for the specific language governing permissions and limitations under the Licence.
 #
-# Changelog
-# Date       Author   Comments
-# ===========================================================================
-# 2023-08-12 J. Baten Initial version
-# 2023-08-14 J. Baten Debugging. Hacking Superadmin password to support
-#                     current stable standard Ansible
-# 2023-09-16 J. Baten Inject variables for version numbers, and prepare for MR.
-# 2023-11-19 J. Baten Handling MR feedback.
-# 2023-12-06 J. Baten Handling more MR feedback.
-# 2023-10-13 J. Baten Handling more MR feedback.
-
 # Usage: Make sure you can ssh to the root account on the remote server using
 #        authorized_keys. After that run the following command (and don't forget
 #        the comma!
@@ -42,6 +30,7 @@
     katrelease: "1.11.0"
     xtdbrelease: "1.0.7"
     arch: "amd64"
+    kat_default_pw: "dummy"
 
   tasks:
 
@@ -55,34 +44,45 @@
       # Generate unique passwords for several services.
       # Turns out that special characters create problems!
       #var: "{{ lookup('community.general.random_string', length=20, min_numeric=3, min_upper=3, min_special=3) }}"
-      rocky_db_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
+      rocky_db_password: "{{ kat_default_pw | default( lookup('password', '/dev/null', length=20, chars=['ascii_letters'] )) }}"
       # Generate a unique secure password for the KAT-alogus database user. You can use the same method we used for generating the Rocky database user password.
-      kat_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
-      bytes_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
-      mula_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}"
+      kat_password: "{{ kat_default_pw | default( lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) ) }}"
+      bytes_password: "{{ kat_default_pw | default( lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) ) }}"
+      mula_password: "{{ kat_default_pw | default( lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) ) }}"
       # The next password needs minimum 2 uppercase, 2 lowercase and 2 special characties.
       # Because community.general.random_string is only available in recent versions of Ansible we fix these mandatory syntax rules this way.
-      admin_password: "{{ lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) }}AaBb12-_!"
+      admin_password: "{{ kat_default_pw | default( lookup('password', '/dev/null', length=20, chars=['ascii_letters'] ) ) }}"
       # DJANGO_CSRF_TRUSTED_ORIGINS="https://openkat.example.org"
       # TODO read IPv4 and IPv6 dict of IP's and add them all here separated with a comma.
       django_csrf: "https://{{ ansible_default_ipv4.address }}"
       # Generate a safe password for the KAT user in rabbitmq. You can use the /dev/urandom method again and put it in a shell variable to use it later:
       # rabbitmq_pass=$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 20). Well, you can, but this works too. :-)
-      kat_mq_password: "{{ lookup('password', '/dev/null length=20 chars=ascii_letters') }}"
+      kat_mq_password: "{{ kat_default_pw | default( lookup('password', '/dev/null length=20 chars=ascii_letters') ) }}"
+    tags:
+      - always
 
   # If you will be running the database on the same machine as KAT, you can install Postgres:
   # sudo apt install postgresql
   - name: Install needed packages
     ansible.builtin.apt:
-      name: "{{ item }}"
       state: present
-    loop:
-      - python3-psycopg2
-      - python3-pexpect
-      - postgresql
-      - postgresql-client
+      pkg:
+        - python3-psycopg2
+        - python3-pexpect
+        - postgresql
+        - postgresql-15
+        - postgresql-client
+        - postgresql-client-15
+        - rabbitmq-server
+
+  - name: Enable services
+    ansible.builtin.systemd:
+      name: "{{ item }}"
+      enabled: true
+      state: started
+    with_items:
+      - postgresql@15-main
       - rabbitmq-server
-      - sudo
 
   # Downloading and installing
   # Download the packages for all the components of KAT from GitHub. Also download the XTDB multinode package from GitHub.
@@ -120,8 +120,9 @@
   # sudo apt install --no-install-recommends ./kat-*_amd64.deb ./xtdb-http-multinode_*_all.deb
   - name: Install all needed packages
     ansible.builtin.apt:
-      deb: "/tmp/{{ item }}"
       install_recommends: false
+      state: present
+      deb: "/tmp/{{ item }}"
     loop:
       - "kat-boefjes_{{ katrelease }}_{{ arch }}.deb"
       - "kat-bytes_{{ katrelease }}_{{ arch }}.deb"
@@ -292,11 +293,12 @@
     ansible.builtin.expect:
       command: /usr/bin/rocky-cli createsuperuser
       echo: yes
+      timeout: 10
       responses:
         "Email.*": "root@localhost.local"
         "Full name.*": "Superadmin account"
         "Password.*": "{{ admin_password }}"
-        "Password (again.*": "{{ admin_password }}"
+        "Password.*agai": "{{ admin_password }}"
         "Bypass password validation and create user anyway.*": "y"
     ignore_errors: yes
 
@@ -316,11 +318,11 @@
   # Is already done.
   # By default RabbitMQ will listen on all interfaces. For a single node setup this is not what we want. To prevent RabbitMQ from being accessed from the internet add the following lines to /etc/rabbitmq/rabbitmq-env.conf:
   # export ERL_EPMD_ADDRESS=127.0.0.1
-  - name: Change ERL_EPMD_ADDRESS in RabbitMQ settings
-    ansible.builtin.lineinfile:
-      path: /etc/rabbitmq/rabbitmq-env.conf
-      regexp: "ERL_EPMD_ADDRESS=.*"
-      line:  "ERL_EPMD_ADDRESS=127.0.0.1"
+  #  - name: Change ERL_EPMD_ADDRESS in RabbitMQ settings
+  #  ansible.builtin.lineinfile:
+  #    path: /etc/rabbitmq/rabbitmq-env.conf
+  #    regexp: "ERL_EPMD_ADDRESS=.*"
+  #    line:  "ERL_EPMD_ADDRESS=127.0.0.1"
 
   # export NODENAME=rabbit@localhost
   - name: Change NODENAME in RabbitMQ settings
@@ -338,9 +340,10 @@
 
   # Stop epmd:
   # sudo epmd -kill
-  - name: Stop epmd
-    ansible.builtin.shell:
-      cmd: /usr/bin/epmd -kill
+  - name: Stop and disable epmd
+    ansible.builtin.systemd:
+      name: epmd
+      state: stopped
 
   # Create a new file /etc/rabbitmq/rabbitmq.conf and add the following lines:
   # listeners.tcp.local = 127.0.0.1:5672
@@ -377,21 +380,26 @@
       state: started
 
   # Add the ‘kat’ vhost
+  - name: Create rabbitmq-virtual host
+    community.rabbitmq.rabbitmq_vhost:
+      name: "kat"
+      node: rabbit
+      state: present
+    tags:
+      - rabbitmqvhost
+
   # Now create a KAT user for RabbitMQ, create the virtual host and set the permissions:
   # sudo rabbitmqctl add_user kat ${rabbitmq_pass}
   - name: Create KAT user for RabbitMQ
-    ansible.builtin.shell:
-      cmd: "rabbitmqctl add_user kat {{ kat_mq_password }}"
-
-  # sudo rabbitmqctl add_vhost kat
-  - name: Create virtual host
-    ansible.builtin.shell:
-      cmd: rabbitmqctl add_vhost kat
-
-  # sudo rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
-  - name: Set permissions in RabbitMQ for kat user
-    ansible.builtin.shell:
-      cmd: rabbitmqctl set_permissions -p "kat" "kat" ".*" ".*" ".*"
+    community.rabbitmq.rabbitmq_user:
+      user: "kat"
+      password: "{{ kat_mq_password }}"
+      permissions:
+        - vhost: "/kat"
+          configure_priv: .*
+          read_priv: .*
+          write_priv: .*
+      state: present
 
   # Now configure KAT to use the vhost we created and with the kat user. To do this, update the following settings for /etc/kat/mula.conf:
   # SCHEDULER_RABBITMQ_DSN=amqp://kat:<password>@127.0.0.1:5672/kat
