@@ -33,6 +33,13 @@
       msg: "This playbook only works for a Debian 12 server. But this is a {{ ansible_facts['distribution'] ansible_facts['distribution_major_version'] }} server."
     when: not ( ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "12" )
 
+  - name: Create 'kat' application user
+    ansible.builtin.user:
+      name: "kat"
+      system: true
+      home: "/home/kat"
+      state: present
+
   - name: Install required packages
     ansible.builtin.apt:
       state: present
@@ -149,7 +156,7 @@
 
   - name: Create rabbitmq-virtual host
     community.rabbitmq.rabbitmq_vhost:
-      name: "/kat"
+      name: "kat"
       state: present
     tags:
       - rabbitmqvhost
@@ -159,7 +166,7 @@
       user: "kat"
       password: "{{ default_pw }}"
       permissions:
-        - vhost: "/kat"
+        - vhost: "kat"
           configure_priv: .*
           read_priv: .*
           write_priv: .*
