@@ -27,190 +27,187 @@
     admin_email: "admin@openkat.local"
 
   tasks:
+    - name: First let's check if this is indeed a Debian 12 server.
+      ansible.builtin.fail:
+        msg: "This playbook only works for a Debian 12 server. But this is a {{ ansible_distribution }} {{ distribution_major_version }} server."
+      when:
+        - ansible_facts['distribution'] != "Debian"
+        - ansible_facts['distribution_major_version'] != "12" )
 
-  - name: First let's check if this is indeed a Debian 12 server.
-    ansible.builtin.fail:
-      msg: "This playbook only works for a Debian 12 server. But this is a {{ ansible_facts['distribution'] ansible_facts['distribution_major_version'] }} server."
-    when: not ( ansible_facts['distribution'] == "Debian" and ansible_facts['distribution_major_version'] == "12" )
+    - name: Create 'kat' application user
+      ansible.builtin.user:
+        name: "kat"
+        system: true
+        home: "/home/kat"
+        state: present
 
-  - name: Create 'kat' application user
-    ansible.builtin.user:
-      name: "kat"
-      system: true
-      home: "/home/kat"
-      state: present
+    - name: Install required packages
+      ansible.builtin.apt:
+        state: present
+        pkg:
+          - python3-psycopg2
+          - python3-pexpect
+          - postgresql
+          - postgresql-client
+          - rabbitmq-server
+          - expect
+          - libpango-1.0-0
+          - libpangoft2-1.0-0
 
-  - name: Install required packages
-    ansible.builtin.apt:
-      state: present
-      pkg:
-        - python3-psycopg2
-        - python3-pexpect
-        - postgresql
-        - postgresql-client
+    - name: Make sure required services are running
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      with_items:
+        - postgresql@15-main
         - rabbitmq-server
-        - expect
-        - libpango-1.0-0
-        - libpangoft2-1.0-0
 
-  - name: Make sure required services are running
-    ansible.builtin.systemd:
-      name: "{{ item }}"
-      enabled: true
-      state: started
-    with_items:
-      - postgresql@15-main
-      - rabbitmq-server
+    - name: "Download kat packages our Debian 12 server"
+      ansible.builtin.get_url:
+        url: "{{ item }}"
+        dest: /tmp
+        mode: '0440'
+      loop:
+        - "https://github.com/minvws/nl-kat-coordination/releases/download/v{{ kat_version }}/kat-debian12-{{ kat_version }}.tar.gz"
+        - "https://github.com/dekkers/xtdb-http-multinode/releases/download/v{{ xtdb_version }}/xtdb-http-multinode_{{ xtdb_version }}_all.deb"
 
-  - name: "Download kat packages our Debian 12 server"
-    ansible.builtin.get_url:
-      url: "{{ item }}"
-      dest: /tmp
-      mode: '0440'
-    loop:
-      - "https://github.com/minvws/nl-kat-coordination/releases/download/v{{ kat_version }}/kat-debian12-{{ kat_version }}.tar.gz"
-      - "https://github.com/dekkers/xtdb-http-multinode/releases/download/v{{ xtdb_version }}/xtdb-http-multinode_{{ xtdb_version }}_all.deb"
+    - name: Unpack tar OpenKAT file
+      ansible.builtin.unarchive:
+        src: "/tmp/kat-debian12-{{ kat_version }}.tar.gz"
+        remote_src: true
+        dest: /tmp
+        creates: "/tmp/kat-rocky_{{ kat_version }}_{{ deb_arch }}.deb"
 
-  - name: Unpack tar OpenKAT file
-    ansible.builtin.unarchive:
-      src: "/tmp/kat-debian12-{{ kat_version }}.tar.gz"
-      remote_src: yes
-      dest: /tmp
-      creates: "/tmp/kat-rocky_{{ kat_version }}_{{ deb_arch }}.deb"
+    - name: Install all needed packages
+      ansible.builtin.apt:
+        install_recommends: false
+        state: present
+        deb: "/tmp/{{ item }}"
+      loop:
+        - "kat-boefjes_{{ kat_version }}_{{ deb_arch }}.deb"
+        - "kat-bytes_{{ kat_version }}_{{ deb_arch }}.deb"
+        - "kat-keiko_{{ kat_version }}_{{ deb_arch }}.deb"
+        - "kat-mula_{{ kat_version }}_{{ deb_arch }}.deb"
+        - "kat-octopoes_{{ kat_version }}_{{ deb_arch }}.deb"
+        - "kat-rocky_{{ kat_version }}_{{ deb_arch }}.deb"
+        - "xtdb-http-multinode_{{ xtdb_version }}_all.deb"
 
-  - name: Install all needed packages
-    ansible.builtin.apt:
-      install_recommends: false
-      state: present
-      deb: "/tmp/{{ item }}"
-    loop:
-      - "kat-boefjes_{{ kat_version }}_{{ deb_arch }}.deb"
-      - "kat-bytes_{{ kat_version }}_{{ deb_arch }}.deb"
-      - "kat-keiko_{{ kat_version }}_{{ deb_arch }}.deb"
-      - "kat-mula_{{ kat_version }}_{{ deb_arch }}.deb"
-      - "kat-octopoes_{{ kat_version }}_{{ deb_arch }}.deb"
-      - "kat-rocky_{{ kat_version }}_{{ deb_arch }}.deb"
-      - "xtdb-http-multinode_{{ xtdb_version }}_all.deb"
+    - name: Template kat-configurations
+      ansible.builtin.lineinfile:
+        path: "/etc/kat/{{ item.name }}"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { name: "rocky.conf", regexp: "ROCKY_DB_PASSWORD=.*", line: "ROCKY_DB_PASSWORD={{ default_pw }}" }
+        - { name: "boefjes.conf", regexp: "KATALOGUS_DB_URI=.*", line: "KATALOGUS_DB_URI=postgresql://katalogus:{{ default_pw }}@localhost/katalogus_db" }
+        - { name: "mula.conf", regexp: "SCHEDULER_DB_URI=.*", line: "SCHEDULER_DB_URI=postgresql://mula:{{ default_pw }}@localhost/mula_db" }
+        - { name: "rocky.conf", regexp: "DJANGO_ALLOWED_HOSTS=.*", line: "DJANGO_ALLOWED_HOSTS=127.0.0.1" }
+        - { name: "rocky.conf", regexp: "DJANGO_CSRF_TRUSTED_ORIGINS=.*", line: "DJANGO_CSRF_TRUSTED_ORIGINS={{ django_csrf }}" }
+        - { name: "rocky.conf", regexp: "DEBUG=.*", line: "DEBUG={{ kat_debug | default('False') }}" }
+        - { name: "bytes.conf", regexp: "BYTES_DB_URI=.*", line: "BYTES_DB_URI=postgresql://bytes:{{ default_pw }}@localhost/bytes_db" }
+        - { name: "mula.conf", regexp: "SCHEDULER_RABBITMQ_DSN=.*", line: "SCHEDULER_RABBITMQ_DSN=amqp://kat:{{ default_pw }}@127.0.0.1:5672/kat" }
 
-  - name: Template kat-configurations
-    ansible.builtin.lineinfile:
-      path: "/etc/kat/{{ item.name }}"
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-    loop:
-      - { name: "rocky.conf", regexp: "ROCKY_DB_PASSWORD=.*", line: "ROCKY_DB_PASSWORD={{ default_pw }}" }
-      - { name: "boefjes.conf", regexp: "KATALOGUS_DB_URI=.*", line: "KATALOGUS_DB_URI=postgresql://katalogus:{{ default_pw }}@localhost/katalogus_db" }
-      - { name: "mula.conf", regexp: "SCHEDULER_DB_URI=.*", line: "SCHEDULER_DB_URI=postgresql://mula:{{ default_pw }}@localhost/mula_db" }
-      - { name: "rocky.conf", regexp: "DJANGO_ALLOWED_HOSTS=.*", line: "DJANGO_ALLOWED_HOSTS=127.0.0.1" }
-      - { name: "rocky.conf", regexp: "DJANGO_CSRF_TRUSTED_ORIGINS=.*", line: "DJANGO_CSRF_TRUSTED_ORIGINS={{ django_csrf }}" }
-      - { name: "rocky.conf", regexp: "DEBUG=.*", line: "DEBUG={{ kat_debug | default('False') }}" }
-      - { name: "bytes.conf", regexp: "BYTES_DB_URI=.*", line: "BYTES_DB_URI=postgresql://bytes:{{ default_pw }}@localhost/bytes_db" }
-      - { name: "mula.conf", regexp: "SCHEDULER_RABBITMQ_DSN=.*", line: "SCHEDULER_RABBITMQ_DSN=amqp://kat:{{ default_pw }}@127.0.0.1:5672/kat" }
+    - name: Update QUEUE_URI setting in rocky.conf, bytes.conf, boefjes.conf and octopoes.conf
+      ansible.builtin.lineinfile:
+        path: "/etc/kat/{{ item }}"
+        regexp: "QUEUE_URI=.*"
+        line: "QUEUE_URI=amqp://kat:{{ default_pw }}@127.0.0.1:5672/kat"
+      loop:
+        - rocky.conf
+        - bytes.conf
+        - boefjes.conf
+        - octopoes.conf
+        - mula.conf
 
-  - name: Update QUEUE_URI setting in rocky.conf, bytes.conf, boefjes.conf and octopoes.conf
-    ansible.builtin.lineinfile:
-      path: "/etc/kat/{{ item }}"
-      regexp: "QUEUE_URI=.*"
-      line:  "QUEUE_URI=amqp://kat:{{ default_pw }}@127.0.0.1:5672/kat"
-    loop:
-      - rocky.conf
-      - bytes.conf
-      - boefjes.conf
-      - octopoes.conf
-      - mula.conf
+    - name: Update BYTES_PASSWORD setting in rocky.conf, boefjes.conf and mula.conf
+      ansible.builtin.lineinfile:
+        path: "/etc/kat/{{ item }}"
+        regexp: "BYTES_PASSWORD=.*"
+        line: "BYTES_PASSWORD={{ default_pw }}"
+      loop:
+        - rocky.conf
+        - boefjes.conf
+        - mula.conf
 
-  - name: Update BYTES_PASSWORD setting in rocky.conf, boefjes.conf and mula.conf
-    ansible.builtin.lineinfile:
-      path: "/etc/kat/{{ item }}"
-      regexp: "BYTES_PASSWORD=.*"
-      line:  "BYTES_PASSWORD={{ default_pw }}"
-    loop:
-      - rocky.conf
-      - boefjes.conf
-      - mula.conf
+    - name: Create posrgres users
+      community.postgresql.postgresql_user:
+        name: "{{ item.name }}"
+        password: "{{ item.password }}"
+        role_attr_flags: NOSUPERUSER
+      become_user: postgres
+      loop:
+        - { name: "bytes", password: "{{ default_pw }}" }
+        - { name: "katalogus", password: "{{ default_pw }}" }
+        - { name: "mula", password: "{{ default_pw }}" }
+        - { name: "rocky", password: "{{ default_pw }}" }
 
-  - name: Create posrgres users
-    community.postgresql.postgresql_user:
-      name: "{{ item.name }}"
-      password: "{{ item.password }}"
-      role_attr_flags: NOSUPERUSER
-    become_user: postgres
-    loop:
-      - { name: "bytes", password: "{{ default_pw }}" }
-      - { name: "katalogus", password: "{{ default_pw }}" }
-      - { name: "mula", password: "{{ default_pw }}" }
-      - { name: "rocky", password: "{{ default_pw }}" }
+    - name: Create postgres databases
+      community.postgresql.postgresql_db:
+        name: "{{ item.dbname | default( item.owner ~ '_db' ) }}"
+        owner: "{{ item.owner }}"
+        encoding: "UTF-8"
+        template: "template0"
+      become_user: postgres
+      loop:
+        - { owner: "bytes" }
+        - { owner: "katalogus" }
+        - { owner: "mula" }
+        - { owner: "rocky" }
 
-  - name: Create postgres databases
-    community.postgresql.postgresql_db:
-      name: "{{ item.dbname | default( item.owner ~ '_db' ) }}"
-      owner: "{{ item.owner }}"
-      encoding: "UTF-8"
-      template: "template0"
-    become_user: postgres
-    loop:
-      - { owner: "bytes" }
-      - { owner: "katalogus" }
-      - { owner: "mula" }
-      - { owner: "rocky" }
+    - name: Create rabbitmq-virtual host
+      community.rabbitmq.rabbitmq_vhost:
+        name: "kat"
+        state: present
+      tags:
+        - rabbitmqvhost
 
-  - name: Create rabbitmq-virtual host
-    community.rabbitmq.rabbitmq_vhost:
-      name: "kat"
-      state: present
-    tags:
-      - rabbitmqvhost
+    - name: Create KAT user for RabbitMQ
+      community.rabbitmq.rabbitmq_user:
+        user: "kat"
+        password: "{{ default_pw }}"
+        permissions:
+          - vhost: "kat"
+            configure_priv: .*
+            read_priv: .*
+            write_priv: .*
+        state: present
 
-  - name: Create KAT user for RabbitMQ
-    community.rabbitmq.rabbitmq_user:
-      user: "kat"
-      password: "{{ default_pw }}"
-      permissions:
-        - vhost: "kat"
-          configure_priv: .*
-          read_priv: .*
-          write_priv: .*
-      state: present
+    - name: Run DB-Migrations
+      ansible.builtin.shell: # noqa no-changed-when command-instead-of-shell
+        cmd: "{{ item }}"
+      become_user: "kat"
+      become: true
+      loop:
+        - rocky-cli migrate
+        - update-bytes-db
+        - update-mula-db
+        - update-katalogus-db
+        - rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
+        - rocky-cli setup_dev_account
 
-  - name: Run DB-Migrations
-    ansible.builtin.shell:
-      cmd: "{{ item }}"
-    become_user: "kat"
-    become: true
-    loop:
-      - rocky-cli migrate
-      - update-bytes-db
-      - update-mula-db
-      - update-katalogus-db
-      - rocky-cli loaddata /usr/share/kat-rocky/OOI_database_seed.json
-      - rocky-cli setup_dev_account
+    - name: Re-Start kat-services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: restarted
+        enabled: true
+      loop:
+        - kat-mula
+        - kat-bytes
+        - kat-boefjes
+        - kat-normalizers
+        - kat-katalogus
+        - kat-keiko
+        - kat-octopoes
+        - kat-octopoes-worker
+        - kat-rocky
 
-  - name: Re-Start kat-services
-    ansible.builtin.systemd:
-      name: "{{ item }}"
-      state: restarted
-      enabled: true
-    loop:
-      - kat-mula
-      - kat-bytes
-      - kat-boefjes
-      - kat-normalizers
-      - kat-katalogus
-      - kat-keiko
-      - kat-octopoes
-      - kat-octopoes-worker
-      - kat-rocky
+    - name: Create rocky superuser (DIY)
+      ansible.builtin.debug:
+        msg: |
+          The OpenKAT install is now finished
+          Please run the following command to create the initial useraccount:
+            sudo -i -u kat /usr/bin/rocky-cli createsuperuser --email='{{ admin_email }}' --full_name='Superadmin'
+          Then OpenKAT should be usable on http://127.0.0.1:8000/
 
-  - name: Create rocky superuser (DIY)
-    ansible.builtin.debug:
-      msg: |
-        The OpenKAT install is now finished
-
-        Please run the following command to create the initial useraccount:
-
-          sudo -i -u kat /usr/bin/rocky-cli createsuperuser --email='{{ admin_email }}' --full_name='Superadmin'
-
-        Then OpenKAT should be usable on http://127.0.0.1:8000/
-
-
-
+...
