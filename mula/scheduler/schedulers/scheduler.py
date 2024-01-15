@@ -69,7 +69,7 @@ class Scheduler(abc.ABC):
         self.max_tries: int = max_tries
         self.callback: Optional[Callable[[], Any]] = callback
         self._last_activity: Optional[datetime] = None
-        self.job_ranker = rankers.JobDeadlineRanker(ctx=self.ctx)
+        self.deadline_ranker = rankers.JobDeadlineRanker(ctx=self.ctx)
 
         # Listeners
         self.listeners: Dict[str, connectors.listeners.Listener] = {}
@@ -366,7 +366,7 @@ class Scheduler(abc.ABC):
         if job is None:
             return
 
-        job.deadline_at = datetime.fromtimestamp(self.job_ranker.rank(job))
+        job.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(job))
         self.ctx.datastores.job_store.update_job(job)
 
     def is_space_on_queue(self) -> bool:

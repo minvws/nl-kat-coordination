@@ -62,9 +62,11 @@ class BoefjeScheduler(Scheduler):
             callback=callback,
         )
 
-        self.ranker = rankers.BoefjeRanker(
-            ctx=self.ctx,
-        )
+        # Priority ranker
+        self.priority_ranker = rankers.BoefjeRanker(self.ctx)
+
+        # Deadline ranker
+        self.deadline_ranker = rankers.DefaultDeadlineRanker(self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -776,7 +778,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         prior_tasks = self.ctx.datastores.task_store.get_tasks_by_hash(task.hash)
-        score = self.ranker.rank(
+        score = self.priority_ranker.rank(
             SimpleNamespace(
                 prior_tasks=prior_tasks,
                 task=task,

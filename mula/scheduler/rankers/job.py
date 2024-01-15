@@ -5,8 +5,16 @@ from typing import Any
 from .ranker import Ranker
 
 
-class JobDeadlineRanker(Ranker):
+class DefaultDeadlineRanker(Ranker):
     def rank(self, obj: Any) -> int:
+        """Create a deadline for a job
+
+        Args:
+            obj (Any): The object to rank
+
+        Returns:
+            int: The timestamp of the deadline
+        """
         # We at least delay a job by the grace period
         minimum = self.ctx.config.pq_grace_period
         deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)
