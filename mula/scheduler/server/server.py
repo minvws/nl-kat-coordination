@@ -5,7 +5,7 @@ import fastapi
 import prometheus_client
 import structlog
 import uvicorn
-from fastapi import status
+from fastapi import BackgroundTasks, status
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -620,7 +620,7 @@ class Server:
 
         return models.Task(**task.model_dump())
 
-    def patch_task(self, task_id: str, item: Dict) -> Any:
+    def patch_task(self, task_id: str, item: Dict, background_tasks: BackgroundTasks) -> Any:
         if len(item) == 0:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -653,7 +653,6 @@ class Server:
                 detail="failed to update task",
             ) from exc
 
-        # FIXME: perhaps handle this in the background?
         # Send signal event
         s = self.schedulers.get(updated_task.scheduler_id)
         if s is None:
@@ -662,7 +661,7 @@ class Server:
                 detail="scheduler not found",
             )
 
-        s.signal_handler_task(updated_task)
+        background_tasks.add_task(s.signal_handler_task, updated_task)
 
         return updated_task
 

@@ -1,6 +1,7 @@
 import abc
 import threading
 import time
+from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Dict, List, Optional
 
@@ -69,7 +70,7 @@ class Scheduler(abc.ABC):
         self.max_tries: int = max_tries
         self.callback: Optional[Callable[[], Any]] = callback
         self._last_activity: Optional[datetime] = None
-        self.deadline_ranker = rankers.JobDeadlineRanker(ctx=self.ctx)
+        self.deadline_ranker = rankers.DefaultDeadlineRanker(ctx=self.ctx)
 
         # Listeners
         self.listeners: Dict[str, connectors.listeners.Listener] = {}
@@ -78,6 +79,7 @@ class Scheduler(abc.ABC):
         self.lock: threading.Lock = threading.Lock()
         self.stop_event_threads: threading.Event = threading.Event()
         self.threads: List[thread.ThreadRunner] = []
+        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -362,12 +364,12 @@ class Scheduler(abc.ABC):
         if task.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
             return
 
-        job = self.ctx.datastores.job_store.get_job_by_hash(task.p_item.hash)
-        if job is None:
-            return
+        def _calculate_deadline(task: models.Task):
+            job = self.ctx.datastores.job_store.get_job_by_hash(task.p_item.hash)
+            job.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(job))
+            self.ctx.datastores.job_store.update_job(job)
 
-        job.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(job))
-        self.ctx.datastores.job_store.update_job(job)
+        self.executor.submit(_calculate_deadline, task)
 
     def is_space_on_queue(self) -> bool:
         """Check if there is space on the queue.

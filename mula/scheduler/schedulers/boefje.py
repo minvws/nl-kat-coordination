@@ -305,10 +305,6 @@ class BoefjeScheduler(Scheduler):
 
         with futures.ThreadPoolExecutor() as executor:
             for job in jobs:
-                # TODO: if we're not able to parse it because a faulty
-                # type of task was pushed by for instance the jobs endpoint
-                # we need to disable the job.
-
                 # Create a new task from the p_item spec of a job
                 try:
                     task = BoefjeTask.parse_obj(job.p_item.data)
@@ -321,6 +317,11 @@ class BoefjeScheduler(Scheduler):
                         scheduler_id=self.scheduler_id,
                         exc_info=exc,
                     )
+
+                    # If we're not able to parse it because a faulty type of
+                    # task was pushed by for instance the jobs endpoint we need
+                    # to disable the job.
+                    self.ctx.datastores.job_store.update_job_enabled(job.id, False)
                     continue
 
                 # Boefje still exists?
