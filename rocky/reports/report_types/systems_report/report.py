@@ -45,7 +45,7 @@ class SystemReport(Report):
                 "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
             )
         elif reference.class_type in (IPAddressV4, IPAddressV6):
-            ips = [self.octopoes_api_connector.get(reference)]
+            ips = [self.octopoes_api_connector.get(reference, valid_time)]
 
         ip_services = {}
 

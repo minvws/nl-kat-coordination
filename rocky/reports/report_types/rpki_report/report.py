@@ -30,7 +30,7 @@ class RPKIReport(Report):
                 "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
             )
         else:
-            ips = [self.octopoes_api_connector.get(reference)]
+            ips = [self.octopoes_api_connector.get(reference, valid_time)]
 
         rpki_ips = {}
         number_of_ips = len(ips)

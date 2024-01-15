@@ -70,7 +70,7 @@ class NameServerSystemReport(Report):
         hostnames = []
 
         if reference.class_type == Hostname:
-            hostnames = [self.octopoes_api_connector.get(reference)]
+            hostnames = [self.octopoes_api_connector.get(reference, valid_time)]
 
         elif reference.class_type in (IPAddressV4, IPAddressV6):
             hostnames = self.octopoes_api_connector.query(
