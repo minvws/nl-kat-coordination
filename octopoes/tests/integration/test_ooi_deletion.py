@@ -12,7 +12,7 @@ from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.service import OctopoesService
 from octopoes.events.events import OOIDBEvent, OriginDBEvent
-from octopoes.models import OOI, ScanLevel
+from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import NXDOMAIN, DNSARecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -37,10 +37,10 @@ def printer(arg1, arg2):
 @pytest.mark.xfail(reason="Issue #2083")
 def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="internet")
-    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time, level=ScanLevel.L2))
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
     url = "mispo.es"
     hostname = Hostname(network=network.reference, name=url)
-    octopoes_api_connector.save_declaration(Declaration(ooi=hostname, valid_time=valid_time, level=ScanLevel.L2))
+    octopoes_api_connector.save_declaration(Declaration(ooi=hostname, valid_time=valid_time))
 
     original_size = len(octopoes_api_connector.list_origins(task_id={}))
     assert original_size >= 2
