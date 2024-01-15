@@ -159,6 +159,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                         report_data[ooi][report_type.name] = {"data": data, "template": template}
             except ObjectNotFoundException:
                 error_oois.append(ooi)
+            except StopIteration:
+                error_oois.append(ooi)
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_oois:
             oois = ", ".join(set(error_oois))
