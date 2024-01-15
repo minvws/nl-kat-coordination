@@ -42,7 +42,7 @@ class UvicornServer(multiprocessing.Process):
 
 
 def run():
-    config = Config(app, host=settings.boefje_api_host, port=settings.boefje_api_port)
+    config = Config(app, host=settings.api_host, port=settings.api_port)
     instance = UvicornServer(config=config)
     instance.start()
     return instance
@@ -101,7 +101,7 @@ async def boefje_input(
 
     boefje_meta = create_boefje_meta(task, local_repository)
 
-    output_url = str(settings.boefje_api).rstrip("/") + f"/api/v0/tasks/{task_id}"
+    output_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
     return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=boefje_meta)
 
 
