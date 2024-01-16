@@ -95,7 +95,8 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         return ooi
 
     def get_ooi_from_csv(self, ooi_type_name: str, values: Dict[str, str]):
-        level = int(values["clearance"]) if "clearance" in values else 0
+        ckey = "clearance"
+        level = int(values[ckey]) if ckey in values and values[ckey] in list("01234") else None
         ooi_type = self.ooi_types[ooi_type_name]["type"]
         ooi_fields = [
             (field, model_field.annotation == Reference, model_field.is_required())
@@ -160,7 +161,8 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
                     self.octopoes_api_connector.save_declaration(
                         Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
                     )
-                    self.raise_clearance_level(ooi.reference, level)
+                    if isinstance(level, int):
+                        self.raise_clearance_level(ooi.reference, level)
                 except ValidationError:
                     rows_with_error.append(row_number)
 
