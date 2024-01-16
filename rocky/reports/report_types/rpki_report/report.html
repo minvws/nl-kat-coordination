@@ -72,25 +72,25 @@
                     {% if not info.valid %}
                         <tr>
                             <td>
-                                <span class="icon alert"></span>{% translate "RPKI record is not valid." %}
-                            </td>
-                            <td>
-                                <span class="low">Low</span>
-                            </td>
-                        </tr>
-                    {% endif %}
-                    {% if not info.exists %}
-                        <tr>
-                            <td>
-                                <span class="icon alert"></span>{% translate "RPKI record does not exist." %}
-                            </td>
-                            <td>
-                                <span class="low">Low</span>
-                            </td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        {% endif %}
-    {% endfor %}
+                            </span>{% translate "RPKI record is not valid." %}
+                        </td>
+                        <td>
+                            <span class="low">Low</span>
+                        </td>
+                    </tr>
+                {% endif %}
+                {% if not info.exists %}
+                    <tr>
+                        <td>
+                        </span>{% translate "RPKI record does not exist." %}
+                    </td>
+                    <td>
+                        <span class="low">Low</span>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+{% endif %}
+{% endfor %}
 {% endif %}
