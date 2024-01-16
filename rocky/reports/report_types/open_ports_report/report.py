@@ -30,7 +30,7 @@ class OpenPortsReport(Report):
                 return {}
             references = [ip.reference for ip in ips]
         else:
-            references = [ref]
+            references = [self.octopoes_api_connector.get(ref, valid_time)]
 
         results = {}
         for ref in references:
