@@ -54,6 +54,10 @@ services:
         condition: service_healthy
     env_file:
       - ".ci/ci-crux.env"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
 
   katalogus_mock:
     image: "wiremock/wiremock:2.34.0"
