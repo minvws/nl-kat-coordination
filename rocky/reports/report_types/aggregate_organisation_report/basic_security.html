@@ -50,7 +50,7 @@
                         {% if compliance.system_specific.total == 0 %}
                             -
                         {% else %}
-                            {% if compliance.safe_connections.number_of_compliant != compliance.safe_connections.total %}
+                            {% if compliance.system_specific.number_of_compliant != compliance.system_specific.total %}
                                 <span class="icon incomplete"></span>
                             {% else %}
                                 <span class="icon positive"></span>
@@ -62,7 +62,7 @@
                         {% if compliance.rpki.total == 0 %}
                             -
                         {% else %}
-                            {% if compliance.safe_connections.number_of_compliant != compliance.safe_connections.total %}
+                            {% if compliance.rpki.number_of_compliant != compliance.rpki.total %}
                                 <span class="icon incomplete"></span>
                             {% else %}
                                 <span class="icon positive"></span>
