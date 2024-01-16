@@ -24,7 +24,6 @@ class JobRequest(BaseModel):
     # TODO: not yet implemented, added as proof of concept
     rate_limit: Optional[RateLimit] = None
 
-    # TODO: not yet implemented, added as proof of concept
-    crontab: Optional[str] = None
+    cron_expression: Optional[str] = None
 
     deadline_at: Optional[datetime] = None

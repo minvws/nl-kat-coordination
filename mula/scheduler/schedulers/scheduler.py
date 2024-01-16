@@ -366,7 +366,17 @@ class Scheduler(abc.ABC):
 
         def _calculate_deadline(task: models.Task):
             job = self.ctx.datastores.job_store.get_job_by_hash(task.p_item.hash)
-            job.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(job))
+            try:
+                job.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(job))
+            except Exception:
+                self.logger.error(
+                    "Unable to calculate deadline for job %s. Disabling job",
+                    job.id,
+                    job_id=job.id,
+                    task_hash=task.p_item.hash,
+                    scheduler_id=self.scheduler_id,
+                )
+                job.enabled = False
             self.ctx.datastores.job_store.update_job(job)
 
         self.executor.submit(_calculate_deadline, task)

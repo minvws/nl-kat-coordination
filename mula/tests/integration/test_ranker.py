@@ -31,4 +31,25 @@ class DefaultDeadlineRanker(unittest.TestCase):
         self.dbconn.engine.dispose()
 
     def test_calculate_deadline(self):
-        self.ranker.rank(None)
+        deadline = self.ranker.rank(None)
+        self.assertIsNotNone(deadline)
+
+    def test_calculate_deadline_cron(self):
+        job = models.Job(
+            scheduler_id="test",
+            p_item=models.PrioritizedItem(hash="test", priority=1),
+            cron_expression="0 12 * * 1",  # every Monday at noon
+        )
+
+        deadline = self.ranker.rank(job)
+        self.assertIsNotNone(deadline)
+
+    def test_calculate_deadline_malformed(self):
+        job = models.Job(
+            scheduler_id="test",
+            p_item=models.PrioritizedItem(hash="test", priority=1),
+            cron_expression=".&^%$#",
+        )
+
+        with self.assertRaises(ValueError):
+            self.ranker.rank(job)

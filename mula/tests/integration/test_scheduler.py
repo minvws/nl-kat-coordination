@@ -258,3 +258,33 @@ class SchedulerTestCase(unittest.TestCase):
         updated_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
         updated_timestamp = updated_job_db.deadline_at
         self.assertEqual(initial_timestamp, updated_timestamp)
+
+    def test_signal_handler_malformed_cron_expression(self):
+        # Arrange
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
+
+        self.scheduler.push_item_to_queue(p_item)
+        self.scheduler.pop_item_from_queue()
+
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+
+        # Get job
+        initial_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
+
+        # Set cron expression to malformed
+        initial_job_db.cron_expression = ".&^%$#"
+        self.mock_ctx.datastores.job_store.update_job(initial_job_db)
+
+        # Set task to complete
+        task_db.status = models.TaskStatus.COMPLETED
+        self.mock_ctx.datastores.task_store.update_task(task_db)
+
+        # Act
+        self.scheduler.signal_handler_task(task_db)
+
+        # Assert: Job should be disabled
+        updated_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
+        self.assertFalse(updated_job_db.enabled)

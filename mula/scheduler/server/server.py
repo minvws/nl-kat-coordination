@@ -378,6 +378,15 @@ class Server:
                 detail=str(exc),
             ) from exc
 
+        # Validate job
+        try:
+            job.validate()
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            )
+
         try:
             created_job = self.ctx.datastores.job_store.create_job(job)
         except Exception as exc:
@@ -434,6 +443,15 @@ class Server:
             )
 
         updated_job = job_db.model_copy(update=item)
+
+        # Validate job
+        try:
+            updated_job.validate()
+        except Exception as exc:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(exc),
+            )
 
         # Update job in database
         try:

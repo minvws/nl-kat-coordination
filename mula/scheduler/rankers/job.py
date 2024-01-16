@@ -2,6 +2,8 @@ import random
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+from scheduler.utils import cron
+
 from .ranker import Ranker
 
 
@@ -15,6 +17,14 @@ class DefaultDeadlineRanker(Ranker):
         Returns:
             int: The timestamp of the deadline
         """
+        # Do we have a cron expression?
+        if obj is not None and obj.cron_expression:
+            try:
+                next_run = cron.next_run(obj.cron_expression)
+            except Exception as exc:
+                raise ValueError(f"Invalid cron expression: {obj.cron_expression}") from exc
+            return int(next_run.timestamp())
+
         # We at least delay a job by the grace period
         minimum = self.ctx.config.pq_grace_period
         deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)

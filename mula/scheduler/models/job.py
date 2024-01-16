@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from scheduler.utils import GUID
+from scheduler.utils import GUID, cron
 
 from .base import Base
 from .queue import PrioritizedItem
@@ -33,8 +33,7 @@ class Job(BaseModel):
     # TODO: not yet implemented, added as proof of concept
     rate_limit: Optional[RateLimit] = None
 
-    # TODO: not yet implemented, added as proof of concept
-    crontab: Optional[str] = None
+    cron_expression: Optional[str] = None
 
     deadline_at: Optional[datetime] = None
     evaluated_at: Optional[datetime] = None
@@ -42,6 +41,14 @@ class Job(BaseModel):
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # TODO: index on the p_item.hash
+
+    def validate(self):
+        """Validate the job model"""
+        if self.cron_expression is not None:
+            try:
+                cron.next_run(self.cron_expression)
+            except Exception as exc:
+                raise ValueError(f"Invalid cron expression: {self.cron_expression}") from exc
 
 
 class JobDB(Base):
@@ -53,7 +60,7 @@ class JobDB(Base):
     p_item = Column(JSONB, nullable=False)
     tasks = relationship("TaskDB", back_populates="job", order_by="TaskDB.created_at", cascade="all,delete-orphan")
     rate_limit = Column(JSONB, nullable=True)
-    crontab = Column(String, nullable=True)
+    cron_expression = Column(String, nullable=True)
 
     deadline_at = Column(
         DateTime(timezone=True),

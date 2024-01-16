@@ -2,7 +2,7 @@
 
 Revision ID: 0008
 Revises: 0007
-Create Date: 2024-01-09 15:00:50.975252
+Create Date: 2024-01-16 13:09:25.846897
 
 """
 import sqlalchemy as sa
@@ -27,7 +27,7 @@ def upgrade():
         sa.Column("enabled", sa.Boolean(), nullable=False),
         sa.Column("p_item", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column("rate_limit", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-        sa.Column("crontab", sa.String(), nullable=True),
+        sa.Column("cron_expression", sa.String(), nullable=True),
         sa.Column("deadline_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("evaluated_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),

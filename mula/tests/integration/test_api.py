@@ -700,6 +700,25 @@ class APIJobsEndpointTestCase(APITemplateTestCase):
         self.assertEqual(201, response_post.status_code)
         self.assertEqual(200, response_get.status_code)
 
+    def test_create_job_validate_malformed_cron_expresssion(self):
+        # Arrange
+        cron_expression = "malformed"
+
+        job = {
+            "job": models.Job(
+                scheduler_id=self.scheduler.scheduler_id,
+                p_item=functions.create_p_item("test_scheduler_id", 1),
+                cron_expression=cron_expression,
+            ).model_dump()
+        }
+
+        # Act
+        response_post = self.client.post("/jobs", data=json.dumps(job, cls=UUIDEncoder, default=str))
+
+        # Assert
+        self.assertEqual(400, response_post.status_code)
+        self.assertTrue(response_post.json().get("detail").startswith("Invalid cron expression"))
+
     def test_list_jobs(self):
         response = self.client.get("/jobs")
         self.assertEqual(200, response.status_code)
@@ -799,6 +818,11 @@ class APIJobsEndpointTestCase(APITemplateTestCase):
         response = self.client.patch(f"/jobs/{self.first_job_api.get('id')}", json={"enabled": False})
         self.assertEqual(200, response.status_code)
         self.assertEqual(False, response.json().get("enabled"))
+
+    def test_patch_job_validate_malformed_cron_expression(self):
+        response = self.client.patch(f"/jobs/{self.first_job_api.get('id')}", json={"cron_expression": "malformed"})
+        self.assertEqual(400, response.status_code)
+        self.assertTrue(response.json().get("detail").startswith("Invalid cron expression"))
 
     def test_delete_job(self):
         response = self.client.delete(f"/jobs/{self.first_job_api.get('id')}")
