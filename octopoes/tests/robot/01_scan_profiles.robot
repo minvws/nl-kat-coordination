@@ -33,7 +33,7 @@ Inheritance Of Two Declared Scan Profiles
     Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[0, 4]}}
     Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[0, 2]}}
     Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[0, 4]}}
-    Total Object Count Should Be    12
+    Total Object Count Should Be    14
 
 Recalculate Inheritance After Modification
     Declare Scan Profile    ${REF_HOSTNAME}    ${4}
