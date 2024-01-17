@@ -44,8 +44,9 @@ class MultiOrganizationReport(MultiReport):
         rpki_summary = {}
         ipv6 = {}
         recommendation_counts = {}
+        organization_metrics = {}
 
-        for report_data in data.values():
+        for organization, report_data in data.items():
             basic_security = {"compliant": 0, "total": 0}
 
             for tag in report_data["organization_tags"]:
@@ -119,7 +120,6 @@ class MultiOrganizationReport(MultiReport):
                     system_specific[service] = {"checks": {}, "total": 0}
 
                 system_specific[service]["total"] += summary["system_specific"]["total"]
-
                 for title, count in summary["system_specific"]["checks"].items():
                     if title not in system_specific[service]["checks"]:
                         system_specific[service]["checks"][title] = 0
@@ -155,6 +155,37 @@ class MultiOrganizationReport(MultiReport):
                     recommendation_counts[recommendation] = 0
 
                 recommendation_counts[recommendation] += 1
+
+            # Get metrics per organization for best and worst security score
+            ## Safe Connections
+            is_check_compliant = (
+                safe_connections_summary["number_of_available"] == safe_connections_summary["number_of_ips"]
+            )
+            organization_metrics.setdefault("Safe Ciphers", {})[organization] = is_check_compliant
+
+            ## System Specific
+            for value in system_specific.values():
+                for check, count in value["checks"].items():
+                    is_check_compliant = count == value["total"]
+                    organization_metrics.setdefault(check, {}).setdefault(organization, is_check_compliant)
+                    if organization in organization_metrics[check] and not is_check_compliant:  # to avoid duplicates
+                        organization_metrics[check][organization] = is_check_compliant
+
+            ## RPKI
+            rpki_available_compliant = all(
+                value["number_of_available"] == value["number_of_ips"] for value in rpki_summary.values()
+            )
+            rpki_valid_compliant = all(
+                value["number_of_valid"] == value["number_of_ips"] for value in rpki_summary.values()
+            )
+            organization_metrics.setdefault("RPKI Available", {})[organization] = rpki_available_compliant
+            organization_metrics.setdefault("RPKI Valid", {})[organization] = rpki_valid_compliant
+
+        # Calculate security score
+        for check, results in organization_metrics.items():
+            organization_metrics[check]["score"] = sum(results.values()) / len(results) * 100
+        best_score = max(organization_metrics, key=lambda x: organization_metrics[x]["score"])
+        worst_score = min(organization_metrics, key=lambda x: organization_metrics[x]["score"])
 
         system_vulnerabilities = {}
         system_vulnerability_totals = {}
@@ -203,6 +234,8 @@ class MultiOrganizationReport(MultiReport):
             },
             "services": services,
             "recommendation_counts": recommendation_counts,
+            "best_scoring": best_score,
+            "worst_scoring": worst_score,
             "ipv6": ipv6,
         }
 
