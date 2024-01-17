@@ -141,6 +141,12 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     template_name = "aggregate_report.html"
     current_step = 6
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.report_types = self.get_report_types_from_choice()
+        report_ids = [report.id for report in self.report_types]
+        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(report_ids))
+
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
@@ -172,14 +178,14 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data = aggregate_reports(
-            self.octopoes_api_connector, self.selected_oois, self.get_report_types(), self.valid_time
+            self.octopoes_api_connector, self.selected_oois, self.report_types, self.valid_time
         )
 
         return aggregate_report, post_processed_data, report_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["report_types"] = self.get_report_types()
+        context["report_types"] = [report.class_attributes() for report in self.report_types]
         aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
         context["template"] = aggregate_report.template_path
         context["post_processed_data"] = post_processed_data
@@ -195,7 +201,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             **dict(json="true", **self.request.GET),
         )
         context["oois"] = self.get_oois()
-        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+        context["plugins"] = self.plugins
         return context
 
 

@@ -453,7 +453,7 @@ def aggregate_reports(
         for options, report_types in aggregate_report.reports.items():
             for report_type in report_types:
                 if Reference.from_str(ooi).class_type in report_type.input_ooi_types and report_type.id in [
-                    report["id"] for report in selected_report_types
+                    report.id for report in selected_report_types
                 ]:
                     report = report_type(connector)
                     data = report.generate_data(ooi, valid_time=valid_time)
