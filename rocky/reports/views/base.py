@@ -144,6 +144,8 @@ class BaseReportView(OctopoesView):
         context["observed_at"] = self.valid_time
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
+        context["plugins"] = self.plugins
+        context["oois"] = self.get_oois()
         return context
 
 

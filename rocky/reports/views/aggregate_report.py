@@ -194,8 +194,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             True,
             **dict(json="true", **self.request.GET),
         )
-        context["oois"] = self.get_oois()
-        context["plugins"] = self.plugins
         return context
 
 

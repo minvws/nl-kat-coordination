@@ -170,9 +170,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
         context["report_data"] = self.generate_reports_for_oois()
-        context["plugins"] = self.plugins
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(
             reverse("generate_report_pdf", kwargs={"organization_code": self.organization.code}),
