@@ -13,7 +13,7 @@ from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
-DEFAULT_RECORD_TYPES = set("A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME")
+DEFAULT_RECORD_TYPES = set(("A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME"))
 
 
 class ZoneNotFoundException(Exception):
