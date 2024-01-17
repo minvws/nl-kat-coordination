@@ -43,19 +43,19 @@ reset: clean kat
 
 # Bring up containers
 up:
-	docker-compose up --detach
+	docker compose up --detach
 
 # Stop containers
 stop:
-	-docker-compose stop
+	-docker compose stop
 
 # Remove containers but not volumes (no data loss)
 down:
-	-docker-compose down
+	-docker compose down
 
 # Remove containers and all volumes (data loss!)
 clean:
-	-docker-compose down --timeout 0 --volumes --remove-orphans
+	-docker compose down --timeout 0 --volumes --remove-orphans
 	-rm -Rf rocky/node_modules rocky/assets/dist rocky/.parcel-cache rocky/static
 
 # Fetch the latest changes from the Git remote
@@ -65,7 +65,7 @@ fetch:
 # Pull the latest changes from the default upstream
 pull:
 	git pull
-	docker-compose pull
+	docker compose pull
 
 # Upgrade to the latest release without losing persistent data. Usage: `make upgrade version=v1.5.0` (version is optional)
 VERSION?=$(shell curl -sSf "https://api.github.com/repos/minvws/nl-kat-coordination/tags" | jq -r '[.[].name | select(. | contains("rc") | not)][0]')
@@ -92,9 +92,9 @@ endif
 # Build will prepare all services: migrate them, seed them, etc.
 build:
 ifeq ($(UNAME),Darwin)
-	docker-compose build --pull --parallel --build-arg USER_UID="$$(id -u)"
+	docker compose build --pull --parallel --build-arg USER_UID="$$(id -u)"
 else
-	docker-compose build --pull --parallel --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
+	docker compose build --pull --parallel --build-arg USER_UID="$$(id -u)" --build-arg USER_GID="$$(id -g)"
 endif
 	make -C rocky build
 	make -C boefjes build
