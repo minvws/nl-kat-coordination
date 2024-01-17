@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
@@ -110,15 +111,20 @@ class WebSystemReport(Report):
     template_path = "web_system_report/report.html"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
-        reference = Reference.from_str(input_ooi)
         hostnames = []
 
-        if reference.class_type == Hostname:
-            hostnames = [self.octopoes_api_connector.get(reference, valid_time)]
+        try:
+            ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
+        except ObjectNotFoundException as e:
+            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
+            raise ObjectNotFoundException(e)
 
-        elif reference.class_type in (IPAddressV4, IPAddressV6):
+        if ooi.reference.class_type == Hostname:
+            hostnames = [ooi]
+
+        elif ooi.reference.class_type in (IPAddressV4, IPAddressV6):
             hostnames = self.octopoes_api_connector.query(
-                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
+                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ooi.reference
             )
 
         web_checks = WebChecks()
