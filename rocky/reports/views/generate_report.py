@@ -94,7 +94,8 @@ class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, Base
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
-            messages.error(self.request, _("Select at least one OOI to proceed."))
+            error_message = _("Select at least one OOI to proceed.")
+            messages.add_message(self.request, messages.ERROR, error_message)
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -116,7 +117,8 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
+            error_message = _("Select at least one report type to proceed.")
+            messages.add_message(self.request, messages.ERROR, error_message)
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -135,10 +137,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     def get(self, request, *args, **kwargs):
         if not self.are_plugins_enabled(self.plugins):
-            messages.warning(
-                self.request,
-                _("This report may not show all the data as some plugins are not enabled."),
-            )
+            warning_message = _("This report may not show all the data as some plugins are not enabled.")
+            messages.add_message(self.request, messages.WARNING, warning_message)
         return super().get(request, *args, **kwargs)
 
     def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
@@ -161,11 +161,11 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         if error_oois:
             oois = ", ".join(set(error_oois))
             date = self.valid_time.date()
-            messages.error(
-                self.request,
-                _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.")
-                % {"oois": oois, "date": date},
-            )
+            error_message = _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.") % {
+                "oois": oois,
+                "date": date,
+            }
+            messages.add_message(self.request, messages.ERROR, error_message)
         return report_data
 
     def get_context_data(self, **kwargs):
