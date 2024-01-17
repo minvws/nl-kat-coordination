@@ -35,6 +35,17 @@ class Report(ABC):
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
         raise NotImplementedError
 
+    @classmethod
+    def class_attributes(cls) -> Dict[str, any]:
+        return {
+            "id": cls.id,
+            "name": cls.name,
+            "description": cls.description,
+            "plugins": cls.plugins,
+            "input_ooi_types": cls.input_ooi_types,
+            "template_path": cls.template_path,
+        }
+
 
 class AggregateReport(ABC):
     id: str

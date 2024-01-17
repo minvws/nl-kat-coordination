@@ -2,6 +2,7 @@ from logging import getLogger
 from typing import Any, Dict, List, Optional, Set, Type, Union
 
 from account.mixins import OrganizationView
+from django.contrib import messages
 from django.forms import Form
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -117,7 +118,16 @@ class BaseReportView(OctopoesView):
         return all(enabled_plugins)
 
     def get_report_types_from_choice(self) -> List[Type[Report]]:
-        return [get_report_by_id(report_type) for report_type in self.selected_report_types]
+        report_types = []
+        for report_type in self.selected_report_types:
+            try:
+                report = get_report_by_id(report_type)
+                report_types.append(report)
+            except ValueError:
+                error_message = _("Report type '%s' does not exist.") % report_type
+                messages.add_message(self.request, messages.ERROR, error_message)
+                pass
+        return report_types
 
     def get_report_types(self) -> List[ReportType]:
         return [

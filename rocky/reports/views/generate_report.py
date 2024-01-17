@@ -135,7 +135,9 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+        self.report_types = self.get_report_types_from_choice()
+        report_ids = [report.id for report in self.report_types]
+        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(report_ids))
 
     def get(self, request, *args, **kwargs):
         if not self.are_plugins_enabled(self.plugins):
@@ -151,7 +153,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         for ooi in self.selected_oois:
             report_data[ooi] = {}
             try:
-                for report_type in self.get_report_types_from_choice():
+                for report_type in self.report_types:
                     if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
                         report = report_type(self.octopoes_api_connector)
                         data = report.generate_data(ooi, valid_time=self.valid_time)
@@ -177,7 +179,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         context["oois"] = self.get_oois()
         context["report_data"] = self.generate_reports_for_oois()
         context["plugins"] = self.plugins
-        context["report_types"] = self.get_report_types()
+        context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(
             reverse("generate_report_pdf", kwargs={"organization_code": self.organization.code}),
             True,
