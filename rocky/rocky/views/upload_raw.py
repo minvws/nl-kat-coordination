@@ -17,7 +17,6 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     template_name = "upload_raw.html"
     form_class = UploadRawForm
     permission_required = "tools.can_scan_organization"
-    mime_types = False
 
     def get_initial(self):
         """
