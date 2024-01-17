@@ -17,7 +17,7 @@ from octopoes.models import OOI
 from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import Report, ReportType
-from reports.report_types.helpers import get_report_by_id
+from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from rocky.views.mixins import OctopoesView
 
 logger = getLogger(__name__)
@@ -73,6 +73,10 @@ class BaseReportView(OctopoesView):
         self.valid_time = self.get_observed_at()
         self.selected_oois = request.GET.getlist("ooi", [])
         self.selected_report_types = request.GET.getlist("report_type", [])
+
+        self.report_types = self.get_report_types_from_choice()
+        report_ids = [report.id for report in self.report_types]
+        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(report_ids))
 
     def get_oois(self) -> List[OOI]:
         oois = []

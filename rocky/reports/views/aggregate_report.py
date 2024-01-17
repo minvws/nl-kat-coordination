@@ -141,12 +141,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     template_name = "aggregate_report.html"
     current_step = 6
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.report_types = self.get_report_types_from_choice()
-        report_ids = [report.id for report in self.report_types]
-        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(report_ids))
-
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()

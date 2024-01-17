@@ -133,12 +133,6 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
     template_name = "generate_report.html"
     current_step = 6
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.report_types = self.get_report_types_from_choice()
-        report_ids = [report.id for report in self.report_types]
-        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(report_ids))
-
     def get(self, request, *args, **kwargs):
         if not self.are_plugins_enabled(self.plugins):
             messages.warning(
