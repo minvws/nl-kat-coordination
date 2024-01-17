@@ -26,7 +26,7 @@ Inheritance Of Two Declared Scan Profiles
     Verify Scan LeveL Filter    2    ${2}
     Verify Scan LeveL Filter    3    ${0}
     Verify Scan LeveL Filter    4    ${3}
-    Verify Scan LeveL Filter    0    ${7}
+    Verify Scan LeveL Filter    0    ${9}
     Verify Scan LeveL Filter    ${{ [2,4] }}    ${5}
     Verify Scan LeveL Filter    ${{ [3,4] }}    ${3}
     Verify Scan LeveL Filter    ${{ [2,0] }}    ${9}
