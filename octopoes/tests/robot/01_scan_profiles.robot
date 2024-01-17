@@ -29,7 +29,7 @@ Inheritance Of Two Declared Scan Profiles
     Verify Scan LeveL Filter    0    ${9}
     Verify Scan LeveL Filter    ${{ [2,4] }}    ${5}
     Verify Scan LeveL Filter    ${{ [3,4] }}    ${3}
-    Verify Scan LeveL Filter    ${{ [2,0] }}    ${9}
+    Verify Scan LeveL Filter    ${{ [2,0] }}    ${11}
     Verify Scan Profile Mutation Queue    ${REF_HOSTNAME}    ${{[0, 4]}}
     Verify Scan Profile Mutation Queue    ${REF_IPADDR}    ${{[0, 2]}}
     Verify Scan Profile Mutation Queue    ${REF_RESOLVEDHOSTNAME}    ${{[0, 4]}}
