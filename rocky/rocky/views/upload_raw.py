@@ -19,22 +19,15 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     permission_required = "tools.can_scan_organization"
     mime_types = False
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        if not self.organization:
-            self.add_error_notification(RAW_ERRORS["no_org"])
-        if kwargs.get("mime_type"):
-            self.mime_types = unquote(kwargs["mime_type"])
-        elif kwargs.get("mime_types"):
-            self.mime_types = unquote(kwargs["mime_types"])
-
     def get_initial(self):
         """
         Returns the initial data to use for forms on this view.
         """
         initial = super().get_initial()
-        if self.mime_types:
-            initial["mime_types"] = self.mime_types
+        if "mime_type" in self.kwargs:
+            initial["mime_types"] = unquote(self.kwargs["mime_type"])
+        elif "mime_types" in self.kwargs:
+            initial["mime_types"] = unquote(self.kwargs["mime_type"])
         return initial
 
     def get_success_url(self):
