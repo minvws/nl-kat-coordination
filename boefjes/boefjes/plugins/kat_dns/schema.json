@@ -5,7 +5,7 @@
     "RECORD_TYPES": {
       "title": "RECORD_TYPES",
       "type": "string",
-      "description": "List of comma seperated DNS record types to query for.",
+      "description": "List of comma separated DNS record types to query for.",
       "default": "A,AAAA,CAA,CERT,RP,SRV,TXT,MX,NS,CNAME,DNAME"
     },
     "REMOTE_NS": {
