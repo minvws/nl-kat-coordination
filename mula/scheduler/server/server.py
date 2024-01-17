@@ -17,6 +17,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from scheduler import context, models, queues, schedulers, storage, version
 from scheduler.config import settings
+from scheduler.models.errors import ValidationError
 
 from .pagination import PaginatedResponse, paginate
 
@@ -381,7 +382,7 @@ class Server:
         # Validate job
         try:
             job.validate()
-        except Exception as exc:
+        except ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(exc),
@@ -447,7 +448,7 @@ class Server:
         # Validate job
         try:
             updated_job.validate()
-        except Exception as exc:
+        except ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(exc),

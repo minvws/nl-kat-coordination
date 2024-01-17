@@ -366,6 +366,7 @@ class Scheduler(abc.ABC):
 
         def _calculate_deadline(task: models.Task):
             job = self.ctx.datastores.job_store.get_job_by_hash(task.p_item.hash)
+
             try:
                 job.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(job))
             except Exception:
@@ -377,6 +378,8 @@ class Scheduler(abc.ABC):
                     scheduler_id=self.scheduler_id,
                 )
                 job.enabled = False
+
+            job.evaluated_at = datetime.now(timezone.utc)
             self.ctx.datastores.job_store.update_job(job)
 
         self.executor.submit(_calculate_deadline, task)

@@ -11,6 +11,7 @@ from sqlalchemy.sql import func
 from scheduler.utils import GUID, cron
 
 from .base import Base
+from .errors import ValidationError
 from .queue import PrioritizedItem
 from .rate_limit import RateLimit
 from .tasks import Task
@@ -48,7 +49,7 @@ class Job(BaseModel):
             try:
                 cron.next_run(self.cron_expression)
             except Exception as exc:
-                raise ValueError(f"Invalid cron expression: {self.cron_expression}") from exc
+                raise ValidationError(f"Invalid cron expression: {self.cron_expression}") from exc
 
 
 class JobDB(Base):
