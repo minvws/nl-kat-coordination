@@ -81,6 +81,10 @@ services:
       - .env
     volumes:
       - ./octopoes:/app/octopoes
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
 
   boefje:
     restart: unless-stopped
@@ -244,6 +248,15 @@ services:
       - jaeger-data:/badger
     ports:
       - "127.0.0.1:16686:16686"
+
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fc42:ca7::/64
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1
 
 volumes:
   postgres-data:
