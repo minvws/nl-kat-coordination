@@ -648,6 +648,9 @@ starlette==0.27.0 ; python_version >= "3.8" and python_version < "4.0" \
 structlog==23.2.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:16a167e87b9fa7fae9a972d5d12805ef90e04857a93eba479d4be3801a6a1482 \
     --hash=sha256:334666b94707f89dbc4c81a22a8ccd34449f0201d5b1ee097a030b577fa8c858
+types-croniter==2.0.0.20240106 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:266d9ecabbc06afab7cc0cfa7f2149eb36f613ed66ddd6c9bac4edcf727e9a58 \
+    --hash=sha256:a5c92566d750e025ab31279029ab44b479e2e3509cd8db3784574bdab1012571
 typing-extensions==4.9.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:23478f88c37f27d76ac8aee6c905017a143b0b1b886c3c9f66bc2fd94f9f5783 \
     --hash=sha256:af72aea155e91adfc61c3ae9e0e342dbc0cba726d6cba4b6c72c1f34e47291cd

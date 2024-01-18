@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
+
 from tests.utils import functions
 
 

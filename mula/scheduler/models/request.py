@@ -1,9 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Dict, Optional
 
 from pydantic import BaseModel, Field
-
-from .queue import PrioritizedItem
 
 
 class PrioritizedItemRequest(BaseModel):

@@ -4,9 +4,9 @@ from types import SimpleNamespace
 from unittest import mock
 
 import requests
+from scheduler import config, models, schedulers, storage
 from structlog.testing import capture_logs
 
-from scheduler import config, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,

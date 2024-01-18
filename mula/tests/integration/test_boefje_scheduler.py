@@ -4,9 +4,9 @@ from types import SimpleNamespace
 from unittest import mock
 
 import requests
+from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
-from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -1701,7 +1701,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         mock.patch.stopall()
 
     def test_push_tasks_for_rescheduling(self):
-        """When the dealine of jobs have pased, the resulting task should be added to the queue"""
+        """When the dealine of jobs have passed, the resulting task should be added to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)

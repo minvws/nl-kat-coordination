@@ -812,12 +812,10 @@ class BoefjeScheduler(Scheduler):
             return
 
         self.logger.info(
-            "Created boefje task: %s for ooi: %s",
+            "Created boefje task: %s",
             task.id,
-            ooi.primary_key,
             task_id=task.id,
             boefje_id=boefje.id,
-            ooi_primary_key=ooi.primary_key,
             organisation_id=self.organisation.id,
             scheduler_id=self.scheduler_id,
             caller=caller,

@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional, Tuple
+from datetime import datetime
+from typing import List, Optional, Tuple
 
-from sqlalchemy import exc, func
+from sqlalchemy import exc
 
 from scheduler import models
 
@@ -66,9 +66,9 @@ class JobStore:
             return job
 
     @retry()
-    def get_job_by_hash(self, hash: str) -> Optional[models.Job]:
+    def get_job_by_hash(self, job_hash: str) -> Optional[models.Job]:
         with self.dbconn.session.begin() as session:
-            job_orm = session.query(models.JobDB).filter(models.JobDB.p_item["hash"].as_string() == hash).first()
+            job_orm = session.query(models.JobDB).filter(models.JobDB.p_item["hash"].as_string() == job_hash).first()
 
             if job_orm is None:
                 return None

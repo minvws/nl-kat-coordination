@@ -2,7 +2,7 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from scheduler import config, models, queues, rankers, storage
+from scheduler import config, models, rankers, storage
 
 
 class DefaultDeadlineRanker(unittest.TestCase):
