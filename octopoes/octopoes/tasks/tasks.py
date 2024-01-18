@@ -32,13 +32,13 @@ except FileNotFoundError:
 
 @worker_process_shutdown.connect
 def shutdown_worker(**kwargs):
-    close_rabbit_channel(settings.queue_uri)
+    close_rabbit_channel(str(settings.queue_uri))
 
 
 @worker_process_init.connect
 def init_worker(**kwargs):
     """Set up one RabbitMQ connection and channel on worker startup"""
-    get_rabbit_channel(settings.queue_uri)
+    get_rabbit_channel(str(settings.queue_uri))
 
 
 log = get_task_logger(__name__)
