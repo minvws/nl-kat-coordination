@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-04 15:56+0000\n"
+"POT-Creation-Date: 2024-01-18 14:09+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3903,14 +3903,19 @@ msgstr ""
 msgid "Select at least one report type to proceed."
 msgstr ""
 
-#: reports/views/generate_report.py
-msgid "This report may not show all the data as some plugins are not enabled."
-msgstr ""
-
-#: reports/views/generate_report.py
+#: reports/views/aggregate_report.py reports/views/generate_report.py
 #, python-format
 msgid ""
 "No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+msgstr ""
+
+#: reports/views/base.py
+#, python-format
+msgid "Report type '%s' does not exist."
+msgstr ""
+
+#: reports/views/generate_report.py
+msgid "This report may not show all the data as some plugins are not enabled."
 msgstr ""
 
 #: reports/views/multi_report.py
