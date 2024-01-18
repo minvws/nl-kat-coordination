@@ -171,9 +171,19 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         return super().get(request, *args, **kwargs)
 
     def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
-        aggregate_report, post_processed_data, report_data = aggregate_reports(
+        aggregate_report, post_processed_data, report_data, error_oois = aggregate_reports(
             self.octopoes_api_connector, self.selected_oois, self.report_types, self.valid_time
         )
+
+        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
+        if error_oois:
+            oois = ", ".join(set(error_oois))
+            date = self.valid_time.date()
+            error_message = _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.") % {
+                "oois": oois,
+                "date": date,
+            }
+            messages.add_message(self.request, messages.ERROR, error_message)
 
         return aggregate_report, post_processed_data, report_data
 
