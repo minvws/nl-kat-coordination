@@ -13,7 +13,6 @@ from scheduler.utils import GUID, cron
 from .base import Base
 from .errors import ValidationError
 from .queue import PrioritizedItem
-from .rate_limit import RateLimit
 from .tasks import Task
 
 
@@ -30,9 +29,6 @@ class Job(BaseModel):
     p_item: PrioritizedItem
 
     tasks: List[Task] = []
-
-    # TODO: not yet implemented, added as proof of concept
-    rate_limit: Optional[RateLimit] = None
 
     cron_expression: Optional[str] = None
 
@@ -60,7 +56,6 @@ class JobDB(Base):
     enabled = Column(Boolean, nullable=False, default=True)
     p_item = Column(JSONB, nullable=False)
     tasks = relationship("TaskDB", back_populates="job", order_by="TaskDB.created_at", cascade="all,delete-orphan")
-    rate_limit = Column(JSONB, nullable=True)
     cron_expression = Column(String, nullable=True)
 
     deadline_at = Column(

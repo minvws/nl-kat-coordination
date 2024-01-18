@@ -8,7 +8,6 @@ from .ooi import OOI, MutationOperationType, ScanProfile, ScanProfileMutation
 from .organisation import Organisation
 from .plugin import Plugin
 from .queue import PrioritizedItem, PrioritizedItemDB, Queue
-from .rate_limit import RateLimit
 from .request import JobRequest, PrioritizedItemRequest
 from .scheduler import Scheduler
 from .tasks import BoefjeTask, NormalizerTask, Task, TaskDB, TaskStatus

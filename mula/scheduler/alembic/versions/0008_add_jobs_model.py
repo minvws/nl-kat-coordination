@@ -26,7 +26,6 @@ def upgrade():
         sa.Column("scheduler_id", sa.String(), nullable=True),
         sa.Column("enabled", sa.Boolean(), nullable=False),
         sa.Column("p_item", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("rate_limit", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column("cron_expression", sa.String(), nullable=True),
         sa.Column("deadline_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("evaluated_at", sa.DateTime(timezone=True), nullable=True),

@@ -4,7 +4,6 @@ from typing import Dict, Optional
 from pydantic import BaseModel, Field
 
 from .queue import PrioritizedItem
-from .rate_limit import RateLimit
 
 
 class PrioritizedItemRequest(BaseModel):
@@ -20,9 +19,6 @@ class JobRequest(BaseModel):
     enabled: bool = True
 
     p_item: Dict = Field(default_factory=dict)
-
-    # TODO: not yet implemented, added as proof of concept
-    rate_limit: Optional[RateLimit] = None
 
     cron_expression: Optional[str] = None
 
