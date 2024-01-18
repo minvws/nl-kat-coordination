@@ -4,8 +4,12 @@ from typing import List
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
+from django.db.models.functions import Lower
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from knox import crypto
+from knox.models import AbstractAuthToken
+from knox.settings import CONSTANTS
 from tools.models import Organization, OrganizationMember
 
 
@@ -116,3 +120,26 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         if self.is_superuser:
             return self.all_organizations
         return [m.organization for m in self.organization_members]
+
+
+class AuthToken(AbstractAuthToken):
+    name = models.CharField(_("name"), max_length=150)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint("user", Lower("name"), name="unique name"),
+        ]
+
+    def __str__(self):
+        return f"{self.name} ({self.user})"
+
+    def generate_new_token(self) -> str:
+        """
+        Updates token_key and digest with and returns the new token"
+        """
+        # Code copied from rest-knox AuthTokenManager
+        token = crypto.create_token_string()
+        self.token_key = token[: CONSTANTS.TOKEN_KEY_LENGTH]
+        self.digest = crypto.hash_token(token)
+
+        return token
