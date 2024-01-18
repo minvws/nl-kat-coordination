@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-10 15:12+0000\n"
+"POT-Creation-Date: 2024-01-18 13:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -285,6 +285,10 @@ msgstr ""
 
 #: account/models.py
 msgid "date joined"
+msgstr ""
+
+#: account/models.py
+msgid "name"
 msgstr ""
 
 #: account/templates/account_detail.html account/views/account.py

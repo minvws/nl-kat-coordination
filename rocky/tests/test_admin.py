@@ -28,10 +28,7 @@ class AuthTokenAdminTestCase(ModelAdminTestCase):
     model = AuthToken
 
     def create_form_instance_data(self, response, instance_data=None):
-        print(instance_data)
         ret = super().create_form_instance_data(response, instance_data)
-
-        print(ret)
 
         return ret
 
