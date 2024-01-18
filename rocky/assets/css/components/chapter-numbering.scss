@@ -50,6 +50,8 @@ ol.chapter-numbers {
     &::before {
       counter-increment: chapter;
       content: counter(chapter) ". ";
+      margin-right: 0.25rem;
+      white-space: nowrap;
     }
 
     > ol {
@@ -57,10 +59,14 @@ ol.chapter-numbers {
 
       > li {
         list-style: none;
+        display: flex;
+        flex-direction: row;
 
         &::before {
           counter-increment: subchapter;
           content: counter(chapter) "." counter(subchapter) " ";
+          margin-right: 0.25rem;
+          white-space: nowrap;
         }
       }
     }
