@@ -8,7 +8,7 @@ from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
 from requests import HTTPError
-from tools.forms.upload_raw import RAW_ERRORS, UploadRawForm
+from tools.forms.upload_raw import UploadRawForm
 
 from rocky.bytes_client import get_bytes_client
 
