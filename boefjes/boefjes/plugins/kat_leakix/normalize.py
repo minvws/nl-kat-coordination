@@ -43,25 +43,19 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
         # TODO: LeakIX want to include a confidence per plugin, since some plugins have more false positives than others
         # TODO: ssh, ssl
 
-        # Get general information
-        ip = event["ip"]
-        port_nr = event["port"]
-        protocol = event["protocol"]
-        if protocol != "udp":
-            protocol = "tcp"
+        # reset loop
         event_ooi = pk_ooi
-
+        
         # Autonomous System
         as_ooi = None
         if event["network"]["asn"]:
             as_ooi = handle_autonomous_system(event)
 
         if event["ip"]:
-            event_ooi, ip_port_ooi = hadle_ip(event, network, as_ooi)
+            event_ooi, ip_port_ooi = handle_ip(event, network, as_ooi)
 
-        hostname = event["host"]
-        if hostname:
-            event_ooi = handle_hostname(event, network, event["ip"])
+        if event["host"]:
+            event_ooi = handle_hostname(event, network)
 
         event_ooi, software_ooi = handle_software(event, event_ooi)
         # Potential TODO: add vendor
@@ -70,7 +64,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
         handle_leak(event, event_ooi, software_ooi)
 
         # CVES
-        handle_tag(event, softwre_ooi, ip_port_ooi)
+        handle_tag(event, software_ooi, ip_port_ooi)
 
 
 def handle_autonomous_system(event):
@@ -105,10 +99,14 @@ def handle_ip(event, network, as_ooi):
         )
 
     # Store port
+    protocol = event["protocol"]
+    if protocol != "udp":
+        protocol = "tcp"
+
     ip_port_ooi = IPPort(
         address=ip_ooi.reference,
         protocol=Protocol(protocol),
-        port=int(port_nr),
+        port=int(event["port"]),
         state=PortState("open"),
     )
     yield ip_port_ooi
@@ -116,9 +114,9 @@ def handle_ip(event, network, as_ooi):
     return event_ooi, ip_port_ooi
 
 
-def handle_hostname(event, network, ip: str):
+def handle_hostname(event, network):
     try:
-        ipvx = ipaddress.ip_address(ip)
+        ipvx = ipaddress.ip_address(event["ip"])
         if ipvx.version == 4:
             ip_ooi = IPAddressV4(address=hostname, network=network)
         else:
@@ -127,12 +125,13 @@ def handle_hostname(event, network, ip: str):
         return ip_ooi.reference
     except ValueError:
         # Not an IPAddress, so a hostname
-        hostname_ooi = Hostname(name=hostname, network=network)
+        hostname_ooi = Hostname(name=event["host"], network=network)
         yield hostname_ooi
         return hostname_ooi.reference
 
 
 def handle_software(event, event_ooi):
+    software_args = {}
     software_args["name"] = event.get("service", {}).get("software", {}).get("name")
     software_args["version"] = event.get("service", {}).get("software", {}).get("version")
     software_fingerprint = event.get("service", {}).get("software", {}).get("fingerprint")
@@ -140,7 +139,7 @@ def handle_software(event, event_ooi):
         software_args["name"] = software_fingerprint
 
     if software_args["name"]:
-        software_ooi = Software(**{k: v for k, v in software_args.items() if v})
+        software_ooi = Software(**{k: v for k, v in software_args if v})
         yield software_ooi
         software_instance_ooi = SoftwareInstance(ooi=event_ooi, software=software_ooi.reference)
         yield software_instance_ooi
@@ -174,7 +173,8 @@ def handle_leak(event, event_ooi, software_ooi):
             # no severity given, default = critical
             kat_finding = "KAT-LEAKIX-CRITICAL"
 
-        yield KATFindingType(id=kat_finding)
+        finding_type = KATFindingType(id=kat_finding)
+        yield finding_type
 
         kat_info = []
         if software_ooi:
@@ -190,7 +190,7 @@ def handle_leak(event, event_ooi, software_ooi):
             kat_info.append(f"Stage of the leak is {leak_stage}.")
 
         yield Finding(
-            finding_type=kat_ooi.reference,
+            finding_type=finding_type.reference,
             ooi=event_ooi,
             description=" ".join(kat_info),
         )
