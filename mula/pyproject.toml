@@ -20,7 +20,6 @@ requests = "^2.31.0"
 retry2 = "^0.9.5"
 sqlalchemy = "^2.0.23"
 structlog = "^23.2.0"
-typing-extensions = "^4.8.0"
 uvicorn = "^0.24.0"
 
 # OpenTelemetry
@@ -39,6 +38,7 @@ click = "^8.0.4"
 psutil = "^5.9.5"
 pytest = "^7.2.2"
 pytest-cov = "^4.0.0"
+httpx = "^0.26.0"
 
 [build-system]
 requires = ["setuptools>=59", "wheel"]
