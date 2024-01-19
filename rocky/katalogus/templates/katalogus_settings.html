@@ -44,13 +44,11 @@
                     </div>
                 </div>
                 <div role="group"></div>
-            </div>
-        {% endif %}
-    </div>
-</section>
-{% if form.fields %}
-    {% include "clone_settings.html" %}
+            {% endif %}
+        </section>
+        {% if form.fields %}
+            {% include "clone_settings.html" %}
 
-{% endif %}
-</main>
+        {% endif %}
+    </main>
 {% endblock content %}
