@@ -157,9 +157,9 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
                 if isinstance(rr, CAA):
                     record_value = str(rr).split(" ", 2)
-                    default_args["flags"] = min(max(0, int(recordvalue[0])), 255)
-                    default_args["tag"] = re.sub("[^\\w]", "", recordvalue[1].lower())
-                    default_args["value"] = recordvalue[2]
+                    default_args["flags"] = min(max(0, int(record_value[0])), 255)
+                    default_args["tag"] = re.sub("[^\\w]", "", record_value[1].lower())
+                    default_args["value"] = record_value[2]
                     register_record(DNSCAARecord(**default_args))
 
     # link the hostnames to their discovered zones
