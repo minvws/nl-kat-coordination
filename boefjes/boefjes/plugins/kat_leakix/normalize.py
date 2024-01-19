@@ -26,7 +26,7 @@ SEVERITY_FINDING_MAPPING = {
     "high": "KAT-LEAKIX-HIGH",
     "medium": "KAT-LEAKIX-MEDIUM",
     "low": "KAT-LEAKIX-LOW",
-    "info": "KAT-LEAKIX-RECOMMENDATION
+    "info": "KAT-LEAKIX-RECOMMENDATION",
 }
 
 
