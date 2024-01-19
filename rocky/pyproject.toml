@@ -69,7 +69,6 @@ mypy = "^1.0.1"
 pylint = "^2.15.5"
 vulture = "^2.6"
 djlint = "^1.32.1"
-black = "^23.11.0"
 robotframework-tidy = "^4.1.0"
 
 # Robot Framework dependencies

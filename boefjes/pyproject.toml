@@ -65,7 +65,6 @@ opentelemetry-instrumentation = "^0.41b0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.2"
 pytest-env = "^0.8.2"
-black = "^23.11.0"
 
 [build-system]
 requires = ["setuptools>=45", "wheel"]
