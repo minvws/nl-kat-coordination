@@ -4,11 +4,6 @@ from django import forms
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
-RAW_ERRORS = {
-    "no_org": _("Organization code(s) for raw does not exist in our database"),
-    "decoding": _("File could not be decoded"),
-}
-
 
 class UploadRawForm(forms.Form):
     mime_types = forms.CharField(
