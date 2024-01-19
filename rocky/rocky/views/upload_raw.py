@@ -26,7 +26,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         if "mime_type" in self.kwargs:
             initial["mime_types"] = unquote(self.kwargs["mime_type"])
         elif "mime_types" in self.kwargs:
-            initial["mime_types"] = unquote(self.kwargs["mime_type"])
+            initial["mime_types"] = unquote(self.kwargs["mime_types"])
         return initial
 
     def get_success_url(self):
