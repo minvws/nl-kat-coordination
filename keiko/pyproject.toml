@@ -25,7 +25,6 @@ pydantic-settings = "^2.0.3"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^0.971"
-pylint = "^2.14.5"
 pytest = "^7.2.2"
 robotframework-tidy = "^3.2"
 robotframework = "^6.0.1"
