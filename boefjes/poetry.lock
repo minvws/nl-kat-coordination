@@ -643,19 +643,19 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "fastapi"
-version = "0.101.1"
+version = "0.109.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "fastapi-0.101.1-py3-none-any.whl", hash = "sha256:aef5f8676eb1b8389952e1fe734abe20f04b71f6936afcc53b320ba79b686a4b"},
-    {file = "fastapi-0.101.1.tar.gz", hash = "sha256:7b32000d14ca9992f7461117b81e4ef9ff0c07936af641b4fe40e67d5f9d63cb"},
+    {file = "fastapi-0.109.0-py3-none-any.whl", hash = "sha256:8c77515984cd8e8cfeb58364f8cc7a28f0692088475e2614f7bf03275eba9093"},
+    {file = "fastapi-0.109.0.tar.gz", hash = "sha256:b978095b9ee01a5cf49b19f4bc1ac9b8ca83aa076e770ef8fd9af09a2b88d191"},
 ]
 
 [package.dependencies]
 pydantic = ">=1.7.4,<1.8 || >1.8,<1.8.1 || >1.8.1,<2.0.0 || >2.0.0,<2.0.1 || >2.0.1,<2.1.0 || >2.1.0,<3.0.0"
-starlette = ">=0.27.0,<0.28.0"
-typing-extensions = ">=4.5.0"
+starlette = ">=0.35.0,<0.36.0"
+typing-extensions = ">=4.8.0"
 
 [package.extras]
 all = ["email-validator (>=2.0.0)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)", "jinja2 (>=2.11.2)", "orjson (>=3.2.1)", "pydantic-extra-types (>=2.0.0)", "pydantic-settings (>=2.0.0)", "python-multipart (>=0.0.5)", "pyyaml (>=5.3.1)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0)", "uvicorn[standard] (>=0.12.0)"]
@@ -2541,13 +2541,13 @@ sqlcipher = ["sqlcipher3_binary"]
 
 [[package]]
 name = "starlette"
-version = "0.27.0"
+version = "0.35.1"
 description = "The little ASGI library that shines."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "starlette-0.27.0-py3-none-any.whl", hash = "sha256:918416370e846586541235ccd38a474c08b80443ed31c578a418e2209b3eef91"},
-    {file = "starlette-0.27.0.tar.gz", hash = "sha256:6a6b0d042acb8d469a01eba54e9cda6cbd24ac602c4cd016723117d6a7e73b75"},
+    {file = "starlette-0.35.1-py3-none-any.whl", hash = "sha256:50bbbda9baa098e361f398fda0928062abbaf1f54f4fadcbe17c092a01eb9a25"},
+    {file = "starlette-0.35.1.tar.gz", hash = "sha256:3e2639dac3520e4f58734ed22553f950d3f3cb1001cd2eaac4d57e8cdc5f66bc"},
 ]
 
 [package.dependencies]
@@ -2614,18 +2614,19 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "uvicorn"
-version = "0.20.0"
+version = "0.26.0"
 description = "The lightning-fast ASGI server."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "uvicorn-0.20.0-py3-none-any.whl", hash = "sha256:c3ed1598a5668208723f2bb49336f4509424ad198d6ab2615b7783db58d919fd"},
-    {file = "uvicorn-0.20.0.tar.gz", hash = "sha256:a4e12017b940247f836bc90b72e725d7dfd0c8ed1c51eb365f5ba30d9f5127d8"},
+    {file = "uvicorn-0.26.0-py3-none-any.whl", hash = "sha256:cdb58ef6b8188c6c174994b2b1ba2150a9a8ae7ea5fb2f1b856b94a815d6071d"},
+    {file = "uvicorn-0.26.0.tar.gz", hash = "sha256:48bfd350fce3c5c57af5fb4995fded8fb50da3b4feb543eb18ad7e0d54589602"},
 ]
 
 [package.dependencies]
 click = ">=7.0"
 h11 = ">=0.8"
+typing-extensions = {version = ">=4.0", markers = "python_version < \"3.11\""}
 
 [package.extras]
 standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)", "pyyaml (>=5.1)", "uvloop (>=0.14.0,!=0.15.0,!=0.15.1)", "watchfiles (>=0.13)", "websockets (>=10.4)"]
@@ -2887,4 +2888,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "90d9a04430ff66a07cbc807abe406b9f3bfed6bff986d52b31c9cc8429b90b34"
+content-hash = "0b97928a41d4176da15a575d94c9c571df849775676dd9d0da1a12d2eaa75e4b"
