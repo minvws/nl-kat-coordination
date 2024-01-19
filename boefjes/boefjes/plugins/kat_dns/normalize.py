@@ -156,8 +156,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
                     )
 
                 if isinstance(rr, CAA):
-                    recordvalue = str(rr)
-                    recordvalue = recordvalue.split(" ", 2)
+                    record_value = str(rr).split(" ", 2)
                     default_args["flags"] = min(max(0, int(recordvalue[0])), 255)
                     default_args["tag"] = re.sub("[^\\w]", "", recordvalue[1].lower())
                     default_args["value"] = recordvalue[2]
