@@ -10,7 +10,7 @@
         {% endblocktranslate %}
     </p>
 {% endif %}
-<h4>{{ type }} {% translate "server" %}</h4>
+<h4 id="system-specific-{{ type }}">{{ type }} {% translate "server" %}</h4>
 <p>
     {% blocktranslate trimmed %}
         This table shows which checks were performed. Following that, the compliance
@@ -31,7 +31,7 @@
                 <tr>
                     <td>{{ check }}</td>
                     <td>
-                        {% if value != m.total %}
+                        {% if value != data.total %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
