@@ -45,7 +45,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
 
         # reset loop
         event_ooi = pk_ooi
-        
+
         # Autonomous System
         as_ooi = None
         if event["network"]["asn"]:
@@ -197,8 +197,8 @@ def handle_leak(event, event_ooi, software_ooi):
 
 
 def handle_tag(event, software_ooi=None, ip_port_ooi=None):
-     # Tags (CVE's)
-     if isinstance(event.get("tags"), Iterable):
+    # Tags (CVE's)
+    if isinstance(event.get("tags"), Iterable):
         for tag in event.get("tags", {}):
             if re.match("cve-[0-9]{4}-[0-9]{4,6}", tag):
                 ft = CVEFindingType(id=tag)
