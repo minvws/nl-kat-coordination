@@ -118,9 +118,9 @@ def handle_hostname(event, network):
     try:
         ipvx = ipaddress.ip_address(event["ip"])
         if ipvx.version == 4:
-            ip_ooi = IPAddressV4(address=hostname, network=network)
+            ip_ooi = IPAddressV4(address=event["ip"], network=network)
         else:
-            ip_ooi = IPAddressV6(address=hostname, network=network)
+            ip_ooi = IPAddressV6(address=event["ip"], network=network)
         yield ip_ooi
         return ip_ooi.reference
     except ValueError:
@@ -161,7 +161,7 @@ def handle_leak(event, event_ooi, software_ooi):
         kat_finding = "KAT-LEAKIX-LOW"
         if leak_severity == "critical" or leak_infected or leak_ransomnote:
             kat_finding = "KAT-LEAKIX-CRITICAL"
-        elif leak_severity in SEVERITY_FINDING_MAPPING.keys():
+        elif leak_severity in SEVERITY_FINDING_MAPPING:
             kat_finding = SEVERITY_FINDING_MAPPING[leak_severity]
         elif leak_stage == "open":
             # no severity given, default = low
