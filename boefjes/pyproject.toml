@@ -46,7 +46,7 @@ shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
 cryptography = "41.0.6"
 # required by kat_webpage_analysis/check_images normalizer
-Pillow = "^10.0.1"
+Pillow = "^10.2.0"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.0.2"
 # required by kat_webpage_analysis (forcediphttpsadapter)
