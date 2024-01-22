@@ -2,12 +2,12 @@
 
 ## Purpose
 
-The *scheduler* is tasked with populating and maintaining a priority queue of
+The _scheduler_ is tasked with populating and maintaining a priority queue of
 items that are ranked, and can be popped off through HTTP API calls.
 The scheduler is designed to be extensible, such that you're able to create
 your own rules for the population, and prioritization of tasks.
 
-The *scheduler* implements a priority queue for prioritization of tasks to be
+The _scheduler_ implements a priority queue for prioritization of tasks to be
 performed by the worker(s). In the implementation of the scheduler within KAT
 the scheduler is tasked with populating the priority queue with 'boefje' and
 'normalizer' tasks. Additionally the scheduler is responsible for maintaining
@@ -16,7 +16,7 @@ and updating its internal priority queue.
 A priority queue is used, in as such, that it allows us to determine what tasks
 should be picked up first, or more regularly. Because of the use of a priority
 queue we can differentiate between tasks that are to be executed first, e.g.
-tasks created by the user get precedence over jobs that are created by the
+tasks created by the user get precedence over tasks that are created by the
 internal rescheduling processes within the scheduler.
 
 Calculations in order to determine the priority of a task is performed by the
@@ -26,13 +26,13 @@ called `connectors`.
 In this document we will outline how the scheduler operates within KAT, how
 iternal systems function and how external services use it.
 
-### Architecture / Design
+## Architecture / Design
 
 In order to get a better overview of how the scheduler is implemented we will
 be using the [C4 model](https://c4model.com/) to give an overview of the
 scheduler system with their respective level of abstraction.
 
-#### C2 Container level:
+### C2 Container level:
 
 First we'll review how the `Scheduler` system interacts and sits in between its
 external services. In this overview arrows from external services indicate how
@@ -63,41 +63,83 @@ graph TB
     Scheduler--"Pop task of queue"-->TaskRunner
 ```
 
+### C3 Component level:
+
 When we take a closer look at the `scheduler` system itself we can identify
 several components. The 'Scheduler App' directs the creation and maintenance
-of a multitude of schedulers. Typically in a KAT installation 2 scheduler will
-be created per organisation: a boefje scheduler and a normalizer scheduler.
+of a multitude of schedulers. Typically in a KAT installation, 2 schedulers
+will be created per organisation: a boefje scheduler and a normalizer scheduler.
 
 Each scheduler can implement it's own way of populating, and prioritization of
-its queue. The associated queues of a individual scheduler is persisted in
-a SQL database.
-
-#### C3 Component level:
-
-...
+its queue. The associated queues of an individual scheduler is persisted in
+a SQL database table.
 
 ```mermaid
 C4Component
     title Component diagram for Scheduler
 
-    ContainerDb(db, "Database", "Postgresql Database", "")
+    Container_Boundary(database, "PostgreSQL Database") {
+        ContainerDb(tbl_jobs, "jobs", "table", "Definition of recurring tasks")
+        ContainerDb(tbl_items, "items", "table", "Priority Queue `p_item`")
+        ContainerDb(tbl_tasks, "tasks", "table", "History of current and previous tasks`")
+        ContainerDb(tbl_events, "events", "table", "Change events relating to tasks")
+    }
 
     Container_Boundary(scheduler_app, "Scheduler App") {
-        Container_Boundary(organisation_a, "Organisation A") {
+        Container_Boundary(schedulers, "Schedulers") {
             Component(boefje_scheduler_a, "Boefje Scheduler Org A", "Scheduler", "")
             Component(normalizer_scheduler_a, "Normalizer Scheduler Org A", "Scheduler", "")
-        }
-
-        Container_Boundary(organisation_b, "Organisation B") {
             Component(boefje_scheduler_b, "Boefje Scheduler Org B", "Scheduler", "")
             Component(normalizer_scheduler_b, "Normalizer Scheduler Org B", "Scheduler", "")
         }
 
+    Container_Boundary(server, "Server") {
         Component(server, "Server", "REST API")
     }
+}
 ```
 
-A more complete overview of the different components within the scheduler:
+**Boefje Scheduler**
+
+```mermaid
+C4Component
+    Container_Boundary(boefje_scheduler, "Boefje Scheduler", "Scheduler") {
+        Component("mutations", "Scan Profile Mutations", "Method running in Thread", "...")
+        Component("new_boefjes", "New Boefjes", "Method running in Thread", "...")
+        Component("reschedule", "Rescheduling", "Method running in Thread", "...")
+
+        UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+
+        Component("push_task_boefje", "Push Task", "Method")
+
+        SystemQueue(pq_boefje, "PriorityQueue", "Persisted in a postgresql database table")
+    }
+
+    Rel(mutations, push_task_boefje, "", "")
+    Rel(new_boefjes, push_task_boefje, "", "")
+    Rel(reschedule, push_task_boefje, "", "")
+    Rel(push_task_boefje, pq_boefje, "", "")
+```
+
+**Normalizer Scheduler**
+
+```mermaid
+C4Component
+    Container_Boundary(boefje_scheduler, "Boefje Scheduler", "Scheduler") {
+        Component("raw_file_received", "Raw File Received", "Thread", "...")
+
+        UpdateLayoutConfig($c4ShapeInRow="1", $c4BoundaryInRow="1")
+
+        Component("push_task_normalizer", "Push Task", "Method")
+
+        SystemQueue(pq_normalizer, "PriorityQueue", "Persisted in a postgresql database table")
+    }
+
+    Rel(raw_file_received, push_task_normalizer, "", "")
+    Rel(push_task_normalizer, pq_normalizer, "", "")
+```
+
+A more complete overview of the different components within the scheduler app:
 
 ```mermaid
 C4Component
@@ -181,13 +223,13 @@ C4Component
     UpdateLayoutConfig($c4ShapeInRow="4", $c4BoundaryInRow="2")
 ```
 
-#### Dataflows
+## Dataflows
 
 Following we review how different dataflows, from the `boefjes` and the
 `normalizers` are implemented within the `Scheduler` system. The following
 events within a KAT installation will trigger dataflows in the `Scheduler`.
 With the current implementation of the scheduler we identify the creation of
-two different type of jobs, `boefje` and `normalizer` jobs.
+two different type of tasks, `boefje` and `normalizer` tasks.
 
 A graphical representation of task creation dataflows:
 
@@ -204,7 +246,7 @@ flowchart LR
       subgraph threads_boefje["threads"]
         thread_scan_profile[[scan profile mutations]]
         thread_enabled_boefjes[[enabled boefjes]]
-        thread_random_objects[[random objects]]
+        thread_reschedule[[rescheduler]]
       end
 
       ranker_boefje{{ranker}}
@@ -213,7 +255,7 @@ flowchart LR
 
     thread_scan_profile-->ranker_boefje
     thread_enabled_boefjes-->ranker_boefje
-    thread_random_objects-->ranker_boefje
+    thread_reschedule-->ranker_boefje
     ranker_boefje-->pq_boefjes
 
     subgraph normalizer scheduler organisation 1
@@ -242,51 +284,86 @@ flowchart LR
 
 style thread_scan_profile stroke-dasharray: 5 5
 style thread_enabled_boefjes stroke-dasharray: 5 5
-style thread_random_objects stroke-dasharray: 5 5
+style thread_reschedule stroke-dasharray: 5 5
 style thread_raw_file_received stroke-dasharray: 5 5
 ```
 
-##### Boefje scheduler
+### Boefje scheduler
 
 For a `boefje` scheduler the following events will trigger a dataflow procedure
-to be executed and subsequently the creation of a `boefje` task.:
+to be executed and subsequently the creation of a `boefje` task:
 
-1. scan level mutation of an ooi (object or object-of-interest)
-2. new and/or enabled boefje
-3. rescheduling of ooi's and associated boefjes
-4. scan job creation from rocky
+1. **scan profile mutation**: the scan profile level of an ooi increased
+2. **enabled boefje**: a boefje has been enabled
+3. **rescheduling**: a prior task has been rescheduled
+4. **scan initiated**: from the webapp rocky a scan has been initiated
 
-**1. Scan level mutation**
+**1. Scan profile mutation**
+
+```mermaid
+                                                        flowchart LR
+  rmq_scan_profile([scan profile mutations])
+
+  subgraph mula
+    subgraph boefje scheduler organisation 1
+
+      pq_boefjes(priority queue boefjes)
+
+      subgraph threads_boefje["threads"]
+        thread_scan_profile[[scan profile mutations]]
+      end
+
+      ranker_boefje-->pq_boefjes
+      ranker_boefje{{ranker}}
+
+    end
+
+    thread_scan_profile-->ranker_boefje
+
+    subgraph server
+    end
+
+    pq_boefjes-->server
+
+  end
+
+  rmq_scan_profile-->thread_scan_profile
+
+style thread_scan_profile stroke-dasharray: 5 5
+```
 
 When a scan level is increased on an OOI
-(`schedulers.boefje.push_tasks_for_scan_profile_mutations`), this will get the
-priority of 2.
+(`schedulers.boefje.push_tasks_for_scan_profile_mutations`) the following will
+happen:
 
-* When scan level mutation occurred, the `Scheduler` system will get the
+- When scan level mutation occurs, the `Scheduler` system will get the
   scan profile mutation from the `RabbitMQ` system.
 
-* For the associated OOI of this scan profile mutation, the `Scheduler`
-  system will get the enabled boefjes for this OOI. (`tasks = ooi * boefjes`)
+- For the associated OOI of this scan profile mutation, the `Scheduler`
+  system will fetch the enabled boefjes for this OOI. (`tasks = ooi * boefjes`)
 
-* For each enabled boefje, a `BoefjeTask` will be created and added to the
- `PriorityQueue` of the `BoefjeScheduler`. A `BoefjeTask` is an object
- with the correct specification for the task runner to execute a boefje.
+- For each enabled boefje, a `BoefjeTask` will be created and added to the
+  `PriorityQueue` of the `BoefjeScheduler` as a 'PrioritizedItem`.
+A `BoefjeTask` is an object with the correct specification for the task
+  runner to execute a boefje.
 
-* Each task will be checked if it is:
+- Each task will be checked if it is:
 
-    * `is_allowed_to_run()`
+  - `is_allowed_to_run()`
 
-    * `is_task_running()`
+  - `is_task_running()`
 
-    * `has_grace_period_passed()`
+  - `has_grace_period_passed()`
 
-    * `is_item_on_queue_by_hash()`
+  - `is_item_on_queue_by_hash()`
 
-* The `BoefjeScheduler` will then create a `PrioritizedItem` and push it to
-  the queue. The `PrioritizedItem` will contain the created `BoefjeTask`.
-  Additionally the `BoefjeTask` will be added to the database
-  (`post_push()`). And serves as a log of the tasks that have been
-  queued/executed, and can be queried through the API.
+- The `BoefjeScheduler` will then create a `PrioritizedItem` and pushes it to
+  the queue. The `PrioritizedItem` will contain the created `BoefjeTask` within
+  a data field.
+
+- The `BoefjeTask` will be added to the database (`post_push()`). And serves
+  as a log of the current and prior tasks that have been queued/executed,
+  and can be queried through the API.
 
 ```mermaid
 sequenceDiagram
@@ -336,18 +413,19 @@ sequenceDiagram
     Scheduler->>PriorityQueueStore: push_item_to_queue_with_timeout()
 ```
 
-**2. New Boefjes**
+**2. Enabled Boefjes**
 
-When a plugin of type `boefje` is enabled or disabled in Rocky. This is
-triggered when the plugin cache of an organisation is flushed.
+When a plugin of type `boefje` is enabled or disabled in the Katalogus. The
+scheduler will take notice of it by referencing its internal cache of all
+the available plugins of an organisation. This will happen after:
 
-* The cache of the organisation will be flushed at a specified interval.
+- The cache of the organisation is flushed at a specified interval.
 
-* Due to the flushing of the cache we get a new list of enabled boefjes for
-  an organisation.
+- Due to the flushing of the cache we get a new list of enabled boefjes for
+  an organisation will be created.
   (`connectors.services.katalogus._flush_organisations_boefje_type_cache()`)
 
-* New tasks will be created for enabled boefjes.
+- New tasks will be created for enabled boefjes.
 
 ```mermaid
 sequenceDiagram
@@ -392,56 +470,49 @@ sequenceDiagram
     end
 ```
 
-2. Rescheduling of oois (`schedulers.boefje.push_tasks_for_random_objects`). In
-   order to fill up the queue and to enforce that we reschedule tasks. We
-   continuously get a batch of random ooi's from octopoes
-   (`get_random_objects`). The tasks of from these ooi's (`tasks = ooi * boefjes`)
-   will get the priority that has been calculated by the ranker. At the moment
-   a task will get the priority of 3, when 7 days have gone by (e.g. how longer
-   it hasn't been running the higher the priority it will get). For everything
-   before those 7 days it will scale the priority appropriately.
+**3. Rescheduling**
 
-    * From Octopoes we get `n` random ooi's (`get_random_objects`)
+For every `Task` that has been created within the scheduler a `Job` is created
+for it. A `Job` contains the blueprint of an executed `Task` and is wrapped
+within a `PrioritizedItem` so that it can be pushed onto the queue. A `Job` has
+a 1:m relation to executed tasks.
 
-    * For each OOI, the `Scheduler` will get the enabled boefjes for this OOI.
-      (`tasks = ooi * boefjes`)
+These `Job` models allow us to keep track of tasks that need to be
+rescheduled and executed at another time in the future. Either by calculation
+(calculation of a new deadline), or by specification (adding a cron expression).
 
-    * For each enabled boefje, a `BoefjeTask` will be created and added to the
-     `PriorityQueue` of the `BoefjeScheduler`.
+The scheduler continuously checks for jobs where their deadline has passed:
 
-    * Each task will be checked if it is:
+- Get all jobs for which the deadline has passed
+- Evaluate job (are we able to run the job, for instance a boefje scheduler: is
+  the ooi available, is boefje available, are scan levels correct)
+- Calculate priority, and push to queue
+- Calculate and set deadline (using information about the results of the task)
+  for the job on signal job of finished
 
-        * `is_allowed_to_run()`
-
-        * `is_task_running()`
-
-        * `has_grace_period_passed()`
-
-        * `is_item_on_queue_by_hash()`
-
-    * The `BoefjeScheduler` will then create a `PrioritizedItem` and push it to
-      the queue. The `PrioritizedItem` will contain the created `BoefjeTask`.
-      Additionally the `BoefjeTask` will be added to the database
-      (`post_push()`). And serves as a log of the tasks that have been
-      queued/executed, and can be queried through the API.
-
-    ```mermaid
-    sequenceDiagram
+```mermaid
+sequenceDiagram
     participant Scheduler
 
+    participant JobStore
+    participant TaskStore
+    participant Katalogus
     participant Octopoes
     participant Bytes
-    participant TaskStore
     participant PriorityQueueStore
 
-    Scheduler->>Octopoes: get_random_objects()
+    Scheduler->>JobStore: jobs = get_jobs()  // Get all jobs where the deadline has passed
 
-    loop for ooi in random_oois
-        Scheduler->>Octopoes: get_boefjes_for_ooi()
+    loop for job in jobs
+        Scheduler->>Katalogus: get_boefjes()
+        Scheduler->>Scheduler: is boefje enabled?
+        Scheduler->>Scheduler: ooi still existing?
+        Scheduler->>Scheduler: boefje can still consume ooi?
+        Scheduler->>Scheduler: boefje allowed to scan ooi??
     end
 
     rect rgb(191, 223, 255)
-    note right of Scheduler: push_task(boefje, ooi)
+    note right of Scheduler: push_task()
         Scheduler->>Scheduler: Create BoefjeTask object
         Scheduler->>Scheduler: is_task_allowed_to_run()
 
@@ -465,14 +536,33 @@ sequenceDiagram
         Scheduler->>Scheduler: Create PrioritizedItem
         Scheduler->>PriorityQueueStore: push_item_to_queue_with_timeout()
     end
-    ```
 
-3. Scan jobs created by the user in Rocky (`server.push_queue`), these tasks
-   will get the highest priority of 1. Note, that this will circumvent all
-   the checks that are present in
+    rect rgb(191, 223, 255)
+    note right of Scheduler: post_push()
+        Scheduler->>TaskStore: get_task_by_id()
+        alt task is None
+            Scheduler->>TaskStore: create_task()
+        else task is not None
+            Scheduler->>TaskStore: update_task()
+        end
 
-   * Rocky will create a `BoefjeTask` that will be pushed directly to the
-     specified queue.
+        Scheduler->>JobStore: get_job_by_hash()
+        alt job is None
+            Scheduler->>JobStore: create_job()
+        else job is not None
+            Scheduler->>JobStore: update_job()
+        end
+    end
+```
+
+**4. Scan initiated**
+
+Scan jobs created by the user in Rocky (`server.push_queue`), these tasks will
+get the highest priority of 1. Note, that this will circumvent all the checks
+that are present in
+
+- Rocky will create a `BoefjeTask` that will be pushed directly to the
+  specified queue.
 
 ```mermaid
 sequenceDiagram
@@ -486,22 +576,26 @@ sequenceDiagram
     Scheduler->>PriorityQueueStore: push()
 ```
 
+### Normalizer Scheduler
 
-##### Creation of normalizer jobs
+For a `normalizer` task the following events will trigger a dataflow procedure
 
-For a `normalizer` job the following events will trigger a dataflow procedure
+1. **raw file received**: bytes creates a signal on the message queue that
+   it created a raw file.
 
-1. When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
+\*_ 1. Raw file received_
 
-    * The `NormalizerScheduler` retrieves raw files that have been created in
-      Bytes from a message queue.
+When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
 
-    * For every mime type of the raw file, the `NormalizerScheduler` will
-      retrieve the enabled normalizers for this mime type.
-      (`create_tasks_for_raw_data()`)
+- The `NormalizerScheduler` retrieves raw files that have been created in
+  Bytes from a message queue.
 
-    * For every enabled normalizer, a `NormalizerTask` will be created and
-      added to the `PriorityQueue` of the `NormalizerScheduler`.
+- For every mime type of the raw file, the `NormalizerScheduler` will
+  retrieve the enabled normalizers for this mime type.
+  (`create_tasks_for_raw_data()`)
+
+- For every enabled normalizer, a `NormalizerTask` will be created and added
+  to the `PriorityQueue` of the `NormalizerScheduler`.
 
 ```mermaid
 sequenceDiagram
@@ -557,120 +651,25 @@ sequenceDiagram
     Scheduler->>PriorityQueueStore: push_item_to_queue_with_timeout()
 ```
 
-#### C4 Code level (Condensed class diagram)
-
-The following diagram we can explore the code level of the scheduler
-application, and its class structure.
-
-```mermaid
-classDiagram
-
-    class App {
-        +AppContext ctx
-        +Dict[str, ThreadRunner] threads
-        +Dict[str, Scheduler] schedulers
-        +Dict[str, Listener] listeners
-        +Server server
-        shutdown()
-        run()
-    }
-
-    class Scheduler {
-        <<abstract>>
-        +AppContext ctx
-        +PriorityQueue queue
-        +Ranker ranker
-        +Dict[str, ThreadRunner] threads
-        +Dict[str, Listener] listeners
-        push_items_to_queue()
-        push_item_to_queue()
-        pop_item_from_queue()
-        pop_item_from_queue_with_timeout()
-        post_push()
-        post_pop()
-        run_in_thread()
-        enable()
-        disabled()
-        is_enabled()
-        is_space_on_queue()
-        is_item_on_queue_by_hash()
-        stop()
-        stop_listeners()
-        stop_threads()
-        run()
-    }
-
-    class PriorityQueue{
-        <<abstract>>
-        +PriorityQueueStore pq_store
-        pop()
-        push()
-        peek()
-        remove()
-        empty()
-        qsize()
-        full()
-        is_item_on_queue()
-        get_p_item_by_identifier()
-        create_hash()
-        dict()
-        _is_valid_item()
-    }
-
-    class PriorityQueueStore{
-        +Datastore datastore
-        pop()
-        push()
-        peek()
-        update()
-        remove()
-        get()
-        empty()
-        qsize()
-        get_item_by_hash()
-        get_items_by_scheduler_id()
-    }
-
-    class Ranker {
-        <<abstract>>
-        +AppContext ctx
-        rank()
-    }
-
-    class Listener {
-        listen()
-    }
-
-    App --|> "many" Scheduler : Implements
-    App --|> "many" Listener : Has
-
-    Scheduler --|> "1" PriorityQueue : Has
-    Scheduler --|> "1" Ranker : Has
-    Scheduler --|> "many" ThreadRunner : Has
-    Scheduler --|> "many" Listener : Has
-
-    PriorityQueue --|> PriorityQueueStore: References
-```
-
 The following describes the main components of the scheduler application:
 
-* `App` - The main application class, which is responsible for starting the
+- `App` - The main application class, which is responsible for starting the
   schedulers. It also contains the server, which is responsible for handling
   the rest api requests. The `App` implements multiple `Scheduler` instances.
   The `run()` method starts the schedulers, the listeners, the monitors, and
   the server in threads. The `run()` method is the main thread of the
   application.
 
-* `Scheduler` - And implementation of a `Scheduler` class is responsible for
+- `Scheduler` - And implementation of a `Scheduler` class is responsible for
   populating the queue with tasks. Contains has a `PriorityQueue` and a
   `Ranker`. The `run()` method starts executes threads and listeners, which
   fill up the queue with tasks.
 
-* `PriorityQueue` - The queue class, which is responsible for storing the
+- `PriorityQueue` - The queue class, which is responsible for storing the
   tasks.
 
-* `Ranker` - The ranker class, which is responsible for ranking the tasks,
+- `Ranker` - The ranker class, which is responsible for ranking the tasks,
   and can be called from the `Scheduler` class in order to rank the tasks.
 
-* `Server` - The server class, which is responsible for handling the HTTP
+- `Server` - The server class, which is responsible for handling the HTTP
   requests.
