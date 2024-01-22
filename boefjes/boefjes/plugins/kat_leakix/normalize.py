@@ -118,9 +118,9 @@ def handle_hostname(event, network):
     try:
         ipvx = ipaddress.ip_address(event["ip"])
         if ipvx.version == 4:
-            ip_ooi = IPAddressV4(address=event["ip"], network=network)
+            ip_ooi = IPAddressV4(address=event["host"], network=network)
         else:
-            ip_ooi = IPAddressV6(address=event["ip"], network=network)
+            ip_ooi = IPAddressV6(address=event["host"], network=network)
         yield ip_ooi
         return ip_ooi.reference
     except ValueError:
