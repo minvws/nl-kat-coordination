@@ -7,6 +7,6 @@ Section: python
 Priority: optional
 Architecture: any
 Pre-Depends: ${misc:Pre-Depends}
-Depends: ${python}, openssl, ${misc:Depends}, ${shlibs:Depends}
+Depends: ${python}, openssl, ${misc:Depends}, ${shlibs:Depends}, libpango-1.0-0, libpangoft2-1.0-0
 Description: Rocky web interface for KAT
   This is the web interface component of the KAT project.
