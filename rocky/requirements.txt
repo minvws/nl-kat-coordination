@@ -1257,8 +1257,6 @@ uvloop==0.18.0 ; sys_platform != "win32" and platform_python_implementation == "
     --hash=sha256:ed3c28337d2fefc0bac5705b9c66b2702dc392f2e9a69badb1d606e7e7f773bb \
     --hash=sha256:edbb4de38535f42f020da1e3ae7c60f2f65402d027a08a8c60dc8569464873a6 \
     --hash=sha256:f3b18663efe0012bc4c315f1b64020e44596f5fabc281f5b0d9bc9465288559c
-uwsgi==2.0.22 ; python_version >= "3.8" and python_version < "4.0" \
-    --hash=sha256:4cc4727258671ac5fa17ab422155e9aaef8a2008ebb86e4404b66deaae965db2
 watchfiles==0.21.0 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:02b73130687bc3f6bb79d8a170959042eb56eb3a42df3671c79b428cd73f17cc \
     --hash=sha256:02d91cbac553a3ad141db016e3350b03184deaafeba09b9d6439826ee594b365 \

@@ -327,8 +327,7 @@ def immutable_file_test(path, url):
 
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
-# TODO: set this to True when we aren't using uWSGI anymore
-WHITENOISE_KEEP_ONLY_HASHED_FILES = False
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
