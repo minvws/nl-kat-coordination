@@ -152,6 +152,7 @@ INSTALLED_APPS = [
     "tagulous",
     "compressor",
     "reports",
+    "knox",
     # "drf_standardized_errors",
 ]
 
@@ -459,3 +460,5 @@ TAG_BORDER_TYPES = [
 ]
 
 WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:80/")
+
+KNOX_TOKEN_MODEL = "account.AuthToken"

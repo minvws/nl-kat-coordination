@@ -287,6 +287,10 @@ msgstr ""
 msgid "date joined"
 msgstr ""
 
+#: account/models.py
+msgid "name"
+msgstr ""
+
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr ""
