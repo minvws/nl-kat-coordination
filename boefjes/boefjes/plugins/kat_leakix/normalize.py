@@ -164,7 +164,7 @@ def handle_leak(event, event_ooi_reference, software_ooi):
         elif leak_severity in SEVERITY_FINDING_MAPPING:
             kat_finding = SEVERITY_FINDING_MAPPING[leak_severity]
         elif leak_stage in SEVERITY_LEAKSTAGE_MAPPING:
-            kat_finding = SEVERITY_LEAKSTAGE_MAPPING[leak_stage]            
+            kat_finding = SEVERITY_LEAKSTAGE_MAPPING[leak_stage]
 
         finding_type = KATFindingType(id=kat_finding)
         yield finding_type
