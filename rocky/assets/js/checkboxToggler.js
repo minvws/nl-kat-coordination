@@ -15,3 +15,46 @@ function toggleCheckboxes(name, value) {
     }
   };
 }
+
+const checkbox_required_anchors = document.querySelectorAll(".required");
+for (var i = 0; i < checkbox_required_anchors.length; i++) {
+  let anchor = checkbox_required_anchors[i];
+  if (anchor.type == 'checkbox'){
+    // we are looking at a checkbox itself, asume we want all checkboxes with the same name in the same form
+    var form = anchor.form;
+    var collection = form.getElementsByName(anchor.name);
+  } else if (anchor.type == 'form'){
+    var form = collection;
+    var collection = anchor.getElementsByTagName('checkbox')
+  } else {
+    // we are looking at a parent of a group of checkboxes. lets collect all underlying checkboxes.
+    var collection = anchor.getElementsByTagName('checkbox');
+    var form = collection[0].form;
+  }
+
+  form.addEventListener("submit", checkbox_required_validity.bind(null, form, anchor));
+};
+
+function checkbox_required_validity(form, anchor, event) {
+  //  validate the current list of checkboxes against the current min/max required settings only at submit time.
+  var selected_count = 0;
+  var error_element = null;
+  if (anchor.type == 'checkbox'){
+    // we are looking at a checkbox itself, asume we want all checkboxes with the same name in the same form
+    selected_count = anchor.form.querySelectorAll('checkbox[name='+name+']:checked').length;
+    error_element = anchor.form.querySelector('checkbox[name='+name+']');
+  } else {
+    // we are looking at a parent of a group of checkboxes. lets collect all underlying checkboxes.
+    selected_count = anchor.querySelectorAll('checkbox:checked').length;
+    error_element = anchor.form.querySelector('checkbox');
+  }
+
+  var minselected = 1;
+  error_element.setCustomValidity("");
+  if (("min" in anchor.dataset) && anchor.dataset.min > selected_count) {
+      error_element.setCustomValidity('Not enough checkboxes selected.');
+  } else if (("max" in anchor.dataset) && anchor.dataset.max < selected_count) {
+      error_element.setCustomValidity('Too many checkboxes selected.');
+  }
+  error_element.reportVality();
+}
