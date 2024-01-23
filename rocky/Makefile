@@ -23,7 +23,7 @@ build-rocky-native:
 	python3 manage.py compilemessages
 
 build-rocky-frontend:
-	docker run --rm -v $$PWD:/app/rocky node:18-bookworm sh -c "cd /app/rocky && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
+	docker run --rm -v $$PWD:/app/rocky node:20-bookworm sh -c "cd /app/rocky && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
 
 almost-flush:
 	docker-compose run --rm rocky python manage.py almost_flush
