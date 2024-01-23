@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<div class="horizontal-scroll">
+    <h3>{{ data.finding_type_id }}</h3>
+    <table>
+        <caption class="visually-hidden">{% translate "Findings information" %}</caption>
+        <dl>
+            {% for key, value in data.summary.items %}
+                <div>
+                    <dt>{{ key }}</dt>
+                    <dd>
+                        {{ value }}
+                    </dd>
+                </div>
+            {% endfor %}
+        </dl>
+    </table>
+    <table>
+        <caption class="visually-hidden">{% translate "Occurrences" %}</caption>
+        <dl>
+            {% for finding in occurrence.list %}
+                <div>
+                    <p>{{ finding.ooi }}</p>
+                    <p>{{ finding.description }}</p>
+                </div>
+            {% endfor %}
+        </dl>
+    </table>
+</div>
