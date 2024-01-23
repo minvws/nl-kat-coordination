@@ -934,6 +934,25 @@ phonenumbers = ["phonenumbers (>=7.0.2)"]
 phonenumberslite = ["phonenumberslite (>=7.0.2)"]
 
 [[package]]
+name = "django-rest-knox"
+version = "4.2.0"
+description = "Authentication for django rest framework"
+optional = false
+python-versions = ">=3.6"
+files = []
+develop = false
+
+[package.dependencies]
+django = ">=3.2"
+djangorestframework = "*"
+
+[package.source]
+type = "git"
+url = "https://github.com/jazzband/django-rest-knox"
+reference = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9"
+resolved_reference = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9"
+
+[[package]]
 name = "django-tagulous"
 version = "1.3.3"
 description = "Fabulous Tagging for Django"
@@ -1549,13 +1568,13 @@ requirements-deprecated-finder = ["pip-api", "pipreqs"]
 
 [[package]]
 name = "jinja2"
-version = "3.1.2"
+version = "3.1.3"
 description = "A very fast and expressive template engine."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
-    {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
+    {file = "Jinja2-3.1.3-py3-none-any.whl", hash = "sha256:7d6d50dd97d52cbc355597bd845fabfbac3f551e1f99619e39a35ce8c370b5fa"},
+    {file = "Jinja2-3.1.3.tar.gz", hash = "sha256:ac8bd6544d4bb2c9792bf3a159e80bba8fda7f07e81bc3aed565432d5925ba90"},
 ]
 
 [package.dependencies]
@@ -4383,4 +4402,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "81ea65195a88fb78cc48260175aaecff8f8ed6d3e1fa67dd1216b8d2a0509f94"
+content-hash = "115c4d4972e8de86f47330066793abc90cf8fac297f49a5f5af5fe466db75773"

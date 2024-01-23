@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 14:09+0000\n"
+"POT-Creation-Date: 2024-01-19 09:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -285,6 +285,10 @@ msgstr ""
 
 #: account/models.py
 msgid "date joined"
+msgstr ""
+
+#: account/models.py
+msgid "name"
 msgstr ""
 
 #: account/templates/account_detail.html account/views/account.py
@@ -2850,6 +2854,11 @@ msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Export"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: rocky/templates/oois/ooi_report.html
 #: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
@@ -3360,6 +3369,14 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/report.py
 msgid "Multi Organization Report"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Best scoring security check"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Worst scoring security check"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
@@ -4189,7 +4206,7 @@ msgstr ""
 msgid "Only CSV file supported"
 msgstr ""
 
-#: tools/forms/upload_csv.py tools/forms/upload_raw.py
+#: tools/forms/upload_csv.py
 msgid "File could not be decoded"
 msgstr ""
 
@@ -4227,10 +4244,6 @@ msgstr ""
 
 #: tools/forms/upload_oois.py
 msgid "Choose a type of which objects are added."
-msgstr ""
-
-#: tools/forms/upload_raw.py
-msgid "Organization code(s) for raw does not exist in our database"
 msgstr ""
 
 #: tools/forms/upload_raw.py
@@ -5654,10 +5667,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_csv.html rocky/views/upload_csv.py
 msgid "Upload CSV"
-msgstr ""
-
-#: rocky/templates/partials/ooi_list_toolbar.html
-msgid "Export"
 msgstr ""
 
 #: rocky/templates/partials/ooi_list_toolbar.html

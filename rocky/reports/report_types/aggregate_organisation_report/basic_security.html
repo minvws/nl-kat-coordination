@@ -31,28 +31,44 @@
                     {#For the multi report, "data.services|get_item:service" is a list to avoid deduplication #}
                     <td>{{ service }} {% translate "server" %} ({{ data.services|get_item:service|length }})</td>
                     <td>
-                        {% if compliance.safe_connections.number_of_compliant != compliance.safe_connections.total %}
-                            <span class="icon incomplete"></span>
+                        {% if compliance.safe_connections.total == 0 %}
+                            -
                         {% else %}
-                            <span class="icon positive"></span>
+                            {% if compliance.safe_connections.number_of_compliant != compliance.safe_connections.total %}
+                                <span class="icon incomplete"></span>
+                            {% else %}
+                                <span class="icon positive"></span>
+                            {% endif %}
+                            {% if data.multi_data %}
+                                {{ compliance.safe_connections.number_of_compliant }}/{{ compliance.safe_connections.total }}
+                            {% else %}
+                                <a href="#safe-connections-{{ service }}">{{ compliance.safe_connections.number_of_compliant }}/{{ compliance.safe_connections.total }}</a>
+                            {% endif %}
                         {% endif %}
-                        {{ compliance.safe_connections.number_of_compliant }}/{{ compliance.safe_connections.total }}
                     </td>
                     <td>
-                        {% if compliance.system_specific.number_of_compliant != compliance.system_specific.total %}
-                            <span class="icon incomplete"></span>
+                        {% if compliance.system_specific.total == 0 %}
+                            -
                         {% else %}
-                            <span class="icon positive"></span>
+                            {% if compliance.system_specific.number_of_compliant != compliance.system_specific.total %}
+                                <span class="icon incomplete"></span>
+                            {% else %}
+                                <span class="icon positive"></span>
+                            {% endif %}
+                            <a href="#system-specific-{{ service }}">{{ compliance.system_specific.number_of_compliant }}/{{ compliance.system_specific.total }}</a>
                         {% endif %}
-                        {{ compliance.system_specific.number_of_compliant }}/{{ compliance.system_specific.total }}
                     </td>
                     <td>
-                        {% if compliance.rpki.number_of_compliant != compliance.rpki.total %}
-                            <span class="icon incomplete"></span>
+                        {% if compliance.rpki.total == 0 %}
+                            -
                         {% else %}
-                            <span class="icon positive"></span>
+                            {% if compliance.rpki.number_of_compliant != compliance.rpki.total %}
+                                <span class="icon incomplete"></span>
+                            {% else %}
+                                <span class="icon positive"></span>
+                            {% endif %}
+                            <a href="#rpki-{{ service }}">{{ compliance.rpki.number_of_compliant }}/{{ compliance.rpki.total }}</a>
                         {% endif %}
-                        {{ compliance.rpki.number_of_compliant }}/{{ compliance.rpki.total }}
                     </td>
                 </tr>
             {% endfor %}
