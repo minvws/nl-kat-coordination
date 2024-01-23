@@ -23,10 +23,17 @@ from octopoes.models.ooi.network import (
 from octopoes.models.ooi.software import Software, SoftwareInstance
 
 SEVERITY_FINDING_MAPPING = {
+    "critical": "KAT-LEAKIX-CRITICAL",
     "high": "KAT-LEAKIX-HIGH",
     "medium": "KAT-LEAKIX-MEDIUM",
     "low": "KAT-LEAKIX-LOW",
     "info": "KAT-LEAKIX-RECOMMENDATION",
+}
+
+SEVERITY_LEAKSTAGE_MAPPING = {
+    "open": "KAT-LEAKIX-LOW", # no severity given, default = low
+    "explore": "KAT-LEAKIX-HIGH", # no severity given, default = high
+    "exfiltrate": "KAT-LEAKIX-CRITICAL",
 }
 
 
@@ -58,7 +65,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
             # we only need the last ooi's reference
             event_ooi_reference = ooi.reference
             ip_port_ooi_reference = event_ooi_reference
-                       
+
         if event["host"]:
             host_ooi = handle_hostname(event, network_reference)
             yield ooi
@@ -98,7 +105,7 @@ def handle_ip(event, network_reference, as_ooi_reference):
 
     ip_ooi = ip_type(address=ip, network=network_reference)
     yield ip_ooi
-    
+
     if as_ooi and len(netblock_range) == 2:
         yield block_type(
             network=network_reference,
@@ -108,13 +115,12 @@ def handle_ip(event, network_reference, as_ooi_reference):
         )
 
     # Store port
-    ip_port_ooi = IPPort(
+    yield IPPort(
         address=ip_ooi.reference,
         protocol=Protocol("tcp" if event["protocol"] != "udp" else "udp"),
         port=int(event["port"]),
         state=PortState("open"),
     )
-    yield ip_port_ooi
 
 
 def handle_hostname(event, network_reference):
@@ -154,19 +160,12 @@ def handle_leak(event, event_ooi_reference, software_ooi):
 
         # new stage or severity, default to low
         kat_finding = "KAT-LEAKIX-LOW"
-        if leak_severity == "critical" or leak_infected or leak_ransomnote:
+        if leak_infected or leak_ransomnote:
             kat_finding = "KAT-LEAKIX-CRITICAL"
         elif leak_severity in SEVERITY_FINDING_MAPPING:
             kat_finding = SEVERITY_FINDING_MAPPING[leak_severity]
-        elif leak_stage == "open":
-            # no severity given, default = low
-            kat_finding = "KAT-LEAKIX-LOW"
-        elif leak_stage == "explore":
-            # no severity given, default = high
-            kat_finding = "KAT-LEAKIX-HIGH"
-        elif leak_stage == "exfiltrate":
-            # no severity given, default = critical
-            kat_finding = "KAT-LEAKIX-CRITICAL"
+        elif leak_stage in SEVERITY_LEAKSTAGE_MAPPING:
+            kat_finding = SEVERITY_LEAKSTAGE_MAPPING[leak_stage]            
 
         finding_type = KATFindingType(id=kat_finding)
         yield finding_type
@@ -186,7 +185,7 @@ def handle_leak(event, event_ooi_reference, software_ooi):
 
         yield Finding(
             finding_type=finding_type.reference,
-            ooi=software_ooi.reference if software_ooi or event_source_reference,
+            ooi=software_ooi.reference if software_ooi else event_source_reference,
             description=", ".join(kat_info),
         )
 
