@@ -3920,6 +3920,17 @@ msgstr ""
 msgid "Select at least one report type to proceed."
 msgstr ""
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#, python-format
+msgid ""
+"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+msgstr ""
+
+#: reports/views/base.py
+#, python-format
+msgid "Report type '%s' does not exist."
+msgstr ""
+
 #: reports/views/generate_report.py
 msgid "This report may not show all the data as some plugins are not enabled."
 msgstr ""
