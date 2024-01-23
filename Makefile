@@ -100,10 +100,6 @@ endif
 	make -C boefjes build
 
 # Build Debian 11 build image
-debian11-build-image:
-	docker build -t kat-debian11-build-image packaging/debian11
-
-# Build Debian 11 build image
 debian12-build-image:
 	docker build -t kat-debian12-build-image packaging/debian12
 
