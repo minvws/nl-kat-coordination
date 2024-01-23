@@ -20,7 +20,7 @@ const checkbox_required_anchors = document.querySelectorAll(".required");
 for (var i = 0; i < checkbox_required_anchors.length; i++) {
   let anchor = checkbox_required_anchors[i];
   if (anchor.type == 'checkbox'){
-    // we are looking at a checkbox itself, asume we want all checkboxes with the same name in the same form
+    // we are looking at a checkbox itself, assume we want all checkboxes with the same name in the same form
     var form = anchor.form;
     var collection = form.getElementsByName(anchor.name);
   } else if (anchor.type == 'form'){
