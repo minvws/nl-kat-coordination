@@ -50,13 +50,13 @@ services:
       rabbitmq:
         condition: service_healthy
     ports:
-      - "127.0.0.1:8001:8000"
+      - "127.0.0.1:8001:80"
     build:
       context: octopoes/
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/octopoes/octopoes
+    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80 --reload --reload-dir /app/octopoes/octopoes
     env_file:
       - .env-defaults
       - .env
