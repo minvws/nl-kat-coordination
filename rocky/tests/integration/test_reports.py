@@ -237,10 +237,10 @@ def test_multi_report(
 
     reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     report_types = [{"id": x.id, "name": "", "description": ""} for x in reports]
-    _, data, report_data = aggregate_reports(
+    _, data, report_data, _ = aggregate_reports(
         octopoes_api_connector, ["Hostname|test|example.com"], report_types, valid_time
     )
-    _, data_2, report_data_2 = aggregate_reports(
+    _, data_2, report_data_2, _ = aggregate_reports(
         octopoes_api_connector_2, ["Hostname|test|example.com"], report_types, valid_time
     )
 
