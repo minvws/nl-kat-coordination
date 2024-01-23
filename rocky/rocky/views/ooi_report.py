@@ -17,6 +17,7 @@ from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSAAAARecord,
     DNSARecord,
+    DNSCAARecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSSOARecord,
@@ -201,10 +202,12 @@ class DNSReport(Report):
         DNSMXRecord,
         DNSNSRecord,
         DNSSOARecord,
+        DNSCAARecord,
         Hostname,
     ]
     allowed_finding_types = [
         "KAT-WEBSERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-TWO-IPV6",
+        "KAT-NO-CAA",
     ]
