@@ -16,7 +16,7 @@ function toggleCheckboxes(name, value) {
   };
 }
 
-const checkbox_required_anchors = document.querySelectorAll(".required");
+const checkbox_required_anchors = document.querySelectorAll(".checkboxes_required");
 for (var i = 0; i < checkbox_required_anchors.length; i++) {
   let anchor = checkbox_required_anchors[i];
   if (anchor.type == 'checkbox'){
