@@ -31,8 +31,8 @@ SEVERITY_FINDING_MAPPING = {
 }
 
 SEVERITY_LEAKSTAGE_MAPPING = {
-    "open": "KAT-LEAKIX-LOW", # no severity given, default = low
-    "explore": "KAT-LEAKIX-HIGH", # no severity given, default = high
+    "open": "KAT-LEAKIX-LOW",  # no severity given, default = low
+    "explore": "KAT-LEAKIX-HIGH",  # no severity given, default = high
     "exfiltrate": "KAT-LEAKIX-CRITICAL",
 }
 
@@ -68,8 +68,8 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
 
         if event["host"]:
             host_ooi = handle_hostname(event, network_reference)
-            yield ooi
-            event_ooi_reference = ooi.reference
+            yield host_ooi
+            event_ooi_reference = host_ooi.reference
 
         software_ooi = None
         for ooi in list(handle_software(event, event_ooi_reference)):
@@ -106,7 +106,7 @@ def handle_ip(event, network_reference, as_ooi_reference):
     ip_ooi = ip_type(address=ip, network=network_reference)
     yield ip_ooi
 
-    if as_ooi and len(netblock_range) == 2:
+    if as_ooi_reference and len(netblock_range) == 2:
         yield block_type(
             network=network_reference,
             start_ip=ip_ooi.reference,
@@ -151,7 +151,6 @@ def handle_software(event, event_ooi_reference):
 
 def handle_leak(event, event_ooi_reference, software_ooi):
     leak_severity = event.get("leak", {}).get("severity")
-    event_source = event.get("event_source")
     leak_stage = event.get("leak", {}).get("dataset", {}).get("stage")
     if leak_severity or leak_stage:
         #  Got the different severities from: https://pkg.go.dev/github.com/LeakIX/l9format#pkg-constants
@@ -174,7 +173,7 @@ def handle_leak(event, event_ooi_reference, software_ooi):
         if software_ooi:
             kat_info.append(f'Software = "{software_ooi.name}".')
         else:
-            kat_info.append(f'Plugin = "{event_source_reference}".')
+            kat_info.append(f'Plugin = "{event_ooi_reference}".')
 
         if leak_infected:
             kat_info.append("Found evidence of external activity.")
@@ -185,7 +184,7 @@ def handle_leak(event, event_ooi_reference, software_ooi):
 
         yield Finding(
             finding_type=finding_type.reference,
-            ooi=software_ooi.reference if software_ooi else event_source_reference,
+            ooi=software_ooi.reference if software_ooi else event_ooi_reference,
             description=", ".join(kat_info),
         )
 
