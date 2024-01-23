@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 13:46+0000\n"
+"POT-Creation-Date: 2024-01-19 09:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4195,7 +4195,7 @@ msgstr ""
 msgid "Only CSV file supported"
 msgstr ""
 
-#: tools/forms/upload_csv.py tools/forms/upload_raw.py
+#: tools/forms/upload_csv.py
 msgid "File could not be decoded"
 msgstr ""
 
@@ -4233,10 +4233,6 @@ msgstr ""
 
 #: tools/forms/upload_oois.py
 msgid "Choose a type of which objects are added."
-msgstr ""
-
-#: tools/forms/upload_raw.py
-msgid "Organization code(s) for raw does not exist in our database"
 msgstr ""
 
 #: tools/forms/upload_raw.py

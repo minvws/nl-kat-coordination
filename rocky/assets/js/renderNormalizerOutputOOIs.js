@@ -71,9 +71,8 @@ buttons.forEach((button) => {
 });
 
 function escapeHTMLEntities(input){
-  output = input.replace(/'/g, '&apos;');
+  var output = input.replace(/'/g, '&apos;');
   output = output.replace(/"/g, '&quot;');
   output = output.replace(/</g, '&lt;');
-  output = output.replace(/>/g, '&gt;');
-  return output;
+  return output.replace(/>/g, '&gt;');
 }
