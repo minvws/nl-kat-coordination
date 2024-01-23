@@ -119,6 +119,16 @@
                         </td>
                         <td>DNSSEC</td>
                     </tr>
+                    <tr>
+                        <td>
+                            {% if data.security.caa %}
+                                <i class="icon positive"></i>{% translate "Yes" %}
+                            {% else %}
+                                <i class="icon alert"></i>{% translate "No" %}
+                            {% endif %}
+                        </td>
+                        <td>CAA</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
