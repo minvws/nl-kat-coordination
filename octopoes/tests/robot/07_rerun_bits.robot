@@ -22,7 +22,7 @@ Rerun bits
     Run    docker restart ${container_id_worker}
 
     ${container_id_api}    Run
-    ...    docker ps -aq --filter "name=octopoes_octopoes_api" | grep -v $(docker ps -aq --filter "name=octopoes-octopoes_api_worker") | awk '{print $1}'
+    ...    docker ps -aq --filter "name=octopoes-octopoes_api" | grep -v $(docker ps -aq --filter "name=octopoes-octopoes_api_worker") | awk '{print $1}'
     Log    ${container_id_api}
     Run    docker cp .ci/mock_bits/url_classification_mock ${container_id_api}:app/octopoes/bits
     Run    docker restart ${container_id_api}
