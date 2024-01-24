@@ -2,6 +2,11 @@ name: Rocky Run the test suite
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - octopoes/**
       - rocky/**

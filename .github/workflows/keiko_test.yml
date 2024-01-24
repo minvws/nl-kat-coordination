@@ -2,6 +2,11 @@ name: Keiko Run the unit tests
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - keiko/**
   pull_request:

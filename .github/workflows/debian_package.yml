@@ -1,13 +1,13 @@
 name: Debian packages
 
 on:
-  pull_request:
   push:
     branches:
       - 'main'
       - 'release-*'
     tags:
       - '*'
+  pull_request:
 
 jobs:
   changes:
