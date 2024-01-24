@@ -54,6 +54,7 @@
             <tbody>
                 {% for finding_type_id, occurrence in findings_grouped.items()|sort(attribute='1.finding_type.risk_score', reverse=True) %}
                     <tr>
+                        <!-- Correct this data  -->
                         <td>{{ occurrence.finding_type.risk_severity }}</td>
                         <td>{{ occurrence.finding_type.id }}</td>
                         <td>{{ occurrence.list|length }}</td>

@@ -1,29 +1,74 @@
 {% load i18n %}
 
 <div class="horizontal-scroll">
-    <h3>{{ data.finding_type_id }}</h3>
-    <table>
-        <caption class="visually-hidden">{% translate "Findings information" %}</caption>
-        <dl>
-            {% for key, value in data.summary.items %}
-                <div>
-                    <dt>{{ key }}</dt>
-                    <dd>
-                        {{ value }}
-                    </dd>
-                </div>
-            {% endfor %}
-        </dl>
-    </table>
-    <table>
-        <caption class="visually-hidden">{% translate "Occurrences" %}</caption>
-        <dl>
-            {% for finding in occurrence.list %}
-                <div>
-                    <p>{{ finding.ooi }}</p>
-                    <p>{{ finding.description }}</p>
-                </div>
-            {% endfor %}
-        </dl>
-    </table>
+    {% if data.findings %}
+        {% for finding in data.findings %}
+            <h3>{% translate "Findings information" %}</h3>
+            <table>
+                <dl>
+                    <div>
+                        <dt>{% translate "Type" %}</dt>
+                        <dd>
+                            {{ finding.ooi_type }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Finding" %}</dt>
+                        <dd>
+                            {{ finding.finding_type.tokenized.id }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Risk level" %}</dt>
+                        <dd>
+                            {{ finding.finding_type.risk_score }} / 10
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Risk severity" %}</dt>
+                        <dd>
+                            {{ finding.finding_type.risk_severity }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Impact" %}</dt>
+                        <dd>
+                            {{ finding.finding_type.impact }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Description" %}</dt>
+                        <dd>
+                            {{ finding.finding_type.description }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Recommendation" %}</dt>
+                        <dd>
+                            {{ finding.finding_type.recommendation }}
+                        </dd>
+                    </div>
+                </dl>
+            </table>
+            <h3>{% translate "Occurrences" %}</h3>
+            <table>
+                <dl>
+                    <div>
+                        <dt>{% translate "OOI" %}</dt>
+                        <dd>
+                            {{ finding.ooi }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>{% translate "Description" %}</dt>
+                        <dd>
+                            {{ finding.description }}
+                        </dd>
+                    </div>
+                </dl>
+            </table>
+        {% endfor %}
+    {% else %}
+        <p>{% translate "No findings have been found." %}</p>
+    {% endif %}
 </div>
