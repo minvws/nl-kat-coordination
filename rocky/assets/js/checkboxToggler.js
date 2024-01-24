@@ -40,7 +40,7 @@ function checkbox_required_validity(form, anchor, event) {
   var selected_count = 0;
   var error_element = null;
   if (anchor.type == 'checkbox'){
-    // we are looking at a checkbox itself, asume we want all checkboxes with the same name in the same form
+    // we are looking at a checkbox itself, assume we want all checkboxes with the same name in the same form
     selected_count = anchor.form.querySelectorAll('checkbox[name='+name+']:checked').length;
     error_element = anchor.form.querySelector('checkbox[name='+name+']');
   } else {
