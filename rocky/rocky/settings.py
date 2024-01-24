@@ -459,4 +459,4 @@ TAG_BORDER_TYPES = [
     ("dotted", _("Dotted")),
 ]
 
-WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:80/")
+WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
