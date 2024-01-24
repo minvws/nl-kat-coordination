@@ -14,6 +14,7 @@ from octopoes.models.ooi.dns.records import (
     NXDOMAIN,
     DNSAAAARecord,
     DNSARecord,
+    DNSCAARecord,
     DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
@@ -91,6 +92,7 @@ DnsRecordType = Union[
     DNSPTRRecord,
     DNSSOARecord,
     DNSCNAMERecord,
+    DNSCAARecord,
     ResolvedHostname,
     NXDOMAIN,
 ]
