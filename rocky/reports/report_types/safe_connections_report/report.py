@@ -1,14 +1,18 @@
 from datetime import datetime
+from logging import getLogger
 from typing import Any, Dict
 
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
 CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
+
+logger = getLogger(__name__)
 
 
 class SafeConnectionsReport(Report):
@@ -20,14 +24,18 @@ class SafeConnectionsReport(Report):
     template_path = "safe_connections_report/report.html"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
-        reference = Reference.from_str(input_ooi)
+        try:
+            ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
+        except ObjectNotFoundException as e:
+            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
+            raise ObjectNotFoundException(e)
 
-        if reference.class_type == Hostname:
+        if ooi.reference.class_type == Hostname:
             ips = self.octopoes_api_connector.query(
-                "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
+                "Hostname.<hostname[is ResolvedHostname].address", valid_time, ooi.reference
             )
         else:
-            ips = [self.octopoes_api_connector.get(reference)]
+            ips = [ooi]
 
         sc_ips = {}
         number_of_ips = len(ips)
