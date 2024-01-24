@@ -37,9 +37,9 @@ for (var i = 0; i < checkbox_required_anchors.length; i++){
 function checkbox_required_validity(form, anchor, event) {
   //  validate the current list of checkboxes against the current min/max required settings only at submit time.
   var selected_count = 0;
-  var error_element = null;  
+  var error_element = null;
   if (anchor.tagName == 'INPUT' && anchor.type == 'checkbox'){
-    // we are looking at a checkbox itself, asume we want all checkboxes with the same name in the same form
+    // we are looking at a checkbox itself, assume we want all checkboxes with the same name in the same form
     var name = anchor.name;
     selected_count = anchor.form.querySelectorAll('input[type=checkbox][name='+name+']:checked').length;
     error_element = anchor.form.querySelector('input[type=checkbox][name='+name+']');
@@ -64,9 +64,11 @@ function checkbox_required_validity(form, anchor, event) {
     validity = false;
     event.preventDefault();
   }
-  error_element.addEventListener('change', function(event){ 
-    // we need to remove the custom error on change, because otherwise the submit code wont run  
-    if(event.target.checked){event.target.setCustomValidity('');}
+  error_element.addEventListener('change', function(event){
+    // we need to remove the custom error on change, because otherwise the submit code won't run.
+    if(event.target.checked){
+      event.target.setCustomValidity('');
+    }
   });
   error_element.reportValidity();
   return validity;
