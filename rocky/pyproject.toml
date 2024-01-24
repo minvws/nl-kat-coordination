@@ -47,6 +47,7 @@ django-compressor = { git = "https://github.com/dekkers/django-compressor", rev 
 pyparsing = "^3.1.1"
 django-weasyprint = "^2.2.1"
 strenum = "^0.4.15"
+django-rest-knox = { git = "https://github.com/jazzband/django-rest-knox", rev = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9" }
 
 # temp fix to pass build, remove later when https://github.com/xhtml2pdf/xhtml2pdf/issues/589 is solved
 reportlab = "^3.6.13"
@@ -65,11 +66,7 @@ pydantic-settings = "^2.0.3"
 
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^1.0.1"
-pylint = "^2.15.5"
-vulture = "^2.6"
 djlint = "^1.32.1"
-black = "^23.11.0"
 robotframework-tidy = "^4.1.0"
 
 # Robot Framework dependencies

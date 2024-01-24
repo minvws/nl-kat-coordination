@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-03 13:13+0000\n"
+"POT-Creation-Date: 2024-01-19 09:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -285,6 +285,10 @@ msgstr ""
 
 #: account/models.py
 msgid "date joined"
+msgstr ""
+
+#: account/models.py
+msgid "name"
 msgstr ""
 
 #: account/templates/account_detail.html account/views/account.py
@@ -3367,6 +3371,14 @@ msgstr ""
 msgid "Multi Organization Report"
 msgstr ""
 
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Best scoring security check"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Worst scoring security check"
+msgstr ""
+
 #: reports/report_types/multi_organization_report/vulnerabilities.html
 msgid ""
 "Vulnerabilities found are grouped per system. Here, we only consider CVE "
@@ -3908,6 +3920,17 @@ msgstr ""
 msgid "Select at least one report type to proceed."
 msgstr ""
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#, python-format
+msgid ""
+"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+msgstr ""
+
+#: reports/views/base.py
+#, python-format
+msgid "Report type '%s' does not exist."
+msgstr ""
+
 #: reports/views/generate_report.py
 msgid "This report may not show all the data as some plugins are not enabled."
 msgstr ""
@@ -4183,7 +4206,7 @@ msgstr ""
 msgid "Only CSV file supported"
 msgstr ""
 
-#: tools/forms/upload_csv.py tools/forms/upload_raw.py
+#: tools/forms/upload_csv.py
 msgid "File could not be decoded"
 msgstr ""
 
@@ -4221,10 +4244,6 @@ msgstr ""
 
 #: tools/forms/upload_oois.py
 msgid "Choose a type of which objects are added."
-msgstr ""
-
-#: tools/forms/upload_raw.py
-msgid "Organization code(s) for raw does not exist in our database"
 msgstr ""
 
 #: tools/forms/upload_raw.py

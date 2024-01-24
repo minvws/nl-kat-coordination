@@ -12,7 +12,7 @@
     </p>
 {% endif %}
 {% if type %}
-    <h4>{{ type }} {% translate "server" %}</h4>
+    <h4 id="safe-connections-{{ type }}">{{ type }} {% translate "server" %}</h4>
     <p>
         {% blocktranslate trimmed %}
             This table shows which checks were performed. Following that, the compliance
@@ -59,9 +59,7 @@
                 <tbody>
                     {% for finding_type in findings %}
                         <tr>
-                            <td>
-                                <span class="icon alert"></span>{{ finding_type.description }}
-                            </td>
+                            <td>{{ finding_type.description }}</td>
                             <td>
                                 <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
                             </td>
