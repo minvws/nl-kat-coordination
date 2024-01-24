@@ -2,6 +2,11 @@ name: Mula Run the test suite
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - mula/**
   pull_request:
