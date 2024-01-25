@@ -3,13 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: reports/report_types/aggregate_findings_report/table_of_contents.html
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-23 15:38+0000\n"
+"POT-Creation-Date: 2024-01-25 13:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -517,9 +516,8 @@ msgstr ""
 msgid "Your session has timed out. Please login again."
 msgstr ""
 
-#: account/views/login.py
-#: reports/report_types/aggregate_findings_report/report_header.html
-#: reports/templates/partials/report_header.html rocky/templates/header.html
+#: account/views/login.py reports/templates/partials/report_header.html
+#: rocky/templates/header.html
 msgid "OpenKAT"
 msgstr ""
 
@@ -559,6 +557,7 @@ msgstr ""
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
 #: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/templates/summary/report_summary.html tools/forms/finding_type.py
 #: rocky/templates/oois/ooi_detail.html
@@ -1074,7 +1073,6 @@ msgid "Failure mode report"
 msgstr ""
 
 #: fmea/templates/fmea/fmea_failure_mode_report.html
-#: reports/report_types/aggregate_findings_report/summary.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
 #: reports/report_types/multi_organization_report/summary.html
@@ -2350,6 +2348,7 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -2698,176 +2697,6 @@ msgstr ""
 msgid "Report types"
 msgstr ""
 
-#: reports/report_types/aggregate_findings_report/introduction.html
-msgid "About this document"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/asset_overview.html
-#: reports/report_types/multi_organization_report/asset_overview.html
-msgid ""
-"An overview of the manually released scanned assets. Assets in <strong>bold</"
-"strong> are taken as a starting point, assets that are not in bold were "
-"found by OpenKAT itself."
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/introduction.html
-msgid "Confidentiality"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/introduction.html
-msgid ""
-"In information security, the Traffic Light Protocol (TLP) is used. This is "
-"an international uniform convention based on the colors of the traffic "
-"light. It indicates how confidential the information in the document is and "
-"whether it may be shared with other individuals or organizations."
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/introduction.html
-msgid ""
-"TLP:RED. This information has the highest confidentiality. This may not be "
-"shared with other persons or organizations. Often this information will be "
-"transmitted verbally. In many cases also not via e-mail or on paper, but of "
-"course it can be."
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/introduction.html
-msgid ""
-"TLP:AMBER. This information may be shared on a need to know basis. den "
-"shared within one's own organization and clients (or affiliated parties)."
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/introduction.html
-msgid ""
-"TLP:AMBER+STRICT. This information may only be shared within the own "
-"organization with people for whom access is necessary is necessary. This is "
-"on a need to know basis within one's own organization."
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/introduction.html
-msgid ""
-"TLP:GREEN. This information is available to anyone within the community to "
-"which it is directed. This means that it can be useful can be and thus "
-"shared on a 'nice to know' basis. There is no restriction to one's own "
-"organization."
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/introduction.html
-msgid ""
-"TLP:CLEAR. This information is not confidential and can be shared publicly "
-"shared."
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/report.html
-#: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/report.py
-msgid "Aggregate Findings Report"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/report_header.html
-msgid "Findings report for organization"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/report_header.html
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/multi_organization_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "Observed at:"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/report_header.html
-#: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/multi_organization_report/introduction.html
-#: reports/templates/partials/report_header.html
-msgid "Created by:"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-#: reports/templates/partials/report_sidemenu.html
-#: rocky/templates/oois/ooi_page_tabs.html
-msgid "Overview"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-#, python-format
-msgid ""
-"These are the findings of an OpenKAT analysis on %(date)s. The following "
-"filters apply to these findings:"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-msgid "Total"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-msgid "Level"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Unique"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total occurrences"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-#: tools/forms/finding_type.py
-msgid "Finding types"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-#: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/rpki_report/report.html
-#: reports/report_types/safe_connections_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Risk level"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-msgid "Finding type"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/summary.html
-#: reports/report_types/findings_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrences"
-msgstr ""
-
-#: reports/report_types/aggregate_findings_report/table_of_contents.html
-#: reports/templates/partials/report_sidemenu.html
-msgid "Table of contents"
-msgstr ""
-
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/report_types/multi_organization_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
@@ -2955,6 +2784,14 @@ msgstr ""
 msgid "Asset overview"
 msgstr ""
 
+#: reports/report_types/aggregate_organisation_report/asset_overview.html
+#: reports/report_types/multi_organization_report/asset_overview.html
+msgid ""
+"An overview of the manually released scanned assets. Assets in <strong>bold</"
+"strong> are taken as a starting point, assets that are not in bold were "
+"found by OpenKAT itself."
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/basic_security.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Basic security"
@@ -3031,6 +2868,20 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 msgid "This is the OpenKAT report for organization"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/multi_organization_report/introduction.html
+#: reports/templates/partials/report_header.html
+msgid "Observed at:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/multi_organization_report/introduction.html
+#: reports/templates/partials/report_header.html
+msgid "Created by:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -3200,6 +3051,19 @@ msgstr ""
 msgid "Compliance issue"
 msgstr ""
 
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Risk level"
+msgstr ""
+
 #: reports/report_types/aggregate_organisation_report/term_overview.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Term Overview"
@@ -3321,6 +3185,40 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid "Findings information"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: rocky/templates/findings/finding_add.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "Risk severity"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "Impact"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Recommendation"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrences"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "No findings have been found."
 msgstr ""
 
 #: reports/report_types/findings_report/report.py
@@ -3499,10 +3397,6 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
 msgid "Overview of recommendations"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/recommendations.html
-msgid "Recommendation"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
@@ -3697,6 +3591,20 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 msgid "No ciphers found for this IPService"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
 msgstr ""
 
 #: reports/report_types/tls_report/report.py
@@ -3953,6 +3861,15 @@ msgid "Generate report"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
+msgid "Table of contents"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
+#: rocky/templates/oois/ooi_page_tabs.html
+msgid "Overview"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
 msgstr ""
 
@@ -4131,6 +4048,10 @@ msgstr ""
 
 #: tools/forms/finding_type.py
 msgid "Click to select one of the available options"
+msgstr ""
+
+#: tools/forms/finding_type.py
+msgid "Finding types"
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -4737,13 +4658,6 @@ msgstr ""
 msgid "Add finding"
 msgstr ""
 
-#: rocky/templates/findings/finding_add.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding"
-msgstr ""
-
 #: rocky/templates/findings/finding_list.html
 msgid "Findings @ "
 msgstr ""
@@ -5346,6 +5260,11 @@ msgid "Top 10 most severe Findings"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+msgid "Finding type"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
 msgid "OOI type"
 msgstr ""
 
@@ -5794,8 +5713,17 @@ msgid ""
 "source. This situation requires manual investigation of the severity."
 msgstr ""
 
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total occurrences"
+msgstr ""
+
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total per severity overview:"
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Unique"
 msgstr ""
 
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
