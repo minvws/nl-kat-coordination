@@ -1,18 +1,5 @@
 .PHONY: debian ubuntu clean
 
-debian11:
-	mkdir -p build
-	docker run --rm \
-	--env PKG_NAME=kat-octopoes \
-	--env BUILD_DIR=./build \
-	--env REPOSITORY=minvws/nl-kat-octopoes \
-	--env RELEASE_VERSION=${RELEASE_VERSION} \
-	--env RELEASE_TAG=${RELEASE_TAG} \
-	--mount type=bind,src=${CURDIR},dst=/app \
-	--workdir /app \
-	kat-debian11-build-image \
-	packaging/scripts/build-debian-package.sh
-
 debian12:
 	mkdir -p build
 	docker run --rm \
@@ -59,21 +46,21 @@ test:
 	pytest
 
 rtest:
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml kill
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build octopoes_api octopoes_api_worker
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml kill
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build octopoes_api octopoes_api_worker
 	sleep 2
 	robot -d reports --variablefile tests/robot/variables.py:xtdb tests/robot
 
 itest:
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml kill
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml build $(build_args)
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml run --rm octopoes_integration
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml kill
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml build $(build_args)
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml down
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml run --rm octopoes_integration
 
 rtest-crux:
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml kill
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose-crux.yml down --remove-orphans
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose-crux.yml up -d --build octopoes_api octopoes_api_worker
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml kill
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose-crux.yml down --remove-orphans
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose-crux.yml up -d --build octopoes_api octopoes_api_worker
 	sleep 2
 	robot -d reports --variablefile tests/robot/variables.py:crux tests/robot || :

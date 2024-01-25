@@ -8,6 +8,7 @@ from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
+from reports.report_types.multi_organization_report.report import MultiOrganizationReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
 from reports.report_types.open_ports_report.report import OpenPortsReport
 from reports.report_types.rpki_report.report import RPKIReport
@@ -33,6 +34,8 @@ REPORTS = [
     FindingsReport,
 ]
 AGGREGATE_REPORTS = [AggregateOrganisationReport]
+
+MULTI_REPORTS = [MultiOrganizationReport]
 
 
 def get_ooi_types_with_report() -> Set[Type[OOI]]:
@@ -62,7 +65,7 @@ def get_report_by_id(report_id: str) -> Type[Report]:
     """
     Get report type by id
     """
-    for report in REPORTS:
+    for report in REPORTS + MULTI_REPORTS:
         if report.id == report_id:
             return report
     raise ValueError(f"Report with id {report_id} not found")

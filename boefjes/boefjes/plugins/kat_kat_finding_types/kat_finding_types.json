@@ -531,11 +531,18 @@
             "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
             "recommendation": "Work on implementing RPKI for your IP addresses. This may involve creating Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses."
     },
-    "KAT-INVALID-RPKI": {
-            "description": "The IP address does not have a valid route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+    "KAT-EXPIRED-RPKI": {
+            "description": "The route announcement that is matched by the published Route Policy and Authorization (RPKI) is expired",
             "source": null,
             "risk": "low",
             "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
             "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
+    },
+    "KAT-NO-CAA": {
+        "description": "This zone does not carry at least one CAA record.",
+        "source": null,
+        "risk": "low",
+        "impact": null,
+        "recommendation": "Set a CAA record to limit which CA's are allowed to issue certs."
     }
 }
