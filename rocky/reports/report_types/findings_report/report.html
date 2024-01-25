@@ -54,7 +54,7 @@
             <h4>{% translate "Occurrences" %}</h4>
             {% for occurrence in info.occurrences %}
                 <div>
-                    <strong>{{ occurrence.ooi }}</strong>
+                    <strong>{{ occurrence.ooi.human_readable }}</strong>
                     <p>{{ occurrence.description }}</p>
                 </div>
             {% endfor %}
