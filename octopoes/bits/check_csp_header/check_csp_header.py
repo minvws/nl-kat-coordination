@@ -50,6 +50,10 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
 
     policies = [policy.strip().split(" ") for policy in header.value.split(";")]
     for policy in policies:
+        if len(policy) < 2:
+            findings.append("CSP setting has no value.")
+            continue
+
         if policy[0] in ["frame-src", "frame-ancestors"] and not _source_valid(policy[1:]):
             findings.append(f"{policy[0]} has not been correctly defined.")
 
@@ -62,6 +66,7 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
             findings.append(
                 "'data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
             )
+
         if policy[0].endswith("-uri") and (
             "unsafe-eval" in policy[2:]
             or "unsafe-hashes" in policy[2:]
