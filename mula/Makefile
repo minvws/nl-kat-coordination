@@ -21,7 +21,7 @@ export file
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
 
 ##
 ##+------------------------------------------------------------------------+
@@ -41,11 +41,11 @@ check: ## Check the code style using black, mypy and pylint.
 	make pylint
 
 mypy: ## Check code style using mypy.
-	docker-compose run --rm scheduler \
+	docker compose run --rm scheduler \
 		python -m mypy --cache-dir /home/scheduler/.mypy_cache /app/scheduler/scheduler
 
 black: ## Check code style with black.
-	docker-compose run --rm scheduler \
+	docker compose run --rm scheduler \
 		black --check --diff .
 
 pylint: ## Rate the code with pylint.
@@ -53,7 +53,7 @@ pylint: ## Rate the code with pylint.
 		pylint --rcfile pyproject.toml scheduler
 
 fmt: ## Format the code using black.
-	docker-compose run --rm scheduler \
+	docker compose run --rm scheduler \
 		black .
 
 done: ## Prepare for a commit.
@@ -73,7 +73,7 @@ cov: ## Generate a test coverage report
 ##+------------------------------------------------------------------------+
 
 sql: ## Generate raw sql for the migrations.
-	docker-compose run --rm scheduler \
+	docker compose run --rm scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		upgrade $(rev1):$(rev2) --sql
 
@@ -83,14 +83,14 @@ ifeq ($(m),)
 else ifeq ($(revid),)
 	$(HIDE) (echo "ERROR: Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run --rm scheduler \
+	docker compose run --rm scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		revision --autogenerate \
 		-m "$(m)" --rev-id "$(revid)"
 endif
 
 migrate: ## Run migrations using alembic.
-	docker-compose run scheduler \
+	docker compose run scheduler \
 		alembic --config /app/scheduler/scheduler/alembic.ini \
 		upgrade head
 
