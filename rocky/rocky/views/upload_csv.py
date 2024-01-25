@@ -36,6 +36,10 @@ CSV_CRITERIA = [
         "For IPAddressV4 and IPAddressV6 object types, a column of 'address' is required, optionally a second column "
         "'network' is supported "
     ),
+    _(
+        "Clearance levels can be controlled by a column 'clearance' taking numerical values 0, 1, 2, 3, and 4 for "
+        "the corresponding clearance level (other values are ignored) "
+    ),
 ]
 
 
