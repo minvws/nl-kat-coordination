@@ -74,6 +74,8 @@ section we review how different dataflows, from the `boefjes` and the
 
 ### `BoefjeScheduler`
 
+#### Design
+
 First, we wil use the `BoefjeScheduler` as an example. A `BoefjeScheduler` is
 tasked with creating tasks that are able to be picked up and processed by a
 'Task Runner'. The scheduler creates a `BoefjeTask` to the specification that
@@ -83,7 +85,7 @@ the 'Task Runner' can interpret, namely in this instance of a `BoefjeTask`.
 
 The scheduler wraps this `BoefjeTask` within a `PrioritizedItem` (`p_item`),
 this is done such that we can push the task on the queue and add extra
-information to this `PrioritizedItem` like its priority. We uniquely identify
+information to this `PrioritizedItem`, like its priority. We uniquely identify
 a task that is contained within the `PrioritizedItem` by its hash.
 
 ![diagram004](./img/diagram004.svg)
@@ -92,48 +94,82 @@ By doing this, it allows the scheduler to wrap whatever object within a
 `PrioritizedItem`, and as a result we're able to create and extend more types
 of schedulers that are not specifically bound to a type. Additionally this
 allows us to persist its items to a database and makes it so that the queue can
-be interchanged with a different technology.
+be interchanged with a different technology if so desired.
 
 And we want to uniquely identify a task because we want to make sure that the
 same tasks are not being pushed on the queue (de-duplication), or that they are
 being rescheduled too quickly (grace-period). For example with a `BoefjeTask`
-we hash the values of: the ooi, the boefje id, and the organization id. So for
-a `PrioritizedItem` we know what specific `BoefjeTask` it contains by this
-hash.
+we unique identify a task by hashing the values of: the ooi, the boefje id, and
+the organization id. So for a `PrioritizedItem` we know what specific
+`BoefjeTask` it contains by this hash.
 
-Before a `BoefjeTask` is wrapped by a `PrioritizedItem` and pushed on the queue
+Before a `BoefjeTask` is wrapped by a `PrioritizedItem`, and pushed on the queue
 we will check the following:
 
-- `is_allowed_to_run()`
+- `is_task_allowed_to_run()`
+
+  - is boefje enabled
+  - are scan levels between boefje and ooi correct
 
 - `is_task_running()`
 
+  - is task still running according to the datastore (`TaskStore`)?
+  - is task still running according to Bytes?
+
 - `has_grace_period_passed()`
+
+  - has the grace period passed according to the datastore (`TaskStore`)?
+  - has the grace period passed according to Bytes?
+
+- `is_task_stalled()`
+
+  - is task status still `DISPATCHED` for longer than the grace-period?
 
 - `is_item_on_queue_by_hash()`
 
+  - check if the same task is already on the priority queue
+
 Important to note is that when a `BoefjeTask` is created and pushed onto the
-queue as a `PrioritizedItem` a `TaskRun` is created. We create this `TaskRun`
-in order to know the status of the task throughout its lifetime. It also gives
-us an overview and insights of what tasks have been created in the past and
-what tasks are currently running. You might know this overview from Rocky
-know as the task list.
+queue as a `PrioritizedItem` a new unique `TaskRun` is generated.[^1] This
+ensures that each task has its own dedicated `TaskRun` throughout its entire
+lifecycle. This approach maintains a distinct record for each task, providing
+an accurate and independent history of task statuses. This means that each
+execution of a `BoefjeTask`, regardless of whether it's the same task being
+repeated in the future, is tracked independently with its own unique `TaskRun`.
+
+This approach ensures that the historical record of each task's execution is
+distinct, providing a clear and isolated view of each instance of the task's
+lifecycle. This strategy enables maintaining accurate and unambiguous
+monitoring and logging of task executions over time. Additionally it enables us
+an overview and insights of what tasks have been created in the past and what
+tasks are currently running. You might know this overview from Rocky as the
+task list.
 
 ![diagram005](./img/diagram005.svg)
 
 Whenever a task is created in the scheduler it flows through the system, to
 keep track of the status of this task throughout the system we update its
-`TaskRun` reference. When a `BoefjeTask` has been created by the scheduler it
-is packaged within its `PrioritizedItem` and it will get the status of
-`PENDING` (1) meaning a task has been created but it hasn't been queued yet. When
-the `PrioritizedItem` is pushed onto the queue the `TaskRun` will get a status
-update and will get the status of `QUEUED` (2). When the 'Task Runner' picks up
-the task by popping the `PrioritizedItem` from the queue the `TaskRun` status
-will be updated to `DISPATCHED` (3). The 'Task Runner' is now able to start
-executing the `BoefjeTask` that was contained in the `PrioritizedItem` and the
-status of the `TaskRun` will be updated to `RUNNING` (4). Whenever the task
-has been completed the 'Task Runner' will update the `TaskRun` status by either
-setting the status to `COMPLETED`, `FAILED` or `CANCELLED`.
+`TaskRun` reference.
+
+- When a `BoefjeTask` has been created by the scheduler it is packaged within
+  its `PrioritizedItem` and it will get the status of `PENDING` (1) meaning a
+  task has been created but it hasn't been queued yet.
+
+- When the `PrioritizedItem` is pushed onto the queue the `TaskRun` will get a
+  status update and will get the status of `QUEUED` (2).
+
+- When the 'Task Runner' picks up the task by popping the `PrioritizedItem`
+  from the queue the `TaskRun` status will be updated to `DISPATCHED` (3).
+
+- The 'Task Runner' is now able to start executing the `BoefjeTask` that was
+  contained in the `PrioritizedItem` and the status of the `TaskRun` will be
+  updated to `RUNNING` (4).
+
+- Whenever the task has been completed the 'Task Runner' will update the
+  `TaskRun` status by either setting the status to `COMPLETED`, `FAILED` or
+  `CANCELLED`. (5)
+
+#### Processes
 
 In order to create a `BoefjeTask` and trigger the dataflow we described above
 we have 4 different processes within a `BoefjeScheduler` that can create boefje
@@ -146,7 +182,7 @@ tasks. Namely:
 
 ![diagram006](./img/diagram006.svg)
 
-#### 1. Scan profile mutations
+##### 1. Scan profile mutations
 
 ![diagram007](./img/diagram007.svg)
 
@@ -174,7 +210,7 @@ The dataflow is as follows:
 - A `TaskRun` reference to the task is created to keep track of the status
   of the task (`post_push`).
 
-#### 2. Enabling of boefjes
+##### 2. Enabling of boefjes
 
 ![diagram008](./img/diagram008.svg)
 
@@ -198,7 +234,7 @@ The dataflow is as follows:
 - A `TaskRun` reference to the task is created to keep track of the status
   of the task (`post_push`).
 
-#### 3. Rescheduling of prior tasks
+##### 3. Rescheduling of prior tasks
 
 ![diagram009](./img/diagram009.svg)
 
@@ -228,7 +264,7 @@ The dataflow is as follows:
 - A `TaskRun` reference to the task is created to keep track of the status
   of the task (`post_push`).
 
-#### 4. Manual scan job
+##### 4. Manual scan job
 
 ![diagram010](./img/diagram010.jpg)
 
@@ -249,17 +285,35 @@ The dataflow is as follows:
 
 ### `NormalizerScheduler`
 
+#### Design
+
 The `NormalizerScheduler` is tasked with creating tasks that are able to be
-picked up and processed by a 'Task Runner'. The scheduler create a
+picked up and processed by a 'Task Runner'. The scheduler creates a
 `NormalizerTask` to the specification that the 'Task Runner' can interpret,
 namely the instance of a `NormalizerTask`.
 
-The following processes within a `NormalizerScheduler` will create
+The of queueing and processing a `NormalizerTask` task is the same as for
+the `BoefjeScheduler`. So reference that section for a more in-depth explanation.
+
+Before `NormalizerTask` is wrapped by a `PrioritizedItem`, and pushed to the
+queue we will check the following:
+
+- `is_task_allowed_to_run()`
+
+  - is the normalizer enabled
+
+- `is_task_running()`
+
+  - is task still running according to the datastore (`TaskStore`)?
+
+#### Processes
+
+The following processes within a `NormalizerScheduler` will create a
 `NormalizerTask` tasks:
 
 1. A raw file is created in Bytes
 
-#### 1. Raw file creation in Bytes
+##### 1. Raw file creation in Bytes
 
 When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
 
@@ -272,101 +326,46 @@ When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
 - For every enabled normalizer, a `NormalizerTask` will be created and added to
   the `PriorityQueue` of the `NormalizerScheduler`.
 
-TODO: continue here
-
-#### C4 Code level (Condensed class diagram)
+## ERD
 
 The following diagram we can explore the code level of the scheduler
 application, and its class structure.
 
-```mermaid
-classDiagram
+**TODO**
 
-    class App {
-        +AppContext ctx
-        +Dict[str, ThreadRunner] threads
-        +Dict[str, Scheduler] schedulers
-        +Dict[str, Listener] listeners
-        +Server server
-        shutdown()
-        run()
-    }
+## Project structure
 
-    class Scheduler {
-        <<abstract>>
-        +AppContext ctx
-        +PriorityQueue queue
-        +Ranker ranker
-        +Dict[str, ThreadRunner] threads
-        +Dict[str, Listener] listeners
-        push_items_to_queue()
-        push_item_to_queue()
-        pop_item_from_queue()
-        pop_item_from_queue_with_timeout()
-        post_push()
-        post_pop()
-        run_in_thread()
-        enable()
-        disabled()
-        is_enabled()
-        is_space_on_queue()
-        is_item_on_queue_by_hash()
-        stop()
-        stop_listeners()
-        stop_threads()
-        run()
-    }
-
-    class PriorityQueue{
-        <<abstract>>
-        +PriorityQueueStore pq_store
-        pop()
-        push()
-        peek()
-        remove()
-        empty()
-        qsize()
-        full()
-        is_item_on_queue()
-        get_p_item_by_identifier()
-        create_hash()
-        dict()
-        _is_valid_item()
-    }
-
-    class PriorityQueueStore{
-        +Datastore datastore
-        pop()
-        push()
-        peek()
-        update()
-        remove()
-        get()
-        empty()
-        qsize()
-        get_item_by_hash()
-        get_items_by_scheduler_id()
-    }
-
-    class Ranker {
-        <<abstract>>
-        +AppContext ctx
-        rank()
-    }
-
-    class Listener {
-        listen()
-    }
-
-    App --|> "many" Scheduler : Implements
-    App --|> "many" Listener : Has
-
-    Scheduler --|> "1" PriorityQueue : Has
-    Scheduler --|> "1" Ranker : Has
-    Scheduler --|> "many" ThreadRunner : Has
-    Scheduler --|> "many" Listener : Has
-
-    PriorityQueue --|> PriorityQueueStore: References
+```
+$ tree -L 3 --dirsfirst
+.
+├── docs/                           # additional documentation
+├── scheduler/                      # scheduler python module
+│   ├── config                      # application settings configuration
+│   ├── connectors                  # external service connectors
+│   │   ├── listeners               # channel/socket listeners
+│   │   ├── services                # rest api connectors
+│   │   └── __init__.py
+│   ├── context/                    # shared application context
+│   ├── models/                     # internal model definitions
+│   ├── queues/                     # priority queue
+│   ├── rankers/                    # priority/score calculations
+│   ├── storage/                    # data abstraction layer
+│   ├── schedulers/                 # schedulers
+│   ├── server/                     # http rest api server
+│   ├── utils/                      # common utility functions
+│   ├── __init__.py
+│   ├── __main__.py
+│   ├── app.py                      # kat scheduler app implementation
+│   └── version.py                  # version information
+└─── tests/
+    ├── factories/
+    ├── integration/
+    ├── mocks/
+    ├── scripts/
+    ├── simulation/
+    ├── unit/
+    ├── utils/
+    └── __init__.py
 ```
 
 The following describes the main components of the scheduler application:
@@ -379,9 +378,9 @@ The following describes the main components of the scheduler application:
   application.
 
 - `Scheduler` - And implementation of a `Scheduler` class is responsible for
-  populating the queue with tasks. Contains has a `PriorityQueue` and a
-  `Ranker`. The `run()` method starts executes threads and listeners, which
-  fill up the queue with tasks.
+  populating the queue with tasks. Contains a `PriorityQueue`. The `run()`
+  method starts executes threads and listeners, which fill up the queue with
+  tasks.
 
 - `PriorityQueue` - The queue class, which is responsible for storing the
   tasks.
@@ -391,3 +390,8 @@ The following describes the main components of the scheduler application:
 
 - `Server` - The server class, which is responsible for handling the HTTP
   requests.
+
+[^1]:
+    As of writing a `TaskRun` is known within the scheduler as a `Task`. In the
+    future the naming of this model will change to accurate describe its role
+    and functionality.
