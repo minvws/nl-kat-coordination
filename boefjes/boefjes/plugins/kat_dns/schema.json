@@ -1,0 +1,19 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "RECORD_TYPES": {
+      "title": "RECORD_TYPES",
+      "type": "string",
+      "description": "List of comma separated DNS record types to query for.",
+      "default": "A,AAAA,CAA,CERT,RP,SRV,TXT,MX,NS,CNAME,DNAME"
+    },
+    "REMOTE_NS": {
+      "title": "REMOTE_NS",
+      "maxLength": 45,
+      "type": "string",
+      "description": "The IP address of the DNS resolver you want to use.",
+      "default": "1.1.1.1"
+    }
+  }
+}

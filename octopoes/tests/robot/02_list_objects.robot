@@ -25,7 +25,7 @@ List Random Objects With Filter
     Recalculate Scan Profiles
     Await Sync
     Length Of Random Object List With Filter Should Be    ${1}    ${5}
-    Length Of Random Object List With Filter Should Be    ${0}    ${7}
+    Length Of Random Object List With Filter Should Be    ${0}    ${9}
     Length Of Random Object List With Filter Should Be    ${{ [1,0] }}    ${10}
     Length Of Random Object List With Filter Should Be    ${{ [2,3] }}    ${0}
 
