@@ -43,7 +43,7 @@ class RPKIReport(Report):
             )
             rpki_ips[ip.reference] = {}
             exists = not any([finding_type for finding_type in finding_types if finding_type.id in ["KAT-NO-RPKI"]])
-            valid = not any([finding_type for finding_type in finding_types if finding_type.id in ["KAT-INVALID-RPKI"]])
+            valid = not any([finding_type for finding_type in finding_types if finding_type.id in ["KAT-EXPIRED-RPKI"]])
             rpki_ips[ip.reference]["exists"] = exists
             rpki_ips[ip.reference]["valid"] = valid
             number_of_available -= 1 if not exists else 0

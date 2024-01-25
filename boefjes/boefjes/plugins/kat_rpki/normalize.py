@@ -17,7 +17,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
         yield f
 
     if not results.get("valid") and not results.get("notexpired"):
-        ft = KATFindingType(id="KAT-INVALID-RPKI")
+        ft = KATFindingType(id="KAT-EXPIRED-RPKI")
         f = Finding(finding_type=ft.reference, ooi=ooi)
         yield ft
         yield f
