@@ -159,7 +159,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
                 try:
                     ooi, level = self.get_ooi_from_csv(object_type, row)
                     self.octopoes_api_connector.save_declaration(
-                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
+                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=task_id)
                     )
                     if isinstance(level, int):
                         self.raise_clearance_level(ooi.reference, level)
