@@ -42,6 +42,8 @@ CSV_CRITERIA = [
     ),
 ]
 
+CLEARANCE_VALUES = ["0", "1", "2", "3", "4"]
+
 
 class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
     template_name = "upload_csv.html"
@@ -99,8 +101,8 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         return ooi
 
     def get_ooi_from_csv(self, ooi_type_name: str, values: Dict[str, str]):
-        ckey = "clearance"
-        level = int(values[ckey]) if ckey in values and values[ckey] in list("01234") else None
+        key = "clearance"
+        level = int(values[key]) if key in values and values[key] in CLEARANCE_VALUES else None
         ooi_type = self.ooi_types[ooi_type_name]["type"]
         ooi_fields = [
             (field, model_field.annotation == Reference, model_field.is_required())
