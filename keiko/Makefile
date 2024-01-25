@@ -34,9 +34,9 @@ test:
 	pytest
 
 itest:
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build && sleep 1
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml up -d --build && sleep 1
 	robot -d reports tests/robot
-	docker-compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
+	docker compose -f docker-compose-base.yml -f .ci/docker-compose.yml down --remove-orphans
 
 debian12:
 	mkdir -p build

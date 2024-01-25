@@ -1,7 +1,7 @@
 # Production: Container deployment
 
 OpenKAT can be deployed using containers. We aim to support both simple docker /
-docker-compose setups and container orchestration systems like Kubernetes and
+docker compose setups and container orchestration systems like Kubernetes and
 Nomad.
 
 There is a docker-compose.release-example.yml in the root directory that can be
@@ -52,7 +52,7 @@ following in the katalogus container:
 python3 -m boefjes.seed
 ```
 
-With docker-compose you would run this as:
+With docker compose you would run this as:
 
 ```shell
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec katalogus python3 -m boefjes.seed
@@ -64,7 +64,7 @@ In the rocky container we first need to import the OOI database seed:
 python3 manage.py loaddata OOI_database_seed.json
 ```
 
-With docker-compose you would run this as:
+With docker compose you would run this as:
 
 ```shell
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py loaddata OOI_database_seed.json
@@ -76,7 +76,7 @@ Next we need to create the superuser, this will prompt for the e-mail address an
 python3 manage.py createsuperuser
 ```
 
-With docker-compose you would run this as:
+With docker compose you would run this as:
 
 ```shell
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py createsuperuser
@@ -89,7 +89,7 @@ We also need to create an organisation, this command will create a development o
 python3 manage.py setup_dev_account
 ```
 
-With docker-compose you would run this as:
+With docker compose you would run this as:
 
 ```shell
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py setup_dev_account
@@ -119,7 +119,7 @@ manually using the following command:
 python3 manage.py loaddata OOI_database_seed.json
 ```
 
-With docker-compose you would run this as:
+With docker compose you would run this as:
 
 ```shell
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py loaddata OOI_database_seed.json
