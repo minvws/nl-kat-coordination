@@ -25,6 +25,7 @@ class FindingsReport(Report):
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
         reference = Reference.from_str(input_ooi)
         findings = []
+        results = {}
 
         tree = self.octopoes_api_connector.get_tree(
             reference, depth=TREE_DEPTH, types={Finding}, valid_time=valid_time
@@ -33,6 +34,17 @@ class FindingsReport(Report):
             if ooi.ooi_type == "Finding":
                 findings.append(ooi)
 
-        return {
-            "findings": findings,
-        }
+        for finding in findings:
+            finding_types = self.octopoes_api_connector.query(
+                "Finding.finding_type", valid_time, Reference.from_str(finding)
+            )
+
+            if finding_types:
+                finding_type = finding_types[0]
+
+                if finding_type.id in results:
+                    results[finding_type.id]["occurrences"].append(finding)
+                else:
+                    results[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
+
+        return results
