@@ -31,7 +31,7 @@ help: ## Show this help.
 build: seed
 
 seed:  # Seed the katalogus database
-	-docker-compose run --rm katalogus python -m boefjes.seed
+	-docker compose run --rm katalogus python -m boefjes.seed
 
 ##
 ##|------------------------------------------------------------------------|
@@ -42,12 +42,12 @@ migrations: ## Generate a migration using alembic
 ifeq ($(m),)
 	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)"
+	docker compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)"
 endif
 
 
 sql: ## Generate raw sql for the migrations
-	docker-compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade $(rev1):$(rev2) --sql
+	docker compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade $(rev1):$(rev2) --sql
 
 check:
 	pre-commit run --all-files --color always
@@ -57,7 +57,7 @@ check:
 ##			Tests
 ##|------------------------------------------------------------------------|
 
-ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
 
 
 test: itest ## Run all tests.

@@ -2,6 +2,11 @@ name: Octopoes tests
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - octopoes/**
   pull_request:

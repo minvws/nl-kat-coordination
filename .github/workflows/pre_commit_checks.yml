@@ -1,6 +1,13 @@
 name: Pre-commit checks
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
+  pull_request:
 
 jobs:
   pre-commit:
