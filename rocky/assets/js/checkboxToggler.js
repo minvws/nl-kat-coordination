@@ -56,7 +56,7 @@ function checkbox_required_validity(form, anchor, event) {
     selected_count = anchor.querySelectorAll('input[type=checkbox]:checked').length;
     elements = anchor.form.querySelectorAll('input[type=checkbox]');
   }
-  
+
   var error_element = elements[0];
   var minselected = 1; // we expect at least one, unless otherwise specified.
   var validity = true;
@@ -71,8 +71,8 @@ function checkbox_required_validity(form, anchor, event) {
     validity = false;
     event.preventDefault();
   }
-  
-  // bind a change event to *all* checkboxes that might increase or decrease our selected_count; 
+
+  // bind a change event to *all* checkboxes that might increase or decrease our selected_count;
   // Increase resets the usecase of a minimal selection, decrease is needed if we have reached the max.
   elements.forEach(function (element){
     element.addEventListener('change', function(event){
