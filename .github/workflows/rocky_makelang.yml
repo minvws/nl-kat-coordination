@@ -2,6 +2,11 @@ name: Rocky Check if translations are up to date
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - rocky/**
       - .github/workflows/rocky_makelang.yml
