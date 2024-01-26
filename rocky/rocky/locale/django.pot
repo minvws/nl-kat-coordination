@@ -2873,10 +2873,14 @@ msgid "This is the OpenKAT report for organization"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/templates/partials/report_header.html
+msgid "Created with data from"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Observed at:"
+msgid "Created on"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -2988,6 +2992,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Terms in report"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Observed at:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -3280,6 +3288,10 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
 msgid "This is the OpenKAT Sector rapport."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
+msgid "Created with date from"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
