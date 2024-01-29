@@ -2,6 +2,11 @@ name: Bytes Create container image
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - bytes/**
       - .github/workflows/bytes_container_image.yml

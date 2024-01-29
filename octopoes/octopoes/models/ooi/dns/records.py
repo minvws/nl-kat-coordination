@@ -1,5 +1,6 @@
 import abc
 import hashlib
+from enum import Enum
 from typing import Literal, Optional
 
 from octopoes.models import OOI, Reference
@@ -10,7 +11,7 @@ from octopoes.models.persistence import ReferenceField
 
 class DNSRecord(OOI, abc.ABC):
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=2)
-    dns_record_type: Literal["A", "AAAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
+    dns_record_type: Literal["A", "AAAA", "CAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
     value: str
     ttl: Optional[int] = None  # todo: validation
 
@@ -155,3 +156,33 @@ class DNSPTRRecord(DNSRecord):
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:
         return f"{reference.tokenized.address.address} -> {reference.tokenized.hostname.name}"
+
+
+class CAATAGS(Enum):
+    ISSUE = "issue"
+    ISSUEWILD = "issuewild"
+    IODEF = "iodef"
+    CONTACTEMAIL = "contactemail"
+    CONACTPHONE = "contactphone"
+    ISSUEVMC = "issuevmc"
+    ISSUEMAIL = "issuemail"
+
+    def __str__(self):
+        return self.value
+
+
+class DNSCAARecord(DNSRecord):
+    object_type: Literal["DNSCAARecord"] = "DNSCAARecord"
+    dns_record_type: Literal["CAA"] = "CAA"
+
+    # https://datatracker.ietf.org/doc/html/rfc8659#name-canonical-presentation-form
+    # An unsigned integer between 0 and 255.
+    flags: Optional[int] = None
+
+    # A non-zero-length sequence of ASCII letters and numbers in lowercase.
+    tag: CAATAGS
+
+    # The Value field, expressed as either (1) a contiguous set of characters
+    # without interior spaces or (2) a quoted string.
+    value: str
+    _natural_key_attrs = ["hostname", "flags", "tag", "value"]

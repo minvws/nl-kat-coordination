@@ -152,6 +152,7 @@ INSTALLED_APPS = [
     "tagulous",
     "compressor",
     "reports",
+    "knox",
     # "drf_standardized_errors",
 ]
 
@@ -327,8 +328,7 @@ def immutable_file_test(path, url):
 
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
-# TODO: set this to True when we aren't using uWSGI anymore
-WHITENOISE_KEEP_ONLY_HASHED_FILES = False
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
@@ -459,4 +459,6 @@ TAG_BORDER_TYPES = [
     ("dotted", _("Dotted")),
 ]
 
-WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:80/")
+WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
+
+KNOX_TOKEN_MODEL = "account.AuthToken"
