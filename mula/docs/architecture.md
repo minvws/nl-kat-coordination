@@ -171,6 +171,22 @@ keep track of the status of this task throughout the system we update its
   `TaskRun` status by either setting the status to `COMPLETED`, `FAILED` or
   `CANCELLED`. (5)
 
+Since a task within the KAT implementation of the scheduler, generates findings
+at a specific moment in time. We want to account for additional findings or
+change for the same task at a later moment in time. Meaning we want to be able
+to reschedule particular tasks.
+
+In order to support this, every task that is executed by the
+`BoefjesScheduler` a `TaskSchedule` is created. This `TaskSchedule` contains
+the necessary information in order to reschedule a task at a later moment in
+time.
+
+![diagram006](./img/diagram006.svg)
+
+A `TaskSchedule`
+
+TODO: continue here
+
 #### Processes
 
 In order to create a `BoefjeTask` and trigger the dataflow we described above
@@ -182,11 +198,11 @@ tasks. Namely:
 3. rescheduling of prior tasks
 4. manual scan job
 
-![diagram006](./img/diagram006.svg)
+![diagram007](./img/diagram007.svg)
 
 ##### 1. Scan profile mutations
 
-![diagram007](./img/diagram007.svg)
+![diagram008](./img/diagram008.svg)
 
 When a scan level is increased on an OOI
 (`schedulers.boefje.push_tasks_for_scan_profile_mutations`) a message is pushed
@@ -214,7 +230,7 @@ The dataflow is as follows:
 
 ##### 2. Enabling of boefjes
 
-![diagram008](./img/diagram008.svg)
+![diagram009](./img/diagram009.svg)
 
 When a plugin of type `boefje` is enabled or disabled in Rocky. The dataflow is
 triggered when the plugin cache of an organisation is flushed.
@@ -238,7 +254,7 @@ The dataflow is as follows:
 
 ##### 3. Rescheduling of prior tasks
 
-![diagram009](./img/diagram009.svg)
+![diagram010](./img/diagram010.svg)
 
 In order to re-run tasks that have been executed in the past we try to create
 new tasks on ooi's. We continuously get a batch of random ooi's from octopoes
@@ -268,7 +284,7 @@ The dataflow is as follows:
 
 ##### 4. Manual scan job
 
-![diagram010](./img/diagram010.svg)
+![diagram011](./img/diagram011.svg)
 
 Scan jobs created by the user in Rocky (`server.push_queue`), will
 get the highest priority of 1. Note, that this will circumvent all the checks
