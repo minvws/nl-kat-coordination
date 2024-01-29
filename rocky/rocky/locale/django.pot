@@ -287,6 +287,10 @@ msgstr ""
 msgid "date joined"
 msgstr ""
 
+#: account/models.py
+msgid "name"
+msgstr ""
+
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr ""
@@ -2873,10 +2877,14 @@ msgid "This is the OpenKAT report for organization"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/templates/partials/report_header.html
+msgid "Created with data from"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Observed at:"
+msgid "Created on"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -2988,6 +2996,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Terms in report"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Observed at:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -3283,6 +3295,10 @@ msgid "This is the OpenKAT Sector rapport."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
+msgid "Created with date from"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
 msgid "This sector contains"
 msgstr ""
 
@@ -3369,6 +3385,14 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/report.py
 msgid "Multi Organization Report"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Best scoring security check"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Worst scoring security check"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
@@ -3933,6 +3957,17 @@ msgstr ""
 msgid "Select at least one report type to proceed."
 msgstr ""
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#, python-format
+msgid ""
+"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+msgstr ""
+
+#: reports/views/base.py
+#, python-format
+msgid "Report type '%s' does not exist."
+msgstr ""
+
 #: reports/views/generate_report.py
 msgid "This report may not show all the data as some plugins are not enabled."
 msgstr ""
@@ -4208,7 +4243,7 @@ msgstr ""
 msgid "Only CSV file supported"
 msgstr ""
 
-#: tools/forms/upload_csv.py tools/forms/upload_raw.py
+#: tools/forms/upload_csv.py
 msgid "File could not be decoded"
 msgstr ""
 
@@ -4246,10 +4281,6 @@ msgstr ""
 
 #: tools/forms/upload_oois.py
 msgid "Choose a type of which objects are added."
-msgstr ""
-
-#: tools/forms/upload_raw.py
-msgid "Organization code(s) for raw does not exist in our database"
 msgstr ""
 
 #: tools/forms/upload_raw.py
@@ -6586,6 +6617,13 @@ msgstr ""
 msgid ""
 "For IPAddressV4 and IPAddressV6 object types, a column of 'address' is "
 "required, optionally a second column 'network' is supported "
+msgstr ""
+
+#: rocky/views/upload_csv.py
+msgid ""
+"Clearance levels can be controlled by a column 'clearance' taking numerical "
+"values 0, 1, 2, 3, and 4 for the corresponding clearance level (other values "
+"are ignored) "
 msgstr ""
 
 #: rocky/views/upload_csv.py

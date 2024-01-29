@@ -1,13 +1,13 @@
 name: Debian packages
 
 on:
-  pull_request:
   push:
     branches:
       - 'main'
       - 'release-*'
     tags:
       - '*'
+  pull_request:
 
 jobs:
   changes:
@@ -50,12 +50,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dist: [debian11, debian12, ubuntu22.04]
+        dist: [debian12, ubuntu22.04]
         # On main, release branches and tags we always want to build all the packages
         package: ${{ github.event_name == 'push' && fromJSON('["boefjes", "bytes", "cveapi", "keiko", "mula", "octopoes", "rocky"]') || fromJSON(needs.changes.outputs.packages) }}
         exclude:
-          - package: cveapi
-            dist: debian11
           - package: cveapi
             dist: ubuntu22.04
     runs-on: ubuntu-22.04
