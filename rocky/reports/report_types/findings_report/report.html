@@ -2,7 +2,7 @@
 
 <div class="horizontal-scroll">
     {% if data %}
-        {% for info in data.values %}
+        {% for info in data %}
             <h3>{{ info.finding_type }}</h3>
             <h4>{% translate "Findings information" %}</h4>
             <table>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-25 13:13+0000\n"
+"POT-Creation-Date: 2024-01-29 16:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2862,7 +2862,6 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: rocky/templates/oois/ooi_report.html
-#: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
 msgstr ""
 
@@ -3227,6 +3226,10 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.py
 msgid "Findings Report"
+msgstr ""
+
+#: reports/report_types/findings_report/report.py
+msgid "Shows all the finding types and their occurrences."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html

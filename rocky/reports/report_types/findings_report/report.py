@@ -41,10 +41,11 @@ class FindingsReport(Report):
                 finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
 
                 if finding_type in results:
-                    results[finding_type]["occurrences"].append(finding)
+                    results[finding_type.id]["occurrences"].append(finding)
                 else:
-                    results[finding_type] = {"finding_type": finding_type, "occurrences": [finding]}
+                    results[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
             except ObjectNotFoundException:
                 logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
 
+        results = sorted(results.values(), key=lambda x: x["finding_type"].risk_score, reverse=True)
         return results
