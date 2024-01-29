@@ -58,7 +58,7 @@ be created per organisation: a _boefje scheduler_ and a _normalizer scheduler_.
 
 ![diagram002](./img/diagram002.svg)
 
-Each scheduler implements it's own priority queue, and can implement it's own
+Each scheduler type implements it's own priority queue, and can implement it's own
 way of populating, and prioritization of its queue. The associated queues of an
 individual scheduler is persisted in a SQL database.
 
@@ -266,7 +266,7 @@ The dataflow is as follows:
 
 ##### 4. Manual scan job
 
-![diagram010](./img/diagram010.jpg)
+![diagram010](./img/diagram010.svg)
 
 Scan jobs created by the user in Rocky (`server.push_queue`), will
 get the highest priority of 1. Note, that this will circumvent all the checks
@@ -293,7 +293,7 @@ picked up and processed by a 'Task Runner'. The scheduler creates a
 namely the instance of a `NormalizerTask`.
 
 The of queueing and processing a `NormalizerTask` task is the same as for
-the `BoefjeScheduler`. So reference that section for a more in-depth explanation.
+the `BoefjeScheduler`. Reference that section for a more in-depth explanation.
 
 Before `NormalizerTask` is wrapped by a `PrioritizedItem`, and pushed to the
 queue we will check the following:
@@ -326,12 +326,177 @@ When a raw file is created (`schedulers.normalizer.create_tasks_for_raw_data`)
 - For every enabled normalizer, a `NormalizerTask` will be created and added to
   the `PriorityQueue` of the `NormalizerScheduler`.
 
-## ERD
+## Class Diagram
 
 The following diagram we can explore the code level of the scheduler
 application, and its class structure.
 
-**TODO**
+The following describes the main components of the scheduler application:
+
+- `App` - The main application class, which is responsible for starting the
+  schedulers. It also contains the server, which is responsible for handling
+  the rest api requests. The `App` implements multiple `Scheduler` instances.
+  The `run()` method starts the schedulers, the listeners, the monitors, and
+  the server in threads. The `run()` method is the main thread of the
+  application.
+
+- `Scheduler` - And implementation of a `Scheduler` class is responsible for
+  populating the queue with tasks. Contains a `PriorityQueue`. The `run()`
+  method starts executes threads and listeners, which fill up the queue with
+  tasks.
+
+- `PriorityQueue` - The queue class, which is responsible for storing the
+  tasks.
+
+- `Server` - The server class, which is responsible for handling the HTTP
+  requests.
+
+```mermaid
+classDiagram
+    class App {
+        +AppContext ctx
+        +Dict[str, Scheduler] schedulers
+        +Server server
+
+        monitor_organisations()
+        collect_metrics()
+        start_schedulers()
+        start_monitors()
+        start_collectors()
+        start_server()
+        run()
+        shutdown()
+        stop_threads()
+    }
+
+    class Scheduler {
+        <<abstract>>
+        +AppContext ctx
+        +PriorityQueue queue
+        +Dict[str, Listener] listeners
+        +Dict[str, ThreadRunner] threads
+
+        run()
+        run_in_thread()
+
+        push_items_to_queue()
+        push_item_to_queue_with_timeout()
+        push_item_to_queue()
+        post_push()
+
+        pop_item_from_queue()
+        post_pop()
+
+        enable()
+        disable()
+        stop()
+        stop_listeners()
+        stop_threads()
+
+        is_enabled()
+        is_space_on_queue()
+        is_item_on_queue_by_hash()
+
+        last_activity()
+        dict()
+    }
+
+    class Server {
+        +AppContext ctx
+        +Dict[str, Scheduler] schedulers
+
+        health()
+        metrics()
+        get_schedulers()
+        get_scheduler()
+        patch_scheduler()
+        list_tasks()
+        get_task()
+        patch_task()
+        get_task_stats()
+        get_queues()
+        get_queue()
+        pop_queue()
+        push_queue()
+        run()
+    }
+
+    class PriorityQueue{
+        <<abstract>>
+        +PriorityQueueStore pq_store
+        pop()
+        push()
+        peek()
+        remove()
+        empty()
+        qsize()
+        full()
+        is_item_on_queue()
+        is_item_on_queue_by_hash()
+        get_p_item_by_identifier()
+        create_hash()
+        dict()
+        _is_valid_item()
+    }
+
+    class PriorityQueueStore{
+        +Datastore datastore
+        pop()
+        push()
+        peek()
+        update()
+        remove()
+        get()
+        empty()
+        qsize()
+        get_item_by_hash()
+        get_items_by_scheduler_id()
+    }
+
+    class Listener {
+        listen()
+    }
+
+    class ThreadRunner {
+        run_forever()
+        run_once()
+        run()
+        join()
+        stop()
+    }
+
+    App --|> "many" Scheduler : Implements
+    App --|> "one" Server: Has
+    Scheduler --|> "1" PriorityQueue : Has
+    Scheduler --|> "many" ThreadRunner : Has
+    Scheduler --|> "many" Listener : Has
+    PriorityQueue --|> PriorityQueueStore: References
+```
+
+## Database Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    items {
+        uuid id PK
+        character_varying scheduler_id
+        character_varying hash
+        integer priority
+        jsonb data
+        timestamp_with_time_zone created_at
+        timestamp_with_time_zone modified_at
+    }
+
+    tasks {
+        uuid id PK
+        character_varying scheduler_id
+        taskstatus status
+        timestamp_with_time_zone created_at
+        timestamp_with_time_zone modified_at
+        jsonb p_item
+        character_varying type
+    }
+```
 
 ## Project structure
 
@@ -367,29 +532,6 @@ $ tree -L 3 --dirsfirst
     ├── utils/
     └── __init__.py
 ```
-
-The following describes the main components of the scheduler application:
-
-- `App` - The main application class, which is responsible for starting the
-  schedulers. It also contains the server, which is responsible for handling
-  the rest api requests. The `App` implements multiple `Scheduler` instances.
-  The `run()` method starts the schedulers, the listeners, the monitors, and
-  the server in threads. The `run()` method is the main thread of the
-  application.
-
-- `Scheduler` - And implementation of a `Scheduler` class is responsible for
-  populating the queue with tasks. Contains a `PriorityQueue`. The `run()`
-  method starts executes threads and listeners, which fill up the queue with
-  tasks.
-
-- `PriorityQueue` - The queue class, which is responsible for storing the
-  tasks.
-
-- `Ranker` - The ranker class, which is responsible for ranking the tasks,
-  and can be called from the `Scheduler` class in order to rank the tasks.
-
-- `Server` - The server class, which is responsible for handling the HTTP
-  requests.
 
 [^1]:
     As of writing a `TaskRun` is known within the scheduler as a `Task`. In the
