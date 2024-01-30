@@ -4,9 +4,9 @@ from types import SimpleNamespace
 from unittest import mock
 
 import requests
-from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
+from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -61,7 +61,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.JobStore.name: storage.JobStore(self.dbconn),
+                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
             }
         )
 
@@ -178,7 +178,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -220,7 +220,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db_first = models.Task(
+        task_db_first = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -230,7 +230,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        task_db_second = models.Task(
+        task_db_second = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -373,7 +373,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -408,7 +408,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -446,7 +446,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -487,7 +487,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -523,7 +523,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -562,7 +562,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -601,7 +601,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -646,7 +646,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -822,9 +822,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-        # Job should be in datastore
-        job_db = self.mock_ctx.datastores.job_store.get_job_by_hash(task.hash)
-        self.assertEqual(job_db.p_item.hash, task.hash)
+        # Schedule should be in datastore
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task.hash)
+        self.assertEqual(schedule_db.p_item.hash, task.hash)
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
@@ -1567,7 +1567,7 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -1685,8 +1685,8 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             return_value=True,
         ).start()
 
-        self.mock_get_jobs = mock.patch(
-            "scheduler.context.AppContext.datastores.job_store.get_jobs",
+        self.mock_get_schedules = mock.patch(
+            "scheduler.context.AppContext.datastores.schedule_store.get_schedules",
         ).start()
 
         self.mock_get_object = mock.patch(
@@ -1701,7 +1701,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         mock.patch.stopall()
 
     def test_push_tasks_for_rescheduling(self):
-        """When the dealine of jobs have passed, the resulting task should be added to the queue"""
+        """When the dealine of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1721,16 +1721,16 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=task.hash,
             p_item=p_item,
         )
 
-        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Mocks
-        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_schedules.return_value = ([schedule], 1)
         self.mock_get_object.return_value = ooi
         self.mock_get_plugin.return_value = plugin
 
@@ -1742,7 +1742,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
 
         # Assert: new item is created with a similar task
         peek = self.scheduler.queue.peek(0)
-        self.assertEqual(job_db.p_item.hash, peek.hash)
+        self.assertEqual(schedule_db.p_item.hash, peek.hash)
 
         # Assert: task should be created, and should be the one that is queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(peek.id)
@@ -1772,16 +1772,16 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=task.hash,
             p_item=p_item,
         )
 
-        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Mocks
-        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_schedules.return_value = ([schedule], 1)
         self.mock_get_object.return_value = ooi
         self.mock_get_plugin.return_value = plugin
 
@@ -1793,7 +1793,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
 
         # Assert: new item is created with a similar task
         peek = self.scheduler.queue.peek(0)
-        self.assertEqual(job_db.p_item.hash, peek.hash)
+        self.assertEqual(schedule_db.p_item.hash, peek.hash)
 
         # Assert: task should be created, and should be the one that is queued
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(peek.id)
@@ -1801,7 +1801,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(peek.id, task_db.id)
 
     def test_push_tasks_for_rescheduling_ooi_not_found(self):
-        """When ooi isn't found anymore for the job, we disable the job"""
+        """When ooi isn't found anymore for the schedule, we disable the schedule"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1821,16 +1821,16 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=task.hash,
             p_item=p_item,
         )
 
-        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Mocks
-        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_schedules.return_value = ([schedule], 1)
         self.mock_get_object.return_value = None
         self.mock_get_plugin.return_value = plugin
 
@@ -1840,12 +1840,12 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: item should not be on queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-        # Assert: job should be disabled
-        job_db_disabled = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
-        self.assertFalse(job_db_disabled.enabled)
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
 
     def test_push_tasks_for_rescheduling_boefje_not_found(self):
-        """When boefje isn't found anymore for the job, we disable the job"""
+        """When boefje isn't found anymore for the schedule, we disable the schedule"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1865,16 +1865,16 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=task.hash,
             p_item=p_item,
         )
 
-        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Mocks
-        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_schedules.return_value = ([schedule], 1)
         self.mock_get_object.return_value = ooi
         self.mock_get_plugin.return_value = None
 
@@ -1884,12 +1884,12 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: item should not be on queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-        # Assert: job should be disabled
-        job_db_disabled = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
-        self.assertFalse(job_db_disabled.enabled)
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
 
     def test_push_tasks_for_rescheduling_boefje_disabled(self):
-        """When boefje disabled for the job, we disable the job"""
+        """When boefje disabled for the schedule, we disable the schedule"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1909,16 +1909,16 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=task.hash,
             p_item=p_item,
         )
 
-        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Mocks
-        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_schedules.return_value = ([schedule], 1)
         self.mock_get_object.return_value = ooi
         self.mock_get_plugin.return_value = plugin
 
@@ -1928,12 +1928,12 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: item should not be on queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-        # Assert: job should be disabled
-        job_db_disabled = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
-        self.assertFalse(job_db_disabled.enabled)
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
 
     def test_push_tasks_for_rescheduling_boefje_doesnt_consume_ooi(self):
-        """When boefje doesn't consume the ooi, we disable the job"""
+        """When boefje doesn't consume the ooi, we disable the schedule"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1953,16 +1953,16 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=task.hash,
             p_item=p_item,
         )
 
-        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Mocks
-        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_schedules.return_value = ([schedule], 1)
         self.mock_get_object.return_value = ooi
         self.mock_get_plugin.return_value = plugin
 
@@ -1972,12 +1972,12 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: item should not be on queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-        # Assert: job should be disabled
-        job_db_disabled = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
-        self.assertFalse(job_db_disabled.enabled)
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
 
     def test_push_tasks_for_rescheduling_boefje_cannot_scan_ooi(self):
-        """When boefje cannot scan the ooi, we disable the job"""
+        """When boefje cannot scan the ooi, we disable the schedule"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
@@ -1997,16 +1997,16 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             hash=task.hash,
             p_item=p_item,
         )
 
-        job_db = self.mock_ctx.datastores.job_store.create_job(job)
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 
         # Mocks
-        self.mock_get_jobs.return_value = ([job], 1)
+        self.mock_get_schedules.return_value = ([schedule], 1)
         self.mock_get_object.return_value = ooi
         self.mock_get_plugin.return_value = plugin
 
@@ -2016,6 +2016,6 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         # Assert: item should not be on queue
         self.assertEqual(0, self.scheduler.queue.qsize())
 
-        # Assert: job should be disabled
-        job_db_disabled = self.mock_ctx.datastores.job_store.get_job_by_id(job_db.id)
-        self.assertFalse(job_db_disabled.enabled)
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)

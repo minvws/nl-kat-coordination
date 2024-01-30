@@ -279,14 +279,14 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-            jobs, _ = self.ctx.datastores.job_store.get_jobs(
+            schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
                 scheduler_id=self.scheduler_id,
                 enabled=True,
                 max_deadline=datetime.now(timezone.utc),
             )
         except Exception as exc_db:
             self.logger.error(
-                "Could not get jobs for scheduler: %s",
+                "Could not get schedules for scheduler: %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
                 organisation_id=self.organisation.id,
@@ -294,9 +294,9 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
-        if not jobs:
+        if not schedules:
             self.logger.debug(
-                "No jobs found for scheduler: %s",
+                "No schedules found for scheduler: %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
                 organisation_id=self.organisation.id,
@@ -304,24 +304,24 @@ class BoefjeScheduler(Scheduler):
             return
 
         with futures.ThreadPoolExecutor() as executor:
-            for job in jobs:
-                # Create a new task from the p_item spec of a job
+            for schedule in schedules:
+                # Create a new task from the p_item spec of a schedule
                 try:
-                    task = BoefjeTask.parse_obj(job.p_item.data)
+                    task = BoefjeTask.parse_obj(schedule.p_item.data)
                 except Exception as exc:
                     self.logger.error(
-                        "Could not parse task from job: %s",
-                        job.id,
-                        job_id=job.id,
+                        "Could not parse task from schedule: %s",
+                        schedule.id,
+                        schedule_id=schedule.id,
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                         exc_info=exc,
                     )
 
                     # If we're not able to parse it because a faulty type of
-                    # task was pushed by for instance the jobs endpoint we need
-                    # to disable the job.
-                    self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                    # task was pushed by for instance the schedules endpoint we need
+                    # to disable the schedule.
+                    self.ctx.datastores.schedule_store.update_schedule_enabled(schedule.id, False)
                     continue
 
                 # Boefje still exists?
@@ -333,7 +333,7 @@ class BoefjeScheduler(Scheduler):
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                     )
-                    self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                    self.ctx.datastores.schedule_store.update_schedule_enabled(schedule.id, False)
                     continue
 
                 # Boefje still enabled?
@@ -344,7 +344,7 @@ class BoefjeScheduler(Scheduler):
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                     )
-                    self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                    self.ctx.datastores.schedule_store.update_schedule_enabled(schedule.id, False)
                     continue
 
                 # We check if the task has an input_ooi, since it is possible
@@ -360,7 +360,7 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                        self.ctx.datastores.schedule_store.update_schedule_enabled(schedule.id, False)
                         continue
 
                     # Boefje still consuming ooi?
@@ -372,7 +372,7 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                        self.ctx.datastores.schedule_store.update_schedule_enabled(schedule.id, False)
                         continue
 
                     # Boefje allowed to scan ooi?
@@ -384,7 +384,7 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        self.ctx.datastores.job_store.update_job_enabled(job.id, False)
+                        self.ctx.datastores.schedule_store.update_schedule_enabled(schedule.id, False)
                         continue
 
                 executor.submit(

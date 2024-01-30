@@ -253,13 +253,13 @@ class Scheduler(abc.ABC):
         # Set last activity of scheduler
         self.last_activity = datetime.now(timezone.utc)
 
-        # Create Job
+        # Create TaskSchedule
         #
-        # Do we have a job for this task?
-        job_db = self.ctx.datastores.job_store.get_job_by_hash(p_item.hash)
-        if job_db is None:
-            job_db = self.ctx.datastores.job_store.create_job(
-                models.Job(
+        # Do we have a schedule for this task?
+        schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(p_item.hash)
+        if schedule_db is None:
+            schedule_db = self.ctx.datastores.schedule_store.create_schedule(
+                models.Schedule(
                     scheduler_id=self.scheduler_id,
                     p_item=p_item,
                     deadline_at=datetime.now(timezone.utc) + timedelta(seconds=self.ctx.config.pq_grace_period),
@@ -272,13 +272,13 @@ class Scheduler(abc.ABC):
         #
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
-        task = models.Task(
+        task = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler_id,
             type=self.queue.item_type.type,
             p_item=p_item,
             status=models.TaskStatus.QUEUED,
-            job_id=job_db.id,
+            schedule_id=schedule_db.id,
             created_at=datetime.now(timezone.utc),
             modified_at=datetime.now(timezone.utc),
         )
@@ -358,28 +358,28 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
-    def signal_handler_task(self, task: models.Task) -> None:
+    def signal_handler_task(self, task: models.TaskRun) -> None:
         """Handle a task that has been completed or failed."""
         if task.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
             return
 
-        def _calculate_deadline(task: models.Task):
-            job = self.ctx.datastores.job_store.get_job_by_hash(task.p_item.hash)
+        def _calculate_deadline(task: models.TaskRun):
+            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(task.p_item.hash)
 
             try:
-                job.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(job))
+                schedule.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(schedule))
             except Exception:
                 self.logger.error(
-                    "Unable to calculate deadline for job %s. Disabling job",
-                    job.id,
-                    job_id=job.id,
+                    "Unable to calculate deadline for schedule %s. Disabling schedule",
+                    schedule.id,
+                    schedule_id=schedule.id,
                     task_hash=task.p_item.hash,
                     scheduler_id=self.scheduler_id,
                 )
-                job.enabled = False
+                schedule.enabled = False
 
-            job.evaluated_at = datetime.now(timezone.utc)
-            self.ctx.datastores.job_store.update_job(job)
+            schedule.evaluated_at = datetime.now(timezone.utc)
+            self.ctx.datastores.schedule_store.update_schedule(schedule)
 
         self.executor.submit(_calculate_deadline, task)
 

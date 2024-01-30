@@ -5,17 +5,18 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
 
-from scheduler.utils import GUID
+from scheduler.utils import GUID, cron
 
 from .base import Base
 from .boefje import Boefje
+from .errors import ValidationError
 from .normalizer import Normalizer
 from .queue import PrioritizedItem
 from .raw_data import RawData
@@ -45,7 +46,7 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-class Task(BaseModel):
+class TaskRun(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -59,7 +60,7 @@ class Task(BaseModel):
 
     status: TaskStatus
 
-    job_id: Optional[uuid.UUID] = None
+    schedule_id: Optional[uuid.UUID] = None
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -69,8 +70,8 @@ class Task(BaseModel):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
 
-class TaskDB(Base):
-    __tablename__ = "tasks"
+class TaskRunDB(Base):
+    __tablename__ = "task_runs"
 
     id = Column(GUID, primary_key=True)
 
@@ -80,8 +81,8 @@ class TaskDB(Base):
 
     p_item = Column(JSONB, nullable=False)
 
-    job_id = Column(GUID, ForeignKey("jobs.id", ondelete="SET NULL"), nullable=True)
-    job = relationship("JobDB", back_populates="tasks")
+    schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
+    schedule = relationship("ScheduleDB", back_populates="tasks")
 
     status = Column(
         Enum(TaskStatus),

@@ -2,21 +2,24 @@ import uuid
 from datetime import datetime, timezone
 from typing import List, Optional
 
+import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Boolean, Column, DateTime, String
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
+from sqlalchemy.sql.expression import text
 
 from scheduler.utils import GUID, cron
 
 from .base import Base
 from .errors import ValidationError
 from .queue import PrioritizedItem
-from .tasks import Task
+from .tasks import TaskRun
 
 
-class Job(BaseModel):
+class Schedule(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -28,7 +31,7 @@ class Job(BaseModel):
     # Priority item specification
     p_item: PrioritizedItem
 
-    tasks: List[Task] = []
+    tasks: List[TaskRun] = []
 
     cron_expression: Optional[str] = None
 
@@ -40,7 +43,7 @@ class Job(BaseModel):
     # TODO: index on the p_item.hash
 
     def validate(self):
-        """Validate the job model"""
+        """Validate the schedule model"""
         if self.cron_expression is not None:
             try:
                 cron.next_run(self.cron_expression)
@@ -48,14 +51,16 @@ class Job(BaseModel):
                 raise ValidationError(f"Invalid cron expression: {self.cron_expression}") from exc
 
 
-class JobDB(Base):
-    __tablename__ = "jobs"
+class ScheduleDB(Base):
+    __tablename__ = "schedules"
 
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String)
     enabled = Column(Boolean, nullable=False, default=True)
     p_item = Column(JSONB, nullable=False)
-    tasks = relationship("TaskDB", back_populates="job", order_by="TaskDB.created_at", cascade="all,delete-orphan")
+    tasks = relationship(
+        "TaskRunDB", back_populates="schedule", order_by="TaskRunDB.created_at", cascade="all,delete-orphan"
+    )
     cron_expression = Column(String, nullable=True)
 
     deadline_at = Column(

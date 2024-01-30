@@ -7,8 +7,8 @@ from types import SimpleNamespace
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, server, storage
 
+from scheduler import config, models, server, storage
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -31,7 +31,7 @@ class APITemplateTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.JobStore.name: storage.JobStore(self.dbconn),
+                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
             }
         )
 
@@ -146,11 +146,11 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(200, response_get_task.status_code)
         self.assertEqual(response_post.json().get("id"), response_get_task.json().get("id"))
 
-        # Job should be created
-        response_get_job = self.client.get(f"/jobs?hash{response_post.json().get('hash')}")
-        self.assertEqual(200, response_get_job.status_code)
+        # Schedule should be created
+        response_get_schedule = self.client.get(f"/schedules?hash{response_post.json().get('hash')}")
+        self.assertEqual(200, response_get_schedule.status_code)
         self.assertEqual(
-            response_post.json().get("hash"), response_get_job.json().get("results")[0].get("p_item").get("hash")
+            response_post.json().get("hash"), response_get_schedule.json().get("results")[0].get("p_item").get("hash")
         )
 
     def test_push_incorrect_item_type(self):
@@ -502,11 +502,11 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response_get_task.status_code)
         self.assertEqual(initial_item_id, response_get_task.json().get("id"))
 
-        # Job should be created
-        response_get_job = self.client.get(f"/jobs?hash{response_post.json().get('hash')}")
-        self.assertEqual(200, response_get_job.status_code)
+        # Schedule should be created
+        response_get_schedule = self.client.get(f"/schedules?hash{response_post.json().get('hash')}")
+        self.assertEqual(200, response_get_schedule.status_code)
         self.assertEqual(
-            response_post.json().get("hash"), response_get_job.json().get("results")[0].get("p_item").get("hash")
+            response_post.json().get("hash"), response_get_schedule.json().get("results")[0].get("p_item").get("hash")
         )
 
     def test_get_tasks(self):
@@ -651,61 +651,61 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
 
 
-class APIJobsEndpointTestCase(APITemplateTestCase):
+class APISchedulesEndpointTestCase(APITemplateTestCase):
     def setUp(self):
         super().setUp()
 
-        first_job = models.Job(
+        first_schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             p_item=functions.create_p_item("test_scheduler_id", 1),
             deadline_at=datetime.now(timezone.utc) + timedelta(days=1),
         )
 
         response = self.client.post(
-            "/jobs", data=json.dumps({"job": first_job.model_dump()}, cls=UUIDEncoder, default=str)
+            "/schedules", data=json.dumps({"schedule": first_schedule.model_dump()}, cls=UUIDEncoder, default=str)
         )
         self.assertEqual(201, response.status_code)
-        first_job_id = response.json().get("id")
+        first_schedule_id = response.json().get("id")
 
-        self.first_job_api = self.client.get(f"/jobs/{first_job_id}").json()
+        self.first_schedule_api = self.client.get(f"/schedules/{first_schedule_id}").json()
 
-        second_job = models.Job(
+        second_schedule = models.Schedule(
             scheduler_id=self.scheduler.scheduler_id,
             p_item=functions.create_p_item("test_scheduler_id", 1),
             deadline_at=datetime.now(timezone.utc) + timedelta(days=2),
         )
 
         response = self.client.post(
-            "/jobs", data=json.dumps({"job": second_job.model_dump()}, cls=UUIDEncoder, default=str)
+            "/schedules", data=json.dumps({"schedule": second_schedule.model_dump()}, cls=UUIDEncoder, default=str)
         )
         self.assertEqual(201, response.status_code)
-        second_job_id = response.json().get("id")
+        second_schedule_id = response.json().get("id")
 
-        self.second_job_api = self.client.get(f"/jobs/{second_job_id}").json()
+        self.second_schedule_api = self.client.get(f"/schedules/{second_schedule_id}").json()
 
-    def test_create_job(self):
+    def test_create_schedule(self):
         # Arrange
-        job = {
-            "job": models.Job(
+        schedule = {
+            "schedule": models.Schedule(
                 scheduler_id=self.scheduler.scheduler_id,
                 p_item=functions.create_p_item("test_scheduler_id", 1),
             ).model_dump()
         }
 
         # Act
-        response_post = self.client.post("/jobs", data=json.dumps(job, cls=UUIDEncoder, default=str))
-        response_get = self.client.get(f"/jobs/{response_post.json().get('id')}")
+        response_post = self.client.post("/schedules", data=json.dumps(schedule, cls=UUIDEncoder, default=str))
+        response_get = self.client.get(f"/schedules/{response_post.json().get('id')}")
 
         # Assert
         self.assertEqual(201, response_post.status_code)
         self.assertEqual(200, response_get.status_code)
 
-    def test_create_job_validate_malformed_cron_expresssion(self):
+    def test_create_schedule_validate_malformed_cron_expresssion(self):
         # Arrange
         cron_expression = "malformed"
 
-        job = {
-            "job": models.Job(
+        schedule = {
+            "schedule": models.Schedule(
                 scheduler_id=self.scheduler.scheduler_id,
                 p_item=functions.create_p_item("test_scheduler_id", 1),
                 cron_expression=cron_expression,
@@ -713,86 +713,86 @@ class APIJobsEndpointTestCase(APITemplateTestCase):
         }
 
         # Act
-        response_post = self.client.post("/jobs", data=json.dumps(job, cls=UUIDEncoder, default=str))
+        response_post = self.client.post("/schedules", data=json.dumps(schedule, cls=UUIDEncoder, default=str))
 
         # Assert
         self.assertEqual(400, response_post.status_code)
         self.assertTrue(response_post.json().get("detail").startswith("Invalid cron expression"))
 
-    def test_list_jobs(self):
-        response = self.client.get("/jobs")
+    def test_list_schedules(self):
+        response = self.client.get("/schedules")
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
-    def test_list_jobs_scheduler_id(self):
-        response = self.client.get(f"/jobs?scheduler_id={self.scheduler.scheduler_id}")
+    def test_list_schedules_scheduler_id(self):
+        response = self.client.get(f"/schedules?scheduler_id={self.scheduler.scheduler_id}")
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
-        self.assertEqual(self.first_job_api.get("scheduler_id"), response.json()["results"][0]["scheduler_id"])
+        self.assertEqual(self.first_schedule_api.get("scheduler_id"), response.json()["results"][0]["scheduler_id"])
 
-    def test_list_jobs_enabled(self):
-        response = self.client.get("/jobs?enabled=true")
+    def test_list_schedules_enabled(self):
+        response = self.client.get("/schedules?enabled=true")
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
-        response = self.client.get("/jobs?enabled=false")
+        response = self.client.get("/schedules?enabled=false")
         self.assertEqual(200, response.status_code)
         self.assertEqual(0, response.json()["count"])
         self.assertEqual(0, len(response.json()["results"]))
 
-    def test_list_jobs_min_deadline(self):
-        response = self.client.get(f"/jobs?min_deadline={self.first_job_api.get('deadline_at')}")
+    def test_list_schedules_min_deadline(self):
+        response = self.client.get(f"/schedules?min_deadline={self.first_schedule_api.get('deadline_at')}")
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
-        response = self.client.get(f"/jobs?min_deadline={self.second_job_api.get('deadline_at')}")
+        response = self.client.get(f"/schedules?min_deadline={self.second_schedule_api.get('deadline_at')}")
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
         self.assertEqual(1, len(response.json()["results"]))
-        self.assertEqual(self.second_job_api.get("id"), response.json()["results"][0]["id"])
+        self.assertEqual(self.second_schedule_api.get("id"), response.json()["results"][0]["id"])
 
-    def test_list_jobs_max_deadline(self):
-        response = self.client.get(f"/jobs?max_deadline={self.second_job_api.get('deadline_at')}")
+    def test_list_schedules_max_deadline(self):
+        response = self.client.get(f"/schedules?max_deadline={self.second_schedule_api.get('deadline_at')}")
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
-        response = self.client.get(f"/jobs?max_deadline={self.first_job_api.get('deadline_at')}")
+        response = self.client.get(f"/schedules?max_deadline={self.first_schedule_api.get('deadline_at')}")
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
         self.assertEqual(1, len(response.json()["results"]))
-        self.assertEqual(self.first_job_api.get("id"), response.json()["results"][0]["id"])
+        self.assertEqual(self.first_schedule_api.get("id"), response.json()["results"][0]["id"])
 
-    def test_list_jobs_min_and_max_deadline(self):
+    def test_list_schedules_min_and_max_deadline(self):
         response = self.client.get(
-            f"/jobs?min_deadline={self.first_job_api.get('deadline_at')}&max_deadline={self.second_job_api.get('deadline_at')}"
+            f"/schedules?min_deadline={self.first_schedule_api.get('deadline_at')}&max_deadline={self.second_schedule_api.get('deadline_at')}"
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, response.json()["count"])
         self.assertEqual(2, len(response.json()["results"]))
 
         response = self.client.get(
-            f"/jobs?min_deadline={self.first_job_api.get('deadline_at')}&max_deadline={self.first_job_api.get('deadline_at')}"
+            f"/schedules?min_deadline={self.first_schedule_api.get('deadline_at')}&max_deadline={self.first_schedule_api.get('deadline_at')}"
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, response.json()["count"])
         self.assertEqual(1, len(response.json()["results"]))
-        self.assertEqual(self.first_job_api.get("id"), response.json()["results"][0]["id"])
+        self.assertEqual(self.first_schedule_api.get("id"), response.json()["results"][0]["id"])
 
-    def test_list_jobs_min_greater_than_max_deadline(self):
+    def test_list_schedules_min_greater_than_max_deadline(self):
         response = self.client.get(
-            f"/jobs?min_deadline={self.second_job_api.get('deadline_at')}&max_deadline={self.first_job_api.get('deadline_at')}"
+            f"/schedules?min_deadline={self.second_schedule_api.get('deadline_at')}&max_deadline={self.first_schedule_api.get('deadline_at')}"
         )
         self.assertEqual(400, response.status_code)
         self.assertEqual("min_deadline must be less than max_deadline", response.json().get("detail"))
 
-    def test_get_jobs_filter(self):
+    def test_get_schedules_filter(self):
         response = self.client.post(
-            "/jobs",
+            "/schedules",
             json={
                 "filters": {
                     "filters": [
@@ -800,7 +800,7 @@ class APIJobsEndpointTestCase(APITemplateTestCase):
                             "column": "p_item",
                             "field": "id",
                             "operator": "eq",
-                            "value": self.first_job_api.get("p_item").get("id"),
+                            "value": self.first_schedule_api.get("p_item").get("id"),
                         }
                     ]
                 }
@@ -809,25 +809,27 @@ class APIJobsEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()["results"]))
 
-    def test_get_job(self):
-        response = self.client.get(f"/jobs/{self.first_job_api.get('id')}")
+    def test_get_schedule(self):
+        response = self.client.get(f"/schedules/{self.first_schedule_api.get('id')}")
         self.assertEqual(200, response.status_code)
-        self.assertEqual(self.first_job_api.get("id"), response.json().get("id"))
+        self.assertEqual(self.first_schedule_api.get("id"), response.json().get("id"))
 
-    def test_patch_job(self):
-        response = self.client.patch(f"/jobs/{self.first_job_api.get('id')}", json={"enabled": False})
+    def test_patch_schedule(self):
+        response = self.client.patch(f"/schedules/{self.first_schedule_api.get('id')}", json={"enabled": False})
         self.assertEqual(200, response.status_code)
         self.assertEqual(False, response.json().get("enabled"))
 
-    def test_patch_job_validate_malformed_cron_expression(self):
-        response = self.client.patch(f"/jobs/{self.first_job_api.get('id')}", json={"cron_expression": "malformed"})
+    def test_patch_schedule_validate_malformed_cron_expression(self):
+        response = self.client.patch(
+            f"/schedules/{self.first_schedule_api.get('id')}", json={"cron_expression": "malformed"}
+        )
         self.assertEqual(400, response.status_code)
         self.assertTrue(response.json().get("detail").startswith("Invalid cron expression"))
 
-    def test_delete_job(self):
-        response = self.client.delete(f"/jobs/{self.first_job_api.get('id')}")
+    def test_delete_schedule(self):
+        response = self.client.delete(f"/schedules/{self.first_schedule_api.get('id')}")
         self.assertEqual(204, response.status_code)
 
-        response = self.client.get(f"/jobs/{self.first_job_api.get('id')}")
+        response = self.client.get(f"/schedules/{self.first_schedule_api.get('id')}")
         self.assertEqual(404, response.status_code)
-        self.assertEqual("job not found", response.json().get("detail"))
+        self.assertEqual("schedule not found", response.json().get("detail"))

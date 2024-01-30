@@ -173,7 +173,7 @@ keep track of the status of this task throughout the system we update its
   `TaskRun` status by either setting the status to `COMPLETED`, `FAILED` or
   `CANCELLED`. (5)
 
-##### `TaskSchedule`
+##### `Schedule`
 
 Since a task within the KAT implementation of the scheduler, generates findings
 at a specific moment in time. We want to account for additional findings or
@@ -181,13 +181,13 @@ changes for the same task at a later moment in time. Meaning we want to be able
 to reschedule particular tasks.
 
 In order to support this, every task that is executed by the
-`BoefjesScheduler` a `TaskSchedule` is created. This `TaskSchedule` contains
+`BoefjesScheduler` a `Schedule` is created. This `Schedule` contains
 the necessary information and the specific task in order to reschedule a task
 at a later moment in time.
 
 ![diagram006](./img/diagram006.svg)
 
-A `TaskSchedule` supports a cron-like expression as schedule which makes it
+A `Schedule` supports a cron-like expression as schedule which makes it
 possible to schedule tasks at certain intervals. When such an expression isn't
 set, the task will be scheduled at a future calculated date.
 

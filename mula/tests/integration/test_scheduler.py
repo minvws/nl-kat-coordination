@@ -4,7 +4,6 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, queues, storage
-
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
 from tests.mocks import task as mock_task
@@ -26,7 +25,7 @@ class SchedulerTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.JobStore.name: storage.JobStore(self.dbconn),
+                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
             }
         )
 
@@ -72,9 +71,9 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
-        # Job should be in datastore
-        job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
-        self.assertEqual(job_db.id, task_db.job_id)
+        # Schedule should be in datastore
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(task_db.schedule_id)
+        self.assertEqual(schedule_db.id, task_db.schedule_id)
 
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
@@ -222,9 +221,9 @@ class SchedulerTestCase(unittest.TestCase):
 
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
 
-        # Get job
-        initial_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
-        initial_timestamp = initial_job_db.deadline_at
+        # Get schedule
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(task_db.schedule_id)
+        initial_timestamp = initial_schedule_db.deadline_at
 
         # Set task to complete
         task_db.status = models.TaskStatus.COMPLETED
@@ -233,9 +232,9 @@ class SchedulerTestCase(unittest.TestCase):
         # Act
         self.scheduler.signal_handler_task(task_db)
 
-        # Assert: Job have a new deadline
-        updated_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
-        updated_timestamp = updated_job_db.deadline_at
+        # Assert: schedule have a new deadline
+        updated_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(task_db.schedule_id)
+        updated_timestamp = updated_schedule_db.deadline_at
         self.assertNotEqual(initial_timestamp, updated_timestamp)
 
     def test_signal_handler_task_not_finished(self):
@@ -249,15 +248,15 @@ class SchedulerTestCase(unittest.TestCase):
 
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
 
-        # Get job
-        initial_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
-        initial_timestamp = initial_job_db.deadline_at
+        # Get schedule
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(task_db.schedule_id)
+        initial_timestamp = initial_schedule_db.deadline_at
 
         self.scheduler.signal_handler_task(task_db)
 
-        # Assert: Job should have same deadline
-        updated_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
-        updated_timestamp = updated_job_db.deadline_at
+        # Assert: schedule should have same deadline
+        updated_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(task_db.schedule_id)
+        updated_timestamp = updated_schedule_db.deadline_at
         self.assertEqual(initial_timestamp, updated_timestamp)
 
     def test_signal_handler_malformed_cron_expression(self):
@@ -272,12 +271,12 @@ class SchedulerTestCase(unittest.TestCase):
 
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
 
-        # Get job
-        initial_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
+        # Get schedule
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(task_db.schedule_id)
 
         # Set cron expression to malformed
-        initial_job_db.cron_expression = ".&^%$#"
-        self.mock_ctx.datastores.job_store.update_job(initial_job_db)
+        initial_schedule_db.cron_expression = ".&^%$#"
+        self.mock_ctx.datastores.schedule_store.update_schedule(initial_schedule_db)
 
         # Set task to complete
         task_db.status = models.TaskStatus.COMPLETED
@@ -286,6 +285,6 @@ class SchedulerTestCase(unittest.TestCase):
         # Act
         self.scheduler.signal_handler_task(task_db)
 
-        # Assert: Job should be disabled
-        updated_job_db = self.mock_ctx.datastores.job_store.get_job_by_id(task_db.job_id)
-        self.assertFalse(updated_job_db.enabled)
+        # Assert: schedule should be disabled
+        updated_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(task_db.schedule_id)
+        self.assertFalse(updated_schedule_db.enabled)

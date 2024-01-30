@@ -130,38 +130,38 @@ class Server:
         )
 
         self.api.add_api_route(
-            path="/jobs",
-            endpoint=self.list_jobs,
+            path="/schedules",
+            endpoint=self.list_schedules,
             methods=["GET", "POST"],
-            response_model=Union[PaginatedResponse, models.Job],
+            response_model=Union[PaginatedResponse, models.Schedule],
             status_code=status.HTTP_200_OK,
-            description="List all jobs",
+            description="List all schedules",
         )
 
         self.api.add_api_route(
-            path="/jobs/{job_id}",
-            endpoint=self.get_job,
+            path="/schedules/{schedule_id}",
+            endpoint=self.get_schedule,
             methods=["GET"],
-            response_model=models.Job,
+            response_model=models.Schedule,
             status_code=status.HTTP_200_OK,
-            description="Get a job",
+            description="Get a schedule",
         )
 
         self.api.add_api_route(
-            path="/jobs/{job_id}",
-            endpoint=self.patch_job,
+            path="/schedules/{schedule_id}",
+            endpoint=self.patch_schedule,
             methods=["PATCH"],
-            response_model=models.Job,
+            response_model=models.Schedule,
             status_code=status.HTTP_200_OK,
-            description="Update a job",
+            description="Update a schedule",
         )
 
         self.api.add_api_route(
-            path="/jobs/{job_id}",
-            endpoint=self.delete_job,
+            path="/schedules/{schedule_id}",
+            endpoint=self.delete_schedule,
             methods=["DELETE"],
             status_code=status.HTTP_204_NO_CONTENT,
-            description="Delete a job",
+            description="Delete a schedule",
         )
 
         self.api.add_api_route(
@@ -193,7 +193,7 @@ class Server:
             path="/tasks/{task_id}",
             endpoint=self.get_task,
             methods=["GET"],
-            response_model=models.Task,
+            response_model=models.TaskRun,
             status_code=status.HTTP_200_OK,
             description="Get a task",
         )
@@ -202,7 +202,7 @@ class Server:
             path="/tasks/{task_id}",
             endpoint=self.patch_task,
             methods=["PATCH"],
-            response_model=models.Task,
+            response_model=models.TaskRun,
             status_code=status.HTTP_200_OK,
             description="Update a task",
         )
@@ -315,7 +315,7 @@ class Server:
 
         return updated_scheduler
 
-    def list_jobs(
+    def list_schedules(
         self,
         request: fastapi.Request,
         scheduler_id: Optional[str] = None,
@@ -325,14 +325,14 @@ class Server:
         offset: int = 0,
         limit: int = 10,
         filters: Optional[storage.filters.FilterRequest] = None,
-        job: Optional[models.JobRequest] = None,
+        schedule: Optional[models.ScheduleRequest] = None,
     ) -> Any:
-        if job is not None and request.method == "POST":
-            created_job = fastapi.encoders.jsonable_encoder(self.create_job(job))
+        if schedule is not None and request.method == "POST":
+            created_schedule = fastapi.encoders.jsonable_encoder(self.create_schedule(schedule))
 
             return fastapi.responses.JSONResponse(
                 status_code=status.HTTP_201_CREATED,
-                content=created_job,
+                content=created_schedule,
             )
 
         if (min_deadline is not None and max_deadline is not None) and min_deadline > max_deadline:
@@ -342,7 +342,7 @@ class Server:
             )
 
         try:
-            results, count = self.ctx.datastores.job_store.get_jobs(
+            results, count = self.ctx.datastores.schedule_store.get_schedules(
                 scheduler_id=scheduler_id,
                 enabled=enabled,
                 min_deadline=min_deadline,
@@ -370,18 +370,18 @@ class Server:
 
         return paginate(request, results, count=count, offset=offset, limit=limit)
 
-    def create_job(self, job: models.JobRequest) -> Any:
+    def create_schedule(self, schedule: models.ScheduleRequest) -> Any:
         try:
-            job = models.Job(**job.dict())
+            schedule = models.Schedule(**schedule.dict())
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail=str(exc),
             ) from exc
 
-        # Validate job
+        # Validate schedule
         try:
-            job.validate()
+            schedule.validate()
         except ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -389,7 +389,7 @@ class Server:
             )
 
         try:
-            created_job = self.ctx.datastores.job_store.create_job(job)
+            created_schedule = self.ctx.datastores.schedule_store.create_schedule(schedule)
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
@@ -397,11 +397,11 @@ class Server:
                 detail="failed to create event",
             ) from exc
 
-        return created_job
+        return created_schedule
 
-    def get_job(self, job_id: str) -> Any:
+    def get_schedule(self, schedule_id: str) -> Any:
         try:
-            job = self.ctx.datastores.job_store.get_job_by_id(job_id)
+            schedule = self.ctx.datastores.schedule_store.get_schedule_by_id(schedule_id)
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -411,18 +411,18 @@ class Server:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get job",
+                detail="failed to get schedule",
             ) from exc
 
-        if job is None:
+        if schedule is None:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="job not found",
+                detail="schedule not found",
             )
 
-        return models.Job(**job.model_dump())
+        return models.Schedule(**schedule.model_dump())
 
-    def patch_job(self, job_id: str, item: Dict) -> Any:
+    def patch_schedule(self, schedule_id: str, item: Dict) -> Any:
         if len(item) == 0:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -430,45 +430,45 @@ class Server:
             )
 
         try:
-            job_db = self.ctx.datastores.job_store.get_job_by_id(job_id)
+            schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_id(schedule_id)
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"failed to get job [exception: {exc}]",
+                detail=f"failed to get schedule [exception: {exc}]",
             ) from exc
 
-        if job_db is None:
+        if schedule_db is None:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="job not found",
+                detail="schedule not found",
             )
 
-        updated_job = job_db.model_copy(update=item)
+        updated_schedule = schedule_db.model_copy(update=item)
 
-        # Validate job
+        # Validate schedule
         try:
-            updated_job.validate()
+            updated_schedule.validate()
         except ValidationError as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(exc),
             )
 
-        # Update job in database
+        # Update schedule in database
         try:
-            self.ctx.datastores.job_store.update_job(updated_job)
+            self.ctx.datastores.schedule_store.update_schedule(updated_schedule)
         except Exception as exc:
             self.logger.error(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to update job",
+                detail="failed to update schedule",
             ) from exc
 
-        return updated_job
+        return updated_schedule
 
-    def delete_job(self, job_id: str):
+    def delete_schedule(self, schedule_id: str):
         try:
-            self.ctx.datastores.job_store.delete_job(job_id)
+            self.ctx.datastores.schedule_store.delete_schedule(schedule_id)
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -478,7 +478,7 @@ class Server:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to delete job",
+                detail="failed to delete schedule",
             ) from exc
 
     def list_tasks(
@@ -637,7 +637,7 @@ class Server:
                 detail="task not found",
             )
 
-        return models.Task(**task.model_dump())
+        return models.TaskRun(**task.model_dump())
 
     def patch_task(self, task_id: str, item: Dict, background_tasks: BackgroundTasks) -> Any:
         if len(item) == 0:

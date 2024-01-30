@@ -11,7 +11,7 @@ class PrioritizedItemRequest(BaseModel):
     data: Dict = Field(default_factory=dict)
 
 
-class JobRequest(BaseModel):
+class ScheduleRequest(BaseModel):
     scheduler_id: str
 
     enabled: bool = True

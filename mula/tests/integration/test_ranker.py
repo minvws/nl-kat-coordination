@@ -20,7 +20,7 @@ class DefaultDeadlineRanker(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.JobStore.name: storage.JobStore(self.dbconn),
+                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
             }
         )
 
@@ -35,21 +35,21 @@ class DefaultDeadlineRanker(unittest.TestCase):
         self.assertIsNotNone(deadline)
 
     def test_calculate_deadline_cron(self):
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id="test",
             p_item=models.PrioritizedItem(hash="test", priority=1),
             cron_expression="0 12 * * 1",  # every Monday at noon
         )
 
-        deadline = self.ranker.rank(job)
+        deadline = self.ranker.rank(schedule)
         self.assertIsNotNone(deadline)
 
     def test_calculate_deadline_malformed(self):
-        job = models.Job(
+        schedule = models.Schedule(
             scheduler_id="test",
             p_item=models.PrioritizedItem(hash="test", priority=1),
             cron_expression=".&^%$#",
         )
 
         with self.assertRaises(ValueError):
-            self.ranker.rank(job)
+            self.ranker.rank(schedule)

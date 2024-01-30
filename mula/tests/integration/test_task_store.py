@@ -7,7 +7,6 @@ from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
-
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 
@@ -69,7 +68,7 @@ class TaskStoreTestCase(unittest.TestCase):
         ):
             for _ in r:
                 p_item = functions.create_p_item(self.organisation.id, 1)
-                task = models.Task(
+                task = models.TaskRun(
                     id=p_item.id,
                     hash=p_item.hash,
                     type=functions.TestModel.type,
@@ -121,7 +120,7 @@ class TaskStoreTestCase(unittest.TestCase):
         ):
             for _ in r:
                 p_item = functions.create_p_item(self.organisation.id, 1)
-                task = models.Task(
+                task = models.TaskRun(
                     id=p_item.id,
                     hash=p_item.hash,
                     type=functions.TestModel.type,
