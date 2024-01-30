@@ -26,26 +26,46 @@ class FindingsReport(Report):
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
         reference = Reference.from_str(input_ooi)
         findings = []
-        results = {}
+        finding_types = {}
+        severity_totals = {}
+        severity_totals_unique = {}
 
         tree = self.octopoes_api_connector.get_tree(
             reference, depth=TREE_DEPTH, types={Finding}, valid_time=valid_time
         ).store
 
-        for pk, ooi in tree.items():
+        for ooi in tree.values():
             if ooi.ooi_type == "Finding":
                 findings.append(ooi)
 
         for finding in findings:
             try:
                 finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
+                severity = finding_type.risk_severity.name.lower()
 
-                if finding_type in results:
-                    results[finding_type.id]["occurrences"].append(finding)
+                if finding_type.id in finding_types:
+                    finding_types[finding_type.id]["occurrences"].append(finding)
+                    severity_totals[severity] += 1
                 else:
-                    results[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
+                    finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
+                    severity_totals[severity] = 1
+
+                    if severity in severity_totals_unique:
+                        severity_totals_unique[severity] += 1
+                    else:
+                        severity_totals_unique[severity] = 1
+
             except ObjectNotFoundException:
                 logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
 
-        results = sorted(results.values(), key=lambda x: x["finding_type"].risk_score, reverse=True)
-        return results
+        finding_types = sorted(finding_types.values(), key=lambda x: x["finding_type"].risk_score, reverse=True)
+
+        # Get summary of severity totals
+        summary = {
+            "severity_totals": severity_totals,
+            "severity_totals_unique": severity_totals_unique,
+            "total_finding_types": len(finding_types),
+            "total_occurrences": len(findings),
+        }
+
+        return {"finding_types": finding_types, "summary": summary}

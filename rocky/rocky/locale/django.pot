@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-29 16:56+0000\n"
+"POT-Creation-Date: 2024-01-30 17:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -968,6 +968,7 @@ msgid "Failure mode effect properties"
 msgstr ""
 
 #: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
+#: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -3867,6 +3868,32 @@ msgstr ""
 msgid "Generate report"
 msgstr ""
 
+#: reports/templates/partials/report_severity_totals.html
+msgid "Severity totals"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals.html
+#: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/partials/ooi_report_severity_totals.html
+msgid "See"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Unique"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total occurrences"
+msgstr ""
+
 #: reports/templates/partials/report_sidemenu.html
 msgid "Table of contents"
 msgstr ""
@@ -5009,11 +5036,6 @@ msgid "There are no boefjes enabled to scan an OOI of type"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
-msgid "See"
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail.html
 msgid "to find and enable boefjes that can scan within the current level."
 msgstr ""
 
@@ -5729,19 +5751,6 @@ msgstr ""
 msgid ""
 "The severity of this findingtype has not (yet) been determined by the data "
 "source. This situation requires manual investigation of the severity."
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total occurrences"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total per severity overview:"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Unique"
 msgstr ""
 
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html

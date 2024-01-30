@@ -2,7 +2,9 @@
 
 <div class="horizontal-scroll">
     {% if data %}
-        {% for info in data %}
+        {% include "partials/report_severity_totals.html" with data=data.summary %}
+
+        {% for info in data.finding_types %}
             <h3>{{ info.finding_type }}</h3>
             <h4>{% translate "Findings information" %}</h4>
             <table>

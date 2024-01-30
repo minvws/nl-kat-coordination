@@ -1,0 +1,58 @@
+{% load i18n %}
+
+<div class="horizontal-scroll">
+    <table>
+        <caption class="visually-hidden">{% translate "Total per severity overview:" %}</caption>
+        <thead>
+            <tr>
+                <th>{% translate "Severity" %}</th>
+                <th>{% translate "Unique" %}</th>
+                <th>{% translate "Total occurrences" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <span class="critical">critical</span>
+                </td>
+                <td class="number">{{ data.severity_totals_unique.critical }}</td>
+                <td class="number">{{ data.severity_totals.critical }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="high">high</span>
+                </td>
+                <td class="number">{{ data.severity_totals_unique.high }}</td>
+                <td class="number">{{ data.severity_totals.high }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="medium">medium</span>
+                </td>
+                <td class="number">{{ data.severity_totals_unique.medium }}</td>
+                <td class="number">{{ data.severity_totals.medium }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="low">low</span>
+                </td>
+                <td class="number">{{ data.severity_totals_unique.low }}</td>
+                <td class="number">{{ data.severity_totals.low }}</td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="recommendation">recommendation</span>
+                </td>
+                <td class="number">{{ data.severity_totals_unique.recommendation }}</td>
+                <td class="number">{{ data.severity_totals.recommendation }}</td>
+            </tr>
+            <tfoot>
+                <tr>
+                    <td>total findings</td>
+                    <td class="number">{{ data.total_finding_types }}</td>
+                    <td class="number">{{ data.total_occurrences }}</td>
+                </tr>
+            </tfoot>
+        </tbody>
+    </table>
+</div>
