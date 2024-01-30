@@ -104,11 +104,6 @@ class BaseReportView(OOIFilterView):
                 logger.warning("No data could be found for '%s' ", ooi_id)
         return oois
 
-    def get_pk_oois(self) -> List[str]:
-        if "all" in self.selected_oois:
-            return [ooi.primary_key for ooi in self.get_oois()]
-        return self.selected_oois
-
     def get_ooi_filter_forms(self, ooi_types: Set[OOIType]) -> Dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(

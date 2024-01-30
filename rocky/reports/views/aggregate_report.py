@@ -171,7 +171,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data, error_oois = aggregate_reports(
-            self.octopoes_api_connector, self.get_pk_oois(), self.get_report_types(), self.valid_time
+            self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.valid_time
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
