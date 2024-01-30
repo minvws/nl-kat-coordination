@@ -149,6 +149,8 @@ task list.
 
 ![diagram005](./img/diagram005.svg)
 
+##### `TaskRun`
+
 Whenever a task is created in the scheduler it flows through the system, to
 keep track of the status of this task throughout the system we update its
 `TaskRun` reference.
@@ -171,21 +173,25 @@ keep track of the status of this task throughout the system we update its
   `TaskRun` status by either setting the status to `COMPLETED`, `FAILED` or
   `CANCELLED`. (5)
 
+##### `TaskSchedule`
+
 Since a task within the KAT implementation of the scheduler, generates findings
 at a specific moment in time. We want to account for additional findings or
-change for the same task at a later moment in time. Meaning we want to be able
+changes for the same task at a later moment in time. Meaning we want to be able
 to reschedule particular tasks.
 
 In order to support this, every task that is executed by the
 `BoefjesScheduler` a `TaskSchedule` is created. This `TaskSchedule` contains
-the necessary information in order to reschedule a task at a later moment in
-time.
+the necessary information and the specific task in order to reschedule a task
+at a later moment in time.
 
 ![diagram006](./img/diagram006.svg)
 
-A `TaskSchedule`
+A `TaskSchedule` supports a cron-like expression as schedule which makes it
+possible to schedule tasks at certain intervals. When such an expression isn't
+set, the task will be scheduled at a future calculated date.
 
-TODO: continue here
+To see how task will be rescheduled, refer to the 'Processes' section.
 
 #### Processes
 
@@ -495,25 +501,42 @@ classDiagram
 
 ```mermaid
 erDiagram
-    items {
-        uuid id PK
-        character_varying scheduler_id
-        character_varying hash
-        integer priority
-        jsonb data
-        timestamp_with_time_zone created_at
-        timestamp_with_time_zone modified_at
-    }
+jobs {
+    uuid id PK
+    character_varying scheduler_id
+    boolean enabled
+    jsonb p_item
+    character_varying cron_expression
+    timestamp_with_time_zone deadline_at
+    timestamp_with_time_zone evaluated_at
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone modified_at
+}
+tasks {
+    uuid id PK
+    uuid job_id FK
+    character_varying scheduler_id
+    taskstatus status
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone modified_at
+    jsonb p_item
+    character_varying type
+}
+alembic_version {
+    character_varying version_num PK
+}
+items {
+    uuid id PK
+    character_varying scheduler_id
+    character_varying hash
+    integer priority
+    jsonb data
+    timestamp_with_time_zone created_at
+    timestamp_with_time_zone modified_at
+}
 
-    tasks {
-        uuid id PK
-        character_varying scheduler_id
-        taskstatus status
-        timestamp_with_time_zone created_at
-        timestamp_with_time_zone modified_at
-        jsonb p_item
-        character_varying type
-    }
+
+tasks }o--|| jobs: ""
 ```
 
 ## Project structure
