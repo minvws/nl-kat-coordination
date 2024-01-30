@@ -2,6 +2,11 @@ name: Check Poetry dependencies
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - '**/requirements.txt'
       - '**/requirements-dev.txt'
