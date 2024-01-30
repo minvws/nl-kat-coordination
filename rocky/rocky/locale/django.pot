@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-30 11:01+0000\n"
+"POT-Creation-Date: 2024-01-30 11:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2706,8 +2706,8 @@ msgid "Appendix"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/partials/report_sidemenu.html
-msgid "Selected Objects"
+#: reports/templates/summary/report_summary.html
+msgid "Selected objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -3878,6 +3878,10 @@ msgid "Overview"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
+msgid "Selected Objects"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
 msgid "Used Config Objects"
 msgstr ""
 
@@ -3915,10 +3919,6 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
-msgstr ""
-
-#: reports/templates/summary/report_summary.html
-msgid "Selected objects"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
