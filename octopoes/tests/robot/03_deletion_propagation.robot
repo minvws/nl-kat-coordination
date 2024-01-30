@@ -14,13 +14,6 @@ Propagate Deletion
 
 
 *** Keywords ***
-Setup Test
-    Start Monitoring    ${QUEUE_URI}
-
-Teardown Test
-    Stop Monitoring
-    Cleanup
-
 Object List Should Be Empty
     ${response_data}    Get Objects
     Should Be Equal    ${response_data["count"]}    ${0}

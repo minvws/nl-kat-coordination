@@ -3,16 +3,12 @@ from datetime import datetime
 
 import pytest
 
-from octopoes.config.settings import XTDBType
 from octopoes.models.ooi.network import Network
 from octopoes.models.pagination import Paginated
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
-
-
-XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 
 
 def test_list_oois(xtdb_ooi_repository: XTDBOOIRepository, valid_time: datetime):
