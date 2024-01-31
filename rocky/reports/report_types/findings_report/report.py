@@ -64,7 +64,7 @@ class FindingsReport(Report):
             "severity_totals": severity_totals,
             "severity_totals_unique": severity_totals_unique,
             "total_finding_types": len(finding_types),
-            "total_occurrences": len(findings),
+            "total_occurrences": sum(severity_totals.values()),
         }
 
         return {"finding_types": finding_types, "summary": summary}
