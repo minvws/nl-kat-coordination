@@ -5,6 +5,21 @@
     <div class="horizontal-scroll">
         <table>
             <caption class="visually-hidden">{% translate "Records found" %}</caption>
+            <p>
+                {% blocktranslate %}
+                    <b>Note:</b> Not all DNSRecords are parsed in OpenKAT.
+                    DNS record types that are parsed and could be displayed in the table are:
+                {% endblocktranslate %}
+                A, AAAA, CAA, CNAME, NS, MX, PTR, SOA, SRV, TXT.
+            </p>
+            <div class="nota-bene">
+                <span>{% translate "All existing DNS record types can be found here" %}:
+                    <a class="nota-bene"
+                       href="https://en.wikipedia.org/wiki/List_of_DNS_record_types"
+                       target="_blank"
+                       rel="noopener noreferrer">https://en.wikipedia.org/wiki/List_of_DNS_record_types</a>
+                </span>
+            </div>
             <thead>
                 <tr>
                     <th>{% translate "Record" %}</th>

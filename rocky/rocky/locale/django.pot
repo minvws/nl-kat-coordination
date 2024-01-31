@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-31 15:43+0000\n"
+"POT-Creation-Date: 2024-01-31 16:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3149,6 +3149,19 @@ msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid ""
+"\n"
+"                    <b>Note:</b> Not all DNSRecords are parsed in OpenKAT.\n"
+"                    DNS record types that are parsed and could be displayed "
+"in the table are:\n"
+"                "
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "All existing DNS record types can be found here"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
