@@ -64,14 +64,15 @@
                     {% endblocktranslate %}
                 </p>
                 <p>
-                {%if plugin.produces %}
-                    {% for ooi_type in plugin.produces %}
-                        <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi_type|urlencode:"" }}">{{ ooi_type }}</a>
-                        {% if not forloop.last %}-{% endif %}
-                    {% endfor %}
-                {% else %}
-                    No known produces OOI's listed. N.B. This list might not be complete.
-                {% endif %}
+                    {%if plugin.produces %}
+                        {% for ooi_type in plugin.produces %}
+                            <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi_type|urlencode:"" }}">{{ ooi_type }}</a>
+                            {% if not forloop.last %}-{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        No known produces OOI's listed. N.B. This list might not be complete.
+                    {% endif %}
+                </p>
                 <p>
                     {% include "tasks/partials/normalizer_task_history.html" %}
 
