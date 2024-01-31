@@ -39,7 +39,7 @@ repos:
     additional_dependencies: ["rstcheck[sphinx]"]
 
 - repo: https://github.com/MarketSquare/robotframework-tidy
-  rev: "4.6.0"
+  rev: "4.8.1"
   hooks:
   - id: robotidy
 
