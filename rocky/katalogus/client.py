@@ -1,4 +1,3 @@
-import contextlib
 import json
 from io import BytesIO
 from logging import getLogger
@@ -30,7 +29,6 @@ class Plugin(BaseModel):
     related: List[str] = Field(default_factory=list)
     enabled: bool
     type: str
-
 
     # def dict(self, *args, **kwargs):
     #     """Pydantic does not stringify the OOI classes, but then templates can't render them"""
