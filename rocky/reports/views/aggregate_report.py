@@ -171,15 +171,25 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         return super().get(request, *args, **kwargs)
 
     def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
-        aggregate_report, post_processed_data, report_data = aggregate_reports(
-            self.octopoes_api_connector, self.selected_oois, self.get_report_types(), self.valid_time
+        aggregate_report, post_processed_data, report_data, error_oois = aggregate_reports(
+            self.octopoes_api_connector, self.selected_oois, self.report_types, self.valid_time
         )
+
+        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
+        if error_oois:
+            oois = ", ".join(set(error_oois))
+            date = self.valid_time.date()
+            error_message = _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.") % {
+                "oois": oois,
+                "date": date,
+            }
+            messages.add_message(self.request, messages.ERROR, error_message)
 
         return aggregate_report, post_processed_data, report_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["report_types"] = self.get_report_types()
+        context["report_types"] = [report.class_attributes() for report in self.report_types]
         aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
         context["template"] = aggregate_report.template_path
         context["post_processed_data"] = post_processed_data
@@ -194,8 +204,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             True,
             **dict(json="true", **self.request.GET),
         )
-        context["oois"] = self.get_oois()
-        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
         return context
 
 

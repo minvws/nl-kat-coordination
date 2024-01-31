@@ -33,6 +33,7 @@ class DNSReport(Report):
             "dkim": True,
             "dmarc": True,
             "dnssec": True,
+            "caa": True,
         }
         ipv4 = []
         ipv6 = []
@@ -63,6 +64,8 @@ class DNSReport(Report):
                     security["dmarc"] = False
                 if "NO-DNSSEC" in ooi.finding_type.tokenized.id:
                     security["dnssec"] = False
+                if "NO-CAA" in ooi.finding_type.tokenized.id:
+                    security["caa"] = False
 
         enough_ipv6_webservers = len(ipv6) >= 2
 

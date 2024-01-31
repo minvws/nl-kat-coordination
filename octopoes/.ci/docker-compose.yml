@@ -4,7 +4,7 @@ services:
 
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3.11-management"
+    image: "rabbitmq:3.12-management"
     ports:
       - "127.0.0.1:29003:15672"
       - "127.0.0.1:29004:5672"
@@ -72,6 +72,10 @@ services:
         condition: service_started
     env_file:
       - ".ci/ci-multinode.env"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
 
   octopoes_api:
     build:
@@ -100,6 +104,10 @@ services:
         condition: service_healthy
     env_file:
       - ".ci/ci.env"
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
 
   katalogus_mock:
     image: "wiremock/wiremock:2.34.0"

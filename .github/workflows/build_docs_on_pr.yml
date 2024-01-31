@@ -2,8 +2,6 @@ name: Build docs artifact for PR
 
 on:
   pull_request:
-    branches:
-      - "**"
     paths:
       - "docs/**"
       - "requirements.txt"
