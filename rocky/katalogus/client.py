@@ -30,7 +30,7 @@ class Plugin(BaseModel):
     related: List[str] = Field(default_factory=list)
     enabled: bool
     type: str
-    produces: Set[str]
+
 
     # def dict(self, *args, **kwargs):
     #     """Pydantic does not stringify the OOI classes, but then templates can't render them"""
@@ -45,6 +45,7 @@ class Boefje(Plugin):
     consumes: Set[Type[OOI]]
     options: List[str] = None
     runnable_hash: Optional[str] = None
+    produces: Set[str]
 
     # use a custom field_serializer for `consumes`
     @field_serializer("consumes")
@@ -57,6 +58,12 @@ class Boefje(Plugin):
 
 class Normalizer(Plugin):
     consumes: Set[str]
+    produces: Set[Type[OOI]]
+
+    # use a custom field_serializer for `produces`
+    @field_serializer("produces")
+    def serialize_produces(self, produces: Set[Type[OOI]]):
+        return {ooi_class.get_ooi_type() for ooi_class in produces}
 
 
 class KATalogusClientV1:
@@ -87,7 +94,6 @@ class KATalogusClientV1:
     def get_plugin(self, plugin_id: str) -> Union[Boefje, Normalizer]:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
-
         return parse_plugin(response.json())
 
     def get_plugin_schema(self, plugin_id) -> Optional[Dict]:
@@ -99,8 +105,8 @@ class KATalogusClientV1:
         try:
             Draft202012Validator.check_schema(schema)
             return schema
-        except SchemaError:
-            logger.warning("Invalid schema found for plugin %s", plugin_id)
+        except SchemaError as error:
+            logger.warning("Invalid schema found for plugin %s, %s", plugin_id, error)
 
     def get_plugin_settings(self, plugin_id: str) -> Dict:
         response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
@@ -134,17 +140,20 @@ class KATalogusClientV1:
     def get_boefjes(self) -> List[Boefje]:
         return self.get_plugins(plugin_type="boefje")
 
-    def enable_boefje(self, plugin: Boefje) -> None:
+    def enable_boefje(self, plugin: Boefje, plugin_id: str) -> None:
         self._patch_boefje_state(plugin.id, True, plugin.repository_id)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
-        self.enable_boefje(self.get_plugin(boefje_id))
+        self.enable_boefje(plugin_id=boefje_id)
 
     def disable_boefje(self, plugin: Boefje) -> None:
         self._patch_boefje_state(plugin.id, False, plugin.repository_id)
 
     def get_enabled_boefjes(self) -> List[Boefje]:
-        return [boefje for boefje in self.get_boefjes() if boefje.enabled]
+        return [plugin for plugin in self.get_boefjes() if plugin.enabled]
+
+    def get_enabled_normalizers(self) -> List[Normalizer]:
+        return [plugin for plugin in self.get_boefjes() if plugin.enabled]
 
     def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
         body = {"enabled": enabled}
@@ -195,10 +204,13 @@ def parse_normalizer(normalizer: Dict) -> Normalizer:
     name = normalizer["id"].replace("_", " ").replace("kat ", "").title()
 
     consumes = set(normalizer["consumes"])
+    consumes.add(f"normalizer/{name.lower()}")
     produces = set()
-    with contextlib.suppress(StopIteration):
-        consumes.add(f"normalizer/{name.lower()}")
-        produces.add(type_by_name(normalizer["produces"]))
+    for type_name in normalizer.get("produces", []):
+        try:
+            produces.add(type_by_name(type_name))
+        except StopIteration:
+            logger.warning("Unknown OOI type %s for normalizer produces %s", type_name, normalizer["id"])
 
     return Normalizer(
         id=normalizer["id"],
