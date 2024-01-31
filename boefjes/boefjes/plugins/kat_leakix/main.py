@@ -14,12 +14,12 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     results = []
     if re.match(pk, "IPAddressV4|.*") or re.match(pk, "IPAddressV6|.*"):
         ip = pk.split("|")[-1]
-        dork = quote_plus(f"+ip:{ip}")
+        query = quote_plus(f"+ip:{ip}")
     elif re.match(pk, "Hostname|.*"):
         hostname = pk.split("|")[-1]
-        dork = quote_plus(f'+host:"{hostname}"')
+        query = quote_plus(f'+host:"{hostname}"')
     else:
-        raise NameError(f'Expected an IPAddress of Hostname, but got pk "{pk}"')
+        raise NameError(f'Expected an IPAddress or Hostname, but got pk "{pk}"')
 
     for scope in ("leak", "service"):
         page_counter = 0
@@ -27,7 +27,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         while want_next_result:
             want_next_result = False
             response = requests.get(
-                f"https://leakix.net/search?scope={scope}&q={dork}&page={page_counter}",
+                f"https://leakix.net/search?scope={scope}&q={query}&page={page_counter}",
                 headers={"Accept": "application/json", "api-key": getenv("LEAKIX_API")},
             )
             page_counter += 1
