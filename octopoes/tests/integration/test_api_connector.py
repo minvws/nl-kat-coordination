@@ -7,7 +7,6 @@ from typing import List
 import pytest
 
 from octopoes.api.models import Declaration, Observation
-from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSMXRecord, DNSNSRecord
@@ -16,13 +15,9 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Networ
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
 from octopoes.models.origin import OriginType
-from octopoes.repositories.ooi_repository import XTDBOOIRepository
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
-
-
-XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 
 
 def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):

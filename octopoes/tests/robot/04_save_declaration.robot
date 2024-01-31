@@ -18,13 +18,6 @@ Add Several Append Origins
 
 
 *** Keywords ***
-Setup Test
-    Start Monitoring    ${QUEUE_URI}
-
-Teardown Test
-    Stop Monitoring
-    Cleanup
-
 Verify Origin Present
     [Arguments]    ${reference}    ${origin_task_id}
     ${response}    Get    ${OCTOPOES_URI}/origins    params=result=${reference}

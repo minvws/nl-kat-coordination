@@ -15,21 +15,6 @@ services:
     env_file:
       - ".ci/ci.env"
 
-  crux:
-    env_file:
-      - ".ci/ci.env"
-    entrypoint: ["clojure", "-J-Dlogback.configurationFile=resources/logback.xml", "-M", "-m", "xtdb.main"]
-    healthcheck:
-      test: [ "CMD", "python3", "/home/health_check.py", "http://localhost:3000/_xtdb/status"]
-      interval: 5s
-      retries: 10
-    image: "juxt/xtdb-standalone-rocksdb:1.21.0"
-    ports:
-      - "127.0.0.1:29002:3000"
-    restart: on-failure
-    volumes:
-      - ./.ci/health_check.py:/home/health_check.py
-
   octopoes_integration:
     build:
       args:
@@ -37,13 +22,15 @@ services:
       context: .
     command: pytest -x tests/integration --timeout=300
     depends_on:
-      - xtdb_multinode
+      - xtdb
       - ci_octopoes
     env_file:
-      - ".ci/ci-multinode.env"
+      - ".ci/ci.env"
 
-  xtdb_multinode:
+  xtdb:
     image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+    ports:
+      - "127.0.0.1:29002:3000"
 
   ci_octopoes:
     build:
@@ -52,56 +39,26 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      xtdb_multinode:
+      xtdb:
         condition: service_started
       katalogus_mock:
         condition: service_started
       ci_octopoes_api_worker:
         condition: service_started
     env_file:
-      - ".ci/ci-multinode.env"
+      - ".ci/ci.env"
+    ports:
+        - "127.0.0.1:29000:80"
 
   ci_octopoes_api_worker:
     build:
       context: .
-    command: celery -A octopoes.tasks.tasks worker -E -B -s /tmp/celerybeat-schedule --loglevel=INFO
+    command: celery -A octopoes.tasks.tasks worker -E --loglevel=INFO
     depends_on:
       rabbitmq:
         condition: service_healthy
-      xtdb_multinode:
+      xtdb:
         condition: service_started
-    env_file:
-      - ".ci/ci-multinode.env"
-    ulimits:
-      nofile:
-        soft: 262144
-        hard: 262144
-
-  octopoes_api:
-    build:
-      context: .
-    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      crux:
-        condition: service_healthy
-      katalogus_mock:
-        condition: service_started
-    ports:
-        - "127.0.0.1:29000:80"
-    env_file:
-      - ".ci/ci.env"
-
-  octopoes_api_worker:
-    build:
-      context: .
-    command: celery -A octopoes.tasks.tasks worker -E -B -s /tmp/celerybeat-schedule --loglevel=INFO
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-      crux:
-        condition: service_healthy
     env_file:
       - ".ci/ci.env"
     ulimits:
