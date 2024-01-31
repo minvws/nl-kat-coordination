@@ -450,7 +450,7 @@ def aggregate_reports(
     error_oois = []
 
     for ooi in input_ooi_references:
-        report_data[ooi] = {}
+        report_data[ooi.primary_key] = {}
         try:
             for options, report_types in aggregate_report.reports.items():
                 for report_type in report_types:
@@ -459,10 +459,11 @@ def aggregate_reports(
                         and report_type.id in selected_report_types
                     ):
                         report = report_type(connector)
-                        data = report.generate_data(ooi, valid_time=valid_time)
-                        report_data[ooi][report_type.id] = data
+                        data = report.generate_data(ooi.primary_key, valid_time=valid_time)
+                        report_data[ooi.primary_key][report_type.id] = data
         except Exception:
             error_oois.append(ooi.primary_key)
+
     post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
 
     return aggregate_report, post_processed_data, report_data, error_oois

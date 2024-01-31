@@ -27,7 +27,6 @@ from tools.models import (
 )
 
 from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
-from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import Network
 from rocky.scheduler import Task
@@ -610,20 +609,3 @@ def mock_scheduler_client_task_list(mocker):
     mock_scheduler_client_session.get.return_value = response
 
     return mock_scheduler_client_session
-
-
-@pytest.fixture()
-def hostname_ooi():
-    return [
-        Hostname(
-            object_type="Hostname",
-            scan_profile=DeclaredScanProfile(
-                scan_profile_type="declared", reference=Reference("Hostname|test|example.com"), level=2
-            ),
-            primary_key="Hostname|test|example.com",
-            network=Reference("Network|test"),
-            name="example.com",
-            dns_zone=Reference("DNSZone|test|example.com"),
-            registered_domain=None,
-        )
-    ]
