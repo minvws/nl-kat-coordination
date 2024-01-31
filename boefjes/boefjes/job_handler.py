@@ -36,7 +36,7 @@ bytes_api_client = BytesAPIClient(
 
 
 def _find_ooi_in_past(reference: Reference, connector: OctopoesAPIConnector, lookback_days: int = 4) -> OOI:
-    # Source OOIs may not live in crux since we currently have TTLs in place (to be removed soon).
+    # Source OOIs may not live in XTDB since we currently have TTLs in place (to be removed soon).
     valid_time = datetime.now(timezone.utc)
 
     for days_in_past in range(lookback_days):

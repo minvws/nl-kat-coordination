@@ -27,13 +27,3 @@ HSTS Header Without Config
     Await Sync
     Recalculate Scan Profiles
     Verify Object Not Present    ${REF_HSTS_FINDING}
-
-
-*** Keywords ***
-Setup Test
-    Start Monitoring    ${QUEUE_URI}
-
-Teardown Test
-    Cleanup
-    Await Sync
-    Stop Monitoring

@@ -48,12 +48,12 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      xtdb_multinode:
+      xtdb:
         condition: service_started
     env_file:
       - .ci/.env.test
 
-  xtdb_multinode:
+  xtdb:
     image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
 
   rabbitmq:
