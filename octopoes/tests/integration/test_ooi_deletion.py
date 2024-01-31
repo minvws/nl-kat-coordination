@@ -1,3 +1,4 @@
+import os
 import time
 import uuid
 from datetime import datetime
@@ -17,6 +18,9 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV4, Network
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.origin import Origin, OriginType
+
+if os.environ.get("CI") != "1":
+    pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
 
 def printer(arg1, arg2):
