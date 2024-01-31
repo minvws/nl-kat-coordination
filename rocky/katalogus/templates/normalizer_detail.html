@@ -11,10 +11,12 @@
             <div class="two-thirds-one-third">
                 <div>
                     <h1>{{ plugin.name }}</h1>
-                    <p>
-                        <strong>{% translate "Description" %}</strong>
-                    </p>
-                    <p>{{ plugin.description }}</p>
+                    {% if plugin.description %}
+                        <p>
+                            <strong>{% translate "Description" %}</strong>
+                        </p>
+                        <p>{{ plugin.description }}</p>
+                    {% endif %}
                     <div class="horizontal-view">
                         {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
@@ -62,8 +64,14 @@
                     {% endblocktranslate %}
                 </p>
                 <p>
-                    {% for ooi in plugin.produces %}{{ ooi }}{% endfor %}
-                </p>
+                {%if plugin.produces %}
+                    {% for ooi_type in plugin.produces %}
+                        <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ ooi_type|urlencode:"" }}">{{ ooi_type }}</a>
+                        {% if not forloop.last %}-{% endif %}
+                    {% endfor %}
+                {% else %}
+                    No known produces OOI's listed. N.B. This list might not be complete.
+                {% endif %}
                 <p>
                     {% include "tasks/partials/normalizer_task_history.html" %}
 
