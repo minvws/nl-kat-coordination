@@ -6,13 +6,14 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.findings import Finding
+from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.types import ALL_TYPES
 from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
 
 TREE_DEPTH = 9
+SEVERITY_OPTIONS = [severity.value for severity in RiskLevelSeverity]
 
 
 class FindingsReport(Report):
@@ -30,6 +31,10 @@ class FindingsReport(Report):
         severity_totals = {}
         severity_totals_unique = {}
 
+        for severity in SEVERITY_OPTIONS:
+            severity_totals[severity] = 0
+            severity_totals_unique[severity] = 0
+
         tree = self.octopoes_api_connector.get_tree(
             reference, depth=TREE_DEPTH, types={Finding}, valid_time=valid_time
         ).store
@@ -42,25 +47,19 @@ class FindingsReport(Report):
             try:
                 finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
                 severity = finding_type.risk_severity.name.lower()
+                severity_totals[severity] += 1
 
                 if finding_type.id in finding_types:
                     finding_types[finding_type.id]["occurrences"].append(finding)
-                    severity_totals[severity] += 1
                 else:
                     finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
-                    severity_totals[severity] = 1
-
-                    if severity in severity_totals_unique:
-                        severity_totals_unique[severity] += 1
-                    else:
-                        severity_totals_unique[severity] = 1
+                    severity_totals_unique[severity] += 1
 
             except ObjectNotFoundException:
                 logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
 
         finding_types = sorted(finding_types.values(), key=lambda x: x["finding_type"].risk_score, reverse=True)
 
-        # Get summary of severity totals
         summary = {
             "severity_totals": severity_totals,
             "severity_totals_unique": severity_totals_unique,

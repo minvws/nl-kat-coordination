@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-30 17:06+0000\n"
+"POT-Creation-Date: 2024-01-31 08:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1081,6 +1081,7 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
 #: reports/report_types/multi_organization_report/summary.html
+#: reports/templates/partials/report_severity_totals.html
 #: reports/templates/summary/report_summary.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
@@ -3866,10 +3867,6 @@ msgstr ""
 #: reports/views/generate_report.py
 #: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate report"
-msgstr ""
-
-#: reports/templates/partials/report_severity_totals.html
-msgid "Severity totals"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
