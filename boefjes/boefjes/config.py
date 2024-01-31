@@ -52,6 +52,12 @@ class Settings(BaseSettings):
         "1.1.1.1", description="Name server used for remote DNS resolution in the boefje runner"
     )
 
+    scan_profile_plugin_whitelist: str = Field(
+        "",
+        description="Whitelist for plugins that are allowed to produce scan profiles, including a default level",
+        examples=["external_db=3,dns-records=1"],
+    )
+
     # Queue configuration
     queue_uri: AmqpDsn = Field(..., description="KAT queue URI", examples=["amqp://"], validation_alias="QUEUE_URI")
 
