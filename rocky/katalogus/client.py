@@ -140,11 +140,11 @@ class KATalogusClientV1:
     def get_boefjes(self) -> List[Boefje]:
         return self.get_plugins(plugin_type="boefje")
 
-    def enable_boefje(self, plugin: Boefje, plugin_id: str) -> None:
+    def enable_boefje(self, plugin: Boefje) -> None:
         self._patch_boefje_state(plugin.id, True, plugin.repository_id)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
-        self.enable_boefje(plugin_id=boefje_id)
+        self.enable_boefje(self.get_plugin(boefje_id))
 
     def disable_boefje(self, plugin: Boefje) -> None:
         self._patch_boefje_state(plugin.id, False, plugin.repository_id)
@@ -153,7 +153,7 @@ class KATalogusClientV1:
         return [plugin for plugin in self.get_boefjes() if plugin.enabled]
 
     def get_enabled_normalizers(self) -> List[Normalizer]:
-        return [plugin for plugin in self.get_boefjes() if plugin.enabled]
+        return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
     def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
         body = {"enabled": enabled}
