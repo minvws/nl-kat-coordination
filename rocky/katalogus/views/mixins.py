@@ -37,8 +37,9 @@ class SinglePluginView(OrganizationView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.katalogus_client: Optional[KATalogusClientV1] = None
-        self.plugin_schema = None
-        self.plugin: Union[KATalogusBoefje, KATalogusNormalizer] = None
+        self.id = None
+        self._plugin_schema = None
+        self._plugin: Union[KATalogusBoefje, KATalogusNormalizer] = None
 
     def setup(self, request, *args, **kwargs):
         """
@@ -46,22 +47,19 @@ class SinglePluginView(OrganizationView):
         """
         super().setup(request, *args, **kwargs)
         self.katalogus_client = get_katalogus(self.organization.code)
-        plugin_id = kwargs.get("plugin_id")
+        self.id = kwargs.get("plugin_id")
 
-        try:
-            self.plugin = self.katalogus_client.get_plugin(plugin_id)
-            self.plugin_schema = self.katalogus_client.get_plugin_schema(plugin_id)
-        except HTTPError as e:
-            if e.response.status_code == HTTP_404_NOT_FOUND:
-                raise Http404(f"Plugin {plugin_id} not found.")
-
-            raise
-        except RequestException:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _("Getting information for plugin {} failed. Please check the KATalogus logs.").format(plugin_id),
-            )
+    @property
+    def plugin(self):
+        if self._plugin is None:
+           self._plugin = self.katalogus_client.get_plugin(self.id)
+        return self._plugin
+    
+    @property
+    def plugin_schema(self):
+        if self._plugin_schema is None:
+           self._plugin_schema = self.katalogus_client.get_plugin_schema(self.id)
+        return self._plugin_schema
 
     def dispatch(self, request, *args, **kwargs):
         if not self.plugin:
