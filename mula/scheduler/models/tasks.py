@@ -5,7 +5,7 @@ from typing import ClassVar, List, Optional
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field, computed_field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import Column, DateTime, Enum, Interval, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
@@ -46,40 +46,6 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-class TaskEventType(str, enum.Enum):
-    STATUS_CHANGE = "status_change"
-
-
-class TaskEvent(BaseModel):
-    """TaskEvent represent an event that happened to a Task."""
-
-    model_config = ConfigDict(from_attributes=True)
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    task_id: uuid.UUID
-    event_type: str
-    event_data: dict
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-
-class TaskEventDB(Base):
-    __tablename__ = "task_events"
-
-    id = Column(GUID, primary_key=True)
-
-    task_id = Column(GUID, ForeignKey("tasks.id"), index=True, nullable=False)
-    task = relationship("TaskDB", back_populates="events")
-
-    event_type = Column(String, nullable=False)
-    event_data = Column(JSONB, nullable=False)
-
-    timestamp = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
-
-
 class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -93,103 +59,51 @@ class Task(BaseModel):
 
     status: TaskStatus
 
-    events: List[TaskEvent] = []
+    pending: Optional[timedelta] = None
+
+    queued: Optional[timedelta] = None
+
+    dispatched: Optional[timedelta] = None
+
+    running: Optional[timedelta] = None
+
+    meta: Optional[dict] = None
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    @computed_field  # type: ignore
-    @property
-    def queued(self) -> Optional[timedelta]:
-        """Get the time the task has been queued in seconds. From the time the
-        task has been QUEUED to the time it has been DISPATCHED."""
-        start_time: Optional[datetime] = None
-        end_time: Optional[datetime] = None
+    def update_status(self, status: TaskStatus) -> None:
+        from_status = self.status
+        to_status = status
 
-        # From the events, get the timestamp of the first QUEUED event
-        for event in self.events:
-            if event.event_type == TaskEventType.STATUS_CHANGE and event.event_data["to_status"] == TaskStatus.QUEUED:
-                start_time = event.timestamp
-                break
+        t0 = (
+            self.created_at
+            + (self.pending or timedelta())
+            + (self.queued or timedelta())
+            + (self.dispatched or timedelta())
+            + (self.running or timedelta())
+        )
 
-        # From the events, get the timestamp of the first DISPATCHED event
-        for event in self.events:
-            if (
-                event.event_type == TaskEventType.STATUS_CHANGE
-                and event.event_data["to_status"] == TaskStatus.DISPATCHED
-            ):
-                end_time = event.timestamp
-                break
+        now_utc = datetime.now(timezone.utc)
 
-        if start_time and end_time:
-            return end_time - start_time
+        if from_status == TaskStatus.PENDING and to_status in (TaskStatus.QUEUED, TaskStatus.CANCELLED):
+            self.pending = now_utc - t0
+        elif from_status == TaskStatus.QUEUED and to_status in (TaskStatus.DISPATCHED, TaskStatus.CANCELLED):
+            self.queued = now_utc - t0
+        elif from_status == TaskStatus.DISPATCHED and to_status in (TaskStatus.RUNNING, TaskStatus.CANCELLED):
+            self.dispatched = now_utc - t0
+        elif from_status == TaskStatus.RUNNING and to_status in (
+            TaskStatus.COMPLETED,
+            TaskStatus.FAILED,
+            TaskStatus.CANCELLED,
+        ):
+            self.running = now_utc - t0
 
-        return None
-
-    @computed_field  # type: ignore
-    @property
-    def runtime(self) -> Optional[timedelta]:
-        """Get the runtime of the task in seconds. From the time the task has
-        been DISPATCHED to the time it has been COMPLETED or FAILED."""
-        start_time: Optional[datetime] = None
-        end_time: Optional[datetime] = None
-
-        # From the events, get the timestamp of the first DISPATCHED event
-        for event in self.events:
-            if (
-                event.event_type == TaskEventType.STATUS_CHANGE
-                and event.event_data["to_status"] == TaskStatus.DISPATCHED
-            ):
-                start_time = event.timestamp
-                break
-
-        # From the events, get the timestamp of the last COMPLETED or FAILED event
-        for event in reversed(self.events):
-            if event.event_type == TaskEventType.STATUS_CHANGE and event.event_data["to_status"] in [
-                TaskStatus.COMPLETED,
-                TaskStatus.FAILED,
-            ]:
-                end_time = event.timestamp
-                break
-
-        if start_time and end_time:
-            return end_time - start_time
-
-        return None
-
-    @computed_field  # type: ignore
-    @property
-    def duration(self) -> Optional[timedelta]:
-        """Get the duration of the task in seconds. From the time the task has
-        been QUEUED to the time it has been COMPLETED or FAILED."""
-        start_time: Optional[datetime] = None
-        end_time: Optional[datetime] = None
-
-        # From the events, get the timestamp of the first QUEUED event
-        for event in self.events:
-            if event.event_type == TaskEventType.STATUS_CHANGE and event.event_data["to_status"] == TaskStatus.QUEUED:
-                start_time = event.timestamp
-                break
-
-        # From the events, get the timestamp of the last COMPLETED or FAILED event
-        for event in reversed(self.events):
-            if event.event_type == TaskEventType.STATUS_CHANGE and event.event_data["to_status"] in [
-                TaskStatus.COMPLETED,
-                TaskStatus.FAILED,
-            ]:
-                end_time = event.timestamp
-                break
-
-        if start_time and end_time:
-            return end_time - start_time
-
-        return None
+        self.status = to_status
 
     def __repr__(self):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
-
-    def model_dump_db(self):
-        return self.model_dump(exclude={"events", "runtime", "duration", "queued"})
 
 
 class TaskDB(Base):
@@ -209,9 +123,15 @@ class TaskDB(Base):
         default=TaskStatus.PENDING,
     )
 
-    events = relationship(
-        "TaskEventDB", back_populates="task", cascade="all, delete-orphan", order_by="TaskEventDB.timestamp"
-    )
+    pending = Column(Interval)
+
+    queued = Column(Interval)
+
+    dispatched = Column(Interval)
+
+    running = Column(Interval)
+
+    meta = Column(JSONB)
 
     created_at = Column(
         DateTime(timezone=True),

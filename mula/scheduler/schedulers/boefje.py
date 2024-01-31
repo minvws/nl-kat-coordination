@@ -182,7 +182,7 @@ class BoefjeScheduler(Scheduler):
                 if task is None:
                     continue
 
-                task.status = TaskStatus.CANCELLED
+                task.update_status(TaskStatus.CANCELLED)
                 self.ctx.datastores.task_store.update_task(task)
 
             return
@@ -593,7 +593,7 @@ class BoefjeScheduler(Scheduler):
 
                 # Update task in datastore to be failed
                 task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-                task_db.status = TaskStatus.FAILED
+                task_db.update_status(TaskStatus.FAILED)
                 self.ctx.datastores.task_store.update_task(task_db)
         except Exception as exc_stalled:
             self.logger.warning(

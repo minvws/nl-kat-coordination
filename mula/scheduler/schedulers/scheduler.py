@@ -89,34 +89,12 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The prioritized item from the priority queue.
         """
-        # NOTE: we set the id of the task the same as the p_item, for easier
-        # lookup.
-        task = models.Task(
-            id=p_item.id,
-            scheduler_id=self.scheduler_id,
-            type=self.queue.item_type.type,
-            p_item=p_item,
-            status=models.TaskStatus.QUEUED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
-
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
-        if task_db is not None:
-            self.ctx.datastores.task_store.update_task(task)
+        if task_db is None:
             return
 
-        # Create task
-        self.ctx.datastores.task_store.create_task(task)
-
-        # Create event
-        self.ctx.datastores.task_store.log_event(
-            models.TaskEvent(
-                task_id=task.id,
-                event_type=models.TaskEventType.STATUS_CHANGE,
-                event_data={"from_status": models.TaskStatus.PENDING, "to_status": task.status},
-            )
-        )
+        task_db.update_status(models.TaskStatus.QUEUED)
+        self.ctx.datastores.task_store.update_task(task_db)
 
         self.last_activity = datetime.now(timezone.utc)
 
@@ -143,16 +121,8 @@ class Scheduler(abc.ABC):
             )
             return
 
-        task.status = models.TaskStatus.DISPATCHED
+        task.update_status(models.TaskStatus.DISPATCHED)
         self.ctx.datastores.task_store.update_task(task)
-
-        self.ctx.datastores.task_store.log_event(
-            models.TaskEvent(
-                task_id=task.id,
-                event_type=models.TaskEventType.STATUS_CHANGE,
-                event_data={"from_status": models.TaskStatus.QUEUED, "to_status": task.status},
-            )
-        )
 
         self.last_activity = datetime.now(timezone.utc)
 
@@ -212,6 +182,21 @@ class Scheduler(abc.ABC):
                 scheduler_id=self.scheduler_id,
             )
             raise queues.errors.NotAllowedError("Scheduler is disabled")
+
+        # Create task
+        #
+        # NOTE: we set the id of the task the same as the p_item, for easier
+        # lookup.
+        task = models.Task(
+            id=p_item.id,
+            scheduler_id=self.scheduler_id,
+            type=self.queue.item_type.type,
+            p_item=p_item,
+            status=models.TaskStatus.PENDING,
+            created_at=datetime.now(timezone.utc),
+            modified_at=datetime.now(timezone.utc),
+        )
+        self.ctx.datastores.task_store.create_task(task)
 
         try:
             self.queue.push(p_item)

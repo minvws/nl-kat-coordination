@@ -62,12 +62,7 @@ class TaskStore:
     @retry()
     def get_task_by_id(self, task_id: str) -> Optional[models.Task]:
         with self.dbconn.session.begin() as session:
-            task_orm = (
-                session.query(models.TaskDB)
-                .options(joinedload(models.TaskDB.events))
-                .filter(models.TaskDB.id == task_id)
-                .first()
-            )
+            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
             if task_orm is None:
                 return None
 
@@ -112,7 +107,7 @@ class TaskStore:
     @retry()
     def create_task(self, task: models.Task) -> Optional[models.Task]:
         with self.dbconn.session.begin() as session:
-            task_orm = models.TaskDB(**task.model_dump_db())
+            task_orm = models.TaskDB(**task.model_dump())
             session.add(task_orm)
 
             created_task = models.Task.model_validate(task_orm)
@@ -122,7 +117,7 @@ class TaskStore:
     @retry()
     def update_task(self, task: models.Task) -> None:
         with self.dbconn.session.begin() as session:
-            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump_db()))
+            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump()))
 
     @retry()
     def cancel_tasks(self, scheduler_id: str, task_ids: List[str]) -> None:
@@ -130,12 +125,6 @@ class TaskStore:
             session.query(models.TaskDB).filter(
                 models.TaskDB.scheduler_id == scheduler_id, models.TaskDB.id.in_(task_ids)
             ).update({"status": models.TaskStatus.CANCELLED.name})
-
-    @retry()
-    def log_event(self, event: models.TaskEvent) -> None:
-        with self.dbconn.session.begin() as session:
-            event_orm = models.TaskEventDB(**event.model_dump())
-            session.add(event_orm)
 
     @retry()
     def get_status_count_per_hour(

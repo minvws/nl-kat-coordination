@@ -460,22 +460,9 @@ class Server:
 
         updated_task = task_db.model_copy(update=item)
 
-        # Check if status changed and log event
+        # Check if status changed and update duration
         if "status" in item and item["status"] != task_db.status:
-            try:
-                self.ctx.datastores.task_store.log_event(
-                    models.TaskEvent(
-                        task_id=task_id,
-                        event_type=models.TaskEventType.STATUS_CHANGE,
-                        event_data={"from_status": task_db.status, "to_status": item["status"]},
-                    )
-                )
-            except Exception as exc:
-                self.logger.error(exc)
-                raise fastapi.HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="failed to log event",
-                ) from exc
+            updated_task.update_status(item["status"])
 
         # Update task in database
         try:
