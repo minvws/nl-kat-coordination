@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-26 13:36+0000\n"
+"POT-Creation-Date: 2024-01-26 20:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6592,6 +6592,13 @@ msgstr ""
 msgid ""
 "For IPAddressV4 and IPAddressV6 object types, a column of 'address' is "
 "required, optionally a second column 'network' is supported "
+msgstr ""
+
+#: rocky/views/upload_csv.py
+msgid ""
+"Clearance levels can be controlled by a column 'clearance' taking numerical "
+"values 0, 1, 2, 3, and 4 for the corresponding clearance level (other values "
+"are ignored) "
 msgstr ""
 
 #: rocky/views/upload_csv.py
