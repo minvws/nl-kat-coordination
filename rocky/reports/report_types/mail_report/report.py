@@ -50,7 +50,7 @@ class MailReport(Report):
 
         for hostname in hostnames:
             measures = self._get_measures(valid_time, hostname)
-            mail_security_measures[hostname] = measures
+            mail_security_measures[hostname.primary_key] = measures
 
             number_of_spf -= (
                 1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures[hostname])) else 0

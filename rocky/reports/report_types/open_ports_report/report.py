@@ -65,6 +65,6 @@ class OpenPortsReport(Report):
                     )
                 ]
 
-            results[ref] = {"ports": port_numbers, "hostnames": hostnames, "services": services}
+            results[str(ref)] = {"ports": port_numbers, "hostnames": hostnames, "services": services}
 
         return results
