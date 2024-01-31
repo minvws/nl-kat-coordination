@@ -7,6 +7,7 @@ services:
       dockerfile: rocky/Dockerfile
       args:
         ENVIRONMENT: dev
+      target: dev
     command: bash /app/run_rocky.sh
     depends_on:
       - ci_rocky-db
@@ -17,7 +18,50 @@ services:
     env_file:
       - .ci/.env.test
 
+  rocky_integration_tests:
+    build:
+      context: ..
+      dockerfile: rocky/Dockerfile
+      args:
+        ENVIRONMENT: dev
+      target: dev
+    command: python -m pytest tests/integration
+    depends_on:
+      - ci_rocky-db
+      - ci_octopoes
+    volumes:
+      - .:/app/rocky
+      - ./.ci/run_rocky.sh:/app/run_rocky.sh
+      - ../octopoes/octopoes:/app/rocky/octopoes
+    env_file:
+      - .ci/.env.test
+
   ci_rocky-db:
     image: postgres:15
+    env_file:
+      - .ci/.env.test
+
+  ci_octopoes:
+    build:
+      context: ../octopoes
+    command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      xtdb_multinode:
+        condition: service_started
+    env_file:
+      - .ci/.env.test
+
+  xtdb_multinode:
+    image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
+
+  rabbitmq:
+    restart: on-failure
+    image: "rabbitmq:3.12-management"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      retries: 4
     env_file:
       - .ci/.env.test

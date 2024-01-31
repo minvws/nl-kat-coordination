@@ -2,8 +2,6 @@ name: Build docs artifact for PR
 
 on:
   pull_request:
-    branches:
-      - "**"
     paths:
       - "docs/**"
       - "requirements.txt"
@@ -19,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: 3.11
           cache: 'pip' # caching pip dependencies
@@ -31,7 +29,7 @@ jobs:
         run: make docs
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "github-pages-no-deploy"
           path: 'docs/_build'

@@ -2,6 +2,11 @@ name: Check Poetry dependencies
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - '**/requirements.txt'
       - '**/requirements-dev.txt'
@@ -28,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         id: py311
         with:
           python-version: 3.11

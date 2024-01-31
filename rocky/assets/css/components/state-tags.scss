@@ -1,0 +1,54 @@
+/* State tags */
+
+.new {
+  @extend %tag;
+
+  background-color: var(--colors-blue-1);
+  border: 1px solid var(--colors-blue-5);
+  color: var(--colors-blue-8);
+}
+
+// .tag.critical {
+//   @extend %tag;
+
+//   background-color: var(--colors-red-3);
+//   border: 1px solid var(--risk-level-critical);
+//   color: var(--colors-orange-8);
+//   display: inline;
+
+//   &::before {
+//     content: none;
+//   }
+// }
+
+.tag {
+  &.critical,
+  &.medium,
+  &.secure {
+    @extend %tag;
+
+    display: inline;
+
+    &::before {
+      content: none;
+    }
+  }
+
+  &.critical {
+    background-color: var(--colors-red-3);
+    border: 1px solid var(--risk-level-critical);
+    color: var(--colors-orange-8);
+  }
+
+  &.medium {
+    background-color: var(--colors-yellow-1);
+    border: 1px solid var(--colors-yellow-6);
+    color: var(--color-alert-warning);
+  }
+
+  &.secure {
+    background-color: var(--colors-green-4);
+    border: 1px solid var(--colors-green-7);
+    color: var(--colors-green-9);
+  }
+}

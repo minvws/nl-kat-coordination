@@ -18,7 +18,7 @@ from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification
 from tools.ooi_helpers import format_display
-from tools.view_helpers import schedule_task
+from tools.view_helpers import reschedule_task
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
@@ -62,7 +62,7 @@ class OOIDetailView(
         try:
             if action == PageActions.RESCHEDULE_TASK.value:
                 task_id = self.request.POST.get("task_id")
-                schedule_task(self.request, self.organization.code, task_id)
+                reschedule_task(self.request, self.organization.code, task_id)
 
             if action == PageActions.START_SCAN.value:
                 boefje_id = self.request.POST.get("boefje_id")
@@ -148,22 +148,18 @@ class OOIDetailView(
         filter_form = PossibleBoefjesFilterForm(self.request.GET)
 
         # List from katalogus
-        boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
+        boefjes = []
+        if self.get_organization_indemnification():
+            boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
 
         if boefjes:
             context["enabled_boefjes_available"] = True
 
-        # Filter boefjes on scan level <= OOI clearance level when not "show all"
-        # or when not "acknowledged clearance level > 0"
+        max_level = self.organization_member.acknowledged_clearance_level
+        if self.ooi.scan_profile and filter_form.is_valid() and not filter_form.cleaned_data["show_all"]:
+            max_level = min(max_level, self.ooi.scan_profile.level)
 
-        if (
-            (filter_form.is_valid() and not filter_form.cleaned_data["show_all"])
-            or self.organization_member.acknowledged_clearance_level <= 0
-            or self.get_organization_indemnification()
-        ):
-            boefjes = [boefje for boefje in boefjes if boefje.scan_level.value <= self.ooi.scan_profile.level]
-
-        context["boefjes"] = boefjes
+        context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
         context["ooi"] = self.ooi
 
         declarations, observations, inferences = self.get_origins(

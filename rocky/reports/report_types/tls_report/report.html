@@ -4,6 +4,7 @@
 {% if data.suites %}
     <div class="horizontal-scroll">
         <table>
+            <caption class="visually-hidden">{% translate "Ciphers:" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Status" %}</th>
@@ -21,7 +22,7 @@
                         <tr>
                             <td>
                                 {% if suite.cipher_suite_name in data.suites_with_findings %}
-                                    <i class="icon negative"></i> {% translate "Phase out" %}
+                                    <i class="icon alert"></i> {% translate "Phase out" %}
                                 {% else %}
                                     <i class="icon positive"></i> {% translate "Good" %}
                                 {% endif %}

@@ -12,7 +12,7 @@ build: build-rocky build-rocky-frontend
 
 build-rocky:
 # Set DATABASE_MIGRATION=false to prevent entrypoint from running migration
-	docker-compose run --rm -e DATABASE_MIGRATION=false rocky make build-rocky-native
+	docker compose run --rm -e DATABASE_MIGRATION=false rocky make build-rocky-native
 
 build-rocky-native:
 	while ! nc -vz $$ROCKY_DB_HOST $$ROCKY_DB_PORT; do sleep 0.1; done
@@ -23,10 +23,10 @@ build-rocky-native:
 	python3 manage.py compilemessages
 
 build-rocky-frontend:
-	docker run --rm -v $$PWD:/app/rocky node:18-bookworm sh -c "cd /app/rocky && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
+	docker run --rm -v $$PWD:/app/rocky node:20-bookworm sh -c "cd /app/rocky && yarn --ignore-engine && yarn build && chown -R $$(id -u) .parcel-cache node_modules assets/dist"
 
 almost-flush:
-	docker-compose run --rm rocky python manage.py almost_flush
+	docker compose run --rm rocky python manage.py almost_flush
 
 run:
 	python3 manage.py runserver
@@ -34,12 +34,17 @@ run:
 test:
 	python3 manage.py test
 
+utest: ## Run the integration tests.
+	docker compose -f base.yml  -f .ci/docker-compose.yml kill
+	docker compose -f base.yml  -f .ci/docker-compose.yml down --remove-orphans
+	docker compose -f base.yml -f .ci/docker-compose.yml build
+	docker compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_tests
+
 itest: ## Run the integration tests.
-	docker-compose -f base.yml  -f .ci/docker-compose.yml down
-ifneq ($(build),)
-	docker-compose -f base.yml -f .ci/docker-compose.yml build
-endif
-	docker-compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_tests
+	docker compose -f base.yml  -f .ci/docker-compose.yml kill
+	docker compose -f base.yml  -f .ci/docker-compose.yml down --remove-orphans
+	docker compose -f base.yml -f .ci/docker-compose.yml build
+	docker compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration_tests
 
 export_migrations:
 	python manage.py export_migrations contenttypes 0001
@@ -59,19 +64,6 @@ languages:
 	python manage.py makemessages -i "venv/*" -i "build/*" -i "octopoes/*" -i "node_modules/*" --verbosity 2 --add-location file -a --keep-pot
 
 lang: languages
-
-debian11:
-	mkdir -p build
-	docker run --rm \
-	--env PKG_NAME=kat-rocky \
-	--env REPOSITORY=minvws/nl-kat-rocky \
-	--env RELEASE_VERSION=${RELEASE_VERSION} \
-	--env RELEASE_TAG=${RELEASE_TAG} \
-	--mount type=bind,src=${CURDIR},dst=/app \
-	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
-	--workdir /app \
-	kat-debian11-build-image \
-	packaging/scripts/build-debian-package.sh
 
 debian12:
 	mkdir -p build

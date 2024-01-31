@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 import uuid
 from enum import Enum
 from http import HTTPStatus
@@ -10,7 +11,7 @@ from typing import Any, Dict, List, Optional, Union
 import requests
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
@@ -65,7 +66,7 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
-    id: uuid.UUID
+    id: Optional[uuid.UUID] = None
     normalizer: Normalizer
     raw_data: RawData
     type: str = "normalizer"
@@ -74,23 +75,23 @@ class NormalizerTask(BaseModel):
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
-    id: uuid.UUID
+    id: Optional[uuid.UUID] = None
     boefje: Boefje
     input_ooi: Optional[str] = None
     organization: str
     type: str = "boefje"
 
 
-class QueuePrioritizedItem(BaseModel):
+class PrioritizedItem(BaseModel):
     """Representation of a queue.PrioritizedItem on the priority queue. Used
     for unmarshalling of priority queue prioritized items to a JSON
     representation.
     """
 
-    id: uuid.UUID
-    priority: int
+    id: Optional[uuid.UUID] = None
     hash: Optional[str] = None
-    data: Union[BoefjeTask, NormalizerTask]
+    priority: int
+    data: SerializeAsAny[Union[BoefjeTask, NormalizerTask]]
 
 
 class TaskStatus(Enum):
@@ -105,10 +106,10 @@ class TaskStatus(Enum):
 
 
 class Task(BaseModel):
-    id: uuid.UUID
+    id: Optional[uuid.UUID] = None
     scheduler_id: str
     type: str
-    p_item: QueuePrioritizedItem
+    p_item: PrioritizedItem
     status: TaskStatus
     created_at: datetime.datetime
     modified_at: datetime.datetime
@@ -236,7 +237,7 @@ class SchedulerClient:
             raise TaskNotFoundError()
         return task_details
 
-    def push_task(self, queue_name: str, prioritized_item: QueuePrioritizedItem) -> None:
+    def push_task(self, queue_name: str, prioritized_item: PrioritizedItem) -> None:
         try:
             res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
             res.raise_for_status()
@@ -255,6 +256,15 @@ class SchedulerClient:
         health_endpoint = self.session.get(f"{self._base_uri}/health")
         health_endpoint.raise_for_status()
         return ServiceHealth.model_validate_json(health_endpoint.content)
+
+    def get_task_stats(self, organization_code: str, task_type: str) -> Dict:
+        try:
+            res = self.session.get(f"{self._base_uri}/tasks/stats/{task_type}-{organization_code}")
+            res.raise_for_status()
+        except HTTPError:
+            raise SchedulerError()
+        task_stats = json.loads(res.content)
+        return task_stats
 
 
 client = SchedulerClient(settings.SCHEDULER_API)

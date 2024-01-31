@@ -1,0 +1,73 @@
+{% load i18n %}
+
+<section>
+    <div>
+        <h2>
+            {% blocktranslate trimmed count counter=object_list|length %}
+                Select object
+            {% plural %}
+                Select objects
+            {% endblocktranslate %}
+        </h2>
+        <p>{% translate "Select which objects you want to include in your report." %}</p>
+        {% translate "Filter" as filter_title %}
+        {% include "partials/ooi_list_filters.html" with title=filter_title clearance_level_filter_form=clearance_level_filter_form %}
+
+        <p class="de-emphasized">
+            {% if active_filters %}
+                <strong>{% translate "Currently filtered on:" %}</strong>
+                {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value|title }}&nbsp;{% endfor %}
+            {% endif %}
+        </p>
+        <p class="de-emphasized">
+            {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
+        </p>
+        {% if not object_list %}
+            <p>{% translate "No objects found." %}</p>
+            <div class="button-container">
+                <a class="button ghost"
+                   href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
+                <a class="button"
+                   href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
+            </div>
+        {% else %}
+            <form method="get" action="{{ next }}" class="inline layout-wide">
+                {% include "forms/report_form_fields.html" %}
+
+                <table>
+                    <caption class="visually-hidden">{% translate "Objects:" %}</caption>
+                    <thead>
+                        <th>
+                            <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                        </th>
+                        <th>{% translate "Object" %}</th>
+                        <th>{% translate "Type" %}</th>
+                        <th>{% translate "Clearance level" %}</th>
+                        <th>{% translate "Clearance type" %}</th>
+                    </thead>
+                    <tbody>
+                        {% for object in object_list %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois %}checked{% endif %}>
+                                </td>
+                                <td>{{ object.human_readable }}</td>
+                                <td>{{ object.ooi_type }}</td>
+                                <td>
+                                    {% include "partials/scan_level_indicator.html" with value=object.scan_profile.level.value %}
+
+                                </td>
+                                <td>{{ object.scan_profile.scan_profile_type|title }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button type="submit" class="button">
+                    {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
+                </button>
+            </form>
+            {% include "partials/list_paginator.html" %}
+
+        {% endif %}
+    </div>
+</section>

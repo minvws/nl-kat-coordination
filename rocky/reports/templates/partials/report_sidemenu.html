@@ -1,0 +1,91 @@
+{% load i18n %}
+
+<nav data-open-label="Zijbalknavigatie"
+     data-close-label="Sluit zijbalknavigatie"
+     aria-label="Zijbalknavigatie">
+    <div class="sticky">
+        <h2 class="heading-large">{% translate "Table of contents" %}</h2>
+        <ol class="chapter-numbers">
+            <li>
+                <a href="#recommendations">{% translate "Recommendations" %}</a>
+            </li>
+            <li>
+                <a href="#asset-overview">{% translate "Asset overview" %}</a>
+            </li>
+            {% if data.open_ports %}
+                <li>
+                    <a href="#open-ports">{% translate "Open ports" %}</a>
+                </li>
+            {% endif %}
+            {% if data.ipv6 %}
+                <li>
+                    <a href="#ipv6">IPv6</a>
+                </li>
+            {% endif %}
+            {% if data.basic_security.summary %}
+                <li>
+                    <a href="#basic-security">{% translate "Basic security" %}</a>
+                    <ol>
+                        <li>
+                            <a href="#basic-security-overview">{% translate "Overview" %}</a>
+                        </li>
+                        {% if data.basic_security.safe_connections %}
+                            <li>
+                                <a href="#safe-connections">{% translate "Safe connections" %}</a>
+                            </li>
+                        {% endif %}
+                        {% if data.basic_security.system_specific %}
+                            <li>
+                                <a href="#system-specific">{% translate "System specific" %}</a>
+                            </li>
+                        {% endif %}
+                        {% if data.basic_security.rpki %}
+                            <li>
+                                <a href="#rpki">{% translate "Resource Public Key Infrastructure" %}</a>
+                            </li>
+                        {% endif %}
+                    </ol>
+                </li>
+            {% endif %}
+            {% if data.vulnerabilities %}
+                <li>
+                    <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
+                    <ol>
+                        {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
+                            {% if vulnerabilities.vulnerabilities %}
+                                <li class="object">
+                                    <a href="#vulnerabilities">{{ vulnerabilities.title }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ol>
+                </li>
+            {% endif %}
+        </ol>
+        <ol class="chapter-numbers type-a">
+            <li>
+                <a href="#appendix">{% translate "Appendix" %}</a>
+                <ol>
+                    <li>
+                        <a href="#term-overview">{% translate "Term Overview" %}</a>
+                    </li>
+                    <li>
+                        <a href="#selected-oois">{% translate "Selected Objects" %}</a>
+                    </li>
+                    <li>
+                        <a href="#selected-report-types">{% translate "Selected Report Types" %}</a>
+                    </li>
+                    <li>
+                        <a href="#selected-plugins">{% translate "Selected Plugins" %}</a>
+                    </li>
+                    <li>
+                        <a href="#service-versions-and-health">{% translate "Service Versions and Health" %}</a>
+                    </li>
+                    <li>
+                        <a href="#used-config-oois">{% translate "Used Config Objects" %}</a>
+                    </li>
+                </ol>
+            </li>
+        </ol>
+    </div>
+</nav>

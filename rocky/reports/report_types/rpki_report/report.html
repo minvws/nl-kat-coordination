@@ -1,9 +1,30 @@
 {% load i18n %}
 
-<h2>{% translate "Resource Public Key Infrastructure" %}</h2>
+{% if show_heading %}
+    <h2>{% translate "Resource Public Key Infrastructure" %}</h2>
+    <p>
+        {% blocktranslate trimmed %}
+            This section contains basic security information about resource public key
+            infrastructure. If your web server employs RPKI for its IP addresses and
+            associated nameservers, then it enhances visitor protection against
+            misconfigurations and malicious route intercepts through verified route
+            announcements, ensuring reliable server access and secure internet traffic.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
+{% if type %}
+    <h4 id="rpki-{{ type }}">{{ type }} {% translate "server" %}</h4>
+    <p>
+        {% blocktranslate trimmed %}
+            This table shows which checks were performed. Following that, the compliance
+            issues, if any, are shown for each {{ type }} Server.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
 {% if data.rpki_ips %}
     <div class="horizontal-scroll">
         <table>
+            <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Check" %}</th>
@@ -13,21 +34,59 @@
             <tbody>
                 <tr>
                     <td>{% translate "RPKI Available" %}</td>
-                    <td>{{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}</td>
+                    <td>
+                        {% if data.number_of_available != data.number_of_ips %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_available }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}
+                    </td>
                 </tr>
                 <tr>
-                    <td>{% translate "RPKI Valid" %}</td>
-                    <td>{{ data.number_of_valid }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}</td>
+                    <td>{% translate "RPKI Not expired" %}</td>
+                    <td>
+                        {% if data.number_of_valid != data.number_of_ips %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_valid }}/{{ data.number_of_ips }} {% translate "IPs are compliant" %}
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
     {% for ip, info in data.rpki_ips.items %}
-        {% if not info.valid %}
-            <p>{% translate "RPKI record does is not valid for" %} {{ ip }}.</p>
-        {% endif %}
-        {% if not info.exists %}
-            <p>{% translate "RPKI record does not exist for" %} {{ ip }}.</p>
+        {% if not info.valid or not info.exists %}
+            <h5>{{ ip }}</h5>
+            <table>
+                <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
+                <thead>
+                    <tr>
+                        <th>{% translate "Compliance issue" %}</th>
+                        <th>{% translate "Risk level" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if not info.valid %}
+                        <tr>
+                            <td>{% translate "RPKI record is not valid." %}</td>
+                            <td>
+                                <span class="low">Low</span>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% if not info.exists %}
+                        <tr>
+                            <td>{% translate "RPKI record does not exist." %}</td>
+                            <td>
+                                <span class="low">Low</span>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         {% endif %}
     {% endfor %}
 {% endif %}

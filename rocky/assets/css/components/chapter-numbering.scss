@@ -1,0 +1,92 @@
+/* Chapter numbering */
+
+/* Includes parent numbers */
+.chapter-numbers {
+  counter-reset: chapter;
+
+  > * {
+    counter-reset: subchapter;
+  }
+
+  h2 {
+    &::before {
+      counter-increment: chapter;
+      content: counter(chapter) ". ";
+    }
+  }
+
+  h3 {
+    &::before {
+      counter-increment: subchapter;
+      content: counter(chapter) "." counter(subchapter) " ";
+    }
+  }
+
+  &.type-a {
+    h2 {
+      &::before {
+        counter-increment: chapter;
+        content: counter(chapter, upper-alpha) ". ";
+      }
+    }
+
+    h3 {
+      &::before {
+        counter-increment: subchapter;
+        content: counter(chapter, upper-alpha) "." counter(subchapter) " ";
+      }
+    }
+  }
+}
+
+ol.chapter-numbers {
+  padding-left: 0;
+  list-style-position: outside;
+
+  > li {
+    list-style: none;
+    list-style-position: outside;
+
+    &::before {
+      counter-increment: chapter;
+      content: counter(chapter) ". ";
+      margin-right: 0.25rem;
+      white-space: nowrap;
+    }
+
+    > ol {
+      padding-left: 0.75rem;
+
+      > li {
+        list-style: none;
+        display: flex;
+        flex-direction: row;
+
+        &::before {
+          counter-increment: subchapter;
+          content: counter(chapter) "." counter(subchapter) " ";
+          margin-right: 0.25rem;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
+  &.type-a {
+    > li {
+      &::before {
+        counter-increment: chapter;
+        content: counter(chapter, upper-alpha) ". ";
+      }
+
+      > ol {
+        > li {
+          &::before {
+            counter-increment: subchapter;
+            content: counter(chapter, upper-alpha) "." counter(subchapter) " ";
+          }
+        }
+      }
+    }
+  }
+}

@@ -4,3 +4,4 @@ import "@minvws/manon/filters";
 import "@minvws/manon/form-help";
 import "@minvws/manon/collapsible";
 import "@minvws/manon/language-selector";
+import "@minvws/manon/sidemenu";

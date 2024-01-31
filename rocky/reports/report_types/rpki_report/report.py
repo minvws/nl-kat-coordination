@@ -5,6 +5,7 @@ from typing import Any, Dict
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
@@ -24,34 +25,42 @@ class RPKIReport(Report):
     template_path = "rpki_report/report.html"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
-        reference = Reference.from_str(input_ooi)
-        if reference.class_type == Hostname:
+        try:
+            ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
+        except ObjectNotFoundException as e:
+            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
+            raise ObjectNotFoundException(e)
+
+        if ooi.reference.class_type == Hostname:
             ips = self.octopoes_api_connector.query(
-                "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
+                "Hostname.<hostname[is ResolvedHostname].address", valid_time, ooi.reference
             )
         else:
-            ips = [self.octopoes_api_connector.get(reference)]
+            ips = [ooi]
 
         rpki_ips = {}
         number_of_ips = len(ips)
+        number_of_compliant = number_of_ips
         number_of_available = number_of_ips
         number_of_valid = number_of_ips
         for ip in ips:
             finding_types = self.octopoes_api_connector.query(
                 "IPAddress.<ooi[is Finding].finding_type", valid_time, ip.reference
             )
-            rpki_ips[ip.address] = {}
+            rpki_ips[ip.reference] = {}
             exists = not any([finding_type for finding_type in finding_types if finding_type.id in ["KAT-NO-RPKI"]])
-            valid = not any([finding_type for finding_type in finding_types if finding_type.id in ["KAT-INVALID-RPKI"]])
-            rpki_ips[ip.address]["exists"] = exists
-            rpki_ips[ip.address]["valid"] = valid
+            valid = not any([finding_type for finding_type in finding_types if finding_type.id in ["KAT-EXPIRED-RPKI"]])
+            rpki_ips[ip.reference]["exists"] = exists
+            rpki_ips[ip.reference]["valid"] = valid
             number_of_available -= 1 if not exists else 0
             number_of_valid -= 1 if not valid else 0
+            number_of_compliant -= 1 if not (exists and valid) else 0
 
         return {
             "input_ooi": input_ooi,
             "rpki_ips": rpki_ips,
             "number_of_available": number_of_available,
+            "number_of_compliant": number_of_compliant,
             "number_of_valid": number_of_valid,
             "number_of_ips": number_of_ips,
         }
