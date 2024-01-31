@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-26 20:33+0000\n"
+"POT-Creation-Date: 2024-01-31 15:43+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,6 +28,7 @@ msgstr ""
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -1432,7 +1433,6 @@ msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
-#: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr ""
@@ -2171,6 +2171,7 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_2a_choose_report_info.html
+#: reports/report_types/dns_report/report.html
 msgid "Data"
 msgstr ""
 
@@ -3147,31 +3148,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "IP address lookup"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "warning"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-msgid ""
-"You have less than one webserver that is reachable over IPv6, which is "
-"<strong>not</strong> in compliance to internet.nl standards."
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-msgid "Other records found"
+msgid "Records found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3179,7 +3156,11 @@ msgid "Record"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Found by"
+msgid "TTL"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "minutes"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -4629,6 +4610,18 @@ msgstr ""
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "User overview:"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "warning"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Warning"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
