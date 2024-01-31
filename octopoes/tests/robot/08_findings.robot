@@ -23,14 +23,9 @@ List Findings
 
 *** Keywords ***
 Setup Test
-    Start Monitoring    ${QUEUE_URI}
+    robot.Setup Test
     Insert Normalizer Output
     Await Sync
-
-Teardown Test
-    Cleanup
-    Await Sync
-    Stop Monitoring
 
 List Findings
     ${response}    Get    ${OCTOPOES_URI}/findings
