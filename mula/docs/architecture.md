@@ -501,7 +501,7 @@ classDiagram
 
 ```mermaid
 erDiagram
-jobs {
+schedules {
     uuid id PK
     character_varying scheduler_id
     boolean enabled
@@ -512,7 +512,7 @@ jobs {
     timestamp_with_time_zone created_at
     timestamp_with_time_zone modified_at
 }
-tasks {
+task_runs {
     uuid id PK
     uuid job_id FK
     character_varying scheduler_id
