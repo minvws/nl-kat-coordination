@@ -16,13 +16,14 @@ from boefjes.job_models import (
     BoefjeMeta,
     NormalizerMeta,
     NormalizerPlainOOI,
+    NormalizerScanProfile,
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI, Reference, ScanProfile
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.types import OOIType
 
@@ -207,6 +208,12 @@ class NormalizerHandler(Handler):
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )
                 )
+
+            if results.scan_profiles:
+                connector.save_many_scan_profiles(
+                    [self._parse_scan_profile(scan_profile) for scan_profile in results.scan_profiles],
+                    valid_time=normalizer_meta.raw_data.boefje_meta.ended_at
+                )
         finally:
             normalizer_meta.ended_at = datetime.now(timezone.utc)
             bytes_api_client.save_normalizer_meta(normalizer_meta)
@@ -216,6 +223,10 @@ class NormalizerHandler(Handler):
     @staticmethod
     def _parse_ooi(result: NormalizerPlainOOI):
         return parse_obj_as(OOIType, result.model_dump())
+
+    @staticmethod
+    def _parse_scan_profile(result: NormalizerScanProfile):
+        return parse_obj_as(ScanProfile, result.model_dump())
 
 
 def get_octopoes_api_connector(org_code: str):

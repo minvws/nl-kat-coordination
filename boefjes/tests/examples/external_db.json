@@ -1,0 +1,23 @@
+{
+    "id": "f50de284-d3c1-4f87-ba68-07b957b7a48f",
+    "raw_data": {
+        "id": "66451567-2381-4248-b5a1-d0d0985e065f",
+        "boefje_meta": {
+            "id": "f29f76c5-f7b1-4662-89c6-6dc313a9f93f",
+            "boefje": {
+                "id": "external_db"
+            },
+            "input_ooi": "Network|internet",
+            "arguments": {"input": {"name": "internet"}},
+            "organization": "tst"
+        },
+        "mime_types": [
+            {
+                "value": "external_db"
+            }
+        ]
+    },
+    "normalizer": {
+        "id": "kat_external_db_normalize"
+    }
+}
