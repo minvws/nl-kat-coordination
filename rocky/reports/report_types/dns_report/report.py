@@ -56,6 +56,7 @@ class DNSReport(Report):
                         "content": ooi.value,
                     }
                 )
+        records = sorted(records, key=lambda x: x["type"])
 
         return {
             "input_ooi": input_ooi,

@@ -2,6 +2,11 @@
 
 {% if data.records %}
     <h2>{% translate "Records found" %}</h2>
+    <p>
+        {% blocktranslate trimmed %}
+            The table below gives an overview of the DNS records that were found for the abovementioned DNSZone.
+        {% endblocktranslate %}
+    </p>
     <div class="horizontal-scroll">
         <table>
             <caption class="visually-hidden">{% translate "Records found" %}</caption>
