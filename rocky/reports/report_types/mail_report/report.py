@@ -53,13 +53,25 @@ class MailReport(Report):
             mail_security_measures[hostname.primary_key] = measures
 
             number_of_spf -= (
-                1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures[hostname])) else 0
+                1
+                if list(
+                    filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures[hostname.primary_key])
+                )
+                else 0
             )
             number_of_dmarc -= (
-                1 if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", mail_security_measures[hostname])) else 0
+                1
+                if list(
+                    filter(lambda finding: finding.id == "KAT-NO-DMARC", mail_security_measures[hostname.primary_key])
+                )
+                else 0
             )
             number_of_dkim -= (
-                1 if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", mail_security_measures[hostname])) else 0
+                1
+                if list(
+                    filter(lambda finding: finding.id == "KAT-NO-DKIM", mail_security_measures[hostname.primary_key])
+                )
+                else 0
             )
 
         return {
