@@ -4,7 +4,7 @@ from ipaddress import IPv4Interface, ip_interface
 from typing import Iterator, Union
 
 from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from octopoes.models import OOI, DeclaredScanProfile
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPV4NetBlock, IPV6NetBlock, Network
 
@@ -50,6 +50,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI
 
         ip_address = address_type(address=address, network=network.reference)
         yield ip_address
+        yield DeclaredScanProfile(reference=ip_address.reference, level=3)  # TODO
         addresses_count += 1
 
         if mask < interface.ip.max_prefixlen:
