@@ -23,7 +23,7 @@ from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference, ScanProfile
+from octopoes.models import OOI, Reference, ScanProfile, ScanLevel
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.types import OOIType
 
@@ -209,7 +209,10 @@ class NormalizerHandler(Handler):
                     )
                 )
 
-            if results.scan_profiles:
+            validated_scan_profiles = [profile for profile in results.scan_profiles if self._matches_whitelist(
+                profile, normalizer_meta.normalizer.id, settings.scan_profile_plugin_whitelist
+            )]
+            if validated_scan_profiles:
                 connector.save_many_scan_profiles(
                     [self._parse_scan_profile(scan_profile) for scan_profile in results.scan_profiles],
                     valid_time=normalizer_meta.raw_data.boefje_meta.ended_at
@@ -228,6 +231,24 @@ class NormalizerHandler(Handler):
     def _parse_scan_profile(result: NormalizerScanProfile):
         return parse_obj_as(ScanProfile, result.model_dump())
 
+    @staticmethod
+    def _matches_whitelist(obj, source_plugin_id: str, whitelist: str) -> bool:
+        for item in whitelist.split(","):
+            if item.count("=") != 1:
+                raise InvalidWhitelist(f"Whitelist '{whitelist}' is invalid: item '{item}' does not contain an '='.")
+
+            plugin_id, maximum_scan_level = item.split("=")
+            maximum_scan_level = ScanLevel(int(maximum_scan_level))
+
+            if plugin_id == source_plugin_id and obj.level <= maximum_scan_level:
+                return True
+
+        return False
+
 
 def get_octopoes_api_connector(org_code: str):
     return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
+
+
+class InvalidWhitelist(Exception):
+    pass
