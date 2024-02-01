@@ -6,8 +6,8 @@
         <thead>
             <tr>
                 <th>{% translate "Severity" %}</th>
-                <th>{% translate "Unique" %}</th>
-                <th>{% translate "Total occurrences" %}</th>
+                <th>{% translate "Finding types" %}</th>
+                <th>{% translate "Occurrences" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -15,36 +15,36 @@
                 <td>
                     <span class="critical">critical</span>
                 </td>
-                <td class="number">{{ data.severity_totals_unique.critical }}</td>
-                <td class="number">{{ data.severity_totals.critical }}</td>
+                <td class="number">{{ data.total_by_severity_per_finding_type.critical }}</td>
+                <td class="number">{{ data.total_by_severity.critical }}</td>
             </tr>
             <tr>
                 <td>
                     <span class="high">high</span>
                 </td>
-                <td class="number">{{ data.severity_totals_unique.high }}</td>
-                <td class="number">{{ data.severity_totals.high }}</td>
+                <td class="number">{{ data.total_by_severity_per_finding_type.high }}</td>
+                <td class="number">{{ data.total_by_severity.high }}</td>
             </tr>
             <tr>
                 <td>
                     <span class="medium">medium</span>
                 </td>
-                <td class="number">{{ data.severity_totals_unique.medium }}</td>
-                <td class="number">{{ data.severity_totals.medium }}</td>
+                <td class="number">{{ data.total_by_severity_per_finding_type.medium }}</td>
+                <td class="number">{{ data.total_by_severity.medium }}</td>
             </tr>
             <tr>
                 <td>
                     <span class="low">low</span>
                 </td>
-                <td class="number">{{ data.severity_totals_unique.low }}</td>
-                <td class="number">{{ data.severity_totals.low }}</td>
+                <td class="number">{{ data.total_by_severity_per_finding_type.low }}</td>
+                <td class="number">{{ data.total_by_severity.low }}</td>
             </tr>
             <tr>
                 <td>
                     <span class="recommendation">recommendation</span>
                 </td>
-                <td class="number">{{ data.severity_totals_unique.recommendation }}</td>
-                <td class="number">{{ data.severity_totals.recommendation }}</td>
+                <td class="number">{{ data.total_by_severity_per_finding_type.recommendation }}</td>
+                <td class="number">{{ data.total_by_severity.recommendation }}</td>
             </tr>
             <tfoot>
                 <tr>

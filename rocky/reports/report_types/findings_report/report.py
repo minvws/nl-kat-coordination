@@ -28,12 +28,12 @@ class FindingsReport(Report):
         reference = Reference.from_str(input_ooi)
         findings = []
         finding_types = {}
-        severity_totals = {}
-        severity_totals_unique = {}
+        total_by_severity = {}
+        total_by_severity_per_finding_type = {}
 
         for severity in SEVERITY_OPTIONS:
-            severity_totals[severity] = 0
-            severity_totals_unique[severity] = 0
+            total_by_severity[severity] = 0
+            total_by_severity_per_finding_type[severity] = 0
 
         tree = self.octopoes_api_connector.get_tree(
             reference, depth=TREE_DEPTH, types={Finding}, valid_time=valid_time
@@ -47,13 +47,13 @@ class FindingsReport(Report):
             try:
                 finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
                 severity = finding_type.risk_severity.name.lower()
-                severity_totals[severity] += 1
+                total_by_severity[severity] += 1
 
                 if finding_type.id in finding_types:
                     finding_types[finding_type.id]["occurrences"].append(finding)
                 else:
                     finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
-                    severity_totals_unique[severity] += 1
+                    total_by_severity_per_finding_type[severity] += 1
 
             except ObjectNotFoundException:
                 logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
@@ -61,10 +61,10 @@ class FindingsReport(Report):
         finding_types = sorted(finding_types.values(), key=lambda x: x["finding_type"].risk_score, reverse=True)
 
         summary = {
-            "severity_totals": severity_totals,
-            "severity_totals_unique": severity_totals_unique,
+            "total_by_severity": total_by_severity,
+            "total_by_severity_per_finding_type": total_by_severity_per_finding_type,
             "total_finding_types": len(finding_types),
-            "total_occurrences": sum(severity_totals.values()),
+            "total_occurrences": sum(total_by_severity.values()),
         }
 
         return {"finding_types": finding_types, "summary": summary}

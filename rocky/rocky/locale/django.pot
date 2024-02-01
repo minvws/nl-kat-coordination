@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-31 08:27+0000\n"
+"POT-Creation-Date: 2024-02-01 10:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2864,6 +2864,7 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: rocky/templates/oois/ooi_report.html
+#: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
 msgstr ""
 
@@ -3215,6 +3216,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
@@ -3881,14 +3883,8 @@ msgid "Total per severity overview:"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Unique"
-msgstr ""
-
-#: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total occurrences"
+#: tools/forms/finding_type.py
+msgid "Finding types"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
@@ -4090,10 +4086,6 @@ msgstr ""
 
 #: tools/forms/finding_type.py
 msgid "Click to select one of the available options"
-msgstr ""
-
-#: tools/forms/finding_type.py
-msgid "Finding types"
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -5748,6 +5740,15 @@ msgstr ""
 msgid ""
 "The severity of this findingtype has not (yet) been determined by the data "
 "source. This situation requires manual investigation of the severity."
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total occurrences"
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Unique"
 msgstr ""
 
 #: rocky/templates/partials/ooi_tree_toolbar_bottom.html
