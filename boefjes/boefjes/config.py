@@ -52,7 +52,7 @@ class Settings(BaseSettings):
         "1.1.1.1", description="Name server used for remote DNS resolution in the boefje runner"
     )
 
-    scan_profile_plugin_whitelist: str = Field(
+    scan_profile_whitelist: str = Field(
         "",
         description="Whitelist for plugins that are allowed to produce scan profiles, including a default level",
         examples=["external_db=3,dns-records=1"],

@@ -33,7 +33,7 @@ def run_normalizer(start_pdb, normalizer_id, raw_id):
 
     local_repository = get_local_repository()
 
-    handler = NormalizerHandler(LocalNormalizerJobRunner(local_repository))
+    handler = NormalizerHandler(LocalNormalizerJobRunner(local_repository), bytes_api_client)
     try:
         handler.handle(meta)
     except Exception:

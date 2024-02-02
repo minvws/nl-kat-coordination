@@ -13,9 +13,9 @@ from boefjes.job_models import (
     NormalizerOutput,
     NormalizerPlainOOI,
     NormalizerResult,
+    NormalizerScanProfile,
     ObservationsWithoutInputOOI,
     UnsupportedReturnTypeNormalizer,
-    NormalizerScanProfile,
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
