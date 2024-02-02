@@ -35,7 +35,7 @@ if settings.span_export_grpc_endpoint is not None:
 
     resource = Resource(attributes={SERVICE_NAME: "katalogus"})
     provider = TracerProvider(resource=resource)
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=settings.span_export_grpc_endpoint))
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint)))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
