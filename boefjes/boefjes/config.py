@@ -1,9 +1,9 @@
 import logging
 import os
 from pathlib import Path
-from typing import Annotated, Any, Dict, Optional, Tuple, Type
+from typing import Any, Dict, Optional, Tuple, Type
 
-from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
@@ -52,7 +52,7 @@ class Settings(BaseSettings):
         "1.1.1.1", description="Name server used for remote DNS resolution in the boefje runner"
     )
 
-    scan_profile_whitelist: Dict[str, Annotated[int, Field(strict=True, ge=0, le=4)]] = Field(
+    scan_profile_whitelist: Dict[str, conint(strict=True, ge=0, le=4)] = Field(
         {},
         description="Whitelist for normalizer ids allowed to produce scan profiles, including a maximum level.",
         examples=['{"kat_external_db_normalize": 3, "kat_dns_normalize": 1}'],
