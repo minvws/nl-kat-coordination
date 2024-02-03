@@ -256,7 +256,9 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, bytes_api_client)
     else:
-        item_handler = NormalizerHandler(LocalNormalizerJobRunner(local_repository), bytes_api_client)
+        item_handler = NormalizerHandler(
+            LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
+        )
 
     return SchedulerWorkerManager(
         item_handler,

@@ -1,13 +1,16 @@
 import json
+import os
 from pathlib import Path
 from unittest import TestCase, mock
+
+import pytest
+from pydantic import ValidationError
 
 from boefjes.config import Settings
 from boefjes.job_handler import NormalizerHandler
 from boefjes.job_models import NormalizerMeta, NormalizerScanProfile
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
-from octopoes.models import DeclaredScanProfile, Reference
 from tests.loading import get_dummy_data
 
 
@@ -44,34 +47,6 @@ class ScanProfileTest(TestCase):
         self.assertEqual("Hostname|internet|example.com", profile.reference)
         self.assertEqual(3, profile.level)
 
-    def test_whitelist_approves_right_format(self):
-        ref = Reference.from_str("Network|internet")
-
-        self.assertTrue(
-            NormalizerHandler._matches_whitelist(DeclaredScanProfile(level=2, reference=ref), "test", "test=2")
-        )
-        self.assertTrue(
-            NormalizerHandler._matches_whitelist(
-                DeclaredScanProfile(level=2, reference=ref), "test", "test=2,abc=8"  # Early return!
-            )
-        )
-        self.assertTrue(
-            NormalizerHandler._matches_whitelist(DeclaredScanProfile(level=3, reference=ref), "test", "abc=2,test=4,")
-        )
-        self.assertFalse(
-            NormalizerHandler._matches_whitelist(
-                DeclaredScanProfile(level=2, reference=ref), "test", "test=1,abc=1,def=0"
-            )
-        )
-        self.assertFalse(
-            NormalizerHandler._matches_whitelist(DeclaredScanProfile(level=0, reference=ref), "test", "abc=1,def=0")
-        )
-        self.assertFalse(
-            NormalizerHandler._matches_whitelist(
-                DeclaredScanProfile(level=4, reference=ref), "ah", "test=4,abc=1,def=0"
-            )
-        )
-
     def test_job_handler_respects_whitelist(self):
         raw = {
             "ip_addresses": [{"ip_address": "127.0.0.1"}, {"ip_address": "10.0.0.0"}],
@@ -85,23 +60,26 @@ class ScanProfileTest(TestCase):
         runner = LocalNormalizerJobRunner(local_repository)
         meta = NormalizerMeta.model_validate_json(get_dummy_data("external_db.json"))
 
-        NormalizerHandler(runner, bytes_mock, lambda x: octopoes, Settings(scan_profile_whitelist="")).handle(meta)
+        os.environ["BOEFJES_SCAN_PROFILE_WHITELIST"] = '{"x": 5}'
+        with pytest.raises(ValidationError):
+            Settings()
+
+        os.environ["BOEFJES_SCAN_PROFILE_WHITELIST"] = '{"x": -1}'
+        with pytest.raises(ValidationError):
+            Settings()
+
+        os.environ["BOEFJES_SCAN_PROFILE_WHITELIST"] = '{"x": 3}'
+        NormalizerHandler(runner, bytes_mock, lambda x: octopoes, Settings().scan_profile_whitelist).handle(meta)
         assert octopoes.save_many_scan_profiles.call_count == 0
 
-        NormalizerHandler(runner, bytes_mock, lambda x: octopoes, Settings(scan_profile_whitelist="x=3")).handle(meta)
+        os.environ["BOEFJES_SCAN_PROFILE_WHITELIST"] = '{"kat_external_db_normalize": 2}'
+        NormalizerHandler(runner, bytes_mock, lambda x: octopoes, Settings().scan_profile_whitelist).handle(meta)
         assert octopoes.save_many_scan_profiles.call_count == 0
 
-        NormalizerHandler(
-            runner, bytes_mock, lambda x: octopoes, Settings(scan_profile_whitelist="kat_external_db_normalize=2,")
-        ).handle(meta)
-        assert octopoes.save_many_scan_profiles.call_count == 0
-
-        NormalizerHandler(
-            runner, bytes_mock, lambda x: octopoes, Settings(scan_profile_whitelist="kat_external_db_normalize=3")
-        ).handle(meta)
+        os.environ["BOEFJES_SCAN_PROFILE_WHITELIST"] = '{"kat_external_db_normalize": 3}'
+        NormalizerHandler(runner, bytes_mock, lambda x: octopoes, Settings().scan_profile_whitelist).handle(meta)
         assert octopoes.save_many_scan_profiles.call_count == 1
 
-        NormalizerHandler(
-            runner, bytes_mock, lambda x: octopoes, Settings(scan_profile_whitelist="kat_external_db_normalize=4,abc=0")
-        ).handle(meta)
+        os.environ["BOEFJES_SCAN_PROFILE_WHITELIST"] = '{"kat_external_db_normalize": 4, "abc": 0}'
+        NormalizerHandler(runner, bytes_mock, lambda x: octopoes, Settings().scan_profile_whitelist).handle(meta)
         assert octopoes.save_many_scan_profiles.call_count == 2
