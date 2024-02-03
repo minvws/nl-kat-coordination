@@ -19,7 +19,7 @@ from boefjes.job_models import (
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
-from octopoes.models import OOI, ScanProfile
+from octopoes.models import OOI, DeclaredScanProfile
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class LocalNormalizerJobRunner(NormalizerJobRunner):
     @staticmethod
     def _parse(result: Any) -> NormalizerResult:
         if not isinstance(result, dict):  # Must be an OOI or ScanProfile. Should be phased out with Octopoes dependency
-            if not isinstance(result, (OOI, ScanProfile)):
+            if not isinstance(result, (OOI, DeclaredScanProfile)):
                 raise UnsupportedReturnTypeNormalizer(str(type(result)))
 
             result = result.dict()
