@@ -11,6 +11,9 @@ apps = {}
 def get_app(queue_uri: str) -> Celery:
     config = {
         "broker_url": queue_uri,
+        "broker_pool_limit": 0,
+        "worker_concurrency": 1,
+        "worker_prefetch_multiplier": 0,
         "result_backend": f"rpc://{queue_uri}",
         "task_serializer": "json",
         "result_serializer": "json",
@@ -18,6 +21,7 @@ def get_app(queue_uri: str) -> Celery:
         "accept_content": ["application/json", "application/x-python-serialize"],
         "result_accept_content": ["application/json", "application/x-python-serialize"],
         "task_queues": ("octopoes",),
+        "task_alway_eager": True,
     }
     if queue_uri not in apps:
         apps[queue_uri] = Celery()
