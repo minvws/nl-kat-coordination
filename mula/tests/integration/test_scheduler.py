@@ -194,6 +194,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertTrue(self.scheduler.is_enabled())
 
         # Push item to the queue
+        p_item = functions.create_p_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+        )
         self.scheduler.push_item_to_queue(p_item)
 
         # Assert: task should be on priority queue
