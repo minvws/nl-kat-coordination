@@ -458,11 +458,11 @@ class Server:
                 detail="task not found",
             )
 
-        updated_task = task_db.model_copy(update=item)
-
         # Check if status changed and update duration
         if "status" in item and item["status"] != task_db.status:
-            updated_task.update_status(item["status"])
+            task_db.update_status(item["status"])
+
+        updated_task = task_db.model_copy(update=item)
 
         # Update task in database
         try:

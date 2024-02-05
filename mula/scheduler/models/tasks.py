@@ -59,12 +59,10 @@ class Task(BaseModel):
 
     status: TaskStatus
 
+    # Durations
     pending: Optional[timedelta] = None
-
     queued: Optional[timedelta] = None
-
     dispatched: Optional[timedelta] = None
-
     running: Optional[timedelta] = None
 
     meta: Optional[dict] = None
@@ -77,6 +75,7 @@ class Task(BaseModel):
         from_status = self.status
         to_status = status
 
+        now_utc = datetime.now(timezone.utc)
         t0 = (
             self.created_at
             + (self.pending or timedelta())
@@ -85,13 +84,23 @@ class Task(BaseModel):
             + (self.running or timedelta())
         )
 
-        now_utc = datetime.now(timezone.utc)
-
-        if from_status == TaskStatus.PENDING and to_status in (TaskStatus.QUEUED, TaskStatus.CANCELLED):
+        if from_status == TaskStatus.PENDING and to_status in (
+            TaskStatus.QUEUED,
+            TaskStatus.CANCELLED,
+            TaskStatus.FAILED,
+        ):
             self.pending = now_utc - t0
-        elif from_status == TaskStatus.QUEUED and to_status in (TaskStatus.DISPATCHED, TaskStatus.CANCELLED):
+        elif from_status == TaskStatus.QUEUED and to_status in (
+            TaskStatus.DISPATCHED,
+            TaskStatus.CANCELLED,
+            TaskStatus.FAILED,
+        ):
             self.queued = now_utc - t0
-        elif from_status == TaskStatus.DISPATCHED and to_status in (TaskStatus.RUNNING, TaskStatus.CANCELLED):
+        elif from_status == TaskStatus.DISPATCHED and to_status in (
+            TaskStatus.RUNNING,
+            TaskStatus.CANCELLED,
+            TaskStatus.FAILED,
+        ):
             self.dispatched = now_utc - t0
         elif from_status == TaskStatus.RUNNING and to_status in (
             TaskStatus.COMPLETED,
@@ -124,11 +133,8 @@ class TaskDB(Base):
     )
 
     pending = Column(Interval)
-
     queued = Column(Interval)
-
     dispatched = Column(Interval)
-
     running = Column(Interval)
 
     meta = Column(JSONB)

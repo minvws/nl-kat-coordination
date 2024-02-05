@@ -599,6 +599,13 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual("completed", response.json().get("status"))
 
+    def test_patch_task_update_status(self):
+        self.assertEqual("queued", self.first_item_api.get("status"))
+        response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"status": "dispatched"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("dispatched", response.json().get("status"))
+        self.assertIsNotNone(response.json().get("queued"))
+
     def test_patch_task_empty(self):
         # Patch a task with empty body
         response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={})

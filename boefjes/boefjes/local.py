@@ -2,8 +2,11 @@ import logging
 import os
 from typing import Any, Dict, List, Tuple, Union
 
+from octopoes.models import OOI
 from pydantic import ValidationError
 
+from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
+from boefjes.config import settings
 from boefjes.job_models import (
     BoefjeMeta,
     InvalidReturnValueNormalizer,
@@ -18,7 +21,6 @@ from boefjes.job_models import (
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
-from octopoes.models import OOI
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +42,13 @@ class TemporaryEnvironment:
 class LocalBoefjeJobRunner(BoefjeJobRunner):
     def __init__(self, local_repository: LocalPluginRepository):
         self.local_repository = local_repository
+        self.scheduler_client = SchedulerAPIClient(str(settings.scheduler_api))
 
     def run(self, boefje_meta: BoefjeMeta, environment: Dict[str, str]) -> List[Tuple[set, Union[bytes, str]]]:
         logger.info("Running local boefje plugin")
+
+        task_id = str(boefje_meta.id)
+        self.scheduler_client.patch_task(task_id, TaskStatus.RUNNING)
 
         boefjes = self.local_repository.resolve_boefjes()
         boefje_resource = boefjes[boefje_meta.boefje.id]
@@ -58,9 +64,13 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
 class LocalNormalizerJobRunner(NormalizerJobRunner):
     def __init__(self, local_repository: LocalPluginRepository):
         self.local_repository = local_repository
+        self.scheduler_client = SchedulerAPIClient(str(settings.scheduler_api))
 
     def run(self, normalizer_meta, raw) -> NormalizerOutput:
         logger.info("Running local normalizer plugin")
+
+        task_id = str(normalizer_meta.id)
+        self.scheduler_client.patch_task(task_id, TaskStatus.RUNNING)
 
         normalizers = self.local_repository.resolve_normalizers()
         normalizer = normalizers[normalizer_meta.normalizer.id]
