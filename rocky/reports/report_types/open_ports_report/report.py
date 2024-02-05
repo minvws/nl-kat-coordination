@@ -36,7 +36,7 @@ class OpenPortsReport(Report):
                 return {}
             references = [ip.reference for ip in ips]
         else:
-            references = [ooi]
+            references = [ooi.reference]
 
         results = {}
         for ref in references:
