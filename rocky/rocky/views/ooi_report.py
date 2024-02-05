@@ -1,21 +1,23 @@
-from typing import List, Set, Type
+from datetime import datetime
+from typing import Any, List, Set, Type
 
 from account.mixins import OrganizationView
 from django.contrib import messages
-from django.core.exceptions import BadRequest
-from django.http import FileResponse
+from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import get_katalogus
 from tools.forms.ooi import OOIReportSettingsForm
 from tools.models import Organization
-from tools.view_helpers import get_ooi_url, is_future_date_observed_at
+from tools.view_helpers import convert_date_to_datetime, get_ooi_url
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSAAAARecord,
     DNSARecord,
+    DNSCAARecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSSOARecord,
@@ -39,18 +41,13 @@ class OOIReportView(BaseOOIDetailView):
     template_name = "oois/ooi_report.html"
     connector_form_class = OOIReportSettingsForm
 
-    def dispatch(self, request, *args, **kwargs):
-        if "ooi_id" not in request.GET:
-            raise BadRequest("Missing ooi_id parameter")
-        ooi_id = request.GET["ooi_id"]
-
-        if is_future_date_observed_at(request, self.get_observed_at()):
-            return redirect(get_ooi_url("ooi_detail", ooi_id, self.organization.code))
-        return super().dispatch(request, *args, **kwargs)
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.depth = self.get_depth()
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if self.get_observed_at() > convert_date_to_datetime(datetime.now(timezone.utc)):
+            messages.error(
+                request,
+                _("You can't generate a report for an OOI on a date in the future."),
+            )
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -67,42 +64,36 @@ class OOIReportView(BaseOOIDetailView):
 
 
 class OOIReportPDFView(SingleOOITreeMixin):
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.api_connector = self.octopoes_api_connector
-        self.depth = self.get_depth()
-
     def get(self, request, *args, **kwargs):
-        self.setup(request, *args, **kwargs)
-        self.ooi = self.get_ooi()
         valid_time = self.get_observed_at()
+        ooi = self.get_ooi()
         reports_service = ReportsService(keiko_client)
 
         try:
             report = reports_service.get_report(
                 valid_time,
-                self.ooi.object_type,
-                self.ooi.human_readable,
+                ooi.object_type,
+                ooi.human_readable,
                 self.tree.store,
                 OOIReportQuery(
                     self.organization.code,
                     valid_time.date(),
-                    self.ooi,
+                    ooi,
                     self.depth,
                     origin=f"{request.scheme}://{request.get_host()}",
                 ),
             )
         except GeneratingReportFailed:
             messages.error(self.request, _("Generating report failed. See Keiko logs for more information."))
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+            return redirect(get_ooi_url("ooi_report", ooi.primary_key, self.organization.code))
         except ReportNotFoundException:
             messages.error(self.request, _("Timeout reached generating report. See Keiko logs for more information."))
-            return redirect(get_ooi_url("ooi_report", self.ooi.primary_key, self.organization.code))
+            return redirect(get_ooi_url("ooi_report", ooi.primary_key, self.organization.code))
 
         return FileResponse(
             report,
             as_attachment=True,
-            filename=ReportsService.ooi_report_file_name(valid_time, self.organization.code, self.ooi.primary_key),
+            filename=ReportsService.ooi_report_file_name(valid_time, self.organization.code, ooi.primary_key),
         )
 
 
@@ -211,10 +202,12 @@ class DNSReport(Report):
         DNSMXRecord,
         DNSNSRecord,
         DNSSOARecord,
+        DNSCAARecord,
         Hostname,
     ]
     allowed_finding_types = [
         "KAT-WEBSERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-TWO-IPV6",
+        "KAT-NO-CAA",
     ]

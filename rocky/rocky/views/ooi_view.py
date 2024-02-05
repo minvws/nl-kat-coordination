@@ -1,6 +1,7 @@
 from time import sleep
-from typing import Dict, List, Set, Type
+from typing import Any, Dict, List, Set, Type
 
+from django import http
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -8,24 +9,18 @@ from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
 from tools.forms.base import BaseRockyForm, ObservedAtForm
-from tools.forms.ooi_form import ClearanceFilterForm, OOIForm
+from tools.forms.ooi_form import _EXCLUDED_OOI_TYPES, ClearanceFilterForm, OOIForm
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_mandatory_fields, get_ooi_url
 
 from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PROFILE_TYPE_FILTER
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
-from octopoes.models.types import get_collapsed_types
-from rocky.views.mixins import (
-    ConnectorFormMixin,
-    MultipleOOIMixin,
-    OOIList,
-    SingleOOIMixin,
-    SingleOOITreeMixin,
-)
+from octopoes.models.types import get_collapsed_types, type_by_name
+from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
 
 
-class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
+class BaseOOIListView(ConnectorFormMixin, OctopoesView, ListView):
     connector_form_class = ObservedAtForm
     paginate_by = 150
     context_object_name = "ooi_list"
@@ -60,9 +55,16 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
             return self.scan_profile_types
         return {ScanProfileType(s) for s in self.clearance_type}
 
+    def get_ooi_types(self) -> Set[Type[OOI]]:
+        if not self.filtered_ooi_types:
+            return self.ooi_types
+        return {type_by_name(t) for t in self.filtered_ooi_types if t not in _EXCLUDED_OOI_TYPES}
+
     def get_queryset(self) -> OOIList:
-        return self.get_list(
-            observed_at=self.get_observed_at(),
+        return OOIList(
+            self.octopoes_api_connector,
+            ooi_types=self.get_ooi_types(),
+            valid_time=self.get_observed_at(),
             scan_level=self.get_ooi_scan_levels(),
             scan_profile_type=self.get_ooi_profile_types(),
         )
@@ -74,11 +76,12 @@ class BaseOOIListView(MultipleOOIMixin, ConnectorFormMixin, ListView):
         context["observed_at"] = self.get_observed_at()
         context["total_oois"] = len(self.object_list)
         context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
+        context["active_filters"] = self.get_active_filters()
         return context
 
 
 class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request: http.HttpRequest, *args: Any, **kwargs: Any) -> http.HttpResponse:
         self.ooi = self.get_ooi()
         return super().get(request, *args, **kwargs)
 
@@ -119,11 +122,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         return self.ooi.__class__ if hasattr(self, "ooi") else None
 
     def get_form(self, form_class=None) -> BaseRockyForm:
-        if form_class is None:
-            form_class = self.get_form_class()
-
-        kwargs = self.get_form_kwargs()
-        form = form_class(**kwargs)
+        form = super().get_form(form_class)
 
         # Disable natural key attributes
         if self.get_readonly_fields():

@@ -13,8 +13,8 @@ if [ "$ID" != "debian" ]; then
 fi
 
 # Check Debian version
-if [ "$VERSION_ID" != "11" ] && [ "$VERSION_ID" != "12" ]; then
-    echo "Only Debian version 11 and 12 are supported"
+if [ "$VERSION_ID" != "12" ]; then
+    echo "Only Debian version 12 is supported"
     exit 1
 fi
 
@@ -27,6 +27,16 @@ fi
 debian_version=$VERSION_ID
 
 echo "Step 0 - Get needed tools and clean up"
+
+if ! command -v sudo; then
+    if [ "$EUID" -ne 0 ]; then
+        echo "Sudo could not be found, please first install sudo as root"
+        exit 1
+    fi
+    apt -y update
+    apt -y install sudo
+fi
+
 sudo apt -y update
 sudo apt -y install curl
 

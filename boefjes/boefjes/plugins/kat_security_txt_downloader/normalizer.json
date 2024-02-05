@@ -1,7 +1,7 @@
 {
     "id": "kat_sec_txt_downloader_normalize",
     "consumes": [
-        "security_txt_downloader"
+        "boefje/security_txt_downloader"
     ],
     "produces": [
         "SecurityTXT",

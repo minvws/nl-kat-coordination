@@ -8,7 +8,7 @@ from http import HTTPStatus
 from typing import Any, Dict, List, Optional, Set, Tuple, Type, Union, cast
 
 from bits.definitions import BitDefinition
-from pydantic import BaseModel, parse_obj_as
+from pydantic import RootModel, TypeAdapter
 from requests import HTTPError
 
 from octopoes.config.settings import (
@@ -16,7 +16,6 @@ from octopoes.config.settings import (
     DEFAULT_OFFSET,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-    XTDBType,
 )
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
@@ -31,6 +30,7 @@ from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceNode, ReferenceTree
 from octopoes.models.types import get_concrete_types, get_relation, get_relations, to_concrete, type_by_name
 from octopoes.repositories.repository import Repository
@@ -66,6 +66,19 @@ class OOIRepository(Repository):
         self.event_manager = event_manager
 
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
+        raise NotImplementedError
+
+    def get_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = False,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
         raise NotImplementedError
 
     def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
@@ -136,18 +149,18 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
 
-class XTDBReferenceNode(BaseModel):
-    __root__: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
+class XTDBReferenceNode(RootModel):
+    root: Dict[str, Union[str, List[XTDBReferenceNode], XTDBReferenceNode]]
 
     def to_reference_node(self, pk_prefix: str) -> Optional[ReferenceNode]:
-        if not self.__root__:
+        if not self.root:
             return None
         # Apparently relations can be joined to Null values..?!?
-        if pk_prefix not in self.__root__:
+        if pk_prefix not in self.root:
             return None
-        reference = Reference.from_str(self.__root__.pop(pk_prefix))
+        reference = Reference.from_str(self.root.pop(pk_prefix))
         children = {}
-        for name, value in self.__root__.items():
+        for name, value in self.root.items():
             if isinstance(value, XTDBReferenceNode):
                 sub_nodes = [value.to_reference_node(pk_prefix)]
             elif isinstance(value, (List, Set)):
@@ -157,8 +170,6 @@ class XTDBReferenceNode(BaseModel):
                 children[name] = sub_nodes
         return ReferenceNode(reference=reference, children=children)
 
-
-XTDBReferenceNode.update_forward_refs()
 
 entities = {}
 for ooi_type_ in get_concrete_types():
@@ -179,19 +190,14 @@ datamodel = Datamodel(entities=entities)
 
 
 class XTDBOOIRepository(OOIRepository):
-    xtdb_type: XTDBType = XTDBType.CRUX
+    pk_prefix = "xt/id"
 
-    def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
+    def __init__(self, event_manager: EventManager, session: XTDBSession):
         super().__init__(event_manager)
         self.session = session
-        self.__class__.xtdb_type = xtdb_type
 
     def commit(self):
         self.session.commit()
-
-    @classmethod
-    def pk_prefix(cls):
-        return "crux.db/id" if cls.xtdb_type == XTDBType.CRUX else "xt/id"
 
     @classmethod
     def serialize(cls, ooi: OOI) -> Dict[str, Any]:
@@ -203,18 +209,18 @@ class XTDBOOIRepository(OOIRepository):
         export = {f"{ooi.__class__.__name__}/{key}": value for key, value in export.items() if value is not None}
 
         export["object_type"] = ooi.__class__.__name__
-        export[cls.pk_prefix()] = ooi.primary_key
+        export[cls.pk_prefix] = ooi.primary_key
 
         return export
 
     @classmethod
     def deserialize(cls, data: Dict[str, Any]) -> OOI:
         if "object_type" not in data:
-            raise ValueError
+            raise ValueError("Data is missing object_type")
 
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
-        data.pop(cls.pk_prefix())
+        data.pop(cls.pk_prefix)
 
         # remove type prefixes
         stripped = {key.split("/")[1]: value for key, value in data.items()}
@@ -228,9 +234,34 @@ class XTDBOOIRepository(OOIRepository):
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
+    def get_history(
+        self,
+        reference: Reference,
+        *,
+        sort_order: str = "asc",  # Or: "desc"
+        with_docs: bool = False,
+        has_doc: Optional[bool] = None,
+        offset: int = 0,
+        limit: Optional[int] = None,
+        indices: Optional[List[int]] = None,
+    ) -> List[TransactionRecord]:
+        try:
+            return self.session.client.get_entity_history(
+                str(reference),
+                sort_order=sort_order,
+                with_docs=with_docs,
+                has_doc=has_doc,
+                offset=offset,
+                limit=limit,
+                indices=indices,
+            )
+        except HTTPError as e:
+            if e.response.status_code == HTTPStatus.NOT_FOUND:
+                raise ObjectNotFoundException(str(reference))
+
     def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
         ids = list(map(str, references))
-        query = generate_pull_query(self.xtdb_type, FieldSet.ALL_FIELDS, {self.pk_prefix(): ids})
+        query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: ids})
         res = self.session.client.query(query, valid_time)
         oois = [self.deserialize(x[0]) for x in res]
         return {ooi.primary_key: ooi for ooi in oois}
@@ -307,7 +338,7 @@ class XTDBOOIRepository(OOIRepository):
                     :find [(rand {amount} ?id)]
                     :in [[_scan_level ...]]
                     :where [
-                        [?e :crux.db/id ?id]
+                        [?e :xt/id ?id]
                         [?e :object_type]
                         [?scan_profile :type "ScanProfile"]
                         [?scan_profile :reference ?e]
@@ -361,13 +392,11 @@ class XTDBOOIRepository(OOIRepository):
             object_types=ooi_classes,
         )
         field_node.build_tree(1)
-        query = generate_pull_query(
-            self.xtdb_type, FieldSet.ONLY_ID, {self.pk_prefix(): ooi_ids}, field_node=field_node
-        )
+        query = generate_pull_query(FieldSet.ONLY_ID, {self.pk_prefix: ooi_ids}, field_node=field_node)
         res = self.session.client.query(query, valid_time=valid_time)
         res = [element[0] for element in res]
-        xtdb_reference_root_nodes = parse_obj_as(List[XTDBReferenceNode], res)
-        return [x.to_reference_node(self.pk_prefix()) for x in xtdb_reference_root_nodes]
+        xtdb_reference_root_nodes = TypeAdapter(List[XTDBReferenceNode]).validate_python(res)
+        return [x.to_reference_node(self.pk_prefix) for x in xtdb_reference_root_nodes]
 
     def _get_tree_level(
         self,
@@ -447,12 +476,12 @@ class XTDBOOIRepository(OOIRepository):
                     :query {{
                         :find [
                             (pull ?e [
-                                :crux.db/id
+                                :xt/id
                                 {related_fields}
                             ])
                         ]
-                        :in [[ _crux_db_id ... ]]
-                        :where [[?e :crux.db/id _crux_db_id]]
+                        :in [[ _xt_id ... ]]
+                        :where [[?e :xt/id _xt_id]]
                     }}
                     :in-args [["{reference}"]]
                 }}""".format(
@@ -470,12 +499,12 @@ class XTDBOOIRepository(OOIRepository):
                         :query {{
                             :find [
                                 (pull ?e [
-                                    :crux.db/id
+                                    :xt/id
                                     {related_fields}
                                 ])
                             ]
-                            :in [[ _crux_db_id ... ]]
-                            :where [[?e :crux.db/id _crux_db_id]]
+                            :in [[ _xt_id ... ]]
+                            :where [[?e :xt/id _xt_id]]
                         }}
                         :in-args [[{reference}]]
                     }}""".format(
@@ -498,7 +527,7 @@ class XTDBOOIRepository(OOIRepository):
 
         ret = {}
         for key, value in response_data.items():
-            if key == "crux.db/id" or value == {}:
+            if key == "xt/id" or value == {}:
                 continue
             path = Path([self.decode_segment(key)])
             if isinstance(value, list):
@@ -526,7 +555,7 @@ class XTDBOOIRepository(OOIRepository):
                         else:
                             neighbours.add(self.deserialize(value))
                 except ValueError:
-                    # is not an error, old crux versions return the foreign key as a string,
+                    # Is not an error, XTDB returns the foreign key as a string,
                     # when related object is not found
                     logger.info("Could not deserialize value [value=%s]", value)
 
@@ -601,7 +630,7 @@ class XTDBOOIRepository(OOIRepository):
         """
 
         for finding_type_name, finding_type_object, finding_count in self.session.client.query(
-            str(query), valid_time=valid_time
+            query, valid_time=valid_time
         ):
             if not finding_type_object:
                 logger.warning(
@@ -714,4 +743,4 @@ class XTDBOOIRepository(OOIRepository):
         )
 
     def query(self, query: Query, valid_time: datetime) -> List[OOI]:
-        return [self.deserialize(row[0]) for row in self.session.client.query(str(query), valid_time=valid_time)]
+        return [self.deserialize(row[0]) for row in self.session.client.query(query, valid_time=valid_time)]

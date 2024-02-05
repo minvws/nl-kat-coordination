@@ -1,14 +1,23 @@
-import logging
 from concurrent import futures
 from types import SimpleNamespace
 from typing import Callable, Dict, List, Optional
 
 import requests
+import structlog
 from opentelemetry import trace
 
 from scheduler import context, queues, rankers
 from scheduler.connectors import listeners
-from scheduler.models import Normalizer, NormalizerTask, Organisation, Plugin, PrioritizedItem, RawData, TaskStatus
+from scheduler.models import (
+    Normalizer,
+    NormalizerTask,
+    Organisation,
+    Plugin,
+    PrioritizedItem,
+    RawData,
+    RawDataReceivedEvent,
+    TaskStatus,
+)
 
 from .scheduler import Scheduler
 
@@ -32,7 +41,7 @@ class NormalizerScheduler(Scheduler):
         queue: Optional[queues.PriorityQueue] = None,
         callback: Optional[Callable[..., None]] = None,
     ):
-        self.logger = logging.getLogger(__name__)
+        self.logger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
 
         self.queue = queue or queues.NormalizerPriorityQueue(
@@ -79,19 +88,31 @@ class NormalizerScheduler(Scheduler):
             loop=False,
         )
 
+        self.logger.info(
+            "Normalizer scheduler started for %s",
+            self.organisation.id,
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
+            item_type=self.queue.item_type.__name__,
+        )
+
     @tracer.start_as_current_span("normalizer_push_task_for_received_raw_data")
-    def push_tasks_for_received_raw_data(self, latest_raw_data: RawData) -> None:
+    def push_tasks_for_received_raw_data(self, body: bytes) -> None:
         """Create tasks for the received raw data.
 
         Args:
             latest_raw_data: A `RawData` object that was received from the
             message queue.
         """
+        # Convert body into a RawDataReceivedEvent
+        latest_raw_data = RawDataReceivedEvent.parse_raw(body)
+
         self.logger.debug(
-            "Received new raw data from message queue [raw_data_id=%s, organisation_id=%s, scheduler_id=%s]",
+            "Received raw data %s",
             latest_raw_data.raw_data.id,
-            self.organisation.id,
-            self.scheduler_id,
+            raw_data_id=latest_raw_data.raw_data.id,
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
         )
 
         # Check if the raw data doesn't contain an error mime-type,
@@ -99,11 +120,13 @@ class NormalizerScheduler(Scheduler):
         # an error.
         for mime_type in latest_raw_data.raw_data.mime_types:
             if mime_type.get("value", "").startswith("error/"):
-                self.logger.warning(
-                    "Skipping raw data with error mime type [raw_data_id=%s, organisation_id=%s, scheduler_id=%s]",
+                self.logger.debug(
+                    "Skipping raw data %s with error mime type",
                     latest_raw_data.raw_data.id,
-                    self.organisation.id,
-                    self.scheduler_id,
+                    mime_type=mime_type.get("value"),
+                    raw_data_id=latest_raw_data.raw_data.id,
+                    organisation_id=self.organisation.id,
+                    scheduler_id=self.scheduler_id,
                 )
                 return
 
@@ -117,10 +140,11 @@ class NormalizerScheduler(Scheduler):
 
         if not normalizers:
             self.logger.debug(
-                "No normalizers found for raw data [raw_data_id=%s, organisation_id=%s, scheduler_id=%s]",
+                "No normalizers found for raw data %s",
                 latest_raw_data.raw_data.id,
-                self.organisation.id,
-                self.scheduler_id,
+                raw_data_id=latest_raw_data.raw_data.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
             )
 
         with futures.ThreadPoolExecutor() as executor:
@@ -149,41 +173,46 @@ class NormalizerScheduler(Scheduler):
 
         if not self.is_task_allowed_to_run(normalizer):
             self.logger.debug(
-                "Task is not allowed to run: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
-                task,
-                self.organisation.id,
-                self.scheduler_id,
-                caller,
+                "Task is not allowed to run: %s",
+                task.id,
+                task_id=task.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                caller=caller,
             )
             return
 
         try:
             if self.is_task_running(task):
                 self.logger.debug(
-                    "Task is already running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
-                    task,
-                    self.organisation.id,
-                    self.scheduler_id,
-                    caller,
+                    "Task is still running: %s",
+                    task.id,
+                    task_id=task.id,
+                    organisation_id=self.organisation.id,
+                    scheduler_id=self.scheduler_id,
+                    caller=caller,
                 )
                 return
         except Exception:
             self.logger.warning(
-                "Could not check if task is running: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
-                task,
-                self.organisation.id,
-                self.scheduler_id,
-                caller,
+                "Could not check if task is running: %s",
+                task.id,
+                task_id=task.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                caller=caller,
+                exc_info=True,
             )
             return
 
         if self.is_item_on_queue_by_hash(task.hash):
             self.logger.debug(
-                "Normalizer task is already on queue: %s [organisation_id=%s, scheduler_id=%s, caller=%s]",
-                task,
-                self.organisation.id,
-                self.scheduler_id,
-                caller,
+                "Task is already on queue: %s",
+                task.id,
+                task_id=task.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                caller=caller,
             )
             return
 
@@ -208,27 +237,27 @@ class NormalizerScheduler(Scheduler):
             self.push_item_to_queue_with_timeout(p_item, self.max_tries)
         except queues.QueueFullError:
             self.logger.warning(
-                "Could not add task to queue, queue was full: %s "
-                "[queue_qsize=%d, queue_maxsize=%d, organisation_id=%s, scheduler_id=%s, caller=%s]",
-                task,
-                self.queue.qsize(),
-                self.queue.maxsize,
-                self.organisation.id,
-                self.scheduler_id,
-                caller,
+                "Could not add task to queue, queue was full: %s",
+                task.id,
+                task_id=task.id,
+                queue_qsize=self.queue.qsize(),
+                queue_maxsize=self.queue.maxsize,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                caller=caller,
             )
             return
 
         self.logger.info(
-            "Created normalizer task: %s for raw data: %s "
-            "[normalizer_id=%s, raw_data_id=%s, organisation_id=%s, scheduler_id=%s, caller=%s]",
-            task,
+            "Created normalizer task: %s for raw data: %s",
+            task.id,
             raw_data.id,
-            normalizer.id,
-            raw_data.id,
-            self.organisation.id,
-            self.scheduler_id,
-            caller,
+            task_id=task.id,
+            normalizer_id=normalizer.id,
+            raw_data_id=raw_data.id,
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
+            caller=caller,
         )
 
     def get_normalizers_for_mime_type(self, mime_type: str) -> List[Plugin]:
@@ -267,14 +296,13 @@ class NormalizerScheduler(Scheduler):
             return []
 
         self.logger.debug(
-            "Found %d normalizers for mime_type: %s "
-            "[mime_type=%s, normalizers=%s, organisation_id=%s, scheduler_id=%s]",
+            "Found %d normalizers for mime_type: %s",
             len(normalizers),
             mime_type,
-            mime_type,
-            [normalizer.id for normalizer in normalizers],
-            self.organisation.id,
-            self.scheduler_id,
+            mime_type=mime_type,
+            normalizers=[normalizer.id for normalizer in normalizers],
+            organisation=self.organisation.id,
+            scheduler_id=self.scheduler_id,
         )
 
         return normalizers
@@ -291,11 +319,11 @@ class NormalizerScheduler(Scheduler):
         """
         if not normalizer.enabled:
             self.logger.debug(
-                "Normalizer: %s is disabled [normalizer_id= %s, organisation_id=%s, scheduler_id=%s]",
+                "Normalizer: %s is disabled",
                 normalizer.id,
-                normalizer.id,
-                self.organisation.id,
-                self.scheduler_id,
+                normalizer_id=normalizer.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
             )
             return False
 
@@ -316,11 +344,12 @@ class NormalizerScheduler(Scheduler):
         try:
             task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
         except Exception as exc_db:
-            self.logger.warning(
-                "Could not get latest task by hash: %s [organisation_id=%s, scheduler_id=%s]",
+            self.logger.error(
+                "Could not get latest task by hash: %s",
                 task.hash,
-                self.organisation.id,
-                self.scheduler_id,
+                task_id=task.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
                 exc_info=exc_db,
             )
             raise exc_db

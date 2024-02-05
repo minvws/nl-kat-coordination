@@ -1,0 +1,97 @@
+%chapter {
+  gap: var(--spacing-grid-500);
+  padding: 0;
+
+  > div {
+    width: 100%;
+  }
+
+  &.introduction {
+    > div {
+      width: 100%;
+
+      .toolbar {
+        width: 100%;
+        max-width: 100%;
+        justify-content: space-between;
+        display: flex;
+        align-items: center;
+
+        button {
+          align-self: center;
+        }
+      }
+
+      > div {
+        gap: var(--spacing-grid-300);
+
+        > div {
+          gap: var(--spacing-grid-200);
+        }
+      }
+    }
+  }
+}
+
+.report {
+  --max-line-length-breakpoint-hyphens: initial;
+
+  article {
+    gap: var(--spacing-grid-500);
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-bottom: -0.75rem; /* Reducing margin below the header due to additional space within the font */
+    }
+
+    > section {
+      @extend %chapter;
+    }
+
+    > div {
+      padding: 0;
+
+      > section {
+        @extend %chapter;
+      }
+
+      &.report-content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-grid-500);
+
+        > section {
+          > div {
+            display: flex;
+            width: 100%;
+            gap: var(--spacing-grid-200);
+            padding: 0;
+
+            > div {
+              width: 100%;
+              margin: 1rem 0;
+              gap: var(--spacing-grid-200);
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    table {
+      caption {
+        --table-base-caption-font-size: var(--heading-normal-font-size);
+        --table-base-caption-text-color: var(--text-color-dark);
+
+        font-family: var(--headings-base-set-font-family);
+        font-weight: 600;
+      }
+    }
+  }
+}

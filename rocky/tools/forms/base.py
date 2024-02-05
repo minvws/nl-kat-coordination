@@ -70,7 +70,7 @@ class ObservedAtForm(BaseRockyForm):
 
     def clean_observed_at(self):
         observed_at = self.cleaned_data["observed_at"]
-        now = datetime.datetime.now(tz=datetime.timezone.utc).date()
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
         if observed_at > now:
             raise forms.ValidationError(_("Your selected date is in the future. Please select a different date."))
         return observed_at
@@ -120,6 +120,7 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
     def create_option(self, *arg, **kwargs) -> Dict[str, Any]:
         option = super().create_option(*arg, **kwargs)
         option["wrap_label"] = self.wrap_label
+        option["attrs"]["checked"] = self.is_required_option(option["value"])
         option["attrs"]["required"] = self.is_required_option(option["value"])
         return option
 

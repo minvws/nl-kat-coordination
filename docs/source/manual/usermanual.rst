@@ -245,6 +245,25 @@ After the CSV file has been uploaded the users receive a welcome email on their 
  Sincerely,
  The OpenKAT team
 
+
+Token authentication
+--------------------
+
+Authentication tokens can be created in the admin interface (/admin). The token is created for an user account and will have the same permissions as the user. After creating a token it will display the newly created token once. You need to copy the token immediately, because the token are stored hashed in the database and won't be visible anymore.
+
+The token can be used by adding the Authorization header with the token to the request:
+
+::
+
+    Authorization: Token f2505ed4d2a51624fe1691c977789ce00dc9886d48271c6c91a25e7dd258c932
+
+For example this will use the token to get the list of organizations:
+
+.. code-block:: sh
+
+    curl -H 'Authorization: Token f2505ed4d2a51624fe1691c977789ce00dc9886d48271c6c91a25e7dd258c932' http://127.0.0.1:8000/api/v1/organization/
+
+
 Working with objects
 ====================
 

@@ -15,7 +15,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     # Generic bits
     steps:
@@ -24,9 +24,9 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.10'
           cache: 'pip'
 
       - name: Prep Install requirements
@@ -48,12 +48,12 @@ jobs:
 
       - name: Octopoes Build whl package
         run: |
-          python3.8 -m pip install build
-          python3.8 -m build
+          python3.10 -m pip install build
+          python3.10 -m build
         working-directory: ./octopoes
 
       - name: Octopoes Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Octopoes Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
@@ -84,7 +84,7 @@ jobs:
         working-directory: ./rocky
 
       - name: Rocky Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Rocky Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
@@ -113,7 +113,7 @@ jobs:
         working-directory: ./rocky
 
       - name: Rocky Compilemessages
-        run: /var/www/html/.venv/bin/python3.8 manage.py collectstatic && /var/www/html/.venv/bin/python3.8 manage.py compress && /var/www/html/.venv/bin/python3.8 manage.py compilemessages
+        run: /var/www/html/.venv/bin/python3.10 manage.py collectstatic && /var/www/html/.venv/bin/python3.10 manage.py compress && /var/www/html/.venv/bin/python3.10 manage.py compilemessages
         working-directory: ./rocky
         env:
           BYTES_API: http://bytes:8000
@@ -138,7 +138,7 @@ jobs:
         working-directory: ./bytes
 
       - name: Bytes Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Bytes Install requirements
         run: cd /var/www/html; source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
@@ -159,14 +159,14 @@ jobs:
         working-directory: ./mula
 
       - name: Mula Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Create scheduler release archive
         run: tar -cvzf ${{ env.PKGDIR }}/scheduler_${{ env.RELEASE_VERSION }}.tar.gz --exclude=./.git* --exclude=Makefile --exclude=Dockerfile --exclude=base.yml --exclude=requirements* --exclude=tests .
         working-directory: ./mula
 
       - name: Create virtual env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Install requirements
         run: source .venv/bin/activate; pip install --upgrade pip; pip install --requirement requirements.txt
@@ -184,7 +184,7 @@ jobs:
         working-directory: ./boefjes
 
       - name: Boefjes Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Install requirements
         run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
@@ -206,7 +206,7 @@ jobs:
         working-directory: ./keiko
 
       - name: Keiko Create env
-        run: python3.8 -m venv /var/www/html/.venv
+        run: python3.10 -m venv /var/www/html/.venv
 
       - name: Keiko Install requirements
         run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r
@@ -221,79 +221,79 @@ jobs:
 
   # Common / Uploads
       - name: Octopoes Upload whl package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "octopoes-${{env.RELEASE_VERSION}}"
           path: "${{ github.workspace }}/octopoes/dist/octopoes*.whl"
 
       - name: Octopoes Upload venv tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: octopoes_venv_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/octopoes_venv_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Octopoes Upload octopoes tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: octopoes_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/octopoes_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Rocky Upload rocky tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rocky_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/rocky_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Rocky Upload venv tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rocky_venv_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/rocky_venv_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Bytes Upload bytes tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bytes_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/bytes_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Bytes Upload bytes venv tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bytes_venv_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/bytes_venv_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Upload scheduler release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: scheduler_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/scheduler_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Upload venv archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: scheduler_venv_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/scheduler_venv_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Upload boefjes tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: boefjes_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/boefjes_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Upload venv tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: boefjes_venv_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/boefjes_venv_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Keiko Upload tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: katkeiko_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/katkeiko_${{ env.RELEASE_VERSION }}.tar.gz
 
       - name: Keiko Upload venv tar
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: katkeiko_venv_${{ env.RELEASE_VERSION }}
           path: ${{ env.PKGDIR }}/katkeiko_venv_${{ env.RELEASE_VERSION }}.tar.gz

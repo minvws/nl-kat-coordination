@@ -16,7 +16,7 @@ class WebsiteAnalysisTest(TestCase):
 
     @mock.patch("boefjes.plugins.kat_webpage_analysis.main.do_request")
     def test_website_analysis(self, do_request_mock: MagicMock):
-        meta = BoefjeMeta.parse_raw(get_dummy_data("webpage-analysis.json"))
+        meta = BoefjeMeta.model_validate_json(get_dummy_data("webpage-analysis.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalBoefjeJobRunner(local_repository)
@@ -35,7 +35,7 @@ class WebsiteAnalysisTest(TestCase):
 
     @mock.patch("boefjes.plugins.kat_webpage_analysis.main.do_request")
     def test_website_analysis_for_image(self, do_request_mock: MagicMock):
-        meta = BoefjeMeta.parse_raw(get_dummy_data("webpage-analysis.json"))
+        meta = BoefjeMeta.model_validate_json(get_dummy_data("webpage-analysis.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalBoefjeJobRunner(local_repository)
@@ -50,7 +50,7 @@ class WebsiteAnalysisTest(TestCase):
         self.assertIn("image/jpeg", output[2][0])
 
     def test_body_image_normalizer(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("bodyimage-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("bodyimage-normalize.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)
@@ -79,7 +79,7 @@ class WebsiteAnalysisTest(TestCase):
         )
 
     def test_body_normalizer(self):
-        meta = NormalizerMeta.parse_raw(get_dummy_data("body-normalize.json"))
+        meta = NormalizerMeta.model_validate_json(get_dummy_data("body-normalize.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
 
         runner = LocalNormalizerJobRunner(local_repository)

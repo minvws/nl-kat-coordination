@@ -40,7 +40,6 @@ class OOIListView(BaseOOIListView, OctopoesView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["active_filters"] = self.get_active_filters()
         context["ooi_type_form"] = OOITypeMultiCheckboxForm(self.request.GET)
         context["mandatory_fields"] = get_mandatory_fields(self.request, params=["observed_at"])
         context["select_oois_form"] = SelectOOIForm(

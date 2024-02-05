@@ -64,6 +64,11 @@ class Settings(BaseSettings):
         description="Enables/disables the collection of metrics to be used with tools like Prometheus",
     )
 
+    json_logging: bool = Field(
+        False,
+        description="Enables/disables structured logging in json format",
+    )
+
     # Server settings
     api_host: str = Field(
         "0.0.0.0",
@@ -76,11 +81,6 @@ class Settings(BaseSettings):
     )
 
     # Application settings
-    katalogus_cache_ttl: int = Field(
-        30,
-        description="The lifetime of the katalogus cache in seconds",
-    )
-
     monitor_organisations_interval: int = Field(
         60,
         description="Interval in seconds of the execution of the "
@@ -90,9 +90,40 @@ class Settings(BaseSettings):
         "their schedulers.",
     )
 
+    # External services settings
     octopoes_request_timeout: int = Field(
         10,
         description="The timeout in seconds for the requests to the octopoes api",
+    )
+
+    octopoes_pool_connections: int = Field(
+        10,
+        description="The maximum number of connections to save in the pool for the octopoes api",
+    )
+
+    katalogus_cache_ttl: int = Field(
+        30,
+        description="The lifetime of the katalogus cache in seconds",
+    )
+
+    katalogus_request_timeout: int = Field(
+        10,
+        description="The timeout in seconds for the requests to the katalogus api",
+    )
+
+    katalogus_pool_connections: int = Field(
+        10,
+        description="The maximum number of connections to save in the pool for the katalogus api",
+    )
+
+    bytes_request_timeout: int = Field(
+        10,
+        description="The timeout in seconds for the requests to the bytes api",
+    )
+
+    bytes_pool_connections: int = Field(
+        10,
+        description="The maximum number of connections to save in the pool for the bytes api",
     )
 
     rabbitmq_prefetch_count: int = Field(

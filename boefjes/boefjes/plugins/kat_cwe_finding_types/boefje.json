@@ -5,9 +5,6 @@
     "consumes": [
         "CWEFindingType"
     ],
-    "produces": [
-        "CWEFindingType"
-    ],
     "scan_level": 0,
     "enabled": true
 }

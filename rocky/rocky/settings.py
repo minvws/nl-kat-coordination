@@ -152,6 +152,7 @@ INSTALLED_APPS = [
     "tagulous",
     "compressor",
     "reports",
+    "knox",
     # "drf_standardized_errors",
 ]
 
@@ -277,6 +278,7 @@ LOCALE_PATHS = (BASE_DIR / "rocky/locale",)
 # Add custom languages not provided by Django
 EXTRA_LANG_INFO = {
     "pap": {"bidi": False, "code": "pap", "name": "Papiamentu", "name_local": "Papiamentu"},
+    "en@pirate": {"bidi": False, "code": "en@pirate", "name": "English (Pirate)", "name_local": "English (Pirate)"},
 }
 LANG_INFO = locale.LANG_INFO.copy()
 LANG_INFO.update(EXTRA_LANG_INFO)
@@ -288,6 +290,12 @@ LANGUAGES = [
     ("pap", "pap"),
     ("it", "it"),
 ]
+
+if env.bool("PIRATE", False):
+    LANGUAGE_CODE = "en@pirate"
+    LANGUAGES += [
+        ("en@pirate", "en@pirate"),
+    ]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -320,8 +328,7 @@ def immutable_file_test(path, url):
 
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
-# TODO: set this to True when we aren't using uWSGI anymore
-WHITENOISE_KEEP_ONLY_HASHED_FILES = False
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
@@ -391,7 +398,7 @@ CSP_IMG_SRC = ["'self'"]
 CSP_FONT_SRC = ["'self'"]
 CSP_STYLE_SRC = ["'self'"]
 CSP_FRAME_ANCESTORS = ["'none'"]
-CSP_BASE = ["'none'"]
+CSP_BASE_URI = ["'none'"]
 CSP_FORM_ACTION = ["'self'"]
 CSP_INCLUDE_NONCE_IN = ["script-src"]
 CSP_CONNECT_SRC = ["'self'"]
@@ -451,3 +458,7 @@ TAG_BORDER_TYPES = [
     ("dashed", _("Dashed")),
     ("dotted", _("Dotted")),
 ]
+
+WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
+
+KNOX_TOKEN_MODEL = "account.AuthToken"

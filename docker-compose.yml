@@ -3,7 +3,7 @@ version: "3.9"
 services:
   rabbitmq:
     restart: unless-stopped
-    image: "rabbitmq:3.11-management"
+    image: "rabbitmq:3.12-management"
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -81,6 +81,10 @@ services:
       - .env
     volumes:
       - ./octopoes:/app/octopoes
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
 
   boefje:
     restart: unless-stopped
@@ -134,14 +138,14 @@ services:
     depends_on:
       - postgres
     ports:
-      - "127.0.0.1:8000:80"
+      - "127.0.0.1:8000:8000"
     build:
       context: .
       dockerfile: rocky/Dockerfile
       target: dev
       args:
         ENVIRONMENT: dev
-    command: python3 manage.py runserver 0.0.0.0:80
+    command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
       - ./rocky:/app/rocky
       - ./octopoes/octopoes:/app/rocky/octopoes
@@ -244,6 +248,15 @@ services:
       - jaeger-data:/badger
     ports:
       - "127.0.0.1:16686:16686"
+
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fc42:ca7::/64
+        - subnet: 172.30.0.0/16
+          gateway: 172.30.0.1
 
 volumes:
   postgres-data:

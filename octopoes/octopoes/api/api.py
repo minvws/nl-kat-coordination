@@ -8,7 +8,6 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
-from fastapi_utils.timing import add_timing_middleware
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
@@ -40,7 +39,6 @@ except FileNotFoundError:
 
 
 app = FastAPI()
-add_timing_middleware(app, record=logger.debug, prefix="app")
 
 # Set up OpenTelemetry instrumentation
 if settings.span_export_grpc_endpoint is not None:
@@ -51,7 +49,7 @@ if settings.span_export_grpc_endpoint is not None:
 
     resource = Resource(attributes={SERVICE_NAME: "octopoes"})
     provider = TracerProvider(resource=resource)
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=settings.span_export_grpc_endpoint))
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint)))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
@@ -113,13 +111,13 @@ def root_health() -> ServiceHealth:
 
 @app.on_event("shutdown")
 def close_rabbit_mq_connection():
-    close_rabbit_channel(settings.queue_uri)
+    close_rabbit_channel(str(settings.queue_uri))
 
 
 @app.on_event("startup")
 def create_rabbit_mq_connection():
     try:
-        get_rabbit_channel(settings.queue_uri)
+        get_rabbit_channel(str(settings.queue_uri))
     except (AMQPConnectionWorkflowFailed, socket.gaierror):
         logger.exception("Unable to connect RabbitMQ on startup")
 

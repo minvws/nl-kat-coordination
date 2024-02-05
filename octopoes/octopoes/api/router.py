@@ -5,6 +5,7 @@ from logging import getLogger
 from typing import Generator, List, Optional, Set, Type
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from pydantic import AwareDatetime
 from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
@@ -26,18 +27,18 @@ from octopoes.models import (
     ScanProfileBase,
     ScanProfileType,
 )
-from octopoes.models.datetime import TimezoneAwareDatetime
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path as ObjectPath
+from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
 from octopoes.xtdb.client import XTDBSession
-from octopoes.xtdb.exceptions import NoMultinode, XTDBException
+from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Query as XTDBQuery
 
 logger = getLogger(__name__)
@@ -49,13 +50,13 @@ def extract_client(client: str = Path(...)) -> str:
     return client
 
 
-def extract_valid_time(valid_time: Optional[TimezoneAwareDatetime] = Query(None)) -> datetime:
+def extract_valid_time(valid_time: Optional[AwareDatetime] = Query(None)) -> datetime:
     if valid_time is None:
         return datetime.now(timezone.utc)
     return valid_time
 
 
-def extract_required_valid_time(valid_time: TimezoneAwareDatetime) -> datetime:
+def extract_required_valid_time(valid_time: AwareDatetime) -> datetime:
     return valid_time
 
 
@@ -81,7 +82,7 @@ def settings() -> Settings:
 def xtdb_session(
     client: str = Depends(extract_client), settings_: Settings = Depends(settings)
 ) -> Generator[XTDBSession, None, None]:
-    yield XTDBSession(get_xtdb_client(settings_.xtdb_uri, client, settings_.xtdb_type))
+    yield XTDBSession(get_xtdb_client(str(settings_.xtdb_uri), client))
 
 
 def octopoes_service(
@@ -168,6 +169,28 @@ def get_object(
     reference: Reference = Depends(extract_reference),
 ):
     return octopoes.get_ooi(reference, valid_time)
+
+
+@router.get("/object-history", tags=["Objects"])
+def get_object_history(
+    reference: Reference = Depends(extract_reference),
+    sort_order: str = "asc",  # Or: "desc"
+    with_docs: bool = False,
+    has_doc: Optional[bool] = None,
+    offset: int = 0,
+    limit: Optional[int] = None,
+    indices: Optional[List[int]] = None,
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> List[TransactionRecord]:
+    return octopoes.get_ooi_history(
+        reference,
+        sort_order=sort_order,
+        with_docs=with_docs,
+        has_doc=has_doc,
+        offset=offset,
+        limit=limit,
+        indices=indices,
+    )
 
 
 @router.get("/objects/random", tags=["Objects"])
@@ -376,10 +399,6 @@ def create_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
     try:
         xtdb_session_.client.create_node()
         xtdb_session_.commit()
-    except NoMultinode:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
-        )
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Creating node failed") from e
 
@@ -389,10 +408,6 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
     try:
         xtdb_session_.client.delete_node()
         xtdb_session_.commit()
-    except NoMultinode:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
-        )
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deleting node failed") from e
 

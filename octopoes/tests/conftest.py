@@ -1,5 +1,6 @@
+import uuid
 from datetime import datetime, timezone
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, ip_address
 from typing import Dict, Iterator, List, Optional, Set
 from unittest.mock import Mock
 
@@ -7,14 +8,18 @@ import pytest
 from bits.runner import BitRunner
 from requests.adapters import HTTPAdapter, Retry
 
-from octopoes.api.api import app
-from octopoes.api.router import settings
-from octopoes.config.settings import Settings, XTDBType
+from octopoes.config.settings import Settings
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.app import get_xtdb_client
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, DeclaredScanProfile, EmptyScanProfile, Reference, ScanProfileBase
+from octopoes.models.ooi.certificate import X509Certificate
+from octopoes.models.ooi.findings import Finding, KATFindingType
+from octopoes.models.ooi.network import IPAddressV6
+from octopoes.models.ooi.software import Software, SoftwareInstance
+from octopoes.models.ooi.web import URL, HTTPHeader, SecurityTXT
+from octopoes.models.origin import Origin, OriginType
 from octopoes.models.path import Direction, Path
 from octopoes.models.types import (
     DNSZone,
@@ -193,16 +198,6 @@ def declared_scan_profile():
 
 
 @pytest.fixture
-def xtdbtype_crux():
-    def get_settings_override():
-        return Settings(xtdb_type=XTDBType.CRUX)
-
-    app.dependency_overrides[settings] = get_settings_override
-    yield
-    app.dependency_overrides = {}
-
-
-@pytest.fixture
 def app_settings():
     return Settings()
 
@@ -218,8 +213,9 @@ def bit_runner(mocker) -> BitRunner:
 
 
 @pytest.fixture
-def xtdb_http_client(app_settings: Settings) -> XTDBHTTPClient:
-    client = get_xtdb_client(app_settings.xtdb_uri, "test", app_settings.xtdb_type)
+def xtdb_http_client(request, app_settings: Settings) -> XTDBHTTPClient:
+    test_node = f"test-{request.node.originalname}"
+    client = get_xtdb_client(str(app_settings.xtdb_uri), test_node)
     client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return client
@@ -236,7 +232,7 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
 
 @pytest.fixture
 def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
-    connector = OctopoesAPIConnector("http://ci_octopoes:80", "test")
+    connector = OctopoesAPIConnector("http://ci_octopoes:80", xtdb_session.client._client)
     connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return connector
@@ -244,7 +240,12 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
 
 @pytest.fixture
 def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session)
+
+
+@pytest.fixture
+def xtdb_origin_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session)
 
 
 @pytest.fixture
@@ -254,4 +255,135 @@ def mock_xtdb_session():
 
 @pytest.fixture
 def origin_repository(mock_xtdb_session):
-    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)
+    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session)
+
+
+def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: XTDBOriginRepository, valid_time):
+    network = Network(name="test")
+
+    hostnames = [
+        Hostname(network=network.reference, name="example.com"),
+        Hostname(network=network.reference, name="a.example.com"),
+        Hostname(network=network.reference, name="b.example.com"),
+        Hostname(network=network.reference, name="c.example.com"),
+        Hostname(network=network.reference, name="d.example.com"),
+        Hostname(network=network.reference, name="e.example.com"),
+        Hostname(network=network.reference, name="f.example.com"),
+    ]
+
+    addresses = [
+        IPAddressV4(network=network.reference, address=ip_address("192.0.2.3")),
+        IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230")),
+    ]
+    ports = [
+        IPPort(address=addresses[0].reference, protocol="tcp", port=25),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=443),
+        IPPort(address=addresses[0].reference, protocol="tcp", port=22),
+        IPPort(address=addresses[1].reference, protocol="tcp", port=80),
+    ]
+    services = [Service(name="smtp"), Service(name="https"), Service(name="http"), Service(name="ssh")]
+    ip_services = [
+        IPService(ip_port=ports[0].reference, service=services[0].reference),
+        IPService(ip_port=ports[1].reference, service=services[1].reference),
+        IPService(ip_port=ports[2].reference, service=services[3].reference),
+        IPService(ip_port=ports[3].reference, service=services[2].reference),
+    ]
+
+    resolved_hostnames = [
+        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[0].reference),  # ipv4
+        ResolvedHostname(hostname=hostnames[0].reference, address=addresses[1].reference),  # ipv6
+        ResolvedHostname(hostname=hostnames[1].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[2].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[5].reference, address=addresses[0].reference),
+        ResolvedHostname(hostname=hostnames[3].reference, address=addresses[1].reference),
+        ResolvedHostname(hostname=hostnames[4].reference, address=addresses[1].reference),
+        ResolvedHostname(hostname=hostnames[6].reference, address=addresses[1].reference),
+    ]
+    certificates = [
+        X509Certificate(
+            subject="example.com",
+            valid_from="2022-11-15T08:52:57",
+            valid_until="2030-11-15T08:52:57",
+            serial_number="abc123",
+        )
+    ]
+    websites = [
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[0].reference, certificates=certificates[0]),
+        Website(ip_service=ip_services[0].reference, hostname=hostnames[1].reference),
+    ]
+    software = [Software(name="DICOM")]
+    instance = [SoftwareInstance(ooi=ports[0].reference, software=software[0].reference)]
+
+    web_urls = [
+        HostnameHTTPURL(netloc=hostnames[0].reference, path="/", scheme="http", network=network.reference, port=80),
+        HostnameHTTPURL(netloc=hostnames[0].reference, path="/", scheme="https", network=network.reference, port=443),
+    ]
+    urls = [URL(network=network.reference, raw="https://test.com/security", web_url=web_urls[1].reference)]
+    resources = [
+        HTTPResource(website=websites[0].reference, web_url=web_urls[0].reference),
+        HTTPResource(website=websites[0].reference, web_url=web_urls[1].reference),
+    ]
+    headers = [HTTPHeader(resource=resources[1].reference, key="test key", value="test value")]
+    security_txts = [SecurityTXT(website=websites[1].reference, url=urls[0].reference, security_txt="test text")]
+    finding_types = [
+        KATFindingType(id="KAT-NO-CSP"),
+        KATFindingType(id="KAT-CSP-VULNERABILITIES"),
+        KATFindingType(id="KAT-NO-HTTPS-REDIRECT"),
+        KATFindingType(id="KAT-NO-CERTIFICATE"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRED"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
+    ]
+    findings = [
+        Finding(finding_type=finding_types[0].reference, ooi=resources[0].reference),
+        Finding(finding_type=finding_types[2].reference, ooi=web_urls[0].reference),
+        Finding(finding_type=finding_types[3].reference, ooi=websites[1].reference),
+        Finding(finding_type=finding_types[4].reference, ooi=certificates[0].reference),
+    ]
+
+    oois = (
+        hostnames
+        + addresses
+        + ports
+        + services
+        + ip_services
+        + resolved_hostnames
+        + websites
+        + software
+        + instance
+        + web_urls
+        + resources
+        + headers
+        + finding_types
+        + findings
+        + urls
+        + security_txts
+        + certificates
+    )
+
+    network_origin = Origin(
+        origin_type=OriginType.DECLARATION,
+        method="manual",
+        source=network.reference,
+        result=[network.reference],
+        task_id=uuid.uuid4(),
+    )
+    xtdb_ooi_repository.save(network, valid_time=valid_time)
+    xtdb_origin_repository.save(network_origin, valid_time=valid_time)
+
+    origin = Origin(
+        origin_type=OriginType.OBSERVATION,
+        method="",
+        source=network.reference,
+        result=[ooi.reference for ooi in oois],
+        task_id=uuid.uuid4(),
+    )
+
+    for ooi in oois:
+        xtdb_ooi_repository.save(ooi, valid_time=valid_time)
+
+    xtdb_origin_repository.save(origin, valid_time=valid_time)
+
+    xtdb_origin_repository.commit()
+    xtdb_ooi_repository.commit()

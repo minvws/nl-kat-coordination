@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from enum import Enum
 from logging import getLogger
@@ -14,13 +13,12 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
-from tools.view_helpers import schedule_task
+from tools.view_helpers import reschedule_task
 
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky import scheduler
-from rocky.scheduler import client
 
 logger = getLogger(__name__)
 
@@ -84,20 +82,12 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
-            task = client.get_task_details(task_id)
-
-            # TODO: Consistent UUID-parsing across services https://github.com/minvws/nl-kat-coordination/issues/1451
-            new_id = uuid.uuid4()
-
-            task.p_item.id = new_id
-            task.p_item.data.id = new_id
-
-            schedule_task(self.request, self.organization.code, task.p_item)
+            reschedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["task_history"] = self.get_task_history()
         context["task_history_form_fields"] = [
             "task_history_from",
@@ -153,7 +143,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
             context["select_oois_form"] = SelectOOIForm(
                 oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
             )
-        context["plugin"] = self.plugin.dict()
+        context["plugin"] = self.plugin.model_dump()
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),

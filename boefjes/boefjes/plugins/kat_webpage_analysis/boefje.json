@@ -6,9 +6,6 @@
         "HTTPResource"
     ],
     "produces": [
-        "HTTPHeader"
-    ],
-    "mime_types": [
         "openkat-http/full",
         "openkat-http/headers",
 

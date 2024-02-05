@@ -84,7 +84,7 @@ class RelatedFieldNode:
     def generate_field(self, field_set: FieldSet, pk_prefix: str):
         queried_fields = pk_prefix if field_set is FieldSet.ONLY_ID else "*"
         """
-        Output dicts in Crux Query Language
+        Output dicts in XTDB Query Language
         """
         if not self.relations_out and not self.relations_in:
             return f"[{queried_fields}]"
@@ -94,24 +94,14 @@ class RelatedFieldNode:
         for key, node in self.relations_out.items():
             cls, attr_name = key
             deeper_fields = node.generate_field(field_set, pk_prefix)
-            field_query = "{{(:{}/{} {{:as {}}}) {}}}".format(
-                cls,
-                attr_name,
-                attr_name,
-                deeper_fields,
-            )
+            field_query = f"{{(:{cls}/{attr_name} {{:as {attr_name}}}) {deeper_fields}}}"
             fields.append(field_query)
 
         # Loop incoming QueryNodes
         for key, node in self.relations_in.items():
             foreign_cls, attr_name, reverse_name = key
             deeper_fields = node.generate_field(field_set, pk_prefix)
-            field_query = "{{(:{}/_{} {{:as {}}}) {}}}".format(
-                foreign_cls,
-                attr_name,
-                reverse_name,
-                deeper_fields,
-            )
+            field_query = f"{{(:{foreign_cls}/_{attr_name} {{:as {reverse_name}}}) {deeper_fields}}}"
             fields.append(field_query)
 
         # Join fields

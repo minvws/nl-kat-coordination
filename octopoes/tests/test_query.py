@@ -1,11 +1,13 @@
+import uuid
 from uuid import UUID
 
 import pytest
 
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSNSRecord
-from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.network import IPAddress, IPPort, Network
+from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
 from octopoes.models.path import Path
 from octopoes.xtdb.query import A, InvalidField, Query
@@ -163,7 +165,7 @@ def test_create_query_from_path():
 
 
 def test_finding_type_count_query():
-    query = Query(FindingType).where(Finding, finding_type=FindingType).group_by(FindingType).count(Finding)
+    query = Query(FindingType).where(Finding, finding_type=FindingType).pull(FindingType).count(Finding)
     object_type_options = [
         '[ FindingType :object_type "ADRFindingType" ]',
         '[ FindingType :object_type "CAPECFindingType" ]',
@@ -260,3 +262,51 @@ def test_aliased_query_starting_with_hostname(mocker):
     [ IPPort :IPPort/address IPAddressV4 ]
     [ IPPort :object_type "IPPort" ]]}}"""
     assert query.format() == expected_query
+
+
+def test_build_system_query_with_path_segments(mocker):
+    uuid_batch = [uuid.uuid4() for _ in range(3)]
+    uuid_mock = mocker.patch("octopoes.xtdb.query.uuid4")
+    uuid_mock.side_effect = uuid_batch
+
+    resolved_hostname_alias = A(ResolvedHostname)
+    hostname_alias = A(Hostname)
+
+    query = (
+        Query(hostname_alias)
+        .where(Hostname, primary_key="Hostname|test|example.com")
+        .where(ResolvedHostname, hostname=Hostname)
+        .where(ResolvedHostname, address=IPAddress)
+        .where(resolved_hostname_alias, hostname=hostname_alias)
+        .where(resolved_hostname_alias, address=IPAddress)
+    )
+
+    uuid_mock.side_effect = uuid_batch
+    path_query = Query.from_path(
+        Path.parse("Hostname.<hostname[is ResolvedHostname].address.<address[is ResolvedHostname].hostname")
+    ).where(Hostname, primary_key="Hostname|test|example.com")
+
+    assert str(query) == str(path_query)
+    assert query == path_query
+
+    uuid_mock.side_effect = uuid_batch
+
+    query = (
+        Query(Service)
+        .where(Hostname, primary_key="Hostname|test|example.com")
+        .where(ResolvedHostname, hostname=Hostname)
+        .where(ResolvedHostname, address=IPAddress)
+        .where(IPPort, address=IPAddress)
+        .where(IPService, ip_port=IPPort)
+        .where(IPService, service=Service)
+    )
+
+    uuid_mock.side_effect = uuid_batch
+    path_query = Query.from_path(
+        Path.parse(
+            "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ip_port [is IPService].service"
+        )
+    ).where(Hostname, primary_key="Hostname|test|example.com")
+
+    assert str(query) == str(path_query)
+    assert query == path_query

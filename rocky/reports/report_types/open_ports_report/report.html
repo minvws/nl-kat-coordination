@@ -1,0 +1,52 @@
+{% load i18n %}
+
+<section id="open-ports">
+    <div class="horizontal-scroll">
+        {% if show_heading %}
+            <h2>{% translate "Open ports" %}</h2>
+        {% endif %}
+        <p>
+            {% blocktranslate trimmed %}
+                See an overview of open ports found. <strong>Bold</strong> open ports are found through
+                direct scans that the organization performs via OpenKAT.
+                Other open ports were found outside by OpenKAT itself. Scans with the same hostnames,
+                ports and IPs are merged.
+            {% endblocktranslate %}
+        </p>
+        <table>
+            <caption class="visually-hidden">{% translate "Overview of open ports found for the scanned assets." %}</caption>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "IP address" %}</th>
+                    <th scope="col">{% translate "Open ports" %}</th>
+                    <th scope="col">{% translate "Hostnames" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ip, detailed_data in data.items %}
+                    <tr>
+                        <td>{{ ip.tokenized.address }}</td>
+                        {# djLint formatting adds spaces before the comma. #}
+                        {# djlint:off #}
+                        <td>
+                            {% for port, found_by_openkat in detailed_data.ports.items %}
+                                {% if found_by_openkat %}
+                                    <strong><span class="visually-hidden">({% translate "Direct scan" %})</span>{{ port }}</strong>{% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
+                                {% else %}
+                                    {{ port }}{% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                        </td>
+                        <td>
+                            {% for hostnames in detailed_data.hostnames %}
+                                {{ hostnames }}{% if detailed_data.hostnames|length > 1 and not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </td>
+                        {# djlint:on #}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>

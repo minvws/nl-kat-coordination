@@ -29,11 +29,13 @@
                 {% endif %}
             </div>
         </section>
+        {% include "tasks/partials/stats.html" %}
+
     </main>
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
     {% compress js %}
-        <script src="{% static "js/renderNormalizerOutputOOIs.js" %}" nonce="{{ request.csp_nonce }}"></script>
+        <script type="module" src="{% static "js/renderNormalizerOutputOOIs.js" %}" nonce="{{ request.csp_nonce }}"></script>
     {% endcompress %}
 {% endblock html_at_end_body %}
