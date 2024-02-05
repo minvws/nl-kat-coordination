@@ -8,9 +8,7 @@ import pytest
 from bits.runner import BitRunner
 from requests.adapters import HTTPAdapter, Retry
 
-from octopoes.api.api import app
-from octopoes.api.router import settings
-from octopoes.config.settings import Settings, XTDBType
+from octopoes.config.settings import Settings
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.app import get_xtdb_client
 from octopoes.core.service import OctopoesService
@@ -200,17 +198,6 @@ def declared_scan_profile():
 
 
 @pytest.fixture
-def xtdbtype_crux():
-    def get_settings_override():
-        return Settings(xtdb_type=XTDBType.CRUX)
-
-    overrides = app.dependency_overrides.copy()
-    app.dependency_overrides[settings] = get_settings_override
-    yield
-    app.dependency_overrides = overrides
-
-
-@pytest.fixture
 def app_settings():
     return Settings()
 
@@ -228,7 +215,7 @@ def bit_runner(mocker) -> BitRunner:
 @pytest.fixture
 def xtdb_http_client(request, app_settings: Settings) -> XTDBHTTPClient:
     test_node = f"test-{request.node.originalname}"
-    client = get_xtdb_client(str(app_settings.xtdb_uri), test_node, app_settings.xtdb_type)
+    client = get_xtdb_client(str(app_settings.xtdb_uri), test_node)
     client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return client
@@ -253,12 +240,12 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
 
 @pytest.fixture
 def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session)
 
 
 @pytest.fixture
 def xtdb_origin_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session)
 
 
 @pytest.fixture
@@ -268,7 +255,7 @@ def mock_xtdb_session():
 
 @pytest.fixture
 def origin_repository(mock_xtdb_session):
-    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)
+    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session)
 
 
 def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: XTDBOriginRepository, valid_time):
