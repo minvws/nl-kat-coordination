@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
@@ -461,9 +462,9 @@ def aggregate_reports(
                         report = report_type(connector)
                         data = report.generate_data(ooi.primary_key, valid_time=valid_time)
                         report_data[ooi.primary_key][report_type.id] = data
-        except Exception:
+        except ObjectNotFoundException:
+            logger.error("Object not found: %s", ooi.primary_key)
             error_oois.append(ooi.primary_key)
-
     post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
 
     return aggregate_report, post_processed_data, report_data, error_oois
