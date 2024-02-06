@@ -53,7 +53,7 @@ class Settings(BaseSettings):
     )
 
     scan_profile_whitelist: Dict[str, conint(strict=True, ge=0, le=4)] = Field(
-        {},
+        default_factory=dict,
         description="Whitelist for normalizer ids allowed to produce scan profiles, including a maximum level.",
         examples=['{"kat_external_db_normalize": 3, "kat_dns_normalize": 1}'],
     )

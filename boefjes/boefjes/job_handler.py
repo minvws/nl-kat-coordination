@@ -3,7 +3,7 @@ import os
 import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -190,7 +190,7 @@ class NormalizerHandler(Handler):
         job_runner: NormalizerJobRunner,
         bytes_client: BytesAPIClient,
         octopoes_factory=get_octopoes_api_connector,
-        whitelist: Dict[str, int] = None,
+        whitelist: Optional[Dict[str, int]] = None,
     ):
         self.job_runner = job_runner
         self.bytes_client: BytesAPIClient = bytes_client
@@ -230,9 +230,14 @@ class NormalizerHandler(Handler):
                     )
                 )
 
+            corrected_scan_profiles = []
+            for profile in results.scan_profiles:
+                profile.level = min(profile.level, self.whitelist.get(normalizer_meta.normalizer.id, profile.level))
+                corrected_scan_profiles.append(profile)
+
             validated_scan_profiles = [
                 profile
-                for profile in results.scan_profiles
+                for profile in corrected_scan_profiles
                 if self.whitelist and profile.level <= self.whitelist.get(normalizer_meta.normalizer.id, -1)
             ]
             if validated_scan_profiles:
