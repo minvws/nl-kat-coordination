@@ -47,7 +47,12 @@ def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
     connector.delete_node()
 
 
-def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time, test_hostname: str = "example.com", test_ip: str = "192.0.2.3"):
+def seed_system(
+    octopoes_api_connector: OctopoesAPIConnector,
+    valid_time,
+    test_hostname: str = "example.com",
+    test_ip: str = "192.0.2.3",
+):
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
