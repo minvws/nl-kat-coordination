@@ -43,7 +43,7 @@ services:
       - ../init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
 
   ci_rabbitmq:
-    image: "rabbitmq:3.11-management"
+    image: "rabbitmq:3.12-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:

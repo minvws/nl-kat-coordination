@@ -36,7 +36,13 @@ CSV_CRITERIA = [
         "For IPAddressV4 and IPAddressV6 object types, a column of 'address' is required, optionally a second column "
         "'network' is supported "
     ),
+    _(
+        "Clearance levels can be controlled by a column 'clearance' taking numerical values 0, 1, 2, 3, and 4 for "
+        "the corresponding clearance level (other values are ignored) "
+    ),
 ]
+
+CLEARANCE_VALUES = ["0", "1", "2", "3", "4"]
 
 
 class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView):
@@ -95,6 +101,8 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         return ooi
 
     def get_ooi_from_csv(self, ooi_type_name: str, values: Dict[str, str]):
+        key = "clearance"
+        level = int(values[key]) if key in values and values[key] in CLEARANCE_VALUES else None
         ooi_type = self.ooi_types[ooi_type_name]["type"]
         ooi_fields = [
             (field, model_field.annotation == Reference, model_field.is_required())
@@ -122,7 +130,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
             else:
                 kwargs[field] = values.get(field)
 
-        return ooi_type(**kwargs)
+        return ooi_type(**kwargs), level
 
     def form_valid(self, form):
         if not self.process_csv(form):
@@ -155,10 +163,12 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
                 if not row:
                     continue  # skip empty lines
                 try:
-                    ooi = self.get_ooi_from_csv(object_type, row)
+                    ooi, level = self.get_ooi_from_csv(object_type, row)
                     self.octopoes_api_connector.save_declaration(
-                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=str(task_id))
+                        Declaration(ooi=ooi, valid_time=datetime.now(timezone.utc), task_id=task_id)
                     )
+                    if isinstance(level, int):
+                        self.raise_clearance_level(ooi.reference, level)
                 except ValidationError:
                     rows_with_error.append(row_number)
 
