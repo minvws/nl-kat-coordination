@@ -46,7 +46,7 @@ itest: testclean ## Run the integration tests.
 	docker compose  -f .ci/docker-compose.yml run --rm rocky_integration
 
 bench: testclean ## Run the report benchmark.
-	docker compose  -f .ci/docker-compose.yml run --rm rocky_integration pytest -m slow --no-cov tests/integration
+	docker compose  -f .ci/docker-compose.yml run --rm rocky_integration python -m cProfile -o .ci/bench.pstat -m pytest -m slow --no-cov tests/integration
 
 export_migrations:
 	python manage.py export_migrations contenttypes 0001
