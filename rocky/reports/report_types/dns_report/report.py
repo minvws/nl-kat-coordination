@@ -37,16 +37,9 @@ class DNSReport(Report):
         }
         for ooi_type, ooi in tree.items():
             if isinstance(ooi, Finding):
-                if "NO-SPF" in ooi.finding_type.tokenized.id:
-                    security["spf"] = False
-                if "NO-DKIM" in ooi.finding_type.tokenized.id:
-                    security["dkim"] = False
-                if "NO-DMARC" in ooi.finding_type.tokenized.id:
-                    security["dmarc"] = False
-                if "NO-DNSSEC" in ooi.finding_type.tokenized.id:
-                    security["dnssec"] = False
-                if "NO-CAA" in ooi.finding_type.tokenized.id:
-                    security["caa"] = False
+                for check in ["caa", "dkim", "dmarc", "dnssec", "spf"]:
+                    if "NO-%s" % check.upper() in ooi.finding_type.tokenized.id:
+                        security[check] = False
             elif isinstance(ooi, DNSRecord):
                 records.append(
                     {
