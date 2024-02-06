@@ -1,7 +1,6 @@
 import re
 from typing import Dict, Iterator, List, Optional, Set, Union
 
-from octopoes.config.settings import XTDBType
 from octopoes.xtdb.related_field_generator import (
     FieldSet,
     RelatedFieldNode,
@@ -20,14 +19,13 @@ def str_val(val):
 
 
 def generate_pull_query(
-    xtdb_type: XTDBType,
     field_set: Optional[FieldSet] = FieldSet.ALL_FIELDS,
     where: Optional[Dict[str, Union[str, int, List[Union[str, int]], Set[Union[str, int]]]]] = None,
     offset: Optional[int] = None,
     limit: Optional[int] = None,
     field_node: Optional[RelatedFieldNode] = None,
 ) -> str:
-    pk_prefix = ":crux.db/id" if xtdb_type == XTDBType.CRUX else ":xt/id"
+    pk_prefix = ":xt/id"
 
     in_params = []
     in_args = []
