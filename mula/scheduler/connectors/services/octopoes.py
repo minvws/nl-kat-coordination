@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import OOI, Organisation
@@ -81,6 +81,18 @@ class Octopoes(HTTPService):
         response = self.get(url, params={"reference": reference})
         return OOI(**response.json())
 
+    @exception_handler
+    def get_findings_by_ooi(self, organisation_id: str, reference: str) -> List[Dict]:
+        url = f"{self.host}/{organisation_id}/tree"
+        response = self.get(url, params={"reference": reference, "depth": 2})
+        return self.findings_from_tree_response(response.json())
+
+    @exception_handler
+    def get_objects_by_ooi(self, organisation_id: str, reference: str) -> List[Dict]:
+        url = f"{self.host}/{organisation_id}/tree"
+        response = self.get(url, params={"reference": reference, "depth": 2})
+        return self.objects_from_tree_response(response.json())
+
     def is_healthy(self) -> bool:
         healthy = True
         for org in self.orgs:
@@ -88,3 +100,22 @@ class Octopoes(HTTPService):
                 return False
 
         return healthy
+
+    @staticmethod
+    def findings_from_tree_response(tree_response: Dict) -> List[Dict]:
+        findings: List[Dict] = []
+        for _, obj in tree_response["store"].items():
+            if obj["object_type"] != "Finding":
+                continue
+
+            findings.append(obj)
+
+        return findings
+
+    @staticmethod
+    def objects_from_tree_response(tree_response: Dict) -> List[Dict]:
+        objects: List[Dict] = []
+        for _, obj in tree_response["store"].items():
+            objects.append(obj)
+
+        return objects

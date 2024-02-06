@@ -1,0 +1,202 @@
+ {
+    "root": {
+        "children": {
+            "findings": [
+                {
+                    "children": {
+                        "finding_type": [
+                            {
+                                "children": {},
+                                "reference": "KATFindingType|KAT-NO-DKIM"
+                            }
+                        ]
+                    },
+                    "reference": "Finding|Hostname|internet|mispo.es|KAT-NO-DKIM"
+                },
+                {
+                    "children": {
+                        "finding_type": [
+                            {
+                                "children": {},
+                                "reference": "KATFindingType|KAT-NO-DMARC"
+                            }
+                        ]
+                    },
+                    "reference": "Finding|Hostname|internet|mispo.es|KAT-NO-DMARC"
+                },
+                {
+                    "children": {
+                        "finding_type": [
+                            {
+                                "children": {},
+                                "reference": "KATFindingType|KAT-NO-SPF"
+                            }
+                        ]
+                    },
+                    "reference": "Finding|Hostname|internet|mispo.es|KAT-NO-SPF"
+                }
+            ],
+            "network": [
+                {
+                    "children": {},
+                    "reference": "Network|internet"
+                }
+            ],
+            "urls": [
+                {
+                    "children": {
+                        "URL_web_url": [
+                            {
+                                "children": {},
+                                "reference": "URL|internet|http://mispo.es"
+                            }
+                        ],
+                        "network": [
+                            {
+                                "children": {},
+                                "reference": "Network|internet"
+                            }
+                        ]
+                    },
+                    "reference": "HostnameHTTPURL|http|internet|mispo.es|80|/"
+                }
+            ]
+        },
+        "reference": "Hostname|internet|mispo.es"
+    },
+    "store": {
+        "Finding|Hostname|internet|mispo.es|KAT-NO-DKIM": {
+            "description": "This hostname does not support DKIM records",
+            "finding_type": "KATFindingType|KAT-NO-DKIM",
+            "object_type": "Finding",
+            "ooi": "Hostname|internet|mispo.es",
+            "primary_key": "Finding|Hostname|internet|mispo.es|KAT-NO-DKIM",
+            "proof": null,
+            "reproduce": null,
+            "scan_profile": {
+                "level": 0,
+                "reference": "Finding|Hostname|internet|mispo.es|KAT-NO-DKIM",
+                "scan_profile_type": "empty"
+            }
+        },
+        "Finding|Hostname|internet|mispo.es|KAT-NO-DMARC": {
+            "description": "This hostname does not have a DMARC record",
+            "finding_type": "KATFindingType|KAT-NO-DMARC",
+            "object_type": "Finding",
+            "ooi": "Hostname|internet|mispo.es",
+            "primary_key": "Finding|Hostname|internet|mispo.es|KAT-NO-DMARC",
+            "proof": null,
+            "reproduce": null,
+            "scan_profile": {
+                "level": 0,
+                "reference": "Finding|Hostname|internet|mispo.es|KAT-NO-DMARC",
+                "scan_profile_type": "empty"
+            }
+        },
+        "Finding|Hostname|internet|mispo.es|KAT-NO-SPF": {
+            "description": "This hostname does not have an SPF record",
+            "finding_type": "KATFindingType|KAT-NO-SPF",
+            "object_type": "Finding",
+            "ooi": "Hostname|internet|mispo.es",
+            "primary_key": "Finding|Hostname|internet|mispo.es|KAT-NO-SPF",
+            "proof": null,
+            "reproduce": null,
+            "scan_profile": {
+                "level": 0,
+                "reference": "Finding|Hostname|internet|mispo.es|KAT-NO-SPF",
+                "scan_profile_type": "empty"
+            }
+        },
+        "HostnameHTTPURL|http|internet|mispo.es|80|/": {
+            "netloc": "Hostname|internet|mispo.es",
+            "network": "Network|internet",
+            "object_type": "HostnameHTTPURL",
+            "path": "/",
+            "port": 80,
+            "primary_key": "HostnameHTTPURL|http|internet|mispo.es|80|/",
+            "scan_profile": {
+                "level": 2,
+                "reference": "HostnameHTTPURL|http|internet|mispo.es|80|/",
+                "scan_profile_type": "inherited"
+            },
+            "scheme": "http"
+        },
+        "Hostname|internet|mispo.es": {
+            "dns_zone": null,
+            "name": "mispo.es",
+            "network": "Network|internet",
+            "object_type": "Hostname",
+            "primary_key": "Hostname|internet|mispo.es",
+            "registered_domain": null,
+            "scan_profile": {
+                "level": 2,
+                "reference": "Hostname|internet|mispo.es",
+                "scan_profile_type": "inherited"
+            }
+        },
+        "KATFindingType|KAT-NO-DKIM": {
+            "description": null,
+            "id": "KAT-NO-DKIM",
+            "object_type": "KATFindingType",
+            "primary_key": "KATFindingType|KAT-NO-DKIM",
+            "risk_score": null,
+            "risk_severity": null,
+            "scan_profile": {
+                "level": 0,
+                "reference": "KATFindingType|KAT-NO-DKIM",
+                "scan_profile_type": "empty"
+            },
+            "source": null
+        },
+        "KATFindingType|KAT-NO-DMARC": {
+            "description": null,
+            "id": "KAT-NO-DMARC",
+            "object_type": "KATFindingType",
+            "primary_key": "KATFindingType|KAT-NO-DMARC",
+            "risk_score": null,
+            "risk_severity": null,
+            "scan_profile": {
+                "level": 0,
+                "reference": "KATFindingType|KAT-NO-DMARC",
+                "scan_profile_type": "empty"
+            },
+            "source": null
+        },
+        "KATFindingType|KAT-NO-SPF": {
+            "description": null,
+            "id": "KAT-NO-SPF",
+            "object_type": "KATFindingType",
+            "primary_key": "KATFindingType|KAT-NO-SPF",
+            "risk_score": null,
+            "risk_severity": null,
+            "scan_profile": {
+                "level": 0,
+                "reference": "KATFindingType|KAT-NO-SPF",
+                "scan_profile_type": "empty"
+            },
+            "source": null
+        },
+        "Network|internet": {
+            "name": "internet",
+            "object_type": "Network",
+            "primary_key": "Network|internet",
+            "scan_profile": {
+                "level": 0,
+                "reference": "Network|internet",
+                "scan_profile_type": "empty"
+            }
+        },
+        "URL|internet|http://mispo.es": {
+            "network": "Network|internet",
+            "object_type": "URL",
+            "primary_key": "URL|internet|http://mispo.es",
+            "raw": "http://mispo.es",
+            "scan_profile": {
+                "level": 2,
+                "reference": "URL|internet|http://mispo.es",
+                "scan_profile_type": "declared"
+            },
+            "web_url": "HostnameHTTPURL|http|internet|mispo.es|80|/"
+        }
+    }
+}
