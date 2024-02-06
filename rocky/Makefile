@@ -34,17 +34,19 @@ run:
 test:
 	python3 manage.py test
 
-utest: ## Run the integration tests.
-	docker compose -f base.yml  -f .ci/docker-compose.yml kill
-	docker compose -f base.yml  -f .ci/docker-compose.yml down --remove-orphans
-	docker compose -f base.yml -f .ci/docker-compose.yml build
-	docker compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_tests
+testclean:
+	docker compose  -f .ci/docker-compose.yml kill
+	docker compose  -f .ci/docker-compose.yml down --remove-orphans
+	docker compose -f .ci/docker-compose.yml build
 
-itest: ## Run the integration tests.
-	docker compose -f base.yml  -f .ci/docker-compose.yml kill
-	docker compose -f base.yml  -f .ci/docker-compose.yml down --remove-orphans
-	docker compose -f base.yml -f .ci/docker-compose.yml build
-	docker compose -f base.yml  -f .ci/docker-compose.yml run --rm rocky_integration_tests
+utest: testclean ## Run the unit tests.
+	docker compose  -f .ci/docker-compose.yml run --rm rocky_tests
+
+itest: testclean ## Run the integration tests.
+	docker compose  -f .ci/docker-compose.yml run --rm rocky_integration
+
+bench: testclean ## Run the report benchmark.
+	docker compose  -f .ci/docker-compose.yml run --rm rocky_integration pytest -m slow --no-cov tests/integration
 
 export_migrations:
 	python manage.py export_migrations contenttypes 0001
