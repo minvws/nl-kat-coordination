@@ -443,4 +443,4 @@ nl-kat-*
 /boefjes/boefjes/plugins/kat_rpki/rpki.json
 /boefjes/boefjes/plugins/kat_rpki/rpki-meta.json
 
-bench*.pstat
+*.pstat

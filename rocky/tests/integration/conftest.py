@@ -49,7 +49,7 @@ def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
 
 def seed_system(
     octopoes_api_connector: OctopoesAPIConnector,
-    valid_time,
+    valid_time: datetime,
     test_hostname: str = "example.com",
     test_ip: str = "192.0.2.3",
 ):
@@ -57,7 +57,7 @@ def seed_system(
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     hostnames = [
-        Hostname(network=network.reference, name=f"{test_hostname}"),
+        Hostname(network=network.reference, name=test_hostname),
         Hostname(network=network.reference, name=f"a.{test_hostname}"),
         Hostname(network=network.reference, name=f"b.{test_hostname}"),
         Hostname(network=network.reference, name=f"c.{test_hostname}"),
