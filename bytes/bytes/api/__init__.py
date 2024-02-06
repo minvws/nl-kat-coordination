@@ -32,7 +32,7 @@ if get_settings().span_export_grpc_endpoint is not None:
 
     resource = Resource(attributes={SERVICE_NAME: "bytes"})
     provider = TracerProvider(resource=resource)
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=get_settings().span_export_grpc_endpoint))
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(get_settings().span_export_grpc_endpoint)))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
