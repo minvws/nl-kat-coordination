@@ -9,11 +9,11 @@ license = "EUPL"
 python = "^3.8"
 alembic = "^1.8.1"
 click = "^8.1.3"
-httpx = "^0.23.3"
+httpx = "^0.26.0"
 jsonschema = "^4.17.0"
 pydantic = "^2.4.2"
 docker = "^6.1.3"
-fastapi = "^0.109.0"
+fastapi = "^0.109.1"
 uvicorn = "^0.26.0"
 psycopg2 = "^2.9.6"
 pynacl = "^1.5.0"
@@ -44,13 +44,13 @@ python-libnmap = "0.7.3"
 # required by kat_shodan boefje
 shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
-cryptography = "41.0.6"
+cryptography = "^42.0.1"
 # required by kat_webpage_analysis/check_images normalizer
 Pillow = "^10.0.1"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.0.2"
 # required by kat_webpage_analysis (forcediphttpsadapter)
-urllib3 = "^1.26.0"
+urllib3 = "^2.1.0"
 # required by kat_website_software
 python-Wappalyzer = "0.3.1"
 # required by kat_wpscan
@@ -63,8 +63,8 @@ pydantic-settings = "^2.0.3"
 opentelemetry-instrumentation = "^0.41b0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.2.2"
-pytest-env = "^0.8.2"
+pytest = "^8.0.0"
+pytest-env = "^1.1.3"
 
 [build-system]
 requires = ["setuptools>=45", "wheel"]

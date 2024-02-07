@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from octopoes.config.settings import XTDBType
 from octopoes.models.origin import Origin
 from octopoes.xtdb import (
     Datamodel,
@@ -197,9 +196,8 @@ class QueryNodeTest(TestCase):
         field_node.build_tree(1)
 
         query = generate_pull_query(
-            XTDBType.CRUX,
             FieldSet.ALL_FIELDS,
-            {"db.crux/id": "IpAddressV4|internet|1.1.1.1"},
+            {"xt/id": "IpAddressV4|internet|1.1.1.1"},
             field_node=field_node,
         )
 
@@ -207,7 +205,7 @@ class QueryNodeTest(TestCase):
             "{:query {:find [(pull ?e [* {(:DnsARecord/_IpAddressV4 {:as DnsARecord/_IpAddressV4}) [*]} "
             "{(:Finding/_OOI {:as Finding/_OOI}) [*]} {(:IpAddressV4/Network {:as Network}) [*]} "
             "{(:IpPort/_IpAddress {:as IpPort/_IpAddress}) [*]} {(:Job/_oois {:as Job/_oois}) [*]}])] "
-            ':in [_db_crux_id] :where [[?e :db.crux/id _db_crux_id]]   } :in-args [ "IpAddressV4|internet|1.1.1.1" ]}'
+            ':in [_xt_id] :where [[?e :xt/id _xt_id]]   } :in-args [ "IpAddressV4|internet|1.1.1.1" ]}'
         )
         self.assertEqual(
             expected_query,
@@ -216,7 +214,6 @@ class QueryNodeTest(TestCase):
 
     def test_escape_injection_success(self):
         query = generate_pull_query(
-            XTDBType.CRUX,
             FieldSet.ALL_FIELDS,
             where={"attr_1": 'test_value_with_quotes" and injection'},
         )
@@ -232,7 +229,6 @@ class QueryNodeTest(TestCase):
 
     def test_get_origin_by_task_id(self):
         query = generate_pull_query(
-            XTDBType.CRUX,
             FieldSet.ALL_FIELDS,
             {
                 "task_id": "5c864d45a4364a81a5fecfd8b359cf9d",

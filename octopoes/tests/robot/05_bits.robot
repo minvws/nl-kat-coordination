@@ -17,12 +17,3 @@ Bit With Scan Level 1
     Declare Scan Profile    Hostname|internet|example.com    0
     Await Sync
     Object List Should Not Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
-
-
-*** Keywords ***
-Setup Test
-    Start Monitoring    ${QUEUE_URI}
-
-Teardown Test
-    Stop Monitoring
-    Cleanup
