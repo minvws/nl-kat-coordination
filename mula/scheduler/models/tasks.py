@@ -70,7 +70,7 @@ class Task(BaseModel):
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def update_status(self, status: TaskStatus) -> None:
-        """Update and calculate the duration of the task status transition.""" ""
+        """Update and calculate the duration of the task status transition."""
         from_status = self.status
         to_status = status
 
