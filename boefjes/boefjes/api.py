@@ -50,7 +50,7 @@ def run():
 
 
 class BoefjeInput(BaseModel):
-    task_id: str
+    task_id: UUID
     output_url: str
     boefje_meta: BoefjeMeta
     model_config = ConfigDict(extra="forbid")
