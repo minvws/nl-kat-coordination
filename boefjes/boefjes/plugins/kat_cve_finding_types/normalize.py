@@ -1,5 +1,6 @@
 import json
 import logging
+import unicodedata
 from typing import Iterable, Union
 
 from boefjes.job_models import NormalizerMeta
@@ -54,7 +55,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     yield CVEFindingType(
         id=cve_finding_type_id,
-        description=english_description["value"],
+        description=unicodedata.normalize("NFKC", english_description["value"])
+        .replace("‘", "'")
+        .replace("’", "'")
+        .replace("“", '"')
+        .replace("”", '"'),
         source=f"https://cve.circl.lu/cve/{cve_finding_type_id}",
         risk_severity=risk_severity,
         risk_score=risk_score,
