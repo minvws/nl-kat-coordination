@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from rocky.views.mixins import ObservedAtMixin
 
@@ -44,7 +44,7 @@ def test_observed_at_datetime_with_timezone(mocker):
 
 def test_observed_at_future_date(mocker):
     mock_request = mocker.Mock()
-    day_plus_1_in_future = (datetime.now(tz=timezone.utc) + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    day_plus_1_in_future = (datetime.now(tz=timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%d")
     mock_request.GET = {"observed_at": day_plus_1_in_future}
 
     observed_at = ObservedAtMixin()
