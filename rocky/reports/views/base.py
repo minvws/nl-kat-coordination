@@ -113,6 +113,11 @@ class BaseReportView(OctopoesView):
         plugins = {}
         for plugin, plugin_ids in plugin_ids.items():
             plugins[plugin] = [get_katalogus(self.organization.code).get_plugin(plugin_id) for plugin_id in plugin_ids]
+
+        for plugin_type, plugin_list in plugins.items():
+            if all(plugin.enabled for plugin in plugin_list):
+                plugins[plugin_type] = []
+
         return plugins
 
     def are_plugins_enabled(self, plugins_dict: Dict[str, Plugin]) -> bool:

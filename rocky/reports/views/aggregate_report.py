@@ -125,6 +125,10 @@ class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportVie
     def get(self, request, *args, **kwargs):
         if not self.selected_report_types:
             messages.error(self.request, _("Select at least one report type to proceed."))
+
+        if not (self.plugins["required"] or self.plugins["optional"]):
+            return redirect(reverse("aggregate_report_view", kwargs=kwargs) + self.get_selection())
+
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
