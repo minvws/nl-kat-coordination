@@ -190,7 +190,7 @@ class NormalizerHandler(Handler):
         job_runner: NormalizerJobRunner,
         bytes_client: BytesAPIClient,
         whitelist: Optional[Dict[str, int]] = None,
-        octopoes_factory: Callable[[str], OctopoesAPIConnector] = 3,
+        octopoes_factory: Callable[[str], OctopoesAPIConnector] = get_octopoes_api_connector,
     ):
         self.job_runner = job_runner
         self.bytes_client: BytesAPIClient = bytes_client
