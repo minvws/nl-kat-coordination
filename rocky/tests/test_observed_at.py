@@ -40,3 +40,15 @@ def test_observed_at_datetime_with_timezone(mocker):
     observed_at = ObservedAtMixin()
     observed_at.request = mock_request
     assert observed_at.get_observed_at() == datetime(2023, 10, 24, 9, 34, 56, 0, tzinfo=timezone.utc)
+
+
+def test_observed_at_future_date(mocker):
+    mock_request = mocker.Mock()
+    day_plus_1_in_future = (datetime.now(tz=timezone.utc) + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    mock_request.GET = {"observed_at": day_plus_1_in_future}
+
+    observed_at = ObservedAtMixin()
+    observed_at.request = mock_request
+
+    messages = list(observed_at.request._messages)
+    assert messages[0].message == "Beware: You have chosen for a date in the future."
