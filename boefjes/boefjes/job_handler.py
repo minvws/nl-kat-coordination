@@ -3,7 +3,7 @@ import os
 import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Callable
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -82,7 +82,7 @@ def serialize_ooi(ooi: OOI):
     return serialized_oois
 
 
-def get_octopoes_api_connector(org_code: str):
+def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
     return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
 
 
@@ -190,7 +190,7 @@ class NormalizerHandler(Handler):
         job_runner: NormalizerJobRunner,
         bytes_client: BytesAPIClient,
         whitelist: Optional[Dict[str, int]] = None,
-        octopoes_factory=get_octopoes_api_connector,
+        octopoes_factory: Callable[[str], OctopoesAPIConnector] = 3,
     ):
         self.job_runner = job_runner
         self.bytes_client: BytesAPIClient = bytes_client
