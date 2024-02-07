@@ -24,7 +24,7 @@ def get_record_types() -> List[str]:
     requested_record_types = getenv("RECORD_TYPES", "")
     if not requested_record_types:
         return DEFAULT_RECORD_TYPES
-    requested_record_types = re.sub("[^A-Za-z,]", requested_record_types.upper(), "").split(",")
+    requested_record_types = list(map(lambda x: re.sub(r"[^A-Za-z]", "", x), requested_record_types.upper().split(",")))
     return list(set(requested_record_types).intersection(DEFAULT_RECORD_TYPES))
 
 
