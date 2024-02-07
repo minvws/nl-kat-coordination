@@ -234,7 +234,7 @@ services:
 
   jaeger:
     profiles:
-    - jaeger
+      - jaeger
     restart: unless-stopped
     image: jaegertracing/all-in-one:1.48
     environment:
@@ -248,6 +248,15 @@ services:
       - jaeger-data:/badger
     ports:
       - "127.0.0.1:16686:16686"
+
+  prometheus:
+    restart: unless-stopped
+    image: prom/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
 
 networks:
   default:
@@ -264,3 +273,4 @@ volumes:
   keiko-reports:
   xtdb-data:
   jaeger-data:
+  prometheus-data:
