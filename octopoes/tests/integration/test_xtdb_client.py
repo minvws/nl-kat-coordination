@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 import pytest
 from requests import HTTPError
 
-from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -22,9 +21,6 @@ logger = logging.getLogger(__name__)
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
-
-
-XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 
 
 def test_node_creation_and_deletion(xtdb_http_client: XTDBHTTPClient):

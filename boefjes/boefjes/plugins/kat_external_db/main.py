@@ -1,4 +1,4 @@
-"""Boefje script for getting domaions and ipaddresses from dadb"""
+"""Boefje script for getting domains and ipaddresses from dadb"""
 from os import getenv
 from typing import List, Tuple, Union
 

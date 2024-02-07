@@ -37,14 +37,6 @@ Load Bulk
 
 
 *** Keywords ***
-Setup Test
-    Start Monitoring    ${QUEUE_URI}
-
-Teardown Test
-    Cleanup
-    Await Sync
-    Stop Monitoring
-
 Verify Object List With Filter
     ${response_data}    Get Objects With ScanLevel 0
     Should Be Equal    ${response_data["count"]}    ${6}

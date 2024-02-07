@@ -13,7 +13,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
 
     if input_["software"]["name"] != "WordPress" or (
-        "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"]
+        "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"].dict()
     ):
         return [(set(), "")]
 
