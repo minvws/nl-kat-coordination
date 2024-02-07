@@ -132,11 +132,11 @@ class BaseReportView(OOIFilterView):
         return plugins
 
     def are_plugins_enabled(self, plugins_dict: Dict[str, Plugin]) -> bool:
-        enabled_plugins = []
         for k, plugins in plugins_dict.items():
             for plugin in plugins:
-                enabled_plugins.append(plugin.enabled)
-        return all(enabled_plugins)
+                if not plugin.enabled:
+                    return False
+        return True
 
     def get_report_types_from_choice(self) -> List[Type[Report]]:
         report_types = []
