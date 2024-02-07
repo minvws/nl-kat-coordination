@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-09 14:36+0000\n"
+"POT-Creation-Date: 2024-02-07 12:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3961,7 +3961,7 @@ msgid "Date"
 msgstr ""
 
 #: tools/forms/base.py
-msgid "The date can not be in the future. Please select a different date."
+msgid "Your selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
@@ -4316,8 +4316,8 @@ msgid ""
 "refresh of the page may be needed to show the results."
 msgstr ""
 
-#: tools/view_helpers.py
-msgid "You can't generate a report for an OOI on a date in the future."
+#: tools/view_helpers.py rocky/scheduler.py
+msgid "Task not found."
 msgstr ""
 
 #: rocky/messaging.py
@@ -6311,6 +6311,10 @@ msgid "Indemnification successfully set."
 msgstr ""
 
 #: rocky/views/mixins.py
+msgid "Beware: You have chosen for a date in the future."
+msgstr ""
+
+#: rocky/views/mixins.py
 msgid "Can not parse date, falling back to show current date."
 msgstr ""
 
@@ -6417,6 +6421,10 @@ msgstr ""
 
 #: rocky/views/ooi_mute.py
 msgid "Finding(s) successfully muted."
+msgstr ""
+
+#: rocky/views/ooi_report.py
+msgid "You can't generate a report for an OOI on a date in the future."
 msgstr ""
 
 #: rocky/views/ooi_report.py
