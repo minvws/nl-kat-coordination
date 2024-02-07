@@ -62,7 +62,10 @@ class ObservedAtMixin:
 
         try:
             datetime_format = "%Y-%m-%d"
-            return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
+            date_time = convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
+            if date_time.date() > datetime.now(timezone.utc).date():
+                messages.error(self.request, _("Beware: You have chosen for a date in the future."))
+            return date_time
         except ValueError:
             try:
                 ret = datetime.fromisoformat(observed_at)
