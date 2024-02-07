@@ -48,7 +48,7 @@ cryptography = "^42.0.1"
 # required by kat_webpage_analysis/check_images normalizer
 Pillow = "^10.0.1"
 # required by kat_webpage_analysis
-forcediphttpsadapter = "1.0.2"
+forcediphttpsadapter = "1.1.0"
 # required by kat_webpage_analysis (forcediphttpsadapter)
 urllib3 = "^2.1.0"
 # required by kat_website_software
