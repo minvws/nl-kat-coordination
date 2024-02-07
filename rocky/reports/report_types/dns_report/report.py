@@ -5,7 +5,7 @@ from typing import Any, Dict
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
-from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSRecord
+from octopoes.models.ooi.dns.records import DNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
 from reports.report_types.definitions import Report
@@ -27,7 +27,7 @@ class DNSReport(Report):
             ref, depth=3, types={DNSRecord, Finding}, valid_time=valid_time
         ).store
 
-        other_records = []
+        records = []
         security = {
             "spf": True,
             "dkim": True,
@@ -35,45 +35,24 @@ class DNSReport(Report):
             "dnssec": True,
             "caa": True,
         }
-        ipv4 = []
-        ipv6 = []
         for ooi_type, ooi in tree.items():
-            reference = Reference.from_str(ooi)
-            if isinstance(ooi, DNSARecord):
-                if ref.tokenized.name == ooi.hostname.tokenized.name:
-                    ipv4.append(ooi.value)
-            elif isinstance(ooi, DNSAAAARecord):
-                if ref.tokenized.name == ooi.hostname.tokenized.name:
-                    ipv6.append(ooi.value)
+            if isinstance(ooi, Finding):
+                for check in ["caa", "dkim", "dmarc", "dnssec", "spf"]:
+                    if "NO-%s" % check.upper() in ooi.finding_type.tokenized.id:
+                        security[check] = False
             elif isinstance(ooi, DNSRecord):
-                origin = self.octopoes_api_connector.list_origins(source=ref, result=reference, valid_time=valid_time)
-                if origin:
-                    other_records.append(
-                        {
-                            "human_readable": reference.human_readable,
-                            "content": ooi.value,
-                            "origin": origin[0].method,
-                        }
-                    )
-            elif isinstance(ooi, Finding):
-                if "NO-SPF" in ooi.finding_type.tokenized.id:
-                    security["spf"] = False
-                if "NO-DKIM" in ooi.finding_type.tokenized.id:
-                    security["dkim"] = False
-                if "NO-DMARC" in ooi.finding_type.tokenized.id:
-                    security["dmarc"] = False
-                if "NO-DNSSEC" in ooi.finding_type.tokenized.id:
-                    security["dnssec"] = False
-                if "NO-CAA" in ooi.finding_type.tokenized.id:
-                    security["caa"] = False
-
-        enough_ipv6_webservers = len(ipv6) >= 2
+                records.append(
+                    {
+                        "type": ooi.dns_record_type,
+                        "ttl": round(ooi.ttl / 60),
+                        "name": ooi.hostname.tokenized.name,
+                        "content": ooi.value,
+                    }
+                )
+        records = sorted(records, key=lambda x: x["type"])
 
         return {
             "input_ooi": input_ooi,
-            "other_records": other_records,
+            "records": records,
             "security": security,
-            "ipv4": ipv4,
-            "ipv6": ipv6,
-            "enough_ipv6_webservers": enough_ipv6_webservers,
         }
