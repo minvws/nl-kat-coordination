@@ -189,13 +189,13 @@ class NormalizerHandler(Handler):
         self,
         job_runner: NormalizerJobRunner,
         bytes_client: BytesAPIClient,
-        octopoes_factory=get_octopoes_api_connector,
         whitelist: Optional[Dict[str, int]] = None,
+        octopoes_factory=get_octopoes_api_connector,
     ):
         self.job_runner = job_runner
         self.bytes_client: BytesAPIClient = bytes_client
-        self.octopoes_factory = octopoes_factory
         self.whitelist = whitelist
+        self.octopoes_factory = octopoes_factory
 
     def handle(self, normalizer_meta: NormalizerMeta) -> None:
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
