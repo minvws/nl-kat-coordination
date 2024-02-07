@@ -76,7 +76,7 @@ section we review how different dataflows, from the `boefjes` and the
 
 #### Design
 
-First, we wil use the `BoefjeScheduler` as an example. A `BoefjeScheduler` is
+First, we will use the `BoefjeScheduler` as an example. A `BoefjeScheduler` is
 tasked with creating tasks that are able to be picked up and processed by a
 'Task Runner'. The scheduler creates a `BoefjeTask` to the specification that
 the 'Task Runner' can interpret, namely in this instance of a `BoefjeTask`.
