@@ -5,6 +5,7 @@ from typing import Any, Dict
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.path import Path
@@ -22,15 +23,20 @@ class OpenPortsReport(Report):
     template_path = "open_ports_report/report.html"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
-        ref = Reference.from_str(input_ooi)
-        if ref.class_type == Hostname:
+        try:
+            ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
+        except ObjectNotFoundException as e:
+            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
+            raise ObjectNotFoundException(e)
+
+        if ooi.reference.class_type == Hostname:
             path = Path.parse("Hostname.<hostname [is ResolvedHostname].address")
-            ips = self.octopoes_api_connector.query(path=path, source=ref, valid_time=valid_time)
+            ips = self.octopoes_api_connector.query(path=path, source=ooi.reference, valid_time=valid_time)
             if not ips:
                 return {}
             references = [ip.reference for ip in ips]
         else:
-            references = [ref]
+            references = [ooi.reference]
 
         results = {}
         for ref in references:

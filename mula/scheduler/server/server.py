@@ -360,7 +360,7 @@ class Server:
             elif task_type == "normalizer":
                 f_plugin = storage.filters.Filter(
                     column="p_item",
-                    field="data__raw_data__boefje_meta__id",
+                    field="data__normalizer__id",
                     operator="eq",
                     value=plugin_id,
                 )
@@ -375,7 +375,7 @@ class Server:
                         ),
                         storage.filters.Filter(
                             column="p_item",
-                            field="data__raw_data__boefje_meta__id",
+                            field="data__normalizer__id",
                             operator="eq",
                             value=plugin_id,
                         ),

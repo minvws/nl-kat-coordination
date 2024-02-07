@@ -87,7 +87,7 @@ scheduler. See the environment settings section under Installation and Deploymen
 
 ```
 # Build and run the scheduler in the background
-$ docker-compose up --build -d scheduler
+$ docker compose up --build -d scheduler
 ```
 
 ## Testing

@@ -1,6 +1,13 @@
 name: Pre-commit checks
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
+  pull_request:
 
 jobs:
   pre-commit:
@@ -18,7 +25,7 @@ jobs:
     - name: Install pre-commit
       run: pip install pre-commit==3.6.0
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ steps.py311.outputs.python-version }}|${{ hashFiles('.pre-commit-config.yaml') }}

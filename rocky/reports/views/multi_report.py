@@ -53,7 +53,7 @@ class LandingMultiReportView(BreadcrumbsMultiReportView, TemplateView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("multi_report_select_oois", kwargs=self.get_kwargs()) + self.get_selection())
+        return redirect(reverse("multi_report_select_oois", kwargs=self.get_kwargs()))
 
 
 class OOISelectionMultiReportView(BreadcrumbsMultiReportView, BaseReportView, BaseOOIListView):

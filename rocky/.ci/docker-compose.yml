@@ -48,17 +48,17 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      xtdb_multinode:
+      xtdb:
         condition: service_started
     env_file:
       - .ci/.env.test
 
-  xtdb_multinode:
+  xtdb:
     image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
 
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3.11-management"
+    image: "rabbitmq:3.12-management"
     healthcheck:
       test: [ "CMD", "rabbitmqctl", "status" ]
       interval: 5s

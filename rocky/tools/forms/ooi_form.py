@@ -1,7 +1,7 @@
 from enum import Enum
 from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, Literal, Optional, Type, Union, cast, get_args, get_origin
+from typing import Dict, List, Literal, Optional, Type, Union, cast, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -63,6 +63,8 @@ class OOIForm(BaseRockyForm):
                 fields[name] = generate_ip_field(field)
             elif annotation == AnyUrl:
                 fields[name] = generate_url_field(field)
+            elif annotation == Dict or annotation == Dict[str, str] or annotation == List[str]:
+                fields[name] = forms.JSONField(**default_attrs)
             elif annotation == int or (hasattr(annotation, "__args__") and int in annotation.__args__):
                 fields[name] = forms.IntegerField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, Enum):

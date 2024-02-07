@@ -84,7 +84,7 @@ class RelatedFieldNode:
     def generate_field(self, field_set: FieldSet, pk_prefix: str):
         queried_fields = pk_prefix if field_set is FieldSet.ONLY_ID else "*"
         """
-        Output dicts in Crux Query Language
+        Output dicts in XTDB Query Language
         """
         if not self.relations_out and not self.relations_in:
             return f"[{queried_fields}]"

@@ -1,8 +1,11 @@
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils import translation
+from knox.auth import TokenAuthentication
+from rest_framework.exceptions import APIException
 
 
 def AuthRequiredMiddleware(get_response):
@@ -32,6 +35,15 @@ def AuthRequiredMiddleware(get_response):
             reverse("two_factor:qr"),
             reverse("logout"),
         ]
+
+        if not request.user.is_authenticated and "HTTP_AUTHORIZATION" in request.META:
+            authenticator = TokenAuthentication()
+            try:
+                user, token = authenticator.authenticate(request)
+            except APIException:
+                return HttpResponseForbidden("Invalid token\n")
+            else:
+                request.user = user
 
         # Check if the user is logged in, and if not, redirect to login page
         if not request.user.is_authenticated and not (

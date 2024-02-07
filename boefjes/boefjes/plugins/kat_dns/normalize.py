@@ -1,9 +1,11 @@
 import json
+import re
 from ipaddress import IPv4Address, IPv6Address
 from typing import Dict, Iterable, List, Union
 
 from dns.message import Message, from_text
 from dns.rdata import Rdata
+from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
 from dns.rdtypes.ANY.MX import MX
 from dns.rdtypes.ANY.NS import NS
@@ -18,6 +20,7 @@ from octopoes.models.ooi.dns.records import (
     NXDOMAIN,
     DNSAAAARecord,
     DNSARecord,
+    DNSCAARecord,
     DNSCNAMERecord,
     DNSMXRecord,
     DNSNSRecord,
@@ -151,6 +154,13 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
                             **default_args,
                         )
                     )
+
+                if isinstance(rr, CAA):
+                    record_value = str(rr).split(" ", 2)
+                    default_args["flags"] = min(max(0, int(record_value[0])), 255)
+                    default_args["tag"] = re.sub("[^\\w]", "", record_value[1].lower())
+                    default_args["value"] = record_value[2]
+                    register_record(DNSCAARecord(**default_args))
 
     # link the hostnames to their discovered zones
     for hostname_, zone in zone_links.items():

@@ -52,9 +52,11 @@
                     <a href="#vulnerabilities">{% translate "Vulnerabilities" %}</a>
                     <ol>
                         {% for input_ooi, vulnerabilities in data.vulnerabilities.items %}
-                            <li class="object">
-                                <a href="#vulnerabilities">{{ vulnerabilities.title }}</a>
-                            </li>
+                            {% if vulnerabilities.vulnerabilities %}
+                                <li class="object">
+                                    <a href="#vulnerabilities">{{ vulnerabilities.title }}</a>
+                                </li>
+                            {% endif %}
                         {% endfor %}
                     </ol>
                 </li>
