@@ -2,7 +2,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple
 
 from sqlalchemy import exc, func
-from sqlalchemy.orm import joinedload
 
 from scheduler import models
 

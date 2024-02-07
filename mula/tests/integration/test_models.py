@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, timezone
 
 from scheduler import models
+
 from tests.utils import functions
 
 

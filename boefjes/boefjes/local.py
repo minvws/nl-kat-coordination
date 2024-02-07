@@ -2,7 +2,6 @@ import logging
 import os
 from typing import Any, Dict, List, Tuple, Union
 
-from octopoes.models import OOI
 from pydantic import ValidationError
 
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
@@ -21,6 +20,7 @@ from boefjes.job_models import (
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
+from octopoes.models import OOI
 
 logger = logging.getLogger(__name__)
 

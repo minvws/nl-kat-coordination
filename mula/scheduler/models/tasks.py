@@ -4,14 +4,12 @@ from datetime import datetime, timedelta, timezone
 from typing import ClassVar, List, Optional
 
 import mmh3
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Column, DateTime, Enum, Interval, String
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
-from sqlalchemy.sql.schema import ForeignKey
 
 from scheduler.utils import GUID
 
@@ -72,6 +70,7 @@ class Task(BaseModel):
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def update_status(self, status: TaskStatus) -> None:
+        """Update and calculate the duration of the task status transition.""" ""
         from_status = self.status
         to_status = status
 
