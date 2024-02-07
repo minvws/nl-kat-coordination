@@ -55,11 +55,9 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     yield CVEFindingType(
         id=cve_finding_type_id,
-        description=unicodedata.normalize("NFKC", english_description["value"])
-        .replace("‘", "'")
-        .replace("’", "'")
-        .replace("“", '"')
-        .replace("”", '"'),
+        description=unicodedata.normalize("NFKC", english_description["value"]).translate(
+            str.maketrans("‘’“”", "''\"\"")
+        ),
         source=f"https://cve.circl.lu/cve/{cve_finding_type_id}",
         risk_severity=risk_severity,
         risk_score=risk_score,
