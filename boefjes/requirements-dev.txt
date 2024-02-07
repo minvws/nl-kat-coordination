@@ -324,8 +324,9 @@ fastapi==0.109.1 ; python_version >= "3.8" and python_version < "4.0" \
 filelock==3.13.1 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:521f5f56c50f8426f5e03ad3b281b490a87ef15bc6c526f168290f0c7148d44e \
     --hash=sha256:57dbda9b35157b05fb3e58ee91448612eb674172fab98ee235ccb0b5bee19a1c
-forcediphttpsadapter==1.0.2 ; python_version >= "3.8" and python_version < "4.0" \
-    --hash=sha256:f7582b34aaa6ab6b17f69ab1abbfe67097b952ed0682b758b5e01e18fe24433e
+forcediphttpsadapter==1.1.0 ; python_version >= "3.8" and python_version < "4.0" \
+    --hash=sha256:0d224cf6e8e50eb788c9f5994a7afa6d389bac6dbe540b7dfd77a32590ad0153 \
+    --hash=sha256:5e7662ece61735585332d09b87d94fffe4752469d5c0d3feff48746e5d70744b
 frozenlist==1.4.1 ; python_version >= "3.8" and python_version < "4.0" \
     --hash=sha256:04ced3e6a46b4cfffe20f9ae482818e34eba9b5fb0ce4056e4cc9b6e212d09b7 \
     --hash=sha256:0633c8d5337cb5c77acbccc6357ac49a1770b8c487e5b3505c57b949b4b82e98 \
