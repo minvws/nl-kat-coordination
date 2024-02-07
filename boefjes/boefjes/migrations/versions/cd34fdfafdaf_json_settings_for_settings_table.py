@@ -62,7 +62,7 @@ def upgrade_encrypted_settings(conn: Connection):
         # Seed the encrypted original data into the new table
         for result in results:
             conn.execute(
-                "INSERT INTO settings (values, plugin_id, organisation_pk) VALUES ('%s', '%s', %s)",
+                "INSERT INTO settings (values, plugin_id, organisation_pk) VALUES (%s, %s, %s)",
                 [result[0], result[1], result[2]],
             )
 
@@ -104,7 +104,7 @@ def downgrade_encrypted_settings(conn: Connection):
 
         for result in results:
             conn.execute(
-                "INSERT INTO setting (key, value, plugin_id, organisation_pk) VALUES ('%s', '%s', '%s', %s)",
+                "INSERT INTO setting (key, value, plugin_id, organisation_pk) VALUES (%s, %s, %s, %s)",
                 [result[0], result[1], result[2], result[3]],
             )
 
