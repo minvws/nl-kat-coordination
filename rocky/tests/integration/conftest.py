@@ -48,22 +48,27 @@ def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
     connector.delete_node()
 
 
-def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
+def seed_system(
+    octopoes_api_connector: OctopoesAPIConnector,
+    valid_time: datetime,
+    test_hostname: str = "example.com",
+    test_ip: str = "192.0.2.3",
+):
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     hostnames = [
-        Hostname(network=network.reference, name="example.com"),
-        Hostname(network=network.reference, name="a.example.com"),
-        Hostname(network=network.reference, name="b.example.com"),
-        Hostname(network=network.reference, name="c.example.com"),
-        Hostname(network=network.reference, name="d.example.com"),
-        Hostname(network=network.reference, name="e.example.com"),
-        Hostname(network=network.reference, name="f.example.com"),
+        Hostname(network=network.reference, name=test_hostname),
+        Hostname(network=network.reference, name=f"a.{test_hostname}"),
+        Hostname(network=network.reference, name=f"b.{test_hostname}"),
+        Hostname(network=network.reference, name=f"c.{test_hostname}"),
+        Hostname(network=network.reference, name=f"d.{test_hostname}"),
+        Hostname(network=network.reference, name=f"e.{test_hostname}"),
+        Hostname(network=network.reference, name=f"f.{test_hostname}"),
     ]
 
     addresses = [
-        IPAddressV4(network=network.reference, address=ip_address("192.0.2.3")),
+        IPAddressV4(network=network.reference, address=ip_address(test_ip)),
         IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230")),
     ]
     ports = [
@@ -94,7 +99,7 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     ]
     certificates = [
         X509Certificate(
-            subject="example.com",
+            subject=test_hostname,
             valid_from="2022-11-15T08:52:57",
             valid_until="2030-11-15T08:52:57",
             serial_number="abc123",
