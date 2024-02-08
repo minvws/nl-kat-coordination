@@ -36,12 +36,9 @@ class MailReport(Report):
         if ooi.reference.class_type == Hostname:
             hostnames = [ooi]
         elif ooi.reference.class_type in (IPAddressV4, IPAddressV6):
-            hostnames = [
-                x.reference
-                for x in self.octopoes_api_connector.query(
-                    "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ooi.reference
-                )
-            ]
+            hostnames = self.octopoes_api_connector.query(
+                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ooi.reference
+            )
 
         number_of_hostnames = len(hostnames)
         number_of_spf = number_of_hostnames
