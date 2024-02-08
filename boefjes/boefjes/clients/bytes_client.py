@@ -1,7 +1,7 @@
 import logging
 import typing
 from functools import wraps
-from typing import Any, Callable, Dict, Set, Union
+from typing import Any, Callable, Dict, FrozenSet, Union
 from uuid import UUID
 
 import requests
@@ -103,7 +103,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Set[str] = frozenset()) -> UUID:
+    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: FrozenSet[str] = frozenset()) -> UUID:
         headers = {"content-type": "application/octet-stream"}
         headers.update(self.headers)
 
