@@ -11,7 +11,7 @@ LIMIT = 100
 
 class PaginationParameters(BaseModel):
     offset: int = 0
-    limit: Optional[int] = LIMIT
+    limit: int = LIMIT
 
 
 class FilterParameters(BaseModel):
