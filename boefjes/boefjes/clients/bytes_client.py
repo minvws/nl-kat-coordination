@@ -38,7 +38,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
             return function(self, *args, **kwargs)
         except HTTPError as error:
             if error.response.status_code != 401:
-                raise error from HTTPError
+                raise
 
             self.login()
             return function(self, *args, **kwargs)
@@ -67,8 +67,9 @@ class BytesAPIClient:
     def _verify_response(response: requests.Response) -> None:
         try:
             response.raise_for_status()
-        except HTTPError:
-            logger.error(response.text)
+        except HTTPError as error:
+            if error.response.status_code != 401:
+                logger.error(response.text)
             raise
 
     def _get_authentication_headers(self) -> Dict[str, str]:
