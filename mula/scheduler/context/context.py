@@ -188,3 +188,17 @@ class AppContext:
             registry=self.metrics_registry,
             labelnames=["scheduler_id", "status"],
         )
+
+        self.metrics_cpu_usage = Gauge(
+            name="scheduler_cpu_usage",
+            documentation="CPU usage of the scheduler",
+            registry=self.metrics_registry,
+            labelnames=["type", "unit"],
+        )
+
+        self.metrics_memory_usage = Gauge(
+            name="scheduler_memory_usage",
+            documentation="Memory usage of the scheduler",
+            registry=self.metrics_registry,
+            labelnames=["type", "unit"],
+        )

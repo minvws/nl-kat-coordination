@@ -2,6 +2,7 @@ import os
 import threading
 from typing import Dict, Optional, Set, Union
 
+import psutil
 import structlog
 from opentelemetry import trace
 
@@ -164,6 +165,24 @@ class App:
                     ).set(
                         count,
                     )
+
+            current_process = psutil.Process(os.getpid())
+            cpu = current_process.cpu_percent(interval=0.1)
+            mem = current_process.memory_info()
+
+            self.ctx.metrics_cpu_usage.labels(
+                type="cpu",
+                unit="percent",
+            ).set(
+                cpu,
+            )
+
+            self.ctx.metrics_memory_usage.labels(
+                type="memory",
+                unit="bytes",
+            ).set(
+                mem.rss,
+            )
 
     def start_schedulers(self) -> None:
         # Initialize the schedulers
