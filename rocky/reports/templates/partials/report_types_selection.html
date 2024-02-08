@@ -25,8 +25,12 @@
                     Selected objects
                 {% endblocktranslate %}
             </h2>
-            {% include "summary/ooi_selection.html" %}
+            {% if 'all' in oois %}
+                <p class="emphasized">{% translate "You have selected all objects in previous step." %}</p>
+            {% else %}
+                {% include "summary/ooi_selection.html" %}
 
+            {% endif %}
             <a href="{{ previous }}" class="button ghost">
                 <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
             </a>
@@ -38,7 +42,8 @@
             <p>{% translate "All report types that are available for your selection." %}</p>
             <a class="toggle-all" data-toggle-target="report_type">{% translate "Toggle all report types" %}</a>
             <form class="inline layout-wide" method="get" action="{{ next }}">
-                {% for ooi in selected_oois %}<input type="hidden" name="ooi" value={{ ooi }}>{% endfor %}
+                {% include "forms/report_form_fields.html" %}
+
                 <div class="column-4 tiles">
                     {% if available_report_types_aggregate %}
                         {% include "partials/report_types_tiles_required_optional.html" with report_types=available_report_types_aggregate %}

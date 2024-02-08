@@ -5,9 +5,12 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 import structlog
+from opentelemetry import trace
 
 from scheduler import connectors, context, models, queues, storage, utils
 from scheduler.utils import thread
+
+tracer = trace.get_tracer(__name__)
 
 
 class Scheduler(abc.ABC):
@@ -126,6 +129,7 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
+    @tracer.start_as_current_span("scheduler_pop_item_from_queue")
     def pop_item_from_queue(
         self, filters: Optional[storage.filters.FilterRequest] = None
     ) -> Optional[models.PrioritizedItem]:
@@ -167,6 +171,7 @@ class Scheduler(abc.ABC):
 
         return p_item
 
+    @tracer.start_as_current_span("scheduler_push_item_to_queue")
     def push_item_to_queue(self, p_item: models.PrioritizedItem) -> None:
         """Push a PrioritizedItem to the queue.
 

@@ -44,4 +44,4 @@ class PluginRepositoryClient(PluginRepositoryClientInterface):
         res = self._session.get(f"{repository.base_url}/plugins/{plugin_id}")
         res.raise_for_status()
 
-        return PluginType.model_validate_json(res.content)
+        return PluginType.model_validate_json(res.content)  # type: ignore
