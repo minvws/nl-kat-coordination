@@ -71,7 +71,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 class BaseReportView(OctopoesView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.valid_time = self.get_observed_at()
+        self.valid_time = self.get_observed_at
         self.selected_oois = request.GET.getlist("ooi", [])
         self.selected_report_types = request.GET.getlist("report_type", [])
 

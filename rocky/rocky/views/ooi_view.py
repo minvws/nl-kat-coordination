@@ -33,7 +33,7 @@ class BaseOOIListView(ConnectorFormMixin, OctopoesView, ListView):
         self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
         self.clearance_level = request.GET.getlist("clearance_level", [])
         self.clearance_type = request.GET.getlist("clearance_type", [])
-        self.valid_time = self.get_observed_at()
+        self.valid_time = self.get_observed_at
 
     def get_active_filters(self) -> Dict[str, str]:
         active_filters = {}
@@ -91,7 +91,7 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
 
         context["ooi"] = self.ooi
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["observed_at"] = self.get_observed_at()
+        context["observed_at"] = self.get_observed_at
 
         return context
 

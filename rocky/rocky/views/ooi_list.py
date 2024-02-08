@@ -210,7 +210,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
 class OOIListExportView(BaseOOIListView):
     def get(self, request, *args, **kwargs):
         file_type = request.GET.get("file_type")
-        observed_at = self.get_observed_at()
+        observed_at = self.get_observed_at
         filters = self.get_active_filters()
 
         queryset = self.get_queryset()

@@ -55,6 +55,7 @@ class OOIAttributeError(AttributeError):
 
 
 class ObservedAtMixin:
+    @cached_property
     def get_observed_at(self) -> datetime:
         observed_at = self.request.GET.get("observed_at", None)
         if not observed_at:
@@ -349,7 +350,7 @@ class SingleOOITreeMixin(SingleOOIMixin):
             pk = self.get_ooi_id()
 
         if observed_at is None:
-            observed_at = self.get_observed_at()
+            observed_at = self.get_observed_at
 
         return self.get_object_from_tree(pk, observed_at)
 

@@ -99,7 +99,7 @@ class OOIDetailView(
 
     def get_current_ooi(self) -> Optional[OOI]:
         # self.ooi is already the current state of the OOI
-        if self.get_observed_at().date() == datetime.utcnow().date():
+        if self.get_observed_at.date() == datetime.utcnow().date():
             return self.ooi
         try:
             return self.get_ooi(pk=self.get_ooi_id(), observed_at=datetime.now(timezone.utc))
@@ -163,7 +163,7 @@ class OOIDetailView(
         context["ooi"] = self.ooi
 
         declarations, observations, inferences = self.get_origins(
-            self.ooi.reference, self.get_observed_at(), self.organization
+            self.ooi.reference, self.get_observed_at, self.organization
         )
 
         inference_params = self.octopoes_api_connector.list_origin_parameters(
@@ -185,7 +185,7 @@ class OOIDetailView(
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = self.get_observed_at()
+        context["observed_at"] = self.get_observed_at
         context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects(context["observed_at"])

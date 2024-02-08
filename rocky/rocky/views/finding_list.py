@@ -54,7 +54,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.severities = self.get_severities()
-        self.valid_time = self.get_observed_at()
+        self.valid_time = self.get_observed_at
         self.muted_findings = request.GET.get("muted_findings", "non-muted")
 
         self.exclude_muted = self.muted_findings == "non-muted"
