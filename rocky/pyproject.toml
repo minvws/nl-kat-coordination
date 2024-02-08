@@ -96,8 +96,9 @@ requires = ["setuptools>=62.2", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered --ignore=tests/integration"
+addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered -m 'not slow' --ignore=tests/integration"
 DJANGO_SETTINGS_MODULE = "rocky.settings_test"
+markers = ["slow: marks tests as slow"]
 
 [tool.coverage.run]
 omit = ["fmea/*"]
