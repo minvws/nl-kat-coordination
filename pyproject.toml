@@ -1,9 +1,9 @@
 [tool.black]
-target-version = ["py38", "py39", "py310", "py311"]
+target-version = ["py310", "py311"]
 line-length = 120
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.10"
 plugins = ["pydantic.mypy"]
 strict = false
 ignore_missing_imports = true
@@ -24,7 +24,8 @@ paths = ["."]
 # To be extended with DJ, PT, RUF, C90, D, PL, RET
 select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A"]
 # non-pep585-annotation and non-pep604-annotation are not actually compatible with 3.8
-ignore = ["UP006", "UP007", "A003", "SIM108"]
+# TODO: UP035 and UP038 are ignored temporarily until we've updated typing to Python 3.10
+ignore = ["UP006", "UP007", "UP035", "UP038", "A003", "SIM108"]
 fix = true
 
 # Exclude a variety of commonly ignored directories.
@@ -56,8 +57,8 @@ exclude = [
 # Same as Black.
 line-length = 120
 
-# Support Python 3.8 and higher
-target-version = "py38"
+# Support Python 3.10 and higher
+target-version = "py310"
 
 # Add "Example" to allowed code comments
 task-tags = ["Example", "todo", "TODO", "FIXME"]
@@ -100,7 +101,7 @@ requires = ["poetry-core>=1.0.0","setuptools>=65", "setuptools_scm[toml]>=7.1"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 sphinx = "<8"
 sphinx_rtd_theme = "2.0.0"
 sphinxcontrib-mermaid = "^0.9.2"
