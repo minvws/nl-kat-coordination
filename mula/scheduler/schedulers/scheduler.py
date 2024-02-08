@@ -9,6 +9,8 @@ import structlog
 from scheduler import connectors, context, models, queues, storage, utils
 from scheduler.utils import thread
 
+tracer = trace.get_tracer(__name__)
+
 
 class Scheduler(abc.ABC):
     """The Scheduler class combines the priority queue.
@@ -111,6 +113,7 @@ class Scheduler(abc.ABC):
 
         self.threads.append(t)
 
+    @tracer.start_as_current_span("scheduler_push_item_to_queue")
     def push_items_to_queue(self, p_items: List[models.PrioritizedItem]) -> None:
         """Push multiple PrioritizedItems to the queue.
 
@@ -268,6 +271,7 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
+    @tracer.start_as_current_span("scheduler_pop_item_from_queue")
     def pop_item_from_queue(
         self, filters: Optional[storage.filters.FilterRequest] = None
     ) -> Optional[models.PrioritizedItem]:
