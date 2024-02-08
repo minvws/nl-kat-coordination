@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 import structlog
+from opentelemetry import trace
 
 from scheduler import connectors, context, models, queues, storage, utils
 from scheduler.utils import thread
