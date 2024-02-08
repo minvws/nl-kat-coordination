@@ -60,7 +60,7 @@ class PluginService:
     def get_all(self, organisation_id: str) -> List[PluginType]:
         all_plugins = self._plugins_for_repos(self.repository_storage.get_all().values(), organisation_id)
 
-        flat = []
+        flat: List[PluginType] = []
 
         for plugins in all_plugins.values():
             flat.extend(plugins.values())
@@ -161,7 +161,7 @@ class PluginService:
     def _plugins_for_repos(
         self, repositories: Iterable[Repository], organisation_id: str
     ) -> Dict[str, Dict[str, PluginType]]:
-        plugins = {}
+        plugins: Dict[str, Dict[str, PluginType]] = {}
 
         for repository in repositories:
             if repository.id == RESERVED_LOCAL_ID:
