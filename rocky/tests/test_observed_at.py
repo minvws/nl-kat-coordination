@@ -74,4 +74,4 @@ def test_observed_at_future_date(rf, client_member, mock_organization_view_octop
 
     form = ObservedAtForm(data=request.GET)
     assert not form.is_valid()
-    assert "Your selected date is in the future. Please select a different date." in form.errors["observed_at"]
+    assert "The selected date is in the future. Please select a different date." in form.errors["observed_at"]
