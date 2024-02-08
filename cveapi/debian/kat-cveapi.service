@@ -29,3 +29,4 @@ LockPersonality=yes
 MemoryDenyWriteExecute=yes
 UMask=0022
 ReadWritePaths=/var/lib/kat-cveapi
+TimeoutStartSec=8h

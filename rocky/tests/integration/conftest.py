@@ -9,6 +9,7 @@ from urllib3 import Retry
 
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import DeclaredScanProfile, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.findings import CVEFindingType, KATFindingType, RetireJSFindingType, RiskLevelSeverity
@@ -187,3 +188,20 @@ def seed_system(
         "security_txts": security_txts,
         "certificates": certificates,
     }
+
+
+@pytest.fixture()
+def hostname_oois():
+    return [
+        Hostname(
+            object_type="Hostname",
+            scan_profile=DeclaredScanProfile(
+                scan_profile_type="declared", reference=Reference("Hostname|test|example.com"), level=2
+            ),
+            primary_key="Hostname|test|example.com",
+            network=Reference("Network|test"),
+            name="example.com",
+            dns_zone=Reference("DNSZone|test|example.com"),
+            registered_domain=None,
+        )
+    ]
