@@ -202,7 +202,7 @@ def parse_normalizer(normalizer: Dict) -> Normalizer:
     name = normalizer["id"].replace("_", " ").replace("kat ", "").title()
 
     consumes = set(normalizer["consumes"])
-    consumes.add(f"normalizer/{normalizer['id'}")
+    consumes.add(f"normalizer/{normalizer['id']}")
     produces = set()
     for type_name in normalizer.get("produces", []):
         try:
@@ -213,7 +213,7 @@ def parse_normalizer(normalizer: Dict) -> Normalizer:
     return Normalizer(
         id=normalizer["id"],
         repository_id=normalizer["repository_id"],
-        name=name or normalizer["id"],
+        name=name,
         description=normalizer["description"],
         enabled=normalizer["enabled"],
         type=normalizer["type"],
