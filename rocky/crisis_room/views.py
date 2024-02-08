@@ -62,7 +62,7 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
     def get_finding_type_severity_count(self, organization: Organization) -> Dict[str, int]:
         try:
             api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
-            return api_connector.count_findings_by_severity(valid_time=self.get_observed_at)
+            return api_connector.count_findings_by_severity(valid_time=self.observed_at)
         except ConnectorException:
             messages.add_message(
                 self.request,
@@ -99,6 +99,6 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
         context["org_finding_counts_per_severity_critical"] = self.sort_by_severity(org_finding_counts_per_severity)
 
         context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = self.get_observed_at.date()
+        context["observed_at"] = self.observed_at.date()
 
         return context
