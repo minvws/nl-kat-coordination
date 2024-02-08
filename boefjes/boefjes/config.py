@@ -52,7 +52,7 @@ class Settings(BaseSettings):
         "1.1.1.1", description="Name server used for remote DNS resolution in the boefje runner"
     )
 
-    scan_profile_whitelist: Dict[str, conint(strict=True, ge=0, le=4)] = Field(
+    scan_profile_whitelist: Dict[str, conint(strict=True, ge=0, le=4)] = Field(  # type: ignore
         default_factory=dict,
         description="Whitelist for normalizer ids allowed to produce scan profiles, including a maximum level.",
         examples=['{"kat_external_db_normalize": 3, "kat_dns_normalize": 1}'],
