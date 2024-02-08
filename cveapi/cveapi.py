@@ -26,7 +26,7 @@ def download_files(directory, last_update, update_timestamp):
             parameters = f"startIndex={index}"
         logger.debug("Parameters are %s", parameters)
 
-        r = session.get(f"https://services.nvd.nist.gov/rest/json/cves/2.0/?{(parameters)}")
+        r = session.get(f"https://services.nvd.nist.gov/rest/json/cves/2.0/?{(parameters)}", timeout=60)
         if r.status_code != 200:
             error_count += 1
             if error_count == 5:
