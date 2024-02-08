@@ -194,7 +194,7 @@ class NormalizerHandler(Handler):
     ):
         self.job_runner = job_runner
         self.bytes_client: BytesAPIClient = bytes_client
-        self.whitelist = whitelist
+        self.whitelist = whitelist or {}
         self.octopoes_factory = octopoes_factory
 
     def handle(self, normalizer_meta: NormalizerMeta) -> None:
