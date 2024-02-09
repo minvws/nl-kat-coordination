@@ -70,6 +70,8 @@ class BytesAPIClient:
         except HTTPError as error:
             if error.response.status_code != 401:
                 logger.error(response.text)
+            else:
+                logger.debug(response.text)
             raise
 
     def _get_authentication_headers(self) -> Dict[str, str]:
