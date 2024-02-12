@@ -13,7 +13,7 @@ from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
-DEFAULT_RECORD_TYPES = set(("A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME"))
+DEFAULT_RECORD_TYPES = set(("A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME", "SOA"))
 
 
 class ZoneNotFoundException(Exception):
@@ -36,11 +36,16 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     nameserver = getenv("REMOTE_NS", str(settings.remote_ns))
     resolver.nameservers = [nameserver]
 
-    answers = [
-        get_parent_zone_soa(resolver, requested_dns_name),
-    ]
+    record_types = get_record_types()
+    answers = (
+        [
+            get_parent_zone_soa(resolver, requested_dns_name),
+        ]
+        if "SOA" in record_types
+        else []
+    )
 
-    for type_ in get_record_types():
+    for type_ in record_types:
         try:
             answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)
