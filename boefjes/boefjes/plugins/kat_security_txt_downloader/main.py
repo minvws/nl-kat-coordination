@@ -41,7 +41,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         # we can not force the ip anymore
         elif response.status_code in [301, 302, 307, 308]:
             uri = response.headers["Location"]
-            response = requests.get(uri, stream=True, timeout=30)
+            response = requests.get(uri, stream=True, timeout=30, verify=False)  # noqa: S501
             ip = response.raw._connection.sock.getpeername()[0]
             results[path] = {
                 "content": response.content.decode(),
