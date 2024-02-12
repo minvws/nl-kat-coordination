@@ -9,7 +9,7 @@ import docker
 from boefjes.job_models import BoefjeMeta
 
 IMAGE = "ghcr.io/minvws/nl-kat-masscan-build-image:latest"
-FILE_PATH = "/tmp/output.json"
+FILE_PATH = "/tmp/output.json"  # noqa: S108
 
 
 ###############################################################################
