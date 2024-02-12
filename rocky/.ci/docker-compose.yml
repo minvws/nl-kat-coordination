@@ -3,7 +3,7 @@ version: "3.9"
 services:
   rocky_tests:
     build:
-      context: ..
+      context: ../..
       dockerfile: rocky/Dockerfile
       args:
         ENVIRONMENT: dev
@@ -12,48 +12,48 @@ services:
     depends_on:
       - ci_rocky-db
     volumes:
-      - .:/app/rocky
-      - ./.ci/run_rocky.sh:/app/run_rocky.sh
-      - ../octopoes/octopoes:/app/rocky/octopoes
+      - ..:/app/rocky
+      - ./run_rocky.sh:/app/run_rocky.sh
+      - ../../octopoes/octopoes:/app/rocky/octopoes
     env_file:
-      - .ci/.env.test
+      - .env.test
 
-  rocky_integration_tests:
+  rocky_integration:
     build:
-      context: ..
+      context: ../..
       dockerfile: rocky/Dockerfile
       args:
         ENVIRONMENT: dev
       target: dev
-    command: python -m pytest tests/integration
+    command: pytest tests/integration
     depends_on:
       - ci_rocky-db
       - ci_octopoes
     volumes:
-      - .:/app/rocky
-      - ./.ci/run_rocky.sh:/app/run_rocky.sh
-      - ../octopoes/octopoes:/app/rocky/octopoes
+      - ..:/app/rocky
+      - ./run_rocky.sh:/app/run_rocky.sh
+      - ../../octopoes/octopoes:/app/rocky/octopoes
     env_file:
-      - .ci/.env.test
+      - .env.test
 
   ci_rocky-db:
     image: postgres:15
     env_file:
-      - .ci/.env.test
+      - .env.test
 
   ci_octopoes:
     build:
-      context: ../octopoes
+      context: ../../octopoes
     command: uvicorn octopoes.api.api:app --host 0.0.0.0 --port 80
     depends_on:
       rabbitmq:
         condition: service_healthy
-      xtdb_multinode:
+      xtdb:
         condition: service_started
     env_file:
-      - .ci/.env.test
+      - .env.test
 
-  xtdb_multinode:
+  xtdb:
     image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"
 
   rabbitmq:
@@ -64,4 +64,4 @@ services:
       interval: 5s
       retries: 4
     env_file:
-      - .ci/.env.test
+      - .env.test

@@ -3,7 +3,7 @@ import os
 import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -16,13 +16,14 @@ from boefjes.job_models import (
     BoefjeMeta,
     NormalizerMeta,
     NormalizerPlainOOI,
+    NormalizerScanProfile,
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI, Reference, ScanProfile
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.types import OOIType
 
@@ -36,7 +37,7 @@ bytes_api_client = BytesAPIClient(
 
 
 def _find_ooi_in_past(reference: Reference, connector: OctopoesAPIConnector, lookback_days: int = 4) -> OOI:
-    # Source OOIs may not live in crux since we currently have TTLs in place (to be removed soon).
+    # Source OOIs may not live in XTDB since we currently have TTLs in place (to be removed soon).
     valid_time = datetime.now(timezone.utc)
 
     for days_in_past in range(lookback_days):
@@ -81,6 +82,10 @@ def serialize_ooi(ooi: OOI):
     return serialized_oois
 
 
+def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
+    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
+
+
 def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str]) -> Dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
@@ -106,9 +111,17 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
 
 
 class BoefjeHandler(Handler):
-    def __init__(self, job_runner, local_repository: LocalPluginRepository):
-        self.job_runner: BoefjeJobRunner = job_runner
-        self.local_repository: LocalPluginRepository = local_repository
+    def __init__(
+        self,
+        job_runner: BoefjeJobRunner,
+        local_repository: LocalPluginRepository,
+        bytes_client: BytesAPIClient,
+        octopoes_factory=get_octopoes_api_connector,
+    ):
+        self.job_runner = job_runner
+        self.local_repository = local_repository
+        self.bytes_client = bytes_client
+        self.octopoes_factory = octopoes_factory
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
@@ -129,7 +142,7 @@ class BoefjeHandler(Handler):
             boefje_meta.arguments["input"] = serialize_ooi(
                 _find_ooi_in_past(
                     Reference.from_str(boefje_meta.input_ooi),
-                    get_octopoes_api_connector(boefje_meta.organization),
+                    self.octopoes_factory(boefje_meta.organization),
                 )
             )
 
@@ -157,11 +170,11 @@ class BoefjeHandler(Handler):
             boefje_meta.ended_at = datetime.now(timezone.utc)
             logger.info("Saving to Bytes for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
 
-            bytes_api_client.save_boefje_meta(boefje_meta)
+            self.bytes_client.save_boefje_meta(boefje_meta)
 
             if boefje_results:
                 for boefje_added_mime_types, output in boefje_results:
-                    raw_file_id = bytes_api_client.save_raw(
+                    raw_file_id = self.bytes_client.save_raw(
                         boefje_meta.id, output, mime_types.union(boefje_added_mime_types)
                     )
                     logger.debug(
@@ -172,19 +185,28 @@ class BoefjeHandler(Handler):
 
 
 class NormalizerHandler(Handler):
-    def __init__(self, job_runner):
-        self.job_runner: NormalizerJobRunner = job_runner
+    def __init__(
+        self,
+        job_runner: NormalizerJobRunner,
+        bytes_client: BytesAPIClient,
+        whitelist: Optional[Dict[str, int]] = None,
+        octopoes_factory: Callable[[str], OctopoesAPIConnector] = get_octopoes_api_connector,
+    ):
+        self.job_runner = job_runner
+        self.bytes_client: BytesAPIClient = bytes_client
+        self.whitelist = whitelist or {}
+        self.octopoes_factory = octopoes_factory
 
     def handle(self, normalizer_meta: NormalizerMeta) -> None:
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
-        raw = bytes_api_client.get_raw(normalizer_meta.raw_data.id)
+        raw = self.bytes_client.get_raw(normalizer_meta.raw_data.id)
 
         normalizer_meta.started_at = datetime.now(timezone.utc)
 
         try:
             results = self.job_runner.run(normalizer_meta, raw)
-            connector = get_octopoes_api_connector(normalizer_meta.raw_data.boefje_meta.organization)
+            connector = self.octopoes_factory(normalizer_meta.raw_data.boefje_meta.organization)
 
             for observation in results.observations:
                 reference = Reference.from_str(observation.input_ooi)
@@ -207,9 +229,25 @@ class NormalizerHandler(Handler):
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )
                 )
+
+            corrected_scan_profiles = []
+            for profile in results.scan_profiles:
+                profile.level = min(profile.level, self.whitelist.get(normalizer_meta.normalizer.id, profile.level))
+                corrected_scan_profiles.append(profile)
+
+            validated_scan_profiles = [
+                profile
+                for profile in corrected_scan_profiles
+                if self.whitelist and profile.level <= self.whitelist.get(normalizer_meta.normalizer.id, -1)
+            ]
+            if validated_scan_profiles:
+                connector.save_many_scan_profiles(
+                    [self._parse_scan_profile(scan_profile) for scan_profile in results.scan_profiles],
+                    valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                )
         finally:
             normalizer_meta.ended_at = datetime.now(timezone.utc)
-            bytes_api_client.save_normalizer_meta(normalizer_meta)
+            self.bytes_client.save_normalizer_meta(normalizer_meta)
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
 
@@ -217,6 +255,10 @@ class NormalizerHandler(Handler):
     def _parse_ooi(result: NormalizerPlainOOI):
         return parse_obj_as(OOIType, result.model_dump())
 
+    @staticmethod
+    def _parse_scan_profile(result: NormalizerScanProfile):
+        return parse_obj_as(ScanProfile, result.model_dump())
 
-def get_octopoes_api_connector(org_code: str):
-    return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
+
+class InvalidWhitelist(Exception):
+    pass

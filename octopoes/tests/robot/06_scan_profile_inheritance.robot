@@ -15,14 +15,9 @@ Simple Scan Profile Inheritance
 
 *** Keywords ***
 Setup Test
-    Start Monitoring    ${QUEUE_URI}
+    robot.Setup Test
     Insert Normalizer Output
     Await Sync
-
-Teardown Test
-    Cleanup
-    Await Sync
-    Stop Monitoring
 
 Get Scan Profile Inheritance
     [Arguments]    ${reference}

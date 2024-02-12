@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, Optional, Set, Tuple, Type
 
@@ -19,16 +18,9 @@ if os.getenv("DOCS"):
     BASE_DIR = Path("../../../")
 
 
-class XTDBType(Enum):
-    CRUX = "crux"
-    XTDB = "xtdb"
-    XTDB_MULTINODE = "xtdb-multinode"
-
-
 class BackwardsCompatibleEnvSettings(EnvSettingsSource):
     backwards_compatibility_mapping = {
         "LOG_CFG": "OCTOPOES_LOG_CFG",
-        "XTDB_TYPE": "OCTOPOES_XTDB_TYPE",
     }
 
     def __call__(self) -> Dict[str, Any]:
@@ -57,12 +49,7 @@ class Settings(BaseSettings):
     # External services settings
     queue_uri: AmqpDsn = Field(..., examples=["amqp://"], description="KAT queue URI", validation_alias="QUEUE_URI")
     xtdb_uri: AnyHttpUrl = Field(
-        ..., examples=["http://crux:3000"], description="XTDB API", validation_alias="XTDB_URI"
-    )
-    xtdb_type: XTDBType = Field(
-        XTDBType.XTDB_MULTINODE,
-        description="Determines how Octopoes will format documents' primary in serialization (crux.db/id vs xt/id)",
-        possible_values=["crux", "xtdb", "xtdb-multinode"],
+        ..., examples=["http://xtdb:3000"], description="XTDB API", validation_alias="XTDB_URI"
     )
 
     katalogus_api: AnyHttpUrl = Field(

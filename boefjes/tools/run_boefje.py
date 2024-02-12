@@ -11,7 +11,7 @@ import click
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from boefjes.job_handler import BoefjeHandler
+from boefjes.job_handler import BoefjeHandler, bytes_api_client
 from boefjes.job_models import Boefje, BoefjeMeta
 from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalBoefjeJobRunner
@@ -31,7 +31,7 @@ def run_boefje(start_pdb, organization_code, boefje_id, input_ooi):
 
     local_repository = get_local_repository()
 
-    handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository)
+    handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, bytes_api_client)
     try:
         handler.handle(meta)
     except Exception:
