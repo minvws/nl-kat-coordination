@@ -31,9 +31,25 @@
                    href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
             </div>
         {% else %}
-            <form method="get" action="{{ next }}" class="inline layout-wide">
+            <form method="get"
+                  action="{{ next }}"
+                  class="inline layout-wide checkboxes_required">
                 {% include "forms/report_form_fields.html" %}
 
+                {% if channel != "generate_report" %}
+                    <p class="explanation"
+                       role="group"
+                       aria-label="{% translate "explanation select all" %}">
+                        <span>{% translate "Explanation 'Continue with all OOIs'" %}:</span>
+                        {% blocktrans trimmed %}
+                            This option will select all OOIs (+ current filters)
+                            for {{ organization }} organization.
+                        {% endblocktrans %}
+                    </p>
+                    <button type="submit" class="button" name="ooi" value="all">
+                        {% translate "Continue with all OOIs" %}<span class="icon ti-chevron-right"></span>
+                    </button>
+                {% endif %}
                 <table>
                     <caption class="visually-hidden">{% translate "Objects:" %}</caption>
                     <thead>
@@ -63,7 +79,7 @@
                     </tbody>
                 </table>
                 <button type="submit" class="button">
-                    {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
+                    {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
                 </button>
             </form>
             {% include "partials/list_paginator.html" %}

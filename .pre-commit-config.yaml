@@ -20,6 +20,7 @@ repos:
   - id: end-of-file-fixer
     exclude: |
       (?x)(
+      \.svcg$ |
       ^boefjes/tests/examples/rdns-nxdomain.txt$
       )
 
@@ -67,7 +68,7 @@ repos:
     additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'types-retry', 'pydantic', 'pynacl']
     exclude: |
       (?x)(
-      ^boefjes/ |
+      ^boefjes/boefjes/plugins |
       ^keiko/templates |
       ^mula/whitelist\.py$ |
       ^octopoes/ |
@@ -87,6 +88,7 @@ repos:
       (?x)(
       \.po$ |
       \.xml$ |
+      \.svg$ |
       poetry.lock$ |
       pyproject.toml$ |
       requirements-.*.txt$ |
