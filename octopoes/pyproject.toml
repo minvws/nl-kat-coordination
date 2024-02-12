@@ -10,7 +10,7 @@ requires = ["setuptools>=62.2", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 requests = "^2.31.0"
 pydantic = "^2.4.2"
 fastapi = "^0.109.1"
@@ -49,7 +49,7 @@ httpx = "^0.26.0"
 pytest-timeout = "^2.1.0"
 
 [tool.black]
-target-version = ["py38", "py39", "py310", "py311"]
+target-version = ["py310", "py311"]
 line-length = 120
 
 [tool.pytest.ini_options]
