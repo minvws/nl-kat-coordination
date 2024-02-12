@@ -90,7 +90,8 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = requests.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
+            timeout=30,
         )
         response.raise_for_status()
         environment = response.json()
