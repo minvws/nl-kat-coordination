@@ -145,7 +145,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                 for report_type in self.report_types:
                     if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
                         report = report_type(self.octopoes_api_connector)
-                        data = report.generate_data(ooi, valid_time=self.valid_time)
+                        data = report.generate_data(ooi, valid_time=self.observed_at)
                         template = report.template_path
                         report_data[ooi][report_type.name] = {"data": data, "template": template}
             except ObjectNotFoundException:
@@ -155,7 +155,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_oois:
             oois = ", ".join(set(error_oois))
-            date = self.valid_time.date()
+            date = self.observed_at.date()
             error_message = _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.") % {
                 "oois": oois,
                 "date": date,

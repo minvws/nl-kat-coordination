@@ -79,7 +79,6 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 class BaseReportView(OOIFilterView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.valid_time = self.observed_at
         self.selected_oois = request.GET.getlist("ooi", [])
         self.selected_report_types = request.GET.getlist("report_type", [])
 
@@ -91,7 +90,7 @@ class BaseReportView(OOIFilterView):
         if "all" in self.selected_oois:
             return self.octopoes_api_connector.list(
                 self.get_ooi_types(),
-                valid_time=self.valid_time,
+                valid_time=self.observed_at,
                 limit=OOIList.HARD_LIMIT,
                 scan_level=self.get_ooi_scan_levels(),
                 scan_profile_type=self.get_ooi_profile_types(),
@@ -159,7 +158,6 @@ class BaseReportView(OOIFilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observed_at"] = self.valid_time
         context["created_at"] = datetime.now()
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types

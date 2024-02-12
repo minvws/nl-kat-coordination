@@ -38,7 +38,6 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.valid_time = self.observed_at
         self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
         self.clearance_levels = request.GET.getlist("clearance_level", [])
         self.clearance_types = request.GET.getlist("clearance_type", [])
@@ -71,7 +70,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observed_at"] = self.valid_time
+        context["observed_at"] = self.observed_at
         context["observed_at_form"] = self.get_connector_form()
 
         context["ooi_types_selection"] = self.filtered_ooi_types
@@ -93,7 +92,7 @@ class BaseOOIListView(OOIFilterView, ListView):
         return OOIList(
             self.octopoes_api_connector,
             ooi_types=self.get_ooi_types(),
-            valid_time=self.valid_time,
+            valid_time=self.observed_at,
             scan_level=self.get_ooi_scan_levels(),
             scan_profile_type=self.get_ooi_profile_types(),
         )
@@ -101,11 +100,7 @@ class BaseOOIListView(OOIFilterView, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = self.valid_time
         context["total_oois"] = len(self.object_list)
-        context["clearance_level_filter_form"] = ClearanceFilterForm(self.request.GET)
-        context["active_filters"] = self.get_active_filters()
         return context
 
 

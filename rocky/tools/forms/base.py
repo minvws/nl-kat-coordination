@@ -63,7 +63,7 @@ class ObservedAtForm(BaseRockyForm):
     observed_at = forms.DateField(
         label=_("Date"),
         widget=DateInput(format="%Y-%m-%d"),
-        initial=lambda: datetime.now(tz=timezone.utc),
+        initial=lambda: datetime.now(tz=timezone.utc).date(),
         required=True,
         help_text=OBSERVED_AT_HELP_TEXT,
     )
