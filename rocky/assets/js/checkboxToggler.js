@@ -75,11 +75,15 @@ function checkbox_required_validity(form, anchor, event) {
   // bind a change event to *all* checkboxes that might increase or decrease our selected_count;
   // Increase resets the usecase of a minimal selection, decrease is needed if we have reached the max.
   elements.forEach(function (element){
-    element.addEventListener('change', function(event){
-      // we need to remove the custom error on change, because otherwise the submit won't allow us to revalidate as the form immediately raises an invalid state.
-      event.target.setCustomValidity('');
-    });
+    element.addEventListener('change', reset_validity.bind(null, error_element));
   });
+
   error_element.reportValidity();
   return validity;
 }
+
+function reset_validity(error_element, event){
+  // we need to remove the custom error on change, because otherwise the submit won't allow us to revalidate as the form immediately raises an invalid state.
+  error_element.setCustomValidity('');
+}
+
