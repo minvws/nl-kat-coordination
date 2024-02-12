@@ -10,11 +10,10 @@
     },
     "REMOTE_NS": {
       "title": "REMOTE_NS",
-      "maxLength": 15,
+      "maxLength": 45,
       "type": "string",
       "description": "The IP address of the DNS resolver you want to use.",
       "default": "1.1.1.1"
     }
-  },
-  "required": []
+  }
 }
