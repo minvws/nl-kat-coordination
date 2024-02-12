@@ -1,5 +1,6 @@
-import xml.etree.ElementTree as ET
 from typing import Iterable, Union
+
+import defusedxml.ElementTree as ET
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
