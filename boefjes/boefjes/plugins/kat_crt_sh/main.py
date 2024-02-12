@@ -48,7 +48,7 @@ def request_certs(search_string, search_type="Identity", match="=", deduplicate=
     if deduplicate:
         query["deduplicate"] = "Y"
 
-    response = requests.get(CRT_SH_API, params=query)
+    response = requests.get(CRT_SH_API, params=query, timeout=30)
     if response.status_code != 200:
         response.raise_for_status()
     if json_output:
