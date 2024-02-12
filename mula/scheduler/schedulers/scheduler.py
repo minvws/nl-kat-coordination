@@ -92,24 +92,23 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The prioritized item from the priority queue.
         """
-        # NOTE: we set the id of the task the same as the p_item, for easier
-        # lookup.
-        task = models.Task(
-            id=p_item.id,
-            scheduler_id=self.scheduler_id,
-            type=self.queue.item_type.type,
-            p_item=p_item,
-            status=models.TaskStatus.QUEUED,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
 
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
-        if task_db is not None:
-            self.ctx.datastores.task_store.update_task(task)
+        if task_db is None:
+            self.logger.warning(
+                "%s pushed to %s, task %s not found in datastore, could not update task status",
+                p_item.id,
+                self.queue.pq_id,
+                p_item.data.get("id"),
+                p_item_id=p_item.id,
+                task_id=p_item.data.get("id"),
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
             return
 
-        self.ctx.datastores.task_store.create_task(task)
+        task_db.status = models.TaskStatus.QUEUED
+        self.ctx.datastores.task_store.update_task(task_db)
 
         self.last_activity = datetime.now(timezone.utc)
 
@@ -184,11 +183,13 @@ class Scheduler(abc.ABC):
         return p_item
 
     @tracer.start_as_current_span("scheduler_push_item_to_queue")
-    def push_item_to_queue(self, p_item: models.PrioritizedItem) -> None:
+    def push_item_to_queue(self, p_item: models.PrioritizedItem, push: bool = True) -> None:
         """Push a PrioritizedItem to the queue.
 
         Args:
             p_item: The PrioritizedItem to push to the queue.
+            push: Whether to push the item to the queue. Allows for Creation
+            of the task without pushing it to the queue.
         """
         if not self.is_enabled():
             self.logger.warning(
@@ -200,6 +201,33 @@ class Scheduler(abc.ABC):
             )
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
+        task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
+        if task_db is None:
+            # Create task
+            # NOTE: we set the id of the task the same as the p_item, for easier
+            # lookup.
+            task = models.Task(
+                id=p_item.id,
+                scheduler_id=self.scheduler_id,
+                type=self.queue.item_type.type,
+                p_item=p_item,
+                status=models.TaskStatus.PENDING,
+                created_at=datetime.now(timezone.utc),
+                modified_at=datetime.now(timezone.utc),
+            )
+            task_db = self.ctx.datastores.task_store.create_task(task)
+
+        if not push:
+            self.logger.debug(
+                "Not pushing item %s to queue %s",
+                p_item.id,
+                self.queue.pq_id,
+                p_item_id=p_item.id,
+                queue_id=self.queue.pq_id,
+                scheduler_id=self.scheduler_id,
+            )
+            return
+
         try:
             self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
@@ -210,6 +238,8 @@ class Scheduler(abc.ABC):
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
             )
+            task_db.status = models.TaskStatus.FAILED
+            self.ctx.datastores.task_store.update_task(task_db)
             raise exc
         except queues.errors.QueueFullError as exc:
             self.logger.warning(
@@ -220,6 +250,8 @@ class Scheduler(abc.ABC):
                 queue_qsize=self.queue.qsize(),
                 scheduler_id=self.scheduler_id,
             )
+            task_db.status = models.TaskStatus.FAILED
+            self.ctx.datastores.task_store.update_task(task_db)
             raise exc
         except queues.errors.InvalidPrioritizedItemError as exc:
             self.logger.warning(
@@ -230,6 +262,8 @@ class Scheduler(abc.ABC):
                 queue_qsize=self.queue.qsize(),
                 scheduler_id=self.scheduler_id,
             )
+            task_db.status = models.TaskStatus.FAILED
+            self.ctx.datastores.task_store.update_task(task_db)
             raise exc
 
         self.logger.debug(
@@ -286,6 +320,7 @@ class Scheduler(abc.ABC):
         p_item: models.PrioritizedItem,
         max_tries: int = 5,
         timeout: int = 1,
+        push: bool = True,
     ) -> None:
         """Push an item to the queue, with a timeout.
 
@@ -311,7 +346,7 @@ class Scheduler(abc.ABC):
         if tries >= max_tries and max_tries != -1:
             raise queues.errors.QueueFullError()
 
-        self.push_item_to_queue(p_item)
+        self.push_item_to_queue(p_item, push=push)
 
     def run_in_thread(
         self,

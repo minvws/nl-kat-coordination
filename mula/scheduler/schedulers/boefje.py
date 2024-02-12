@@ -9,17 +9,9 @@ from opentelemetry import trace
 
 from scheduler import context, models, queues, rankers
 from scheduler.connectors import listeners
-from scheduler.models import (
-    OOI,
-    Boefje,
-    BoefjeTask,
-    MutationOperationType,
-    Organisation,
-    Plugin,
-    PrioritizedItem,
-    ScanProfileMutation,
-    TaskStatus,
-)
+from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
+                              Organisation, Plugin, PrioritizedItem,
+                              ScanProfileMutation, TaskStatus)
 from scheduler.storage import filters
 
 from .scheduler import Scheduler
@@ -111,6 +103,13 @@ class BoefjeScheduler(Scheduler):
             name=f"scheduler-{self.scheduler_id}-random",
             target=self.push_tasks_for_random_objects,
             interval=60.0,
+        )
+
+        # Push pending tasks to the queue
+        self.run_in_thread(
+            name=f"scheduler-{self.scheduler_id}-push_pending",
+            target=self.push_pending_tasks,
+            interval=60.0
         )
 
         self.logger.info(
@@ -329,6 +328,26 @@ class BoefjeScheduler(Scheduler):
                         ooi,
                         self.push_tasks_for_random_objects.__name__,
                     )
+
+    def push_pending_tasks(self) -> None:
+        """Push pending tasks to the queue."""
+        pending_tasks = self.ctx.datastores.task_store.get_tasks(
+            scheduler_id=self.scheduler_id,
+            task_type=self.queue.item_type,
+            status=TaskStatus.PENDING,
+        )
+
+        # TODO: here we need to determine if we need to push the task to the
+        # queue
+
+        # NOTE: is_task_running does not account for the pending status atm.
+
+        for task in pending_tasks:
+            self.push_task(
+                task.boefje,
+                task.ooi,
+                self.push_pending_tasks.__name__,
+            )
 
     @tracer.start_as_current_span("boefje_is_task_allowed_to_run")
     def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
@@ -660,8 +679,15 @@ class BoefjeScheduler(Scheduler):
             hash=task.hash,
         )
 
+        # TODO: Here we can check if we need to delay pushing the task on the
+        # queue. 
+        #
+        # Determine here if you need to push it onto the queue or not.
+        push = True
+        if 
+
         try:
-            self.push_item_to_queue_with_timeout(p_item, self.max_tries)
+            self.push_item_to_queue_with_timeout(p_item, self.max_tries, push)
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
