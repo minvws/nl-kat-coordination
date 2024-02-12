@@ -6,7 +6,7 @@ authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 alembic = "^1.8.1"
 anyio = "^4.2.0"
 asgiref = "^3.5.2"
@@ -83,5 +83,5 @@ requires = ["setuptools>=65", "wheel"]
 build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.black]
-target-version = ["py38", "py39", "py310", "py311"]
+target-version = ["py310", "py311"]
 line-length = 120

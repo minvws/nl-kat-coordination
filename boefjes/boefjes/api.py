@@ -4,6 +4,7 @@ import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Optional
+from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, Response
 from pydantic import BaseModel, ConfigDict, Field
@@ -49,7 +50,7 @@ def run():
 
 
 class BoefjeInput(BaseModel):
-    task_id: str
+    task_id: UUID
     output_url: str
     boefje_meta: BoefjeMeta
     model_config = ConfigDict(extra="forbid")
@@ -90,7 +91,7 @@ async def root():
 
 @app.get("/api/v0/tasks/{task_id}", response_model=BoefjeInput)
 async def boefje_input(
-    task_id: str,
+    task_id: UUID,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     local_repository: LocalPluginRepository = Depends(get_local_repository),
 ):
@@ -107,7 +108,7 @@ async def boefje_input(
 
 @app.post("/api/v0/tasks/{task_id}")
 async def boefje_output(
-    task_id: str,
+    task_id: UUID,
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     bytes_client: BytesAPIClient = Depends(get_bytes_client),
