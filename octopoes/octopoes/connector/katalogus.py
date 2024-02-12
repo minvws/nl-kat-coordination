@@ -8,7 +8,7 @@ class KATalogusClientV1:
         self.base_uri = f"{base_uri.rstrip('/')}/v1"
 
     def get_organisations(self) -> List[str]:
-        response = requests.get(f"{self.base_uri}/organisations")
+        response = requests.get(f"{self.base_uri}/organisations", timeout=30)
         response.raise_for_status()
 
         return response.json().keys()
