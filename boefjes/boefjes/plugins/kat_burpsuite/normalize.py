@@ -2,9 +2,9 @@ import base64
 from ipaddress import IPv4Address, IPv6Address, ip_address
 from typing import Iterable, Union
 from urllib.parse import urlparse
-from xml.dom import minidom
 
 from bs4 import BeautifulSoup
+from defusedxml import minidom
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
