@@ -31,7 +31,9 @@
                    href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
             </div>
         {% else %}
-            <form method="get" action="{{ next }}" class="inline layout-wide">
+            <form method="get"
+                  action="{{ next }}"
+                  class="inline layout-wide checkboxes_required">
                 {% include "forms/report_form_fields.html" %}
 
                 {% if channel != "generate_report" %}
