@@ -128,9 +128,9 @@ class SystemReport(Report):
 
         domains = []
         for data in ip_services.values():
-            domains.extend(data["hostnames"])
+            domains.update(data["hostnames"])
 
-        total_domains = len(set(domains))
+        total_domains = len(domains)
 
         summary = {"total_systems": total_systems, "total_domains": total_domains}
 
