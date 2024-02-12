@@ -6,6 +6,14 @@
         {% include "aggregate_organisation_report/term_overview.html" %}
 
         <h3 id="selected-oois">{% translate "Selected objects" %}</h3>
+        {% if active_filters %}
+            <p>
+                <span class="icon positive"></span><strong>{% translate "Currently filtered on" %}</strong>
+            </p>
+            <p>
+                {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value }}&nbsp;{% endfor %}
+            </p>
+        {% endif %}
         {% include "summary/ooi_selection.html" %}
 
     </div>
