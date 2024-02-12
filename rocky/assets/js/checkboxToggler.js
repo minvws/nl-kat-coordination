@@ -86,4 +86,3 @@ function reset_validity(error_element, event){
   // we need to remove the custom error on change, because otherwise the submit won't allow us to revalidate as the form immediately raises an invalid state.
   error_element.setCustomValidity('');
 }
-
