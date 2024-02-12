@@ -2,7 +2,7 @@ import json
 import logging
 import pkgutil
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from boefjes.katalogus.models import PluginType
 from boefjes.plugins.models import (
@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 class LocalPluginRepository:
     def __init__(self, path: Path):
         self.path = path
-        self._cached_boefjes = None
-        self._cached_normalizers = None
+        self._cached_boefjes: Optional[Dict[str, Any]] = None
+        self._cached_normalizers: Optional[Dict[str, Any]] = None
 
     def get_all(self) -> List[PluginType]:
         all_plugins = [boefje_resource.boefje for boefje_resource in self.resolve_boefjes().values()]
