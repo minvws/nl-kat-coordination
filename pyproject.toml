@@ -22,10 +22,23 @@ paths = ["."]
 [tool.ruff]
 # Enable classic flake8, pyflakes, eradicate, and tidyimport
 # To be extended with DJ, PT, RUF, C90, D, PL, RET
-select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A"]
-# non-pep585-annotation and non-pep604-annotation are not actually compatible with 3.8
-# TODO: UP035 and UP038 are ignored temporarily until we've updated typing to Python 3.10
-ignore = ["UP006", "UP007", "UP035", "UP038", "A003", "SIM108"]
+select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A", "S"]
+ignore = [
+     "UP006", # Is not compatible with Python 3.8
+     "UP007", # Is not compatible with Python 3.8
+     "UP035", # Ignored temporarily until we've updated typing to Python 3.10
+     "UP038", # Ignored temporarily until we've updated typing to Python 3.10
+     "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
+     "SIM108", # Ternary operator is not always more readable
+     "S101", # Assert use is normal in pytest tests
+     "S104", # Binding to all is normal in containers
+     "S105", # Disabled because of false positives
+     "S106", # Disabled because of false positives
+     "S308", # Mark_safe usage is okay
+     "S324", # Insecure hash functions can still be useful
+     "S603", # Disabled because of false positives
+     "S607", # Disabled because of false positives
+]
 fix = true
 
 # Exclude a variety of commonly ignored directories.
