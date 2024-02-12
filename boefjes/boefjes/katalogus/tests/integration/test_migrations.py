@@ -30,7 +30,7 @@ class TestRepositories(TestCase):
 
         encrypter = create_encrypter()
         entries = self._collect_entries(encrypter)
-        query = f"INSERT INTO setting (key, value, organisation_pk, plugin_id) values {','.join(map(str, entries))}"
+        query = f"INSERT INTO setting (key, value, organisation_pk, plugin_id) values {','.join(map(str, entries))}"  # noqa: S608
         self.engine.execute(text(query))
 
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
