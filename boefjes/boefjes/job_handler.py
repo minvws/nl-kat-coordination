@@ -90,7 +90,8 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = requests.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
+            timeout=30,
         )
         response.raise_for_status()
         environment = response.json()
@@ -190,11 +191,11 @@ class NormalizerHandler(Handler):
         job_runner: NormalizerJobRunner,
         bytes_client: BytesAPIClient,
         whitelist: Optional[Dict[str, int]] = None,
-        octopoes_factory: Callable[[str], OctopoesAPIConnector] = 3,
+        octopoes_factory: Callable[[str], OctopoesAPIConnector] = get_octopoes_api_connector,
     ):
         self.job_runner = job_runner
         self.bytes_client: BytesAPIClient = bytes_client
-        self.whitelist = whitelist
+        self.whitelist = whitelist or {}
         self.octopoes_factory = octopoes_factory
 
     def handle(self, normalizer_meta: NormalizerMeta) -> None:

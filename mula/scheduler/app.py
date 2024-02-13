@@ -238,7 +238,6 @@ class App:
         following processes:
 
             * schedulers
-            * listeners
             * monitors
             * metrics collecting
             * api server
