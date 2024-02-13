@@ -66,7 +66,7 @@ class XTDBOriginRepository(OriginRepository):
     def deserialize(cls, data: Dict[str, Any]) -> Origin:
         return Origin.parse_obj(data)
 
-    def list_orgins(
+    def list_origins(
         self,
         valid_time: datetime,
         *,
