@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-26 20:33+0000\n"
+"POT-Creation-Date: 2024-01-30 11:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,6 +28,7 @@ msgstr ""
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -1432,7 +1433,6 @@ msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
-#: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr ""
@@ -2171,6 +2171,7 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_2a_choose_report_info.html
+#: reports/report_types/dns_report/report.html
 msgid "Data"
 msgstr ""
 
@@ -2711,6 +2712,10 @@ msgid "Selected objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Currently filtered on"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_summary.html
 msgid "Selected Report Types"
@@ -3147,31 +3152,27 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "IP address lookup"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "warning"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
+msgid "Records found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid ""
-"You have less than one webserver that is reachable over IPv6, which is "
-"<strong>not</strong> in compliance to internet.nl standards."
+"The table below gives an overview of the DNS records that were found for the "
+"abovementioned DNSZone."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Other records found"
+msgid ""
+"\n"
+"                    <strong>Disclaimer:</strong>\n"
+"                    Not all DNSRecords are parsed in OpenKAT.\n"
+"                    DNS record types that are parsed and could be displayed "
+"in the table are:\n"
+"                "
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "All existing DNS record types can be found here"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3179,7 +3180,11 @@ msgid "Record"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Found by"
+msgid "TTL"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "minutes"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3780,16 +3785,37 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+msgid "explanation select all"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Explanation 'Continue with all OOIs'"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#, python-format
+msgid ""
+"This option will select all OOIs (+ current filters) for %(organization)s "
+"organization."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with all OOIs"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 msgid "Objects:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html
 msgid "Clearance type"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Setup report"
+#: reports/templates/partials/report_types_selection.html
+msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3881,6 +3907,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
+msgid "You have selected all objects in previous step."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
 msgstr ""
 
@@ -3890,10 +3920,6 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
-msgstr ""
-
-#: reports/templates/partials/report_types_selection.html
-msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
@@ -4629,6 +4655,18 @@ msgstr ""
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "User overview:"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "warning"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Warning"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html

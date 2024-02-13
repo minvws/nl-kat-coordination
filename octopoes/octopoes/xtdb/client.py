@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 from requests import HTTPError, Response
 
 from octopoes.models.transaction import TransactionRecord
-from octopoes.xtdb.exceptions import NodeNotFound, NoMultinode, XTDBException
+from octopoes.xtdb.exceptions import NodeNotFound, XTDBException
 from octopoes.xtdb.query import Query
 
 logger = logging.getLogger(__name__)
@@ -59,9 +59,8 @@ def get_xtdb_http_session(base_url):
 
 
 class XTDBHTTPClient:
-    def __init__(self, base_url, client: str, multinode=False):
+    def __init__(self, base_url, client: str):
         self._client = client
-        self._is_multinode = multinode
         self._session = get_xtdb_http_session(base_url.rstrip("/"))
 
     @staticmethod
@@ -76,9 +75,6 @@ class XTDBHTTPClient:
             raise e
 
     def client_url(self) -> str:
-        if not self._is_multinode:
-            return ""
-
         return f"/{self._client}"
 
     def status(self) -> XTDBStatus:
@@ -155,9 +151,6 @@ class XTDBHTTPClient:
         self.await_transaction(res.json()["txId"])
 
     def create_node(self) -> None:
-        if not self._is_multinode:
-            raise NoMultinode("Creating nodes requires XTDB multinode")
-
         try:
             res = self._session.post("/create-node", json={"node": self._client})
             self._verify_response(res)
@@ -166,9 +159,6 @@ class XTDBHTTPClient:
             raise XTDBException("Could not create node") from e
 
     def delete_node(self) -> None:
-        if not self._is_multinode:
-            raise NoMultinode("Deleting nodes requires XTDB multinode")
-
         try:
             res = self._session.post("/delete-node", json={"node": self._client})
             self._verify_response(res)

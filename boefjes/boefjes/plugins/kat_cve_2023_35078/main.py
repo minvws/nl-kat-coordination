@@ -15,7 +15,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[str, bytes]]]:
     website = f"{service}://{hostname}"
 
     full_url = urljoin(website, ENDPOINT_PATH)
-    response = requests.get(full_url, verify=False, allow_redirects=False)
+    response = requests.get(full_url, verify=False, allow_redirects=False, timeout=30)  # noqa: S501
 
     if response.status_code == 200:
         return [(set(), response.content)]

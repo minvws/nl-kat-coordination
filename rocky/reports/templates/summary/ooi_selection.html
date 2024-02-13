@@ -7,6 +7,7 @@
             <th>{% translate "Object" %}</th>
             <th>{% translate "Type" %}</th>
             <th>{% translate "Clearance level" %}</th>
+            <th>{% translate "Clearance type" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -18,6 +19,7 @@
                     {% include "partials/scan_level_indicator.html" with value=ooi.scan_profile.level.value custom_class="left" %}
 
                 </td>
+                <td>{{ ooi.scan_profile.scan_profile_type|title }}</td>
             </tr>
         {% endfor %}
     </tbody>
