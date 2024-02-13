@@ -30,19 +30,19 @@
                         {% include "partials/form/fieldset.html" with legend=name fields=form %}
 
                         <div class="button-container">
-                            <button type="submit" class="ghost" name="add">
-                                {% blocktrans count form.fields|length as count %}
-                  Add setting
-                {% plural %}
-                  Add settings
-                {% endblocktrans %}
-                            </button>
                             <button type="submit" name="add-enable">
                                 {% blocktrans count form.fields|length as count %}
                   Add setting and enable boefje
                 {% plural %}
                   Add settings and enable boefje
                 {% endblocktrans %}
+                            </button>
+                            <button type="submit" class="ghost" name="add">
+                                {% blocktrans count form.fields|length as count %}
+                Add setting
+              {% plural %}
+                Add settings
+              {% endblocktrans %}
                             </button>
                         </div>
                     </form>

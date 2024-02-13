@@ -64,11 +64,11 @@
                 <form method="post" class="inline">
                     {% csrf_token %}
                     <div class="button-container">
+                        <button type="submit" class="button">{% translate "Start scanning" %}</button>
                         {% if organization %}
                             <a href="{% url "complete_onboarding" organization.code %}"
                                class="button ghost">{% translate "Skip onboarding" %}</a>
                         {% endif %}
-                        <button type="submit" class="button">{% translate "Start scanning" %}</button>
                     </div>
                 </form>
             </div>

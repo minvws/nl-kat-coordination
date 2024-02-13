@@ -30,8 +30,8 @@
         {% include "partials/form/fieldset.html" with fields=form %}
 
         <div class="button-container">
-            <a href="{% url "two_factor:profile" %}" class="button ghost">{% trans "Back to Account Security" %}</a>
             <button type="submit">{% trans "Generate Tokens" %}</button>
+            <a href="{% url "two_factor:profile" %}" class="button ghost">{% trans "Back to Account Security" %}</a>
         </div>
     </form>
 {% endblock content %}

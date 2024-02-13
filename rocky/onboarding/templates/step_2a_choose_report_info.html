@@ -54,12 +54,12 @@
                     {% endblocktranslate %}
                 </p>
                 <div class="button-container">
+                    <a href="{% url "step_choose_report_type" organization.code %}"
+                       class="button">{% translate "Let's choose a report" %}</a>
                     {% if organization %}
                         <a href="{% url "complete_onboarding" organization.code %}"
                            class="button ghost">{% translate "Skip onboarding" %}</a>
                     {% endif %}
-                    <a href="{% url "step_choose_report_type" organization.code %}"
-                       class="button">{% translate "Let's choose a report" %}</a>
                 </div>
             </div>
         </section>

@@ -31,10 +31,10 @@
                 </p>
                 <div class="button-container">
                     {% if organization %}
-                        <a href="{% url "complete_onboarding" organization.code %}"
-                           class="button ghost">{% translate "Skip onboarding" %}</a>
                         <a href="{% url "step_setup_scan_ooi_info" organization.code %}"
                            class="button">{% translate "DNS report" %}</a>
+                        <a href="{% url "complete_onboarding" organization.code %}"
+                           class="button ghost">{% translate "Skip onboarding" %}</a>
                     {% endif %}
                     <a href="" class="button ghost disabled">Pen test</a>
                     <a href="" class="button ghost disabled">Mail report</a>

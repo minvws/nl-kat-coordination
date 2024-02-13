@@ -57,10 +57,10 @@
                     </div>
                 </div>
                 <div class="button-container">
-                    <a href="{% url "complete_onboarding" organization.code %}"
-                       class="button ghost">{% translate "Skip onboarding" %}</a>
                     <a href="{% url "step_acknowledge_clearance_level" organization.code %}?ooi_id={{ ooi }}"
                        class="button">{% translate "Continue" %}</a>
+                    <a href="{% url "complete_onboarding" organization.code %}"
+                       class="button ghost">{% translate "Skip onboarding" %}</a>
                 </div>
             </div>
         </section>

@@ -25,10 +25,10 @@
         {% if not object_list %}
             <p>{% translate "No objects found." %}</p>
             <div class="button-container">
-                <a class="button ghost"
-                   href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
                 <a class="button"
                    href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
+                <a class="button ghost"
+                   href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
             </div>
         {% else %}
             <form method="get" action="{{ next }}" class="inline layout-wide">
