@@ -212,6 +212,11 @@ class NormalizerHandler(Handler):
             logger.info("Obtained results %s", str(results))
 
             for observation in results.observations:
+                for result in observation.results:
+                    if self._parse_ooi(result).primary_key == observation.input_ooi:
+                        logger.warning(
+                            'Normalizer "%s" returned input [%s]', normalizer_meta.normalizer.id, observation.input_ooi
+                        )
                 reference = Reference.from_str(observation.input_ooi)
                 connector.save_observation(
                     Observation(
