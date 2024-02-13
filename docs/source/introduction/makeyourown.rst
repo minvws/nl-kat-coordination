@@ -251,7 +251,7 @@ fill and yield the actual objects. (of valid object-types that are subclassed fr
                 yield f
 
 Yielding a DeclaredScanProfile
-===================
+==============================
 
 Additionally, normalizers can yield DeclaredScanProfiles.
 This is useful if you want to avoid the manual work of raising these levels through the interface for new objects.
@@ -262,8 +262,10 @@ As an example, see these lines in `kat_external_db/normalize.py`:
 
 .. code-block:: python
 
- yield ip_address
- yield DeclaredScanProfile(reference=ip_address.reference, level=3)
+  def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+   ...
+   yield ip_address
+   yield DeclaredScanProfile(reference=ip_address.reference, level=3)
 
 
 This indicates that the ip_address should automatically be assigned a declared scan profile of level 3.
@@ -278,8 +280,10 @@ Combining the code and whitelist above would therefore be equivalent to combinin
 
 .. code-block:: python
 
- yield ip_address
- yield DeclaredScanProfile(reference=ip_address.reference, level=2)
+  def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+   ...
+   yield ip_address
+   yield DeclaredScanProfile(reference=ip_address.reference, level=2)
 
 
 Of course, when the normalizer id is not present in the whitelist, the yielded DeclaredScanProfiles are ignored.
