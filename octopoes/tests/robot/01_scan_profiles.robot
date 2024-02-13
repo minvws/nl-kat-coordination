@@ -64,14 +64,9 @@ Empty Scan Profiles
 
 *** Keywords ***
 Setup Test
-    Start Monitoring    ${QUEUE_URI}
+    robot.Setup Test
     Insert Normalizer Output
     Await Sync
-
-Teardown Test
-    Cleanup
-    Await Sync
-    Stop Monitoring
 
 Set Scan Profile To Empty
     [Arguments]    ${reference}

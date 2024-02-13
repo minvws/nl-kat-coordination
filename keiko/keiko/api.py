@@ -35,7 +35,7 @@ def construct_api(settings: Settings) -> FastAPI:
 
         resource = Resource(attributes={SERVICE_NAME: "keiko"})
         provider = TracerProvider(resource=resource)
-        processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=settings.span_export_grpc_endpoint))
+        processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint)))
         provider.add_span_processor(processor)
         trace.set_tracer_provider(provider)
 

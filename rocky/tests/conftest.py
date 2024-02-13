@@ -2,10 +2,13 @@ import binascii
 import io
 import json
 import logging
+from datetime import datetime, timezone
+from ipaddress import IPv4Address
 from os import urandom
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List, Optional, Union
 from unittest.mock import MagicMock, patch
+from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -26,15 +29,23 @@ from tools.models import (
     OrganizationMember,
 )
 
-from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
-from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
-from octopoes.models.ooi.network import Network
+from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.network import IPAddressV4, Network
+from octopoes.models.origin import Origin, OriginType
+from octopoes.models.transaction import TransactionRecord
 from rocky.scheduler import Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+@pytest.fixture
+def valid_time():
+    return datetime.now(timezone.utc)
 
 
 @pytest.fixture(params=LANG_LIST)
@@ -429,6 +440,64 @@ def network():
 
 
 @pytest.fixture
+def ipaddressv4(network):
+    return IPAddressV4(network=network.reference, address=IPv4Address("192.0.2.1"))
+
+
+@pytest.fixture
+def hostname(network):
+    return Hostname(name="example.com", network=network.reference)
+
+
+@pytest.fixture
+def cve_finding_type_2019_8331():
+    return CVEFindingType(
+        id="CVE-2019-8331",
+        description="In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or "
+        "popover data-template attribute.",
+        source="https://cve.circl.lu/cve/CVE-2019-8331",
+        risk_score=6.1,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def cve_finding_2019_8331():
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2019-8331"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2019-8331"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2019-8331 detected",
+        reproduce=None,
+    )
+
+
+@pytest.fixture
+def cve_finding_type_no_score():
+    return CVEFindingType(
+        id="CVE-0000-0001",
+        description="CVE Finding without scopre",
+        source="https://cve.circl.lu/cve/CVE-0000-0001",
+        risk_severity=RiskLevelSeverity.UNKNOWN,
+    )
+
+
+@pytest.fixture
+def cve_finding_no_score():
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-0000-0001"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-0000-0001"
+        ),
+        proof=None,
+        description="Vulnerability CVE-0000-0001 detected",
+        reproduce=None,
+    )
+
+
+@pytest.fixture
 def finding():
     return Finding(
         finding_type=Reference.from_str("KATFindingType|KAT-0001"),
@@ -609,3 +678,50 @@ def mock_scheduler_client_task_list(mocker):
     mock_scheduler_client_session.get.return_value = response
 
     return mock_scheduler_client_session
+
+
+class MockOctopoesAPIConnector:
+    oois: Dict[Reference, OOI]
+    queries: Dict[str, Dict[Optional[Union[Reference, str]], List[OOI]]]
+    valid_time: datetime
+
+    def __init__(self, valid_time: datetime):
+        self.valid_time = valid_time
+
+    def get(self, reference: Reference, valid_time: Optional[datetime] = None) -> OOI:
+        return self.oois[reference]
+
+    def query(
+        self,
+        path: str,
+        valid_time: datetime,
+        source: Optional[Union[Reference, str]] = None,
+        offset: int = 0,
+        limit: int = 50,
+    ) -> List[OOI]:
+        return self.queries[path][source]
+
+    def get_history(self, reference: Reference) -> List[TransactionRecord]:
+        return [
+            TransactionRecord(
+                txTime=self.valid_time,
+                txId=287,
+                validTime=self.valid_time,
+                contentHash="636a28da4792b9f5007143bb35bd37d48662df9b",
+            )
+        ]
+
+    def list_origins(
+        self,
+        valid_time: Optional[datetime] = None,
+        source: Optional[Reference] = None,
+        result: Optional[Reference] = None,
+        task_id: Optional[UUID] = None,
+        origin_type: Optional[OriginType] = None,
+    ) -> List[Origin]:
+        return []
+
+
+@pytest.fixture
+def mock_octopoes_api_connector(valid_time):
+    return MockOctopoesAPIConnector(valid_time)
