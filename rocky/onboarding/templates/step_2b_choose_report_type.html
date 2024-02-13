@@ -33,12 +33,14 @@
                     {% if organization %}
                         <a href="{% url "step_setup_scan_ooi_info" organization.code %}"
                            class="button">{% translate "DNS report" %}</a>
+                    {% endif %}
+                    <a href="" class="button disabled">Pen test</a>
+                    <a href="" class="button disabled">Mail report</a>
+                    <a href="" class="button disabled">DigiD</a>
+                    {% if organization %}
                         <a href="{% url "complete_onboarding" organization.code %}"
                            class="button ghost">{% translate "Skip onboarding" %}</a>
                     {% endif %}
-                    <a href="" class="button ghost disabled">Pen test</a>
-                    <a href="" class="button ghost disabled">Mail report</a>
-                    <a href="" class="button ghost disabled">DigiD</a>
                 </div>
             </div>
         </section>
