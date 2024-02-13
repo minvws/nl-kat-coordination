@@ -25,6 +25,7 @@ def run(org_num: int = 1):
         resp_katalogus = requests.post(
             url=f"{KATALOGUS_API}/v1/organisations/",
             json=org,
+            timeout=30,
         )
 
         try:
@@ -40,6 +41,7 @@ def run(org_num: int = 1):
         try:
             requests.post(
                 url=f"{OCTOPOES_API}/{org.get('id')}/node/",
+                timeout=30,
             )
         except requests.exceptions.HTTPError:
             print("Error creating organisation ", org)
@@ -53,6 +55,7 @@ def run(org_num: int = 1):
             resp_enable_boefje = requests.patch(
                 url=f"{KATALOGUS_API}/v1/organisations/{org.get('id')}/repositories/LOCAL/plugins/{boefje_id}",
                 json={"enabled": True},
+                timeout=30,
             )
 
             try:
@@ -95,7 +98,9 @@ def run(org_num: int = 1):
 
     for org in orgs:
         for declaration in declarations:
-            resp_octopoes_decl = requests.post(f"{OCTOPOES_API}/{org.get('id')}/declarations", json=declaration)
+            resp_octopoes_decl = requests.post(
+                f"{OCTOPOES_API}/{org.get('id')}/declarations", json=declaration, timeout=30
+            )
 
             try:
                 resp_octopoes_decl.raise_for_status()
@@ -114,6 +119,7 @@ def run(org_num: int = 1):
                     "reference": declaration.get("ooi").get("scan_profile").get("reference"),
                     "level": declaration.get("ooi").get("scan_profile").get("level"),
                 },
+                timeout=30,
             )
 
             try:
