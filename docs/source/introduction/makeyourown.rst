@@ -179,7 +179,8 @@ The boefje itself imports the shodan api module, assigns an IP address to it and
 Normalizers
 -----------
 
-The normalizer imports the raw information, extracts the objects from it and gives them to Octopoes. Since OpenKAT 1.3.0, the normalizers are fully self-contained. They consist of the following files:
+The normalizer imports the raw information, extracts the objects from it and gives them to Octopoes.
+Since OpenKAT 1.3.0, the normalizers are fully self-contained. They consist of the following files:
 
 - __init__.py
 - normalize.py
@@ -188,7 +189,11 @@ The normalizer imports the raw information, extracts the objects from it and giv
 normalizer.json
 ***************
 
-The normalizers translate the output of a boefje into objects that fit the data model. Each normalizer defines what input it accepts and what object-types it provides. In the case of the shodan normalizer, it involves the entire output of the shodan boefje (created based on IP address), where findings and ports come out. The normalizer.json defines these:
+The normalizers translate the output of a boefje into objects that fit the data model.
+Each normalizer defines what input it accepts and what object-types it provides.
+In the case of the shodan normalizer,
+it involves the entire output of the shodan boefje (created based on IP address),
+where findings and ports come out. The normalizer.json defines these:
 
 .. code-block:: json
 
@@ -207,7 +212,8 @@ The normalizers translate the output of a boefje into objects that fit the data 
 normalize.py
 ************
 
-The file normalize.py contains the actual normalizer: Its only job is to parse raw data and create, fill and yield the actual objects. (of valid object-types that are subclassed from OOI like IPPort)
+The file normalize.py contains the actual normalizer: Its only job is to parse raw data and create,
+fill and yield the actual objects. (of valid object-types that are subclassed from OOI like IPPort)
 
 
 .. code-block:: python
@@ -243,6 +249,41 @@ The file normalize.py contains the actual normalizer: Its only job is to parse r
                 f = Finding(finding_type=ft.reference, ooi=ip_port.reference)
                 yield ft
                 yield f
+
+Yielding a DeclaredScanProfile
+===================
+
+Additionally, normalizers can yield DeclaredScanProfiles.
+This is useful if you want to avoid the manual work of raising these levels through the interface for new objects.
+Perhaps you have a trusted source of IP addresses and hostnames you are allowed to scan intrusively.
+Or perhaps you do not have intrusive boefjes enabled and always want to perform a DNS scan on new IP addresses.
+
+As an example, see these lines in `kat_external_db/normalize.py`:
+
+.. code-block:: python
+
+ yield ip_address
+ yield DeclaredScanProfile(reference=ip_address.reference, level=3)
+
+
+This indicates that the ip_address should automatically be assigned a declared scan profile of level 3.
+
+The safeguard here is that you `always` need to specify which normalizers are allowed to add these scan profiles.
+This must be done through the ``SCAN_PROFILE_WHITELIST`` environment variable, which is a json-encoded mapping
+of normalizer ids to the `maximum` scan level they are allowed to set.
+An example value would be ``SCAN_PROFILE_WHITELIST='{"kat_external_db_normalize": 2}'``.
+
+When a higher level has been yielded, it will be lowered to the maximum.
+Combining the code and whitelist above would therefore be equivalent to combining this code with the whitelist:
+
+.. code-block:: python
+
+ yield ip_address
+ yield DeclaredScanProfile(reference=ip_address.reference, level=2)
+
+
+Of course, when the normalizer id is not present in the whitelist, the yielded DeclaredScanProfiles are ignored.
+
 
 Adding object-types
 ===================
