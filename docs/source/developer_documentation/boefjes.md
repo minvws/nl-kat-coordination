@@ -1,9 +1,9 @@
 # Boefjes
 
 This module has several entry points discussed below, but let us first consider the prerequisites and scope.
-If you already have running setup and want to learn where each bit of functionality goes, read the following page:
+If you already have a running setup and want to learn where each bit of functionality goes, read the following page:
 
-[Developing Openkat Plugins]([https://docs.openkat.nl/introduction/makeyourown.html])
+[Developing Openkat Plugins](../introduction/makeyourown.rst)
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ To run a development environment you need to have:
 - A running RabbitMQ service
 - A running Bytes API service
 - A `./env` containing the environment variables explained below
-- Everything in `requirements.txt` installed
+- Everything in the `requirements.txt` installed
 
 Optionally, you could have an instance of the octopoes api listening on a port that receives the normalized data from
 the normalizers.
@@ -62,15 +62,36 @@ This feature can also be used to set default values for KAT-alogus settings. For
 will set the default value for the `TOP_PORTS` setting (used by the nmap Boefje).
 This default value can be overridden by setting any value for `TOP_PORTS` in the KAT-alogus.
 
-## Design
+## Technical Design
 
-Boefjes will run as containerized workers pulling jobs from a centralized job queue:
+Boefjes will run as containerized workers pulling jobs from a queue in the Scheduler:
 
-![design](img/boefje_design.png)
+```{mermaid}
+sequenceDiagram
+    participant Boefje
+    participant Rocky
+    participant Scheduler
+    participant Normalizer
+    participant Bytes
+    participant Octopoes
+    Boefje->>+Scheduler: Get Boefje Task
+    Scheduler-->>Scheduler: boefje_task.status = DISPATCHED
+    Boefje->>Scheduler: boefje_task.status = RUNNING
+    Boefje-->>Boefje: Run Boefje Task
+    Boefje->>Scheduler: boefje_task.status = COMPLETED
+    Boefje->>Bytes: Save Raw
+    Bytes-->>Scheduler: Raw File Received
+    Scheduler->>Scheduler: Push Normalizer Task
+    Normalizer->>Scheduler: Get Normalizer Task
+    Scheduler-->>Scheduler: normalizer_task.status = DISPATCHED
+    Normalizer->>Bytes: Get Raw
+    Normalizer->>Scheduler: normalizer_task.status = RUNNING
+    Normalizer-->>Normalizer: Run Normalizer Task
+    Normalizer->>Scheduler: normalizer_task.status = COMPLETED
+    Normalizer->>Octopoes: Add object(s)
+```
 
-Connections to other components, represented by the yellow squares, are abstracted by the modules inside them. The red
-components live outside the boefjes module. The green core files however is what can be focused on and can be
-developed/refactored further to support boefjes of all different kinds.
+The connection between the Scheduler and Bytes is managed asynchronously through RabbitMQ.
 
 ### Boefje and Normalizer Workers
 
@@ -82,7 +103,7 @@ like when the process [runs out of memory and is killed by Docker](https://githu
 No maximum size is defined on the queue since we want to avoid blocking.
 Hence, we manually check if the queue does not pile up beyond the number of workers, i.e. `n`.
 
-#### Design
+#### Parallel Workers
 
 The setup for the main process and workers:
 
@@ -112,25 +133,27 @@ subgraph Process 0
 end
 ```
 
-#### Worker failure mode
-Rough representation of the failure mode when a SIGKILL has been sent to the worker:
+#### Sending a SIGKILL to a worker process
+A representation of the failure mode when a SIGKILL has been sent to the worker (also see `boefjes/app.py`):
 
 ```{mermaid}
 sequenceDiagram
   participant SchedulerRuntimeManager
-  participant handling_tasks
-  participant Worker1
+  participant SharedDict
+  participant Queue
+  participant Worker[pid=1]
   participant Scheduler
-  participant Worker2
-  Worker1->>handling_tasks: set p_item.id for worker1.pid
-  SchedulerRuntimeManager->>Worker1: if not is_alive()
-  SchedulerRuntimeManager->>handling_tasks: get p_item.id for worker1.pid
-  SchedulerRuntimeManager->>Scheduler: set p_item.status to FAILED
-  SchedulerRuntimeManager->>Worker1: close()
-  SchedulerRuntimeManager->>Worker2: start()
+  participant Worker[pid=2]
+  Worker[pid=1]->>SharedDict: set: SharedDict[1] = p_item.id
+  Worker[pid=1]->>Worker[pid=1]: receives SIGKILL
+  SchedulerRuntimeManager->>Worker[pid=1]: if not is_alive()
+  SchedulerRuntimeManager->>SharedDict: set p_item_id = SharedDict[1]
+  SchedulerRuntimeManager->>Scheduler: set p_item_id status to FAILED
+  SchedulerRuntimeManager->>Worker[pid=1]: close()
+  SchedulerRuntimeManager->>Worker[pid=2]: start()
 ```
 
-
+Here, the SharedDict is an object that keeps track of a mapping of the pid's of workers to the task they are handling.
 
 ### Running as a Docker container
 
@@ -234,28 +257,34 @@ Here a `Boefje` object that wraps this metadata is defined, as well as `Normaliz
 Each module may also have its own `requirements.txt` file that lists dependencies not included in the base requirements.
 Furthermore, you can add static data such as a cover and a description (markdown) to show up in Rocky's KATalogus.
 
-Example structure:
+#### Example
 
 ```shell
-$ tree boefjes/kat_dns
-├── boefje.py
+$ tree boefjes/plugins/kat_dns
+├── boefje.json
 ├── cover.jpg
 ├── description.md
 ├── __init__.py
 ├── main.py
 ├── normalize.py
-└── requirements.txt
+├── normalizer.json
+└── schema.json
 ```
 
-### Running the test suite
+### Tests
 
-To run the test suite, run:
+To run the unit test suite, run:
 
 ```shell
 $ python -m pytest
 ```
 
-To lint the code using black, run:
+For the KATalogus integration tests, run:
 ```shell
-$ python -m black .
+$ make itest
+```
+
+To lint the code using pre-commit, run:
+```shell
+$ pre-commit run --all
 ```
