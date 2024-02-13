@@ -88,7 +88,7 @@ class BaseReportView(OOIFilterView):
 
     def get_oois(self) -> List[OOI]:
         if "all" in self.selected_oois:
-            return self.octopoes_api_connector.list(
+            return self.octopoes_api_connector.list_objects(
                 self.get_ooi_types(),
                 valid_time=self.valid_time,
                 limit=OOIList.HARD_LIMIT,

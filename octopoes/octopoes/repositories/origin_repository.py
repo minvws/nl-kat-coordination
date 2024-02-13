@@ -30,7 +30,7 @@ class OriginRepository(Repository):
     def save(self, origin: Origin, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def list(
+    def list_origins(
         self,
         valid_time: datetime,
         *,
@@ -66,7 +66,7 @@ class XTDBOriginRepository(OriginRepository):
     def deserialize(cls, data: Dict[str, Any]) -> Origin:
         return Origin.parse_obj(data)
 
-    def list(
+    def list_orgins(
         self,
         valid_time: datetime,
         *,
