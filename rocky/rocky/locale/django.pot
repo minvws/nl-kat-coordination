@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-26 20:33+0000\n"
+"POT-Creation-Date: 2024-02-13 14:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -390,12 +390,12 @@ msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Back"
+msgid "Send"
 msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Send"
+msgid "Back"
 msgstr ""
 
 #: account/templates/password_reset_confirm.html
@@ -469,11 +469,11 @@ msgid "Please contact the system administrator."
 msgstr ""
 
 #: account/templates/recover_email.html
-msgid "Back to Home"
+msgid "Back to login"
 msgstr ""
 
 #: account/templates/recover_email.html
-msgid "Back to login"
+msgid "Back to Home"
 msgstr ""
 
 #: account/templates/registration_email.html
@@ -1640,11 +1640,11 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting\n"
+"                  Add setting and enable boefje\n"
 "                "
 msgid_plural ""
 "\n"
-"                  Add settings\n"
+"                  Add settings and enable boefje\n"
 "                "
 msgstr[0] ""
 msgstr[1] ""
@@ -1652,12 +1652,12 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting and enable boefje\n"
-"                "
+"                Add setting\n"
+"              "
 msgid_plural ""
 "\n"
-"                  Add settings and enable boefje\n"
-"                "
+"                Add settings\n"
+"              "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2038,13 +2038,13 @@ msgstr ""
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Go back to previous step"
+msgid "Skip this step"
 msgstr ""
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Skip this step"
+#: onboarding/templates/account/step_6_account_setup_client.html
+msgid "Go back to previous step"
 msgstr ""
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
@@ -6064,12 +6064,12 @@ msgid "You don't have any backup codes yet."
 msgstr ""
 
 #: rocky/templates/two_factor/core/backup_tokens.html
-#: rocky/templates/two_factor/core/setup_complete.html
-msgid "Back to Account Security"
+msgid "Generate Tokens"
 msgstr ""
 
 #: rocky/templates/two_factor/core/backup_tokens.html
-msgid "Generate Tokens"
+#: rocky/templates/two_factor/core/setup_complete.html
+msgid "Back to Account Security"
 msgstr ""
 
 #: rocky/templates/two_factor/core/login.html
