@@ -91,7 +91,9 @@ class RabbitMQ(Listener):
         self.prefetch_count: int = prefetch_count
         self.func: Callable = func
 
-        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
+        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(
+            max_workers=10, thread_name_prefix=f"Listener-TPE-{self.__class__.__name__}"
+        )
         self.connection: Optional[pika.BlockingConnection] = None
         self.channel: Optional[pika.BlockingConnection.channel] = None
         self.connect(self.queue, self.durable, self.prefetch_count)

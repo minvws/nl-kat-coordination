@@ -57,7 +57,7 @@ class ThreadRunner(threading.Thread):
 
         super().__init__(target=self._target, daemon=daemon)
 
-        self.name = f"{self.name}-{name}" if name else self.name
+        self.name = name if name else self.name
 
     def run_forever(self) -> None:
         """Run the target function in a loop until the stop event is set."""

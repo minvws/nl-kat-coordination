@@ -210,7 +210,7 @@ class App:
 
     def start_monitors(self) -> None:
         thread.ThreadRunner(
-            name="monitor_organisations",
+            name="App-monitor_organisations",
             target=self.monitor_organisations,
             stop_event=self.stop_event,
             interval=self.ctx.config.monitor_organisations_interval,
@@ -218,7 +218,7 @@ class App:
 
     def start_collectors(self) -> None:
         thread.ThreadRunner(
-            name="metrics_collector",
+            name="App-metrics_collector",
             target=self.collect_metrics,
             stop_event=self.stop_event,
             interval=10,
@@ -227,7 +227,7 @@ class App:
     def start_server(self) -> None:
         self.server = server.Server(self.ctx, self.schedulers)
         thread.ThreadRunner(
-            name="server",
+            name="App-server",
             target=self.server.run,
             stop_event=self.stop_event,
             loop=False,
