@@ -1,19 +1,15 @@
-## Rocky
+# Rocky
 
 Rocky is part of the openKAT project, made with Django.
-
-### Stack
-
-Django is the framework for this project.
-To comply to government standards, use [Manon](https://github.com/minvws/nl-rdo-manon) for style and accessibility.
+To comply to government standards, [Manon](https://github.com/minvws/nl-rdo-manon) is used for style and accessibility.
 Yarn is used as package manager and ParcelJS is used as bundler to compile the frontend (CSS and Javascript).
-You can find the Manon repository here: [https://github.com/minvws/nl-rdo-manon](https://github.com/minvws/nl-rdo-manon)
+You can find the Manon repository [here](https://github.com/minvws/nl-rdo-manon).
 
-### Running Rocky
+## Installation
 
-#### Containerized
+### Containerized
 
-To run rocky from the docker container, from the parent directory `nl-kat-coordination`, just run:
+To run rocky from using Docker, run this from the parent directory `nl-kat-coordination`:
 
 ```bash
 $ make kat
@@ -21,48 +17,26 @@ $ make kat
 
 and continue reading this document at "First run".
 
-#### Locally
+### Local
 
-To run rocky locally, follow these steps.
+For a local set up, you need to start the Django app and compile the frontend.
 
-### Installation
+#### Django App
 
-Yarn is used to bundle CSS and Javascript.
-You can build Rocky locally using:
-
+This requires a working python (>3.10) environment.
+One example of how to create, activate and initialize a development environment is:
 ```bash
-$ make build
+$ python3 -m venv $PWD/.venv
+$ source .venv/bin/activate
+$ python3 -m pip install -r requirements-dev.txt
 ```
 
-This will set up Django and compile the frontend.
-
-#### Running
-
-You can run Rocky using:
-
+Copy the `.env-dist` to a `.env` and configure the hosts and credentials to PostgreSQL, RabbitMQ and the other services.
 ```bash
-$ make run
+$ cp .env-dist .env
 ```
 
-#### First run
-
-After running the first time, visit [localhost:8000](http://localhost:8000) in your browser.
-Log in with credentials: admin / admin
-
-You will be prompted to create secure your account with a One Time Password, so get your authenticator ready.
-
-#### Testing
-
-To run all tests, run:
-
-```bash
-$ make test
-```
-
-#### Database
-
-To connect to the PostgreSQL database, set the following environment variables (e.g. "localhost", "5432" etc.):
-
+For instance, to configure the PostgreSQL database set the following variables:
 ```
 ROCKY_DB_HOST=
 ROCKY_DB_PORT=
@@ -72,7 +46,82 @@ ROCKY_DB_PASSWORD=
 ROCKY_DB_DSN=
 ```
 
-The `ROCKY_DB_DSN` is optional (e.g. `postgresql://username:password@hostname:port/database_name`) and if unset the other DB variables will be used to setup the database connection.
+Here, `ROCKY_DB_DSN` is optional (e.g. `postgresql://username:password@hostname:port/database_name`)
+and if not set, the other DB variables will be used.
+
+
+Once your environment variables are set up (see `.env-dist`, you can initialize Rocky using:
+
+```bash
+$ make build-rocky-native
+```
+
+To start the Django server, run:
+
+```bash
+$ make run
+```
+
+
+#### Frontend
+
+Yarn is used to bundle CSS and Javascript.
+
+To compile the frontend using yarn locally, run:
+```bash
+$ yarn --ignore-engine
+$ yarn build
+```
+
+To compile the frontend using Docker, run:
+```bash
+$ make build-rocky-frontend
+```
+
+The app should be running at [localhost:8000](http://localhost:8000).
+
+#### TL;DR
+Given a proper `.env` file, run:
+
+```bash
+$ python3 -m venv $PWD/.venv
+$ source .venv/bin/activate
+$ python3 -m pip install -r requirements-dev.txt
+$ make build-rocky-native
+$ & make run
+$ make build-rocky-frontend
+```
+
+## Development
+
+
+### Testing
+
+To run all unit tests, run:
+
+```bash
+$ make utest
+```
+
+#### Tip
+A local python environment is useful for unit testing even when using Docker.
+Follow the first instructions in the local setup to create a Python environment.
+Then create a `rocky/.env` from the template `rocky/.env-dist` and set `ROCKY_DB_HOST=localhost`.
+Now for the unit tests you should be able to just run
+```bash
+$ pytest
+```
+
+to run them locally.
+
+You can easily parallelize the tests can be parallelized using pytest-xdist:
+```bash
+$ python -m pip install pytest-xdist
+$ time pytest  # 1:08,92 on 13-02-2024
+$ time pytest -n 8  # 21,749 on 13-02-2024
+```
+
+## Design
 
 ### Fonts license
 
@@ -89,7 +138,7 @@ https://fonts.google.com/specimen/Open+Sans/about
 #### Tabler icons
 https://tabler-icons.io/
 
-## Rocky Design
+## Technical Design
 
 ### Running a boefje
 
@@ -119,7 +168,7 @@ sequenceDiagram
 ```
 
 
-## Rocky View Structure
+### Rocky View Structure
 
 Rocky has a hierarchical set of views that are not easy to capture in a single diagram.
 We therefore made several diagrams to show the most coherent components.
