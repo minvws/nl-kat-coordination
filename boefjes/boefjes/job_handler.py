@@ -21,7 +21,7 @@ from boefjes.job_models import (
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
-from octopoes.api.models import Declaration, Observation
+from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanProfile
 from octopoes.models.exception import ObjectNotFoundException
@@ -209,6 +209,8 @@ class NormalizerHandler(Handler):
             results = self.job_runner.run(normalizer_meta, raw)
             connector = self.octopoes_factory(normalizer_meta.raw_data.boefje_meta.organization)
 
+            logger.info("Obtained results %s", str(results))
+
             for observation in results.observations:
                 reference = Reference.from_str(observation.input_ooi)
                 connector.save_observation(
@@ -230,6 +232,16 @@ class NormalizerHandler(Handler):
                     Declaration(
                         method=normalizer_meta.normalizer.id,
                         ooi=self._parse_ooi(declaration.ooi),
+                        task_id=normalizer_meta.id,
+                        valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                    )
+                )
+
+            for affirmation in results.affirmations:
+                connector.save_affirmation(
+                    Affirmation(
+                        method=normalizer_meta.normalizer.id,
+                        ooi=self._parse_ooi(affirmation.ooi),
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )

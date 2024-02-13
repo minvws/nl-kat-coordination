@@ -17,7 +17,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     risk_score = None
 
     yield {
-        "type": "declaration",
+        "type": "affirmation",
         "ooi": CWEFindingType(
             id=cwe_finding_type_id,
             description=f"{data['name']} - {data['description']}",

@@ -96,16 +96,24 @@ class NormalizerDeclaration(BaseModel):
     ooi: NormalizerPlainOOI
 
 
+class NormalizerAffirmation(BaseModel):
+    type: Literal["affirmation"] = "affirmation"
+    ooi: NormalizerPlainOOI
+
+
 class NormalizerScanProfile(BaseModel):
     scan_profile_type: str
     model_config = ConfigDict(populate_by_name=True, extra="allow")
 
 
 class NormalizerResult(BaseModel):  # Moves all validation logic to Pydantic
-    item: Union[NormalizerPlainOOI, NormalizerObservation, NormalizerDeclaration, NormalizerScanProfile]
+    item: Union[
+        NormalizerPlainOOI, NormalizerObservation, NormalizerDeclaration, NormalizerAffirmation, NormalizerScanProfile
+    ]
 
 
 class NormalizerOutput(BaseModel):
     observations: List[NormalizerObservation] = []
     declarations: List[NormalizerDeclaration] = []
+    affirmations: List[NormalizerAffirmation] = []
     scan_profiles: List[NormalizerScanProfile] = []

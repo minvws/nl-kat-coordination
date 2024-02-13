@@ -10,7 +10,7 @@ from tests.loading import get_dummy_data
 
 
 def dict_declare(ooi):
-    return {"type": "declaration", "ooi": ooi.dict()}
+    return {"type": "affirmation", "ooi": ooi.dict()}
 
 
 class CVETest(TestCase):

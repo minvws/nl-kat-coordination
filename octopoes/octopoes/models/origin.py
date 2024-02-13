@@ -11,6 +11,7 @@ class OriginType(Enum):
     DECLARATION = "declaration"
     OBSERVATION = "observation"
     INFERENCE = "inference"
+    AFFIRMATION = "affirmation"
 
 
 class Origin(BaseModel):

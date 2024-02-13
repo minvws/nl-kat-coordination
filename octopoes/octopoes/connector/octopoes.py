@@ -7,7 +7,7 @@ import requests
 from pydantic import TypeAdapter
 from requests import HTTPError, Response
 
-from octopoes.api.models import Declaration, Observation, ServiceHealth
+from octopoes.api.models import Affirmation, Declaration, Observation, ServiceHealth
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
@@ -186,6 +186,9 @@ class OctopoesAPIConnector:
 
     def save_declaration(self, declaration: Declaration) -> None:
         self.session.post(f"/{self.client}/declarations", data=declaration.model_dump_json())
+
+    def save_affirmation(self, affirmation: Affirmation) -> None:
+        self.session.post(f"/{self.client}/affirmations", data=affirmation.model_dump_json())
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
