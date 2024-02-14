@@ -27,19 +27,24 @@ class DNSReport(Report):
             ref, depth=3, types={DNSRecord, Finding}, valid_time=valid_time
         ).store
 
+        findings = []
         records = []
         security = {
             "spf": True,
             "dkim": True,
             "dmarc": True,
             "dnssec": True,
-            "caa": True,
+            "caa": True
         }
         for ooi_type, ooi in tree.items():
             if isinstance(ooi, Finding):
                 for check in ["caa", "dkim", "dmarc", "dnssec", "spf"]:
                     if "NO-%s" % check.upper() in ooi.finding_type.tokenized.id:
                         security[check] = False
+                if "KAT-INVALID-SPF" == ooi.finding_type.tokenized.id:
+                    security["spf"] = False
+                if ooi.finding_type.tokenized.id in ("KAT-INVALID-SPF", "KAT-NAMESERVER-NO-IPV6", "KAT-NAMESERVER-NO-TWO-IPV6"):
+                    findings.append(ooi)
             elif isinstance(ooi, DNSRecord):
                 records.append(
                     {
@@ -55,4 +60,5 @@ class DNSReport(Report):
             "input_ooi": input_ooi,
             "records": records,
             "security": security,
+            "findings": findings
         }
