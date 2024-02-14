@@ -11,6 +11,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     input_ = boefje_meta.arguments["input"]
     hostname = input_["hostname"]["name"]
 
-    response = requests.get(f"{API_URL}/greencheck/{hostname}")
+    response = requests.get(f"{API_URL}/greencheck/{hostname}", timeout=30)
 
     return [(set(), response.content)]

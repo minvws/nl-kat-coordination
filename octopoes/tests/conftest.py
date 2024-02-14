@@ -58,7 +58,7 @@ class MockScanProfileRepository(ScanProfileRepository):
     ) -> None:
         self.profiles[new_scan_profile.reference] = new_scan_profile
 
-    def list(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
+    def list_scan_profiles(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
         if scan_profile_type:
             return [profile for profile in self.profiles.values() if profile.scan_profile_type == scan_profile_type]
         else:

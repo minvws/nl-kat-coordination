@@ -123,7 +123,7 @@ class OctopoesService:
         scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOI]:
-        paginated = self.ooi_repository.list(types, valid_time, limit, offset, scan_levels, scan_profile_types)
+        paginated = self.ooi_repository.list_oois(types, valid_time, limit, offset, scan_levels, scan_profile_types)
         self._populate_scan_profiles(paginated.items, valid_time)
         return paginated
 
@@ -139,7 +139,7 @@ class OctopoesService:
         return tree
 
     def _delete_ooi(self, reference: Reference, valid_time: datetime) -> None:
-        referencing_origins = self.origin_repository.list(valid_time, result=reference)
+        referencing_origins = self.origin_repository.list_origins(valid_time, result=reference)
         if not referencing_origins:
             self.ooi_repository.delete(reference, valid_time)
 
@@ -206,7 +206,7 @@ class OctopoesService:
 
     def recalculate_scan_profiles(self, valid_time: datetime) -> None:
         # fetch all scan profiles
-        all_scan_profiles = self.scan_profile_repository.list(None, valid_time=valid_time)
+        all_scan_profiles = self.scan_profile_repository.list_scan_profiles(None, valid_time=valid_time)
 
         # cache all declared
         all_declared_scan_profiles = {
@@ -390,7 +390,7 @@ class OctopoesService:
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
-        inference_origins = self.origin_repository.list(event.valid_time, source=event.new_data.reference)
+        inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.new_data.reference)
         inference_params = self.origin_parameter_repository.list_by_reference(
             event.new_data.reference, valid_time=event.valid_time
         )
@@ -405,7 +405,7 @@ class OctopoesService:
         reference = event.old_data.reference
 
         # delete related origins to which it is a source
-        origins = self.origin_repository.list(event.valid_time, source=reference)
+        origins = self.origin_repository.list_origins(event.valid_time, source=reference)
         for origin in origins:
             self.origin_repository.delete(origin, event.valid_time)
 
@@ -457,7 +457,7 @@ class OctopoesService:
             return
 
     def _run_inferences(self, event: ScanProfileDBEvent) -> None:
-        inference_origins = self.origin_repository.list(event.valid_time, source=event.reference)
+        inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.reference)
         inference_origins = [o for o in inference_origins if o.origin_type == OriginType.INFERENCE]
         for inference_origin in inference_origins:
             self._run_inference(inference_origin, event.valid_time)
@@ -552,7 +552,9 @@ class OctopoesService:
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
             # loop over all oois that are consumed by the bit
-            for ooi in self.ooi_repository.list({bit_definition.consumes}, limit=20000, valid_time=valid_time).items:
+            for ooi in self.ooi_repository.list_oois(
+                {bit_definition.consumes}, limit=20000, valid_time=valid_time
+            ).items:
                 if not isinstance(ooi, bit_definition.consumes):
                     logger.exception("Wut?")
 
@@ -579,7 +581,7 @@ class OctopoesService:
         # TODO: remove all Origins and Origin Parameters, which are no longer in use
 
         # rerun all existing bits
-        origins = self.origin_repository.list(valid_time, origin_type=OriginType.INFERENCE)
+        origins = self.origin_repository.list_origins(valid_time, origin_type=OriginType.INFERENCE)
         for origin in origins:
             self._run_inference(origin, valid_time)
             bit_counter.update({origin.method})

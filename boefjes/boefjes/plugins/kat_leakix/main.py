@@ -29,6 +29,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
             response = requests.get(
                 f"https://leakix.net/search?scope={scope}&q={dork}&page={page_counter}",
                 headers={"Accept": "application/json", "api-key": getenv("LEAKIX_API")},
+                timeout=30,
             )
             page_counter += 1
             if not response or not response.content:

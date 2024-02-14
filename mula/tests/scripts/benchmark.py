@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 def are_tasks_done() -> bool:
     response = requests.get(
         url=f"{SCHEDULER_API}/tasks/stats",
+        timeout=30,
     )
 
     try:
@@ -32,6 +33,7 @@ def are_tasks_done() -> bool:
 def parse_stats() -> None:
     resp_tasks_stats = requests.get(
         url=f"{SCHEDULER_API}/tasks/stats",
+        timeout=30,
     )
 
     try:
