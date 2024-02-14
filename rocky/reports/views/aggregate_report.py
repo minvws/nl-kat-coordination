@@ -17,10 +17,7 @@ from reports.report_types.helpers import (
     get_report_types_from_aggregate_report,
 )
 from reports.utils import JSONEncoder, debug_json_keys
-from reports.views.base import (
-    BaseReportView,
-    ReportBreadcrumbs,
-)
+from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -28,7 +25,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
-        selection = self.get_selection()
+        selection = get_selection(self.request)
         breadcrumbs += [
             {
                 "url": reverse("aggregate_report_landing", kwargs=kwargs) + selection,
@@ -54,19 +51,16 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingAggregateReportView(BreadcrumbsAggregateReportView, TemplateView):
+class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView):
     """
     Landing page to start the 'Aggregate Report' flow.
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        kwargs = self.get_kwargs()
-        pre_selection = {
-            "clearance_level": ["2", "3", "4"],
-            "clearance_type": "declared",
-        }
-        selection = self.get_selection(pre_selection)
-        return redirect(reverse("aggregate_report_select_oois", kwargs=kwargs) + selection)
+        return redirect(
+            reverse("aggregate_report_select_oois", kwargs=self.get_kwargs())
+            + get_selection(request, REPORTS_PRE_SELECTION)
+        )
 
 
 class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):
@@ -81,6 +75,7 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOILis
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_ooi_filter_forms(self.ooi_types))
+        context["channel"] = "aggregate_report"
         return context
 
 
@@ -106,7 +101,10 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Ba
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
+        if "all" not in self.selected_oois:
+            context["oois"] = self.get_oois()
+        else:
+            context["oois"] = "all"
         context["available_report_types_aggregate"] = self.available_report_types
         context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
             self.available_report_types["optional"]
@@ -146,6 +144,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     template_name = "aggregate_report.html"
     current_step = 6
+    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
@@ -178,7 +177,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data, error_oois = aggregate_reports(
-            self.octopoes_api_connector, self.selected_oois, self.report_types, self.valid_time
+            self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.valid_time
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
@@ -210,6 +209,9 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             True,
             **dict(json="true", **self.request.GET),
         )
+
+        context["oois"] = self.get_oois()
+        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
         return context
 
 

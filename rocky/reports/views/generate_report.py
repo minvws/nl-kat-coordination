@@ -16,10 +16,7 @@ from reports.report_types.helpers import (
     get_plugins_for_report_ids,
     get_report_types_for_oois,
 )
-from reports.views.base import (
-    BaseReportView,
-    ReportBreadcrumbs,
-)
+from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -27,7 +24,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
-        selection = self.get_selection()
+        selection = get_selection(self.request)
         breadcrumbs += [
             {
                 "url": reverse("generate_report_landing", kwargs=kwargs) + selection,
@@ -53,19 +50,16 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingGenerateReportView(BreadcrumbsGenerateReportView, TemplateView):
+class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
     """
     Landing page to start the 'Generate Report' flow.
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        kwargs = self.get_kwargs()
-        pre_selection = {
-            "clearance_level": ["2", "3", "4"],
-            "clearance_type": "declared",
-        }
-        selection = self.get_selection(pre_selection)
-        return redirect(reverse("generate_report_select_oois", kwargs=kwargs) + selection)
+        return redirect(
+            reverse("generate_report_select_oois", kwargs=self.get_kwargs())
+            + get_selection(request, REPORTS_PRE_SELECTION)
+        )
 
 
 class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):
@@ -79,6 +73,7 @@ class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["channel"] = "generate_report"
         context.update(self.get_ooi_filter_forms(self.ooi_types))
         return context
 

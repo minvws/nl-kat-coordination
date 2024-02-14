@@ -262,12 +262,12 @@ def test_save_raw_no_mime_types(bytes_api_client: BytesAPIClient) -> None:
     raw_url = f"{bytes_api_client._session._base_url}/bytes/raw"
 
     raw = b"second test 123456"
-    response = requests.post(raw_url, data=raw, headers=headers, params={"boefje_meta_id": boefje_meta.id})
+    response = requests.post(raw_url, data=raw, headers=headers, params={"boefje_meta_id": boefje_meta.id}, timeout=30)
 
     assert response.status_code == 200
 
     get_raw_without_mime_type_response = requests.get(
-        f"{raw_url}/{response.json().get('id')}", headers=bytes_api_client.headers, stream=True
+        f"{raw_url}/{response.json().get('id')}", headers=bytes_api_client.headers, stream=True, timeout=30
     )
 
     assert get_raw_without_mime_type_response.status_code == 200

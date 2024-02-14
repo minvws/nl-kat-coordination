@@ -3,7 +3,7 @@ import os
 import traceback
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -82,7 +82,7 @@ def serialize_ooi(ooi: OOI):
     return serialized_oois
 
 
-def get_octopoes_api_connector(org_code: str):
+def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
     return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
 
 
@@ -90,7 +90,8 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = requests.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings"
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
+            timeout=30,
         )
         response.raise_for_status()
         environment = response.json()
@@ -189,13 +190,13 @@ class NormalizerHandler(Handler):
         self,
         job_runner: NormalizerJobRunner,
         bytes_client: BytesAPIClient,
-        octopoes_factory=get_octopoes_api_connector,
         whitelist: Optional[Dict[str, int]] = None,
+        octopoes_factory: Callable[[str], OctopoesAPIConnector] = get_octopoes_api_connector,
     ):
         self.job_runner = job_runner
         self.bytes_client: BytesAPIClient = bytes_client
+        self.whitelist = whitelist or {}
         self.octopoes_factory = octopoes_factory
-        self.whitelist = whitelist
 
     def handle(self, normalizer_meta: NormalizerMeta) -> None:
         logger.info("Handling normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
