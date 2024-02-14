@@ -3,7 +3,6 @@ import time
 from datetime import datetime, timezone
 from multiprocessing import Manager
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
 from uuid import UUID
 
 import pytest
@@ -22,8 +21,8 @@ class MockSchedulerClient(SchedulerClientInterface):
     def __init__(
         self,
         queue_response: bytes,
-        boefje_responses: List[bytes],
-        normalizer_responses: List[bytes],
+        boefje_responses: list[bytes],
+        normalizer_responses: list[bytes],
         log_path: Path,
         raise_on_empty_queue: Exception = KeyboardInterrupt,
         iterations_to_wait_for_exception: int = 0,
@@ -38,15 +37,15 @@ class MockSchedulerClient(SchedulerClientInterface):
         self.sleep_time = sleep_time
 
         self._iterations = 0
-        self._tasks: Dict[str, Task] = multiprocessing.Manager().dict()
-        self._popped_items: Dict[str, QueuePrioritizedItem] = multiprocessing.Manager().dict()
-        self._pushed_items: Dict[str, Tuple[str, QueuePrioritizedItem]] = multiprocessing.Manager().dict()
+        self._tasks: dict[str, Task] = multiprocessing.Manager().dict()
+        self._popped_items: dict[str, QueuePrioritizedItem] = multiprocessing.Manager().dict()
+        self._pushed_items: dict[str, tuple[str, QueuePrioritizedItem]] = multiprocessing.Manager().dict()
 
-    def get_queues(self) -> List[Queue]:
+    def get_queues(self) -> list[Queue]:
         time.sleep(self.sleep_time)
-        return TypeAdapter(List[Queue]).validate_json(self.queue_response)
+        return TypeAdapter(list[Queue]).validate_json(self.queue_response)
 
-    def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
+    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
         time.sleep(self.sleep_time)
 
         try:
@@ -71,7 +70,7 @@ class MockSchedulerClient(SchedulerClientInterface):
         task.status = status
         self._tasks[str(task_id)] = task
 
-    def get_all_patched_tasks(self) -> List[Tuple[str, ...]]:
+    def get_all_patched_tasks(self) -> list[tuple[str, ...]]:
         with self.log_path.open() as f:
             return [tuple(x.strip().split(",")) for x in f]
 
@@ -99,14 +98,14 @@ class MockHandler(Handler):
         self.queue = Manager().Queue()
         self.exception = exception
 
-    def handle(self, item: Union[BoefjeMeta, NormalizerMeta]):
+    def handle(self, item: BoefjeMeta | NormalizerMeta):
         if str(item.id) == "9071c9fd-2b9f-440f-a524-ef1ca4824fd4":
             raise self.exception()
 
         time.sleep(self.sleep_time)
         self.queue.put(item)
 
-    def get_all(self) -> List[Union[BoefjeMeta, NormalizerMeta]]:
+    def get_all(self) -> list[BoefjeMeta | NormalizerMeta]:
         return [self.queue.get() for _ in range(self.queue.qsize())]
 
 

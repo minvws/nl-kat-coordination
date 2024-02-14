@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -8,8 +8,8 @@ class Software(OOI):
     object_type: Literal["Software"] = "Software"
 
     name: str
-    version: Optional[str] = None
-    cpe: Optional[str] = None
+    version: str | None = None
+    cpe: str | None = None
 
     _natural_key_attrs = ["name", "version", "cpe"]
     _information_value = ["name"]

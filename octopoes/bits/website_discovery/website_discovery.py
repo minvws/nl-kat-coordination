@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Union
+from collections.abc import Iterator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import ResolvedHostname
@@ -8,7 +8,7 @@ from octopoes.models.ooi.web import Website
 
 
 def run(
-    ip_address: IPAddressV4, additional_oois: List[Union[IPService, ResolvedHostname]], config: Dict[str, str]
+    ip_address: IPAddressV4, additional_oois: list[IPService | ResolvedHostname], config: dict[str, str]
 ) -> Iterator[OOI]:
     def is_service_http(ip_service: IPService) -> bool:
         return "http" in ip_service.service.tokenized.name.lower().strip()

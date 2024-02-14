@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
@@ -25,7 +25,7 @@ def get_risk_level(severity_score):
     return None
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     cve_finding_type_id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
     data = json.loads(raw)
 

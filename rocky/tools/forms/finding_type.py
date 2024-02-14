@@ -1,5 +1,4 @@
 import datetime
-from typing import Dict, List
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -141,7 +140,7 @@ CVE-2021-00000""",
     def __init__(
         self,
         connector: OctopoesAPIConnector,
-        ooi_list: List[Dict[str, str]],
+        ooi_list: list[dict[str, str]],
         *args,
         **kwargs,
     ):
@@ -149,7 +148,7 @@ CVE-2021-00000""",
         super().__init__(*args, **kwargs)
         self.set_choices_for_field("ooi_id", ooi_list)
 
-    def set_choices_for_field(self, field, choices: List[Dict[str, str]]):
+    def set_choices_for_field(self, field, choices: list[dict[str, str]]):
         self.fields[field].widget.choices = choices
 
     def clean_date(self):

@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, ClassVar, List, Optional
+from typing import Any, ClassVar
 
 import pydantic
 from scheduler import models
@@ -12,7 +12,7 @@ class TestModel(pydantic.BaseModel):
     id: str
     name: str
     count: int = 0
-    categories: List[str] = None
+    categories: list[str] = None
     child: Any = None
 
     def __init__(self, **data: Any):
@@ -22,7 +22,7 @@ class TestModel(pydantic.BaseModel):
             self.categories = []
 
 
-def create_p_item_request(priority: int, data: Optional[TestModel] = None) -> models.PrioritizedItemRequest:
+def create_p_item_request(priority: int, data: TestModel | None = None) -> models.PrioritizedItemRequest:
     if data is None:
         data = TestModel(
             id=uuid.uuid4().hex,
@@ -35,7 +35,7 @@ def create_p_item_request(priority: int, data: Optional[TestModel] = None) -> mo
     )
 
 
-def create_p_item(scheduler_id: str, priority: int, data: Optional[TestModel] = None) -> models.PrioritizedItem:
+def create_p_item(scheduler_id: str, priority: int, data: TestModel | None = None) -> models.PrioritizedItem:
     if data is None:
         data = TestModel(
             id=uuid.uuid4().hex,

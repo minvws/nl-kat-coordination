@@ -1,4 +1,4 @@
-from typing import Dict, Literal
+from typing import Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -9,7 +9,7 @@ class Config(OOI):
 
     ooi: Reference = ReferenceField(OOI)
     bit_id: str
-    config: Dict[str, str]
+    config: dict[str, str]
 
     _natural_key_attrs = ["ooi", "bit_id"]
 

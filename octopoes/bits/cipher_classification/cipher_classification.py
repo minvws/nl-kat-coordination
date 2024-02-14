@@ -1,6 +1,6 @@
 import csv
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Dict, Iterator, List, Tuple
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -13,7 +13,7 @@ SEVERITY_TO_ID = {
 }
 
 
-def get_severity_and_reasons(cipher_suite) -> List[Tuple[str, str]]:
+def get_severity_and_reasons(cipher_suite) -> list[tuple[str, str]]:
     with Path.open(Path(__file__).parent / "list-ciphers-openssl-with-finding-type.csv", newline="") as csvfile:
         reader = csv.DictReader(csvfile)
         data = [{k.strip(): v.strip() for k, v in row.items() if k} for row in reader]
@@ -43,7 +43,7 @@ def get_severity_and_reasons(cipher_suite) -> List[Tuple[str, str]]:
     return severities_and_reasons
 
 
-def get_highest_severity_and_all_reasons(cipher_suites: Dict) -> Tuple[str, str]:
+def get_highest_severity_and_all_reasons(cipher_suites: dict) -> tuple[str, str]:
     # Define severity levels
     severity_levels = {"Critical": 3, "Medium": 2, "Recommendation": 1}
 

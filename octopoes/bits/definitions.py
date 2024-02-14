@@ -4,7 +4,6 @@ from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from types import ModuleType
-from typing import Dict, List, Optional, Type
 
 from pydantic import BaseModel
 
@@ -16,22 +15,22 @@ logger = getLogger(__name__)
 
 
 class BitParameterDefinition(BaseModel):
-    ooi_type: Type[OOIType]
+    ooi_type: type[OOIType]
     relation_path: str
 
 
 class BitDefinition(BaseModel):
     id: str
-    consumes: Type[OOIType]
-    parameters: List[BitParameterDefinition]
+    consumes: type[OOIType]
+    parameters: list[BitParameterDefinition]
     module: str
     min_scan_level: int = 1
     default_enabled: bool = True
-    config_ooi_relation_path: Optional[str] = None
+    config_ooi_relation_path: str | None = None
 
 
 @lru_cache(maxsize=32)
-def get_bit_definitions() -> Dict[str, BitDefinition]:
+def get_bit_definitions() -> dict[str, BitDefinition]:
     bit_definitions = {}
 
     for package in pkgutil.walk_packages([str(BITS_DIR)]):

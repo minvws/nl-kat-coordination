@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.urls import reverse
@@ -16,7 +16,7 @@ class BaseKATalogusView(OrganizationView, ListView, FormView):
         super().setup(request, *args, **kwargs)
         self.katalogus_client = get_katalogus(self.organization.code)
 
-    def get_initial(self) -> Dict[str, Any]:
+    def get_initial(self) -> dict[str, Any]:
         initial = super().get_initial()
         initial["sorting_options"] = self.request.GET.get("sorting_options", "a-z")
         initial["filter_options"] = self.request.GET.get("filter_options", "all")

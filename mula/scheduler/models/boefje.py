@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import Any, Dict, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -9,8 +9,8 @@ class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
-    name: Optional[str] = Field(default=None)
-    version: Optional[str] = Field(default=None)
+    name: str | None = Field(default=None)
+    version: str | None = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):
@@ -18,9 +18,9 @@ class BoefjeMeta(BaseModel):
 
     id: uuid.UUID
     boefje: Boefje
-    input_ooi: Optional[str]
-    arguments: Dict[str, Any] = Field(default_factory=dict)
+    input_ooi: str | None
+    arguments: dict[str, Any] = Field(default_factory=dict)
     organization: str
 
-    started_at: Optional[datetime.datetime]
-    ended_at: Optional[datetime.datetime]
+    started_at: datetime.datetime | None
+    ended_at: datetime.datetime | None

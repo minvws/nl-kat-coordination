@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from ipaddress import IPv4Address, IPv6Address
 from os import urandom
 from pathlib import Path
-from typing import Dict, List, Optional, Union
 from unittest.mock import MagicMock, patch
 from uuid import UUID
 
@@ -636,15 +635,15 @@ def get_stub_path(file_name: str) -> Path:
     return Path(__file__).parent / "stubs" / file_name
 
 
-def get_boefjes_data() -> Dict:
+def get_boefjes_data() -> dict:
     return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
-def get_normalizers_data() -> Dict:
+def get_normalizers_data() -> dict:
     return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
 
 
-def get_plugins_data() -> Dict:
+def get_plugins_data() -> dict:
     return get_boefjes_data() + get_normalizers_data()
 
 
@@ -698,27 +697,27 @@ def mock_scheduler_client_task_list(mocker):
 
 
 class MockOctopoesAPIConnector:
-    oois: Dict[Reference, OOI]
-    queries: Dict[str, Dict[Optional[Union[Reference, str]], List[OOI]]]
+    oois: dict[Reference, OOI]
+    queries: dict[str, dict[Reference | str | None, list[OOI]]]
     valid_time: datetime
 
     def __init__(self, valid_time: datetime):
         self.valid_time = valid_time
 
-    def get(self, reference: Reference, valid_time: Optional[datetime] = None) -> OOI:
+    def get(self, reference: Reference, valid_time: datetime | None = None) -> OOI:
         return self.oois[reference]
 
     def query(
         self,
         path: str,
         valid_time: datetime,
-        source: Optional[Union[Reference, str]] = None,
+        source: Reference | str | None = None,
         offset: int = 0,
         limit: int = 50,
-    ) -> List[OOI]:
+    ) -> list[OOI]:
         return self.queries[path][source]
 
-    def get_history(self, reference: Reference) -> List[TransactionRecord]:
+    def get_history(self, reference: Reference) -> list[TransactionRecord]:
         return [
             TransactionRecord(
                 txTime=self.valid_time,
@@ -730,12 +729,12 @@ class MockOctopoesAPIConnector:
 
     def list_origins(
         self,
-        valid_time: Optional[datetime] = None,
-        source: Optional[Reference] = None,
-        result: Optional[Reference] = None,
-        task_id: Optional[UUID] = None,
-        origin_type: Optional[OriginType] = None,
-    ) -> List[Origin]:
+        valid_time: datetime | None = None,
+        source: Reference | None = None,
+        result: Reference | None = None,
+        task_id: UUID | None = None,
+        origin_type: OriginType | None = None,
+    ) -> list[Origin]:
         return []
 
 

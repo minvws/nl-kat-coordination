@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -27,7 +27,7 @@ class NameServerCheck:
 
 @dataclass
 class NameServerChecks:
-    checks: List[NameServerCheck] = field(default_factory=list)
+    checks: list[NameServerCheck] = field(default_factory=list)
 
     @property
     def no_uncommon_ports(self):
@@ -66,7 +66,7 @@ class NameServerSystemReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "name_server_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         hostnames = []
 
         try:

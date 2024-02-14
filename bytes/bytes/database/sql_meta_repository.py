@@ -1,6 +1,6 @@
 import logging
 import uuid
-from typing import Dict, Iterator, List, Optional, Type
+from collections.abc import Iterator
 
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
@@ -40,7 +40,7 @@ class SQLMetaDataRepository(MetaDataRepository):
     def __enter__(self) -> None:
         pass
 
-    def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
+    def __exit__(self, _exc_type: type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         try:
             self.session.commit()
             logger.debug("Committed session")
@@ -63,7 +63,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return to_boefje_meta(boefje_meta_in_db)
 
-    def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
+    def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
         logger.debug("Querying boefje meta: %s", query_filter.json())
 
         query = self.session.query(BoefjeMetaInDB).filter(BoefjeMetaInDB.organization == query_filter.organization)
@@ -93,7 +93,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return to_normalizer_meta(normalizer_meta_in_db)
 
-    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
+    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
         logger.debug("Querying normalizer meta: %s", query_filter.json())
 
         query = self.session.query(NormalizerMetaInDB)
@@ -141,7 +141,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return raw_file_in_db.id
 
-    def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
+    def get_raw(self, query_filter: RawDataFilter) -> list[RawDataMeta]:
         logger.debug("Querying raw data: %s", query_filter.json())
         query = self.session.query(RawFileInDB)
         query = query_filter.apply(query)
@@ -149,7 +149,7 @@ class SQLMetaDataRepository(MetaDataRepository):
         return [to_raw_meta(raw_file_in_db) for raw_file_in_db in query]
 
     def get_raw_by_id(self, raw_id: uuid.UUID) -> RawData:
-        raw_in_db: Optional[RawFileInDB] = self.session.get(RawFileInDB, str(raw_id))
+        raw_in_db: RawFileInDB | None = self.session.get(RawFileInDB, str(raw_id))
 
         if raw_in_db is None:
             raise ObjectNotFoundException(RawFileInDB, id=str(raw_id))
@@ -158,14 +158,14 @@ class SQLMetaDataRepository(MetaDataRepository):
         return self.raw_repository.get_raw(raw_in_db.id, boefje_meta)
 
     def get_raw_meta_by_id(self, raw_id: uuid.UUID) -> RawDataMeta:
-        raw_in_db: Optional[RawFileInDB] = self.session.get(RawFileInDB, str(raw_id))
+        raw_in_db: RawFileInDB | None = self.session.get(RawFileInDB, str(raw_id))
 
         if raw_in_db is None:
             raise ObjectNotFoundException(RawFileInDB, id=str(raw_id))
 
         return to_raw_meta(raw_in_db)
 
-    def has_raw(self, boefje_meta: BoefjeMeta, mime_types: List[MimeType]) -> bool:
+    def has_raw(self, boefje_meta: BoefjeMeta, mime_types: list[MimeType]) -> bool:
         query = self.session.query(RawFileInDB).filter(RawFileInDB.boefje_meta_id == str(boefje_meta.id))
 
         if len(mime_types) > 0:
@@ -175,7 +175,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return count > 0
 
-    def get_raw_file_count_per_organization(self) -> Dict[str, int]:
+    def get_raw_file_count_per_organization(self) -> dict[str, int]:
         query = (
             self.session.query(BoefjeMetaInDB.organization, func.count())
             .join(RawFileInDB)
@@ -184,7 +184,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return {organization_id: count for organization_id, count in query}
 
-    def get_raw_file_count_per_mime_type(self, query_filter: RawDataFilter) -> Dict[str, int]:
+    def get_raw_file_count_per_mime_type(self, query_filter: RawDataFilter) -> dict[str, int]:
         logger.debug("Querying count raw data per mime type: %s", query_filter.json())
         query = self.session.query(func.unnest(RawFileInDB.mime_types), func.count()).group_by(
             func.unnest(RawFileInDB.mime_types)
@@ -199,7 +199,7 @@ class SQLMetaDataRepository(MetaDataRepository):
 
         return to_raw_data(raw_file_in_db, data.value)
 
-    def _get_or_create_signing_provider(self, signing_provider_url: Optional[str]) -> Optional[SigningProviderInDB]:
+    def _get_or_create_signing_provider(self, signing_provider_url: str | None) -> SigningProviderInDB | None:
         if not signing_provider_url:
             return None
 
@@ -235,7 +235,7 @@ def create_meta_data_repository() -> Iterator[MetaDataRepository]:
 
 
 class ObjectNotFoundException(Exception):
-    def __init__(self, cls: Type[SQL_BASE], **kwargs):  # type: ignore
+    def __init__(self, cls: type[SQL_BASE], **kwargs):  # type: ignore
         super().__init__(f"The object of type {cls} was not found for query parameters {kwargs}")
 
 
@@ -298,7 +298,7 @@ def to_normalizer_meta(normalizer_meta_in_db: NormalizerMetaInDB) -> NormalizerM
     )
 
 
-def to_raw_file_in_db(raw_data: RawData, signing_provider: Optional[SigningProviderInDB]) -> RawFileInDB:
+def to_raw_file_in_db(raw_data: RawData, signing_provider: SigningProviderInDB | None) -> RawFileInDB:
     return RawFileInDB(
         id=str(uuid.uuid4()),
         boefje_meta_id=str(raw_data.boefje_meta.id),
@@ -309,7 +309,7 @@ def to_raw_file_in_db(raw_data: RawData, signing_provider: Optional[SigningProvi
     )
 
 
-def raw_meta_to_raw_file_in_db(raw_data_meta: RawDataMeta, signing_provider_id: Optional[int]) -> RawFileInDB:
+def raw_meta_to_raw_file_in_db(raw_data_meta: RawDataMeta, signing_provider_id: int | None) -> RawFileInDB:
     return RawFileInDB(
         id=str(raw_data_meta.id),
         boefje_meta_id=raw_data_meta.boefje_meta.id,

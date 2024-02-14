@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, List, Set, Type
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -160,12 +160,12 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
 
 
 class Report(OrganizationView):
-    boefjes_required: Set = None  # type: ignore
-    boefjes_optional: Set = None  # type: ignore
+    boefjes_required: set = None  # type: ignore
+    boefjes_optional: set = None  # type: ignore
     start_ooi: OOI = None  # type: ignore
-    allowed_ooi_types: List[Type[OOI]] = None  # type: ignore
-    allowed_finding_types: List[str] = None  # type: ignore
-    boefjes: List = []
+    allowed_ooi_types: list[type[OOI]] = None  # type: ignore
+    allowed_finding_types: list[str] = None  # type: ignore
+    boefjes: list = []
 
     @classmethod
     def get_finding_filter(cls):

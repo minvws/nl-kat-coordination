@@ -1,6 +1,5 @@
 """Boefje script for getting dns records"""
 import logging
-from typing import List, Tuple, Union
 
 import dns.resolver
 from dns.name import Name
@@ -15,7 +14,7 @@ class ZoneNotFoundException(Exception):
     pass
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     zone_ooi = input_["hostname"]["name"]
 

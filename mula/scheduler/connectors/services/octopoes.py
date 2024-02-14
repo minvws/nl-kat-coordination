@@ -1,5 +1,3 @@
-from typing import List
-
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import OOI, Organisation
 
@@ -16,17 +14,17 @@ class Octopoes(HTTPService):
         self,
         host: str,
         source: str,
-        orgs: List[Organisation],
+        orgs: list[Organisation],
         pool_connections: int,
         timeout: int = 10,
     ):
-        self.orgs: List[Organisation] = orgs
+        self.orgs: list[Organisation] = orgs
         super().__init__(host, source, timeout, pool_connections)
 
     @exception_handler
     def get_objects_by_object_types(
-        self, organisation_id: str, object_types: List[str], scan_level: List[int]
-    ) -> List[OOI]:
+        self, organisation_id: str, object_types: list[str], scan_level: list[int]
+    ) -> list[OOI]:
         """Get all oois from octopoes"""
         if scan_level is None:
             scan_level = []
@@ -58,7 +56,7 @@ class Octopoes(HTTPService):
         return oois
 
     @exception_handler
-    def get_random_objects(self, organisation_id: str, n: int, scan_level: List[int]) -> List[OOI]:
+    def get_random_objects(self, organisation_id: str, n: int, scan_level: list[int]) -> list[OOI]:
         """Get `n` random oois from octopoes"""
         if scan_level is None:
             scan_level = []

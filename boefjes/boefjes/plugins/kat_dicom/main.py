@@ -1,13 +1,12 @@
 import json
 import logging
-from typing import List, Tuple, Union
 
 from pynetdicom import AE
 
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
 

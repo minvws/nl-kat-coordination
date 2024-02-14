@@ -1,7 +1,8 @@
 import logging
 import typing
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Dict, FrozenSet, Union
+from typing import Any
 from uuid import UUID
 
 import requests
@@ -22,7 +23,7 @@ class BytesAPISession(requests.Session):
         self._base_url = base_url.rstrip("/")
         self.headers["User-Agent"] = f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"
 
-    def request(self, method: str, url: Union[str, bytes], **kwargs) -> requests.Response:  # type: ignore
+    def request(self, method: str, url: str | bytes, **kwargs) -> requests.Response:  # type: ignore
         url = self._base_url + str(url)
 
         return super().request(method, url, **kwargs)
@@ -58,7 +59,7 @@ class BytesAPIClient:
             "username": username,
             "password": password,
         }
-        self.headers: Dict[str, str] = {}
+        self.headers: dict[str, str] = {}
 
     def login(self) -> None:
         self.headers = self._get_authentication_headers()
@@ -74,7 +75,7 @@ class BytesAPIClient:
                 logger.debug(response.text)
             raise
 
-    def _get_authentication_headers(self) -> Dict[str, str]:
+    def _get_authentication_headers(self) -> dict[str, str]:
         return {"Authorization": f"bearer {self._get_token()}"}
 
     def _get_token(self) -> str:
@@ -106,7 +107,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: FrozenSet[str] = frozenset()) -> UUID:
+    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: frozenset[str] = frozenset()) -> UUID:
         headers = {"content-type": "application/octet-stream"}
         headers.update(self.headers)
 

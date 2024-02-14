@@ -1,7 +1,8 @@
 import contextlib
 import logging
+from collections.abc import Iterable, Iterator
 from pathlib import Path
-from typing import Dict, Iterable, Iterator, List, Literal, Optional
+from typing import Literal
 
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
@@ -57,10 +58,10 @@ class PluginService:
         self.repository_storage.__exit__(exc_type, exc_val, exc_tb)
         self.plugin_enabled_store.__exit__(exc_type, exc_val, exc_tb)
 
-    def get_all(self, organisation_id: str) -> List[PluginType]:
+    def get_all(self, organisation_id: str) -> list[PluginType]:
         all_plugins = self._plugins_for_repos(self.repository_storage.get_all().values(), organisation_id)
 
-        flat: List[PluginType] = []
+        flat: list[PluginType] = []
 
         for plugins in all_plugins.values():
             flat.extend(plugins.values())
@@ -95,7 +96,7 @@ class PluginService:
             for plugin_id in plugins:
                 self.update_by_id(repository_id, plugin_id, to_organisation, enabled=True)
 
-    def upsert_settings(self, values: Dict, organisation_id: str, plugin_id: str):
+    def upsert_settings(self, values: dict, organisation_id: str, plugin_id: str):
         self._assert_settings_match_schema(values, organisation_id, plugin_id)
 
         return self.settings_storage.upsert(values, organisation_id, plugin_id)
@@ -113,7 +114,7 @@ class PluginService:
 
     # These three methods should return this static info from remote repositories as well in the future
 
-    def schema(self, plugin_id: str) -> Optional[Dict]:
+    def schema(self, plugin_id: str) -> dict | None:
         return self.local_repo.schema(plugin_id)
 
     def cover(self, plugin_id: str) -> Path:
@@ -134,7 +135,7 @@ class PluginService:
             logger.error("Plugin not found: %s", plugin_id)
             return ""
 
-    def repository_plugins(self, repository_id: str, organisation_id: str) -> Dict[str, PluginType]:
+    def repository_plugins(self, repository_id: str, organisation_id: str) -> dict[str, PluginType]:
         return self._plugins_for_repos([self.repository_storage.get_by_id(repository_id)], organisation_id).get(
             repository_id, {}
         )
@@ -160,8 +161,8 @@ class PluginService:
 
     def _plugins_for_repos(
         self, repositories: Iterable[Repository], organisation_id: str
-    ) -> Dict[str, Dict[str, PluginType]]:
-        plugins: Dict[str, Dict[str, PluginType]] = {}
+    ) -> dict[str, dict[str, PluginType]]:
+        plugins: dict[str, dict[str, PluginType]] = {}
 
         for repository in repositories:
             if repository.id == RESERVED_LOCAL_ID:
@@ -177,7 +178,7 @@ class PluginService:
 
         return plugins
 
-    def _assert_settings_match_schema(self, all_settings: Dict, organisation_id: str, plugin_id: str):
+    def _assert_settings_match_schema(self, all_settings: dict, organisation_id: str, plugin_id: str):
         schema = self.schema(plugin_id)
 
         if schema:  # No schema means that there is nothing to assert
@@ -210,13 +211,13 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
     yield from session_managed_iterator(closure)
 
 
-def get_pagination_parameters(offset: int = 0, limit: Optional[int] = LIMIT) -> PaginationParameters:
+def get_pagination_parameters(offset: int = 0, limit: int | None = LIMIT) -> PaginationParameters:
     return PaginationParameters(offset=offset, limit=limit)
 
 
 def get_plugins_filter_parameters(
-    q: Optional[str] = None,
-    plugin_type: Optional[Literal["boefje", "normalizer", "bit"]] = None,
-    state: Optional[bool] = None,
+    q: str | None = None,
+    plugin_type: Literal["boefje", "normalizer", "bit"] | None = None,
+    state: bool | None = None,
 ) -> FilterParameters:
     return FilterParameters(q=q, type=plugin_type, state=state)

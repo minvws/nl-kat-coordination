@@ -1,5 +1,5 @@
 import hashlib
-from typing import Literal, Optional
+from typing import Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.records import DNSTXTRecord
@@ -11,9 +11,9 @@ from octopoes.models.persistence import ReferenceField
 class DNSSPFRecord(OOI):
     object_type: Literal["DNSSPFRecord"] = "DNSSPFRecord"
     value: str
-    ttl: Optional[int] = None
-    all: Optional[str] = None
-    exp: Optional[str] = None
+    ttl: int | None = None
+    all: str | None = None
+    exp: str | None = None
     dns_txt_record: Reference = ReferenceField(DNSTXTRecord, max_inherit_scan_level=1)
 
     _natural_key_attrs = ["dns_txt_record", "value"]
@@ -98,7 +98,7 @@ class DNSSPFMechanismNetBlock(DNSSPFMechanism):
 class DMARCTXTRecord(OOI):
     object_type: Literal["DMARCTXTRecord"] = "DMARCTXTRecord"
     value: str
-    ttl: Optional[int]
+    ttl: int | None
     hostname: Reference = ReferenceField(Hostname)
 
     _natural_key_attrs = ["value", "hostname"]

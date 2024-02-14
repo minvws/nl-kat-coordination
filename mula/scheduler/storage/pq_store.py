@@ -1,4 +1,3 @@
-from typing import List, Optional, Tuple
 from uuid import UUID
 
 from scheduler import models
@@ -14,7 +13,7 @@ class PriorityQueueStore:
         self.dbconn = dbconn
 
     @retry()
-    def pop(self, scheduler_id: str, filters: Optional[FilterRequest] = None) -> Optional[models.PrioritizedItem]:
+    def pop(self, scheduler_id: str, filters: FilterRequest | None = None) -> models.PrioritizedItem | None:
         with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemDB).filter(
                 models.PrioritizedItemDB.scheduler_id == scheduler_id
@@ -31,7 +30,7 @@ class PriorityQueueStore:
             return models.PrioritizedItem.model_validate(item_orm)
 
     @retry()
-    def push(self, scheduler_id: str, item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
+    def push(self, scheduler_id: str, item: models.PrioritizedItem) -> models.PrioritizedItem | None:
         with self.dbconn.session.begin() as session:
             item_orm = models.PrioritizedItemDB(**item.model_dump())
             session.add(item_orm)
@@ -39,7 +38,7 @@ class PriorityQueueStore:
             return models.PrioritizedItem.model_validate(item_orm)
 
     @retry()
-    def peek(self, scheduler_id: str, index: int) -> Optional[models.PrioritizedItem]:
+    def peek(self, scheduler_id: str, index: int) -> models.PrioritizedItem | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.PrioritizedItemDB)
@@ -76,7 +75,7 @@ class PriorityQueueStore:
             )
 
     @retry()
-    def get(self, scheduler_id, item_id: UUID) -> Optional[models.PrioritizedItem]:
+    def get(self, scheduler_id, item_id: UUID) -> models.PrioritizedItem | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.PrioritizedItemDB)
@@ -115,8 +114,8 @@ class PriorityQueueStore:
     def get_items(
         self,
         scheduler_id: str,
-        filters: Optional[FilterRequest],
-    ) -> Tuple[List[models.PrioritizedItem], int]:
+        filters: FilterRequest | None,
+    ) -> tuple[list[models.PrioritizedItem], int]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemDB).filter(
                 models.PrioritizedItemDB.scheduler_id == scheduler_id
@@ -131,7 +130,7 @@ class PriorityQueueStore:
             return ([models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm], count)
 
     @retry()
-    def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> Optional[models.PrioritizedItem]:
+    def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> models.PrioritizedItem | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.PrioritizedItemDB)
@@ -147,7 +146,7 @@ class PriorityQueueStore:
             return models.PrioritizedItem.model_validate(item_orm)
 
     @retry()
-    def get_items_by_scheduler_id(self, scheduler_id: str) -> List[models.PrioritizedItem]:
+    def get_items_by_scheduler_id(self, scheduler_id: str) -> list[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             items_orm = (
                 session.query(models.PrioritizedItemDB)

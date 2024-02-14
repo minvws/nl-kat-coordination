@@ -7,7 +7,7 @@ import json
 import os
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, Set, cast
+from typing import Any, cast
 
 from pydantic import BaseModel
 
@@ -19,7 +19,7 @@ DATA_STRUCTURE_CLASS_NAME = "DataShape"
 logger = getLogger(__name__)
 
 
-def get_templates(settings: Settings) -> Set[str]:
+def get_templates(settings: Settings) -> set[str]:
     """Assembles all template definitions found in the templates directory."""
 
     templates = set()
@@ -59,7 +59,7 @@ def get_data_shape(template: str, settings: Settings) -> BaseModel:
     return cast(BaseModel, getattr(module, DATA_STRUCTURE_CLASS_NAME))
 
 
-def get_samples(settings: Settings) -> Dict[str, Dict[str, Any]]:
+def get_samples(settings: Settings) -> dict[str, dict[str, Any]]:
     """Returns a dictionary of sample data for each template"""
     samples = {}
     template_folder = Path(settings.templates_folder)

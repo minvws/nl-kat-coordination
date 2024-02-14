@@ -1,6 +1,7 @@
 import typing
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any
 from uuid import UUID
 
 import requests
@@ -19,7 +20,7 @@ class BytesAPISession(requests.Session):
         self._base_url = base_url
         self.headers["User-Agent"] = f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"
 
-    def request(self, method: str, url: Union[str, bytes], **kwargs) -> requests.Response:  # type: ignore
+    def request(self, method: str, url: str | bytes, **kwargs) -> requests.Response:  # type: ignore
         url = self._base_url + str(url)
 
         return super().request(method, url, **kwargs)
@@ -50,7 +51,7 @@ class BytesAPIClient:
             "username": username,
             "password": password,
         }
-        self.headers: Dict[str, str] = {}
+        self.headers: dict[str, str] = {}
 
     def login(self) -> None:
         self.headers = self._get_authentication_headers()
@@ -59,7 +60,7 @@ class BytesAPIClient:
     def _verify_response(response: requests.Response) -> None:
         response.raise_for_status()
 
-    def _get_authentication_headers(self) -> Dict[str, str]:
+    def _get_authentication_headers(self) -> dict[str, str]:
         return {"Authorization": f"bearer {self._get_token()}"}
 
     def _get_token(self) -> str:
@@ -80,7 +81,7 @@ class BytesAPIClient:
         return response.content
 
     @retry_with_login
-    def get_mime_type_count(self, query_filter: RawDataFilter) -> Dict[str, str]:
+    def get_mime_type_count(self, query_filter: RawDataFilter) -> dict[str, str]:
         params = query_filter.dict()
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
@@ -104,7 +105,7 @@ class BytesAPIClient:
         return BoefjeMeta.parse_obj(boefje_meta_json)
 
     @retry_with_login
-    def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
+    def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
         response = self._session.get("/bytes/boefje_meta", headers=self.headers, params=query_filter.dict())
         self._verify_response(response)
 
@@ -126,7 +127,7 @@ class BytesAPIClient:
         return NormalizerMeta.parse_obj(normalizer_meta_json)
 
     @retry_with_login
-    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
+    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
         response = self._session.get("/bytes/normalizer_meta", headers=self.headers, params=query_filter.dict())
         self._verify_response(response)
 
@@ -134,7 +135,7 @@ class BytesAPIClient:
         return [NormalizerMeta.parse_obj(normalizer_meta) for normalizer_meta in normalizer_meta_json]
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: UUID, raw: bytes, mime_types: Optional[List[str]] = None) -> str:
+    def save_raw(self, boefje_meta_id: UUID, raw: bytes, mime_types: list[str] | None = None) -> str:
         if not mime_types:
             mime_types = []
 
@@ -158,7 +159,7 @@ class BytesAPIClient:
         return response.content
 
     @retry_with_login
-    def get_raws(self, query_filter: RawDataFilter) -> Dict[str, str]:
+    def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:
         params = query_filter.dict()
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 

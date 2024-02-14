@@ -1,7 +1,7 @@
 import json
 import logging
+from collections.abc import Iterator
 from ipaddress import IPv4Interface, ip_interface
-from typing import Iterator, Union
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, DeclaredScanProfile
@@ -29,7 +29,7 @@ def follow_path_in_dict(path, path_dict):
     return path_dict
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterator[OOI]:
     """Yields hostnames, IPv4/6 addresses or netblocks."""
     results = json.loads(raw)
     network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["name"])

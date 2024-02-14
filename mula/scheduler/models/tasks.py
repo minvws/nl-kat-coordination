@@ -1,7 +1,7 @@
 import enum
 import uuid
 from datetime import datetime, timezone
-from typing import ClassVar, List, Optional
+from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
@@ -109,7 +109,7 @@ class NormalizerTask(BaseModel):
 
     type: ClassVar[str] = "normalizer"
 
-    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4)
+    id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
     normalizer: Normalizer
     raw_data: RawData
 
@@ -128,12 +128,12 @@ class BoefjeTask(BaseModel):
 
     type: ClassVar[str] = "boefje"
 
-    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4)
+    id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
     boefje: Boefje
-    input_ooi: Optional[str]
+    input_ooi: str | None
     organization: str
 
-    dispatches: List[Normalizer] = Field(default_factory=list)
+    dispatches: list[Normalizer] = Field(default_factory=list)
 
     @property
     def hash(self) -> str:

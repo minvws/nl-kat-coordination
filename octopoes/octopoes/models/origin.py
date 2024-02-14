@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import List, Optional, Set
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -17,10 +16,10 @@ class Origin(BaseModel):
     origin_type: OriginType
     method: str
     source: Reference
-    result: Optional[List[Reference]] = Field(default_factory=list)
-    task_id: Optional[UUID] = None
+    result: list[Reference] | None = Field(default_factory=list)
+    task_id: UUID | None = None
 
-    def __sub__(self, other) -> Set[Reference]:
+    def __sub__(self, other) -> set[Reference]:
         if isinstance(other, Origin):
             return set(self.result) - set(other.result)
         else:

@@ -2,7 +2,7 @@ import io
 import logging
 import os
 import tarfile
-from typing import ByteString, Generator, List, Tuple, Union
+from collections.abc import ByteString, Generator
 
 import docker
 
@@ -93,7 +93,7 @@ def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
     ]
 
 
-def run_playwright(webpage: str, browser: str) -> Tuple[bytes]:
+def run_playwright(webpage: str, browser: str) -> tuple[bytes]:
     """Run Playwright in Docker."""
     tmp_path = "/tmp/output"  # noqa: S108
     client = docker.from_env()
@@ -128,7 +128,7 @@ def run_playwright(webpage: str, browser: str) -> Tuple[bytes]:
         container.remove()
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     """Creates webpage and takes capture using Playwright container."""
     input_ = boefje_meta.arguments["input"]
     webpage = f"{input_['scheme']}://{input_['netloc']['name']}{input_['path']}"

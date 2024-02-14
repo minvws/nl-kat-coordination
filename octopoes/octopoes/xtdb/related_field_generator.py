@@ -1,5 +1,3 @@
-from typing import Dict, Optional, Set, Tuple
-
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 
 
@@ -7,8 +5,8 @@ class RelatedFieldNode:
     def __init__(
         self,
         data_model: Datamodel,
-        object_types: Set[str],
-        path: Optional[Tuple[ForeignKey, ...]] = (),
+        object_types: set[str],
+        path: tuple[ForeignKey, ...] | None = (),
     ):
         self.data_model = data_model
         self.object_types = object_types
@@ -16,12 +14,12 @@ class RelatedFieldNode:
         # relations_out -> { (origin_class_name, prop_name): QueryNode }
         # e.g:          -> (DNSARecord, address): QueryNode[[IPAddressV4]]
         # and:          -> (IPService, service): QueryNode[[Service]]
-        self.relations_out: Dict[Tuple[str, str], RelatedFieldNode] = {}
+        self.relations_out: dict[tuple[str, str], RelatedFieldNode] = {}
 
         # relations_in  -> { (foreign_class_name, foreign_prop_name): QueryNode }
         # e.g:          -> (DNSARecord, address, dns_a_records): QueryNode[[DNSARecord]]
         # and:          -> (DNSAAAARecord, address, dns_aaaa_records): QueryNode[[DNSAAAARecord]]
-        self.relations_in: Dict[Tuple[str, str, str], RelatedFieldNode] = {}
+        self.relations_in: dict[tuple[str, str, str], RelatedFieldNode] = {}
 
         self.path = path
 
@@ -107,7 +105,7 @@ class RelatedFieldNode:
         # Join fields
         return "[{}]".format(" ".join(sorted(fields)))
 
-    def search_nodes(self, search_object_types=Set[str]):
+    def search_nodes(self, search_object_types=set[str]):
         # Filter outgoing QueryNodes
         self.relations_out = {
             key: node for key, node in self.relations_out.items() if node.search_nodes(search_object_types)

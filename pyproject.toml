@@ -24,10 +24,6 @@ paths = ["."]
 # To be extended with DJ, PT, RUF, C90, D, PL, RET
 select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A", "S"]
 ignore = [
-     "UP006", # Is not compatible with Python 3.8
-     "UP007", # Is not compatible with Python 3.8
-     "UP035", # Ignored temporarily until we've updated typing to Python 3.10
-     "UP038", # Ignored temporarily until we've updated typing to Python 3.10
      "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
      "SIM108", # Ternary operator is not always more readable
      "S101", # Assert use is normal in pytest tests

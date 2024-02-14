@@ -1,5 +1,3 @@
-from typing import Dict
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from boefjes.katalogus.dependencies.organisations import get_organisations_store
@@ -28,7 +26,7 @@ def check_organisation_exists(
             storage.get_by_id(organisation_id)
 
 
-@router.get("", response_model=Dict[str, Organisation])
+@router.get("", response_model=dict[str, Organisation])
 def list_organisations(
     storage: OrganisationStorage = Depends(get_organisations_store),
 ):

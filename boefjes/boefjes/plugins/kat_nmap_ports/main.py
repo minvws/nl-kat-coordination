@@ -1,7 +1,6 @@
 import re
 from ipaddress import IPv6Address, ip_address
 from os import getenv
-from typing import List, Tuple, Union
 
 import docker
 
@@ -13,13 +12,13 @@ NMAP_VALID_PORTS = (
 )
 
 
-def run_nmap(args: List[str]) -> str:
+def run_nmap(args: list[str]) -> str:
     """Run Nmap in Docker."""
     client = docker.from_env()
     return client.containers.run(NMAP_IMAGE, args, remove=True).decode()
 
 
-def build_nmap_arguments(host: str, ports: str) -> List[str]:
+def build_nmap_arguments(host: str, ports: str) -> list[str]:
     """Build nmap arguments from the hosts IP with the required ports."""
     ip = ip_address(host)
     args = ["nmap", "-T4", "-Pn", "-r", "-v10", "-sV", "-sS", "-sU", f"-p{validate_ports(ports=ports)}"]
@@ -61,7 +60,7 @@ def validate_ports(
     return ports
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     """Build Nmap arguments and return results to normalizer."""
     return [
         (set(), run_nmap(build_nmap_arguments(host=boefje_meta.arguments["input"]["address"], ports=getenv("PORTS"))))

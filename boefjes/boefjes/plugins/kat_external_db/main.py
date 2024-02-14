@@ -1,13 +1,12 @@
 """Boefje script for getting domains and ipaddresses from dadb"""
 from os import getenv
-from typing import List, Tuple, Union
 
 import requests
 
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     """Fetch external database response."""
     api_format = getenv(
         "DB_ENDPOINT_FORMAT",

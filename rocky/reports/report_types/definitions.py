@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, Set, TypedDict
+from typing import Any, TypedDict
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.types import OOIType
@@ -12,13 +12,13 @@ logger = getLogger(__name__)
 
 
 class ReportPlugins(TypedDict):
-    required: List[str]
-    optional: List[str]
+    required: list[str]
+    optional: list[str]
 
 
 class AggregateReportSubReports(TypedDict):
-    required: List[str]
-    optional: List[str]
+    required: list[str]
+    optional: list[str]
 
 
 class Report(ABC):
@@ -26,17 +26,17 @@ class Report(ABC):
     name: str
     description: str
     plugins: ReportPlugins
-    input_ooi_types: Set[OOIType]
+    input_ooi_types: set[OOIType]
     template_path: str = "report.html"
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
 
     @classmethod
-    def class_attributes(cls) -> Dict[str, any]:
+    def class_attributes(cls) -> dict[str, any]:
         return {
             "id": cls.id,
             "name": cls.name,
@@ -57,7 +57,7 @@ class AggregateReport(ABC):
     def __init__(self, octopoes_api_connector):
         self.octopoes_api_connector = octopoes_api_connector
 
-    def post_process_data(self, data: Dict[str, Any], valid_time: datetime) -> Dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any], valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
 
 
@@ -66,13 +66,13 @@ class MultiReport(ABC):
     name: str
     description: str
     plugins: ReportPlugins
-    input_ooi_types: Set[OOIType]
+    input_ooi_types: set[OOIType]
     template_path: str = "report.html"
 
     def __init__(self, octopoes_api_connector):
         self.octopoes_api_connector = octopoes_api_connector
 
-    def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError
 
 

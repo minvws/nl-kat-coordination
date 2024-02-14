@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -29,7 +29,7 @@ class IPv6Report(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "ipv6_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         """
         For hostnames, check whether they point to ipv6 addresses.
         For ip addresses, check all hostnames that point to them, and check whether they point to ipv6 addresses.

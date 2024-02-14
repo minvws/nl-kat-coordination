@@ -1,7 +1,6 @@
 """
 DNS Report Datamodel
 """
-from typing import List
 
 from pydantic import BaseModel
 
@@ -21,8 +20,8 @@ class Hostname(BaseModel):
     primary_key: str
     name: str
     network: str
-    dns_records: List[DNSRecord]
+    dns_records: list[DNSRecord]
 
 
 class DataShape(DataShapeBase):
-    hostnames: List[Hostname]
+    hostnames: list[Hostname]

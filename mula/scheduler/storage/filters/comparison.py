@@ -1,5 +1,3 @@
-from typing import List, Union
-
 from sqlalchemy.sql.elements import BinaryExpression
 
 
@@ -60,7 +58,7 @@ class Comparator:
     def compare(
         self,
         x: BinaryExpression,
-        y: Union[str, int, float, bool, None, List[str], List[int], List[float], List[bool], List[None]],
+        y: str | int | float | bool | None | list[str] | list[int] | list[float] | list[bool] | list[None],
     ) -> BinaryExpression:
         """Compare two values using the operator specified in the constructor.
 

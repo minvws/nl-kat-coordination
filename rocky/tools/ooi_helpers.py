@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -40,14 +40,14 @@ def format_value(value: Any) -> str:
     return value
 
 
-def format_display(data: Dict, ignore: Optional[List] = None) -> Dict[str, str]:
+def format_display(data: dict, ignore: list | None = None) -> dict[str, str]:
     if ignore is None:
         ignore = []
 
     return {format_attr_name(k): format_value(v) for k, v in data.items() if k not in ignore}
 
 
-def get_knowledge_base_data_for_ooi_store(ooi_store) -> Dict[str, Dict]:
+def get_knowledge_base_data_for_ooi_store(ooi_store) -> dict[str, dict]:
     knowledge_base = {}
 
     for ooi in ooi_store.values():
@@ -58,7 +58,7 @@ def get_knowledge_base_data_for_ooi_store(ooi_store) -> Dict[str, Dict]:
     return knowledge_base
 
 
-def get_knowledge_base_data_for_ooi(ooi: OOI) -> Dict:
+def get_knowledge_base_data_for_ooi(ooi: OOI) -> dict:
     knowledge_base_data = {}
 
     # Knowledge base data
@@ -80,12 +80,12 @@ def get_knowledge_base_data_for_ooi(ooi: OOI) -> Dict:
 def process_value(value: Any) -> Any:
     if isinstance(value, Enum):
         return value.value
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return value
     return str(value) if value else None
 
 
-def get_ooi_dict(ooi: OOI) -> Dict:
+def get_ooi_dict(ooi: OOI) -> dict:
     ooi_dict = {
         "id": ooi.primary_key,
         "ooi_type": ooi.get_ooi_type(),
@@ -103,7 +103,7 @@ def get_ooi_dict(ooi: OOI) -> Dict:
     return ooi_dict
 
 
-def get_tree_meta(tree_node: Dict, depth: int, location: str) -> Dict:
+def get_tree_meta(tree_node: dict, depth: int, location: str) -> dict:
     tree_meta = {
         "depth": depth,
         "location": location,
@@ -128,12 +128,12 @@ def get_tree_meta(tree_node: Dict, depth: int, location: str) -> Dict:
 
 def create_object_tree_item_from_ref(
     reference_node: ReferenceNode,
-    ooi_store: Dict[str, OOI],
-    knowledge_base: Optional[Dict[str, Dict]] = None,
+    ooi_store: dict[str, OOI],
+    knowledge_base: dict[str, dict] | None = None,
     depth=0,
     position=1,
     location="loc",
-) -> Dict:
+) -> dict:
     depth = sum([depth, 1])
     location = location + "-" + str(position)
 
@@ -181,7 +181,7 @@ def get_ooi_types_from_tree(ooi, include_self=True):
     return sorted(types)
 
 
-def filter_ooi_tree(ooi_node: Dict, show_types=[], hide_types=[]) -> Dict:
+def filter_ooi_tree(ooi_node: dict, show_types=[], hide_types=[]) -> dict:
     if not show_types and not hide_types:
         return ooi_node
 
@@ -223,14 +223,7 @@ def filter_ooi_tree_item(ooi_node, show_types, hide_types, self_excluded_from_fi
 
 def get_finding_type_from_finding(finding: Finding) -> FindingType:
     return TypeAdapter(
-        Union[
-            KATFindingType,
-            CVEFindingType,
-            CWEFindingType,
-            RetireJSFindingType,
-            SnykFindingType,
-            CAPECFindingType,
-        ]
+        KATFindingType | CVEFindingType | CWEFindingType | RetireJSFindingType | SnykFindingType | CAPECFindingType
     ).validate_python(
         {
             "object_type": finding.finding_type.class_,
@@ -245,7 +238,7 @@ OOI_TYPES_WITHOUT_FINDINGS = [name for name, cls_ in OOI_TYPES.items() if cls_ n
 
 def get_or_create_ooi(
     api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime = None
-) -> Tuple[OOI, Union[bool, datetime]]:
+) -> tuple[OOI, bool | datetime]:
     _now = datetime.now(timezone.utc)
     if observed_at is None:
         observed_at = _now

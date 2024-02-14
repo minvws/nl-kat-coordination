@@ -1,4 +1,4 @@
-from typing import Any, Dict, Literal
+from typing import Any, Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -19,6 +19,6 @@ class Incident(OOI):
     event_type: str
     event_title: str
     severity: str
-    meta_data: Dict[str, Any]
+    meta_data: dict[str, Any]
 
     _natural_key_attrs = ["application", "event_id"]

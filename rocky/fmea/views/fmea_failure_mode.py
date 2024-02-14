@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from django.contrib import messages
 from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -38,7 +36,7 @@ class FailureModeCreateView(FailureModeBreadcrumbsMixin, CreateView):
         success_message = _("Failure mode successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
-    def build_breadcrumbs(self) -> List[Dict[str, str]]:
+    def build_breadcrumbs(self) -> list[dict[str, str]]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(
             {
@@ -68,7 +66,7 @@ class FailureModeUpdateView(FailureModeBreadcrumbsMixin, UpdateView):
     def get_success_url(self, **kwargs):
         return reverse_lazy("fmea_failure_mode_detail", kwargs={"pk": self.object.id})
 
-    def build_breadcrumbs(self) -> List[Dict[str, str]]:
+    def build_breadcrumbs(self) -> list[dict[str, str]]:
         breadcrumbs = super().build_breadcrumbs()
 
         breadcrumbs.append(
@@ -104,7 +102,7 @@ class FailureModeDetailView(FailureModeBreadcrumbsMixin, DetailView):
     template_name = "fmea/fmea_failure_mode_detail.html"
     model = FailureMode
 
-    def build_breadcrumbs(self) -> List[Dict[str, str]]:
+    def build_breadcrumbs(self) -> list[dict[str, str]]:
         breadcrumbs = super().build_breadcrumbs()
 
         breadcrumbs.append(

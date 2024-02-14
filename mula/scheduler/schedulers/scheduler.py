@@ -1,8 +1,9 @@
 import abc
 import threading
 import time
+from collections.abc import Callable
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 import structlog
 from opentelemetry import trace
@@ -44,7 +45,7 @@ class Scheduler(abc.ABC):
         ctx: context.AppContext,
         scheduler_id: str,
         queue: queues.PriorityQueue,
-        callback: Optional[Callable[..., None]] = None,
+        callback: Callable[..., None] | None = None,
         max_tries: int = -1,
     ):
         """Initialize the Scheduler.
@@ -70,16 +71,16 @@ class Scheduler(abc.ABC):
         self.scheduler_id: str = scheduler_id
         self.queue: queues.PriorityQueue = queue
         self.max_tries: int = max_tries
-        self.callback: Optional[Callable[[], Any]] = callback
-        self._last_activity: Optional[datetime] = None
+        self.callback: Callable[[], Any] | None = callback
+        self._last_activity: datetime | None = None
 
         # Listeners
-        self.listeners: Dict[str, connectors.listeners.Listener] = {}
+        self.listeners: dict[str, connectors.listeners.Listener] = {}
 
         # Threads
         self.lock: threading.Lock = threading.Lock()
         self.stop_event_threads: threading.Event = threading.Event()
-        self.threads: List[thread.ThreadRunner] = []
+        self.threads: list[thread.ThreadRunner] = []
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -143,8 +144,8 @@ class Scheduler(abc.ABC):
 
     @tracer.start_as_current_span("scheduler_pop_item_from_queue")
     def pop_item_from_queue(
-        self, filters: Optional[storage.filters.FilterRequest] = None
-    ) -> Optional[models.PrioritizedItem]:
+        self, filters: storage.filters.FilterRequest | None = None
+    ) -> models.PrioritizedItem | None:
         """Pop an item from the queue.
 
         Args:
@@ -244,7 +245,7 @@ class Scheduler(abc.ABC):
 
         self.post_push(p_item)
 
-    def push_items_to_queue(self, p_items: List[models.PrioritizedItem]) -> None:
+    def push_items_to_queue(self, p_items: list[models.PrioritizedItem]) -> None:
         """Push multiple PrioritizedItems to the queue.
 
         Args:
@@ -446,7 +447,7 @@ class Scheduler(abc.ABC):
         self.threads = []
 
     @property
-    def last_activity(self) -> Optional[datetime]:
+    def last_activity(self) -> datetime | None:
         """Get the last activity of the scheduler."""
         with self.lock:
             return self._last_activity
@@ -457,7 +458,7 @@ class Scheduler(abc.ABC):
         with self.lock:
             self._last_activity = value
 
-    def dict(self) -> Dict[str, Any]:
+    def dict(self) -> dict[str, Any]:
         """Get a dict representation of the scheduler."""
         return {
             "id": self.scheduler_id,

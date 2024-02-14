@@ -1,7 +1,7 @@
 import json
 import re
+from collections.abc import Iterable
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, Iterable, List, Union
 
 from dns.message import Message, from_text
 from dns.rdata import Rdata
@@ -33,7 +33,7 @@ from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     internet = Network(name="internet")
 
     if raw.decode() == "NXDOMAIN":
@@ -44,14 +44,14 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     # parse raw data into dns.response.Message
     sections = results["dns_records"].split("\n\n")
-    responses: List[Message] = []
+    responses: list[Message] = []
     for section in sections:
         lines = section.split("\n")
         responses.append(from_text("\n".join(lines[1:])))
 
     zone = None
-    hostname_store: Dict[str, Hostname] = {}
-    record_store: Dict[str, DNSRecord] = {}
+    hostname_store: dict[str, Hostname] = {}
+    record_store: dict[str, DNSRecord] = {}
 
     def register_hostname(name: str) -> Hostname:
         hostname = Hostname(
@@ -69,7 +69,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
     input_hostname = register_hostname(normalizer_meta.raw_data.boefje_meta.arguments["input"]["name"])
 
     # keep track of discovered zones
-    zone_links: Dict[str, DNSZone] = {}
+    zone_links: dict[str, DNSZone] = {}
 
     for response in responses:
         for rrset in response.answer:

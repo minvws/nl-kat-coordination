@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Union
+from collections.abc import Iterator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.certificate import (
@@ -17,14 +17,14 @@ def is_part_of_wildcard(hostname: str, wildcard: str) -> bool:
     return wildcard_domain == higher_level_domain
 
 
-def hostname_in_qualifiers(hostname: str, qualifiers: List[str]) -> bool:
+def hostname_in_qualifiers(hostname: str, qualifiers: list[str]) -> bool:
     return any(is_part_of_wildcard(hostname, qualifier) for qualifier in qualifiers)
 
 
 def run(
     input_ooi: X509Certificate,
-    additional_oois: List[Union[Website, SubjectAlternativeNameHostname]],
-    config: Dict[str, str],
+    additional_oois: list[Website | SubjectAlternativeNameHostname],
+    config: dict[str, str],
 ) -> Iterator[OOI]:
     websites = [website for website in additional_oois if isinstance(website, Website)]
     subject_alternative_name_hostnames = [

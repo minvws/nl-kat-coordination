@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -10,10 +10,10 @@ class ServiceHealth(BaseModel):
 
     service: str
     healthy: bool = False
-    version: Optional[str] = None
+    version: str | None = None
     additional: Any = None
-    results: List["ServiceHealth"] = Field(default_factory=list)
-    externals: Dict[str, bool] = {}
+    results: list["ServiceHealth"] = Field(default_factory=list)
+    externals: dict[str, bool] = {}
 
 
 ServiceHealth.model_rebuild()

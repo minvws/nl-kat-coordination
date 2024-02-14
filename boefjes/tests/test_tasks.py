@@ -3,7 +3,6 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List
 from unittest import TestCase, mock
 from uuid import UUID
 
@@ -81,7 +80,7 @@ class TaskTest(TestCase):
                 parameters=[],
             ),
         ]
-        self.plugins: List[PluginType] = self.boefjes + self.normalizers + self.bits
+        self.plugins: list[PluginType] = self.boefjes + self.normalizers + self.bits
         sys.path.append(str(Path(__file__).parent))
 
     def _get_boefje_meta(self):

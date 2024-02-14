@@ -1,6 +1,6 @@
 import ipaddress
 import json
-from typing import Iterable, Union
+from collections.abc import Iterable
 from urllib.parse import urlparse
 
 from boefjes.job_models import NormalizerMeta
@@ -11,7 +11,7 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     website_original = Reference.from_str(boefje_meta.input_ooi)

@@ -1,13 +1,13 @@
-from typing import Any, List, Tuple
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
 from tools.enums import SCAN_LEVEL
 
-Choice = Tuple[Any, str]
-Choices = List[Choice]
-ChoicesGroup = Tuple[str, Choices]
-ChoicesGroups = List[ChoicesGroup]
+Choice = tuple[Any, str]
+Choices = list[Choice]
+ChoicesGroup = tuple[str, Choices]
+ChoicesGroups = list[ChoicesGroup]
 
 BLANK_CHOICE = ("", _("--- Please select one of the available options ----"))
 FILTER_BLANK_CHOICE = ("", _("--- Show all ----"))

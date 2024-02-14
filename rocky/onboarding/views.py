@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Type
+from typing import Any
 
 from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
 from account.mixins import (
@@ -116,7 +116,7 @@ class OnboardingSetupScanSelectPluginsView(
 ):
     template_name = "step_3g_setup_scan_select_plugins.html"
     current_step = 3
-    report: Type[Report] = DNSReport
+    report: type[Report] = DNSReport
     permission_required = "tools.can_enable_disable_boefje"
 
     def get_form(self):
@@ -148,7 +148,7 @@ class OnboardingSetupScanSelectPluginsView(
             return redirect(get_ooi_url("step_setup_scan_ooi_detail", ooi_id, self.organization.code))
         return self.get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["select_boefjes_form"] = self.get_form()
         return context
@@ -170,7 +170,7 @@ class OnboardingOOIForm(OOIForm):
     """
 
     def __init__(
-        self, hidden_fields: Dict[str, str], ooi_class: Type[OOI], connector: OctopoesAPIConnector, *args, **kwargs
+        self, hidden_fields: dict[str, str], ooi_class: type[OOI], connector: OctopoesAPIConnector, *args, **kwargs
     ):
         self.hidden_ooi_fields = hidden_fields
         super().__init__(ooi_class, connector, *args, **kwargs)
@@ -222,7 +222,7 @@ class OnboardingSetupScanOOIAddView(
 
         return kwargs
 
-    def get_ooi_class(self) -> Type[OOI]:
+    def get_ooi_class(self) -> type[OOI]:
         try:
             return type_by_name(self.kwargs["ooi_type"])
         except KeyError:
@@ -232,7 +232,7 @@ class OnboardingSetupScanOOIAddView(
         self.request.session["ooi_id"] = ooi.primary_key
         return get_ooi_url("step_clearance_level_introduction", ooi.primary_key, self.organization.code)
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         return super().build_breadcrumbs() + [
             {
                 "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code}),
@@ -240,7 +240,7 @@ class OnboardingSetupScanOOIAddView(
             },
         ]
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["type"] = self.ooi_class.get_ooi_type()
         return context
@@ -442,7 +442,7 @@ class OnboardingReportView(
 
 
 class BaseReportView(BaseOOIDetailView):
-    report: Type[Report]
+    report: type[Report]
     depth = 15
 
     def get_tree_dict(self):

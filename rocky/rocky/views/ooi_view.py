@@ -1,5 +1,5 @@
 from time import sleep
-from typing import Any, Dict, List, Set, Type
+from typing import Any
 
 from django import http
 from django.shortcuts import redirect
@@ -43,7 +43,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
         self.clearance_levels = request.GET.getlist("clearance_level", [])
         self.clearance_types = request.GET.getlist("clearance_type", [])
 
-    def get_active_filters(self) -> Dict[str, str]:
+    def get_active_filters(self) -> dict[str, str]:
         active_filters = {}
         if self.filtered_ooi_types:
             active_filters[_("OOI types: ")] = ", ".join(self.filtered_ooi_types)
@@ -54,17 +54,17 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
             active_filters[_("Clearance type: ")] = ", ".join(self.clearance_types)
         return active_filters
 
-    def get_ooi_scan_levels(self) -> Set[ScanLevel]:
+    def get_ooi_scan_levels(self) -> set[ScanLevel]:
         if not self.clearance_levels:
             return self.scan_levels
         return {ScanLevel(int(cl)) for cl in self.clearance_levels}
 
-    def get_ooi_profile_types(self) -> Set[ScanProfileType]:
+    def get_ooi_profile_types(self) -> set[ScanProfileType]:
         if not self.clearance_types:
             return self.scan_profile_types
         return {ScanProfileType(ct) for ct in self.clearance_types}
 
-    def get_ooi_types(self) -> Set[Type[OOI]]:
+    def get_ooi_types(self) -> set[type[OOI]]:
         if not self.filtered_ooi_types:
             return self.ooi_types
         return {type_by_name(t) for t in self.filtered_ooi_types if t not in _EXCLUDED_OOI_TYPES}
@@ -119,7 +119,7 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
 
         return context
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         if isinstance(self.ooi, Finding):
             start = {
                 "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
@@ -140,7 +140,7 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
 
 
 class BaseOOIFormView(SingleOOIMixin, FormView):
-    ooi_class: Type[OOI] = None
+    ooi_class: type[OOI] = None
     form_class = OOIForm
 
     def get_ooi_class(self):
@@ -183,7 +183,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
     def get_ooi_success_url(self, ooi: OOI) -> str:
         return get_ooi_url("ooi_detail", ooi.primary_key, self.organization.code)
 
-    def get_readonly_fields(self) -> List:
+    def get_readonly_fields(self) -> list:
         if not hasattr(self, "ooi"):
             return []
 

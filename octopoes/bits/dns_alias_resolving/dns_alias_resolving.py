@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Union
+from collections.abc import Iterator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import DNSCNAMERecord
@@ -7,7 +7,7 @@ from octopoes.models.ooi.network import Network
 
 
 def run(
-    hostname: Hostname, additional_oois: List[Union[DNSCNAMERecord, ResolvedHostname]], config: Dict[str, str]
+    hostname: Hostname, additional_oois: list[DNSCNAMERecord | ResolvedHostname], config: dict[str, str]
 ) -> Iterator[OOI]:
     cname_records = [ooi for ooi in additional_oois if isinstance(ooi, DNSCNAMERecord)]
     resolved_hostnames = [ooi for ooi in additional_oois if isinstance(ooi, ResolvedHostname)]

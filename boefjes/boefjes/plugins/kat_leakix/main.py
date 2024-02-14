@@ -1,7 +1,6 @@
 import json
 import re
 from os import getenv
-from typing import List, Tuple, Union
 from urllib.parse import quote_plus
 
 import requests
@@ -9,7 +8,7 @@ import requests
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     pk = boefje_meta.input_ooi
     results = []
     if re.match(pk, "IPAddressV4|.*") or re.match(pk, "IPAddressV6|.*"):

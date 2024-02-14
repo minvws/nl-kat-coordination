@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Union
+from collections.abc import Iterator
 
 import tldextract
 
@@ -9,9 +9,7 @@ from octopoes.models.ooi.email_security import DMARCTXTRecord
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(
-    input_ooi: Hostname, additional_oois: List[Union[DMARCTXTRecord, NXDOMAIN]], config: Dict[str, str]
-) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: list[DMARCTXTRecord | NXDOMAIN], config: dict[str, str]) -> Iterator[OOI]:
     dmarc_records = [ooi for ooi in additional_oois if isinstance(ooi, DMARCTXTRecord)]
     nxdomains = (ooi for ooi in additional_oois if isinstance(ooi, NXDOMAIN))
 

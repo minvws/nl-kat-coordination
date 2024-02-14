@@ -1,8 +1,8 @@
 import json
 from collections import Counter
+from collections.abc import Callable
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import Callable, Dict, List, Optional, Set, Type
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
@@ -52,7 +52,7 @@ logger = getLogger(__name__)
 settings = Settings()
 
 
-def find_relation_in_tree(relation: str, tree: ReferenceTree) -> List[OOI]:
+def find_relation_in_tree(relation: str, tree: ReferenceTree) -> list[OOI]:
     parts = relation.split(".")
     nodes = [tree.root]
     for part in parts:
@@ -77,10 +77,10 @@ class OctopoesService:
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
 
-    def _populate_scan_profiles(self, oois: List[OOI], valid_time: datetime) -> List[OOI]:
+    def _populate_scan_profiles(self, oois: list[OOI], valid_time: datetime) -> list[OOI]:
         logger.debug("Populating scan profiles for %s oois", len(oois))
 
-        ooi_cache: Dict[str, OOI] = {str(ooi.reference): ooi for ooi in oois}
+        ooi_cache: dict[str, OOI] = {str(ooi.reference): ooi for ooi in oois}
         scan_profiles = self.scan_profile_repository.get_bulk({x.reference for x in oois}, valid_time)
         for ooi in oois:
             ooi.scan_profile = EmptyScanProfile(reference=ooi.reference)
@@ -99,11 +99,11 @@ class OctopoesService:
         *,
         sort_order: str = "asc",  # Or: "desc"
         with_docs: bool = False,
-        has_doc: Optional[bool] = None,
+        has_doc: bool | None = None,
         offset: int = 0,
-        limit: Optional[int] = None,
-        indices: Optional[List[int]] = None,
-    ) -> List[TransactionRecord]:
+        limit: int | None = None,
+        indices: list[int] | None = None,
+    ) -> list[TransactionRecord]:
         return self.ooi_repository.get_history(
             reference,
             sort_order=sort_order,
@@ -116,12 +116,12 @@ class OctopoesService:
 
     def list_ooi(
         self,
-        types: Set[Type[OOI]],
+        types: set[type[OOI]],
         valid_time: datetime,
         limit: int = DEFAULT_LIMIT,
         offset: int = DEFAULT_OFFSET,
-        scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
-        scan_profile_types: Set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+        scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_types: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOI]:
         paginated = self.ooi_repository.list_oois(types, valid_time, limit, offset, scan_levels, scan_profile_types)
         self._populate_scan_profiles(paginated.items, valid_time)
@@ -131,8 +131,8 @@ class OctopoesService:
         self,
         reference: Reference,
         valid_time: datetime,
-        search_types: Optional[Set[Type[OOI]]] = None,
-        depth: Optional[int] = 1,
+        search_types: set[type[OOI]] | None = None,
+        depth: int | None = 1,
     ):
         tree = self.ooi_repository.get_tree(reference, valid_time, search_types, depth)
         self._populate_scan_profiles(tree.store.values(), valid_time)
@@ -143,7 +143,7 @@ class OctopoesService:
         if not referencing_origins:
             self.ooi_repository.delete(reference, valid_time)
 
-    def save_origin(self, origin: Origin, oois: List[OOI], valid_time: datetime) -> None:
+    def save_origin(self, origin: Origin, oois: list[OOI], valid_time: datetime) -> None:
         origin.result = [ooi.reference for ooi in oois]
 
         # When an Origin is saved while the source OOI does not exist, reject saving the results
@@ -201,7 +201,7 @@ class OctopoesService:
         self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
-    def check_path_level(path_level: Optional[int], current_level: int):
+    def check_path_level(path_level: int | None, current_level: int):
         return path_level is not None and path_level >= current_level
 
     def recalculate_scan_profiles(self, valid_time: datetime) -> None:
@@ -220,7 +220,7 @@ class OctopoesService:
         }
 
         # track all scan level assignments
-        assigned_scan_levels: Dict[Reference, ScanLevel] = {
+        assigned_scan_levels: dict[Reference, ScanLevel] = {
             scan_profile.reference: scan_profile.level for scan_profile in all_declared_scan_profiles
         }
 
@@ -234,7 +234,7 @@ class OctopoesService:
             while next_ooi_set:
                 # prepare next iteration, group oois per type
                 ooi_types = {ooi.__class__ for ooi in next_ooi_set}
-                grouped_per_type: Dict[Type[OOI], Set[OOI]] = {
+                grouped_per_type: dict[type[OOI], set[OOI]] = {
                     ooi_type: {ooi for ooi in next_ooi_set if isinstance(ooi, ooi_type)} for ooi_type in ooi_types
                 }
 
@@ -328,7 +328,7 @@ class OctopoesService:
     def process_event(self, event: DBEvent):
         # handle event
         event_handler_name = f"_on_{event.operation_type.value}_{event.entity_type}"
-        handler: Optional[Callable[[DBEvent], None]] = getattr(self, event_handler_name)
+        handler: Callable[[DBEvent], None] | None = getattr(self, event_handler_name)
         if handler is not None:
             handler(event)
 
@@ -473,22 +473,22 @@ class OctopoesService:
         self._run_inferences(event)
 
     def list_random_ooi(
-        self, valid_time: datetime, amount: int = 1, scan_levels: Set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
-    ) -> List[OOI]:
+        self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
+    ) -> list[OOI]:
         oois = self.ooi_repository.list_random(valid_time, amount, scan_levels)
         self._populate_scan_profiles(oois, valid_time)
         return oois
 
     def get_scan_profile_inheritance(
-        self, reference: Reference, valid_time: datetime, inheritance_chain: List[InheritanceSection]
-    ) -> List[InheritanceSection]:
+        self, reference: Reference, valid_time: datetime, inheritance_chain: list[InheritanceSection]
+    ) -> list[InheritanceSection]:
         neighbour_cache = self.ooi_repository.get_neighbours(reference, valid_time)
 
         last_inheritance_level = inheritance_chain[-1].level
         visited = {inheritance.reference for inheritance in inheritance_chain}
 
         # load scan profiles for all neighbours
-        neighbours_: List[OOI] = [
+        neighbours_: list[OOI] = [
             neighbour
             for neighbours in neighbour_cache.values()
             for neighbour in neighbours

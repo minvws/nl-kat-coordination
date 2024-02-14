@@ -1,6 +1,6 @@
 import contextlib
 import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from django import forms
 from django.forms import Widget
@@ -24,14 +24,14 @@ class BaseRockyForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""  # Removes : as label suffix
 
-    def set_choices_for_field(self, field: str, choices: Union[Choices, ChoicesGroups]) -> None:
+    def set_choices_for_field(self, field: str, choices: Choices | ChoicesGroups) -> None:
         if field in self.fields:
             self.fields[field].choices = choices
 
-    def set_choices_for_widget(self, field: str, choices: Union[Choices, ChoicesGroups]) -> None:
+    def set_choices_for_widget(self, field: str, choices: Choices | ChoicesGroups) -> None:
         self.fields[field].widget.choices = choices
 
-    def set_required_options_for_widget(self, field: str, required_options: List[str]) -> None:
+    def set_required_options_for_widget(self, field: str, required_options: list[str]) -> None:
         """For multiselect widgets, set the required options."""
         self.fields[field].widget.required_options = required_options
 
@@ -89,14 +89,14 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
     input_type = "checkbox"
     template_name = "forms/widgets/checkbox_group_columns.html"
     option_template_name = "forms/widgets/checkbox_option.html"
-    required_options: List[str] = None
+    required_options: list[str] = None
     toggle_all_button = None
     wrap_label = True
 
     def __init__(
         self,
-        required_options: Optional[List[str]] = None,
-        toggle_all_button: Optional[bool] = None,
+        required_options: list[str] | None = None,
+        toggle_all_button: bool | None = None,
         *args,
         **kwargs,
     ) -> None:
@@ -105,12 +105,12 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
             self.toggle_all_button = toggle_all_button
         self.required_options = required_options or []
 
-    def get_context(self, name, value, attrs) -> Dict[str, Any]:
+    def get_context(self, name, value, attrs) -> dict[str, Any]:
         context = super().get_context(name, value, attrs)
         context["toggle_all_button"] = self.toggle_all_button
         return context
 
-    def create_option(self, *arg, **kwargs) -> Dict[str, Any]:
+    def create_option(self, *arg, **kwargs) -> dict[str, Any]:
         option = super().create_option(*arg, **kwargs)
         option["wrap_label"] = self.wrap_label
         option["attrs"]["checked"] = self.is_required_option(option["value"])
@@ -201,6 +201,6 @@ class CheckboxTable(Widget):
         """Return selected values as a list."""
         if value is None and self.allow_multiple_selected:
             return []
-        if not isinstance(value, (tuple, list)):
+        if not isinstance(value, tuple | list):
             value = [value]
         return [str(v) if v is not None else "" for v in value]

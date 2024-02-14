@@ -1,5 +1,4 @@
 from abc import ABC
-from typing import Dict, List, Type
 
 from boefjes.katalogus.models import Organisation, Repository
 
@@ -50,13 +49,13 @@ class OrganisationStorage(ABC):
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
+    def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
     def get_by_id(self, organisation_id: str) -> Organisation:
         raise NotImplementedError
 
-    def get_all(self) -> Dict[str, Organisation]:
+    def get_all(self) -> dict[str, Organisation]:
         raise NotImplementedError
 
     def create(self, organisation: Organisation) -> None:
@@ -70,13 +69,13 @@ class RepositoryStorage(ABC):
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
+    def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
     def get_by_id(self, id_: str) -> Repository:
         raise NotImplementedError
 
-    def get_all(self) -> Dict[str, Repository]:
+    def get_all(self) -> dict[str, Repository]:
         raise NotImplementedError
 
     def create(self, repository: Repository) -> None:
@@ -90,13 +89,13 @@ class SettingsStorage(ABC):
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
+    def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
-    def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
+    def get_all(self, organisation_id: str, plugin_id: str) -> dict[str, str]:
         raise NotImplementedError
 
-    def upsert(self, values: Dict, organisation_id: str, plugin_id: str) -> None:
+    def upsert(self, values: dict, organisation_id: str, plugin_id: str) -> None:
         raise NotImplementedError
 
     def delete(self, organisation_id: str, plugin_id: str) -> None:
@@ -107,13 +106,13 @@ class PluginEnabledStorage(ABC):
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
+    def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
     def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
         raise NotImplementedError
 
-    def get_all_enabled(self, organisation_id: str) -> Dict[str, List[str]]:
+    def get_all_enabled(self, organisation_id: str) -> dict[str, list[str]]:
         raise NotImplementedError
 
     def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:

@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from datetime import datetime, timedelta, timezone
-from typing import Iterable, Union
 
 from boefjes.config import settings
 from boefjes.job_models import NormalizerMeta
@@ -9,7 +9,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPPort
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     ooi = Reference.from_str(boefje_meta.input_ooi)
 

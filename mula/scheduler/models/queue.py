@@ -1,6 +1,5 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import Column, DateTime, Integer, String
@@ -22,14 +21,14 @@ class PrioritizedItem(BaseModel):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
-    scheduler_id: Optional[str] = None
+    scheduler_id: str | None = None
 
     # A unique generated identifier for the object contained in data
-    hash: Optional[str] = Field(None, max_length=32)
+    hash: str | None = Field(None, max_length=32)
 
-    priority: Optional[int] = 0
+    priority: int | None = 0
 
-    data: Dict = Field(default_factory=dict)
+    data: dict = Field(default_factory=dict)
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -71,4 +70,4 @@ class Queue(BaseModel):
     allow_replace: bool
     allow_updates: bool
     allow_priority_updates: bool
-    pq: Optional[List[PrioritizedItem]] = None
+    pq: list[PrioritizedItem] | None = None

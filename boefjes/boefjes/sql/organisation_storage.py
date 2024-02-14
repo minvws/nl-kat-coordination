@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, List
 
 from sqlalchemy.orm import Session
 
@@ -28,7 +27,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
 
         return self.to_organisation(instance)
 
-    def get_all(self) -> Dict[str, Organisation]:
+    def get_all(self) -> dict[str, Organisation]:
         query = self.session.query(OrganisationInDB)
 
         return {organisation.id: self.to_organisation(organisation) for organisation in query.all()}
@@ -50,7 +49,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
         repo_in_db = self._db_repo_instance_by_id(repository_id)
         organisation_in_db.repositories.append(repo_in_db)
 
-    def get_repositories(self, organisation_id: str) -> List[Repository]:
+    def get_repositories(self, organisation_id: str) -> list[Repository]:
         instance = self._db_instance_by_id(organisation_id)
 
         return [SQLRepositoryStorage.to_repository(repo) for repo in instance.repositories]

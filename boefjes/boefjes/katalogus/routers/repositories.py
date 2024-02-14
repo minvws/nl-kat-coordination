@@ -1,5 +1,3 @@
-from typing import Dict
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from boefjes.katalogus.dependencies.repositories import get_repository_store
@@ -14,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=Dict[str, Repository], response_model_exclude={0: {0: False}})
+@router.get("", response_model=dict[str, Repository], response_model_exclude={0: {0: False}})
 def list_repositories(storage: RepositoryStorage = Depends(get_repository_store)):
     return storage.get_all()
 

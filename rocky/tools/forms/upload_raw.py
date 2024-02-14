@@ -1,5 +1,3 @@
-from typing import Set
-
 from django import forms
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
@@ -24,7 +22,7 @@ class UploadRawForm(forms.Form):
         allow_empty_file=False,
     )
 
-    def clean_mime_types(self) -> Set[str]:
+    def clean_mime_types(self) -> set[str]:
         mime_types = self.cleaned_data["mime_types"]
 
         return set([mime_type.strip() for mime_type in mime_types.split(",") if mime_type.strip()])

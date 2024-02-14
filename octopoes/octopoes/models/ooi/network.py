@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Literal, Optional, Union
+from typing import Annotated, Literal
 
 from pydantic import Field
-from typing_extensions import Annotated
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -25,7 +24,7 @@ class Network(OOI):
 
 
 class IPAddress(OOI):
-    address: Union[IPv4Address, IPv6Address]
+    address: IPv4Address | IPv6Address
     network: Reference = ReferenceField(Network)
 
     _natural_key_attrs = ["network", "address"]
@@ -40,7 +39,7 @@ class IPAddressV4(IPAddress):
     object_type: Literal["IPAddressV4"] = "IPAddressV4"
     address: IPv4Address
 
-    netblock: Optional[Reference] = ReferenceField(
+    netblock: Reference | None = ReferenceField(
         "IPV4NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
@@ -54,7 +53,7 @@ class IPAddressV6(IPAddress):
     object_type: Literal["IPAddressV6"] = "IPAddressV6"
     address: IPv6Address
 
-    netblock: Optional[Reference] = ReferenceField(
+    netblock: Reference | None = ReferenceField(
         "IPV6NetBlock", optional=True, max_issue_scan_level=0, max_inherit_scan_level=4, default=None
     )
 
@@ -84,7 +83,7 @@ class IPPort(OOI):
     address: Reference = ReferenceField(IPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
     protocol: Protocol
     port: Annotated[int, Field(gt=0, lt=2**16)]
-    state: Optional[PortState] = None
+    state: PortState | None = None
 
     _natural_key_attrs = ["address", "protocol", "port"]
     _reverse_relation_names = {"address": "ports"}
@@ -100,18 +99,18 @@ class AutonomousSystem(OOI):
     object_type: Literal["AutonomousSystem"] = "AutonomousSystem"
 
     number: str
-    name: Optional[str]
+    name: str | None
     _natural_key_attrs = ["number"]
 
 
 class NetBlock(OOI):
     network: Reference = ReferenceField(Network)
 
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    description: str | None = None
 
-    announced_by: Optional[Reference] = ReferenceField(AutonomousSystem, default=None)
-    parent: Optional[Reference] = ReferenceField("NetBlock", default=None)
+    announced_by: Reference | None = ReferenceField(AutonomousSystem, default=None)
+    parent: Reference | None = ReferenceField("NetBlock", default=None)
 
     _natural_key_attrs = ["network", "start_ip", "mask"]
 
@@ -128,7 +127,7 @@ class NetBlock(OOI):
 class IPV6NetBlock(NetBlock):
     object_type: Literal["IPV6NetBlock"] = "IPV6NetBlock"
 
-    parent: Optional[Reference] = ReferenceField("IPV6NetBlock", default=None)
+    parent: Reference | None = ReferenceField("IPV6NetBlock", default=None)
 
     start_ip: Reference = ReferenceField(IPAddressV6, max_issue_scan_level=4)
     mask: Annotated[int, Field(ge=0, lt=128)]
@@ -142,7 +141,7 @@ class IPV6NetBlock(NetBlock):
 class IPV4NetBlock(NetBlock):
     object_type: Literal["IPV4NetBlock"] = "IPV4NetBlock"
 
-    parent: Optional[Reference] = ReferenceField("IPV4NetBlock", default=None)
+    parent: Reference | None = ReferenceField("IPV4NetBlock", default=None)
 
     start_ip: Reference = ReferenceField(IPAddressV4, max_issue_scan_level=4)
     mask: Annotated[int, Field(ge=0, lt=32)]

@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from django.http import HttpResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -30,7 +28,7 @@ class FailureModeReportView(FMEABreadcrumbsMixin, DetailView):
         )
         return failure_mode_affected_objects
 
-    def build_breadcrumbs(self) -> List[Dict[str, str]]:
+    def build_breadcrumbs(self) -> list[dict[str, str]]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(
             {
@@ -79,7 +77,7 @@ class FMEADepartmentHeatmapView(FMEABreadcrumbsMixin, TemplateView):
             heatmap_data.append(failure_mode_data)
         return heatmap_data
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append({"text": _("Heatmap"), "url": reverse("fmea_department_heatmap")})
         return breadcrumbs

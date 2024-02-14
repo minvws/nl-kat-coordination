@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Tuple, Type
+from typing import Any
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath
 from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
@@ -23,8 +23,8 @@ class BackwardsCompatibleEnvSettings(EnvSettingsSource):
         "LOG_CFG": "OCTOPOES_LOG_CFG",
     }
 
-    def __call__(self) -> Dict[str, Any]:
-        d: Dict[str, Any] = {}
+    def __call__(self) -> dict[str, Any]:
+        d: dict[str, Any] = {}
         env_vars = {k.lower(): v for k, v in os.environ.items()}
         env_prefix = self.settings_cls.model_config.get("env_prefix", "").lower()
 
@@ -59,12 +59,12 @@ class Settings(BaseSettings):
     scan_level_recalculation_interval: int = Field(
         60, description="Interval in seconds of the periodic task that recalculates scan levels"
     )
-    bits_enabled: Set[str] = Field(set(), examples=['["port-common"]'], description="Explicitly enabled bits")
-    bits_disabled: Set[str] = Field(
+    bits_enabled: set[str] = Field(set(), examples=['["port-common"]'], description="Explicitly enabled bits")
+    bits_disabled: set[str] = Field(
         set(), examples=['["port-classification-ip"]'], description="Explicitly disabled bits"
     )
 
-    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
+    span_export_grpc_endpoint: AnyHttpUrl | None = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
@@ -73,12 +73,12 @@ class Settings(BaseSettings):
     @classmethod
     def settings_customise_sources(
         cls,
-        settings_cls: Type[BaseSettings],
+        settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
-    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
         backwards_compatible_settings = BackwardsCompatibleEnvSettings(settings_cls)
         return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 

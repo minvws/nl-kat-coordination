@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, List, Optional
 from uuid import UUID
 
 from cachetools import TTLCache, cached
@@ -52,16 +51,16 @@ def get_boefje_meta_by_id(
         return meta
 
 
-@router.get("/boefje_meta", response_model=List[BoefjeMeta], tags=[BOEFJE_META_TAG])
+@router.get("/boefje_meta", response_model=list[BoefjeMeta], tags=[BOEFJE_META_TAG])
 def get_boefje_meta(
     organization: str,
-    boefje_id: Optional[str] = None,
-    input_ooi: Optional[str] = None,
+    boefje_id: str | None = None,
+    input_ooi: str | None = None,
     limit: int = 1,
     offset: int = 0,
     descending: bool = True,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
-) -> List[BoefjeMeta]:
+) -> list[BoefjeMeta]:
     logger.debug(
         "Filtering boefje_meta on: boefje_id=%s, input_ooi=%s, limit=%s, descending=%s",
         boefje_id,
@@ -110,16 +109,16 @@ def get_normalizer_meta_by_id(
         return meta_repository.get_normalizer_meta_by_id(normalizer_meta_id)
 
 
-@router.get("/normalizer_meta", response_model=List[NormalizerMeta], tags=[NORMALIZER_META_TAG])
+@router.get("/normalizer_meta", response_model=list[NormalizerMeta], tags=[NORMALIZER_META_TAG])
 def get_normalizer_meta(
     organization: str,
-    normalizer_id: Optional[str] = None,
-    raw_id: Optional[UUID] = None,
+    normalizer_id: str | None = None,
+    raw_id: UUID | None = None,
     limit: int = 1,
     offset: int = 0,
     descending: bool = True,
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
-) -> List[NormalizerMeta]:
+) -> list[NormalizerMeta]:
     logger.debug(
         "Filtering normalizer_meta on: normalizer_id=%s, raw_id=%s, limit=%s, offset=%s, descending=%s",
         normalizer_id,
@@ -148,7 +147,7 @@ def get_normalizer_meta(
 async def create_raw(
     request: Request,
     boefje_meta_id: UUID,
-    mime_types: Optional[List[str]] = Query(None),
+    mime_types: list[str] | None = Query(None),
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
     event_manager: EventManager = Depends(create_event_manager),
 ) -> RawResponse:
@@ -208,15 +207,15 @@ def get_raw_meta_by_id(
     return raw_meta
 
 
-@router.get("/raw", response_model=List[RawDataMeta], tags=[RAW_TAG])
+@router.get("/raw", response_model=list[RawDataMeta], tags=[RAW_TAG])
 def get_raw(
-    organization: Optional[str] = None,
-    boefje_meta_id: Optional[UUID] = None,
-    normalized: Optional[bool] = None,
+    organization: str | None = None,
+    boefje_meta_id: UUID | None = None,
+    normalized: bool | None = None,
     limit: int = 1,
-    mime_types: Optional[List[str]] = Query(None),
+    mime_types: list[str] | None = Query(None),
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
-) -> List[RawDataMeta]:
+) -> list[RawDataMeta]:
     """Get a filtered list of RawDataMeta objects, which contains metadata of a RawData object without the contents"""
 
     parsed_mime_types = [] if mime_types is None else [MimeType(value=mime_type) for mime_type in mime_types]
@@ -234,14 +233,14 @@ def get_raw(
     return meta_repository.get_raw(query_filter)
 
 
-@router.get("/mime_types", response_model=Dict[str, int], tags=[RAW_TAG])
+@router.get("/mime_types", response_model=dict[str, int], tags=[RAW_TAG])
 def get_raw_count_per_mime_type(
-    organization: Optional[str] = None,
-    boefje_meta_id: Optional[UUID] = None,
-    normalized: Optional[bool] = None,
-    mime_types: Optional[List[str]] = Query(None),
+    organization: str | None = None,
+    boefje_meta_id: UUID | None = None,
+    normalized: bool | None = None,
+    mime_types: list[str] | None = Query(None),
     meta_repository: MetaDataRepository = Depends(create_meta_data_repository),
-) -> Dict[str, int]:
+) -> dict[str, int]:
     parsed_mime_types = [] if mime_types is None else [MimeType(value=mime_type) for mime_type in mime_types]
 
     query_filter = RawDataFilter(
@@ -267,7 +266,7 @@ def ignore_arguments_key(meta_repository: MetaDataRepository, query_filter: RawD
     cache=TTLCache(maxsize=get_settings().metrics_cache_size, ttl=get_settings().metrics_ttl_seconds),
     key=ignore_arguments_key,
 )
-def cached_counts_per_mime_type(meta_repository: MetaDataRepository, query_filter: RawDataFilter) -> Dict[str, int]:
+def cached_counts_per_mime_type(meta_repository: MetaDataRepository, query_filter: RawDataFilter) -> dict[str, int]:
     logger.debug(
         "Metrics cache miss for cached_counts_per_mime_type, ttl set to %s seconds",
         get_settings().metrics_ttl_seconds,

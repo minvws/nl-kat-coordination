@@ -2,7 +2,7 @@ import datetime
 import ipaddress
 import logging
 import re
-from typing import Iterable, List, Tuple, Union
+from collections.abc import Iterable
 
 import cryptography
 from cryptography import x509
@@ -34,7 +34,7 @@ def find_between(s: str, first: str, last: str) -> str:
         return ""
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     # only get the first part of certificates
     contents = find_between(raw.decode(), "Certificate chain", "Certificate chain")
 
@@ -95,7 +95,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
 def read_certificates(
     contents: str, website_reference: Reference
-) -> Tuple[List[X509Certificate], List[SubjectAlternativeName], List[Hostname]]:
+) -> tuple[list[X509Certificate], list[SubjectAlternativeName], list[Hostname]]:
     # iterate through the PEM certificates and decode them
     certificates = []
     certificate_subject_alternative_names = []

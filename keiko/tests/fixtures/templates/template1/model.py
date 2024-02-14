@@ -1,7 +1,6 @@
 """
 Template1 Datamodel
 """
-from typing import List
 
 from pydantic import BaseModel
 
@@ -20,4 +19,4 @@ class Model(BaseModel):
 
 
 class DataShape(DataShapeBase):
-    models: List[Model]
+    models: list[Model]

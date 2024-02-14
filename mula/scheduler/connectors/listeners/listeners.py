@@ -1,7 +1,7 @@
 import functools
 import socket
+from collections.abc import Callable
 from concurrent import futures
-from typing import Callable, Optional
 
 import pika
 import structlog
@@ -20,7 +20,7 @@ class Listener(Connector):
             The logger for the class.
     """
 
-    name: Optional[str] = None
+    name: str | None = None
 
     def __init__(self) -> None:
         super().__init__()
@@ -92,8 +92,8 @@ class RabbitMQ(Listener):
         self.func: Callable = func
 
         self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
-        self.connection: Optional[pika.BlockingConnection] = None
-        self.channel: Optional[pika.BlockingConnection.channel] = None
+        self.connection: pika.BlockingConnection | None = None
+        self.channel: pika.BlockingConnection.channel | None = None
         self.connect(self.queue, self.durable, self.prefetch_count)
 
     def listen(self) -> None:

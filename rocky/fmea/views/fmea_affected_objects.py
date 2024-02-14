@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404, redirect
@@ -40,7 +38,7 @@ class FailureModeAffectedObjectCreateView(AffectedObjectBreadcrumbsMixin, Create
         success_message = _("Failure mode affected objects successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
-    def build_breadcrumbs(self) -> List[Dict[str, str]]:
+    def build_breadcrumbs(self) -> list[dict[str, str]]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(
             {
@@ -69,7 +67,7 @@ class FailureModeAffectedObjectUpdateView(AffectedObjectBreadcrumbsMixin, Update
         context["failure_mode_exist"] = FailureMode.objects.all().exists()
         return context
 
-    def build_breadcrumbs(self) -> List[Dict[str, str]]:
+    def build_breadcrumbs(self) -> list[dict[str, str]]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(
             {

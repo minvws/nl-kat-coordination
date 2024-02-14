@@ -1,6 +1,5 @@
 from ipaddress import IPv6Network, ip_network
 from os import getenv
-from typing import List, Tuple, Union
 
 import docker
 
@@ -12,13 +11,13 @@ TOP_PORTS_DEFAULT = 250
 TOP_PORTS_MIN = 1
 
 
-def run_nmap(args: List[str]) -> str:
+def run_nmap(args: list[str]) -> str:
     """Run Nmap in Docker."""
     client = docker.from_env()
     return client.containers.run(NMAP_IMAGE, args, remove=True).decode()
 
 
-def build_nmap_arguments(ip_range: str, top_ports: int, protocol_str: str) -> List[str]:
+def build_nmap_arguments(ip_range: str, top_ports: int, protocol_str: str) -> list[str]:
     """Build nmap arguments from the hosts IP with the required ports."""
     if protocol_str not in ["S", "U"]:
         raise ValueError('Protocol should be "S" or "U"')
@@ -33,7 +32,7 @@ def build_nmap_arguments(ip_range: str, top_ports: int, protocol_str: str) -> Li
     return args
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     """Build Nmap arguments and return results to normalizer."""
     ip_range = f"{boefje_meta.arguments['input']['start_ip']['address']}/{str(boefje_meta.arguments['input']['mask'])}"
     top_ports_tcp = int(getenv("TOP_PORTS_TCP", 250))

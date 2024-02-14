@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Dict, Union
 
 from diskcache import Cache
 
@@ -13,7 +12,7 @@ from boefjes.katalogus.storage.interfaces import (
 
 
 class OrganisationStorageDisk(OrganisationStorage):
-    def __init__(self, directory: Union[str, Path]):
+    def __init__(self, directory: str | Path):
         self._cache = Cache(Path(directory).as_posix())
         if "organisations" not in self._cache:
             self._cache["organisations"] = {}
@@ -23,7 +22,7 @@ class OrganisationStorageDisk(OrganisationStorage):
     def get_by_id(self, organisation_id: str) -> Organisation:
         return self._organisations[organisation_id]
 
-    def get_all(self) -> Dict[str, Organisation]:
+    def get_all(self) -> dict[str, Organisation]:
         return self._organisations
 
     def create(self, organisation: Organisation) -> None:
@@ -34,7 +33,7 @@ class OrganisationStorageDisk(OrganisationStorage):
 
 
 class RepositoryStorageDisk(RepositoryStorage):
-    def __init__(self, directory: Union[str, Path]):
+    def __init__(self, directory: str | Path):
         self._cache = Cache(Path(directory).as_posix())
         if "repositories" not in self._cache:
             self._cache["repositories"] = {}
@@ -44,7 +43,7 @@ class RepositoryStorageDisk(RepositoryStorage):
     def get_by_id(self, id_: str) -> Repository:
         return self._repositories[id_]
 
-    def get_all(self) -> Dict[str, Repository]:
+    def get_all(self) -> dict[str, Repository]:
         return self._repositories
 
     def create(self, repository: Repository) -> None:

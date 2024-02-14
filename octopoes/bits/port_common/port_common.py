@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List
+from collections.abc import Iterator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -24,8 +24,8 @@ COMMON_UDP_PORTS = [
 
 def run(
     input_ooi: IPPort,
-    additional_oois: List,
-    config: Dict[str, str],
+    additional_oois: list,
+    config: dict[str, str],
 ) -> Iterator[OOI]:
     port = input_ooi.port
     protocol = input_ooi.protocol

@@ -1,5 +1,3 @@
-from typing import List, Tuple, Union
-
 import docker
 
 from boefjes.job_models import BoefjeMeta
@@ -7,7 +5,7 @@ from boefjes.job_models import BoefjeMeta
 SSLSCAN_IMAGE = "breezethink/sslscan:latest"
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     client = docker.from_env()
     input_ = boefje_meta.arguments["input"]
     hostname = input_["hostname"]["name"]

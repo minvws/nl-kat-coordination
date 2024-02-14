@@ -6,7 +6,6 @@ import tempfile
 from datetime import datetime
 from os import getenv
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
 
 import requests
 from netaddr import IPAddress, IPNetwork
@@ -21,7 +20,7 @@ RPKI_CACHE_TIMEOUT = 1800  # in seconds
 HASHFUNC = "sha256"
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
     now = datetime.utcnow()
@@ -73,7 +72,7 @@ def cache_out_of_date() -> bool:
     return (now - cached_file_timestamp).total_seconds() > maxage
 
 
-def refresh_rpki(algo: str) -> Tuple[Dict, Dict]:
+def refresh_rpki(algo: str) -> tuple[dict, dict]:
     source_url = getenv("RPKI_SOURCE_URL", RPKI_SOURCE_URL)
     response = requests.get(source_url, allow_redirects=True, timeout=30)
     response.raise_for_status()

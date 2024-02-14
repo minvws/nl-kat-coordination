@@ -1,4 +1,4 @@
-from typing import Iterable
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference

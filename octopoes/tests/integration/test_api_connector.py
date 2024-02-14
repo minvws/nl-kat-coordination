@@ -2,7 +2,6 @@ import os
 import uuid
 from datetime import datetime, timezone
 from ipaddress import ip_address
-from typing import List
 
 import pytest
 
@@ -115,7 +114,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
         )
     )
 
-    hostnames: List[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
+    hostnames: list[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
 
     addresses = [IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"))]
     v4_addresses = [IPAddressV4(network=network.reference, address=ip_address("127.0.0.1"))]

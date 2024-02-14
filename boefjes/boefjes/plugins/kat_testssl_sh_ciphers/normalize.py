@@ -1,12 +1,12 @@
 import json
-from typing import Dict, Iterable, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.service import TLSCipher
 
 
-def parse_cipher(cipher: Dict) -> Union[Dict, None]:
+def parse_cipher(cipher: dict) -> dict | None:
     if cipher["id"].startswith("cipher-tls"):
         parts = cipher["finding"].split()
 
@@ -40,7 +40,7 @@ def parse_cipher(cipher: Dict) -> Union[Dict, None]:
         return cipher_dict
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ooi = Reference.from_str(boefje_meta.input_ooi)
     output = json.loads(raw)

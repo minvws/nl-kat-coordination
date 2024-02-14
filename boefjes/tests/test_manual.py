@@ -1,6 +1,5 @@
 from ipaddress import IPv4Address, IPv6Address
 from pathlib import Path
-from typing import Tuple
 from unittest import TestCase
 
 from pydantic_core import Url
@@ -155,7 +154,7 @@ darknet,https://openkat.nl/""",
             output.declarations[1].ooi.dict(),
         )
 
-    def check_network_created(self, csv_idx: int) -> Tuple[NormalizerMeta, NormalizerOutput, LocalNormalizerJobRunner]:
+    def check_network_created(self, csv_idx: int) -> tuple[NormalizerMeta, NormalizerOutput, LocalNormalizerJobRunner]:
         meta = NormalizerMeta.model_validate_json(get_dummy_data("manual-csv.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)

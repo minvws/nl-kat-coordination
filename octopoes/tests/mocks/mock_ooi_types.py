@@ -2,10 +2,9 @@ from __future__ import annotations
 
 from enum import Enum
 from ipaddress import IPv4Address, IPv6Address
-from typing import Literal, Optional, Union
+from typing import Annotated, Literal
 
 from pydantic import Field
-from typing_extensions import Annotated
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -18,7 +17,7 @@ class MockNetwork(OOI):
 
 
 class MockIPAddress(OOI):
-    address: Union[IPv4Address, IPv6Address]
+    address: IPv4Address | IPv6Address
     network: Reference = ReferenceField(MockNetwork)
 
     _natural_key_attrs = ["network", "address"]
@@ -71,7 +70,7 @@ class MockIPPort(OOI):
     address: Reference = ReferenceField(MockIPAddress, max_issue_scan_level=0, max_inherit_scan_level=4)
     protocol: MockProtocol
     port: Annotated[int, Field(gt=0, lt=2**16)]
-    state: Optional[MockPortState]
+    state: MockPortState | None
 
     _natural_key_attrs = ["address", "protocol", "port"]
     _reverse_relation_names = {
@@ -94,10 +93,10 @@ class MockIPService(OOI):
 class MockHostname(OOI):
     object_type: Literal["MockHostname"] = "MockHostname"
 
-    dns_zone: Optional[Reference] = ReferenceField(MockDNSZone, default=None, max_issue_scan_level=1)
+    dns_zone: Reference | None = ReferenceField(MockDNSZone, default=None, max_issue_scan_level=1)
     network: Reference = ReferenceField(MockNetwork)
     name: str
-    fqdn: Optional[Reference] = ReferenceField("MockHostname", default=None)
+    fqdn: Reference | None = ReferenceField("MockHostname", default=None)
 
     _natural_key_attrs = ["network", "name"]
     _reverse_relation_names = {
@@ -141,7 +140,7 @@ class MockLabel(OOI):
 
     ooi: Reference = ReferenceField(OOI)
     label_id: str
-    label_text: Optional[str] = None
+    label_text: str | None = None
 
     @property
     def natural_key(self) -> str:
@@ -166,17 +165,18 @@ ALL_OOI_TYPES = {
     MockLabel,
 }
 
-MockOOIType = Union[
-    MockNetwork,
-    MockIPAddressV4,
-    MockIPAddressV6,
-    MockIPPort,
-    MockHostname,
-    MockDNSZone,
-    MockResolvedHostname,
-    MockDNSCNAMERecord,
-    MockLabel,
-]
+MockOOIType = (
+    MockNetwork
+    | MockIPAddressV4
+    | MockIPAddressV6
+    | MockIPPort
+    | MockHostname
+    | MockDNSZone
+    | MockResolvedHostname
+    | MockDNSCNAMERecord
+    | MockLabel
+)
+
 
 for ooi_type in ALL_OOI_TYPES:
     ooi_type.model_rebuild()

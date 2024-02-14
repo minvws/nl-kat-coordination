@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Type
+from typing import Any
 
 from pydantic import AmqpDsn, AnyHttpUrl, Field, PostgresDsn, fields
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
@@ -19,11 +19,11 @@ class BackwardsCompatibleEnvSettings(PydanticBaseSettingsSource):
         "SCHEDULER_DB_DSN": "SCHEDULER_DB_URI",
     }
 
-    def get_field_value(self, field: fields.FieldInfo, field_name: str) -> Tuple[Any, str, bool]:
+    def get_field_value(self, field: fields.FieldInfo, field_name: str) -> tuple[Any, str, bool]:
         return super().get_field_value(field, field_name)
 
-    def __call__(self) -> Dict[str, Any]:
-        d: Dict[str, Any] = {}
+    def __call__(self) -> dict[str, Any]:
+        d: dict[str, Any] = {}
         env_vars = {k.lower(): v for k, v in os.environ.items()}
         env_prefix = self.settings_cls.model_config.get("env_prefix").lower()
 
@@ -183,7 +183,7 @@ class Settings(BaseSettings):
         description="KAT queue URI for host raw data",
     )
 
-    host_metrics: Optional[AnyHttpUrl] = Field(
+    host_metrics: AnyHttpUrl | None = Field(
         None,
         alias="SPAN_EXPORT_GRPC_ENDPOINT",
         description="OpenTelemetry endpoint",
@@ -218,12 +218,12 @@ class Settings(BaseSettings):
     @classmethod
     def settings_customise_sources(
         cls,
-        settings_cls: Type[BaseSettings],
+        settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
-    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
         return (
             init_settings,
             env_settings,

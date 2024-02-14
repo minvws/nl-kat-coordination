@@ -2,7 +2,7 @@ import json
 import logging
 import pkgutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from boefjes.katalogus.models import PluginType
 from boefjes.plugins.models import (
@@ -22,10 +22,10 @@ logger = logging.getLogger(__name__)
 class LocalPluginRepository:
     def __init__(self, path: Path):
         self.path = path
-        self._cached_boefjes: Optional[Dict[str, Any]] = None
-        self._cached_normalizers: Optional[Dict[str, Any]] = None
+        self._cached_boefjes: dict[str, Any] | None = None
+        self._cached_normalizers: dict[str, Any] | None = None
 
-    def get_all(self) -> List[PluginType]:
+    def get_all(self) -> list[PluginType]:
         all_plugins = [boefje_resource.boefje for boefje_resource in self.resolve_boefjes().values()]
         normalizers = [normalizer_resource.normalizer for normalizer_resource in self.resolve_normalizers().values()]
 
@@ -46,7 +46,7 @@ class LocalPluginRepository:
 
         raise Exception(f"Can't find plugin {plugin_id}")
 
-    def schema(self, id_: str) -> Optional[Dict]:
+    def schema(self, id_: str) -> dict | None:
         boefjes = self.resolve_boefjes()
 
         if id_ not in boefjes:
@@ -80,7 +80,7 @@ class LocalPluginRepository:
     def default_cover_path(self) -> Path:
         return self.path / "default_cover.jpg"
 
-    def description_path(self, id_: str) -> Optional[Path]:
+    def description_path(self, id_: str) -> Path | None:
         boefjes = self.resolve_boefjes()
 
         if id_ not in boefjes:
@@ -88,7 +88,7 @@ class LocalPluginRepository:
 
         return boefjes[id_].path / "description.md"
 
-    def resolve_boefjes(self) -> Dict[str, BoefjeResource]:
+    def resolve_boefjes(self) -> dict[str, BoefjeResource]:
         if self._cached_boefjes:
             return self._cached_boefjes
 
@@ -105,7 +105,7 @@ class LocalPluginRepository:
 
         return self._cached_boefjes
 
-    def resolve_normalizers(self) -> Dict[str, NormalizerResource]:
+    def resolve_normalizers(self) -> dict[str, NormalizerResource]:
         if self._cached_normalizers:
             return self._cached_normalizers
 
@@ -124,7 +124,7 @@ class LocalPluginRepository:
 
         return self._cached_normalizers
 
-    def _find_packages_in_path_containing_files(self, files: List[str]) -> List[Tuple[Path, str]]:
+    def _find_packages_in_path_containing_files(self, files: list[str]) -> list[tuple[Path, str]]:
         prefix = self.create_relative_import_statement_from_cwd(self.path)
         paths = []
 

@@ -2,7 +2,7 @@ import json
 import logging
 import threading
 import uuid
-from typing import Callable, Optional
+from collections.abc import Callable
 
 import pika
 from celery import Celery
@@ -25,7 +25,7 @@ class AbstractOOI(BaseModel):
 class ScanProfileMutation(BaseModel):
     operation: OperationType
     primary_key: str
-    value: Optional[AbstractOOI] = None
+    value: AbstractOOI | None = None
 
 
 thread_local = threading.local()

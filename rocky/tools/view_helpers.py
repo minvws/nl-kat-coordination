@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, datetime, timezone
-from typing import List, TypedDict
+from typing import TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from account.mixins import OrganizationView
@@ -22,7 +22,7 @@ def convert_date_to_datetime(d: date) -> datetime:
     return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
 
 
-def get_mandatory_fields(request, params: List[str] = None):
+def get_mandatory_fields(request, params: list[str] = None):
     mandatory_fields = []
 
     if not params:
@@ -85,9 +85,9 @@ class Breadcrumb(TypedDict):
 
 
 class BreadcrumbsMixin:
-    breadcrumbs: List[Breadcrumb] = []
+    breadcrumbs: list[Breadcrumb] = []
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         return self.breadcrumbs.copy()
 
     def get_context_data(self, **kwargs):
@@ -102,7 +102,7 @@ class Step(TypedDict):
 
 
 class StepsMixin:
-    steps: List[Step] = []
+    steps: list[Step] = []
     current_step: int = None
 
     def get_current_step(self):
@@ -113,7 +113,7 @@ class StepsMixin:
     def set_current_stepper_url(self, url):
         self.steps[self.get_current_step() - 1]["url"] = url
 
-    def build_steps(self) -> List[Step]:
+    def build_steps(self) -> list[Step]:
         return self.steps.copy()
 
     def get_context_data(self, **kwargs):

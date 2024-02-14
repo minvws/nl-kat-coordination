@@ -1,6 +1,7 @@
+from collections.abc import Iterator
 from importlib import import_module
 from inspect import isfunction, signature
-from typing import Any, Dict, Iterator, List, Protocol, cast
+from typing import Any, Protocol, cast
 
 from bits.definitions import BitDefinition
 from octopoes.models import OOI
@@ -19,7 +20,7 @@ class BitRunner:
     def __init__(self, bit_definition: BitDefinition):
         self.module = bit_definition.module
 
-    def run(self, *args, **kwargs) -> List[OOI]:
+    def run(self, *args, **kwargs) -> list[OOI]:
         module = import_module(self.module)
         module = cast(Runnable, module)
 
@@ -36,7 +37,7 @@ class BitRunner:
         return f"BitRunner {self.module}"
 
 
-def _bit_run_signature(input_ooi: OOI, additional_oois: List[OOI], config: Dict[str, str]) -> Iterator[OOI]:
+def _bit_run_signature(input_ooi: OOI, additional_oois: list[OOI], config: dict[str, str]) -> Iterator[OOI]:
     ...
 
 

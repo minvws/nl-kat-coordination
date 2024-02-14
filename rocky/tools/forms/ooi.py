@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple
+from typing import Any
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -35,11 +35,11 @@ class OoiTreeSettingsForm(OOIReportSettingsForm):
         required=False,
     )
 
-    def __init__(self, ooi_types: List[str], *args, **kwargs):
+    def __init__(self, ooi_types: list[str], *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_ooi_types(ooi_types)
 
-    def set_ooi_types(self, ooi_types: List[str]) -> None:
+    def set_ooi_types(self, ooi_types: list[str]) -> None:
         if not ooi_types:
             self.fields.pop("ooi_type", None)
             return
@@ -62,7 +62,7 @@ class SelectOOIForm(BaseRockyForm):
 
     def __init__(
         self,
-        oois: List[OOI],
+        oois: list[OOI],
         organization_code: str,
         mandatory_fields: list = None,
         *args,
@@ -77,7 +77,7 @@ class SelectOOIForm(BaseRockyForm):
             self.fields["ooi"].initial = self.fields["ooi"].choices[0][0]
 
     @staticmethod
-    def _to_choice(ooi: OOI) -> Tuple[str, Any]:
+    def _to_choice(ooi: OOI) -> tuple[str, Any]:
         return str(ooi), (
             ooi,
             ooi,

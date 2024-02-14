@@ -1,7 +1,7 @@
+from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import Callable, List, Optional
 
 import requests
 import structlog
@@ -41,8 +41,8 @@ class BoefjeScheduler(Scheduler):
         ctx: context.AppContext,
         scheduler_id: str,
         organisation: Organisation,
-        queue: Optional[queues.PriorityQueue] = None,
-        callback: Optional[Callable[..., None]] = None,
+        queue: queues.PriorityQueue | None = None,
+        callback: Callable[..., None] | None = None,
     ):
         self.logger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
@@ -240,7 +240,7 @@ class BoefjeScheduler(Scheduler):
         )
 
         for boefje in new_boefjes:
-            oois_by_object_type: List[OOI] = []
+            oois_by_object_type: list[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
                     self.organisation.id,
@@ -760,7 +760,7 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
-    def get_boefjes_for_ooi(self, ooi) -> List[Plugin]:
+    def get_boefjes_for_ooi(self, ooi) -> list[Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
 
         Args:

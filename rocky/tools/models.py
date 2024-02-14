@@ -1,7 +1,7 @@
 import datetime
 import logging
+from collections.abc import Iterable
 from functools import cached_property
-from typing import Iterable, Set
 
 import tagulous.models
 from django.conf import settings
@@ -237,7 +237,7 @@ class OrganizationMember(models.Model):
     )
 
     @cached_property
-    def all_permissions(self) -> Set[str]:
+    def all_permissions(self) -> set[str]:
         if self.user.is_active and self.user.is_superuser:
             # Superuser always has all permissions
             return {

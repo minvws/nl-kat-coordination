@@ -1,5 +1,4 @@
 import threading
-from typing import Dict, List
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import Boefje, Organisation, Plugin
@@ -34,7 +33,7 @@ class Katalogus(HTTPService):
 
         # For every organisation we cache which new boefjes for an organisation
         # have been enabled.
-        self.organisations_new_boefjes_cache: Dict = {}
+        self.organisations_new_boefjes_cache: dict = {}
 
         # Initialise the cache.
         self.flush_caches()
@@ -126,7 +125,7 @@ class Katalogus(HTTPService):
         self.logger.debug("Flushed the katalogus normalizer type cache for organisations")
 
     @exception_handler
-    def get_boefjes(self) -> List[Boefje]:
+    def get_boefjes(self) -> list[Boefje]:
         url = f"{self.host}/boefjes"
         response = self.get(url)
         return [Boefje(**boefje) for boefje in response.json()]
@@ -144,17 +143,17 @@ class Katalogus(HTTPService):
         return Organisation(**response.json())
 
     @exception_handler
-    def get_organisations(self) -> List[Organisation]:
+    def get_organisations(self) -> list[Organisation]:
         url = f"{self.host}/v1/organisations"
         response = self.get(url)
         return [Organisation(**organisation) for organisation in response.json().values()]
 
-    def get_plugins_by_organisation(self, organisation_id: str) -> List[Plugin]:
+    def get_plugins_by_organisation(self, organisation_id: str) -> list[Plugin]:
         url = f"{self.host}/v1/organisations/{organisation_id}/plugins"
         response = self.get(url)
         return [Plugin(**plugin) for plugin in response.json()]
 
-    def get_plugins_by_org_id(self, organisation_id: str) -> List[Plugin]:
+    def get_plugins_by_org_id(self, organisation_id: str) -> list[Plugin]:
         try:
             with self.lock:
                 return dict_utils.deep_get(self.organisations_plugin_cache, [organisation_id])
@@ -170,7 +169,7 @@ class Katalogus(HTTPService):
             self.flush_organisations_plugin_cache()
             return dict_utils.deep_get(self.organisations_plugin_cache, [organisation_id, plugin_id])
 
-    def get_boefjes_by_type_and_org_id(self, boefje_type: str, organisation_id: str) -> List[Plugin]:
+    def get_boefjes_by_type_and_org_id(self, boefje_type: str, organisation_id: str) -> list[Plugin]:
         try:
             with self.lock:
                 return dict_utils.deep_get(self.organisations_boefje_type_cache, [organisation_id, boefje_type])
@@ -178,7 +177,7 @@ class Katalogus(HTTPService):
             self.flush_organisations_boefje_type_cache()
             return dict_utils.deep_get(self.organisations_boefje_type_cache, [organisation_id, boefje_type])
 
-    def get_normalizers_by_org_id_and_type(self, organisation_id: str, normalizer_type: str) -> List[Plugin]:
+    def get_normalizers_by_org_id_and_type(self, organisation_id: str, normalizer_type: str) -> list[Plugin]:
         try:
             with self.lock:
                 return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
@@ -186,7 +185,7 @@ class Katalogus(HTTPService):
             self.flush_organisations_normalizer_type_cache()
             return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
 
-    def get_new_boefjes_by_org_id(self, organisation_id: str) -> List[Plugin]:
+    def get_new_boefjes_by_org_id(self, organisation_id: str) -> list[Plugin]:
         # Get the enabled boefjes for the organisation from katalogus
         plugins = self.get_plugins_by_organisation(organisation_id)
         enabled_boefjes = {

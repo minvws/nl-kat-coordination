@@ -2,7 +2,6 @@ import csv
 import json
 from datetime import datetime, timezone
 from enum import Enum
-from typing import List
 
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
@@ -86,7 +85,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, status=404, *args, **kwargs)
 
     def _set_scan_profiles(
-        self, selected_oois: List[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
+        self, selected_oois: list[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
     ) -> HttpResponse:
         try:
             self.raise_clearance_levels(selected_oois, level.value)
@@ -152,7 +151,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, *args, **kwargs)
 
     def _set_oois_to_inherit(
-        self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs
+        self, selected_oois: list[Reference], request: HttpRequest, *args, **kwargs
     ) -> HttpResponse:
         scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
 
@@ -180,7 +179,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         )
         return self.get(request, *args, **kwargs)
 
-    def _delete_oois(self, selected_oois: List[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def _delete_oois(self, selected_oois: list[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
         connector = self.octopoes_api_connector
         valid_time = datetime.now(timezone.utc)
 

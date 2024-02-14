@@ -1,7 +1,7 @@
 import datetime
 import json
 from datetime import timezone
-from typing import Any, Dict, Optional
+from typing import Any
 from uuid import UUID
 
 from bytes.config import BASE_DIR
@@ -16,7 +16,7 @@ from bytes.models import (
 )
 
 
-def load_stub(relative_path: str) -> Dict[str, Any]:
+def load_stub(relative_path: str) -> dict[str, Any]:
     full_path = BASE_DIR / "tests" / "stubs" / relative_path
 
     return dict(json.loads(full_path.read_text()))
@@ -31,7 +31,7 @@ def load_stub_raw(relative_path: str) -> bytes:
 def get_boefje_meta(
     meta_id: UUID = UUID("d63d755b-6c23-44ab-8de6-8d144c448a71"),
     boefje_id: str = "kat_test.main",
-    input_ooi: Optional[str] = "Hostname|internet|test.org",
+    input_ooi: str | None = "Hostname|internet|test.org",
 ) -> BoefjeMeta:
     return BoefjeMeta(
         id=meta_id,

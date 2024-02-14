@@ -1,5 +1,4 @@
 import logging
-from typing import Dict
 
 from sqlalchemy.orm import Session
 
@@ -24,7 +23,7 @@ class SQLRepositoryStorage(SessionMixin, RepositoryStorage):
 
         return self.to_repository(instance)
 
-    def get_all(self) -> Dict[str, Repository]:
+    def get_all(self) -> dict[str, Repository]:
         query = self.session.query(RepositoryInDB)
 
         return {repository.id: self.to_repository(repository) for repository in query.all()}

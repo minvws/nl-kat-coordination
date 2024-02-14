@@ -1,5 +1,3 @@
-from typing import Dict, List, Optional
-
 from boefjes.katalogus.models import RESERVED_LOCAL_ID, Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
     OrganisationStorage,
@@ -9,23 +7,23 @@ from boefjes.katalogus.storage.interfaces import (
 )
 
 # key = organisation id; value = organisation
-organisations: Dict[str, Organisation] = {}
+organisations: dict[str, Organisation] = {}
 
 # key = organisation, repository/plugin id; value = enabled/ disabled
-plugins_state: Dict[str, Dict[str, bool]] = {}
+plugins_state: dict[str, dict[str, bool]] = {}
 
 # key = organisation id, repository id; value = repository
-repositories: Dict[str, Dict[str, Repository]] = {}
+repositories: dict[str, dict[str, Repository]] = {}
 
 
 class OrganisationStorageMemory(OrganisationStorage):
-    def __init__(self, defaults: Optional[Dict[str, Organisation]] = None):
+    def __init__(self, defaults: dict[str, Organisation] | None = None):
         self._data = organisations if defaults is None else defaults
 
     def get_by_id(self, organisation_id: str) -> Organisation:
         return self._data[organisation_id]
 
-    def get_all(self) -> Dict[str, Organisation]:
+    def get_all(self) -> dict[str, Organisation]:
         return self._data
 
     def create(self, organisation: Organisation) -> None:
@@ -39,7 +37,7 @@ class RepositoryStorageMemory(RepositoryStorage):
     def __init__(
         self,
         organisation_id: str,
-        defaults: Optional[Dict[str, Repository]] = None,
+        defaults: dict[str, Repository] | None = None,
     ):
         self._data = repositories.setdefault(organisation_id, {}) if defaults is None else defaults
         self._organisation_id = organisation_id
@@ -47,7 +45,7 @@ class RepositoryStorageMemory(RepositoryStorage):
     def get_by_id(self, id_: str) -> Repository:
         return self._data[id_]
 
-    def get_all(self) -> Dict[str, Repository]:
+    def get_all(self) -> dict[str, Repository]:
         return self._data
 
     def create(self, repository: Repository) -> None:
@@ -61,13 +59,13 @@ class SettingsStorageMemory(SettingsStorage):
     def __init__(self):
         self._data = {}
 
-    def get_all(self, organisation_id: str, plugin_id: str) -> Dict[str, str]:
+    def get_all(self, organisation_id: str, plugin_id: str) -> dict[str, str]:
         if organisation_id not in self._data:
             return {}
 
         return self._data[organisation_id].get(plugin_id, {})
 
-    def upsert(self, values: Dict, organisation_id: str, plugin_id: str) -> None:
+    def upsert(self, values: dict, organisation_id: str, plugin_id: str) -> None:
         if organisation_id not in self._data:
             self._data[organisation_id] = {}
 
@@ -84,7 +82,7 @@ class PluginStatesStorageMemory(PluginEnabledStorage):
     def __init__(
         self,
         organisation: str,
-        defaults: Optional[Dict[str, bool]] = None,
+        defaults: dict[str, bool] | None = None,
     ):
         self._data = plugins_state.setdefault(organisation, {}) if defaults is None else defaults
         self._organisation = organisation
@@ -92,7 +90,7 @@ class PluginStatesStorageMemory(PluginEnabledStorage):
     def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
         return self._data[f"{organisation_id}.{plugin_id}"]
 
-    def get_all_enabled(self, organisation_id: str) -> Dict[str, List[str]]:
+    def get_all_enabled(self, organisation_id: str) -> dict[str, list[str]]:
         return {
             RESERVED_LOCAL_ID: [
                 key.split(".", maxsplit=1)[1]

@@ -1,7 +1,7 @@
 import hashlib
 import json
 import logging
-from typing import Dict, Iterable, List, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
@@ -19,7 +19,7 @@ SEVERITY_SCORE_LOOKUP = {
 }
 
 
-def _hash_identifiers(identifiers: Dict[str, Union[str, List[str]]]) -> str:
+def _hash_identifiers(identifiers: dict[str, str | list[str]]) -> str:
     pre_hash = ""
     for identifier in identifiers.values():
         pre_hash += "".join(identifier)
@@ -42,7 +42,7 @@ def _create_description(finding: dict) -> str:
     return description
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     retirejs_finding_type_id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
     data = json.loads(raw)
 

@@ -1,7 +1,6 @@
 import ipaddress
 import json
 from os import getenv
-from typing import List, Tuple, Union
 
 import requests
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
@@ -10,7 +9,7 @@ from requests import Session
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     netloc = input_["hostname"]["name"]
     scheme = input_["ip_service"]["service"]["name"]

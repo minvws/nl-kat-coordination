@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import List, Optional
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -67,9 +66,9 @@ class OrganizationPermWrapper:
 class OrganizationView(View):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.organization: Optional[Organization] = None
-        self.octopoes_api_connector: Optional[OctopoesAPIConnector] = None
-        self.bytes_client: Optional[BytesClient] = None
+        self.organization: Organization | None = None
+        self.octopoes_api_connector: OctopoesAPIConnector | None = None
+        self.bytes_client: BytesClient | None = None
         self.organization_member = None
         self.indemnification_present = False
 
@@ -143,7 +142,7 @@ class OrganizationView(View):
 
         return True
 
-    def raise_clearance_levels(self, ooi_references: List[Reference], level: int) -> bool:
+    def raise_clearance_levels(self, ooi_references: list[Reference], level: int) -> bool:
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_many_scan_profiles(
             [DeclaredScanProfile(reference=reference, level=ScanLevel(level)) for reference in ooi_references],

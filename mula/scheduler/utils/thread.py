@@ -1,5 +1,6 @@
 import threading
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
 import structlog
 
@@ -30,9 +31,9 @@ class ThreadRunner(threading.Thread):
         name: str,
         target: Callable[[], Any],
         stop_event: threading.Event,
-        callback: Optional[Callable[[], Any]] = None,
-        callback_args: Optional[tuple] = None,
-        interval: Optional[float] = None,
+        callback: Callable[[], Any] | None = None,
+        callback_args: tuple | None = None,
+        interval: float | None = None,
         daemon: bool = False,
         loop: bool = True,
     ) -> None:
@@ -49,11 +50,11 @@ class ThreadRunner(threading.Thread):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self._target: Callable[[], Any] = target
         self.stop_event: threading.Event = stop_event
-        self.interval: Optional[float] = interval
+        self.interval: float | None = interval
         self.loop: bool = loop
-        self.exception: Optional[Exception] = None
-        self.callback: Optional[Callable[[], Any]] = callback
-        self.callback_args: Optional[tuple] = callback_args
+        self.exception: Exception | None = None
+        self.callback: Callable[[], Any] | None = callback
+        self.callback_args: tuple | None = callback_args
 
         super().__init__(target=self._target, daemon=daemon)
 
@@ -96,7 +97,7 @@ class ThreadRunner(threading.Thread):
 
         self.logger.debug("Thread stopped: %s", self.name)
 
-    def join(self, timeout: Optional[float] = None) -> None:
+    def join(self, timeout: float | None = None) -> None:
         self.logger.debug("Stopping thread: %s", self.name, thread_name=self.name)
 
         self.stop_event.set()
