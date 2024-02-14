@@ -79,7 +79,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 class BaseReportView(OOIFilterView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.selected_oois = request.GET.getlist("ooi", [])
+        self.selected_oois = list(set(request.GET.getlist("ooi", [])))
         self.selected_report_types = request.GET.getlist("report_type", [])
 
         self.report_types = self.get_report_types_from_choice()
