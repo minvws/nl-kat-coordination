@@ -27,4 +27,4 @@ class LeakIxNormalizerTest(TestCase):
         output = [x for x in run(get_normalizer_meta(boefje_meta), get_dummy_data("raw/leakix-example.com.json"))]
 
         self.assertEqual(170, len(output))
-        self.assertEqual(get_dummy_data("raw/leakix-example.com-output.json").decode(), str(output))
+        self.assertEqual(get_dummy_data("raw/leakix-example.com-output.txt").decode(), str(output))
