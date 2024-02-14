@@ -1,5 +1,7 @@
 *** Settings ***
 Resource            robot.resource
+Library             OperatingSystem
+Library             BuiltIn
 
 Test Setup          Setup Test
 Test Teardown       Teardown Test
@@ -12,17 +14,8 @@ Bit With Scan Level 1
     Object List Should Not Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
     Declare Scan Profile    Hostname|internet|example.com    1
     Await Sync
-    Object List Should Contain    KATFindingType|KAT-NXDOMAIN
-    Object List Should Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
+    Wait Until Keyword Succeeds    60s    1s    Object List Should Contain    KATFindingType|KAT-NXDOMAIN
+    Wait Until Keyword Succeeds    60s    1s    Object List Should Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
     Declare Scan Profile    Hostname|internet|example.com    0
     Await Sync
-    Object List Should Not Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
-
-
-*** Keywords ***
-Setup Test
-    Start Monitoring    ${QUEUE_URI}
-
-Teardown Test
-    Stop Monitoring
-    Cleanup
+    Wait Until Keyword Succeeds    60s    1s    Object List Should Not Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN

@@ -26,9 +26,17 @@ internet,https://example.com/
 darknet,https://openkat.nl/""",
     # url without network
     b"raw\nhttps://example.com/",
+    b"""raw, clearance
+https://potato0.com/,0
+https://potato1.com/,1
+https://potato2.com/,2
+https://potato3.com/,3
+https://potato4.com/,4
+https://potato5.com/,5
+https://potato.com/,potato""",
 ]
-INPUT_TYPES = ["Hostname", "Hostname", "IPAddressV4", "IPAddressV6", "URL", "URL"]
-EXPECTED_OOI_COUNTS = [2, 2, 6, 4, 4, 2]
+INPUT_TYPES = ["Hostname", "Hostname", "IPAddressV4", "IPAddressV6", "URL", "URL", "URL"]
+EXPECTED_OOI_COUNTS = [2, 2, 6, 4, 4, 2, 14]
 
 
 def test_upload_csv_page(rf, redteam_member):

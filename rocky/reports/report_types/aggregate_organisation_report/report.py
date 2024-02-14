@@ -5,9 +5,10 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference
+from octopoes.models import OOI, Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
-from reports.report_types.definitions import AggregateReport, ReportType
+from reports.report_types.definitions import AggregateReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.name_server_report.report import NameServerSystemReport
@@ -441,8 +442,8 @@ class AggregateOrganisationReport(AggregateReport):
 
 def aggregate_reports(
     connector: OctopoesAPIConnector,
-    input_ooi_references: List[str],
-    selected_report_types: List[ReportType],
+    input_ooi_references: List[OOI],
+    selected_report_types: List[str],
     valid_time: datetime,
 ):
     aggregate_report = AggregateOrganisationReport(connector)
@@ -450,18 +451,20 @@ def aggregate_reports(
     error_oois = []
 
     for ooi in input_ooi_references:
-        report_data[ooi] = {}
+        report_data[ooi.primary_key] = {}
         try:
             for options, report_types in aggregate_report.reports.items():
                 for report_type in report_types:
-                    if Reference.from_str(ooi).class_type in report_type.input_ooi_types and report_type.id in [
-                        report.id for report in selected_report_types
-                    ]:
+                    if (
+                        Reference.from_str(ooi).class_type in report_type.input_ooi_types
+                        and report_type.id in selected_report_types
+                    ):
                         report = report_type(connector)
-                        data = report.generate_data(ooi, valid_time=valid_time)
-                        report_data[ooi][report_type.id] = data
-        except Exception:
-            error_oois.append(ooi)
+                        data = report.generate_data(ooi.primary_key, valid_time=valid_time)
+                        report_data[ooi.primary_key][report_type.id] = data
+        except ObjectNotFoundException:
+            logger.error("Object not found: %s", ooi.primary_key)
+            error_oois.append(ooi.primary_key)
     post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
 
     return aggregate_report, post_processed_data, report_data, error_oois
