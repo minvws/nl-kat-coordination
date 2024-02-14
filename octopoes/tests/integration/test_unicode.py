@@ -42,9 +42,9 @@ def test_unicode_operations(octopoes_api_connector: OctopoesAPIConnector, valid_
     scanprof = DeclaredScanProfile(reference=hostname.reference, level=ScanLevel.L2)
     octopoes_api_connector.save_scan_profile(scanprof, valid_time)
 
-    assert octopoes_api_connector.list(types={Network}).count == 1
-    assert octopoes_api_connector.list(types={Hostname}).count == 1
-    assert octopoes_api_connector.list(types={Network, Hostname}).count == 2
+    assert octopoes_api_connector.list_objects(types={Network}).count == 1
+    assert octopoes_api_connector.list_objects(types={Hostname}).count == 1
+    assert octopoes_api_connector.list_objects(types={Network, Hostname}).count == 2
 
     origins = octopoes_api_connector.list_origins(task_id=task_id)
     assert origins[0].dict() == {
