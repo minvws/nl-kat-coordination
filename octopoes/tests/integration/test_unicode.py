@@ -1,7 +1,8 @@
 import os
-import pytest
-from datetime import datetime
 import uuid
+from datetime import datetime
+
+import pytest
 
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -15,6 +16,7 @@ if os.environ.get("CI") != "1":
 
 use_unicode = False
 names = ["🐱", "★.com", "🐈"] if use_unicode else ["cat", "xn--p3h.com", "boefje"]
+
 
 def test_unicode_operations(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name=names[0])
