@@ -16,7 +16,7 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
     max_age = int(config.get("max-age", one_year)) if config else one_year
     findings: [str] = []
 
-    if "includeSubDomains" not in header.value.lower():
+    if "includesubdomains" not in header.value.lower():
         findings.append("The HSTS should include subdomains.")
 
     if "max-age" not in header.value.lower():
