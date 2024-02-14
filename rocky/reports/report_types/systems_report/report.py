@@ -87,27 +87,23 @@ class SystemReport(Report):
                     )
                 ],
                 "services": list(
-                    set(
-                        [
-                            service_mapping.get(str(x.name), SystemType.OTHER)
+                    {
+                        service_mapping.get(str(x.name), SystemType.OTHER)
+                        for x in self.octopoes_api_connector.query(
+                            "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                            valid_time,
+                            ip.reference,
+                        )
+                    }.union(
+                        {
+                            software_mapping[str(x.name)]
                             for x in self.octopoes_api_connector.query(
-                                "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                                "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
                                 valid_time,
                                 ip.reference,
                             )
-                        ]
-                    ).union(
-                        set(
-                            [
-                                software_mapping[str(x.name)]
-                                for x in self.octopoes_api_connector.query(
-                                    "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
-                                    valid_time,
-                                    ip.reference,
-                                )
-                                if str(x.name) in software_mapping
-                            ]
-                        )
+                            if str(x.name) in software_mapping
+                        }
                     ),
                 ),
             }
