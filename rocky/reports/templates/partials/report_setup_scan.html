@@ -16,15 +16,17 @@
             <p>
                 {% translate "If you choose not to give a plugin permission to run, the data that plugin would collect or produce will be left out of the report which will then be generated based on the available data collected by the enabled plugins." %}
             </p>
-            <h3>{% translate "Required plugins" %}</h3>
-            <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
-            <div class="column-4 tiles plugins images-cover">
-                {% for required_plugin in plugins.required %}
-                    {% include "partials/plugin_tile.html" with plugin=required_plugin %}
+            {% if not all_plugins_enabled.required %}
+                <h3>{% translate "Required plugins" %}</h3>
+                <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
+                <div class="column-4 tiles plugins images-cover">
+                    {% for required_plugin in plugins.required %}
+                        {% include "partials/plugin_tile.html" with plugin=required_plugin %}
 
-                {% endfor %}
-            </div>
-            {% if plugins.optional %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if not all_plugins_enabled.optional %}
                 <h3>{% translate "Suggested plugins" %}</h3>
                 <p>
                     {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
