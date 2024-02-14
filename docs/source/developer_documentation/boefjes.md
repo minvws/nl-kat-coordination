@@ -153,7 +153,7 @@ sequenceDiagram
   SchedulerRuntimeManager->>Worker[pid=2]: start()
 ```
 
-Here, the SharedDict is an object that keeps track of a mapping of the pid's of workers to the task they are handling.
+Here, the `SharedDict` maps worker process IDs (PIDs) to the task they are handling.
 
 ### Running as a Docker container
 

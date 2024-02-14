@@ -193,7 +193,7 @@ The normalizers translate the output of a boefje into objects that fit the data 
 Each normalizer defines what input it accepts and what object-types it provides.
 In the case of the shodan normalizer,
 it involves the entire output of the shodan boefje (created based on IP address),
-where findings and ports come out. The normalizer.json defines these:
+where findings and ports come out. The `normalizer.json` defines these:
 
 .. code-block:: json
 
@@ -212,7 +212,7 @@ where findings and ports come out. The normalizer.json defines these:
 normalize.py
 ************
 
-The file normalize.py contains the actual normalizer: Its only job is to parse raw data and create,
+The file `normalize.py` contains the actual normalizer: Its only job is to parse raw data and create,
 fill and yield the actual objects. (of valid object-types that are subclassed from OOI like IPPort)
 
 
@@ -250,10 +250,10 @@ fill and yield the actual objects. (of valid object-types that are subclassed fr
                 yield ft
                 yield f
 
-Yielding a DeclaredScanProfile
-==============================
+Yielding a ``DeclaredScanProfile``
+**********************************
 
-Additionally, normalizers can yield DeclaredScanProfiles.
+Additionally, normalizers can yield a ``DeclaredScanProfile``.
 This is useful if you want to avoid the manual work of raising these levels through the interface for new objects.
 Perhaps you have a trusted source of IP addresses and hostnames you are allowed to scan intrusively.
 Or perhaps you do not have intrusive boefjes enabled and always want to perform a DNS scan on new IP addresses.
@@ -286,7 +286,7 @@ Combining the code and whitelist above would therefore be equivalent to combinin
    yield DeclaredScanProfile(reference=ip_address.reference, level=2)
 
 
-Of course, when the normalizer id is not present in the whitelist, the yielded DeclaredScanProfiles are ignored.
+Of course, when the normalizer id is not present in the whitelist, the yielded scan profiles are ignored.
 
 
 Adding object-types
@@ -314,7 +314,9 @@ As with the boefje for shodan, here we again use the example from the functional
     _information_value = ["protocol", "port"]
 
 
-Here it is defined that to an IPPort belongs an IPadress, a Protocol and a PortState. It also specifies how scan levels flow through this object-type and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]". More explanation about scan levels / indemnities follows later in this document.
+Here it is defined that to an ``IPPort`` belongs an ``IPAddress``, a ``Protocol`` and a ``PortState``.
+It also specifies how scan levels flow through this object-type and specifies the attributes that format the primary/natural key: "_natural_key_attrs = ["address", "protocol", "port"]".
+More explanation about scan levels / indemnities follows later in this document.
 
 The PortState is defined separately. This can be done for information that has a very specific nature so you can describe it.
 
