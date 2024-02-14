@@ -20,6 +20,7 @@ repos:
   - id: end-of-file-fixer
     exclude: |
       (?x)(
+      \.svcg$ |
       ^boefjes/tests/examples/rdns-nxdomain.txt$
       )
 
@@ -87,6 +88,7 @@ repos:
       (?x)(
       \.po$ |
       \.xml$ |
+      \.svg$ |
       poetry.lock$ |
       pyproject.toml$ |
       requirements-.*.txt$ |
