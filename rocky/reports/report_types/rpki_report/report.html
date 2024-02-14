@@ -13,7 +13,7 @@
     </p>
 {% endif %}
 {% if type %}
-    <h4>{{ type }} {% translate "server" %}</h4>
+    <h4 id="rpki-{{ type }}">{{ type }} {% translate "server" %}</h4>
     <p>
         {% blocktranslate trimmed %}
             This table shows which checks were performed. Following that, the compliance
@@ -71,9 +71,7 @@
                 <tbody>
                     {% if not info.valid %}
                         <tr>
-                            <td>
-                                <span class="icon alert"></span>{% translate "RPKI record is not valid." %}
-                            </td>
+                            <td>{% translate "RPKI record is not valid." %}</td>
                             <td>
                                 <span class="low">Low</span>
                             </td>
@@ -81,9 +79,7 @@
                     {% endif %}
                     {% if not info.exists %}
                         <tr>
-                            <td>
-                                <span class="icon alert"></span>{% translate "RPKI record does not exist." %}
-                            </td>
+                            <td>{% translate "RPKI record does not exist." %}</td>
                             <td>
                                 <span class="low">Low</span>
                             </td>

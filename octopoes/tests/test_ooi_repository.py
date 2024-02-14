@@ -5,7 +5,6 @@ from typing import List, Literal, cast
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from octopoes.config.settings import XTDBType
 from octopoes.events.manager import EventManager
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import DNSZone
@@ -21,7 +20,7 @@ class OOIRepositoryTest(TestCase):
     def setUp(self) -> None:
         self.event_manager = Mock(spec=EventManager)
         self.session = XTDBSession(Mock(spec=XTDBHTTPClient))
-        self.repository = XTDBOOIRepository(self.event_manager, self.session, XTDBType.CRUX)
+        self.repository = XTDBOOIRepository(self.event_manager, self.session)
 
     def test_node_from_ooi(self):
         internet = Network(name="internet")
@@ -29,7 +28,7 @@ class OOIRepositoryTest(TestCase):
         serial = self.repository.serialize(ip)
         self.assertEqual("Network|internet", serial["IPAddressV4/network"])
         self.assertEqual("1.1.1.1", serial["IPAddressV4/address"])
-        self.assertEqual("IPAddressV4|internet|1.1.1.1", serial["crux.db/id"])
+        self.assertEqual("IPAddressV4|internet|1.1.1.1", serial["xt/id"])
         self.assertNotIn("IPAddressV4/object_type", serial)
 
     def test_node_from_ooi_with_list(self):
@@ -46,12 +45,12 @@ class OOIRepositoryTest(TestCase):
         )
         serial = self.repository.serialize(test)
         self.assertEqual(["Network|internet", "Network|internet2"], serial["TestOOIClass/multiple_refs"])
-        self.assertEqual("TestOOIClass|test_id", serial["crux.db/id"])
+        self.assertEqual("TestOOIClass|test_id", serial["xt/id"])
 
     def test_extract_node(self):
         internet = Network(name="internet")
         raw_node = {
-            "crux.db/id": "DNSZone|internet|test.nl",
+            "xt/id": "DNSZone|internet|test.nl",
             "object_type": "DNSZone",
             "DNSZone/object_type": "DNSZone",
             "DNSZone/hostname": "Hostname|internet|test.nl",
@@ -73,15 +72,15 @@ class OOIRepositoryTest(TestCase):
                     :query {
                         :find [
                             (pull ?e [
-                                :crux.db/id
+                                :xt/id
                                 {:MockIPPort/_address [*]}
                                 {:MockResolvedHostname/_address [*]}
                                 {:MockLabel/_ooi [*]}
                                 {:MockIPAddressV4/network [*]}
                             ])
                         ]
-                        :in [[ _crux_db_id ... ]]
-                        :where [[?e :crux.db/id _crux_db_id]]
+                        :in [[ _xt_id ... ]]
+                        :where [[?e :xt/id _xt_id]]
                     }
                     :in-args [["MockIPAddressV4|internet|1.1.1.1"]]
                 }"""
@@ -121,10 +120,10 @@ class OOIRepositoryTest(TestCase):
                     "MockResolvedHostname/_hostname": {
                         "MockResolvedHostname/address": "MockIPAddressV4|internet|1.1.1.1",
                         "MockResolvedHostname/hostname": "MockHostname|internet|example.com",
-                        "crux.db/id": "MockResolvedHostname|internet|example.com|internet|1.1.1.1",
+                        "xt/id": "MockResolvedHostname|internet|example.com|internet|1.1.1.1",
                         "object_type": "MockResolvedHostname",
                     },
-                    "crux.db/id": "MockHostname|internet|example.com",
+                    "xt/id": "MockHostname|internet|example.com",
                 }
             ]
         ]

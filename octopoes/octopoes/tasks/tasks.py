@@ -32,13 +32,13 @@ except FileNotFoundError:
 
 @worker_process_shutdown.connect
 def shutdown_worker(**kwargs):
-    close_rabbit_channel(settings.queue_uri)
+    close_rabbit_channel(str(settings.queue_uri))
 
 
 @worker_process_init.connect
 def init_worker(**kwargs):
     """Set up one RabbitMQ connection and channel on worker startup"""
-    get_rabbit_channel(settings.queue_uri)
+    get_rabbit_channel(str(settings.queue_uri))
 
 
 log = get_task_logger(__name__)
@@ -49,7 +49,7 @@ def handle_event(event: Dict):
     try:
         parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
 
-        session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), parsed_event.client, settings.xtdb_type))
+        session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), parsed_event.client))
         bootstrap_octopoes(settings, parsed_event.client, session).process_event(parsed_event)
         session.commit()
     except Exception:
@@ -77,7 +77,7 @@ def schedule_scan_profile_recalculations():
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def recalculate_scan_profiles(org: str, *args, **kwargs):
-    session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org, settings.xtdb_type))
+    session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org))
     octopoes = bootstrap_octopoes(settings, org, session)
 
     timer = timeit.default_timer()

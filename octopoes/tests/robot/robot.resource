@@ -12,10 +12,9 @@ ${REF_IPADDR}                       IPAddressV4|internet|1.1.1.1
 ${REF_RESOLVEDHOSTNAME}             ResolvedHostname|internet|example.com|internet|1.1.1.1
 
 ${OCTOPOES_URI}                     http://localhost:29000/_dev
-${XTDB_URI}                         http://localhost:29002/_xtdb
+${XTDB_URI}                         http://localhost:29002/_xtdb/_dev
 ${QUEUE_URI}                        amqp://ci_user:ci_pass@localhost:29004/kat
 ${RABBIT_MQ_API_URI}                http://ci_user:ci_pass@localhost:29003/api
-${FLOWER_API_URI}                   http://localhost:5555/api
 ${VALID_TIME}                       2022-01-01T00:00:00+00:00
 
 ${SCAN_PROFILE_INCREMENT_QUEUE}     _dev__scan_profile_increments
@@ -95,12 +94,16 @@ Clear XTDB
     ${response}    Post    ${XTDB_URI}/submit-tx    json=${transaction}    headers=${headers}
     Wait For XTDB Synced
 
-Cleanup
-    Clear XTDB
-    Wait For XTDB Synced
+Setup Test
+    Create XTDB node
+    Start Monitoring    ${QUEUE_URI}
+
+Teardown Test
+    Delete XTDB node
     Get Messages From Queue    octopoes    ack_requeue_false
     Get Messages From Queue    ${SCAN_PROFILE_INCREMENT_QUEUE}    ack_requeue_false
     Get Messages From Queue    ${SCAN_PROFILE_MUTATION_QUEUE}    ack_requeue_false
+    Stop Monitoring
 
 Await Sync
     Sleep    300ms
@@ -161,3 +164,11 @@ Verify Object Present
 Verify Object Not Present
     [Arguments]    ${reference}
     ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${reference}    expected_status=404
+
+Create XTDB node
+    ${response}    Post    ${OCTOPOES_URI}/node
+    Should Be Equal As Integers    ${response.status_code}    200
+
+Delete XTDB node
+    ${response}    Delete    ${OCTOPOES_URI}/node
+    Should Be Equal As Integers    ${response.status_code}    200

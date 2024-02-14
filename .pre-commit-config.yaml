@@ -20,6 +20,7 @@ repos:
   - id: end-of-file-fixer
     exclude: |
       (?x)(
+      \.svcg$ |
       ^boefjes/tests/examples/rdns-nxdomain.txt$
       )
 
@@ -39,7 +40,7 @@ repos:
     additional_dependencies: ["rstcheck[sphinx]"]
 
 - repo: https://github.com/MarketSquare/robotframework-tidy
-  rev: "4.6.0"
+  rev: "4.8.1"
   hooks:
   - id: robotidy
 
@@ -51,23 +52,23 @@ repos:
       /tests/
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: 'v0.1.7'
+  rev: 'v0.1.13'
   hooks:
   - id: ruff
 
 - repo: https://github.com/psf/black
-  rev: "23.11.0"
+  rev: "23.12.1"
   hooks:
   - id: black
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.7.1
+  rev: v1.8.0
   hooks:
   - id: mypy
     additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'types-retry', 'pydantic', 'pynacl']
     exclude: |
       (?x)(
-      ^boefjes/ |
+      ^boefjes/boefjes/plugins |
       ^keiko/templates |
       ^mula/whitelist\.py$ |
       ^octopoes/ |
@@ -87,6 +88,7 @@ repos:
       (?x)(
       \.po$ |
       \.xml$ |
+      \.svg$ |
       poetry.lock$ |
       pyproject.toml$ |
       requirements-.*.txt$ |
@@ -107,7 +109,7 @@ repos:
       )
 
 - repo: https://github.com/Riverside-Healthcare/djLint
-  rev: v1.34.0
+  rev: v1.34.1
   hooks:
   - id: djlint-reformat-django
     files: |
@@ -126,7 +128,7 @@ repos:
     exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
 - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-  rev: v15.11.0
+  rev: v16.1.0
   hooks:
     - id: stylelint
       args: [ --fix ]

@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ARG PYTHON_VERSION=3.11
-FROM node:18-bookworm AS node_builder
+FROM node:20-bookworm AS node_builder
 
 WORKDIR /app
 

@@ -16,7 +16,6 @@ from octopoes.config.settings import (
     DEFAULT_OFFSET,
     DEFAULT_SCAN_LEVEL_FILTER,
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-    XTDBType,
 )
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
@@ -90,7 +89,7 @@ class OOIRepository(Repository):
     ) -> Dict[Path, List[OOI]]:
         raise NotImplementedError
 
-    def list(
+    def list_oois(
         self,
         types: Set[Type[OOI]],
         valid_time: datetime,
@@ -191,19 +190,14 @@ datamodel = Datamodel(entities=entities)
 
 
 class XTDBOOIRepository(OOIRepository):
-    xtdb_type: XTDBType = XTDBType.CRUX
+    pk_prefix = "xt/id"
 
-    def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
+    def __init__(self, event_manager: EventManager, session: XTDBSession):
         super().__init__(event_manager)
         self.session = session
-        self.__class__.xtdb_type = xtdb_type
 
     def commit(self):
         self.session.commit()
-
-    @classmethod
-    def pk_prefix(cls):
-        return "crux.db/id" if cls.xtdb_type == XTDBType.CRUX else "xt/id"
 
     @classmethod
     def serialize(cls, ooi: OOI) -> Dict[str, Any]:
@@ -215,18 +209,18 @@ class XTDBOOIRepository(OOIRepository):
         export = {f"{ooi.__class__.__name__}/{key}": value for key, value in export.items() if value is not None}
 
         export["object_type"] = ooi.__class__.__name__
-        export[cls.pk_prefix()] = ooi.primary_key
+        export[cls.pk_prefix] = ooi.primary_key
 
         return export
 
     @classmethod
     def deserialize(cls, data: Dict[str, Any]) -> OOI:
         if "object_type" not in data:
-            raise ValueError
+            raise ValueError("Data is missing object_type")
 
         # pop global attributes
         object_cls = type_by_name(data.pop("object_type"))
-        data.pop(cls.pk_prefix())
+        data.pop(cls.pk_prefix)
 
         # remove type prefixes
         stripped = {key.split("/")[1]: value for key, value in data.items()}
@@ -267,12 +261,12 @@ class XTDBOOIRepository(OOIRepository):
 
     def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
         ids = list(map(str, references))
-        query = generate_pull_query(self.xtdb_type, FieldSet.ALL_FIELDS, {self.pk_prefix(): ids})
+        query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: ids})
         res = self.session.client.query(query, valid_time)
         oois = [self.deserialize(x[0]) for x in res]
         return {ooi.primary_key: ooi for ooi in oois}
 
-    def list(
+    def list_oois(
         self,
         types: Set[Type[OOI]],
         valid_time: datetime,
@@ -344,7 +338,7 @@ class XTDBOOIRepository(OOIRepository):
                     :find [(rand {amount} ?id)]
                     :in [[_scan_level ...]]
                     :where [
-                        [?e :crux.db/id ?id]
+                        [?e :xt/id ?id]
                         [?e :object_type]
                         [?scan_profile :type "ScanProfile"]
                         [?scan_profile :reference ?e]
@@ -398,13 +392,11 @@ class XTDBOOIRepository(OOIRepository):
             object_types=ooi_classes,
         )
         field_node.build_tree(1)
-        query = generate_pull_query(
-            self.xtdb_type, FieldSet.ONLY_ID, {self.pk_prefix(): ooi_ids}, field_node=field_node
-        )
+        query = generate_pull_query(FieldSet.ONLY_ID, {self.pk_prefix: ooi_ids}, field_node=field_node)
         res = self.session.client.query(query, valid_time=valid_time)
         res = [element[0] for element in res]
         xtdb_reference_root_nodes = TypeAdapter(List[XTDBReferenceNode]).validate_python(res)
-        return [x.to_reference_node(self.pk_prefix()) for x in xtdb_reference_root_nodes]
+        return [x.to_reference_node(self.pk_prefix) for x in xtdb_reference_root_nodes]
 
     def _get_tree_level(
         self,
@@ -484,12 +476,12 @@ class XTDBOOIRepository(OOIRepository):
                     :query {{
                         :find [
                             (pull ?e [
-                                :crux.db/id
+                                :xt/id
                                 {related_fields}
                             ])
                         ]
-                        :in [[ _crux_db_id ... ]]
-                        :where [[?e :crux.db/id _crux_db_id]]
+                        :in [[ _xt_id ... ]]
+                        :where [[?e :xt/id _xt_id]]
                     }}
                     :in-args [["{reference}"]]
                 }}""".format(
@@ -507,12 +499,12 @@ class XTDBOOIRepository(OOIRepository):
                         :query {{
                             :find [
                                 (pull ?e [
-                                    :crux.db/id
+                                    :xt/id
                                     {related_fields}
                                 ])
                             ]
-                            :in [[ _crux_db_id ... ]]
-                            :where [[?e :crux.db/id _crux_db_id]]
+                            :in [[ _xt_id ... ]]
+                            :where [[?e :xt/id _xt_id]]
                         }}
                         :in-args [[{reference}]]
                     }}""".format(
@@ -535,7 +527,7 @@ class XTDBOOIRepository(OOIRepository):
 
         ret = {}
         for key, value in response_data.items():
-            if key == "crux.db/id" or value == {}:
+            if key == "xt/id" or value == {}:
                 continue
             path = Path([self.decode_segment(key)])
             if isinstance(value, list):
@@ -563,7 +555,7 @@ class XTDBOOIRepository(OOIRepository):
                         else:
                             neighbours.add(self.deserialize(value))
                 except ValueError:
-                    # is not an error, old crux versions return the foreign key as a string,
+                    # Is not an error, XTDB returns the foreign key as a string,
                     # when related object is not found
                     logger.info("Could not deserialize value [value=%s]", value)
 

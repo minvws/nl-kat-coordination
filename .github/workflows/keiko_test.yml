@@ -2,6 +2,11 @@ name: Keiko Run the unit tests
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - keiko/**
   pull_request:
@@ -14,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ '3.8', '3.9', '3.10', '3.11' ]
+        version: [ '3.10', '3.11' ]
 
     runs-on: ubuntu-22.04
 

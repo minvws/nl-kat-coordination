@@ -35,20 +35,20 @@ class DockerBoefjesRunner:
 
         stderr_mime_types = boefjes.plugins.models._default_mime_types(self.boefje_meta.boefje)
 
-        task_id = str(self.boefje_meta.id)
+        task_id = self.boefje_meta.id
         self.scheduler_client.patch_task(task_id, TaskStatus.RUNNING)
         self.boefje_meta.started_at = datetime.now(timezone.utc)
 
         try:
-            input_url = settings.boefje_api + "/api/v0/tasks/" + task_id
+            input_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
             container_logs = self.docker_client.containers.run(
                 image=self.boefje_resource.oci_image,
-                name="kat_boefje_" + task_id,
+                name="kat_boefje_" + str(task_id),
                 command=input_url,
                 stdout=False,
                 stderr=True,
                 remove=True,
-                network=settings.boefje_docker_network,
+                network=settings.docker_network,
             )
 
             # save container log (stderr) to bytes

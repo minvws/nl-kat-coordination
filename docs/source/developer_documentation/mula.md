@@ -20,23 +20,23 @@ rankers.
 
 ### Stack, packages and libraries
 
-| Name           | Version  | Description                                        |
-|----------------|----------|----------------------------------------------------|
-| Python         | ^3.8     |                                                    |
-| FastAPI        | ^0.93.0  | Used for api server                                |
-| SQLAlchemy     | ^1.4.48  |                                                    |
+| Name       | Version  | Description         |
+| ---------- | -------- | ------------------- |
+| Python     | ^3.8     |                     |
+| FastAPI    | ^0.109.0 | Used for api server |
+| SQLAlchemy | ^2.0.23  |                     |
+| pydantic   | ^2.5.2   |                     |
 
 ### External services
 
 The scheduler interfaces with the following services:
 
-| Service     | Usage                                                                    |
-|-------------|--------------------------------------------------------------------------|
-| [Octopoes]  | Retrieving random OOI's of organizations                                 |
-| [Katalogus] | Used for referencing available plugins and organizations                 |
-| [Bytes]     | Retrieve last run boefje for organization and OOI                        |
-| [Boefjes]   | Sending boefje, and normalizer tasks to Celery                           |
-| [RabbitMQ]  | Used for retrieving scan profile changes, and created raw data in bytes  |
+| Service     | Usage                                                                   |
+| ----------- | ----------------------------------------------------------------------- |
+| [Octopoes]  | Retrieving random OOI's of organizations                                |
+| [Katalogus] | Used for referencing available plugins and organizations                |
+| [Bytes]     | Retrieve last run boefje for organization and OOI                       |
+| [RabbitMQ]  | Used for retrieving scan profile changes, and created raw data in bytes |
 
 ### Project structure
 
@@ -54,9 +54,9 @@ $ tree -L 3 --dirsfirst
 │   ├── models/                     # internal model definitions
 │   ├── queues/                     # priority queue
 │   ├── rankers/                    # priority/score calculations
-│   ├── repositories/               # data abstraction layer
+│   ├── storage/                    # data abstraction layer
 │   ├── schedulers/                 # schedulers
-│   ├── server/                     # scheduler rest api interface
+│   ├── server/                     # http rest api server
 │   ├── utils/                      # common utility functions
 │   ├── __init__.py
 │   ├── __main__.py
@@ -65,8 +65,11 @@ $ tree -L 3 --dirsfirst
 └─── tests/
     ├── factories/
     ├── integration/
+    ├── mocks/
+    ├── scripts/
     ├── simulation/
     ├── unit/
+    ├── utils/
     └── __init__.py
 ```
 
@@ -87,7 +90,7 @@ scheduler. See the environment settings section under Installation and Deploymen
 
 ```
 # Build and run the scheduler in the background
-$ docker-compose up --build -d scheduler
+$ docker compose up --build -d scheduler
 ```
 
 ## Testing

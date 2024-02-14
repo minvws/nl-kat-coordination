@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Type
 
-from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn
+from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
@@ -16,6 +16,10 @@ if os.getenv("DOCS"):
 
 class BackwardsCompatibleEnvSettings(EnvSettingsSource):
     backwards_compatibility_mapping = {
+        "BOEFJES_BOEFJE_API_HOST": "BOEFJES_API_HOST",
+        "BOEFJES_BOEFJE_API_PORT": "BOEFJES_API_PORT",
+        "BOEFJE_API": "BOEFJES_API",
+        "BOEFJE_DOCKER_NETWORK": "BOEFJES_DOCKER_NETWORK",
         "LOG_CFG": "BOEFJES_LOG_CFG",
     }
 
@@ -48,6 +52,12 @@ class Settings(BaseSettings):
         "1.1.1.1", description="Name server used for remote DNS resolution in the boefje runner"
     )
 
+    scan_profile_whitelist: Dict[str, conint(strict=True, ge=0, le=4)] = Field(  # type: ignore
+        default_factory=dict,
+        description="Whitelist for normalizer ids allowed to produce scan profiles, including a maximum level.",
+        examples=['{"kat_external_db_normalize": 3, "kat_dns_normalize": 1}'],
+    )
+
     # Queue configuration
     queue_uri: AmqpDsn = Field(..., description="KAT queue URI", examples=["amqp://"], validation_alias="QUEUE_URI")
 
@@ -67,22 +77,23 @@ class Settings(BaseSettings):
     octopoes_api: AnyHttpUrl = Field(
         ..., examples=["http://localhost:8001"], description="Octopoes API URL", validation_alias="OCTOPOES_API"
     )
-    boefje_api: AnyHttpUrl = Field(
-        ..., examples=["http://boefje:8000"], description="Boefje API URL", validation_alias="BOEFJE_API"
+    api: AnyHttpUrl = Field(
+        ...,
+        examples=["http://boefje:8000"],
+        description="The URL on which the boefjes API is available",
     )
     # Boefje server settings
-    boefje_api_host: str = Field(
+    api_host: str = Field(
         "0.0.0.0",
         description="Host address of the Boefje API server",
     )
-    boefje_api_port: int = Field(
+    api_port: int = Field(
         8000,
         description="Host port of the Boefje API server",
     )
-    boefje_docker_network: str = Field(
+    docker_network: str = Field(
         "bridge",
         description="Docker network to run Boefjes in",
-        env="BOEFJE_DOCKER_NETWORK",
     )
     bytes_api: AnyHttpUrl = Field(
         ..., examples=["http://localhost:8002"], description="Bytes API URL", validation_alias="BYTES_API"

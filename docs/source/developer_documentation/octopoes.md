@@ -264,23 +264,23 @@ end
 Listener ->>- EventManager: #nbsp
 ```
 
-## Crux / XTDB
-[Crux](https://opencrux.com/main/index.html) is the central database of OOIs within KAT. Crux is a graph-database that can store objects (schemalessly), while providing object history and audit-trail functionality out-of-the-box. The term *bitemporal* means it tracks every object on 2 time axis: valid-time and transaction-time.
+## XTDB
+[XTDB](https://xtdb.com) is the central database of OOIs within KAT. XTDB is a graph-database that can store objects (schemalessly), while providing object history and audit-trail functionality out-of-the-box. The term *bitemporal* means it tracks every object on 2 time axis: valid-time and transaction-time.
 
 - Valid-time means the state of an object at a certain time *X* (mutable).
 - Transaction-time means the state of an object with all transactions-processed until time *Y* (immutable)
 
 This is especially useful for forensics-type queries like: What was the state of an object at time *X (valid-time)*, with the information we had at time *Y (transaction-time)*.
 
-Good to know: Crux tracks the history of each object by its **primary key**.
+Good to know: XTDB tracks the history of each object by its **primary key**.
 
-[Read more about Crux bitemporality](https://opencrux.com/articles/bitemporality.html)
+[Read more about XTDB bitemporality](https://v1-docs.xtdb.com/concepts/bitemporality/)
 
 ## OOI
 
 OOI objects are instances of relatively simple classes, which inherit from `OOIBase`.
 
-Because all OOIs are stored in Crux and Crux tracks object history by primary key, KAT defines a way to reliably determine the primary key of an object by its attributes. This is called the [natural key](https://en.wikipedia.org/wiki/Natural_key) of an object.
+Because all OOIs are stored in XTDB and XTDB tracks object history by primary key, KAT defines a way to reliably determine the primary key of an object by its attributes. This is called the [natural key](https://en.wikipedia.org/wiki/Natural_key) of an object.
 
 The main advantage of this method, is that when enough attributes of an OOI are discovered, the primary key of this object is known. This allows reasoning about the exact same objects in several subsystems, without having to query a database.
 
@@ -377,7 +377,7 @@ It provides several methods for doing CRUD operations for the objects/entities.
 
 In particular, for querying objects we have:
 
--  `OctopoesAPIConnector.list()` to filter on OOIs `type`, `scan_level`, `scan_profile_type` and `valid_time`.
+-  `OctopoesAPIConnector.list_objects()` to filter on OOIs `type`, `scan_level`, `scan_profile_type` and `valid_time`.
 
 This is used for example in the object overview page. Returns a paginated list of OOIs.
 
@@ -438,18 +438,18 @@ class TagExample(OOI):
 
 
 # Query abstract class
-OctopoesAPIConnector('http://octopoes', '_dev').list({IPAddress})
+OctopoesAPIConnector('http://octopoes', '_dev').list_objects({IPAddress})
 ```
 
 ## Querying
-Octopoes API uses the OOI model to construct Crux queries. For complex graph-querying, Crux's [pull-syntax](https://www.opencrux.com/reference/1.16.0/queries.html#pull) is used to build a query tree. Crux can join objects to properties which hold (lists of) foreign keys.
+Octopoes API uses the OOI model to construct XTDB queries. For complex graph-querying, XTDB's [pull-syntax](https://v1-docs.xtdb.com/language-reference/1.24.3/datalog-queries/#pull) is used to build a query tree. XTDB can join objects to properties which hold (lists of) foreign keys.
 
 Imagine a query "Give me IpAddressV4 with primary key ***X*** and all related objects **2** levels deep".
 
 What happens under the hood:
   - A relation map is created with all OOI classes and their relations
   - A query plan is created by traversing the relation map 2 levels deep. The queryplan is a tree of QueryNode objects
-  - The query plan is transformed into a Crux Datalog query, utilizing its pull syntax to join related objects
+  - The query plan is transformed into a XTDB Datalog query, utilizing its pull syntax to join related objects
 
 
 **Rules**:

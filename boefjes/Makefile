@@ -31,7 +31,7 @@ help: ## Show this help.
 build: seed
 
 seed:  # Seed the katalogus database
-	-docker-compose run --rm katalogus python -m boefjes.seed
+	-docker compose run --rm katalogus python -m boefjes.seed
 
 ##
 ##|------------------------------------------------------------------------|
@@ -42,12 +42,12 @@ migrations: ## Generate a migration using alembic
 ifeq ($(m),)
 	$(HIDE) (echo "Specify a message with m={message} and a rev-id with revid={revid} (e.g. 0001 etc.)"; exit 1)
 else
-	docker-compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)"
+	docker compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini revision --autogenerate -m "$(m)"
 endif
 
 
 sql: ## Generate raw sql for the migrations
-	docker-compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade $(rev1):$(rev2) --sql
+	docker compose run --rm katalogus python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade $(rev1):$(rev2) --sql
 
 check:
 	pre-commit run --all-files --color always
@@ -57,7 +57,7 @@ check:
 ##			Tests
 ##|------------------------------------------------------------------------|
 
-ci-docker-compose := docker-compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
 
 
 test: itest ## Run all tests.
@@ -67,19 +67,6 @@ itest: ## Run the integration tests.
 	$(ci-docker-compose) down --remove-orphans
 	$(ci-docker-compose) run --rm katalogus_integration
 	$(ci-docker-compose) down
-
-debian11:
-	docker run --rm \
-	--env PKG_NAME=kat-boefjes \
-	--env BUILD_DIR=./build \
-	--env REPOSITORY=minvws/nl-kat-boefjes \
-	--env RELEASE_VERSION=${RELEASE_VERSION} \
-	--env RELEASE_TAG=${RELEASE_TAG} \
-	--mount type=bind,src=${CURDIR},dst=/app \
-	--mount type=bind,src=${CURDIR}/../octopoes,dst=/octopoes \
-	--workdir /app \
-	kat-debian11-build-image \
-	packaging/scripts/build-debian-package.sh
 
 debian12:
 	docker run --rm \
@@ -111,8 +98,8 @@ ubuntu22.04:
 clean:
 	rm -rf build
 	rm -rf debian/kat-*/ debian/.debhelper debian/files *.egg-info/ dist/
-	rm debian/debhelper-build-stamp
-	rm debian/*.*.debhelper
-	rm debian/*.substvars
-	rm debian/*.debhelper.log
-	rm debian/changelog
+	rm -f debian/debhelper-build-stamp
+	rm -f debian/*.*.debhelper
+	rm -f debian/*.substvars
+	rm -f debian/*.debhelper.log
+	rm -f debian/changelog

@@ -4,6 +4,7 @@ import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Optional
+from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, Response
 from pydantic import BaseModel, ConfigDict, Field
@@ -42,14 +43,14 @@ class UvicornServer(multiprocessing.Process):
 
 
 def run():
-    config = Config(app, host=settings.boefje_api_host, port=settings.boefje_api_port)
+    config = Config(app, host=settings.api_host, port=settings.api_port)
     instance = UvicornServer(config=config)
     instance.start()
     return instance
 
 
 class BoefjeInput(BaseModel):
-    task_id: str
+    task_id: UUID
     output_url: str
     boefje_meta: BoefjeMeta
     model_config = ConfigDict(extra="forbid")
@@ -90,7 +91,7 @@ async def root():
 
 @app.get("/api/v0/tasks/{task_id}", response_model=BoefjeInput)
 async def boefje_input(
-    task_id: str,
+    task_id: UUID,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     local_repository: LocalPluginRepository = Depends(get_local_repository),
 ):
@@ -101,13 +102,13 @@ async def boefje_input(
 
     boefje_meta = create_boefje_meta(task, local_repository)
 
-    output_url = str(settings.boefje_api).rstrip("/") + f"/api/v0/tasks/{task_id}"
+    output_url = str(settings.api).rstrip("/") + f"/api/v0/tasks/{task_id}"
     return BoefjeInput(task_id=task_id, output_url=output_url, boefje_meta=boefje_meta)
 
 
 @app.post("/api/v0/tasks/{task_id}")
 async def boefje_output(
-    task_id: str,
+    task_id: UUID,
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     bytes_client: BytesAPIClient = Depends(get_bytes_client),

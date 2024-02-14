@@ -6,15 +6,15 @@ authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 alembic = "^1.8.1"
 click = "^8.1.3"
-httpx = "^0.23.3"
+httpx = "^0.26.0"
 jsonschema = "^4.17.0"
 pydantic = "^2.4.2"
 docker = "^6.1.3"
-fastapi = "^0.101.0"
-uvicorn = "^0.20.0"
+fastapi = "^0.109.2"
+uvicorn = "^0.26.0"
 psycopg2 = "^2.9.6"
 pynacl = "^1.5.0"
 sqlalchemy = "^1.4.48"
@@ -44,13 +44,13 @@ python-libnmap = "0.7.3"
 # required by kat_shodan boefje
 shodan = "1.25.0"
 # required by kat_ssl_certificates boefje
-cryptography = "41.0.6"
+cryptography = "^42.0.1"
 # required by kat_webpage_analysis/check_images normalizer
 Pillow = "^10.0.1"
 # required by kat_webpage_analysis
-forcediphttpsadapter = "1.0.2"
+forcediphttpsadapter = "1.1.0"
 # required by kat_webpage_analysis (forcediphttpsadapter)
-urllib3 = "^1.26.0"
+urllib3 = "^2.1.0"
 # required by kat_website_software
 python-Wappalyzer = "0.3.1"
 # required by kat_wpscan
@@ -59,13 +59,14 @@ wpscan-out-parse = "1.9.3"
 sectxt = "0.9.0"
 # required by kat_rpki
 netaddr = "0.9.0"
+# required by kat_burpsuite, kat_cwe_finding_types and kat_ssl_scan
+defusedxml = "^0.7.1"
 pydantic-settings = "^2.0.3"
 opentelemetry-instrumentation = "^0.41b0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.2.2"
-pytest-env = "^0.8.2"
-black = "^23.11.0"
+pytest = "^8.0.0"
+pytest-env = "^1.1.3"
 
 [build-system]
 requires = ["setuptools>=45", "wheel"]
@@ -76,7 +77,7 @@ line-length = 120
 transform-concats = true
 
 [tool.black]
-target-version = ["py38", "py39", "py310", "py311"]
+target-version = ["py310", "py311"]
 line-length = 120
 
 [tool.pytest.ini_options]

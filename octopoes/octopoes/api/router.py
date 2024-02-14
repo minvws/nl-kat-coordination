@@ -38,7 +38,7 @@ from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
 from octopoes.xtdb.client import XTDBSession
-from octopoes.xtdb.exceptions import NoMultinode, XTDBException
+from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Query as XTDBQuery
 
 logger = getLogger(__name__)
@@ -82,7 +82,7 @@ def settings() -> Settings:
 def xtdb_session(
     client: str = Depends(extract_client), settings_: Settings = Depends(settings)
 ) -> Generator[XTDBSession, None, None]:
-    yield XTDBSession(get_xtdb_client(str(settings_.xtdb_uri), client, settings_.xtdb_type))
+    yield XTDBSession(get_xtdb_client(str(settings_.xtdb_uri), client))
 
 
 def octopoes_service(
@@ -250,7 +250,7 @@ def list_origins(
     task_id: Optional[uuid.UUID] = Query(None),
     origin_type: Optional[OriginType] = Query(None),
 ) -> List[Origin]:
-    return octopoes.origin_repository.list(
+    return octopoes.origin_repository.list_origins(
         valid_time,
         task_id=task_id,
         source=source,
@@ -307,7 +307,7 @@ def list_scan_profiles(
     valid_time: datetime = Depends(extract_valid_time),
     scan_profile_type: Optional[str] = Query(None),
 ) -> List[ScanProfileBase]:
-    return octopoes.scan_profile_repository.list(scan_profile_type, valid_time)
+    return octopoes.scan_profile_repository.list_scan_profiles(scan_profile_type, valid_time)
 
 
 @router.put("/scan_profiles", tags=["Scan Profiles"])
@@ -399,10 +399,6 @@ def create_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
     try:
         xtdb_session_.client.create_node()
         xtdb_session_.commit()
-    except NoMultinode:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
-        )
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Creating node failed") from e
 
@@ -412,10 +408,6 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
     try:
         xtdb_session_.client.delete_node()
         xtdb_session_.commit()
-    except NoMultinode:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
-        )
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deleting node failed") from e
 
