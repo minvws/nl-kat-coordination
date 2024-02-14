@@ -143,30 +143,48 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         return super().get(request, *args, **kwargs)
 
     def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+        error_reports = []
         report_data = {}
-        error_oois = []
+        by_type = {}
+
         for ooi in self.selected_oois:
-            report_data[ooi] = {}
+            ooi_type = Reference.from_str(ooi).class_
+
+            if ooi_type not in by_type:
+                by_type[ooi_type] = []
+
+            by_type[ooi_type].append(ooi)
+
+        for report_type in self.report_types:
+            oois = {
+                ooi for ooi_type in report_type.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
+            }
+
             try:
-                for report_type in self.report_types:
-                    if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
-                        report = report_type(self.octopoes_api_connector)
-                        data = report.generate_data(ooi, valid_time=self.valid_time)
-                        template = report.template_path
-                        report_data[ooi][report_type.name] = {"data": data, "template": template}
+                results = report_type(self.octopoes_api_connector).collect_data(oois, self.valid_time)
             except ObjectNotFoundException:
-                error_oois.append(ooi)
+                error_reports.append(report_type)
+                continue
             except StopIteration:
-                error_oois.append(ooi)
+                error_reports.append(report_type)
+                continue
+
+            for ooi, data in results.items():
+                if ooi not in report_data:
+                    report_data[ooi] = {}
+
+                report_data[ooi][report_type.name] = {"data": data, "template": report_type.template_path}
+
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
-        if error_oois:
-            oois = ", ".join(set(error_oois))
+        if error_reports:
+            report_types = ", ".join(set(error_reports))
             date = self.valid_time.date()
-            error_message = _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.") % {
-                "oois": oois,
+            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
+                "report_types": report_types,
                 "date": date,
             }
             messages.add_message(self.request, messages.ERROR, error_message)
+
         return report_data
 
     def get_context_data(self, **kwargs):

@@ -16,11 +16,6 @@ class ReportPlugins(TypedDict):
     optional: List[str]
 
 
-class AggregateReportSubReports(TypedDict):
-    required: List[str]
-    optional: List[str]
-
-
 class Report(ABC):
     id: str
     name: str
@@ -35,6 +30,11 @@ class Report(ABC):
     def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
         raise NotImplementedError
 
+    def collect_data(self, input_oois: set[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        """Generate data for multiple OOIs. Child classes can override this method to improve performance."""
+
+        return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
+
     @classmethod
     def class_attributes(cls) -> Dict[str, any]:
         return {
@@ -45,6 +45,11 @@ class Report(ABC):
             "input_ooi_types": cls.input_ooi_types,
             "template_path": cls.template_path,
         }
+
+
+class AggregateReportSubReports(TypedDict):
+    required: list[type[Report]]
+    optional: list[type[Report]]
 
 
 class AggregateReport(ABC):

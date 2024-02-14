@@ -5,7 +5,7 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from reports.report_types.definitions import AggregateReport
@@ -445,26 +445,35 @@ def aggregate_reports(
     input_ooi_references: List[OOI],
     selected_report_types: List[str],
     valid_time: datetime,
+    report: type[AggregateReport] = AggregateOrganisationReport,
 ):
-    aggregate_report = AggregateOrganisationReport(connector)
-    report_data = {}
-    error_oois = []
+    by_type = {}
+    errors = []
 
     for ooi in input_ooi_references:
-        report_data[ooi.primary_key] = {}
-        try:
-            for options, report_types in aggregate_report.reports.items():
-                for report_type in report_types:
-                    if (
-                        Reference.from_str(ooi).class_type in report_type.input_ooi_types
-                        and report_type.id in selected_report_types
-                    ):
-                        report = report_type(connector)
-                        data = report.generate_data(ooi.primary_key, valid_time=valid_time)
-                        report_data[ooi.primary_key][report_type.id] = data
-        except ObjectNotFoundException:
-            logger.error("Object not found: %s", ooi.primary_key)
-            error_oois.append(ooi.primary_key)
-    post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
+        if ooi.get_object_type() not in by_type:
+            by_type[ooi.get_object_type()] = []
 
-    return aggregate_report, post_processed_data, report_data, error_oois
+        by_type[ooi.get_object_type()].append(str(ooi.reference))
+
+    all_types = [t for t in report.reports["required"] + report.reports["optional"] if t.id in selected_report_types]
+    report_data = {}
+
+    for report_type in all_types:
+        oois = {x for ooi_type in report_type.input_ooi_types for x in by_type.get(ooi_type.get_object_type(), [])}
+
+        try:
+            results = report_type(connector).collect_data(oois, valid_time)
+        except ObjectNotFoundException:
+            logger.error("Object not found")
+            errors.append(report_type)
+            continue
+
+        for ooi, data in results.items():
+            if ooi not in report_data:
+                report_data[ooi] = {}
+
+            report_data[ooi][report_type.id] = data
+
+    post_processed_data = AggregateOrganisationReport(connector).post_process_data(report_data, valid_time=valid_time)
+    return report, post_processed_data, report_data, errors
