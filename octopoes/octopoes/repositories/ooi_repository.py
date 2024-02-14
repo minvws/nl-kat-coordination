@@ -89,7 +89,7 @@ class OOIRepository(Repository):
     ) -> Dict[Path, List[OOI]]:
         raise NotImplementedError
 
-    def list(
+    def list_oois(
         self,
         types: Set[Type[OOI]],
         valid_time: datetime,
@@ -266,7 +266,7 @@ class XTDBOOIRepository(OOIRepository):
         oois = [self.deserialize(x[0]) for x in res]
         return {ooi.primary_key: ooi for ooi in oois}
 
-    def list(
+    def list_oois(
         self,
         types: Set[Type[OOI]],
         valid_time: datetime,
