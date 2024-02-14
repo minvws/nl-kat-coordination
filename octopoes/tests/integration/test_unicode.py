@@ -1,4 +1,5 @@
 import os
+import time
 import uuid
 from datetime import datetime
 
@@ -41,6 +42,8 @@ def test_unicode_operations(octopoes_api_connector: OctopoesAPIConnector, valid_
 
     scanprof = DeclaredScanProfile(reference=hostname.reference, level=ScanLevel.L2)
     octopoes_api_connector.save_scan_profile(scanprof, valid_time)
+
+    time.sleep(3)
 
     assert octopoes_api_connector.list_objects(types={Network}).count == 1
     assert octopoes_api_connector.list_objects(types={Hostname}).count == 1
