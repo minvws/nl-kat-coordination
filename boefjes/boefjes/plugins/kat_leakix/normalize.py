@@ -45,11 +45,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
         event_ooi = pk_ooi
 
         # Autonomous System
-        as_number = str(event["network"]["asn"])
+        as_number = event["network"].get("asn", False)
         as_name = event["network"]["organization_name"]
-        
+
         if as_number:
-            as_ooi = AutonomousSystem(number=as_number, name=as_name) if as_name else AutonomousSystem(number=as_number)
+            as_ooi = AutonomousSystem(number=str(as_number), name=as_name) if as_name else AutonomousSystem(number=str(as_number))
             yield as_ooi
 
         if ip:
