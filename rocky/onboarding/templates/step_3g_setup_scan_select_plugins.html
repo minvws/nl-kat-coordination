@@ -58,14 +58,28 @@
                         Let’s setup your scan by enabling the plugins of your choice below.
                     {% endblocktranslate %}
                 </p>
-                <h2>{% translate "Suggested plugins" %}</h2>
-                {% if form_view == "table" %}
-                    {% include "partials/form/checkbox_group_table_form.html" with checkbox_group_table_form=select_boefjes_form btn_text="Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
+                <h2>{% translate "Required plugins" %}</h2>
+                <div class="column-4 tiles plugins images-cover">
+                    {% for required_plugin in plugins.required %}
+                        {% include "partials/plugin_tile.html" with form_id="enable_plugin_form" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" required="yes" %}
 
-                {% else %}
-                    {% include "partials/form/boefje_tiles_form.html" with checkbox_group_table_form=select_boefjes_form btn_text="Enable and start scan" btn_disabled=boefje_disabled skip_onboarding="yes" %}
+                    {% endfor %}
+                </div>
+                <h2>{% translate "Optional plugins" %}</h2>
+                <div class="column-4 tiles plugins images-cover">
+                    {% for required_plugin in plugins.optional %}
+                        {% include "partials/plugin_tile.html" with form_id="enable_plugin_form" plugin=required_plugin remove_action_buttons="yes" add_checkbox="yes" %}
 
-                {% endif %}
+                    {% endfor %}
+                </div>
+                <form id="enable_plugin_form" novalidate method="post" class="inline">
+                    {% csrf_token %}
+                    <div class="button-container">
+                        <button type="submit">{% translate "Enable and start scan" %}</button>
+                        <a href="{% url "complete_onboarding" organization.code %}"
+                           class="button ghost">{% translate "Skip onboarding" %}</a>
+                    </div>
+                </form>
             </div>
         </section>
     </main>

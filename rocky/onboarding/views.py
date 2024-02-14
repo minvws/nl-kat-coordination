@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import BadRequest
-from django.http import Http404
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
@@ -18,12 +18,11 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from katalogus.client import get_katalogus
-from tools.forms.boefje import SelectBoefjeForm
+from reports.report_types.dns_report.report import DNSReport
+from requests import HTTPError
 from tools.forms.ooi_form import OOIForm
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import (
-    create_object_tree_item_from_ref,
-    filter_ooi_tree,
     get_or_create_ooi,
 )
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_ooi_url
@@ -51,8 +50,7 @@ from rocky.exceptions import (
 )
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
-from rocky.views.ooi_report import DNSReport, Report, build_findings_list_from_store
-from rocky.views.ooi_view import BaseOOIDetailView, BaseOOIFormView, SingleOOITreeMixin
+from rocky.views.ooi_view import BaseOOIFormView, SingleOOITreeMixin
 
 User = get_user_model()
 
@@ -116,41 +114,48 @@ class OnboardingSetupScanSelectPluginsView(
 ):
     template_name = "step_3g_setup_scan_select_plugins.html"
     current_step = 3
-    report: Type[Report] = DNSReport
+    plugins: Dict[str, List[str]] = DNSReport.plugins
     permission_required = "tools.can_enable_disable_boefje"
 
-    def get_form(self):
-        boefjes = self.report.get_boefjes(self.organization)
-        boefjes = [boefje for boefje in boefjes if boefje["boefje"].scan_level <= DNS_REPORT_LEAST_CLEARANCE_LEVEL]
-        kwargs = {
-            "initial": {"boefje": [item["id"] for item in boefjes if item.get("required", False)]},
-        }
-
-        if self.request.method in ("POST", "PUT"):
-            kwargs.update(
-                {
-                    "data": self.request.POST,
-                }
-            )
-
-        return SelectBoefjeForm(boefjes=boefjes, organization=self.organization, **kwargs)
+    def get_plugins(self):
+        plugins = {}
+        for required_optional, plugin_ids in self.plugins.items():
+            plugins[required_optional] = [
+                get_katalogus(self.organization.code).get_plugin(plugin_id)
+                for plugin_id in plugin_ids
+                if get_katalogus(self.organization.code).get_plugin(plugin_id).scan_level
+                <= DNS_REPORT_LEAST_CLEARANCE_LEVEL
+            ]
+        return plugins
 
     def post(self, request, *args, **kwargs):
         if "ooi_id" not in request.GET:
             raise BadRequest("No OOI ID provided")
-        ooi_id = request.GET["ooi_id"]
 
-        form = self.get_form()
-        if form.is_valid():
-            if "boefje" in request.POST:
-                data = form.cleaned_data
-                request.session["selected_boefjes"] = data
-            return redirect(get_ooi_url("step_setup_scan_ooi_detail", ooi_id, self.organization.code))
-        return self.get(request, *args, **kwargs)
+        ooi_id = request.GET["ooi_id"]
+        selected_plugins = request.POST.getlist("selected_plugins", [])
+
+        if not selected_plugins:
+            messages.error(request, _("Please select a plugin to proceed."))
+            return self.get(request, *args, **kwargs)
+        for plugin_id in self.plugins["required"]:
+            if plugin_id not in selected_plugins:
+                messages.error(request, _("Please select all required plugins to proceed."))
+                return self.get(request, *args, **kwargs)
+        for selected_plugin in selected_plugins:
+            try:
+                get_katalogus(self.organization.code).enable_boefje_by_id(selected_plugin)
+            except HTTPError:
+                messages.error(request, _("Plugins enabling went wrong."))
+                return self.get(request, *args, **kwargs)
+
+        messages.success(request, _("Plugins successfully enabled."))
+        request.session["selected_boefjes"] = selected_plugins
+        return redirect(get_ooi_url("step_setup_scan_ooi_detail", ooi_id, self.organization.code))
 
     def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["select_boefjes_form"] = self.get_form()
+        context["plugins"] = self.get_plugins()
         return context
 
 
@@ -257,80 +262,9 @@ class OnboardingSetupScanOOIDetailView(
     current_step = 3
     permission_required = "tools.can_scan_organization"
 
-    def get_ooi_id(self) -> str:
-        if "ooi_id" in self.request.session:
-            return self.request.session["ooi_id"]
-        return super().get_ooi_id()
-
-    def get(self, request, *args, **kwargs):
-        self.ooi = self.get_ooi()
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        ooi = self.get_ooi()
-        level = DNS_REPORT_LEAST_CLEARANCE_LEVEL
-        try:
-            self.raise_clearance_level(ooi.reference, level)
-        except IndemnificationNotPresentException:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _(
-                    "Could not raise clearance level of %s to L%s. \
-                Indemnification not present at organization %s."
-                )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization.name,
-                ),
-            )
-            return self.get(request, *args, **kwargs)
-        except TrustedClearanceLevelTooLowException:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _(
-                    "Could not raise clearance level of %s to L%s. "
-                    "You were trusted a clearance level of L%s. "
-                    "Contact your administrator to receive a higher clearance."
-                )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
-            )
-            return self.get(request, *args, **kwargs)
-        except AcknowledgedClearanceLevelTooLowException:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _(
-                    "Could not raise clearance level of %s to L%s. "
-                    "You acknowledged a clearance level of L%s. "
-                    "Please accept the clearance level first on your profile page to proceed."
-                )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
-            )
-            return self.get(request, *args, **kwargs)
-
-        self.enable_selected_boefjes()
-        return redirect(get_ooi_url("step_report", self.get_ooi_id(), self.organization.code))
-
-    def enable_selected_boefjes(self) -> None:
-        if not self.request.session.get("selected_boefjes"):
-            return
-        for boefje_id in self.request.session["selected_boefjes"]:
-            get_katalogus(self.organization.code).enable_boefje_by_id(boefje_id)
-
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["ooi"] = self.ooi
+        context["ooi"] = self.get_ooi(self.request.GET.get("ooi_id"))
         return context
 
 
@@ -391,30 +325,74 @@ class OnboardingSetClearanceLevelView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
-    FormView,
+    SingleOOITreeMixin,
+    TemplateView,
 ):
     template_name = "step_3f_set_clearance_level.html"
-    form_class = OnboardingSetClearanceLevelForm
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
-    initial = {"level": DNS_REPORT_LEAST_CLEARANCE_LEVEL}
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        ooi_id = self.request.GET.get("ooi_id")
+        ooi = self.get_ooi(ooi_id)
+        level = DNS_REPORT_LEAST_CLEARANCE_LEVEL
+        try:
+            self.raise_clearance_level(ooi.reference, level)
+        except IndemnificationNotPresentException:
+            messages.error(
+                self.request,
+                _(
+                    "Could not raise clearance level of %s to L%s. \
+                Indemnification not present at organization %s."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization.name,
+                ),
+            )
+            return self.get(request, *args, **kwargs)
+        except TrustedClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. "
+                    "You were trusted a clearance level of L%s. "
+                    "Contact your administrator to receive a higher clearance."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
+            return self.get(request, *args, **kwargs)
+        except AcknowledgedClearanceLevelTooLowException:
+            messages.add_message(
+                self.request,
+                messages.ERROR,
+                _(
+                    "Could not raise clearance level of %s to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Please accept the clearance level first on your profile page to proceed."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
+            return self.get(request, *args, **kwargs)
+        messages.success(self.request, _("Clearance level has been set"))
+        return redirect(get_ooi_url("step_setup_scan_select_plugins", ooi_id, self.organization.code))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["form"] = OnboardingSetClearanceLevelForm(initial={"level": DNS_REPORT_LEAST_CLEARANCE_LEVEL})
         context["ooi"] = self.request.GET.get("ooi_id", None)
         context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         return context
-
-    def get_success_url(self, **kwargs):
-        return get_ooi_url("step_setup_scan_select_plugins", self.request.GET.get("ooi_id"), self.organization.code)
-
-    def form_valid(self, form):
-        self.add_success_notification()
-        return super().form_valid(form)
-
-    def add_success_notification(self):
-        success_message = _("Clearance level has been set")
-        messages.add_message(self.request, messages.SUCCESS, success_message)
 
 
 class OnboardingReportView(
@@ -441,30 +419,15 @@ class OnboardingReportView(
         member.save()
 
 
-class BaseReportView(BaseOOIDetailView):
-    report: Type[Report]
-    depth = 15
-
-    def get_tree_dict(self):
-        return create_object_tree_item_from_ref(self.tree.root, self.tree.store)
-
-    def get_filtered_tree(self, tree_dict):
-        return filter_ooi_tree(tree_dict, self.report.get_ooi_type_filter())
-
-    def get_findings_list(self):
-        return build_findings_list_from_store(self.tree.store, self.report.get_finding_filter())
+class DnsReportView(OrganizationPermissionRequiredMixin, OnboardingBreadcrumbsMixin, TemplateView):
+    template_name = "dns_report.html"
+    permission_required = "tools.can_scan_organization"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["findings_list"] = self.get_findings_list()
-        context["tree"] = self.get_filtered_tree(self.get_tree_dict())
+        context["findings_list"] = ""
+        context["tree"] = ""
         return context
-
-
-class DnsReportView(OrganizationPermissionRequiredMixin, OnboardingBreadcrumbsMixin, BaseReportView):
-    template_name = "dns_report.html"
-    permission_required = "tools.can_scan_organization"
-    report = DNSReport
 
 
 class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):
@@ -656,7 +619,6 @@ class OnboardingAccountSetupRedTeamerView(
     RegistrationBreadcrumbsMixin,
     OnboardingAccountCreationMixin,
 ):
-
     """
     Step 2: Create an redteamer account with redteam rights
     """

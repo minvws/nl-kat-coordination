@@ -2,6 +2,13 @@
 {% load static %}
 
 <div role="group" id="plugin_{{ plugin.id|slugify }}">
+    {% if add_checkbox %}
+        <input type="checkbox"
+               form="{{ form_id }}"
+               name="selected_plugins"
+               value="{{ plugin.id }}"
+               {% if required %}checked{% endif %} />
+    {% endif %}
     <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
          alt="boefje placeholder image" />
     <p class="tile-title">
@@ -17,16 +24,18 @@
             </div>
         {% endif %}
         <span class="plugin-author-link de-emphasized"><a target="_blank" href="https://openkat.nl" rel="noopener noreferrer">OpenKAT</a></span>
-        <div class="action-buttons">
-            {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
+        {% if not remove_action_buttons %}
+            <div class="action-buttons">
+                {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
-            {% if plugin.type == "boefje" %}
-                <a class="tile-detail-link"
-                   href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
-            {% else %}
-                <a class="tile-detail-link"
-                   href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
-            {% endif %}
-        </div>
+                {% if plugin.type == "boefje" %}
+                    <a class="tile-detail-link"
+                       href="{% url "boefje_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                {% else %}
+                    <a class="tile-detail-link"
+                       href="{% url "normalizer_detail" organization_code=organization.code plugin_id=plugin.id %}">{% translate "See details" %}</a>
+                {% endif %}
+            </div>
+        {% endif %}
     {% endif %}
 </div>
