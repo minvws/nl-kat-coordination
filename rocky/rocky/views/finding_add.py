@@ -128,7 +128,7 @@ class FindingAddView(BaseOOIFormView):
     def get_ooi_options(self) -> List[Dict[str, str]]:
         # Query to render form options
         ooi_set = set(OOI_TYPES.values()).difference({Finding, FindingType})
-        objects = self.octopoes_api_connector.list(ooi_set).items
+        objects = self.octopoes_api_connector.list_objects(ooi_set).items
 
         # generate options
         options = [(o.primary_key, o.get_ooi_type()) for o in objects]
