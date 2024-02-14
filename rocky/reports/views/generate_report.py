@@ -114,11 +114,17 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
         if not self.selected_report_types:
             error_message = _("Select at least one report type to proceed.")
             messages.add_message(self.request, messages.ERROR, error_message)
+
+        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
+            return redirect(reverse("generate_report_view", kwargs=kwargs) + self.get_selection())
+
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+        context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
+            get_plugins_for_report_ids(self.selected_report_types)
+        )
         return context
 
 

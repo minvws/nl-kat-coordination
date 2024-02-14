@@ -103,6 +103,10 @@ class SetupScanMultiReportView(BreadcrumbsMultiReportView, BaseReportView, Templ
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
             messages.error(self.request, _("Select at least one report type to proceed."))
+
+        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
+            return redirect(reverse("multi_report_view", kwargs=kwargs) + self.get_selection())
+
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
