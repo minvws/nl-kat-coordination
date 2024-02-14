@@ -3,7 +3,7 @@ import io
 import json
 import logging
 from datetime import datetime, timezone
-from ipaddress import IPv4Address
+from ipaddress import IPv4Address, IPv6Address
 from os import urandom
 from pathlib import Path
 from typing import Dict, List, Optional, Union
@@ -32,7 +32,9 @@ from tools.models import (
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
-from octopoes.models.ooi.network import IPAddressV4, Network
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
+from octopoes.models.ooi.service import Service
+from octopoes.models.ooi.software import Software
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.transaction import TransactionRecord
 from rocky.scheduler import Task
@@ -445,8 +447,23 @@ def ipaddressv4(network):
 
 
 @pytest.fixture
+def ipaddressv6(network):
+    return IPAddressV6(network=network.reference, address=IPv6Address("2001:db8::1"))
+
+
+@pytest.fixture
 def hostname(network):
     return Hostname(name="example.com", network=network.reference)
+
+
+@pytest.fixture
+def service():
+    return Service(name="domain")
+
+
+@pytest.fixture
+def software():
+    return Software(name="DICOM")
 
 
 @pytest.fixture

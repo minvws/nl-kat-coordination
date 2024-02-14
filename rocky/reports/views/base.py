@@ -79,12 +79,14 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 class BaseReportView(OOIFilterView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.selected_oois = request.GET.getlist("ooi", [])
+        self.selected_oois = list(set(request.GET.getlist("ooi", [])))
         self.selected_report_types = request.GET.getlist("report_type", [])
 
         self.report_types = self.get_report_types_from_choice()
         report_ids = [report.id for report in self.report_types]
-        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(report_ids))
+        self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
+            get_plugins_for_report_ids(report_ids)
+        )
 
     def get_oois(self) -> List[OOI]:
         if "all" in self.selected_oois:
@@ -125,11 +127,16 @@ class BaseReportView(OOIFilterView):
             report_types[option] = self.get_report_types_for_generate_report(reports)
         return report_types
 
-    def get_required_optional_plugins(self, plugin_ids: Dict[str, Set[str]]) -> Dict[str, Plugin]:
+    def get_required_optional_plugins(self, plugin_ids: Dict[str, Set[str]]) -> (Dict[str, Plugin], Dict[str, bool]):
         plugins = {}
         for plugin, plugin_ids in plugin_ids.items():
             plugins[plugin] = [get_katalogus(self.organization.code).get_plugin(plugin_id) for plugin_id in plugin_ids]
-        return plugins
+
+        all_plugins_enabled = {
+            plugin_type: all(plugin.enabled for plugin in plugin_list) for plugin_type, plugin_list in plugins.items()
+        }
+
+        return plugins, all_plugins_enabled
 
     def are_plugins_enabled(self, plugins_dict: Dict[str, Plugin]) -> bool:
         for k, plugins in plugins_dict.items():
