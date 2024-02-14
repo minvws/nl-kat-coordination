@@ -21,7 +21,7 @@ repos:
     exclude: |
       (?x)(
       \.svcg$ |
-      ^boefjes/tests/examples/rdns-nxdomain.txt$
+      ^boefjes/tests/examples/rdns-nxdomain.txt$ |
       ^boefjes/tests/examples/raw/.*
       )
 
