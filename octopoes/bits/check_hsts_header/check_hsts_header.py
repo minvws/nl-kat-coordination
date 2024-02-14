@@ -16,13 +16,13 @@ def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) ->
     max_age = int(config.get("max-age", one_year)) if config else one_year
     findings: [str] = []
 
-    if "includeSubDomains" not in header.value:
+    if "includeSubDomains" not in header.value.lower():
         findings.append("The HSTS should include subdomains.")
 
-    if "max-age" not in header.value:
+    if "max-age" not in header.value.lower():
         findings.append("The cache validity period of the HSTS should be defined and should be at least 1 year.")
 
-    if "max-age" in header.value and int(header.value.split("=")[1].split(";")[0]) < max_age:
+    if "max-age" in header.value.lower() and int(header.value.split("=")[1].split(";")[0]) < max_age:
         findings.append(f"The cache validity period of the HSTS should be at least be {max_age} seconds.")
 
     if findings:
