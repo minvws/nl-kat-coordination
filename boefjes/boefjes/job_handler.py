@@ -212,8 +212,9 @@ class NormalizerHandler(Handler):
             logger.info("Obtained results %s", str(results))
 
             for observation in results.observations:
-                for result in observation.results:
-                    if self._parse_ooi(result).primary_key == observation.input_ooi:
+                parsed_oois = [self._parse_ooi(result) for result in observation.results]
+                for parsed_ooi in parsed_oois:
+                    if parsed_ooi.primary_key == observation.input_ooi:
                         logger.warning(
                             'Normalizer "%s" returned input [%s]', normalizer_meta.normalizer.id, observation.input_ooi
                         )
@@ -225,9 +226,7 @@ class NormalizerHandler(Handler):
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                         result=[
-                            self._parse_ooi(result)
-                            for result in observation.results
-                            if self._parse_ooi(result).primary_key != observation.input_ooi
+                            parsed_ooi for parsed_ooi in parsed_oois if parsed_ooi.primary_key != observation.input_ooi
                         ],
                     )
                 )
