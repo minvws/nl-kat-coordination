@@ -88,7 +88,7 @@ class OctopoesAPIConnector:
     def health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self.session.get(f"/{self.client}/health").content)
 
-    def list(
+    def list_objects(
         self,
         types: Set[Type[OOI]],
         valid_time: Optional[datetime] = None,
