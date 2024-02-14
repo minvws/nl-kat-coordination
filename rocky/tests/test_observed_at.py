@@ -70,7 +70,10 @@ def test_observed_at_future_date(rf, client_member, mock_organization_view_octop
     _ = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     messages = list(request._messages)
-    assert messages[0].message == "The selected date is in the future."
+    assert (
+        messages[0].message == "The selected date is in the future. The items below are all items "
+        "in the database across all existing dates."
+    )
 
     form = ObservedAtForm(data=request.GET)
     assert not form.is_valid()
