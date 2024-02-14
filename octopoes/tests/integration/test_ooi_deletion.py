@@ -160,16 +160,16 @@ def test_events_deletion_after_bits(xtdb_octopoes_service: OctopoesService, even
     xtdb_octopoes_service.ooi_repository.save(hostname, valid_time)
     print(1)
     print(f"PROCESSED {event_manager.complete_process_events(xtdb_octopoes_service)}")
-    printer("OOIS", xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).items)
-    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list(valid_time))
+    printer("OOIS", xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).items)
+    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list_origins(valid_time))
     printer("EVENTS", event_manager.queue)
 
     xtdb_octopoes_service.recalculate_bits()
 
     print(2)
     print(f"PROCESSED {event_manager.complete_process_events(xtdb_octopoes_service)}")
-    printer("OOIS", xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).items)
-    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list(valid_time))
+    printer("OOIS", xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).items)
+    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list_origins(valid_time))
     printer("EVENTS", event_manager.queue)
 
     xtdb_octopoes_service.ooi_repository.delete(network.reference, valid_time)
@@ -177,8 +177,8 @@ def test_events_deletion_after_bits(xtdb_octopoes_service: OctopoesService, even
 
     print(3)
     print(f"PROCESSED {event_manager.complete_process_events(xtdb_octopoes_service)}")
-    printer("OOIS", xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).items)
-    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list(valid_time))
+    printer("OOIS", xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).items)
+    printer("ORIGINS", xtdb_octopoes_service.origin_repository.list_origins(valid_time))
     printer("EVENTS", event_manager.queue)
 
     print(f"TOTAL PROCESSED {event_manager.processed}")
@@ -232,7 +232,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) == 0
-    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 6
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 6
 
     nxd = NXDOMAIN(hostname=hostname.reference)
     xtdb_octopoes_service.ooi_repository.save(nxd, valid_time)
@@ -253,7 +253,7 @@ def test_deletion_events_after_nxdomain(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
-    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 4
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 4
 
 
 @pytest.mark.xfail(reason="Wappalyzer works on wrong input objects (to be addressed)")
@@ -331,7 +331,7 @@ def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) == 0
-    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 16
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 16
 
     nxd = NXDOMAIN(hostname=hostname.reference)
     xtdb_octopoes_service.ooi_repository.save(nxd, valid_time)
@@ -352,7 +352,7 @@ def test_deletion_events_after_nxdomain_with_wappalyzer_findings_included(
     event_manager.complete_process_events(xtdb_octopoes_service)
 
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) >= 3
-    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 4
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 4
 
 
 def test_easy_chain_deletion(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):
@@ -394,12 +394,12 @@ def test_easy_chain_deletion(xtdb_octopoes_service: OctopoesService, event_manag
     xtdb_octopoes_service.ooi_repository.save(instance, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    count = xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count
+    count = xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count
 
     xtdb_octopoes_service.ooi_repository.delete(ip[0].reference, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count < count
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count < count
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) > 0
 
 
@@ -427,5 +427,5 @@ def test_basic_chain_deletion(xtdb_octopoes_service: OctopoesService, event_mana
     xtdb_octopoes_service.ooi_repository.delete(software1.reference, valid_time)
     event_manager.complete_process_events(xtdb_octopoes_service)
 
-    assert xtdb_octopoes_service.ooi_repository.list({OOI}, valid_time).count == 0
+    assert xtdb_octopoes_service.ooi_repository.list_oois({OOI}, valid_time).count == 0
     assert len(list(filter(lambda x: x.operation_type.value == "delete", event_manager.queue))) > 0
