@@ -250,7 +250,7 @@ def list_origins(
     task_id: Optional[uuid.UUID] = Query(None),
     origin_type: Optional[OriginType] = Query(None),
 ) -> List[Origin]:
-    return octopoes.origin_repository.list(
+    return octopoes.origin_repository.list_origins(
         valid_time,
         task_id=task_id,
         source=source,
@@ -323,7 +323,7 @@ def list_scan_profiles(
     valid_time: datetime = Depends(extract_valid_time),
     scan_profile_type: Optional[str] = Query(None),
 ) -> List[ScanProfileBase]:
-    return octopoes.scan_profile_repository.list(scan_profile_type, valid_time)
+    return octopoes.scan_profile_repository.list_scan_profiles(scan_profile_type, valid_time)
 
 
 @router.put("/scan_profiles", tags=["Scan Profiles"])
