@@ -49,7 +49,11 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
         as_name = event["network"]["organization_name"]
 
         if as_number:
-            as_ooi = AutonomousSystem(number=str(as_number), name=as_name) if as_name else AutonomousSystem(number=str(as_number))
+            as_ooi = (
+                AutonomousSystem(number=str(as_number), name=as_name)
+                if as_name
+                else AutonomousSystem(number=str(as_number))
+            )
             yield as_ooi
 
         if ip:
