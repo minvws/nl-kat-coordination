@@ -23,7 +23,7 @@ For a local set up, you need to start the Django app and compile the frontend.
 
 #### Django App
 
-This requires a working python (>3.10) environment.
+This requires a working Python (>3.10) environment.
 One example of how to create, activate and initialize a development environment is:
 ```bash
 $ python3 -m venv $PWD/.venv
@@ -104,7 +104,7 @@ $ make utest
 ```
 
 #### Tip
-A local python environment is useful for unit testing even when using Docker.
+A local Python environment is useful for unit testing even when using Docker.
 Follow the first instructions in the local setup to create a Python environment.
 Then create a `rocky/.env` from the template `rocky/.env-dist` and set `ROCKY_DB_HOST=localhost`.
 Now for the unit tests you should be able to just run

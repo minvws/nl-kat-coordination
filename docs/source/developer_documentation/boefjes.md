@@ -286,5 +286,5 @@ $ make itest
 
 To lint the code using pre-commit, run:
 ```shell
-$ pre-commit run --all
+$ pre-commit run --all-files
 ```

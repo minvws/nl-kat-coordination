@@ -56,7 +56,7 @@ The existing boefjes can be viewed via the KATalog in OpenKAT and are on `GitHUB
 Object-types, classes and objects.
 ----------------------------------
 
-When we talk about object-types, we mean things like IPAddressV4. These have corresponding python classes that are all derived from the OOI base class.  These classes are defined in the Octopoes models directory.
+When we talk about object-types, we mean things like IPAddressV4. These have corresponding Python classes that are all derived from the OOI base class.  These classes are defined in the Octopoes models directory.
 
 They are used everywhere, both in code and as strings in json definition files.
 
