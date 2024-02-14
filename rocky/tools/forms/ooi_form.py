@@ -104,7 +104,7 @@ def generate_select_ooi_field(
     if initial:
         select_options.append((initial, initial))
 
-    oois = api_connector.list({related_ooi_type}).items
+    oois = api_connector.list_objects({related_ooi_type}).items
     select_options.extend([(ooi.primary_key, ooi.primary_key) for ooi in oois])
 
     if is_multiselect:
