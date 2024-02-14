@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-12 12:04+0000\n"
+"POT-Creation-Date: 2024-02-14 10:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6336,7 +6336,9 @@ msgid "Indemnification successfully set."
 msgstr ""
 
 #: rocky/views/mixins.py
-msgid "The selected date is in the future."
+msgid ""
+"The selected date is in the future. The items below are all items in the "
+"database across all existing dates."
 msgstr ""
 
 #: rocky/views/mixins.py
