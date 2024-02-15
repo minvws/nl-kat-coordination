@@ -491,8 +491,7 @@ referencing==0.33.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:39240f2ecc770258f28b642dd47fd74bc8b02484de54e1882b74b35ebd779bd5 \
     --hash=sha256:c775fedf74bc0f9189c2a3be1c12fd03e8c23f4d371dce795df44e06c5b412f7
 requests-file==2.0.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:20c5931629c558fda566cacc10cfe2cd502433e628f568c34c80d96a0cc95972 \
-    --hash=sha256:3e493d390adb44aa102ebea827a48717336d5268968c370eaf19abaf5cae13bf
+    --hash=sha256:20c5931629c558fda566cacc10cfe2cd502433e628f568c34c80d96a0cc95972
 requests==2.31.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f \
     --hash=sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1
