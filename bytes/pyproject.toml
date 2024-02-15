@@ -55,6 +55,7 @@ opentelemetry-instrumentation-requests = "^0.41b0"
 opentelemetry-instrumentation = "^0.41b0"
 opentelemetry-instrumentation-dbapi = "^0.41b0"
 pydantic-settings = "^2.0.3"
+python-multipart = "^0.0.9"
 
 [tool.poetry.group.dev.dependencies]
 iniconfig = "^2.0.0"
