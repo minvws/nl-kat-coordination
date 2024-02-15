@@ -57,6 +57,7 @@ opentelemetry-instrumentation = "^0.41b0"
 opentelemetry-instrumentation-fastapi = "^0.41b0"
 granian = "^1.0.2"
 pydantic-settings = "^2.0.3"
+pyparsing = "^3.1.1"
 
 
 [tool.poetry.group.dev.dependencies]
