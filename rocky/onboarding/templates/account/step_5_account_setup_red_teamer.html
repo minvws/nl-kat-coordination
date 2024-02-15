@@ -23,10 +23,10 @@
                     <button type="submit">{% translate "Submit" %}</button>
                 </form>
                 <div class="button-container">
-                    <a href="{% url "step_account_setup_admin" organization.code %}"
-                       class="button ghost">{% translate "Go back to previous step" %}</a>
                     <a href="{% url "step_account_setup_client" organization.code %}"
                        class="button ">{% translate "Skip this step" %}</a>
+                    <a href="{% url "step_account_setup_admin" organization.code %}"
+                       class="button ghost">{% translate "Go back to previous step" %}</a>
                 </div>
             </div>
         </section>
