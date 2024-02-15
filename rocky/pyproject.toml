@@ -6,7 +6,7 @@ authors = ["MinVWS <maintainer@openkat.nl>"]
 license = "EUPL"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.10"
 ares = "^0.7.1"
 asgiref = "^3.6.0"
 beautifulsoup4 = "^4.11.2"
@@ -110,5 +110,5 @@ blank_line_after_tag = "load,extends,include"
 ignore = "H006,H016,H017,H030,H031"
 
 [tool.black]
-target-version = ["py38", "py39", "py310", "py311"]
+target-version = ["py310", "py311"]
 line-length = 120

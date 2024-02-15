@@ -24,14 +24,14 @@ def test_ooi_list(rf, client_member, mock_organization_view_octopoes):
 
     setup_request(request, client_member.user)
 
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
     )
 
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().list.call_count == 2
+    assert mock_organization_view_octopoes().list_objects.call_count == 2
     assertContains(response, "testnetwork")
 
 
@@ -48,21 +48,21 @@ def test_ooi_list_with_clearance_type_filter_and_clearance_level_filter(
 
     setup_request(request, client_member.user)
 
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
     )
 
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().list.call_count == 2
+    assert mock_organization_view_octopoes().list_objects.call_count == 2
 
-    list_call_0 = mock_organization_view_octopoes().list.call_args_list[0]
+    list_call_0 = mock_organization_view_octopoes().list_objects.call_args_list[0]
     assert list_call_0.kwargs["limit"] == 0
     assert list_call_0.kwargs["scan_level"] == {ScanLevel.L0, ScanLevel.L1}
     assert list_call_0.kwargs["scan_profile_type"] == {ScanProfileType.DECLARED, ScanProfileType.INHERITED}
 
-    list_call_1 = mock_organization_view_octopoes().list.call_args_list[1]
+    list_call_1 = mock_organization_view_octopoes().list_objects.call_args_list[1]
     assert list_call_1.kwargs["limit"] == 150
     assert list_call_1.kwargs["offset"] == 0
     assert list_call_1.kwargs["scan_level"] == {ScanLevel.L0, ScanLevel.L1}
@@ -91,7 +91,7 @@ def test_ooi_list_delete_multiple(rf, client_member, mock_organization_view_octo
     response = OOIListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
-    assert mock_organization_view_octopoes().list.call_count == 2
+    assert mock_organization_view_octopoes().list_objects.call_count == 2
     assert mock_organization_view_octopoes().delete_many.call_count == 1
 
 
@@ -389,7 +389,7 @@ def test_ooi_list_export_json(rf, client_member, mock_organization_view_octopoes
 
     setup_request(request, client_member.user)
 
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
     )
 
@@ -397,7 +397,7 @@ def test_ooi_list_export_json(rf, client_member, mock_organization_view_octopoes
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "application/json"
-    assert mock_organization_view_octopoes().list.call_count == 1
+    assert mock_organization_view_octopoes().list_objects.call_count == 1
 
     exported_objects = json.loads(response.content.decode())
     assert len(exported_objects) == 151
@@ -416,7 +416,7 @@ def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes)
 
     setup_request(request, client_member.user)
 
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
     )
 
@@ -424,7 +424,7 @@ def test_ooi_list_export_csv(rf, client_member, mock_organization_view_octopoes)
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "text/csv"
-    assert mock_organization_view_octopoes().list.call_count == 1
+    assert mock_organization_view_octopoes().list_objects.call_count == 1
 
     exported_objects = list(csv.DictReader(io.StringIO(response.content.decode()), delimiter=",", quotechar='"'))
 
@@ -443,7 +443,7 @@ def test_ooi_list_filtered_export_csv(rf, client_member, mock_organization_view_
 
     setup_request(request, client_member.user)
 
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
     )
 
@@ -451,9 +451,9 @@ def test_ooi_list_filtered_export_csv(rf, client_member, mock_organization_view_
 
     assert response.status_code == 200
     assert response.headers["Content-Type"] == "text/csv"
-    assert mock_organization_view_octopoes().list.call_count == 1
+    assert mock_organization_view_octopoes().list_objects.call_count == 1
 
-    mock_calls = mock_organization_view_octopoes().list.mock_calls
+    mock_calls = mock_organization_view_octopoes().list_objects.mock_calls
     assert list(mock_calls[0].kwargs["scan_level"])[0].value == 3
     assert mock_calls[0].args[0].pop() == Network
     assert list(mock_calls[0].kwargs["scan_profile_type"])[0].value == "inherited"
@@ -462,7 +462,7 @@ def test_ooi_list_filtered_export_csv(rf, client_member, mock_organization_view_
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])
 def test_delete_perms_object_list(request, member, rf, mock_organization_view_octopoes):
     member = request.getfixturevalue(member)
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
     )
 
@@ -480,7 +480,7 @@ def test_delete_perms_object_list(request, member, rf, mock_organization_view_oc
 
 
 def test_delete_perms_object_list_clients(rf, client_member, mock_organization_view_octopoes):
-    mock_organization_view_octopoes().list.return_value = Paginated[OOIType](
+    mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=200, items=[Network(name="testnetwork")] * 150
     )
 
