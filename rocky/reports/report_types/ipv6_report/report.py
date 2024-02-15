@@ -48,6 +48,8 @@ class IPv6Report(Report):
 
         results = {}
         for hostname in hostnames:
+            if ooi.reference.class_type == IPAddressV6:
+                return {hostname.name: {"enabled": True} for hostname in hostnames}
             path = Path.parse("Hostname.<hostname [is ResolvedHostname].address")
             ips = self.octopoes_api_connector.query(path=path, source=hostname.reference, valid_time=valid_time)
 
