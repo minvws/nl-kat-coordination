@@ -3,7 +3,7 @@
 {% translate props.ooi_type as display_type %}
 <div class="horizontal-view toolbar">
     <a href="{% url 'generate_report_setup_scan' organization.code %}?ooi={{ ooi_id }}&report_type=findings-report"
-       class="button">{% translate "Generate report" %}</a>
+       class="button">{% translate "Generate findings report" %}</a>
     {% if not ooi_past_due %}
         {% if ooi|is_finding and perms.tools.can_mute_findings %}
             <a href="{% ooi_url 'finding_mute' ooi_id organization.code %}"

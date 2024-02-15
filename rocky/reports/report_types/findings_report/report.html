@@ -7,52 +7,50 @@
         {% for info in data.finding_types %}
             <h3>{{ info.finding_type }}</h3>
             <h4>{% translate "Findings information" %}</h4>
-            <table>
-                <dl>
-                    <div>
-                        <dt>{% translate "Type" %}</dt>
-                        <dd>
-                            {{ info.finding_type.ooi_type }}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>{% translate "Finding" %}</dt>
-                        <dd>
-                            {{ info.finding_type.id }}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>{% translate "Risk level" %}</dt>
-                        <dd>
-                            {{ info.finding_type.risk_score }} / 10
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>{% translate "Risk severity" %}</dt>
-                        <dd>
-                            {{ info.finding_type.risk_severity }}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>{% translate "Impact" %}</dt>
-                        <dd>
-                            {{ info.finding_type.impact }}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>{% translate "Description" %}</dt>
-                        <dd>
-                            {{ info.finding_type.description }}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt>{% translate "Recommendation" %}</dt>
-                        <dd>
-                            {{ info.finding_type.recommendation }}
-                        </dd>
-                    </div>
-                </dl>
-            </table>
+            <dl>
+                <div>
+                    <dt>{% translate "Type" %}</dt>
+                    <dd>
+                        {{ info.finding_type.ooi_type }}
+                    </dd>
+                </div>
+                <div>
+                    <dt>{% translate "Finding" %}</dt>
+                    <dd>
+                        {{ info.finding_type.id }}
+                    </dd>
+                </div>
+                <div>
+                    <dt>{% translate "Risk level" %}</dt>
+                    <dd>
+                        {{ info.finding_type.risk_score }} / 10
+                    </dd>
+                </div>
+                <div>
+                    <dt>{% translate "Risk severity" %}</dt>
+                    <dd>
+                        {{ info.finding_type.risk_severity }}
+                    </dd>
+                </div>
+                <div>
+                    <dt>{% translate "Impact" %}</dt>
+                    <dd>
+                        {{ info.finding_type.impact }}
+                    </dd>
+                </div>
+                <div>
+                    <dt>{% translate "Description" %}</dt>
+                    <dd>
+                        {{ info.finding_type.description }}
+                    </dd>
+                </div>
+                <div>
+                    <dt>{% translate "Recommendation" %}</dt>
+                    <dd>
+                        {{ info.finding_type.recommendation }}
+                    </dd>
+                </div>
+            </dl>
             <h4>{% translate "Occurrences" %}</h4>
             {% for occurrence in info.occurrences %}
                 <div>
