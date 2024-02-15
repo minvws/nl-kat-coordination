@@ -291,7 +291,7 @@ class OctopoesAPIConnector:
         sources: List[OOI | Reference | str] = None,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
-    ) -> dict[str, List[OOI]]:
+    ) -> List[tuple[str, OOIType]]:
         params = {
             "path": path,
             "sources": [str(ooi) for ooi in sources],
@@ -302,4 +302,4 @@ class OctopoesAPIConnector:
 
         result = self.session.get(f"/{self.client}/query-many", params=params).json()
 
-        return TypeAdapter(dict[str, List[OOIType]]).validate_python(result)
+        return TypeAdapter(list[tuple[str, OOIType]]).validate_python(result)

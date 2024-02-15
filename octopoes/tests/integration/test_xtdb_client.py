@@ -14,7 +14,7 @@ from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
-from octopoes.xtdb.query import Query
+from octopoes.xtdb.query import A, Query
 from tests.conftest import seed_system
 
 logger = logging.getLogger(__name__)
@@ -173,6 +173,31 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
     query = Query(Network).where_in(Network, primary_key=["Network|testnetwork", "Network|testnetwork2"])
     result = xtdb_session.client.query(query)
     assert len(result) == 2
+
+    pk = A(Network, field="primary_key")
+    query = (
+        Query(Network)
+        .find(pk)
+        .pull(Network)
+        .where(Network, primary_key=pk)
+        .where_in(Network, primary_key=["Network|testnetwork", "Network|testnetwork2"])
+    )
+    result = xtdb_session.client.query(query)
+    assert len(result) == 2
+
+    # router logic
+    object_path = Path.parse("Hostname.<hostname[is DNSNSRecord]")
+    sources = ["Network|testnetwork", "Network|testnetwork2"]
+    source_pk_alias = A(object_path.segments[0].source_type, field="primary_key")
+    query = (
+        Query.from_path(object_path)
+        .find(source_pk_alias)
+        .pull(object_path.segments[0].source_type)
+        .where(object_path.segments[0].source_type, primary_key=source_pk_alias)
+        .where_in(object_path.segments[0].source_type, primary_key=sources)
+    )
+
+    assert len(xtdb_session.client.query(query, valid_time)) == 0
 
 
 def test_entity_history(xtdb_session: XTDBSession, valid_time: datetime):

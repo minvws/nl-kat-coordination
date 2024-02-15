@@ -4,7 +4,7 @@ from uuid import UUID, uuid4
 
 from octopoes.models import OOI
 from octopoes.models.path import Direction, Path
-from octopoes.models.types import get_abstract_types, get_relations, to_concrete
+from octopoes.models.types import get_abstract_types, to_concrete
 
 
 class InvalidField(ValueError):
@@ -41,6 +41,7 @@ class Aliased:
     # The lambda makes it possible to mock the factory more easily, see:
     # https://stackoverflow.com/questions/61257658/python-dataclasses-mocking-the-default-factory-in-a-frozen-dataclass
     alias: UUID = field(default_factory=lambda: uuid4())
+    field: str | None = field(default=None)
 
 
 Ref = Union[Type[OOI], Aliased]
@@ -130,6 +131,11 @@ class Query:
 
         return self
 
+    def find(self, item: Ref) -> "Query":
+        self._find_clauses.append(self._get_object_alias(item))
+
+        return self
+
     def count(self, ooi_type: Ref) -> "Query":
         self._find_clauses.append(f"(count {self._get_object_alias(ooi_type)})")
 
@@ -183,9 +189,6 @@ class Query:
 
         if not isinstance(value, Aliased) and not issubclass(value, OOI):
             raise InvalidField(f"{value} is not an OOI")
-
-        if field_name not in get_relations(ooi_type):
-            raise InvalidField(f'"{field_name}" is not a relation of {ooi_type.get_object_type()}')
 
         self._add_where_statement(ref, field_name, self._get_object_alias(value))
 
@@ -295,7 +298,8 @@ class Query:
 
     def _get_object_alias(self, object_type: Ref) -> str:
         if isinstance(object_type, Aliased):
-            return "?" + str(object_type.alias)
+            base = "?" + str(object_type.alias)
+            return base if not object_type.field else base + "?" + object_type.field
 
         return object_type.get_object_type()
 

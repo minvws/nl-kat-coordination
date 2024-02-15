@@ -740,5 +740,23 @@ class XTDBOOIRepository(OOIRepository):
             items=self.query(finding_query, valid_time),
         )
 
-    def query(self, query: Union[str, Query], valid_time: datetime) -> List[OOI]:
-        return [self.deserialize(row[0]) for row in self.session.client.query(query, valid_time=valid_time)]
+    def query(self, query: Union[str, Query], valid_time: datetime) -> List[OOI | Tuple]:
+        results = self.session.client.query(query, valid_time=valid_time)
+
+        parsed_results = []
+        for result in results:
+            parsed_result = []
+
+            for item in result:
+                try:
+                    parsed_result.append(self.deserialize(item))
+                except ValueError:
+                    parsed_result.append(item)
+
+            if len(parsed_result) == 1:
+                parsed_results.append(parsed_result[0])
+                continue
+
+            parsed_results.append(tuple(parsed_result))
+
+        return parsed_results
