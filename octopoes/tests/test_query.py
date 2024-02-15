@@ -310,3 +310,11 @@ def test_build_system_query_with_path_segments(mocker):
 
     assert str(query) == str(path_query)
     assert query == path_query
+
+
+def test_build_parth_query_with_multiple_sources():
+    query = (
+        Query(Website)
+        .where_in(Website, primary_key=["test_pk", "second_test_pk"])
+    )
+    assert str(query) == "as"

@@ -79,6 +79,12 @@ class Query:
 
         return self
 
+    def where_in(self, ooi_type: Ref, **kwargs) -> "Query":
+        for field_name, values in kwargs.items():
+            self._where_field_in(ooi_type, field_name, values)
+
+        return self
+
     def format(self) -> str:
         return self._compile(separator="\n    ")
 
@@ -147,9 +153,11 @@ class Query:
 
         abstract_types = get_abstract_types()
 
+        if isinstance(value, str):
+            value = value.replace('"', r"\"")
+
         if ooi_type in abstract_types:
             if isinstance(value, str):
-                value = value.replace('"', r"\"")
                 self._add_or_statement(ref, field_name, f'"{value}"')
                 return
 
@@ -167,7 +175,51 @@ class Query:
                 return
 
         if isinstance(value, str):
-            value = value.replace('"', r"\"")
+            self._add_where_statement(ref, field_name, f'"{value}"')
+            return
+
+        if not isinstance(value, (type, Aliased)):
+            raise InvalidField(f"value '{value}' should be a string or an OOI Type")
+
+        if not isinstance(value, Aliased) and not issubclass(value, OOI):
+            raise InvalidField(f"{value} is not an OOI")
+
+        if field_name not in get_relations(ooi_type):
+            raise InvalidField(f'"{field_name}" is not a relation of {ooi_type.get_object_type()}')
+
+        self._add_where_statement(ref, field_name, self._get_object_alias(value))
+
+    def _where_field_in(self, ref: Ref, field_name: str, values: list[Ref | str | set[str]]) -> None:
+        ooi_type = ref.type if isinstance(ref, Aliased) else ref
+
+        if field_name not in ooi_type.model_fields:
+            raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
+
+        abstract_types = get_abstract_types()
+
+        for value in values:
+            if isinstance(value, str):
+                value = value.replace('"', r"\"")
+
+        if ooi_type in abstract_types:
+            if isinstance(value, str):
+                self._add_or_statement(ref, field_name, f'"{value}"')
+                return
+
+            if not isinstance(value, type):
+                raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
+
+            if issubclass(value, OOI):
+                self._add_or_statement(
+                    ref,
+                    field_name,
+                    self._get_object_alias(
+                        value,
+                    ),
+                )
+                return
+
+        if isinstance(value, str):
             self._add_where_statement(ref, field_name, f'"{value}"')
             return
 
