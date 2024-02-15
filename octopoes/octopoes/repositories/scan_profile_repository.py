@@ -35,7 +35,7 @@ class ScanProfileRepository(Repository):
     ) -> None:
         raise NotImplementedError
 
-    def list(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
+    def list_scan_profiles(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
         raise NotImplementedError
 
     def delete(self, scan_profile: ScanProfileBase, valid_time: datetime) -> None:
@@ -71,7 +71,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
     def deserialize(cls, data: Dict[str, Any]) -> ScanProfileBase:
         return parse_obj_as(ScanProfile, data)
 
-    def list(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
+    def list_scan_profiles(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
         where = {"type": self.object_type}
         if scan_profile_type is not None:
             where["scan_profile_type"] = scan_profile_type
