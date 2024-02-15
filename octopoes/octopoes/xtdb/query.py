@@ -79,6 +79,12 @@ class Query:
 
         return self
 
+    def where_in(self, ooi_type: Ref, **kwargs) -> "Query":
+        for field_name, values in kwargs.items():
+            self._where_field_in(ooi_type, field_name, values)
+
+        return self
+
     def format(self) -> str:
         return self._compile(separator="\n    ")
 
@@ -147,17 +153,19 @@ class Query:
 
         abstract_types = get_abstract_types()
 
+        if isinstance(value, str):
+            value = value.replace('"', r"\"")
+
         if ooi_type in abstract_types:
             if isinstance(value, str):
-                value = value.replace('"', r"\"")
-                self._add_or_statement(ref, field_name, f'"{value}"')
+                self._add_or_statement_for_abstract_types(ref, field_name, f'"{value}"')
                 return
 
             if not isinstance(value, type):
                 raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
 
             if issubclass(value, OOI):
-                self._add_or_statement(
+                self._add_or_statement_for_abstract_types(
                     ref,
                     field_name,
                     self._get_object_alias(
@@ -167,7 +175,6 @@ class Query:
                 return
 
         if isinstance(value, str):
-            value = value.replace('"', r"\"")
             self._add_where_statement(ref, field_name, f'"{value}"')
             return
 
@@ -182,6 +189,24 @@ class Query:
 
         self._add_where_statement(ref, field_name, self._get_object_alias(value))
 
+    def _where_field_in(self, ref: Ref, field_name: str, values: list[str]) -> None:
+        ooi_type = ref.type if isinstance(ref, Aliased) else ref
+
+        if field_name not in ooi_type.model_fields:
+            raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
+
+        new_values = []
+        for value in values:
+            if not isinstance(value, str):
+                raise InvalidField("Only strings allowed as values for a WHERE IN statement for now.")
+
+            value = value.replace('"', r"\"")
+            new_values.append(f'"{value}"')
+
+        self._where_clauses.append(
+            self._or_statement_for_multiple_values(self._get_object_alias(ref), ooi_type, field_name, new_values)
+        )
+
     def _add_where_statement(self, ref: Ref, field_name: str, to_alias: str) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
@@ -195,12 +220,12 @@ class Query:
             )
         )
 
-    def _add_or_statement(self, ref: Ref, field_name: str, to_alias: str) -> None:
+    def _add_or_statement_for_abstract_types(self, ref: Ref, field_name: str, to_alias: str) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         self._where_clauses.append(self._assert_type(ref, ooi_type))
         self._where_clauses.append(
-            self._or_statement(
+            self._or_statement_for_abstract_types(
                 self._get_object_alias(ref),
                 ooi_type.strict_subclasses(),
                 field_name,
@@ -208,10 +233,21 @@ class Query:
             )
         )
 
-    def _or_statement(self, from_alias: str, concrete_types: List[Type[OOI]], field_name: str, to_alias: str) -> str:
+    def _or_statement_for_abstract_types(
+        self, from_alias: str, concrete_types: List[Type[OOI]], field_name: str, to_alias: str
+    ) -> str:
         relationships = [
             self._relationship(from_alias, concrete_type.get_object_type(), field_name, to_alias)
             for concrete_type in concrete_types
+        ]
+
+        return f"(or {' '.join(relationships)} )"
+
+    def _or_statement_for_multiple_values(
+        self, from_alias: str, ooi_type: Type[OOI], field_name: str, to_aliases: list[str]
+    ) -> str:
+        relationships = [
+            self._relationship(from_alias, ooi_type.get_object_type(), field_name, to_alias) for to_alias in to_aliases
         ]
 
         return f"(or {' '.join(relationships)} )"
