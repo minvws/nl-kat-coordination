@@ -153,6 +153,37 @@ def query(
     return octopoes.ooi_repository.query(xtdb_query, valid_time)
 
 
+@router.get("/query-many", tags=["Objects"])
+def query_many(
+    path: str,
+    sources: list[Reference] = Query(None),
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+    offset: int = DEFAULT_OFFSET,
+    limit: int = DEFAULT_LIMIT,
+):
+    if not sources:
+        return {}
+
+    object_path = ObjectPath.parse(path)
+    if not object_path.segments:
+        raise HTTPException(status_code=400, detail="No path components provided.")
+
+    # TODO:
+    # We should still optimize this by combining the queries here
+
+    return {
+        source: octopoes.ooi_repository.query(
+            XTDBQuery.from_path(object_path)
+            .offset(offset)
+            .limit(limit)
+            .where(object_path.segments[0].source_type, primary_key=source),
+            valid_time,
+        )
+        for source in sources
+    }
+
+
 @router.post("/objects/load_bulk", tags=["Objects"])
 def load_objects_bulk(
     octopoes: OctopoesService = Depends(octopoes_service),

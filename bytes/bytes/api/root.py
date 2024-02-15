@@ -43,12 +43,12 @@ def validation_exception_handler(_: Request, exc: Union[RequestValidationError, 
 
 
 @router.get("/", include_in_schema=False)
-def health() -> RedirectResponse:
+def root() -> RedirectResponse:
     return RedirectResponse(url="/health")
 
 
 @router.get("/health", response_model=ServiceHealth)
-def root() -> ServiceHealth:
+def health() -> ServiceHealth:
     bytes_health = ServiceHealth(service="bytes", healthy=True, version=__version__)
     return bytes_health
 
