@@ -32,7 +32,7 @@ from tools.models import (
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
 from octopoes.models.ooi.service import Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.origin import Origin, OriginType
@@ -449,6 +449,11 @@ def ipaddressv4(network):
 @pytest.fixture
 def ipaddressv6(network):
     return IPAddressV6(network=network.reference, address=IPv6Address("2001:db8::1"))
+
+
+@pytest.fixture
+def ip_port(ipaddressv4):
+    return IPPort(address=ipaddressv4.reference, port=80, protocol=Protocol.TCP)
 
 
 @pytest.fixture
