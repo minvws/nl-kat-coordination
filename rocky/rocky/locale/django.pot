@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-06 14:00+0000\n"
+"POT-Creation-Date: 2024-02-15 09:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3880,7 +3880,6 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 #: reports/views/generate_report.py
-#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate report"
 msgstr ""
 
@@ -5700,6 +5699,10 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Use the button below to add a related object. "
+msgstr ""
+
+#: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate findings report"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
