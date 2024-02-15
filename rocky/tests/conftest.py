@@ -553,6 +553,44 @@ def finding_types():
 
 
 @pytest.fixture
+def cipher_finding_types():
+    return [
+        KATFindingType(
+            id="KAT-RECOMMENDATION-BAD-CIPHER",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=3.0,
+            risk_severity=RiskLevelSeverity.RECOMMENDATION,
+        ),
+        KATFindingType(
+            id="KAT-MEDIUM-BAD-CIPHER",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=6.0,
+            risk_severity=RiskLevelSeverity.MEDIUM,
+        ),
+        KATFindingType(
+            id="KAT-CRITICAL-BAD-CIPHER",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=10.0,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+    ]
+
+
+@pytest.fixture
+def cipher_finding_type():
+    return KATFindingType(
+        id="KAT-MEDIUM-BAD-CIPHER",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.0,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {
