@@ -553,6 +553,39 @@ def finding_types():
 
 
 @pytest.fixture
+def finding_type_kat_no_spf():
+    return KATFindingType(
+        id="KAT-NO-SPF",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dmarc():
+    return KATFindingType(
+        id="KAT-NO-DMARC",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dkim():
+    return KATFindingType(
+        id="KAT-NO-DKIM",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {
