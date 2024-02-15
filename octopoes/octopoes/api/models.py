@@ -73,7 +73,7 @@ class ValidatedDeclaration(BaseModel):
     ooi: OOIType
     valid_time: AwareDatetime
     method: Optional[str] = "manual"
-    task_id: Optional[uuid.UUID] = Field(default_factory=lambda: uuid.uuid4())
+    task_id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4)
 
 
 class ValidatedAffirmation(BaseModel):
