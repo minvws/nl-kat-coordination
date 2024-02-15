@@ -419,17 +419,6 @@ class OnboardingReportView(
         member.save()
 
 
-class DnsReportView(OrganizationPermissionRequiredMixin, OnboardingBreadcrumbsMixin, TemplateView):
-    template_name = "dns_report.html"
-    permission_required = "tools.can_scan_organization"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["findings_list"] = ""
-        context["tree"] = ""
-        return context
-
-
 class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):
     breadcrumbs = [
         {"url": reverse_lazy("step_introduction_registration"), "text": _("OpenKAT Setup")},
