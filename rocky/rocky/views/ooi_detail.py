@@ -172,12 +172,14 @@ class OOIDetailView(
         for inference_param in inference_params:
             inference_params_per_inference[inference_param.origin_id].append(inference_param)
 
+        inference_origin_params: list[tuple] = []
         for inference in inferences:
-            inference.params = inference_params_per_inference.get(inference.origin.id, [])
+            inference_origin_params.append((inference, inference_params_per_inference[inference.origin.id]))
 
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
+        context["inference_origin_params"] = inference_origin_params
         context["member"] = self.organization_member
 
         # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145

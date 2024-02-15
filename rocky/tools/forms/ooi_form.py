@@ -1,7 +1,7 @@
 from enum import Enum
 from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
-from typing import Literal, Union, cast, get_args, get_origin
+from typing import Literal, Union, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -36,7 +36,7 @@ class OOIForm(BaseRockyForm):
 
     def generate_form_fields(
         self,
-        hidden_ooi_fields: dict[str, str] = None,
+        hidden_ooi_fields: dict[str, str] | None = None,
     ) -> dict[str, forms.fields.Field]:
         fields = {}
         for name, field in self.ooi_class.model_fields.items():
@@ -68,7 +68,7 @@ class OOIForm(BaseRockyForm):
             elif annotation == int or (hasattr(annotation, "__args__") and int in annotation.__args__):
                 fields[name] = forms.IntegerField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, Enum):
-                fields[name] = generate_select_ooi_type(name, cast(Enum, annotation), field)
+                fields[name] = generate_select_ooi_type(name, annotation, field)
             elif self.ooi_class == Question and issubclass(annotation, str) and name == "json_schema":
                 fields[name] = forms.CharField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, str) or optional_type is str:
@@ -115,7 +115,7 @@ def generate_select_ooi_field(
     return forms.CharField(widget=forms.Select(choices=select_options), **default_attrs)
 
 
-def generate_select_ooi_type(name: str, enumeration: Enum, field: FieldInfo) -> forms.fields.Field:
+def generate_select_ooi_type(name: str, enumeration: type[Enum], field: FieldInfo) -> forms.fields.Field:
     """OOI Type (enum) fields will have a select input"""
     default_attrs = default_field_options(name, field)
     choices = [(entry.value, entry.name) for entry in list(enumeration)]

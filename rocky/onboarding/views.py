@@ -58,6 +58,8 @@ User = get_user_model()
 
 
 class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
+    organization: Organization
+
     def build_breadcrumbs(self):
         return [
             {
@@ -603,7 +605,7 @@ class OnboardingAccountSetupIntroView(
 
 
 class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, FormView):
-    account_type = None
+    account_type: str | None = None
     permission_required = "tools.add_organizationmember"
 
     def get_form_kwargs(self):

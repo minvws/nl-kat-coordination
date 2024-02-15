@@ -640,15 +640,15 @@ def get_stub_path(file_name: str) -> Path:
     return Path(__file__).parent / "stubs" / file_name
 
 
-def get_boefjes_data() -> dict:
+def get_boefjes_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
-def get_normalizers_data() -> dict:
+def get_normalizers_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
 
 
-def get_plugins_data() -> dict:
+def get_plugins_data() -> list[dict]:
     return get_boefjes_data() + get_normalizers_data()
 
 

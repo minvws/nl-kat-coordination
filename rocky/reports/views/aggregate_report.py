@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 
 from django.conf import settings
@@ -11,6 +12,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
     get_plugins_for_report_ids,
@@ -145,6 +147,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     template_name = "aggregate_report.html"
     current_step = 6
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+    report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":

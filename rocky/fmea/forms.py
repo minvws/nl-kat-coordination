@@ -72,7 +72,7 @@ class FailureModeForm(forms.ModelForm):
                     "aria-describedby": _("explanation-detectability_level"),
                 },
             ),
-            "effect": CheckboxGroup(toggle_all_button=False),
+            "effect": CheckboxGroup(),
             "risk_class": forms.Textarea(attrs={"rows": 1, "readonly": ""}),
         }
 

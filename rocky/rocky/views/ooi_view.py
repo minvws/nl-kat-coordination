@@ -1,7 +1,7 @@
 from time import sleep
 from typing import Any
 
-from django import http
+from django import forms, http
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -120,6 +120,7 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
         return context
 
     def build_breadcrumbs(self) -> list[Breadcrumb]:
+        start: Breadcrumb
         if isinstance(self.ooi, Finding):
             start = {
                 "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
@@ -140,8 +141,8 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
 
 
 class BaseOOIFormView(SingleOOIMixin, FormView):
-    ooi_class: type[OOI] = None
-    form_class = OOIForm
+    ooi_class: type[OOI]
+    form_class: forms.Form = OOIForm
 
     def get_ooi_class(self):
         return self.ooi.__class__ if hasattr(self, "ooi") else None

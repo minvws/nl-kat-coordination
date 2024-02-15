@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Iterable
 from typing import Any
 
 from django.urls.base import reverse_lazy
@@ -27,7 +28,7 @@ def sort_by_severity_desc(findings) -> list[dict[str, Any]]:
 
 def generate_findings_metadata(
     findings: FindingList,
-    severity_filter: list[RiskLevelSeverity] | None = None,
+    severity_filter: Iterable[RiskLevelSeverity] | None = None,
 ) -> list[dict[str, Any]]:
     findings_meta = []
 
