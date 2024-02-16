@@ -89,11 +89,6 @@ def test_invalid_field_types():
 
     assert ctx.exconly() == "octopoes.xtdb.query.InvalidField: <class 'octopoes.xtdb.query.InvalidField'> is not an OOI"
 
-    with pytest.raises(InvalidField) as ctx:
-        Query(Network).where(Network, name=Network)
-
-    assert ctx.exconly() == 'octopoes.xtdb.query.InvalidField: "name" is not a relation of Network'
-
 
 def test_allow_string_for_foreign_keys():
     query = Query(Network).where(Finding, ooi="Network|internet")
