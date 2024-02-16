@@ -221,7 +221,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
 
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
-        return self.octopoes_api_connector.list(self.plugin.consumes, limit=self.limit_ooi_list).items
+        return self.octopoes_api_connector.list_objects(self.plugin.consumes, limit=self.limit_ooi_list).items
 
     def get_form_filtered_consumable_oois(self):
         """Return a list of oois that is filtered for oois that meets clearance level."""

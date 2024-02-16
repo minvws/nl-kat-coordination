@@ -93,8 +93,9 @@ def build_playwright_command(webpage: str, browser: str, tmp_path: str) -> str:
     ]
 
 
-def run_playwright(webpage: str, browser: str, tmp_path: str = "/tmp/tmp") -> Tuple[bytes]:
+def run_playwright(webpage: str, browser: str) -> Tuple[bytes]:
     """Run Playwright in Docker."""
+    tmp_path = "/tmp/output"  # noqa: S108
     client = docker.from_env()
     client.images.pull(PLAYWRIGHT_IMAGE)
     # https://playwright.dev/docs/docker#crawling-and-scraping

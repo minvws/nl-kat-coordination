@@ -75,7 +75,7 @@ def cache_out_of_date() -> bool:
 
 def refresh_rpki(algo: str) -> Tuple[Dict, Dict]:
     source_url = getenv("RPKI_SOURCE_URL", RPKI_SOURCE_URL)
-    response = requests.get(source_url, allow_redirects=True)
+    response = requests.get(source_url, allow_redirects=True, timeout=30)
     response.raise_for_status()
     with tempfile.NamedTemporaryFile(mode="wb", dir=RPKI_PATH.parent, delete=False) as temp_rpki_file:
         temp_rpki_file.write(response.content)

@@ -106,7 +106,7 @@ def generate_report(
     logger.info("Glossary loaded. [report_id=%s] [glossary=%s]", report_id, glossary)
 
     # init jinja2 template
-    env = Environment(
+    env = Environment(  # noqa: S701
         loader=FileSystemLoader(settings.templates_folder),
         variable_start_string="@@{",
         variable_end_string="}@@",

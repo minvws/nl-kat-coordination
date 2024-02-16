@@ -45,7 +45,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
 
 def check_with_header(url_input: str, header_name: str, payload: str, timeout: int) -> Optional[str]:
     try:
-        response = requests.get(url_input, headers={header_name: payload}, verify=False, timeout=timeout)
+        response = requests.get(url_input, headers={header_name: payload}, verify=False, timeout=timeout)  # noqa: S501
 
         return b64encode(response.content).decode()
     except requests.exceptions.ConnectionError as e:
@@ -54,7 +54,7 @@ def check_with_header(url_input: str, header_name: str, payload: str, timeout: i
 
 def check(url_input: str, payload: str, timeout: int) -> Optional[str]:
     try:
-        response = requests.get(f"{url_input}{payload}", verify=False, timeout=timeout)
+        response = requests.get(f"{url_input}{payload}", verify=False, timeout=timeout)  # noqa: S501
 
         return b64encode(response.content).decode()
     except requests.exceptions.ConnectionError as e:

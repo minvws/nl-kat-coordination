@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-06 07:57+0000\n"
+"POT-Creation-Date: 2024-02-13 14:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -391,12 +391,12 @@ msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Back"
+msgid "Send"
 msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Send"
+msgid "Back"
 msgstr ""
 
 #: account/templates/password_reset_confirm.html
@@ -470,11 +470,11 @@ msgid "Please contact the system administrator."
 msgstr ""
 
 #: account/templates/recover_email.html
-msgid "Back to Home"
+msgid "Back to login"
 msgstr ""
 
 #: account/templates/recover_email.html
-msgid "Back to login"
+msgid "Back to Home"
 msgstr ""
 
 #: account/templates/registration_email.html
@@ -1640,11 +1640,11 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting\n"
+"                  Add setting and enable boefje\n"
 "                "
 msgid_plural ""
 "\n"
-"                  Add settings\n"
+"                  Add settings and enable boefje\n"
 "                "
 msgstr[0] ""
 msgstr[1] ""
@@ -1652,12 +1652,12 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting and enable boefje\n"
-"                "
+"                Add setting\n"
+"              "
 msgid_plural ""
 "\n"
-"                  Add settings and enable boefje\n"
-"                "
+"                Add settings\n"
+"              "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2038,13 +2038,13 @@ msgstr ""
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Go back to previous step"
+msgid "Skip this step"
 msgstr ""
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Skip this step"
+#: onboarding/templates/account/step_6_account_setup_client.html
+msgid "Go back to previous step"
 msgstr ""
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
@@ -2709,6 +2709,10 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_summary.html
 msgid "Selected objects"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Currently filtered on"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -3781,16 +3785,37 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+msgid "explanation select all"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Explanation 'Continue with all OOIs'"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#, python-format
+msgid ""
+"This option will select all OOIs (+ current filters) for %(organization)s "
+"organization."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with all OOIs"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 msgid "Objects:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html
 msgid "Clearance type"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Setup report"
+#: reports/templates/partials/report_types_selection.html
+msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3882,6 +3907,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
+msgid "You have selected all objects in previous step."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
 msgstr ""
 
@@ -3891,10 +3920,6 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
-msgstr ""
-
-#: reports/templates/partials/report_types_selection.html
-msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
@@ -6077,12 +6102,12 @@ msgid "You don't have any backup codes yet."
 msgstr ""
 
 #: rocky/templates/two_factor/core/backup_tokens.html
-#: rocky/templates/two_factor/core/setup_complete.html
-msgid "Back to Account Security"
+msgid "Generate Tokens"
 msgstr ""
 
 #: rocky/templates/two_factor/core/backup_tokens.html
-msgid "Generate Tokens"
+#: rocky/templates/two_factor/core/setup_complete.html
+msgid "Back to Account Security"
 msgstr ""
 
 #: rocky/templates/two_factor/core/login.html

@@ -1,7 +1,7 @@
 import logging
 import typing
 from functools import wraps
-from typing import Any, Callable, Dict, Set, Union
+from typing import Any, Callable, Dict, FrozenSet, Union
 from uuid import UUID
 
 import requests
@@ -38,7 +38,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
             return function(self, *args, **kwargs)
         except HTTPError as error:
             if error.response.status_code != 401:
-                raise error from HTTPError
+                raise
 
             self.login()
             return function(self, *args, **kwargs)
@@ -67,8 +67,11 @@ class BytesAPIClient:
     def _verify_response(response: requests.Response) -> None:
         try:
             response.raise_for_status()
-        except HTTPError:
-            logger.error(response.text)
+        except HTTPError as error:
+            if error.response.status_code != 401:
+                logger.error(response.text)
+            else:
+                logger.debug(response.text)
             raise
 
     def _get_authentication_headers(self) -> Dict[str, str]:
@@ -103,7 +106,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Set[str] = frozenset()) -> UUID:
+    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: FrozenSet[str] = frozenset()) -> UUID:
         headers = {"content-type": "application/octet-stream"}
         headers.update(self.headers)
 

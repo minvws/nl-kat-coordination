@@ -32,7 +32,8 @@ def iana_service_table(search_query: str) -> List[_Service]:
 
     response = requests.get(
         "https://www.iana.org/assignments/service-names-port-numbers/"
-        "service-names-port-numbers.xhtml?search=" + search_query
+        "service-names-port-numbers.xhtml?search=" + search_query,
+        timeout=30,
     )
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -54,7 +55,7 @@ def iana_service_table(search_query: str) -> List[_Service]:
                     description,
                 )
                 services.append(service)
-        except Exception:
+        except Exception:  # noqa: S110
             # just ignore on parse errors
             pass
     return services
@@ -145,7 +146,7 @@ def _map_usage_value(value: str) -> bool:
 
 
 def wiki_port_tables() -> List[_PortInfo]:
-    response = requests.get("https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers")
+    response = requests.get("https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers", timeout=30)
     soup = BeautifulSoup(response.text, "html.parser")
 
     rows = []
@@ -165,7 +166,7 @@ def wiki_port_tables() -> List[_PortInfo]:
             if _map_usage_value(tcp):
                 protocols.append("udp")
             description = description.strip()
-        except Exception:
+        except Exception:  # noqa: S112
             continue
 
         items.append(_PortInfo(port, protocols, description))

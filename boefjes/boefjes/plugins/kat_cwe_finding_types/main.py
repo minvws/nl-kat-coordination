@@ -1,6 +1,7 @@
 import json
-import xml.etree.ElementTree as ET
 from typing import List, Tuple, Union
+
+import defusedxml.ElementTree as ET
 
 from boefjes.job_models import BoefjeMeta
 

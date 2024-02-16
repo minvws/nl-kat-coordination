@@ -4,6 +4,7 @@ import os
 import signal
 import sys
 import time
+from queue import Queue
 from typing import Dict, List, Optional, Tuple
 
 from pydantic import ValidationError
@@ -40,7 +41,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
         self.handling_tasks = manager.dict()
-        self.workers = []
+        self.workers: List[mp.Process] = []
 
         logger.setLevel(log_level)
 
@@ -77,7 +78,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 raise
 
-    def _fill_queue(self, task_queue: mp.Queue, queue_type: WorkerManager.Queue):
+    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue):
         if task_queue.qsize() > self.settings.pool_size:
             time.sleep(self.settings.worker_heartbeat)
             return
@@ -141,15 +142,20 @@ class SchedulerWorkerManager(WorkerManager):
         new_workers = []
 
         for worker in self.workers:
-            if not worker._closed and worker.is_alive():
-                new_workers.append(worker)
-                continue
+            closed = False
+
+            try:
+                if worker.is_alive():
+                    new_workers.append(worker)
+                    continue
+            except ValueError:
+                closed = True  # worker is closed, so we create a new one
 
             logger.warning(
                 "Worker[pid=%s, %s] not alive, creating new worker...", worker.pid, _format_exit_code(worker.exitcode)
             )
 
-            if not worker._closed:  # Closed workers do not have a pid, so cleaning up would fail
+            if not closed:  # Closed workers do not have a pid, so cleaning up would fail
                 self._cleanup_pending_worker_task(worker)
                 worker.close()
 
@@ -198,9 +204,12 @@ class SchedulerWorkerManager(WorkerManager):
             killed_workers = []
 
             for worker in self.workers:  # Send all signals before joining, speeding up shutdowns
-                if not worker._closed and worker.is_alive():
-                    worker.kill()
-                    killed_workers.append(worker)
+                try:
+                    if worker.is_alive():
+                        worker.kill()
+                        killed_workers.append(worker)
+                except ValueError:
+                    pass  # worker is already closed
 
             for worker in killed_workers:
                 worker.join()
@@ -215,8 +224,8 @@ class SchedulerWorkerManager(WorkerManager):
                 sys.exit()
 
 
-def _format_exit_code(exitcode: int) -> str:
-    if exitcode >= 0:
+def _format_exit_code(exitcode: Optional[int]) -> str:
+    if exitcode is None or exitcode >= 0:
         return f"exitcode={exitcode}"
 
     return f"signal={signal.Signals(-exitcode).name}"
@@ -256,10 +265,8 @@ def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_leve
     if queue is WorkerManager.Queue.BOEFJES:
         item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, bytes_api_client)
     else:
-        item_handler = NormalizerHandler(
-            LocalNormalizerJobRunner(local_repository),
-            bytes_api_client,
-            settings.scan_profile_whitelist,
+        item_handler = NormalizerHandler(  # type: ignore
+            LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
         )
 
     return SchedulerWorkerManager(

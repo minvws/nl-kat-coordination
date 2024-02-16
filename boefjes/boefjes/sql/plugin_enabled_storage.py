@@ -48,7 +48,7 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
             .filter(PluginStateInDB.enabled)
         )
 
-        per_repository = {}
+        per_repository: Dict[str, List[str]] = {}
 
         for state in query.all():
             if state.repository.id not in per_repository:

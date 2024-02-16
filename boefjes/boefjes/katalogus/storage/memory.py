@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from boefjes.katalogus.models import RESERVED_LOCAL_ID, Organisation, Repository
 from boefjes.katalogus.storage.interfaces import (
@@ -19,7 +19,7 @@ repositories: Dict[str, Dict[str, Repository]] = {}
 
 
 class OrganisationStorageMemory(OrganisationStorage):
-    def __init__(self, defaults: Dict[str, Organisation] = None):
+    def __init__(self, defaults: Optional[Dict[str, Organisation]] = None):
         self._data = organisations if defaults is None else defaults
 
     def get_by_id(self, organisation_id: str) -> Organisation:
@@ -39,7 +39,7 @@ class RepositoryStorageMemory(RepositoryStorage):
     def __init__(
         self,
         organisation_id: str,
-        defaults: Dict[str, Repository] = None,
+        defaults: Optional[Dict[str, Repository]] = None,
     ):
         self._data = repositories.setdefault(organisation_id, {}) if defaults is None else defaults
         self._organisation_id = organisation_id
@@ -84,7 +84,7 @@ class PluginStatesStorageMemory(PluginEnabledStorage):
     def __init__(
         self,
         organisation: str,
-        defaults: Dict[str, bool] = None,
+        defaults: Optional[Dict[str, bool]] = None,
     ):
         self._data = plugins_state.setdefault(organisation, {}) if defaults is None else defaults
         self._organisation = organisation

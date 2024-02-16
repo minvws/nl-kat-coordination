@@ -55,4 +55,4 @@ class BoefjeRankerTimeBased(Ranker):
     def rank(self, obj: Any) -> int:
         minimum = datetime.today() + timedelta(days=1)
         maximum = minimum + timedelta(days=7)
-        return random.randint(int(minimum.timestamp()), int(maximum.timestamp()))
+        return random.randint(int(minimum.timestamp()), int(maximum.timestamp()))  # noqa: S311

@@ -1,5 +1,5 @@
 import logging
-from functools import lru_cache
+from functools import cache
 from typing import Any, Callable, Iterator, Type
 
 from sqlalchemy import create_engine
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 SQL_BASE = declarative_base()
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_engine() -> Engine:
     logger.info("Connecting to database..")
 
