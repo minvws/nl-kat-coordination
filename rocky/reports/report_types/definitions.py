@@ -64,7 +64,7 @@ class Report(ABC):
 
         return result
 
-    def to_hostnames(self, input_oois: set[str], valid_time: datetime):
+    def to_hostnames(self, input_oois: set[str], valid_time: datetime) -> dict[str, list[Reference]]:
         """Turn a list of either Hostname and IPAddress reference strings into a list of related hostnames."""
 
         refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
