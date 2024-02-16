@@ -84,7 +84,7 @@ class Query:
         return self
 
     def where_in(self, ooi_type: Ref, **kwargs) -> "Query":
-        """ Allows for filtering on multiple values for a specific field. Assumes these values are strings for now. """
+        """Allows for filtering on multiple values for a specific field. Assumes these values are strings for now."""
 
         for field_name, values in kwargs.items():
             self._where_field_in(ooi_type, field_name, values)
@@ -132,14 +132,14 @@ class Query:
         return query
 
     def pull(self, ooi_type: Ref) -> "Query":
-        """ By default, we pull the target type. But when using find, count, etc., you have to pull explicitly. """
+        """By default, we pull the target type. But when using find, count, etc., you have to pull explicitly."""
 
         self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} [*])")
 
         return self
 
     def find(self, item: Ref) -> "Query":
-        """ Add a find clause, so we can select specific fields in a query to be returned as well. """
+        """Add a find clause, so we can select specific fields in a query to be returned as well."""
 
         self._find_clauses.append(self._get_object_alias(item))
 
