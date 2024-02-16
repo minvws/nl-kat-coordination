@@ -394,7 +394,7 @@ class AggregateOrganisationReport(AggregateReport):
                 for finding_key in vulnerability_data.get("findings", {}):
                     all_findings.add(finding_key)
 
-        config_oois = self.octopoes_api_connector.list(types={Config}, valid_time=valid_time).items
+        config_oois = self.octopoes_api_connector.list_objects(types={Config}, valid_time=valid_time).items
 
         flattened_health = flatten_health(get_rocky_health(self.octopoes_api_connector))
 

@@ -125,7 +125,7 @@ class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportVie
             messages.error(self.request, _("Select at least one report type to proceed."))
 
         if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("aggregate_report_view", kwargs=kwargs) + self.get_selection())
+            return redirect(reverse("aggregate_report_view", kwargs=kwargs) + get_selection(request))
 
         return super().get(request, *args, **kwargs)
 

@@ -45,9 +45,9 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in hostnames + [network]], valid_time
     )
 
-    assert octopoes_api_connector.list(types={Network}).count == 1
-    assert octopoes_api_connector.list(types={Hostname}).count == 10
-    assert octopoes_api_connector.list(types={Network, Hostname}).count == 11
+    assert octopoes_api_connector.list_objects(types={Network}).count == 1
+    assert octopoes_api_connector.list_objects(types={Hostname}).count == 10
+    assert octopoes_api_connector.list_objects(types={Network, Hostname}).count == 11
 
     assert len(octopoes_api_connector.list_origins(task_id=uuid.uuid4())) == 0
     origins = octopoes_api_connector.list_origins(task_id=task_id)
@@ -64,7 +64,7 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
 
     # Delete even-numbered test hostnames
     octopoes_api_connector.delete_many([Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)])
-    assert octopoes_api_connector.list(types={Network, Hostname}).count == 6
+    assert octopoes_api_connector.list_objects(types={Network, Hostname}).count == 6
 
 
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
