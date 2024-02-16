@@ -2,7 +2,6 @@
 import logging
 import uuid
 from pathlib import Path
-from typing import List
 
 from fastapi import BackgroundTasks, Body, FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -44,7 +43,7 @@ def construct_api(settings: Settings) -> FastAPI:
     examples = get_samples(settings)
 
     @app.get("/templates")
-    def get_templates_() -> List[str]:
+    def get_templates_() -> list[str]:
         """Endpoint to list known templates."""
         return list(get_templates(settings))
 

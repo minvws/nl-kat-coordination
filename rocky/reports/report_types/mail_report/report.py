@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -23,7 +23,7 @@ class MailReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "mail_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         hostnames = []
         mail_security_measures = {}
 
@@ -80,7 +80,7 @@ class MailReport(Report):
             "number_of_dkim": number_of_dkim,
         }
 
-    def _get_measures(self, valid_time: datetime, hostname) -> List[OOI]:
+    def _get_measures(self, valid_time: datetime, hostname) -> list[OOI]:
         finding_types = self.octopoes_api_connector.query(
             "Hostname.<ooi[is Finding].finding_type", valid_time, hostname
         )

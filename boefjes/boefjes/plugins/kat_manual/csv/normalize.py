@@ -1,8 +1,8 @@
 import csv
 import io
 import logging
+from collections.abc import Iterable
 from ipaddress import IPv4Network, ip_network
-from typing import Dict, Iterable, List, Tuple, Union
 
 from pydantic import ValidationError
 
@@ -24,7 +24,7 @@ OOI_TYPES = {
 logger = logging.getLogger(__name__)
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     reference_cache = {"Network": {"internet": Network(name="internet")}}
 
     yield from process_csv(raw, reference_cache)
@@ -76,7 +76,7 @@ def get_object_type(csv_data: io.StringIO) -> str:
     raise ValueError("Unsupported OOI type for csv normalizer.")
 
 
-def get_ooi_from_csv(ooi_type_name: str, values: Dict[str, str], reference_cache) -> Tuple[OOIType, List]:
+def get_ooi_from_csv(ooi_type_name: str, values: dict[str, str], reference_cache) -> tuple[OOIType, list]:
     skip_properties = ("object_type", "scan_profile", "primary_key")
 
     ooi_type = OOI_TYPES[ooi_type_name]["type"]

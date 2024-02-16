@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Dict, List, Set
 
 from pydantic import BaseModel
 
 # E.g. {'IPPort': {'address': ['IPAddressV6', 'IPAddressV4'] }, ...}
-DataModel = Dict[str, Dict[str, Set[str]]]
+DataModel = dict[str, dict[str, set[str]]]
 
 
 class FieldSet(Enum):
@@ -17,9 +16,9 @@ class FieldSet(Enum):
 class ForeignKey(BaseModel):
     source_entity: str
     attr_name: str
-    related_entities: Set[str]
+    related_entities: set[str]
     reverse_name: str
 
 
 class Datamodel(BaseModel):
-    entities: Dict[str, List[ForeignKey]]
+    entities: dict[str, list[ForeignKey]]
