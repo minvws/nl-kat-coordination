@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional, Type, Union
-
 from pydantic import Field
 from pydantic.fields import FieldInfo
 
@@ -9,10 +7,10 @@ from octopoes.models import OOI
 
 
 def ReferenceField(
-    object_type: Union[str, Type[OOI]],
+    object_type: str | type[OOI],
     *,
-    max_issue_scan_level: Optional[int] = None,
-    max_inherit_scan_level: Optional[int] = None,
+    max_issue_scan_level: int | None = None,
+    max_inherit_scan_level: int | None = None,
     **kwargs,
 ) -> FieldInfo:
     if not isinstance(object_type, str):

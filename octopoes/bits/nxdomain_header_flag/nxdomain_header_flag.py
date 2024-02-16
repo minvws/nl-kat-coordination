@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Union
+from collections.abc import Iterator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
@@ -8,7 +8,7 @@ from octopoes.models.types import NXDOMAIN
 
 
 def run(
-    input_ooi: Hostname, additional_oois: List[Union[NXDOMAIN, HTTPHeaderHostname]], config: Dict[str, str]
+    input_ooi: Hostname, additional_oois: list[NXDOMAIN | HTTPHeaderHostname], config: dict[str, str]
 ) -> Iterator[OOI]:
     hostname_exists = True
     headers = []

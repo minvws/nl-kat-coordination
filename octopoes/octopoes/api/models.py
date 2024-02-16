@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Any, List, Optional
+from typing import Any
 
 from pydantic import AwareDatetime, BaseModel, Field
 
@@ -11,9 +11,9 @@ from octopoes.models.types import OOIType
 class ServiceHealth(BaseModel):
     service: str
     healthy: bool = False
-    version: Optional[str] = None
+    version: str | None = None
     additional: Any = None
-    results: List["ServiceHealth"] = Field(default_factory=list)
+    results: list["ServiceHealth"] = Field(default_factory=list)
 
 
 ServiceHealth.model_rebuild()
@@ -22,7 +22,7 @@ ServiceHealth.model_rebuild()
 class _BaseObservation(BaseModel):
     method: str
     source: Reference
-    result: List[OOIType]
+    result: list[OOIType]
     valid_time: AwareDatetime
     task_id: uuid.UUID
 
@@ -31,7 +31,7 @@ class _BaseObservation(BaseModel):
 class Observation(_BaseObservation):
     """Used by Octopoes Connector to describe request body"""
 
-    result: List[OOIType]
+    result: list[OOIType]
     valid_time: datetime
 
 
@@ -40,8 +40,8 @@ class Declaration(BaseModel):
 
     ooi: OOIType
     valid_time: datetime
-    method: Optional[str] = None
-    task_id: Optional[uuid.UUID] = None
+    method: str | None = None
+    task_id: uuid.UUID | None = None
 
 
 class ScanProfileDeclaration(BaseModel):
@@ -54,7 +54,7 @@ class ScanProfileDeclaration(BaseModel):
 class ValidatedObservation(_BaseObservation):
     """Used by Octopoes API to validate and parse correctly"""
 
-    result: List[OOIType]
+    result: list[OOIType]
     valid_time: AwareDatetime
 
 
@@ -63,5 +63,5 @@ class ValidatedDeclaration(BaseModel):
 
     ooi: OOIType
     valid_time: AwareDatetime
-    method: Optional[str] = "manual"
-    task_id: Optional[uuid.UUID] = Field(default_factory=lambda: uuid.uuid4())
+    method: str | None = "manual"
+    task_id: uuid.UUID | None = Field(default_factory=lambda: uuid.uuid4())

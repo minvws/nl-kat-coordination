@@ -1,5 +1,3 @@
-from typing import List
-
 from django.utils.translation import gettext_lazy as _
 from tools.forms.ooi import OoiTreeSettingsForm
 from tools.ooi_helpers import create_object_tree_item_from_ref, filter_ooi_tree, get_ooi_types_from_tree
@@ -33,7 +31,7 @@ class OOITreeView(BaseOOIDetailView):
 
         return kwargs
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(self.get_last_breadcrumb())
         return breadcrumbs

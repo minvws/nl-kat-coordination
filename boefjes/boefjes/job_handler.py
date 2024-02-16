@@ -1,9 +1,10 @@
 import logging
 import os
 import traceback
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -67,7 +68,7 @@ def _serialize_value(value: Any, required: bool) -> Any:
             return None
     if isinstance(value, Enum):
         return value.value
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return value
     else:
         return str(value)
@@ -86,7 +87,7 @@ def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
     return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
 
 
-def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str]) -> Dict[str, str]:
+def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str]) -> dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = requests.get(
@@ -190,7 +191,7 @@ class NormalizerHandler(Handler):
         self,
         job_runner: NormalizerJobRunner,
         bytes_client: BytesAPIClient,
-        whitelist: Optional[Dict[str, int]] = None,
+        whitelist: dict[str, int] | None = None,
         octopoes_factory: Callable[[str], OctopoesAPIConnector] = get_octopoes_api_connector,
     ):
         self.job_runner = job_runner

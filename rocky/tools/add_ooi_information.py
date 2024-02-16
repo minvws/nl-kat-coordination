@@ -2,7 +2,6 @@ import datetime
 import logging
 from dataclasses import dataclass
 from itertools import product
-from typing import List, Optional, Tuple
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,9 +14,9 @@ logger = logging.getLogger(__name__)
 @dataclass
 class _Service:
     name: str
-    port: Optional[int] = None
-    transport_protocol: Optional[str] = None
-    description: Optional[str] = None
+    port: int | None = None
+    transport_protocol: str | None = None
+    description: str | None = None
 
 
 @dataclass
@@ -27,7 +26,7 @@ class _PortInfo:
     description: str
 
 
-def iana_service_table(search_query: str) -> List[_Service]:
+def iana_service_table(search_query: str) -> list[_Service]:
     services = []
 
     response = requests.get(
@@ -61,7 +60,7 @@ def iana_service_table(search_query: str) -> List[_Service]:
     return services
 
 
-def service_info(value) -> Tuple[str, str]:
+def service_info(value) -> tuple[str, str]:
     """Provides information about IP Services such as common assigned ports for certain protocols and descriptions"""
     services = iana_service_table(value)
     source = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
@@ -145,7 +144,7 @@ def _map_usage_value(value: str) -> bool:
     return value is not None and value and value != "no"
 
 
-def wiki_port_tables() -> List[_PortInfo]:
+def wiki_port_tables() -> list[_PortInfo]:
     response = requests.get("https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers", timeout=30)
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -174,7 +173,7 @@ def wiki_port_tables() -> List[_PortInfo]:
     return items
 
 
-def port_info(number: str, protocol: str) -> Tuple[str, str]:
+def port_info(number: str, protocol: str) -> tuple[str, str]:
     """Provides possible or common protocols for operation of network applications behind TCP and UDP ports"""
     items = wiki_port_tables()
     source = "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers"

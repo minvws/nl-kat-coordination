@@ -1,7 +1,7 @@
 import abc
 import hashlib
 from enum import Enum
-from typing import Literal, Optional
+from typing import Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -13,7 +13,7 @@ class DNSRecord(OOI, abc.ABC):
     hostname: Reference = ReferenceField(Hostname, max_issue_scan_level=0, max_inherit_scan_level=2)
     dns_record_type: Literal["A", "AAAA", "CAA", "CNAME", "MX", "NS", "PTR", "SOA", "SRV", "TXT"]
     value: str
-    ttl: Optional[int] = None  # todo: validation
+    ttl: int | None = None  # todo: validation
 
     _natural_key_attrs = ["hostname", "value"]
     _reverse_relation_names = {
@@ -56,8 +56,8 @@ class DNSMXRecord(DNSRecord):
     object_type: Literal["DNSMXRecord"] = "DNSMXRecord"
     dns_record_type: Literal["MX"] = "MX"
 
-    mail_hostname: Optional[Reference] = ReferenceField(Hostname, default=None)
-    preference: Optional[int] = None
+    mail_hostname: Reference | None = ReferenceField(Hostname, default=None)
+    preference: int | None = None
 
     _reverse_relation_names = {
         "hostname": "dns_mx_records",
@@ -107,11 +107,11 @@ class DNSSOARecord(DNSRecord):
     dns_record_type: Literal["SOA"] = "SOA"
 
     soa_hostname: Reference = ReferenceField(Hostname)
-    serial: Optional[int] = None
-    retry: Optional[int] = None
-    refresh: Optional[int] = None
-    expire: Optional[int] = None
-    minimum: Optional[int] = None
+    serial: int | None = None
+    retry: int | None = None
+    refresh: int | None = None
+    expire: int | None = None
+    minimum: int | None = None
 
     _reverse_relation_names = {
         "hostname": "dns_soa_records",
@@ -144,7 +144,7 @@ class NXDOMAIN(OOI):
 class DNSPTRRecord(DNSRecord):
     object_type: Literal["DNSPTRRecord"] = "DNSPTRRecord"
     dns_record_type: Literal["PTR"] = "PTR"
-    address: Optional[Reference] = ReferenceField(IPAddress)
+    address: Reference | None = ReferenceField(IPAddress)
 
     _natural_key_attrs = ["hostname", "address"]
 
@@ -177,7 +177,7 @@ class DNSCAARecord(DNSRecord):
 
     # https://datatracker.ietf.org/doc/html/rfc8659#name-canonical-presentation-form
     # An unsigned integer between 0 and 255.
-    flags: Optional[int] = None
+    flags: int | None = None
 
     # A non-zero-length sequence of ASCII letters and numbers in lowercase.
     tag: CAATAGS

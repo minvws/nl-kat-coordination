@@ -1,5 +1,5 @@
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -19,7 +19,7 @@ class MultiOrganizationReport(MultiReport):
     input_ooi_types = {ReportData}
     template_path = "multi_organization_report/report.html"
 
-    def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         """
         The data is of the form:
            {
@@ -242,7 +242,7 @@ class MultiOrganizationReport(MultiReport):
 
 def collect_report_data(
     connector: OctopoesAPIConnector,
-    input_ooi_references: List[str],
+    input_ooi_references: list[str],
 ):
     report_data = {}
     for ooi in [x for x in input_ooi_references if Reference.from_str(x).class_type == ReportData]:
