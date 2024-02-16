@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from django.conf import settings
 from django.contrib import messages
@@ -175,7 +175,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
+    def generate_reports_for_oois(self) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data, error_oois = aggregate_reports(
             self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.valid_time
         )

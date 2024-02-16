@@ -2,7 +2,6 @@ import json
 from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Optional
 
 from django.contrib import messages
 from django.core.paginator import Page, Paginator
@@ -97,7 +96,7 @@ class OOIDetailView(
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
             return self.get(self.request, status_code=500, *self.args, **self.kwargs)
 
-    def get_current_ooi(self) -> Optional[OOI]:
+    def get_current_ooi(self) -> OOI | None:
         # self.ooi is already the current state of the OOI
         if self.get_observed_at().date() == datetime.utcnow().date():
             return self.ooi

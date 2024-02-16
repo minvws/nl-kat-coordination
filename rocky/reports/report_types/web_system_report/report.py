@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -43,7 +43,7 @@ class WebCheck:
 
 @dataclass
 class WebChecks:
-    checks: List[WebCheck] = field(default_factory=list)
+    checks: list[WebCheck] = field(default_factory=list)
 
     @property
     def has_csp(self):
@@ -110,7 +110,7 @@ class WebSystemReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "web_system_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         hostnames = []
 
         try:

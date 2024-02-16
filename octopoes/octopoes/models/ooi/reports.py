@@ -1,4 +1,4 @@
-from typing import Dict, List, Literal
+from typing import Literal
 
 from octopoes.models import OOI, Reference
 
@@ -7,8 +7,8 @@ class ReportData(OOI):
     object_type: Literal["ReportData"] = "ReportData"
     organization_code: str
     organization_name: str
-    organization_tags: List[str]
-    data: Dict
+    organization_tags: list[str]
+    data: dict
 
     _natural_key_attrs = ["organization_code"]
 

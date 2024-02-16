@@ -1,5 +1,4 @@
 import logging
-from typing import Type
 
 from account.mixins import OrganizationView
 from django.http import Http404
@@ -60,7 +59,7 @@ class OOIAddView(BaseOOIFormView):
         self.ooi_class = self.get_ooi_class()
         self.initial = request.GET
 
-    def get_ooi_class(self) -> Type[OOI]:
+    def get_ooi_class(self) -> type[OOI]:
         try:
             return type_by_name(self.kwargs["ooi_type"])
         except KeyError:

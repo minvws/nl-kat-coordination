@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, NewType, Optional
+from typing import Any, NewType
 from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, Field
@@ -47,21 +47,21 @@ class Job(BaseModel):
 
 class Boefje(BaseModel):
     id: str
-    version: Optional[str] = None
+    version: str | None = None
 
 
 class Normalizer(BaseModel):
     id: str
-    version: Optional[str] = None
+    version: str | None = None
 
 
 class BoefjeMeta(Job):
     boefje: Boefje
-    input_ooi: Optional[str] = None
-    arguments: Dict[str, Any]
+    input_ooi: str | None = None
+    arguments: dict[str, Any]
     organization: str
-    runnable_hash: Optional[str] = None
-    environment: Optional[Dict[str, str]] = None
+    runnable_hash: str | None = None
+    environment: dict[str, str] | None = None
 
 
 class RawDataMeta(BaseModel):
@@ -69,23 +69,23 @@ class RawDataMeta(BaseModel):
 
     id: UUID
     boefje_meta: BoefjeMeta
-    mime_types: List[MimeType] = Field(default_factory=list)
+    mime_types: list[MimeType] = Field(default_factory=list)
 
     # These are set once the raw is saved
-    secure_hash: Optional[SecureHash] = None
-    signing_provider_url: Optional[str] = None
-    hash_retrieval_link: Optional[RetrievalLink] = None
+    secure_hash: SecureHash | None = None
+    signing_provider_url: str | None = None
+    hash_retrieval_link: RetrievalLink | None = None
 
 
 class RawData(BaseModel):
     value: bytes
     boefje_meta: BoefjeMeta
-    mime_types: List[MimeType] = Field(default_factory=list)
+    mime_types: list[MimeType] = Field(default_factory=list)
 
     # These are set once the raw is saved
-    secure_hash: Optional[SecureHash] = None
-    signing_provider_url: Optional[str] = None
-    hash_retrieval_link: Optional[RetrievalLink] = None
+    secure_hash: SecureHash | None = None
+    signing_provider_url: str | None = None
+    hash_retrieval_link: RetrievalLink | None = None
 
 
 class NormalizerMeta(Job):

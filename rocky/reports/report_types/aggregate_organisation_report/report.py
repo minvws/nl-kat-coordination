@@ -1,6 +1,5 @@
 from datetime import datetime
 from logging import getLogger
-from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
@@ -442,8 +441,8 @@ class AggregateOrganisationReport(AggregateReport):
 
 def aggregate_reports(
     connector: OctopoesAPIConnector,
-    input_ooi_references: List[OOI],
-    selected_report_types: List[str],
+    input_ooi_references: list[OOI],
+    selected_report_types: list[str],
     valid_time: datetime,
 ):
     aggregate_report = AggregateOrganisationReport(connector)
