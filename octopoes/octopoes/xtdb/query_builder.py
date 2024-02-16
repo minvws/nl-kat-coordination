@@ -1,5 +1,5 @@
 import re
-from typing import Dict, Iterator, List, Optional, Set, Union
+from collections.abc import Iterator
 
 from octopoes.xtdb.related_field_generator import (
     FieldSet,
@@ -19,11 +19,11 @@ def str_val(val):
 
 
 def generate_pull_query(
-    field_set: Optional[FieldSet] = FieldSet.ALL_FIELDS,
-    where: Optional[Dict[str, Union[str, int, List[Union[str, int]], Set[Union[str, int]]]]] = None,
-    offset: Optional[int] = None,
-    limit: Optional[int] = None,
-    field_node: Optional[RelatedFieldNode] = None,
+    field_set: FieldSet | None = FieldSet.ALL_FIELDS,
+    where: dict[str, str | int | list[str | int] | set[str | int]] | None = None,
+    offset: int | None = None,
+    limit: int | None = None,
+    field_node: RelatedFieldNode | None = None,
 ) -> str:
     pk_prefix = ":xt/id"
 
@@ -36,7 +36,7 @@ def generate_pull_query(
     # Break where clause in relevant sections
     for key, value in where.items():
         var_name = re.sub("[^0-9a-zA-Z]+", "_", key)
-        if isinstance(value, (List, Set)):
+        if isinstance(value, list | set):
             value = sorted([str_val(value) for value in value])
             _csv = join_csv(value)
             in_args.append(f"[{_csv}]")

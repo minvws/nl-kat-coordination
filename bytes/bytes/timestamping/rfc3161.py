@@ -1,5 +1,4 @@
 import base64
-from typing import Optional
 
 import rfc3161ng
 
@@ -32,7 +31,7 @@ class RFC3161HashRepository(HashRepository):
 
         return self.timestamper.check(time_stamp_token, data=secure_hash.encode())  # type: ignore
 
-    def get_signing_provider_url(self) -> Optional[str]:
+    def get_signing_provider_url(self) -> str | None:
         """Get the specific signing provider url"""
 
         return self.signing_provider
