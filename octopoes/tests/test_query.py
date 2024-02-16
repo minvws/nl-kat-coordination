@@ -312,9 +312,30 @@ def test_build_system_query_with_path_segments(mocker):
     assert query == path_query
 
 
-def test_build_parth_query_with_multiple_sources():
+def test_build_parth_query_with_multiple_sources(mocker):
+    mocker.patch("octopoes.xtdb.query.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
+
+    query = Query(Website).where_in(Website, primary_key=["test_pk", "second_test_pk"])
+    assert (
+        query.format()
+        == """{:query {:find [(pull Website [*])] :where [
+    (or [ Website :Website/primary_key "test_pk" ] [ Website :Website/primary_key "second_test_pk" ] )
+    [ Website :object_type "Website" ]]}}"""
+    )
+
+    pk = A(Website, field="primary_key")
     query = (
         Query(Website)
+        .find(pk)
+        .pull(Website)
+        .where(Website, primary_key=pk)
         .where_in(Website, primary_key=["test_pk", "second_test_pk"])
     )
-    assert str(query) == "as"
+
+    assert (
+        query.format()
+        == """{:query {:find [?311d6399-4bb4-4830-b077-661cc3f4f2c1?primary_key (pull Website [*])] :where [
+    (or [ Website :Website/primary_key "test_pk" ] [ Website :Website/primary_key "second_test_pk" ] )
+    [ Website :Website/primary_key ?311d6399-4bb4-4830-b077-661cc3f4f2c1?primary_key ]
+    [ Website :object_type "Website" ]]}}"""
+    )

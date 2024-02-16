@@ -217,5 +217,6 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
         valid_time,
         [hostnames[0], hostnames[1], hostnames[2], hostnames[3]],
     )
-    assert len(result) == 4
-    assert len(result[hostnames[2].reference]) == 1
+    assert len(result) == 3
+    assert result[0][0] == hostnames[0].reference
+    assert result[0][1] == dns_ns_records[0]

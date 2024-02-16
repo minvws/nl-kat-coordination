@@ -27,18 +27,25 @@ class MailReport(Report):
         hostname_refs_by_input_ooi = {ref: [ref] for ref in refs if ref.class_type == Hostname}
         ip_refs = [ref for ref in refs if ref.class_type in (IPAddressV4, IPAddressV6)]
 
-        for input_ooi, ip_hostnames in self.octopoes_api_connector.query_many(
+        for input_ooi, ip_hostname in self.octopoes_api_connector.query_many(
             "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ip_refs
-        ).items():
-            hostname_refs_by_input_ooi[input_ooi] = [x.reference for x in ip_hostnames]
+        ):
+            if input_ooi not in hostname_refs_by_input_ooi:
+                hostname_refs_by_input_ooi[input_ooi] = []
+
+            hostname_refs_by_input_ooi[input_ooi].append(ip_hostname.reference)
 
         all_hostnames = [h for key, hostnames in hostname_refs_by_input_ooi.items() for h in hostnames]
-        measures = self.octopoes_api_connector.query_many(
+        filtered_measures = {}
+
+        for input_ooi, finding_type in self.octopoes_api_connector.query_many(
             "Hostname.<ooi[is Finding].finding_type", valid_time, all_hostnames
-        )
-        filtered_measures = {
-            key: list(filter(lambda finding: finding.id in MAIL_FINDINGS, val)) for key, val in measures.items()
-        }
+        ):
+            if input_ooi not in filtered_measures:
+                filtered_measures[input_ooi] = []
+
+            if finding_type.id in MAIL_FINDINGS:
+                filtered_measures[input_ooi].append(finding_type)
 
         result = {}
         for input_ooi, hostname_references in hostname_refs_by_input_ooi.items():
@@ -49,7 +56,7 @@ class MailReport(Report):
             number_of_dkim = number_of_hostnames
 
             for hostname in hostname_references:
-                measures = filtered_measures[hostname]
+                measures = filtered_measures.get(hostname, [])
                 mail_security_measures[hostname] = measures
 
                 number_of_spf -= (

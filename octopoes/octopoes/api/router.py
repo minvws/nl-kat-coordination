@@ -39,6 +39,7 @@ from octopoes.models.types import type_by_name
 from octopoes.version import __version__
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
+from octopoes.xtdb.query import A
 from octopoes.xtdb.query import Query as XTDBQuery
 
 logger = getLogger(__name__)
@@ -163,25 +164,24 @@ def query_many(
     limit: int = DEFAULT_LIMIT,
 ):
     if not sources:
-        return {}
+        return []
 
     object_path = ObjectPath.parse(path)
     if not object_path.segments:
         raise HTTPException(status_code=400, detail="No path components provided.")
 
-    # TODO:
-    # We should still optimize this by combining the queries here
+    source_pk_alias = A(object_path.segments[0].source_type, field="primary_key")
+    query = XTDBQuery.from_path(object_path)
 
-    return {
-        source: octopoes.ooi_repository.query(
-            XTDBQuery.from_path(object_path)
-            .offset(offset)
-            .limit(limit)
-            .where(object_path.segments[0].source_type, primary_key=source),
-            valid_time,
-        )
-        for source in sources
-    }
+    return octopoes.ooi_repository.query(
+        query.find(source_pk_alias)
+        .pull(query.result_type)
+        .offset(offset)
+        .limit(limit)
+        .where(object_path.segments[0].source_type, primary_key=source_pk_alias)
+        .where_in(object_path.segments[0].source_type, primary_key=sources),
+        valid_time,
+    )
 
 
 @router.post("/objects/load_bulk", tags=["Objects"])

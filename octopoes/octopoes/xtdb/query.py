@@ -4,7 +4,7 @@ from uuid import UUID, uuid4
 
 from octopoes.models import OOI
 from octopoes.models.path import Direction, Path
-from octopoes.models.types import get_abstract_types, get_relations, to_concrete
+from octopoes.models.types import get_abstract_types, to_concrete
 
 
 class InvalidField(ValueError):
@@ -41,6 +41,7 @@ class Aliased:
     # The lambda makes it possible to mock the factory more easily, see:
     # https://stackoverflow.com/questions/61257658/python-dataclasses-mocking-the-default-factory-in-a-frozen-dataclass
     alias: UUID = field(default_factory=lambda: uuid4())
+    field: str | None = field(default=None)
 
 
 Ref = Union[Type[OOI], Aliased]
@@ -130,6 +131,11 @@ class Query:
 
         return self
 
+    def find(self, item: Ref) -> "Query":
+        self._find_clauses.append(self._get_object_alias(item))
+
+        return self
+
     def count(self, ooi_type: Ref) -> "Query":
         self._find_clauses.append(f"(count {self._get_object_alias(ooi_type)})")
 
@@ -158,14 +164,14 @@ class Query:
 
         if ooi_type in abstract_types:
             if isinstance(value, str):
-                self._add_or_statement(ref, field_name, f'"{value}"')
+                self._add_or_statement_for_abstract_types(ref, field_name, f'"{value}"')
                 return
 
             if not isinstance(value, type):
                 raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
 
             if issubclass(value, OOI):
-                self._add_or_statement(
+                self._add_or_statement_for_abstract_types(
                     ref,
                     field_name,
                     self._get_object_alias(
@@ -184,55 +190,25 @@ class Query:
         if not isinstance(value, Aliased) and not issubclass(value, OOI):
             raise InvalidField(f"{value} is not an OOI")
 
-        if field_name not in get_relations(ooi_type):
-            raise InvalidField(f'"{field_name}" is not a relation of {ooi_type.get_object_type()}')
-
         self._add_where_statement(ref, field_name, self._get_object_alias(value))
 
-    def _where_field_in(self, ref: Ref, field_name: str, values: list[Ref | str | set[str]]) -> None:
+    def _where_field_in(self, ref: Ref, field_name: str, values: list[str]) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         if field_name not in ooi_type.model_fields:
             raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
-        abstract_types = get_abstract_types()
-
+        new_values = []
         for value in values:
-            if isinstance(value, str):
-                value = value.replace('"', r"\"")
+            if not isinstance(value, str):
+                raise InvalidField("Only strings allowed as values for a WHERE IN statement for now.")
 
-        if ooi_type in abstract_types:
-            if isinstance(value, str):
-                self._add_or_statement(ref, field_name, f'"{value}"')
-                return
+            value = value.replace('"', r"\"")
+            new_values.append(f'"{value}"')
 
-            if not isinstance(value, type):
-                raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
-
-            if issubclass(value, OOI):
-                self._add_or_statement(
-                    ref,
-                    field_name,
-                    self._get_object_alias(
-                        value,
-                    ),
-                )
-                return
-
-        if isinstance(value, str):
-            self._add_where_statement(ref, field_name, f'"{value}"')
-            return
-
-        if not isinstance(value, (type, Aliased)):
-            raise InvalidField(f"value '{value}' should be a string or an OOI Type")
-
-        if not isinstance(value, Aliased) and not issubclass(value, OOI):
-            raise InvalidField(f"{value} is not an OOI")
-
-        if field_name not in get_relations(ooi_type):
-            raise InvalidField(f'"{field_name}" is not a relation of {ooi_type.get_object_type()}')
-
-        self._add_where_statement(ref, field_name, self._get_object_alias(value))
+        self._where_clauses.append(
+            self._or_statement_for_multiple_values(self._get_object_alias(ref), ooi_type, field_name, new_values)
+        )
 
     def _add_where_statement(self, ref: Ref, field_name: str, to_alias: str) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
@@ -247,12 +223,12 @@ class Query:
             )
         )
 
-    def _add_or_statement(self, ref: Ref, field_name: str, to_alias: str) -> None:
+    def _add_or_statement_for_abstract_types(self, ref: Ref, field_name: str, to_alias: str) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         self._where_clauses.append(self._assert_type(ref, ooi_type))
         self._where_clauses.append(
-            self._or_statement(
+            self._or_statement_for_abstract_types(
                 self._get_object_alias(ref),
                 ooi_type.strict_subclasses(),
                 field_name,
@@ -260,10 +236,21 @@ class Query:
             )
         )
 
-    def _or_statement(self, from_alias: str, concrete_types: List[Type[OOI]], field_name: str, to_alias: str) -> str:
+    def _or_statement_for_abstract_types(
+        self, from_alias: str, concrete_types: List[Type[OOI]], field_name: str, to_alias: str
+    ) -> str:
         relationships = [
             self._relationship(from_alias, concrete_type.get_object_type(), field_name, to_alias)
             for concrete_type in concrete_types
+        ]
+
+        return f"(or {' '.join(relationships)} )"
+
+    def _or_statement_for_multiple_values(
+        self, from_alias: str, ooi_type: Type[OOI], field_name: str, to_aliases: list[str]
+    ) -> str:
+        relationships = [
+            self._relationship(from_alias, ooi_type.get_object_type(), field_name, to_alias) for to_alias in to_aliases
         ]
 
         return f"(or {' '.join(relationships)} )"
@@ -311,7 +298,8 @@ class Query:
 
     def _get_object_alias(self, object_type: Ref) -> str:
         if isinstance(object_type, Aliased):
-            return "?" + str(object_type.alias)
+            base = "?" + str(object_type.alias)
+            return base if not object_type.field else base + "?" + object_type.field
 
         return object_type.get_object_type()
 
