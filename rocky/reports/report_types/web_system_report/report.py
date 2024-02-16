@@ -117,7 +117,7 @@ class WebSystemReport(Report):
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
         except ObjectNotFoundException as e:
             logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
-            raise ObjectNotFoundException(e)
+            raise
 
         if ooi.reference.class_type == Hostname:
             hostnames = [ooi]
@@ -241,3 +241,102 @@ class WebSystemReport(Report):
             "web_checks": web_checks,
             "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
         }
+
+    def collect_data(self, input_oois: set[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
+        all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
+
+        query = "Hostname.<hostname[is Website].<website[is HTTPResource].<ooi[is Finding].finding_type"
+        csp_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), lambda ooi: ooi.id == "KAT-NO-CSP"
+        )
+        query = (
+            "Hostname.<hostname[is Website].<website[is HTTPResource].<resource[is HTTPHeader]"
+            ".<ooi[is Finding].finding_type"
+        )
+        csp_vulnerabilities_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            lambda ooi: ooi.id == "KAT-CSP-VULNERABILITIES",
+        )
+        query = "Hostname.<netloc[is HostnameHTTPURL].<ooi[is Finding].finding_type"
+        url_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            lambda ooi: ooi.id == "KAT-NO-HTTPS-REDIRECT",
+        )
+        query = "Hostname.<hostname[is Website].<ooi[is Finding].finding_type"
+        no_certificate_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            lambda ooi: ooi.id == "KAT-NO-CERTIFICATE",
+        )
+        query = "Hostname.<hostname[is Website].<website[is SecurityTXT]"
+        has_security_txt_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames)
+        )
+        query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type"
+        port_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            lambda ooi: ooi.id in ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
+        )
+        query = "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type"
+        certificate_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            lambda ooi: ooi.id in ["KAT-CERTIFICATE-EXPIRED", "KAT-CERTIFICATE-EXPIRING-SOON"],
+        )
+
+        result = {}
+
+        for input_ooi, hostname_references in hostnames_by_input_ooi.items():
+            web_checks = WebChecks()
+            finding_types = {}
+
+            for hostname in hostname_references:
+                check = WebCheck()
+                check.has_csp = not any(csp_finding_types.get(hostname, []))
+                check.has_no_csp_vulnerabilities = check.has_csp and not any(
+                    csp_vulnerabilities_finding_types.get(hostname, [])
+                )
+                check.redirects_http_https = not any(url_finding_types.get(hostname, []))
+                check.offers_https = not any(no_certificate_finding_types.get(hostname, []))
+                check.has_security_txt = bool(has_security_txt_finding_types.get(hostname, []))
+                security_txt_finding_types = [
+                    KATFindingType(
+                        id="KAT-NO-SECURITY-TXT",
+                        description="This hostname does not have a Security.txt file.",
+                        risk_severity=RiskLevelSeverity.RECOMMENDATION,
+                        recommendation="Make sure there is a security.txt available.",
+                    )
+                ]
+
+                check.no_uncommon_ports = not any(port_finding_types.get(hostname, []))
+                check.has_certificates = check.offers_https
+                check.certificates_not_expired = check.has_certificates and "KAT-CERTIFICATE-EXPIRED" not in [
+                    x.id for x in certificate_finding_types.get(hostname, [])
+                ]
+                check.certificates_not_expiring_soon = (
+                    check.has_certificates
+                    and "KAT-CERTIFICATE-EXPIRING-SOON"
+                    not in [x.id for x in certificate_finding_types.get(hostname, [])]
+                )
+
+                web_checks.checks.append(check)
+                new_types = (
+                    csp_finding_types.get(hostname, [])
+                    + csp_vulnerabilities_finding_types.get(hostname, [])
+                    + url_finding_types.get(hostname, [])
+                    + no_certificate_finding_types.get(hostname, [])
+                    + port_finding_types.get(hostname, [])
+                    + certificate_finding_types.get(hostname, [])
+                    + security_txt_finding_types
+                )
+
+                for finding_type in new_types:
+                    if finding_type.risk_severity not in [None, RiskLevelSeverity.PENDING] and finding_type.description:
+                        finding_types[finding_type.id] = finding_type
+
+            result[input_ooi] = {
+                "input_ooi": input_ooi,
+                "web_checks": web_checks,
+                "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
+            }
+
+        return result

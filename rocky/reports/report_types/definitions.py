@@ -5,6 +5,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Set, TypedDict
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.types import OOIType
 
 REPORTS_DIR = Path(__file__).parent
@@ -45,6 +48,39 @@ class Report(ABC):
             "input_ooi_types": cls.input_ooi_types,
             "template_path": cls.template_path,
         }
+
+    @staticmethod
+    def group_by_source(query_result: list[tuple[str, OOIType]], check=None) -> dict[str, list[OOIType]]:
+        """Transform a query-many result from [(ref1, obj1), (ref1, obj2), ...] into {ref1: [obj1, obj2], ...}"""
+
+        result = {}
+
+        for source, ooi in query_result:
+            if source not in result:
+                result[source] = []
+
+            if not check or check(ooi):
+                result[source].append(ooi.reference)
+
+        return result
+
+    def to_hostnames(self, input_oois: set[str], valid_time: datetime):
+        """Turn a list of either Hostname and IPAddress reference strings into a list of related hostnames."""
+
+        refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
+
+        hostnames_by_input_ooi = {str(ref): [ref] for ref in refs if ref.class_type == Hostname}
+        ip_refs = [ref for ref in refs if ref.class_type in (IPAddressV4, IPAddressV6)]
+
+        for input_ooi, ip_hostname in self.octopoes_api_connector.query_many(
+            "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ip_refs
+        ):
+            if input_ooi not in hostnames_by_input_ooi:
+                hostnames_by_input_ooi[input_ooi] = []
+
+            hostnames_by_input_ooi[input_ooi].append(ip_hostname.reference)
+
+        return hostnames_by_input_ooi
 
 
 class AggregateReportSubReports(TypedDict):
