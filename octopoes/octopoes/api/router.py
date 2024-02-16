@@ -170,15 +170,32 @@ def query_many(
     if not object_path.segments:
         raise HTTPException(status_code=400, detail="No path components provided.")
 
-    source_pk_alias = A(object_path.segments[0].source_type, field="primary_key")
-    query = XTDBQuery.from_path(object_path)
+    # How does this work and why do we do this?
+    #
+    # We want to fetch all results but be able to tie these back to the source that was used for a result.
+    # If we query "Network.hostname" for a list of Networks ids, how do we know which hostname lives on which network?
+    # The answer is to add the network id to the "select" statement, so the result is of the form
+    #
+    #     [(network_id_1, hostname1), (network_id_2, hostname3), ...]
+    #
+    # Because you can only select variables in Datalog, "network_id_1" needs to be an Alias. Hence `source_alias`.
+    # We need to tie that to the Network primary_key and add a where-in clause. The example projected on the code:
+    #
+    # q = XTDBQuery.from_path(object_path)                                    # Adds "where ?Hostname.network = ?Network
+    #
+    # q.find(source_alias).pull(query.result_type)                            # "select ?network_id, ?Hostname
+    #  .where(object_path.segments[0].source_type, primary_key=source_alias)  # where ?Network.primary_key = ?network_id
+    #  .where_in(object_path.segments[0].source_type, primary_key=sources)    # and ?Network.primary_key in ["1", ...]"
+
+    q = XTDBQuery.from_path(object_path)
+    source_alias = A(object_path.segments[0].source_type, field="primary_key")
 
     return octopoes.ooi_repository.query(
-        query.find(source_pk_alias)
-        .pull(query.result_type)
+        q.find(source_alias)
+        .pull(q.result_type)
         .offset(offset)
         .limit(limit)
-        .where(object_path.segments[0].source_type, primary_key=source_pk_alias)
+        .where(object_path.segments[0].source_type, primary_key=source_alias)
         .where_in(object_path.segments[0].source_type, primary_key=sources),
         valid_time,
     )

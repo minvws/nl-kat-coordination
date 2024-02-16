@@ -41,6 +41,9 @@ class Aliased:
     # The lambda makes it possible to mock the factory more easily, see:
     # https://stackoverflow.com/questions/61257658/python-dataclasses-mocking-the-default-factory-in-a-frozen-dataclass
     alias: UUID = field(default_factory=lambda: uuid4())
+
+    # Sometimes an Alias refers to a plain field, not a whole model. The current solution is suboptimal
+    # as you can use aliases freely in Datalog but are now tied to the OOI types too much. TODO!
     field: str | None = field(default=None)
 
 
@@ -81,6 +84,8 @@ class Query:
         return self
 
     def where_in(self, ooi_type: Ref, **kwargs) -> "Query":
+        """ Allows for filtering on multiple values for a specific field. Assumes these values are strings for now. """
+
         for field_name, values in kwargs.items():
             self._where_field_in(ooi_type, field_name, values)
 
@@ -127,11 +132,15 @@ class Query:
         return query
 
     def pull(self, ooi_type: Ref) -> "Query":
+        """ By default, we pull the target type. But when using find, count, etc., you have to pull explicitly. """
+
         self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} [*])")
 
         return self
 
     def find(self, item: Ref) -> "Query":
+        """ Add a find clause, so we can select specific fields in a query to be returned as well. """
+
         self._find_clauses.append(self._get_object_alias(item))
 
         return self
@@ -299,6 +308,8 @@ class Query:
     def _get_object_alias(self, object_type: Ref) -> str:
         if isinstance(object_type, Aliased):
             base = "?" + str(object_type.alias)
+
+            # To have at least a way to separate aliases for types and plain fields in the raw query
             return base if not object_type.field else base + "?" + object_type.field
 
         return object_type.get_object_type()
