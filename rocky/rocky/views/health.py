@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 from account.mixins import OrganizationView
 from django.http import JsonResponse
@@ -101,7 +100,7 @@ def get_rocky_health(octopoes_api_connector: OctopoesAPIConnector) -> ServiceHea
     return rocky_health
 
 
-def flatten_health(health_: ServiceHealth) -> List[ServiceHealth]:
+def flatten_health(health_: ServiceHealth) -> list[ServiceHealth]:
     results = [health_]
     for sub_result in health_.results:
         results.extend(flatten_health(sub_result))

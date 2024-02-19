@@ -5,10 +5,17 @@ line-length = 120
 [tool.mypy]
 python_version = "3.10"
 plugins = ["pydantic.mypy"]
-strict = false
-ignore_missing_imports = true
+strict = true
 follow_imports = "skip"
+disallow_subclassing_any = false
 disallow_untyped_decorators = false # Needed for FastAPI decorators
+disallow_any_generics = false
+disallow_untyped_calls = false
+disallow_incomplete_defs = false
+disallow_untyped_defs = false
+no_implicit_reexport = false
+warn_return_any = false
+
 
 [tool.setuptools_scm]
 write_to = "_version.py"
@@ -24,10 +31,6 @@ paths = ["."]
 # To be extended with DJ, PT, RUF, C90, D, PL, RET
 select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A", "S"]
 ignore = [
-     "UP006", # Is not compatible with Python 3.8
-     "UP007", # Is not compatible with Python 3.8
-     "UP035", # Ignored temporarily until we've updated typing to Python 3.10
-     "UP038", # Ignored temporarily until we've updated typing to Python 3.10
      "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
      "SIM108", # Ternary operator is not always more readable
      "S101", # Assert use is normal in pytest tests

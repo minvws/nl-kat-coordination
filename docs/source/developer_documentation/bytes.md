@@ -30,7 +30,7 @@ $ docker run --rm -p 8002:8000 --env-file=/path/to/env bytes  # change according
 
 ### Without Docker
 
-To create and start a python virtual environment, run
+To create and start a Python virtual environment, run
 ```shell
 $ python -m venv $PWD/.venv
 $ source .venv/bin/activate

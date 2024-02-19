@@ -2,7 +2,7 @@ import logging
 import os
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Type
+from typing import Any
 
 from pydantic import AmqpDsn, AnyHttpUrl, DirectoryPath, Field, FilePath, PostgresDsn
 from pydantic_settings import BaseSettings, EnvSettingsSource, PydanticBaseSettingsSource, SettingsConfigDict
@@ -32,8 +32,8 @@ class BackwardsCompatibleEnvSettings(EnvSettingsSource):
         "RFC3161_CERT_FILE": "BYTES_RFC3161_CERT_FILE",
     }
 
-    def __call__(self) -> Dict[str, Any]:
-        d: Dict[str, Any] = {}
+    def __call__(self) -> dict[str, Any]:
+        d: dict[str, Any] = {}
         env_vars = {k.lower(): v for k, v in os.environ.items()}
         env_prefix = self.settings_cls.model_config.get("env_prefix", "").lower()
 
@@ -92,17 +92,17 @@ class Settings(BaseSettings):
         description="Hashing repository used in Bytes (IN_MEMORY is a stub)",
         possible_values=["IN_MEMORY", "PASTEBIN", "RFC3161"],
     )
-    pastebin_api_dev_key: Optional[str] = Field(
+    pastebin_api_dev_key: str | None = Field(
         None, description="API key for Pastebin. Required when using PASTEBIN hashing repository."
     )
-    rfc3161_provider: Optional[AnyHttpUrl] = Field(
+    rfc3161_provider: AnyHttpUrl | None = Field(
         None,
         examples=["https://freetsa.org/tsr"],
         description="Timestamping. "
         "See https://github.com/trbs/rfc3161ng for a list of public providers and their certificates. "
         "Required when using RFC3161 hashing repository.",
     )
-    rfc3161_cert_file: Optional[FilePath] = Field(
+    rfc3161_cert_file: FilePath | None = Field(
         None,
         examples=["bytes/timestamping/certificates/freetsa.crt"],
         description="Path to the certificate of the RFC3161 provider. Required when using RFC3161 hashing repository. "
@@ -114,12 +114,12 @@ class Settings(BaseSettings):
         description="Encryption middleware used in Bytes",
         possible_values=["IDENTITY", "NACL_SEALBOX"],
     )
-    private_key_b64: Optional[str] = Field(
+    private_key_b64: str | None = Field(
         None,
         description="KATalogus NaCl Sealbox base-64 private key string. "
         "Required when using NACL_SEALBOX encryption middleware.",
     )
-    public_key_b64: Optional[str] = Field(
+    public_key_b64: str | None = Field(
         None,
         description="KATalogus NaCl Sealbox base-64 public key string. "
         "Required when using NACL_SEALBOX encryption middleware.",
@@ -132,7 +132,7 @@ class Settings(BaseSettings):
         200, description="The amount of cache entries to keep for metrics endpoints with query parameters."
     )
 
-    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
+    span_export_grpc_endpoint: AnyHttpUrl | None = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
@@ -141,12 +141,12 @@ class Settings(BaseSettings):
     @classmethod
     def settings_customise_sources(
         cls,
-        settings_cls: Type[BaseSettings],
+        settings_cls: type[BaseSettings],
         init_settings: PydanticBaseSettingsSource,
         env_settings: PydanticBaseSettingsSource,
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
-    ) -> Tuple[PydanticBaseSettingsSource, ...]:
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
         backwards_compatible_settings = BackwardsCompatibleEnvSettings(settings_cls)
         return env_settings, init_settings, file_secret_settings, backwards_compatible_settings
 

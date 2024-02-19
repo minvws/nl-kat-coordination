@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -221,14 +221,14 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
 
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
-        return self.octopoes_api_connector.list(self.plugin.consumes, limit=self.limit_ooi_list).items
+        return self.octopoes_api_connector.list_objects(self.plugin.consumes, limit=self.limit_ooi_list).items
 
     def get_form_filtered_consumable_oois(self):
         """Return a list of oois that is filtered for oois that meets clearance level."""
         oois = self.get_form_consumable_oois()
         return [ooi for ooi in oois if ooi.scan_profile.level >= self.plugin.scan_level.value]
 
-    def get_oois(self, selected_oois: List[str]) -> Dict[str, Any]:
+    def get_oois(self, selected_oois: list[str]) -> dict[str, Any]:
         oois_with_clearance = []
         oois_without_clearance = []
         for ooi in selected_oois:

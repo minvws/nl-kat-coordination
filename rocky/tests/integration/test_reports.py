@@ -1,6 +1,7 @@
 from dataclasses import asdict
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.definitions import MultiReport, Report
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.web_system_report.report import WebSystemReport
@@ -65,7 +66,7 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
 
     assert data["input_ooi"] == input_ooi
     assert data["summary"] == {
-        "total_domains": 10,  # TODO: this is not deduplicated, should it be?
+        "total_domains": 7,
         "total_systems": 2,
     }
     assert data["services"] == {
@@ -95,7 +96,9 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
 def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois):
     seed_system(octopoes_api_connector, valid_time)
 
-    reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+    reports: list[type[Report] | type[MultiReport]] = (
+        AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+    )
     report_ids = [report_type.id for report_type in reports]
     _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
 
@@ -243,13 +246,13 @@ def test_multi_report(
     _, data, report_data, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
     _, data_2, report_data_2, _ = aggregate_reports(octopoes_api_connector_2, hostname_oois, report_ids, valid_time)
 
-    report_data = ReportData(
+    report_data_object = ReportData(
         organization_code=octopoes_api_connector.client,
         organization_name="Test name",
         organization_tags=["test1"],
         data={"post_processed_data": data, "report_data": report_data},
     )
-    report_data_2 = ReportData(
+    report_data_object_2 = ReportData(
         organization_code=octopoes_api_connector_2.client,
         organization_name="Name2",
         organization_tags=["test1", "test2", "test3"],
@@ -257,12 +260,12 @@ def test_multi_report(
     )
 
     # Save second organization info in the first organization
-    octopoes_api_connector.save_declaration(Declaration(ooi=report_data, valid_time=valid_time))
-    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_2, valid_time=valid_time))
+    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_object, valid_time=valid_time))
+    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_object_2, valid_time=valid_time))
 
     multi_report = MultiOrganizationReport(octopoes_api_connector)
     multi_report_data = collect_report_data(
-        octopoes_api_connector, [str(report_data.reference), str(report_data_2.reference)]
+        octopoes_api_connector, [str(report_data_object.reference), str(report_data_object_2.reference)]
     )
     multi_data = multi_report.post_process_data(multi_report_data)
     assert multi_data["organizations"] == [octopoes_api_connector.client, octopoes_api_connector_2.client]

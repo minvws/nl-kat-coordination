@@ -1,7 +1,9 @@
 import datetime
 import logging
+from collections.abc import Iterable
+from enum import Enum
 from functools import cached_property
-from typing import Iterable, Set
+from typing import cast
 
 import tagulous.models
 from django.conf import settings
@@ -13,21 +15,13 @@ from django.db.models.signals import post_save, pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import KATalogusClientV1, get_katalogus
-from katalogus.exceptions import (
-    KATalogusDownException,
-    KATalogusException,
-    KATalogusUnhealthyException,
-)
+from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 from requests import RequestException
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.web import Network
-from rocky.exceptions import (
-    OctopoesDownException,
-    OctopoesException,
-    OctopoesUnhealthyException,
-)
+from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
 from tools.fields import LowerCaseSlugField
@@ -131,8 +125,8 @@ class Organization(models.Model):
         except Exception as e:
             try:
                 octopoes_client.create_node()
-            except Exception as e:
-                raise OctopoesException("Failed creating organization in Octopoes") from e
+            except Exception as second_exception:
+                raise OctopoesException("Failed creating organization in Octopoes") from second_exception
 
             raise KATalogusException("Failed deleting organization in the Katalogus") from e
 
@@ -166,8 +160,8 @@ class Organization(models.Model):
         except Exception as e:
             try:
                 katalogus_client.delete_organization()
-            except Exception as e:
-                raise KATalogusException("Failed deleting organization in the Katalogus") from e
+            except Exception as second_exception:
+                raise KATalogusException("Failed deleting organization in the Katalogus") from second_exception
 
             raise OctopoesException("Failed creating organization in Octopoes") from e
 
@@ -221,7 +215,7 @@ class OrganizationMember(models.Model):
         ACTIVE = "active", _("active")
         NEW = "new", _("new")
 
-    scan_levels = [scan_level.value for scan_level in SCAN_LEVEL]
+    scan_levels = [scan_level.value for scan_level in cast(type[Enum], SCAN_LEVEL)]
 
     user = models.ForeignKey("account.KATUser", on_delete=models.PROTECT, related_name="members")
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="members")
@@ -237,7 +231,7 @@ class OrganizationMember(models.Model):
     )
 
     @cached_property
-    def all_permissions(self) -> Set[str]:
+    def all_permissions(self) -> set[str]:
         if self.user.is_active and self.user.is_superuser:
             # Superuser always has all permissions
             return {
