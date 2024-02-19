@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -142,7 +142,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             messages.add_message(self.request, messages.WARNING, warning_message)
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, str]]]:
         report_data = {}
         error_oois = []
         for ooi in self.selected_oois:

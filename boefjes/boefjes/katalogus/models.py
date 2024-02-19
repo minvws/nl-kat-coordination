@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import List, Literal, NewType, Optional, Set, Union
+from typing import Literal, NewType
 
 from pydantic import AnyHttpUrl, BaseModel, Field
 
@@ -21,13 +21,13 @@ class Organisation(BaseModel):
 class Plugin(BaseModel):
     id: str
     repository_id: str = RESERVED_LOCAL_ID
-    name: Optional[str] = None
-    version: Optional[str] = None
-    authors: Optional[List[str]] = None
-    created: Optional[datetime.datetime] = None
-    description: Optional[str] = None
-    environment_keys: List[str] = Field(default_factory=list)
-    related: Optional[List[str]] = None
+    name: str | None = None
+    version: str | None = None
+    authors: list[str] | None = None
+    created: datetime.datetime | None = None
+    description: str | None = None
+    environment_keys: list[str] = Field(default_factory=list)
+    related: list[str] | None = None
     enabled: bool = False
 
     def __str__(self):
@@ -37,29 +37,29 @@ class Plugin(BaseModel):
 class Boefje(Plugin):
     type: Literal["boefje"] = "boefje"
     scan_level: int = 1
-    consumes: Set[str] = Field(default_factory=set)
-    produces: Set[str] = Field(default_factory=set)
-    options: Optional[List[str]] = None
-    runnable_hash: Optional[str] = None
-    oci_image: Optional[str] = None
+    consumes: set[str] = Field(default_factory=set)
+    produces: set[str] = Field(default_factory=set)
+    options: list[str] | None = None
+    runnable_hash: str | None = None
+    oci_image: str | None = None
 
 
 class Normalizer(Plugin):
     type: Literal["normalizer"] = "normalizer"
-    consumes: List[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
-    produces: List[str] = Field(default_factory=list)  # oois
+    consumes: list[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
+    produces: list[str] = Field(default_factory=list)  # oois
     enabled: bool = True
 
 
 class Bit(Plugin):
     type: Literal["bit"] = "bit"
     consumes: str
-    produces: List[str]
-    parameters: List[str]  # ooi.relation-name
+    produces: list[str]
+    parameters: list[str]  # ooi.relation-name
     enabled: bool = True
 
 
-PluginType = Union[Boefje, Normalizer, Bit]
+PluginType = Boefje | Normalizer | Bit
 Base64Str = NewType("Base64Str", str)
 
 

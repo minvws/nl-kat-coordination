@@ -2,7 +2,6 @@ import datetime
 import logging
 import uuid
 from enum import Enum
-from typing import List, Optional, Union
 
 import requests
 from pydantic import BaseModel, TypeAdapter
@@ -26,8 +25,8 @@ class QueuePrioritizedItem(BaseModel):
 
     id: uuid.UUID
     priority: int
-    hash: Optional[str] = None
-    data: Union[BoefjeMeta, NormalizerMeta]
+    hash: str | None = None
+    data: BoefjeMeta | NormalizerMeta
 
 
 class TaskStatus(Enum):
@@ -52,10 +51,10 @@ class Task(BaseModel):
 
 
 class SchedulerClientInterface:
-    def get_queues(self) -> List[Queue]:
+    def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
+    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -91,17 +90,17 @@ class SchedulerAPIClient(SchedulerClientInterface):
     def _verify_response(response: requests.Response) -> None:
         response.raise_for_status()
 
-    def get_queues(self) -> List[Queue]:
+    def get_queues(self) -> list[Queue]:
         response = self._session.get(f"{self.base_url}/queues")
         self._verify_response(response)
 
-        return TypeAdapter(List[Queue]).validate_json(response.content)
+        return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
+    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
         response = self._session.post(f"{self.base_url}/queues/{queue}/pop")
         self._verify_response(response)
 
-        return TypeAdapter(Optional[QueuePrioritizedItem]).validate_json(response.content)
+        return TypeAdapter(QueuePrioritizedItem | None).validate_json(response.content)
 
     def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
         response = self._session.post(f"{self.base_url}/queues/{queue_id}/push", data=p_item.json())

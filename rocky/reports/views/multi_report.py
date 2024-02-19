@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -123,7 +123,7 @@ class MultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView):
     template_name = "multi_report.html"
     current_step = 6
 
-    def multi_reports_for_oois(self) -> Dict[str, Dict[str, Any]]:
+    def multi_reports_for_oois(self) -> dict[str, dict[str, Any]]:
         report = MultiOrganizationReport(self.octopoes_api_connector)
 
         return report.post_process_data(collect_report_data(self.octopoes_api_connector, self.selected_oois))

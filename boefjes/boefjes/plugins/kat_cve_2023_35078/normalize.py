@@ -1,4 +1,4 @@
-from typing import Iterable, List, Tuple, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
@@ -6,10 +6,10 @@ from octopoes.models.ooi.findings import CVEFindingType, Finding
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from packaging import version
 
-VULNERABLE_RANGES: List[Tuple[str, str]] = [("0", "11.8.1.1"), ("11.9.0.0", "11.9.1.1"), ("11.10.0.0", "11.10.0.2")]
+VULNERABLE_RANGES: list[tuple[str, str]] = [("0", "11.8.1.1"), ("11.9.0.0", "11.9.1.1"), ("11.10.0.0", "11.10.0.2")]
 
 
-def extract_js_version(html_content: str) -> Union[version.Version, bool]:
+def extract_js_version(html_content: str) -> version.Version | bool:
     telltale = "/mifs/scripts/auth.js?"
     telltale_position = html_content.find(telltale)
     if telltale_position == -1:
@@ -23,7 +23,7 @@ def extract_js_version(html_content: str) -> Union[version.Version, bool]:
     return version.parse(" ".join(strip_vsp_and_build(version_string)))
 
 
-def extract_css_version(html_content: str) -> Union[version.Version, bool]:
+def extract_css_version(html_content: str) -> version.Version | bool:
     telltale = "/mifs/css/windowsAllAuth.css?"
     telltale_position = html_content.find(telltale)
     if telltale_position == -1:
@@ -48,7 +48,7 @@ def strip_vsp_and_build(url: str) -> Iterable[str]:
 
 
 def is_vulnerable_version(
-    vulnerable_ranges: List[Tuple[version.Version, version.Version]], detected_version: version.Version
+    vulnerable_ranges: list[tuple[version.Version, version.Version]], detected_version: version.Version
 ) -> bool:
     return any(start <= detected_version < end for start, end in vulnerable_ranges)
 
