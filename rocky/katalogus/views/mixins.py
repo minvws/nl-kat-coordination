@@ -21,11 +21,6 @@ from katalogus.client import (
     Normalizer as KATalogusNormalizer,
 )
 from octopoes.models import OOI
-from rocky.exceptions import (
-    AcknowledgedClearanceLevelTooLowException,
-    IndemnificationNotPresentException,
-    TrustedClearanceLevelTooLowException,
-)
 from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, PrioritizedItem, RawData
 from rocky.views.mixins import OctopoesView
 
@@ -117,51 +112,5 @@ class BoefjeMixin(OctopoesView):
 
         for ooi in oois:
             if ooi.scan_profile.level < boefje.scan_level:
-                try:
-                    self.raise_clearance_level(ooi.reference, boefje.scan_level)
-                except IndemnificationNotPresentException:
-                    messages.add_message(
-                        self.request,
-                        messages.ERROR,
-                        _(
-                            "Could not raise clearance level of %s to L%s. \
-                            Indemnification not present at organization %s."
-                        )
-                        % (
-                            ooi.reference.human_readable,
-                            boefje.scan_level,
-                            self.organization.name,
-                        ),
-                    )
-                except TrustedClearanceLevelTooLowException:
-                    messages.add_message(
-                        self.request,
-                        messages.ERROR,
-                        _(
-                            "Could not raise clearance level of %s to L%s. "
-                            "You were trusted a clearance level of L%s. "
-                            "Contact your administrator to receive a higher clearance."
-                        )
-                        % (
-                            ooi.reference.human_readable,
-                            boefje.scan_level,
-                            self.organization_member.trusted_clearance_level,
-                        ),
-                    )
-                except AcknowledgedClearanceLevelTooLowException:
-                    messages.add_message(
-                        self.request,
-                        messages.ERROR,
-                        _(
-                            "Could not raise clearance level of %s to L%s. "
-                            "You acknowledged a clearance level of L%s. "
-                            "Please accept the clearance level first on your profile page to proceed."
-                        )
-                        % (
-                            ooi.reference.human_readable,
-                            boefje.scan_level,
-                            self.organization_member.acknowledged_clearance_level,
-                        ),
-                    )
-
+                self.can_raise_clearance_level(ooi, boefje.scan_level)
             self.run_boefje(boefje, ooi)

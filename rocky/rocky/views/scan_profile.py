@@ -15,11 +15,6 @@ from tools.view_helpers import (
 )
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile
-from rocky.exceptions import (
-    AcknowledgedClearanceLevelTooLowException,
-    IndemnificationNotPresentException,
-    TrustedClearanceLevelTooLowException,
-)
 from rocky.views.ooi_detail import OOIDetailView
 
 
@@ -44,56 +39,9 @@ class ScanProfileDetailView(OOIDetailView, FormView):
         form = self.get_form()
         if form.is_valid():
             level = form.cleaned_data["level"]
-            try:
-                self.raise_clearance_level(self.ooi.reference, level)
-            except IndemnificationNotPresentException:
-                messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _(
-                        "Could not raise clearance level of %s to L%s. \
-                        Indemnification not present at organization %s."
-                    )
-                    % (
-                        self.ooi.reference.human_readable,
-                        level,
-                        self.organization.name,
-                    ),
-                )
+            if not self.can_raise_clearance_level(self.ooi, level):
                 return self.get(request, status=403, *args, **kwargs)
-            except TrustedClearanceLevelTooLowException:
-                messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _(
-                        "Could not raise clearance level of %s to L%s. "
-                        "You were trusted a clearance level of L%s. "
-                        "Contact your administrator to receive a higher clearance."
-                    )
-                    % (
-                        self.ooi.reference.human_readable,
-                        level,
-                        self.organization_member.trusted_clearance_level,
-                    ),
-                )
-                return self.get(request, status=403, *args, **kwargs)
-            except AcknowledgedClearanceLevelTooLowException:
-                messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _(
-                        "Could not raise clearance level of %s to L%s. "
-                        "You acknowledged a clearance level of L%s. "
-                        "Please accept the clearance level below to proceed."
-                    )
-                    % (
-                        self.ooi.reference.human_readable,
-                        level,
-                        self.organization_member.acknowledged_clearance_level,
-                    ),
-                )
-                return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
-
+            return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
         else:
             messages.add_message(
                 self.request,

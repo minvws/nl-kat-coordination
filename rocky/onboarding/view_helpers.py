@@ -1,7 +1,7 @@
 from account.mixins import OrganizationView
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from tools.view_helpers import StepsMixin
+from tools.view_helpers import BreadcrumbsMixin, StepsMixin
 
 ONBOARDING_PERMISSIONS = (
     "tools.can_scan_organization",
@@ -73,3 +73,19 @@ class KatIntroductionAdminStepsMixin(StepsMixin, OrganizationView):
             },
         ]
         return steps
+
+
+class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
+    def build_breadcrumbs(self):
+        return [
+            {
+                "url": reverse_lazy("step_introduction", kwargs={"organization_code": self.organization.code}),
+                "text": _("OpenKAT introduction"),
+            },
+        ]
+
+
+class RegistrationBreadcrumbsMixin(BreadcrumbsMixin):
+    breadcrumbs = [
+        {"url": reverse_lazy("step_introduction_registration"), "text": _("OpenKAT Setup")},
+    ]
