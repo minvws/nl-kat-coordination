@@ -44,7 +44,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable_[OOI]:
         event_ooi = pk_ooi
 
         # Autonomous System
-        as_number = event["network"].get("asn", False)
+        as_number = event["network"].get("asn")
         as_name = event["network"]["organization_name"]
 
         if as_number:
