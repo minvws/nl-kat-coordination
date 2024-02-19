@@ -54,14 +54,21 @@ class OOIAttributeError(AttributeError):
 
 
 class ObservedAtMixin:
-    def get_observed_at(self) -> datetime:
+    @cached_property
+    def observed_at(self) -> datetime:
         observed_at = self.request.GET.get("observed_at", None)
         if not observed_at:
             return datetime.now(timezone.utc)
 
         try:
             datetime_format = "%Y-%m-%d"
-            return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
+            date_time = convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
+            if date_time.date() > datetime.now(timezone.utc).date():
+                messages.warning(
+                    self.request,
+                    _("The selected date is in the future."),
+                )
+            return date_time
         except ValueError:
             try:
                 ret = datetime.fromisoformat(observed_at)
@@ -345,7 +352,7 @@ class SingleOOITreeMixin(SingleOOIMixin):
             pk = self.get_ooi_id()
 
         if observed_at is None:
-            observed_at = self.get_observed_at()
+            observed_at = self.observed_at
 
         return self.get_object_from_tree(pk, observed_at)
 
