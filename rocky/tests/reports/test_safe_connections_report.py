@@ -37,8 +37,7 @@ def test_safe_connections_report_single_cipher_finding_type(
 
     data = report.generate_data(str(ipaddressv4.reference), valid_time)
 
-    assert len(data["sc_ips"][ipaddressv4.reference]) == 1
-    assert data["sc_ips"][ipaddressv4.reference][0] == cipher_finding_type
+    assert data["sc_ips"][ipaddressv4.reference] == [cipher_finding_type]
     assert data["number_of_available"] == 0
     assert data["number_of_ips"] == 1
 
@@ -60,9 +59,7 @@ def test_safe_connections_report_multiple_cipher_finding_types(
 
     data = report.generate_data(str(ipaddressv4.reference), valid_time)
 
-    assert len(data["sc_ips"][ipaddressv4.reference]) == 2
-    assert cipher_finding_types[0] in data["sc_ips"][ipaddressv4.reference]
-    assert cipher_finding_types[1] in data["sc_ips"][ipaddressv4.reference]
+    assert data["sc_ips"][ipaddressv4.reference] == cipher_finding_types
     assert data["number_of_available"] == 0
     assert data["number_of_ips"] == 1
 
