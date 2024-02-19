@@ -1,5 +1,3 @@
-from typing import List
-
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import ObservedAtForm
 from tools.view_helpers import Breadcrumb, get_ooi_url
@@ -12,7 +10,7 @@ class OOIFindingListView(OOIFindingManager, BaseOOIDetailView):
     template_name = "oois/ooi_findings.html"
     connector_form_class = ObservedAtForm
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(self.get_last_breadcrumb())
         return breadcrumbs

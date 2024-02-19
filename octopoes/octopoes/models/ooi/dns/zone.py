@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import string
-from typing import Literal, Optional
+from typing import Annotated, Literal
 
 from pydantic import StringConstraints, field_validator
-from typing_extensions import Annotated
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import IPAddress, Network
@@ -17,9 +16,7 @@ class DNSZone(OOI):
     object_type: Literal["DNSZone"] = "DNSZone"
 
     hostname: Reference = ReferenceField("Hostname", max_issue_scan_level=2, max_inherit_scan_level=1)
-    parent: Optional[Reference] = ReferenceField(
-        "DNSZone", max_issue_scan_level=0, max_inherit_scan_level=1, default=None
-    )
+    parent: Reference | None = ReferenceField("DNSZone", max_issue_scan_level=0, max_inherit_scan_level=1, default=None)
 
     _natural_key_attrs = ["hostname"]
 
@@ -36,11 +33,9 @@ class Hostname(OOI):
     network: Reference = ReferenceField(Network)
     name: Annotated[str, StringConstraints(to_lower=True)]
 
-    dns_zone: Optional[Reference] = ReferenceField(
-        DNSZone, max_issue_scan_level=1, max_inherit_scan_level=2, default=None
-    )
+    dns_zone: Reference | None = ReferenceField(DNSZone, max_issue_scan_level=1, max_inherit_scan_level=2, default=None)
 
-    registered_domain: Optional[Reference] = ReferenceField(
+    registered_domain: Reference | None = ReferenceField(
         "Hostname", max_issue_scan_level=1, max_inherit_scan_level=2, default=None
     )
 

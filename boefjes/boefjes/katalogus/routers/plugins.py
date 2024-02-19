@@ -1,5 +1,4 @@
 from functools import partial
-from typing import Dict, List
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
@@ -32,13 +31,13 @@ def _plugin_matches_query(plugin: PluginType, query: str) -> bool:
 
 
 # todo: sorting?
-@router.get("/plugins", response_model=List[PluginType])
+@router.get("/plugins", response_model=list[PluginType])
 def list_plugins(
     organisation_id: str,
     filter_params: FilterParameters = Depends(get_plugins_filter_parameters),
     pagination_params: PaginationParameters = Depends(get_pagination_parameters),
     plugin_service: PluginService = Depends(get_plugin_service),
-) -> List[PluginType]:
+) -> list[PluginType]:
     with plugin_service as p:
         plugins = p.get_all(organisation_id)
 
@@ -83,7 +82,7 @@ def get_plugin(
 
 @router.get(
     "/repositories/{repository_id}/plugins",
-    response_model=Dict[str, PluginType],
+    response_model=dict[str, PluginType],
 )
 def list_repository_plugins(
     repository_id: str,

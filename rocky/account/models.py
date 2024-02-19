@@ -1,5 +1,4 @@
 from functools import cached_property
-from typing import List
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
@@ -89,18 +88,18 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         return self.full_name
 
     @cached_property
-    def all_organizations(self) -> List[Organization]:
+    def all_organizations(self) -> list[Organization]:
         return list(Organization.objects.all())
 
     @cached_property
-    def organization_members(self) -> List[OrganizationMember]:
+    def organization_members(self) -> list[OrganizationMember]:
         """
         Lists the user's OrganizationMembers including the related Organizations.
         """
         return self.members.select_related("organization")
 
     @cached_property
-    def organizations(self) -> List[Organization]:
+    def organizations(self) -> list[Organization]:
         """
         Lists all organizations a user is a member of, excluding organizations to which access is blocked.
 
@@ -111,7 +110,7 @@ class KATUser(AbstractBaseUser, PermissionsMixin):
         return [m.organization for m in self.organization_members if not m.blocked]
 
     @cached_property
-    def organizations_including_blocked(self) -> List[Organization]:
+    def organizations_including_blocked(self) -> list[Organization]:
         """
         Lists all organizations a user is a member of, including organizations to which access is blocked.
 
