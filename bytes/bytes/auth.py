@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Tuple
 
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -24,7 +23,7 @@ class TokenResponse(BaseModel):
     expires_at: str
 
 
-def get_access_token(form_data: OAuth2PasswordRequestForm) -> Tuple[str, datetime]:
+def get_access_token(form_data: OAuth2PasswordRequestForm) -> tuple[str, datetime]:
     settings = get_settings()
     system_username = settings.username
     hashed_password = pwd_context.hash(settings.password)
@@ -63,7 +62,7 @@ def authenticate_token(token: str = Depends(oauth2_scheme)) -> str:
 
 def _create_access_token(
     form_data: OAuth2PasswordRequestForm, secret: str, access_token_expire_minutes: float
-) -> Tuple[str, datetime]:
+) -> tuple[str, datetime]:
     expire_time = _get_expire_time(access_token_expire_minutes)
     data = {
         "sub": form_data.username,

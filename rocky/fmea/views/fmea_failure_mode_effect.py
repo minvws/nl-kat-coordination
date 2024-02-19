@@ -1,5 +1,3 @@
-from typing import List
-
 from django.contrib import messages
 from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -34,7 +32,7 @@ class FailureModeEffectCreateView(FailureModeEffectBreadcrumbsMixin, CreateView)
         success_message = _("Failure mode effect successfully created.")
         messages.add_message(self.request, messages.SUCCESS, success_message)
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(
             {
@@ -63,7 +61,7 @@ class FailureModeEffectUpdateView(FailureModeEffectBreadcrumbsMixin, UpdateView)
         context["editing_view"] = "editing"
         return context
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
 
         breadcrumbs.append(
@@ -93,7 +91,7 @@ class FailureModeEffectDetailView(FailureModeEffectBreadcrumbsMixin, DetailView)
     template_name = "fmea/fmea_failure_mode_effect_detail.html"
     model = FailureModeEffect
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
 
         breadcrumbs.append(
