@@ -1,7 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
 from requests import HTTPError
@@ -34,11 +34,11 @@ class OriginRepository(Repository):
         self,
         valid_time: datetime,
         *,
-        task_id: Optional[UUID] = None,
-        source: Optional[Reference] = None,
-        result: Optional[Reference] = None,
-        origin_type: Optional[OriginType] = None,
-    ) -> List[Origin]:
+        task_id: UUID | None = None,
+        source: Reference | None = None,
+        result: Reference | None = None,
+        origin_type: OriginType | None = None,
+    ) -> list[Origin]:
         raise NotImplementedError
 
     def delete(self, origin: Origin, valid_time: datetime) -> None:
@@ -56,25 +56,25 @@ class XTDBOriginRepository(OriginRepository):
         self.session.commit()
 
     @classmethod
-    def serialize(cls, origin: Origin) -> Dict[str, Any]:
+    def serialize(cls, origin: Origin) -> dict[str, Any]:
         data = origin.dict()
         data[cls.pk_prefix] = origin.id
         data["type"] = origin.__class__.__name__
         return data
 
     @classmethod
-    def deserialize(cls, data: Dict[str, Any]) -> Origin:
+    def deserialize(cls, data: dict[str, Any]) -> Origin:
         return Origin.parse_obj(data)
 
     def list_origins(
         self,
         valid_time: datetime,
         *,
-        task_id: Optional[UUID] = None,
-        source: Optional[Reference] = None,
-        result: Optional[Reference] = None,
-        origin_type: Optional[OriginType] = None,
-    ) -> List[Origin]:
+        task_id: UUID | None = None,
+        source: Reference | None = None,
+        result: Reference | None = None,
+        origin_type: OriginType | None = None,
+    ) -> list[Origin]:
         where_parameters = {"type": Origin.__name__}
 
         if task_id:

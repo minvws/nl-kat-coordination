@@ -32,7 +32,7 @@ class TestPlugins(TestCase):
                 "kat_test_normalize",
                 "kat_test_normalize_2",
             },
-            set([x["id"] for x in res.json()]),
+            {x["id"] for x in res.json()},
         )
 
     def test_list_filter_by_type(self):
@@ -45,7 +45,7 @@ class TestPlugins(TestCase):
                 "kat_test",
                 "kat_test_2",
             },
-            set([x["id"] for x in res.json()]),
+            {x["id"] for x in res.json()},
         )
 
     def test_list_filter_by_state(self):
@@ -59,7 +59,7 @@ class TestPlugins(TestCase):
                 "kat_test_normalize",
                 "kat_test_normalize_2",
             },
-            set([x["id"] for x in plugins]),
+            {x["id"] for x in plugins},
         )
         self.assertTrue(all([x["enabled"] for x in plugins]))
 
@@ -73,7 +73,7 @@ class TestPlugins(TestCase):
                 "kat_test_normalize",
                 "kat_test_normalize_2",
             },
-            set([x["id"] for x in (res.json())]),
+            {x["id"] for x in (res.json())},
         )
 
     def test_list_pagination(self):
@@ -84,7 +84,7 @@ class TestPlugins(TestCase):
                 "test-bit-1",
                 "test-normalizer-1",
             },
-            set([x["id"] for x in (res.json())]),
+            {x["id"] for x in (res.json())},
         )
 
     def test_list_repository(self):
@@ -114,9 +114,9 @@ class TestPlugins(TestCase):
         assert res.json()["produces"] == ["text/html"]
 
         # For boefjes that are pulled from the local repository, we actually get the default mime_types
-        assert set(self.client.get("/v1/organisations/test-org/plugins/kat_test").json()["produces"]) == set(
-            ["boefje/kat_test"]
-        )
+        assert set(self.client.get("/v1/organisations/test-org/plugins/kat_test").json()["produces"]) == {
+            "boefje/kat_test"
+        }
 
     def test_non_existing_plugin(self):
         res = self.client.get("/v1/organisations/test-org/repositories/test-repo/plugins/future-plugin")

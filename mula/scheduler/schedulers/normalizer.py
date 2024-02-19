@@ -1,6 +1,6 @@
+from collections.abc import Callable
 from concurrent import futures
 from types import SimpleNamespace
-from typing import Callable, Dict, List, Optional
 
 import requests
 import structlog
@@ -38,8 +38,8 @@ class NormalizerScheduler(Scheduler):
         ctx: context.AppContext,
         scheduler_id: str,
         organisation: Organisation,
-        queue: Optional[queues.PriorityQueue] = None,
-        callback: Optional[Callable[..., None]] = None,
+        queue: queues.PriorityQueue | None = None,
+        callback: Callable[..., None] | None = None,
     ):
         self.logger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
@@ -131,9 +131,9 @@ class NormalizerScheduler(Scheduler):
                 return
 
         # Get all normalizers for the mime types of the raw data
-        normalizers: Dict[str, Normalizer] = {}
+        normalizers: dict[str, Normalizer] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: List[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -260,7 +260,7 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
-    def get_normalizers_for_mime_type(self, mime_type: str) -> List[Plugin]:
+    def get_normalizers_for_mime_type(self, mime_type: str) -> list[Plugin]:
         """Get available normalizers for a given mime type.
 
         Args:

@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set, Type, Union
 from uuid import UUID, uuid4
 
 from octopoes.models import OOI
@@ -36,14 +35,14 @@ class Aliased:
     we will get the DNSAAAARecords of the Hostname of the name server of "test.com".
     """
 
-    type: Type[OOI]
+    type: type[OOI]
 
     # The lambda makes it possible to mock the factory more easily, see:
     # https://stackoverflow.com/questions/61257658/python-dataclasses-mocking-the-default-factory-in-a-frozen-dataclass
     alias: UUID = field(default_factory=lambda: uuid4())
 
 
-Ref = Union[Type[OOI], Aliased]
+Ref = type[OOI] | Aliased
 A = Aliased
 
 
@@ -68,10 +67,10 @@ class Query:
 
     result_type: Ref
 
-    _where_clauses: List[str] = field(default_factory=list)
-    _find_clauses: List[str] = field(default_factory=list)
-    _limit: Optional[int] = None
-    _offset: Optional[int] = None
+    _where_clauses: list[str] = field(default_factory=list)
+    _find_clauses: list[str] = field(default_factory=list)
+    _limit: int | None = None
+    _offset: int | None = None
 
     def where(self, ooi_type: Ref, **kwargs) -> "Query":
         for field_name, value in kwargs.items():
@@ -94,7 +93,7 @@ class Query:
         ooi_type = path.segments[-1].target_type
         query = cls(ooi_type)
         target_ref = None
-        alias_map: Dict[str, Ref] = {}
+        alias_map: dict[str, Ref] = {}
 
         for segment in path.segments:
             source_ref = alias_map.get(segment.source_type.get_object_type(), segment.source_type)
@@ -139,7 +138,7 @@ class Query:
 
         return self
 
-    def _where_field_is(self, ref: Ref, field_name: str, value: Union[Ref, str, Set[str]]) -> None:
+    def _where_field_is(self, ref: Ref, field_name: str, value: Ref | str | set[str]) -> None:
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         if field_name not in ooi_type.model_fields:
@@ -171,7 +170,7 @@ class Query:
             self._add_where_statement(ref, field_name, f'"{value}"')
             return
 
-        if not isinstance(value, (type, Aliased)):
+        if not isinstance(value, type | Aliased):
             raise InvalidField(f"value '{value}' should be a string or an OOI Type")
 
         if not isinstance(value, Aliased) and not issubclass(value, OOI):
@@ -208,7 +207,7 @@ class Query:
             )
         )
 
-    def _or_statement(self, from_alias: str, concrete_types: List[Type[OOI]], field_name: str, to_alias: str) -> str:
+    def _or_statement(self, from_alias: str, concrete_types: list[type[OOI]], field_name: str, to_alias: str) -> str:
         relationships = [
             self._relationship(from_alias, concrete_type.get_object_type(), field_name, to_alias)
             for concrete_type in concrete_types
@@ -219,14 +218,14 @@ class Query:
     def _relationship(self, from_alias: str, field_type: str, field_name: str, to_alias: str) -> str:
         return f"[ {from_alias} :{field_type}/{field_name} {to_alias} ]"
 
-    def _assert_type(self, ref: Ref, ooi_type: Type[OOI]) -> str:
+    def _assert_type(self, ref: Ref, ooi_type: type[OOI]) -> str:
         if ooi_type not in get_abstract_types():
             return self._to_object_type_statement(ref, ooi_type)
 
         concrete = sorted(to_concrete({ooi_type}), key=lambda t: t.__name__)
         return f"(or {' '.join([self._to_object_type_statement(ref, x) for x in concrete])} )"
 
-    def _to_object_type_statement(self, ref: Ref, other_type: Type[OOI]) -> str:
+    def _to_object_type_statement(self, ref: Ref, other_type: type[OOI]) -> str:
         return f'[ {self._get_object_alias(ref)} :object_type "{other_type.get_object_type()}" ]'
 
     def _compile_where_clauses(self, *, separator=" ") -> str:

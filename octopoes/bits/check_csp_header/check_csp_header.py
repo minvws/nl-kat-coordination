@@ -1,6 +1,6 @@
 import ipaddress
 import re
-from typing import Dict, Iterator, List
+from collections.abc import Iterator
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -9,7 +9,7 @@ from octopoes.models.types import HTTPHeader
 NON_DECIMAL_FILTER = re.compile(r"[^\d.]+")
 
 
-def run(input_ooi: HTTPHeader, additional_oois: List, config: Dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "content-security-policy":
         return
