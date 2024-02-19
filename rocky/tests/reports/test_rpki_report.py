@@ -42,15 +42,10 @@ def test_rpki_ip_valid(mock_octopoes_api_connector, valid_time, hostname, ipaddr
 
     data = report.generate_data(str(ipaddressv4.reference), valid_time)
 
-    assert all(
-        v == 1
-        for v in [
-            data["number_of_available"],
-            data["number_of_compliant"],
-            data["number_of_valid"],
-            data["number_of_ips"],
-        ]
-    )
+    assert data["number_of_available"] == 1
+    assert data["number_of_compliant"] == 1
+    assert data["number_of_valid"] == 1
+    assert data["number_of_ips"] == 1
 
     assert data["rpki_ips"][ipaddressv4.reference] == {"exists": True, "valid": True}
 
