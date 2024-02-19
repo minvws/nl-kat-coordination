@@ -50,17 +50,23 @@ class MailReport(Report):
 
             number_of_spf -= (
                 1
-                if list(filter(lambda finding: finding.id == "KAT-NO-SPF", finding_types[hostname.primary_key]))
+                if list(
+                    filter(lambda finding_type: finding_type.id == "KAT-NO-SPF", finding_types[hostname.primary_key])
+                )
                 else 0
             )
             number_of_dmarc -= (
                 1
-                if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", finding_types[hostname.primary_key]))
+                if list(
+                    filter(lambda finding_type: finding_type.id == "KAT-NO-DMARC", finding_types[hostname.primary_key])
+                )
                 else 0
             )
             number_of_dkim -= (
                 1
-                if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", finding_types[hostname.primary_key]))
+                if list(
+                    filter(lambda finding_type: finding_type.id == "KAT-NO-DKIM", finding_types[hostname.primary_key])
+                )
                 else 0
             )
 
