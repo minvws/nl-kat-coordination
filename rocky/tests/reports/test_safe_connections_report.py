@@ -81,6 +81,6 @@ def test_safe_connections_report_no_cipher_finding_types(
 
     data = report.generate_data(str(ipaddressv4.reference), valid_time)
 
-    assert len(data["sc_ips"][ipaddressv4.reference]) == 0
+    assert data["sc_ips"][ipaddressv4.reference] == []
     assert data["number_of_available"] == 1
     assert data["number_of_ips"] == 1
