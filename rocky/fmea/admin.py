@@ -14,18 +14,22 @@ from .models import (
 )
 
 
+@admin.register(FailureMode)
 class FailureModeAdmin(admin.ModelAdmin):
     form = FailureModeForm
 
 
+@admin.register(FailureModeAffectedObject)
 class FailureModeAffectedObjectAdmin(admin.ModelAdmin):
     form = FailureModeAffectedObjectForm
 
 
+@admin.register(FailureModeTreeObject)
 class FailureModeTreeObjectAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(FailureModeEffect)
 class FailureModeEffectAdmin(admin.ModelAdmin):
     list_display = (
         "effect",
@@ -33,9 +37,3 @@ class FailureModeEffectAdmin(admin.ModelAdmin):
         "id",
     )
     form = FailureModeEffectForm
-
-
-admin.site.register(FailureMode, FailureModeAdmin)
-admin.site.register(FailureModeAffectedObject, FailureModeAffectedObjectAdmin)
-admin.site.register(FailureModeTreeObject, FailureModeTreeObjectAdmin)
-admin.site.register(FailureModeEffect, FailureModeEffectAdmin)
