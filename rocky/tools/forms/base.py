@@ -96,25 +96,20 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
     input_type = "checkbox"
     template_name = "forms/widgets/checkbox_group_columns.html"
     option_template_name = "forms/widgets/checkbox_option.html"
-    required_options: list[str] = None
-    toggle_all_button = None
+    required_options: list[str]
     wrap_label = True
 
     def __init__(
         self,
         required_options: list[str] | None = None,
-        toggle_all_button: bool | None = None,
         *args,
         **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
-        if toggle_all_button is not None:
-            self.toggle_all_button = toggle_all_button
         self.required_options = required_options or []
 
     def get_context(self, name, value, attrs) -> dict[str, Any]:
         context = super().get_context(name, value, attrs)
-        context["toggle_all_button"] = self.toggle_all_button
         return context
 
     def create_option(self, *arg, **kwargs) -> dict[str, Any]:
