@@ -3,7 +3,6 @@ import logging
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
-from typing import List, Optional
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, Response
@@ -62,14 +61,14 @@ class StatusEnum(str, Enum):
 
 
 class File(BaseModel):
-    name: Optional[str] = None
+    name: str | None = None
     content: str = Field(..., contentEncoding="base64")
-    tags: Optional[List[str]] = None
+    tags: list[str] | None = None
 
 
 class BoefjeOutput(BaseModel):
     status: StatusEnum
-    files: Optional[List[File]] = None
+    files: list[File] | None = None
 
 
 def get_scheduler_client():

@@ -53,7 +53,7 @@ def cast_expression(expression: BinaryExpression, filter_: Filter) -> BinaryExpr
             expression = expression.astext
 
     # Handle other numeric types
-    elif isinstance(filter_.value, (int, float)):
+    elif isinstance(filter_.value, int | float):
         expression = expression.cast(Numeric)
 
     # Handle booleans

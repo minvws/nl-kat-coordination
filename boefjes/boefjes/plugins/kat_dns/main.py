@@ -3,7 +3,6 @@ import json
 import logging
 import re
 from os import getenv
-from typing import List, Tuple, Union
 
 import dns.resolver
 from dns.name import Name
@@ -13,14 +12,14 @@ from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
-DEFAULT_RECORD_TYPES = set(("A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME", "SOA"))
+DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME", "SOA"}
 
 
 class ZoneNotFoundException(Exception):
     pass
 
 
-def get_record_types() -> List[str]:
+def get_record_types() -> list[str]:
     requested_record_types = getenv("RECORD_TYPES", "")
     if not requested_record_types:
         return DEFAULT_RECORD_TYPES
@@ -28,7 +27,7 @@ def get_record_types() -> List[str]:
     return list(set(requested_record_types).intersection(DEFAULT_RECORD_TYPES))
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     hostname = boefje_meta.arguments["input"]["name"]
 
     requested_dns_name = dns.name.from_text(hostname)

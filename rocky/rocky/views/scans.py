@@ -1,6 +1,6 @@
 from logging import getLogger
-from typing import List
 
+from account.mixins import OrganizationView
 from django.views.generic import TemplateView
 from katalogus.client import get_katalogus
 from tools.view_helpers import Breadcrumb, ObjectsBreadcrumbsMixin
@@ -8,10 +8,10 @@ from tools.view_helpers import Breadcrumb, ObjectsBreadcrumbsMixin
 logger = getLogger(__name__)
 
 
-class ScanListView(ObjectsBreadcrumbsMixin, TemplateView):
+class ScanListView(ObjectsBreadcrumbsMixin, OrganizationView, TemplateView):
     template_name = "scan.html"
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
 
         breadcrumbs.append(

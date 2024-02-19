@@ -36,7 +36,7 @@ def AuthRequiredMiddleware(get_response):
             reverse("logout"),
         ]
 
-        if not request.user.is_authenticated and "HTTP_AUTHORIZATION" in request.META:
+        if not request.user.is_authenticated and "authorization" in request.headers:
             authenticator = TokenAuthentication()
             try:
                 user, token = authenticator.authenticate(request)

@@ -1,6 +1,5 @@
 import datetime
 from datetime import timezone
-from typing import Optional
 from uuid import UUID
 
 from boefjes.config import BASE_DIR
@@ -15,7 +14,7 @@ def get_dummy_data(filename: str) -> bytes:
 def get_boefje_meta(
     meta_id: UUID = UUID("d63d755b-6c23-44ab-8de6-8d144c448a71"),
     boefje_id: str = "kat_test.main",
-    input_ooi: Optional[str] = "Hostname|internet|test.org",
+    input_ooi: str | None = "Hostname|internet|test.org",
 ) -> BoefjeMeta:
     return BoefjeMeta(
         id=meta_id,

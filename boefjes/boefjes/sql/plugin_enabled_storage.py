@@ -1,5 +1,4 @@
 import logging
-from typing import Dict, List, Optional
 
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -39,7 +38,7 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
 
         return instance.enabled
 
-    def get_all_enabled(self, organisation_id: str) -> Dict[str, List[str]]:
+    def get_all_enabled(self, organisation_id: str) -> dict[str, list[str]]:
         query = (
             self.session.query(PluginStateInDB)
             .join(OrganisationInDB)
@@ -48,7 +47,7 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
             .filter(PluginStateInDB.enabled)
         )
 
-        per_repository: Dict[str, List[str]] = {}
+        per_repository: dict[str, list[str]] = {}
 
         for state in query.all():
             if state.repository.id not in per_repository:
@@ -115,7 +114,7 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
 
 
 def create_plugin_enabled_storage(
-    session: Optional[Session] = None,
+    session: Session | None = None,
 ) -> SQLPluginEnabledStorage:
     if not session:
         session = sessionmaker(bind=get_engine())()
