@@ -47,7 +47,7 @@ process. See [logging.json](logging.json) for an example.
 ## Building a new template
 Create a new directory in the `templates` directory, with the following files:
 - `template.tex`: the template file
-- `model.json`: the python pydantic model, describing the shape of the report input data
+- `model.json`: the Python Pydantic model, describing the shape of the report input data
 - `sample.json`: a sample input data file, this will be automatically shown in the API documentation
 
 As an example, look into the `templates/dns` directory.

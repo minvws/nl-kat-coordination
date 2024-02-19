@@ -211,7 +211,6 @@ class OOIListView(BaseOOIListView, OctopoesView):
 class OOIListExportView(BaseOOIListView):
     def get(self, request, *args, **kwargs):
         file_type = request.GET.get("file_type")
-        observed_at = self.get_observed_at()
         filters = self.get_active_filters()
 
         queryset = self.get_queryset()
@@ -219,7 +218,7 @@ class OOIListExportView(BaseOOIListView):
 
         exports = [
             {
-                "observed_at": str(observed_at),
+                "observed_at": str(self.observed_at),
                 "filters": str(filters),
             }
         ]
@@ -237,7 +236,7 @@ class OOIListExportView(BaseOOIListView):
             response = HttpResponse(
                 json.dumps(exports),
                 content_type="application/json",
-                headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(observed_at) + ".json"},
+                headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(self.observed_at) + ".json"},
             )
 
             return response
@@ -245,12 +244,12 @@ class OOIListExportView(BaseOOIListView):
         elif file_type == "csv":
             response = HttpResponse(
                 content_type="text/csv",
-                headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(observed_at) + ".csv"},
+                headers={"Content-Disposition": "attachment; filename=ooi_list_" + str(self.observed_at) + ".csv"},
             )
 
             writer = csv.writer(response)
             writer.writerow(["observed_at", "filters"])
-            writer.writerow([str(observed_at), str(filters)])
+            writer.writerow([str(self.observed_at), str(filters)])
             writer.writerow(["key", "name", "ooi_type"])
             for ooi in ooi_list:
                 writer.writerow(
