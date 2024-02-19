@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from django.conf import settings
 from django.contrib import messages
@@ -125,7 +125,7 @@ class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportVie
             messages.error(self.request, _("Select at least one report type to proceed."))
 
         if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("aggregate_report_view", kwargs=kwargs) + self.get_selection())
+            return redirect(reverse("aggregate_report_view", kwargs=kwargs) + get_selection(request))
 
         return super().get(request, *args, **kwargs)
 
@@ -175,7 +175,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> Tuple[AggregateOrganisationReport, Any, Dict[Any, Dict[Any, Any]]]:
+    def generate_reports_for_oois(self) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data, error_oois = aggregate_reports(
             self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.valid_time
         )

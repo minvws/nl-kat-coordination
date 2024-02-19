@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import List
 
 from django.views.generic import TemplateView
 from katalogus.client import get_katalogus
@@ -11,7 +10,7 @@ logger = getLogger(__name__)
 class ScanListView(ObjectsBreadcrumbsMixin, TemplateView):
     template_name = "scan.html"
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
 
         breadcrumbs.append(
