@@ -12,7 +12,7 @@ from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
 
-MAIL_FINDINGS = ["KAT-NO-SPF", "KAT-NO-DMARC", "KAT-NO-DKIM"]
+MAIL_FINDING_TYPES = ["KAT-NO-SPF", "KAT-NO-DMARC", "KAT-NO-DKIM"]
 
 
 class MailReport(Report):
@@ -84,4 +84,4 @@ class MailReport(Report):
             "Hostname.<ooi[is Finding].finding_type", valid_time, hostname
         )
 
-        return list(filter(lambda finding: finding.id in MAIL_FINDINGS, finding_types))
+        return list(filter(lambda finding_type: finding_type.id in MAIL_FINDING_TYPES, finding_types))
