@@ -1,5 +1,5 @@
 import json
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
@@ -8,7 +8,7 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import URL
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
 

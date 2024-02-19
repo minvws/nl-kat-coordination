@@ -1,5 +1,6 @@
 import urllib.parse
-from typing import Any, Dict, MutableMapping, Optional, Union
+from collections.abc import MutableMapping
+from typing import Any
 
 import requests
 import structlog
@@ -35,8 +36,8 @@ class HTTPService(Connector):
             An integer defining the timeout of requests.
     """
 
-    name: Optional[str] = None
-    health_endpoint: Optional[str] = "health"
+    name: str | None = None
+    health_endpoint: str | None = "health"
 
     def __init__(
         self,
@@ -93,8 +94,8 @@ class HTTPService(Connector):
     def get(
         self,
         url: str,
-        payload: Optional[Dict[str, Any]] = None,
-        params: Optional[Dict[str, Any]] = None,
+        payload: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
     ) -> requests.Response:
         """Execute a HTTP GET request
 
@@ -126,8 +127,8 @@ class HTTPService(Connector):
     def post(
         self,
         url: str,
-        payload: Dict[str, Any],
-        params: Optional[Dict[str, Any]] = None,
+        payload: dict[str, Any],
+        params: dict[str, Any] | None = None,
     ) -> requests.Response:
         """Execute a HTTP POST request
 
@@ -160,7 +161,7 @@ class HTTPService(Connector):
         return response
 
     @property
-    def headers(self) -> MutableMapping[str, Union[str, bytes]]:
+    def headers(self) -> MutableMapping[str, str | bytes]:
         return self.session.headers
 
     def _do_checks(self) -> None:

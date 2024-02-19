@@ -1,7 +1,7 @@
 from enum import Enum
 from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
-from typing import Dict, List, Literal, Optional, Type, Union, cast, get_args, get_origin
+from typing import Literal, Union, cast, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -18,7 +18,7 @@ from tools.models import SCAN_LEVEL
 
 
 class OOIForm(BaseRockyForm):
-    def __init__(self, ooi_class: Type[OOI], connector: OctopoesAPIConnector, *args, **kwargs):
+    def __init__(self, ooi_class: type[OOI], connector: OctopoesAPIConnector, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ooi_class = ooi_class
         self.api_connector = connector
@@ -31,13 +31,13 @@ class OOIForm(BaseRockyForm):
     def clean(self):
         return {key: value for key, value in super().clean().items() if value}
 
-    def get_fields(self) -> Dict[str, forms.fields.Field]:
+    def get_fields(self) -> dict[str, forms.fields.Field]:
         return self.generate_form_fields()
 
     def generate_form_fields(
         self,
-        hidden_ooi_fields: Dict[str, str] = None,
-    ) -> Dict[str, forms.fields.Field]:
+        hidden_ooi_fields: dict[str, str] = None,
+    ) -> dict[str, forms.fields.Field]:
         fields = {}
         for name, field in self.ooi_class.model_fields.items():
             annotation = field.annotation
@@ -63,7 +63,7 @@ class OOIForm(BaseRockyForm):
                 fields[name] = generate_ip_field(field)
             elif annotation == AnyUrl:
                 fields[name] = generate_url_field(field)
-            elif annotation == Dict or annotation == Dict[str, str] or annotation == List[str]:
+            elif annotation == dict or annotation == dict[str, str] or annotation == list[str]:
                 fields[name] = forms.JSONField(**default_attrs)
             elif annotation == int or (hasattr(annotation, "__args__") and int in annotation.__args__):
                 fields[name] = forms.IntegerField(**default_attrs)
@@ -72,7 +72,7 @@ class OOIForm(BaseRockyForm):
             elif self.ooi_class == Question and issubclass(annotation, str) and name == "json_schema":
                 fields[name] = forms.CharField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, str) or optional_type is str:
-                if name in self.ooi_class.__annotations__ and self.ooi_class.__annotations__[name] == Dict[str, str]:
+                if name in self.ooi_class.__annotations__ and self.ooi_class.__annotations__[name] == dict[str, str]:
                     fields[name] = forms.JSONField(**default_attrs)
                 else:
                     fields[name] = forms.CharField(
@@ -86,8 +86,8 @@ def generate_select_ooi_field(
     api_connector: OctopoesAPIConnector,
     name: str,
     field: FieldInfo,
-    related_ooi_type: Type[OOI],
-    initial: Optional[str] = None,
+    related_ooi_type: type[OOI],
+    initial: str | None = None,
 ) -> forms.fields.Field:
     # field is a relation, query all objects, and build select
     default_attrs = default_field_options(name, field)
@@ -140,7 +140,7 @@ def generate_url_field(field: FieldInfo) -> forms.fields.Field:
     return field
 
 
-def default_field_options(name: str, field_info: FieldInfo) -> Dict[str, Union[str, bool]]:
+def default_field_options(name: str, field_info: FieldInfo) -> dict[str, str | bool]:
     return {
         "label": name,
         "required": field_info.is_required(),

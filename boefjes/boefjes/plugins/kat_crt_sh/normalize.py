@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 from dateutil.parser import parse
 
@@ -11,7 +11,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     results = json.loads(raw)
     input_ = normalizer_meta.raw_data.boefje_meta.arguments["input"]
     fqdn = input_["hostname"]["name"]

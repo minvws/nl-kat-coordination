@@ -1,9 +1,8 @@
 from datetime import timedelta
-from typing import Dict, List, Literal, Optional, Union
+from typing import Annotated, Literal
 from uuid import UUID
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints
-from typing_extensions import Annotated
 
 
 class JobException(Exception):
@@ -15,11 +14,11 @@ class JobException(Exception):
 
 class Job(BaseModel):
     id: UUID
-    started_at: Optional[AwareDatetime] = Field(default=None)
-    ended_at: Optional[AwareDatetime] = Field(default=None)
+    started_at: AwareDatetime | None = Field(default=None)
+    ended_at: AwareDatetime | None = Field(default=None)
 
     @property
-    def runtime(self) -> Optional[timedelta]:
+    def runtime(self) -> timedelta | None:
         if self.started_at is not None and self.ended_at is not None:
             return self.ended_at - self.started_at
         else:
@@ -30,29 +29,29 @@ class Boefje(BaseModel):
     """Identifier for Boefje in a BoefjeMeta"""
 
     id: Annotated[str, StringConstraints(min_length=1)]
-    version: Optional[str] = Field(default=None)
+    version: str | None = Field(default=None)
 
 
 class Normalizer(BaseModel):
     """Identifier for Normalizer in a NormalizerMeta"""
 
     id: Annotated[str, StringConstraints(min_length=1)]
-    version: Optional[str] = Field(default=None)
+    version: str | None = Field(default=None)
 
 
 class BoefjeMeta(Job):
     boefje: Boefje
-    input_ooi: Optional[str] = None
-    arguments: Dict = {}
+    input_ooi: str | None = None
+    arguments: dict = {}
     organization: str
-    runnable_hash: Optional[str] = None
-    environment: Optional[Dict[str, str]] = None
+    runnable_hash: str | None = None
+    environment: dict[str, str] | None = None
 
 
 class RawDataMeta(BaseModel):
     id: UUID
     boefje_meta: BoefjeMeta
-    mime_types: List[Dict[str, str]]
+    mime_types: list[dict[str, str]]
 
 
 class NormalizerMeta(Job):
@@ -88,7 +87,7 @@ class NormalizerPlainOOI(BaseModel):  # Validation of plain OOIs being returned 
 class NormalizerObservation(BaseModel):
     type: Literal["observation"] = "observation"
     input_ooi: str
-    results: List[NormalizerPlainOOI]
+    results: list[NormalizerPlainOOI]
 
 
 class NormalizerDeclaration(BaseModel):
@@ -102,10 +101,10 @@ class NormalizerScanProfile(BaseModel):
 
 
 class NormalizerResult(BaseModel):  # Moves all validation logic to Pydantic
-    item: Union[NormalizerPlainOOI, NormalizerObservation, NormalizerDeclaration, NormalizerScanProfile]
+    item: NormalizerPlainOOI | NormalizerObservation | NormalizerDeclaration | NormalizerScanProfile
 
 
 class NormalizerOutput(BaseModel):
-    observations: List[NormalizerObservation] = []
-    declarations: List[NormalizerDeclaration] = []
-    scan_profiles: List[NormalizerScanProfile] = []
+    observations: list[NormalizerObservation] = []
+    declarations: list[NormalizerDeclaration] = []
+    scan_profiles: list[NormalizerScanProfile] = []
