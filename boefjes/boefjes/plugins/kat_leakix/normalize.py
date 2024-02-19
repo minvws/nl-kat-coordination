@@ -86,7 +86,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
 
 
 def handle_autonomous_system(event):
-    as_number = event["network"]["asn"]
+    as_number = str(event["network"]["asn"])
     as_name = event["network"]["organization_name"]
     return AutonomousSystem(number=as_number, name=as_name) if as_name else AutonomousSystem(number=as_number)
 
