@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 import functools
 import threading
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pydantic
 import structlog
@@ -100,7 +100,7 @@ class PriorityQueue(abc.ABC):
         self.pq_store: storage.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
-    def pop(self, filters: Optional[storage.filters.FilterRequest] = None) -> Optional[models.PrioritizedItem]:
+    def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.PrioritizedItem | None:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
 
@@ -124,7 +124,7 @@ class PriorityQueue(abc.ABC):
 
         return item
 
-    def push(self, p_item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
+    def push(self, p_item: models.PrioritizedItem) -> models.PrioritizedItem | None:
         """Push an item onto the queue.
 
         Args:
@@ -212,7 +212,7 @@ class PriorityQueue(abc.ABC):
         return item_db
 
     @with_lock
-    def peek(self, index: int) -> Optional[models.PrioritizedItem]:
+    def peek(self, index: int) -> models.PrioritizedItem | None:
         """Return the item at index without removing it.
 
         Args:
@@ -288,7 +288,7 @@ class PriorityQueue(abc.ABC):
         return item is not None
 
     @with_lock
-    def get_p_item_by_identifier(self, p_item: models.PrioritizedItem) -> Optional[models.PrioritizedItem]:
+    def get_p_item_by_identifier(self, p_item: models.PrioritizedItem) -> models.PrioritizedItem | None:
         """Get an item from the queue by its identifier.
 
         Args:
@@ -317,7 +317,7 @@ class PriorityQueue(abc.ABC):
 
         return True
 
-    def dict(self, include_pq: bool = True) -> Dict[str, Any]:
+    def dict(self, include_pq: bool = True) -> dict[str, Any]:
         """Return a dictionary representation of the queue."""
         response = {
             "id": self.pq_id,

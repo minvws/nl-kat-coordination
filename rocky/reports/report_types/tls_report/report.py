@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -23,7 +23,7 @@ class TLSReport(Report):
     input_ooi_types = {IPService}
     template_path = "tls_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         suites = {}
         findings = []
         suites_with_findings = []

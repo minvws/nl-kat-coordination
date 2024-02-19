@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -14,7 +14,7 @@ from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, Se
 logger = logging.getLogger(__name__)
 
 
-def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
+def sort_by_severity_desc(findings) -> list[dict[str, Any]]:
     # Sorting is stable (when multiple records have the same key, their original
     # order is preserved) so if we first sort by finding id the findings with
     # the same risk score will be sorted by finding id
@@ -27,8 +27,8 @@ def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
 
 def generate_findings_metadata(
     findings: FindingList,
-    severity_filter: Optional[List[RiskLevelSeverity]] = None,
-) -> List[Dict[str, Any]]:
+    severity_filter: list[RiskLevelSeverity] | None = None,
+) -> list[dict[str, Any]]:
     findings_meta = []
 
     for finding in findings[: FindingList.HARD_LIMIT]:

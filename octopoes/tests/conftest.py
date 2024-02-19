@@ -1,7 +1,7 @@
 import uuid
+from collections.abc import Iterator
 from datetime import datetime, timezone
 from ipaddress import IPv4Address, ip_address
-from typing import Dict, Iterator, List, Optional, Set
 from unittest.mock import Mock
 
 import pytest
@@ -54,11 +54,11 @@ class MockScanProfileRepository(ScanProfileRepository):
         return self.profiles[ooi_reference]
 
     def save(
-        self, old_scan_profile: Optional[ScanProfileBase], new_scan_profile: ScanProfileBase, valid_time: datetime
+        self, old_scan_profile: ScanProfileBase | None, new_scan_profile: ScanProfileBase, valid_time: datetime
     ) -> None:
         self.profiles[new_scan_profile.reference] = new_scan_profile
 
-    def list_scan_profiles(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
+    def list_scan_profiles(self, scan_profile_type: str | None, valid_time: datetime) -> list[ScanProfileBase]:
         if scan_profile_type:
             return [profile for profile in self.profiles.values() if profile.scan_profile_type == scan_profile_type]
         else:
@@ -78,13 +78,13 @@ class MockOOIRepository(OOIRepository):
         super().__init__(*args, **kwargs)
         self.oois = {}
 
-    def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
+    def save(self, ooi: OOI, valid_time: datetime, end_valid_time: datetime | None = None) -> None:
         self.oois[ooi.reference] = ooi
 
-    def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
+    def load_bulk(self, references: set[Reference], valid_time: datetime) -> dict[str, OOI]:
         return {ooi.primary_key: ooi for ooi in self.oois.values() if ooi.reference in references}
 
-    def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
+    def list_neighbours(self, references: set[Reference], paths: set[Path], valid_time: datetime) -> set[OOI]:
         neighbours = set()
 
         for path in paths:
@@ -107,7 +107,7 @@ class MockOOIRepository(OOIRepository):
 
         return neighbours
 
-    def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
+    def list_oois_without_scan_profile(self, valid_time: datetime) -> set[Reference]:
         return set()
 
 
