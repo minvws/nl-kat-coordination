@@ -1,6 +1,6 @@
 import datetime
 from enum import Enum
-from typing import Literal, NewType
+from typing import Literal
 
 from pydantic import AnyHttpUrl, BaseModel, Field
 
@@ -60,7 +60,6 @@ class Bit(Plugin):
 
 
 PluginType = Boefje | Normalizer | Bit
-Base64Str = NewType("Base64Str", str)
 
 
 class EncryptionMiddleware(Enum):

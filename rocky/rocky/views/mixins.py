@@ -6,7 +6,7 @@ from functools import cached_property
 import requests.exceptions
 from account.mixins import OrganizationView
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, get_katalogus
@@ -54,6 +54,8 @@ class OOIAttributeError(AttributeError):
 
 
 class ObservedAtMixin:
+    request: HttpRequest
+
     @cached_property
     def observed_at(self) -> datetime:
         observed_at = self.request.GET.get("observed_at", None)
@@ -274,17 +276,14 @@ class FindingList:
 
 
 class ConnectorFormMixin:
-    connector_form_class: type[ObservedAtForm] = None
-    connector_form_initial = {}
+    connector_form_class: type[ObservedAtForm]
+    request: HttpRequest
 
     def get_connector_form_kwargs(self) -> dict:
-        kwargs = {
-            "initial": self.connector_form_initial.copy(),
-        }
-
         if "observed_at" in self.request.GET:
-            kwargs.update({"data": self.request.GET})
-        return kwargs
+            return {"data": self.request.GET}
+        else:
+            return {}
 
     def get_connector_form(self) -> ObservedAtForm:
         return self.connector_form_class(**self.get_connector_form_kwargs())
@@ -347,7 +346,7 @@ class SingleOOITreeMixin(SingleOOIMixin):
         super().setup(request, *args, **kwargs)
         self.depth = self.get_depth()
 
-    def get_ooi(self, pk: str = None, observed_at: datetime | None = None) -> OOI:
+    def get_ooi(self, pk: str | None = None, observed_at: datetime | None = None) -> OOI:
         if pk is None:
             pk = self.get_ooi_id()
 
@@ -362,6 +361,8 @@ class SingleOOITreeMixin(SingleOOIMixin):
 
 
 class SeveritiesMixin:
+    request: HttpRequest
+
     def get_severities(self) -> set[RiskLevelSeverity]:
         severities = set()
         for severity in self.request.GET.getlist("severity"):

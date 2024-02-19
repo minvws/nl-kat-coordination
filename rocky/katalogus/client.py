@@ -18,7 +18,7 @@ logger = getLogger(__name__)
 
 class Plugin(BaseModel):
     id: str
-    repository_id: str | None = None
+    repository_id: str
     name: str
     version: str | None = None
     authors: str | None = None
@@ -40,7 +40,7 @@ class Plugin(BaseModel):
 class Boefje(Plugin):
     scan_level: SCAN_LEVEL
     consumes: set[type[OOI]]
-    options: list[str] = None
+    options: list[str] | None = None
     runnable_hash: str | None = None
     produces: set[str]
 
@@ -101,9 +101,12 @@ class KATalogusClientV1:
 
         try:
             Draft202012Validator.check_schema(schema)
-            return schema
         except SchemaError as error:
             logger.warning("Invalid schema found for plugin %s, %s", plugin_id, error)
+        else:
+            return schema
+
+        return None
 
     def get_plugin_settings(self, plugin_id: str) -> dict:
         response = self.session.get(f"{self.organization_uri}/{plugin_id}/settings")
@@ -224,8 +227,10 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
 def parse_plugin(plugin: dict) -> Boefje | Normalizer:
     if plugin["type"] == "boefje":
         return parse_boefje(plugin)
-    if plugin["type"] == "normalizer":
+    elif plugin["type"] == "normalizer":
         return parse_normalizer(plugin)
+    else:
+        raise Exception(f"Unknown plugin type: {plugin['type']}")
 
 
 def get_katalogus(organization: str) -> KATalogusClientV1:

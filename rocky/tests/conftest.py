@@ -557,6 +557,39 @@ def finding_types():
 
 
 @pytest.fixture
+def finding_type_kat_no_spf():
+    return KATFindingType(
+        id="KAT-NO-SPF",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dmarc():
+    return KATFindingType(
+        id="KAT-NO-DMARC",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dkim():
+    return KATFindingType(
+        id="KAT-NO-DKIM",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {
@@ -640,15 +673,15 @@ def get_stub_path(file_name: str) -> Path:
     return Path(__file__).parent / "stubs" / file_name
 
 
-def get_boefjes_data() -> dict:
+def get_boefjes_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
-def get_normalizers_data() -> dict:
+def get_normalizers_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
 
 
-def get_plugins_data() -> dict:
+def get_plugins_data() -> list[dict]:
     return get_boefjes_data() + get_normalizers_data()
 
 

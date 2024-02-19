@@ -154,18 +154,16 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
 
 # boefjes_required - Set of possible boefjes
 # boefjes_optional - Set of possible boefjes
-# start_ooi - OOI that is the starting point of the report
 # allowed_oois - Set of OOIs that are interesting for this specific report
 # allowed_finding_types - Set of finding types that are interesting for this report
 
 
 class Report(OrganizationView):
-    boefjes_required: set = None  # type: ignore
-    boefjes_optional: set = None  # type: ignore
-    start_ooi: OOI = None  # type: ignore
-    allowed_ooi_types: list[type[OOI]] = None  # type: ignore
-    allowed_finding_types: list[str] = None  # type: ignore
-    boefjes: list = []
+    boefjes_required: set
+    boefjes_optional: set
+    allowed_ooi_types: list[type[OOI]]
+    allowed_finding_types: list[str]
+    boefjes: list
 
     @classmethod
     def get_finding_filter(cls):

@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 
 from django.contrib import messages
@@ -11,6 +12,7 @@ from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
+from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
@@ -135,6 +137,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     template_name = "generate_report.html"
     current_step = 6
+    report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
         if not self.are_plugins_enabled(self.plugins):
@@ -142,8 +145,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             messages.add_message(self.request, messages.WARNING, warning_message)
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, str]]]:
-        report_data = {}
+    def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, Any]]]:
+        report_data: dict[str, dict[str, dict[str, Any]]] = {}
         error_oois = []
         for ooi in self.selected_oois:
             report_data[ooi] = {}

@@ -55,7 +55,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
         return context
 
-    def get(self, request: HttpRequest, status=200, *args, **kwargs) -> HttpResponse:
+    def get(self, request: HttpRequest, *args, status=200, **kwargs) -> HttpResponse:
         """Override the response status in case submitting a form returns an error message"""
         response = super().get(request, *args, **kwargs)
         response.status_code = status
@@ -76,7 +76,9 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
         if action == PageActions.UPDATE_SCAN_PROFILE.value:
             scan_profile = request.POST.get("scan-profile")
-            level = CUSTOM_SCAN_LEVEL[str(scan_profile).upper()]
+            # Mypy doesn't understand that CUSTOM_SCAN_LEVEL is an enum without
+            # the Django type hints
+            level = CUSTOM_SCAN_LEVEL[str(scan_profile).upper()]  # type: ignore[misc, valid-type]
             if level.value == "inherit":
                 return self._set_oois_to_inherit(selected_oois, request, *args, **kwargs)
             return self._set_scan_profiles(selected_oois, level, request, *args, **kwargs)
