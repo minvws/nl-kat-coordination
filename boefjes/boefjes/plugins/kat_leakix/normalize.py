@@ -2,7 +2,7 @@ import ipaddress
 import json
 import re
 from collections.abc import Iterable
-from typing import Iterable as Iterable_
+from collections.abc import Iterable as Iterable_
 from typing import Union
 
 from boefjes.job_models import NormalizerMeta
@@ -37,7 +37,7 @@ SEVERITY_LEAKSTAGE_MAPPING = {
 }
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable_[OOI]:
     results = json.loads(raw)
 
     boefje_meta = normalizer_meta.raw_data.boefje_meta
@@ -147,7 +147,7 @@ def handle_software(event, event_ooi_reference):
         software_ooi = Software(name=software_args["name"], version=software_args["version"])
     elif software_args["name"]:
         software_ooi = Software(name=software_args["name"])
- 
+
     if software_ooi:
         yield software_ooi
         software_instance_ooi = SoftwareInstance(ooi=event_ooi_reference, software=software_ooi.reference)
