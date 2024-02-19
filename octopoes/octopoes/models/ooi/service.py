@@ -1,4 +1,4 @@
-from typing import Dict, Literal
+from typing import Literal
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import IPPort
@@ -40,7 +40,7 @@ class TLSCipher(OOI):
     object_type: Literal["TLSCipher"] = "TLSCipher"
 
     ip_service: Reference = ReferenceField(IPService, max_issue_scan_level=0, max_inherit_scan_level=4)
-    suites: Dict
+    suites: dict
 
     _natural_key_attrs = ["ip_service"]
 

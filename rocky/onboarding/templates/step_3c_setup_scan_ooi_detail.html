@@ -63,11 +63,11 @@
                 </dl>
             </div>
             <div class="button-container">
+                <a href="{% url "step_report" organization.code %}" class="button">{% translate "Start scanning" %}</a>
                 {% if organization %}
                     <a href="{% url "complete_onboarding" organization.code %}"
                        class="button ghost">{% translate "Skip onboarding" %}</a>
                 {% endif %}
-                <a href="{% url "step_report" organization.code %}" class="button">{% translate "Start scanning" %}</a>
             </div>
         </section>
     </main>

@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Iterable, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import Reference
@@ -7,7 +7,7 @@ from octopoes.models.ooi.findings import ADRFindingType, Finding
 from octopoes.models.ooi.web import APIDesignRule, APIDesignRuleResult
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[Dict]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[dict]:
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     pk = boefje_meta.input_ooi
     ooi_ref = Reference.from_str(pk)
