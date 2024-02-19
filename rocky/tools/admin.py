@@ -25,6 +25,7 @@ class JSONInfoWidget(widgets.Textarea):
             return super().format_value(value)
 
 
+@admin.register(OOIInformation)
 class OOIInformationAdmin(admin.ModelAdmin):
     # makes sure that the order stays the same
     fields = ("id", "data", "consult_api")
@@ -65,10 +66,12 @@ class OrganizationAdmin(admin.ModelAdmin):
             return []
 
 
+@admin.register(OrganizationMember)
 class OrganizationMemberAdmin(admin.ModelAdmin):
     list_display = ("user", "organization")
 
 
+@admin.register(Indemnification)
 class IndemnificationAdmin(admin.ModelAdmin):
     list_display = ("organization", "user")
 
@@ -79,12 +82,9 @@ class IndemnificationAdmin(admin.ModelAdmin):
             return []
 
 
+@admin.register(OrganizationTag)
 class OrganizationTagAdmin(admin.ModelAdmin):
     pass
 
 
 tagulous.admin.register(Organization, OrganizationAdmin)
-admin.site.register(OrganizationMember, OrganizationMemberAdmin)
-admin.site.register(Indemnification, IndemnificationAdmin)
-admin.site.register(OOIInformation, OOIInformationAdmin)
-admin.site.register(OrganizationTag, OrganizationTagAdmin)
