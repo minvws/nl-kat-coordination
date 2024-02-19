@@ -66,10 +66,7 @@ class ObservedAtMixin:
             if date_time.date() > datetime.now(timezone.utc).date():
                 messages.warning(
                     self.request,
-                    _(
-                        "The selected date is in the future. The items below are all items "
-                        "in the database across all existing dates."
-                    ),
+                    _("The selected date is in the future."),
                 )
             return date_time
         except ValueError:
