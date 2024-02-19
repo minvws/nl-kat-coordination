@@ -82,7 +82,7 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable_[OO
         yield from handle_leak(event, event_ooi_reference, software_ooi)
 
         # CVES
-        yield from handle_tag(event, software_ooi.reference, ip_port_ooi_reference)
+        yield from handle_tag(event, software_ooi.reference if software_ooi else None, ip_port_ooi_reference)
 
 
 def handle_autonomous_system(event):
