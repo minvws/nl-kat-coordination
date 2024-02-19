@@ -32,8 +32,9 @@ from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
-from octopoes.models.ooi.service import Service
+from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
+from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.transaction import TransactionRecord
 from rocky.scheduler import Task
@@ -461,8 +462,31 @@ def hostname(network):
 
 
 @pytest.fixture
+def url(network):
+    return URL(raw="https://example.com/", network=network.reference)
+
+
+@pytest.fixture
+def website(ip_service: IPService, hostname: Hostname):
+    return Website(
+        ip_service=ip_service.reference,
+        hostname=hostname.reference,
+    )
+
+
+@pytest.fixture
+def security_txt(website: Website, url: URL):
+    return SecurityTXT(website=website.reference, url=url.reference, security_txt="example")
+
+
+@pytest.fixture
 def service():
     return Service(name="domain")
+
+
+@pytest.fixture
+def ip_service(ip_port: IPPort, service: Service):
+    return IPService(ip_port=ip_port.reference, service=service.reference)
 
 
 @pytest.fixture
@@ -527,6 +551,22 @@ def finding():
         description="description",
         reproduce="reproduce",
     )
+
+
+@pytest.fixture
+def web_report_finding_types():
+    return [
+        KATFindingType(id="KAT-NO-CSP"),
+        KATFindingType(id="KAT-CSP-VULNERABILITIES"),
+        KATFindingType(id="KAT-NO-HTTPS-REDIRECT"),
+        KATFindingType(id="KAT-NO-CERTIFICATE"),
+        KATFindingType(id="KAT-NO-SECURITY-TXT"),
+        KATFindingType(id="KAT-UNCOMMON-OPEN-PORT"),
+        KATFindingType(id="KAT-OPEN-SYSADMIN-PORT"),
+        KATFindingType(id="KAT-OPEN-DATABASE-PORT"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRED"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
+    ]
 
 
 @pytest.fixture
