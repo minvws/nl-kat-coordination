@@ -1,4 +1,4 @@
-from typing import Iterable, Union
+from collections.abc import Iterable
 from urllib.parse import urljoin
 
 import validators
@@ -10,9 +10,9 @@ from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     soup = BeautifulSoup(raw, "html.parser")
-    images = set([img["src"] for img in soup.find_all("img", src=True)])
+    images = {img["src"] for img in soup.find_all("img", src=True)}
 
     network_name = normalizer_meta.raw_data.boefje_meta.arguments["input"]["website"]["hostname"]["network"]["name"]
     host = normalizer_meta.raw_data.boefje_meta.arguments["input"]["website"]["hostname"]["name"]

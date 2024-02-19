@@ -1,11 +1,11 @@
 import json
-from typing import Dict, Iterator, Union
+from collections.abc import Iterator
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models.ooi.monitoring import Application, Incident
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[str, bytes]) -> Iterator[Dict]:
+def run(normalizer_meta: NormalizerMeta, raw: str | bytes) -> Iterator[dict]:
     data = json.loads(raw)
 
     for log in data:

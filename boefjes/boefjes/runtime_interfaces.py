@@ -1,16 +1,15 @@
 from enum import Enum
-from typing import Dict, List, Tuple, Union
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerOutput
 
 
 class Handler:
-    def handle(self, item: Union[BoefjeMeta, NormalizerMeta]):
+    def handle(self, item: BoefjeMeta | NormalizerMeta):
         raise NotImplementedError()
 
 
 class BoefjeJobRunner:
-    def run(self, boefje_meta: BoefjeMeta, environment: Dict[str, str]) -> List[Tuple[set, Union[bytes, str]]]:
+    def run(self, boefje_meta: BoefjeMeta, environment: dict[str, str]) -> list[tuple[set, bytes | str]]:
         raise NotImplementedError()
 
 

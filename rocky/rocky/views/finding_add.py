@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import Dict, List
 from uuid import uuid4
 
 from django.shortcuts import redirect
@@ -125,10 +124,10 @@ class FindingAddView(BaseOOIFormView):
 
         return redirect(get_ooi_url("ooi_detail", ooi_id, self.organization.code))
 
-    def get_ooi_options(self) -> List[Dict[str, str]]:
+    def get_ooi_options(self) -> list[dict[str, str]]:
         # Query to render form options
         ooi_set = set(OOI_TYPES.values()).difference({Finding, FindingType})
-        objects = self.octopoes_api_connector.list(ooi_set).items
+        objects = self.octopoes_api_connector.list_objects(ooi_set).items
 
         # generate options
         options = [(o.primary_key, o.get_ooi_type()) for o in objects]
