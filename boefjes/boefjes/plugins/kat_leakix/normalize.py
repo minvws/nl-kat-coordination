@@ -142,8 +142,13 @@ def handle_software(event, event_ooi_reference):
     if software_fingerprint:
         software_args["name"] = software_fingerprint
 
-    if software_args["name"]:
-        software_ooi = Software(**{k: v for k, v in software_args if v})
+    software_ooi = None
+    if software_args["name"] and software_args["version"]:
+        software_ooi = Software(name=software_args["name"], version=software_args["version"])
+    elif software_args["name"]:
+        software_ooi = Software(name=software_args["name"])
+ 
+    if software_ooi:
         yield software_ooi
         software_instance_ooi = SoftwareInstance(ooi=event_ooi_reference, software=software_ooi.reference)
         yield software_instance_ooi
