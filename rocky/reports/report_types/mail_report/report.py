@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from django.utils.translation import gettext_lazy as _
 
@@ -79,7 +79,7 @@ class MailReport(Report):
             "number_of_dkim": number_of_dkim,
         }
 
-    def _get_mail_finding_types(self, valid_time: datetime, hostname) -> List[OOI]:
+    def _get_mail_finding_types(self, valid_time: datetime, hostname) -> list[OOI]:
         finding_types = self.octopoes_api_connector.query(
             "Hostname.<ooi[is Finding].finding_type", valid_time, hostname
         )
