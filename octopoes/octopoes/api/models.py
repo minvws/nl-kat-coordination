@@ -17,6 +17,8 @@ class ServiceHealth(BaseModel):
 
 
 ServiceHealth.model_rebuild()
+
+
 class _BaseObservation(BaseModel):
     method: str
     source: Reference
