@@ -179,8 +179,7 @@ The boefje itself imports the shodan api module, assigns an IP address to it and
 Normalizers
 -----------
 
-The normalizer imports the raw information, extracts the objects from it and gives them to Octopoes.
-Since OpenKAT 1.3.0, the normalizers are fully self-contained. They consist of the following files:
+The normalizer imports the raw information, extracts the objects from it and gives them to Octopoes. They consist of the following files:
 
 - __init__.py
 - normalize.py
