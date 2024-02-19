@@ -106,7 +106,13 @@ class NormalizerScanProfile(BaseModel):
 
 
 class NormalizerResult(BaseModel):  # Moves all validation logic to Pydantic
-    item: NormalizerPlainOOI | NormalizerObservation | NormalizerDeclaration | NormalizerAffirmation | NormalizerScanProfile
+    item: (
+        NormalizerPlainOOI
+        | NormalizerObservation
+        | NormalizerDeclaration
+        | NormalizerAffirmation
+        | NormalizerScanProfile
+    )
 
 
 class NormalizerOutput(BaseModel):
