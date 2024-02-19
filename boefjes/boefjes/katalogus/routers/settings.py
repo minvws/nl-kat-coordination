@@ -1,5 +1,3 @@
-from typing import Dict
-
 from fastapi import APIRouter, Depends
 
 from boefjes.katalogus.dependencies.plugins import PluginService, get_plugin_service
@@ -12,7 +10,7 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=Dict)
+@router.get("", response_model=dict)
 def list_settings(
     organisation_id: str,
     plugin_id: str,
@@ -26,7 +24,7 @@ def list_settings(
 def upsert_settings(
     organisation_id: str,
     plugin_id: str,
-    values: Dict,
+    values: dict,
     plugin_service: PluginService = Depends(get_plugin_service),
 ):
     with plugin_service as p:

@@ -1,6 +1,5 @@
 # just an invalid dummy module
-from typing import Tuple
 
 
-def run(boefje_meta: str) -> Tuple[str, int]:
+def run(boefje_meta: str) -> tuple[str, int]:
     return boefje_meta, 10

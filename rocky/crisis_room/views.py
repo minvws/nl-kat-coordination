@@ -1,6 +1,5 @@
 import logging
 from dataclasses import dataclass
-from typing import Dict, List
 
 from account.models import KATUser
 from django.conf import settings
@@ -26,7 +25,7 @@ logger = logging.getLogger(__name__)
 class OrganizationFindingCountPerSeverity:
     name: str
     code: str
-    finding_count_per_severity: Dict[str, int]
+    finding_count_per_severity: dict[str, int]
 
     @property
     def total(self) -> int:
@@ -48,18 +47,18 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
     ]
 
     def sort_by_total(
-        self, finding_counts: List[OrganizationFindingCountPerSeverity]
-    ) -> List[OrganizationFindingCountPerSeverity]:
+        self, finding_counts: list[OrganizationFindingCountPerSeverity]
+    ) -> list[OrganizationFindingCountPerSeverity]:
         is_desc = self.request.GET.get("sort_total_by", "desc") != "asc"
         return sorted(finding_counts, key=lambda x: x.total, reverse=is_desc)
 
     def sort_by_severity(
-        self, finding_counts: List[OrganizationFindingCountPerSeverity]
-    ) -> List[OrganizationFindingCountPerSeverity]:
+        self, finding_counts: list[OrganizationFindingCountPerSeverity]
+    ) -> list[OrganizationFindingCountPerSeverity]:
         is_desc = self.request.GET.get("sort_critical_by", "desc") != "asc"
         return sorted(finding_counts, key=lambda x: x.total_critical, reverse=is_desc)
 
-    def get_finding_type_severity_count(self, organization: Organization) -> Dict[str, int]:
+    def get_finding_type_severity_count(self, organization: Organization) -> dict[str, int]:
         try:
             api_connector = OctopoesAPIConnector(settings.OCTOPOES_API, organization.code)
             return api_connector.count_findings_by_severity(valid_time=self.get_observed_at())
