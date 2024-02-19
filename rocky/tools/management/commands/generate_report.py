@@ -2,7 +2,7 @@ import sys
 from datetime import datetime, timezone
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -75,7 +75,7 @@ class Command(BaseCommand):
         self.stdout.buffer.write(report.read())
 
     @staticmethod
-    def get_findings_metadata(organization, valid_time, severities) -> List[Dict[str, Any]]:
+    def get_findings_metadata(organization, valid_time, severities) -> list[dict[str, Any]]:
         findings = FindingList(
             OctopoesAPIConnector(settings.OCTOPOES_API, organization.code),
             valid_time,
@@ -85,7 +85,7 @@ class Command(BaseCommand):
         return generate_findings_metadata(findings, severities)
 
     @staticmethod
-    def get_organization(**options) -> Optional[Organization]:
+    def get_organization(**options) -> Organization | None:
         if options["code"] and options["id"]:
             return None
 

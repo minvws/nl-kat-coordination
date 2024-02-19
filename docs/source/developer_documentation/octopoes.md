@@ -370,14 +370,14 @@ ref.tokenized.address.address # '2001:db8::1'
 
 ### OctopoesAPIConnector
 
-The OctopoesAPIConnector class provides a python interface for connecting with Octopoes API.
+The OctopoesAPIConnector class provides a Python interface for connecting with Octopoes API.
 It provides several methods for doing CRUD operations for the objects/entities.
 
 #### Querying objects
 
 In particular, for querying objects we have:
 
--  `OctopoesAPIConnector.list()` to filter on OOIs `type`, `scan_level`, `scan_profile_type` and `valid_time`.
+-  `OctopoesAPIConnector.list_objects()` to filter on OOIs `type`, `scan_level`, `scan_profile_type` and `valid_time`.
 
 This is used for example in the object overview page. Returns a paginated list of OOIs.
 
@@ -438,7 +438,7 @@ class TagExample(OOI):
 
 
 # Query abstract class
-OctopoesAPIConnector('http://octopoes', '_dev').list({IPAddress})
+OctopoesAPIConnector('http://octopoes', '_dev').list_objects({IPAddress})
 ```
 
 ## Querying

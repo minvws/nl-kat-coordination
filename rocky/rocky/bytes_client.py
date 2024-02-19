@@ -1,7 +1,6 @@
 import logging
 import uuid
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Set
 
 import requests
 from django.conf import settings
@@ -31,12 +30,12 @@ class BytesClient:
         return ServiceHealth.parse_obj(response.json())
 
     @staticmethod
-    def raw_from_declarations(declarations: List[Declaration]):
+    def raw_from_declarations(declarations: list[Declaration]):
         json_string = f"[{','.join([declaration.json() for declaration in declarations])}]"
 
         return json_string.encode("utf-8")
 
-    def add_manual_proof(self, normalizer_id: uuid.UUID, raw: bytes, manual_mime_types: Optional[Set[str]] = None):
+    def add_manual_proof(self, normalizer_id: uuid.UUID, raw: bytes, manual_mime_types: set[str] | None = None):
         """Per convention for a generic normalizer, we add a raw list of declarations, not a single declaration"""
 
         if manual_mime_types is None:
@@ -72,7 +71,7 @@ class BytesClient:
             ),
         )
 
-    def upload_raw(self, raw: bytes, manual_mime_types: Set[str], input_ooi: Optional[str] = None):
+    def upload_raw(self, raw: bytes, manual_mime_types: set[str], input_ooi: str | None = None):
         self.login()
 
         boefje_meta = BoefjeMeta(
@@ -97,7 +96,7 @@ class BytesClient:
 
         response.raise_for_status()
 
-    def _save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Set[str] = None) -> str:
+    def _save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: set[str] = None) -> str:
         if not mime_types:
             mime_types = set()
 
@@ -122,7 +121,7 @@ class BytesClient:
 
         return response.content
 
-    def get_raw_metas(self, boefje_meta_id: str, organization_code: str) -> List:
+    def get_raw_metas(self, boefje_meta_id: str, organization_code: str) -> list:
         # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
         raw_files_limit = 100
         params = {"boefje_meta_id": boefje_meta_id, "limit": raw_files_limit, "organization": self.organization}
@@ -139,7 +138,7 @@ class BytesClient:
 
         return metas
 
-    def get_normalizer_meta(self, normalizer_meta_id: str) -> Dict:
+    def get_normalizer_meta(self, normalizer_meta_id: str) -> dict:
         # Note: we assume organization permissions are handled before requesting raw data.
 
         response = self.session.get(f"{self.base_url}/bytes/normalizer_meta/{normalizer_meta_id}")
@@ -150,7 +149,7 @@ class BytesClient:
     def login(self):
         self.session.headers.update(self._authorization_header())
 
-    def _authorization_header(self) -> Dict[str, str]:
+    def _authorization_header(self) -> dict[str, str]:
         return {"Authorization": f"bearer {self._get_token()}"}
 
     def _get_token(self) -> str:

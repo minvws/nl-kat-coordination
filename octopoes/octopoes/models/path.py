@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import List, Optional, Set, Tuple, Type
 
 from pyparsing import Literal, Opt, ParseException, Word, alphas
 
@@ -22,10 +21,10 @@ class Direction(Enum):
 class Segment:
     def __init__(
         self,
-        source_type: Type[OOI],
+        source_type: type[OOI],
         direction: Direction,
         property_name: str,
-        target_type: Type[OOI],
+        target_type: type[OOI],
     ):
         self.source_type = source_type
         self.direction = direction
@@ -33,7 +32,7 @@ class Segment:
         self.target_type = target_type
 
     @classmethod
-    def parse_step(cls, step: str) -> Tuple[Direction, str, Optional[Type[OOI]]]:
+    def parse_step(cls, step: str) -> tuple[Direction, str, type[OOI] | None]:
         try:
             parsed_step = incoming_step_grammar.parse_string(step)
             incoming, property_name, _, _, target_type, _ = parsed_step
@@ -49,7 +48,7 @@ class Segment:
                 raise ValueError(f"Could not parse step: {step}")
 
     @classmethod
-    def calculate_step(cls, source_type: Type[OOI], step: str):
+    def calculate_step(cls, source_type: type[OOI], step: str):
         direction, property_name, explicit_target_type = cls.parse_step(step)
         target_type = explicit_target_type if explicit_target_type else get_relation(source_type, property_name)
         return cls(source_type, direction, property_name, target_type)
@@ -80,7 +79,7 @@ class Segment:
 
 
 class Path:
-    def __init__(self, segments: List[Segment]):
+    def __init__(self, segments: list[Segment]):
         self.segments = segments
 
     @classmethod
@@ -114,7 +113,7 @@ class Path:
         return str(self)
 
 
-def get_paths_to_neighours(source_type: Type[OOI]) -> Set[Path]:
+def get_paths_to_neighours(source_type: type[OOI]) -> set[Path]:
     relation_paths = set()
     for property_name, related_type in get_relations(source_type).items():
         relation_paths.add(Path([Segment(source_type, Direction.OUTGOING, property_name, related_type)]))
@@ -127,7 +126,7 @@ def get_paths_to_neighours(source_type: Type[OOI]) -> Set[Path]:
     return relation_paths
 
 
-def get_max_scan_level_inheritance(segment: Segment) -> Optional[int]:
+def get_max_scan_level_inheritance(segment: Segment) -> int | None:
     if segment.direction == Direction.INCOMING:
         return segment.target_type.model_fields[segment.property_name].json_schema_extra.get(
             "max_issue_scan_level", None
@@ -138,7 +137,7 @@ def get_max_scan_level_inheritance(segment: Segment) -> Optional[int]:
         )
 
 
-def get_max_scan_level_issuance(segment: Segment) -> Optional[int]:
+def get_max_scan_level_issuance(segment: Segment) -> int | None:
     if segment.direction == Direction.INCOMING:
         return segment.target_type.model_fields[segment.property_name].json_schema_extra.get(
             "max_inherit_scan_level", None
