@@ -2,7 +2,7 @@ import io
 import logging
 import os
 import tarfile
-from typing import ByteString, Generator, Union
+from collections.abc import ByteString, Generator
 
 import docker
 
@@ -44,7 +44,7 @@ class TarStream(io.RawIOBase):
         return outlen
 
 
-def get_file_from_container(container: docker.models.containers.Container, path: str) -> Union[bytes, None]:
+def get_file_from_container(container: docker.models.containers.Container, path: str) -> bytes | None:
     """Returns a file from a docker container."""
     try:
         stream, _ = container.get_archive(path)

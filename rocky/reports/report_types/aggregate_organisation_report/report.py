@@ -1,6 +1,5 @@
 from datetime import datetime
 from logging import getLogger
-from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
@@ -148,7 +147,7 @@ class AggregateOrganisationReport(AggregateReport):
                 basic_security["safe_connections"][service]["number_of_available"] += 1 if not findings else 0
 
                 # Collect recommendations from findings
-                recommendations.extend(set(finding_type.recommendation for finding_type in findings))
+                recommendations.extend({finding_type.recommendation for finding_type in findings})
 
         # RPKI
         for ip, compliance in rpki["rpki_ips"].items():
@@ -242,12 +241,12 @@ class AggregateOrganisationReport(AggregateReport):
                     },
                     "ips": {
                         ip: sorted(
-                            set(  # Flattening the finding_types field of the mail report output
+                            {  # Flattening the finding_types field of the mail report output
                                 finding_type
                                 for mail_report in mail_report_data[ip]
                                 for hostname, finding_types in mail_report["finding_types"].items()
                                 for finding_type in finding_types
-                            ),
+                            },
                             reverse=True,
                             key=lambda x: x.risk_severity,
                         )
@@ -297,11 +296,11 @@ class AggregateOrganisationReport(AggregateReport):
                     },
                     "ips": {
                         ip: sorted(
-                            set(  # Flattening the finding_types field of the web report output
+                            {  # Flattening the finding_types field of the web report output
                                 finding_type
                                 for web_report in web_report_data[ip]
                                 for finding_type in web_report["finding_types"]
-                            ),
+                            },
                             reverse=True,
                             key=lambda x: x.risk_severity,
                         )
@@ -331,11 +330,11 @@ class AggregateOrganisationReport(AggregateReport):
                     },
                     "ips": {
                         ip: sorted(
-                            set(  # Flattening the finding_types field of the dns report output
+                            {  # Flattening the finding_types field of the dns report output
                                 finding_type
                                 for dns_report in dns_report_data[ip]
                                 for finding_type in dns_report["finding_types"]
-                            ),
+                            },
                             reverse=True,
                             key=lambda x: x.risk_severity,
                         )
@@ -353,11 +352,11 @@ class AggregateOrganisationReport(AggregateReport):
                 and dns_report_data
             ):
                 recommendations.extend(
-                    set(
+                    {
                         finding_type.recommendation
                         for ip, finding in basic_security["summary"][service]["system_specific"]["ips"].items()
                         for finding_type in finding
-                    )
+                    }
                 )
 
         terms = list(set(terms))
@@ -442,8 +441,8 @@ class AggregateOrganisationReport(AggregateReport):
 
 def aggregate_reports(
     connector: OctopoesAPIConnector,
-    input_ooi_references: List[OOI],
-    selected_report_types: List[str],
+    input_ooi_references: list[OOI],
+    selected_report_types: list[str],
     valid_time: datetime,
 ):
     aggregate_report = AggregateOrganisationReport(connector)

@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import List, Optional, Union
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -36,9 +35,9 @@ logger = getLogger(__name__)
 class SinglePluginView(OrganizationView):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.katalogus_client: Optional[KATalogusClientV1] = None
+        self.katalogus_client: KATalogusClientV1 | None = None
         self.plugin_schema = None
-        self.plugin: Union[KATalogusBoefje, KATalogusNormalizer] = None
+        self.plugin: KATalogusBoefje | KATalogusNormalizer = None
 
     def setup(self, request, *args, **kwargs):
         """
@@ -98,7 +97,7 @@ class BoefjeMixin(OctopoesView):
     this mixin provides the methods to construct the boefjes for the OOI's and run them.
     """
 
-    def run_boefje(self, katalogus_boefje: KATalogusBoefje, ooi: Optional[OOI]) -> None:
+    def run_boefje(self, katalogus_boefje: KATalogusBoefje, ooi: OOI | None) -> None:
         boefje_task = BoefjeTask(
             boefje=Boefje.model_validate(katalogus_boefje.model_dump()),
             input_ooi=ooi.reference if ooi else None,
@@ -111,7 +110,7 @@ class BoefjeMixin(OctopoesView):
     def run_boefje_for_oois(
         self,
         boefje: KATalogusBoefje,
-        oois: List[OOI],
+        oois: list[OOI],
     ) -> None:
         if not oois and not boefje.consumes:
             self.run_boefje(boefje, None)

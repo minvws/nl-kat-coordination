@@ -1,6 +1,5 @@
 import logging
 from ipaddress import ip_address
-from typing import List, Tuple, Union
 
 import docker
 
@@ -10,7 +9,7 @@ from boefjes.plugins.helpers import get_file_from_container
 SSL_TEST_IMAGE = "drwetter/testssl.sh:3.2"
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     ip_port = input_["ip_port"]["port"]
     address = input_["ip_port"]["address"]["address"]

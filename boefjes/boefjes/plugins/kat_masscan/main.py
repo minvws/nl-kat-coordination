@@ -2,7 +2,7 @@ import io
 import logging
 import os
 import tarfile
-from typing import ByteString, Generator, List, Tuple, Union
+from collections.abc import ByteString, Generator
 
 import docker
 
@@ -52,7 +52,7 @@ class TarStream(io.RawIOBase):
         return outlen
 
 
-def get_file_from_container(container: docker.models.containers.Container, path: str) -> Union[bytes, None]:
+def get_file_from_container(container: docker.models.containers.Container, path: str) -> bytes | None:
     """Returns a file from a docker container."""
     try:
         stream, _ = container.get_archive(path)
@@ -101,7 +101,7 @@ def run_masscan(target_ip) -> bytes:
     return output
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     """Creates webpage and takes capture using Playwright container."""
     input_ = boefje_meta.arguments["input"]
     ip_range = f"{input_['start_ip']['address']}/{str(input_['mask'])}"

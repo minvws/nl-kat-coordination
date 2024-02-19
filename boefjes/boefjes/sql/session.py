@@ -1,5 +1,4 @@
 import logging
-from typing import Type
 
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
@@ -28,7 +27,7 @@ class SessionMixin:
     def __enter__(self) -> "SessionMixin":
         return self
 
-    def __exit__(self, exc_type: Type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
+    def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         if exc_type is not None:
             logger.error("An error occurred: %s. Rolling back session", exc_value, exc_info=True)
             self.session.rollback()

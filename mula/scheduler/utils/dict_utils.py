@@ -1,9 +1,10 @@
 import threading
+from collections.abc import Iterator
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any
 
 
-def deep_get(d: Optional[Any], keys: List[str]) -> Any:
+def deep_get(d: Any | None, keys: list[str]) -> Any:
     if not keys or d is None:
         return d
     return deep_get(d.get(keys[0]), keys[1:])
@@ -24,10 +25,10 @@ class ExpiringDict:
         self.start_time = start_time
         self.expiration_time: datetime = start_time + self.lifetime
         self.lock: threading.Lock = threading.Lock()
-        self.cache: Dict[str, Any] = {}
+        self.cache: dict[str, Any] = {}
         self._expiration_enabled: bool = True
 
-    def get(self, key: str, default: Optional[Any] = None) -> Any:
+    def get(self, key: str, default: Any | None = None) -> Any:
         try:
             return self.__getitem__(key)
         except KeyError:
