@@ -563,13 +563,6 @@ def cipher_finding_types():
             risk_severity=RiskLevelSeverity.RECOMMENDATION,
         ),
         KATFindingType(
-            id="KAT-MEDIUM-BAD-CIPHER",
-            description="Fake description...",
-            recommendation="Fake recommendation...",
-            risk_score=6.0,
-            risk_severity=RiskLevelSeverity.MEDIUM,
-        ),
-        KATFindingType(
             id="KAT-CRITICAL-BAD-CIPHER",
             description="Fake description...",
             recommendation="Fake recommendation...",
