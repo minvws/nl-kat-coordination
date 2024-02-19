@@ -58,7 +58,7 @@ class FindingsReport(Report):
             except ObjectNotFoundException:
                 logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
 
-        finding_types = sorted(finding_types.values(), key=lambda x: x["finding_type"].risk_score, reverse=True)
+        finding_types = sorted(finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True)
 
         summary = {
             "total_by_severity": total_by_severity,

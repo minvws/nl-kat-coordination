@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-15 09:57+0000\n"
+"POT-Creation-Date: 2024-02-19 08:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3909,9 +3909,7 @@ msgid "Generate report"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
-#: rocky/templates/oois/ooi_detail.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
-msgid "See"
+msgid "See:"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
@@ -5071,6 +5069,11 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "There are no boefjes enabled to scan an OOI of type"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/partials/ooi_report_severity_totals.html
+msgid "See"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
