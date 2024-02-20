@@ -11,7 +11,7 @@ from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
-from rocky.bytes_client import BytesClient, get_bytes_client
+from rocky.bytes_client import get_bytes_client
 from rocky.exceptions import (
     AcknowledgedClearanceLevelTooLowException,
     IndemnificationNotPresentException,
@@ -66,14 +66,6 @@ class OrganizationPermWrapper:
 
 
 class OrganizationView(View):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.organization: Organization | None = None
-        self.octopoes_api_connector: OctopoesAPIConnector | None = None
-        self.bytes_client: BytesClient | None = None
-        self.organization_member = None
-        self.indemnification_present = False
-
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 

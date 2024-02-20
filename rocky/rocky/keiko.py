@@ -298,7 +298,7 @@ def build_finding_dict(
 
 
 def build_meta(findings: list[dict]) -> dict:
-    meta = {
+    meta: dict[str, Any] = {
         "total": len(findings),
         "total_by_severity": {
             RiskLevelSeverity.CRITICAL.value: 0,

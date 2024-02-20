@@ -79,7 +79,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         context["criteria"] = CSV_CRITERIA
         return context
 
-    def get_or_create_reference(self, ooi_type_name: str, value: str):
+    def get_or_create_reference(self, ooi_type_name: str, value: str | None):
         ooi_type_name = next(filter(lambda x: x.casefold() == ooi_type_name.casefold(), self.ooi_types.keys()))
 
         # get from cache

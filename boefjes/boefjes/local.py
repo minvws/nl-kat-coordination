@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from boefjes.job_models import (
     BoefjeMeta,
     InvalidReturnValueNormalizer,
+    NormalizerAffirmation,
     NormalizerDeclaration,
     NormalizerMeta,
     NormalizerObservation,
@@ -35,7 +36,8 @@ class TemporaryEnvironment:
         return os.environ
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        os.environ = self._original_environment
+        os.environ.clear()
+        os.environ.update(self._original_environment)
 
 
 class LocalBoefjeJobRunner(BoefjeJobRunner):
@@ -99,6 +101,7 @@ class LocalNormalizerJobRunner(NormalizerJobRunner):
         return NormalizerOutput(
             observations=observations,
             declarations=[result.item for result in parsed if isinstance(result.item, NormalizerDeclaration)],
+            affirmations=[result.item for result in parsed if isinstance(result.item, NormalizerAffirmation)],
             scan_profiles=[result.item for result in parsed if isinstance(result.item, NormalizerScanProfile)],
         )
 

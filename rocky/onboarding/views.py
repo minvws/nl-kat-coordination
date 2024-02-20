@@ -65,6 +65,7 @@ class OnboardingStart(OrganizationView):
 class OnboardingIntroductionView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     """
@@ -79,6 +80,7 @@ class OnboardingIntroductionView(
 class OnboardingChooseReportInfoView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     """
@@ -93,6 +95,7 @@ class OnboardingChooseReportInfoView(
 class OnboardingChooseReportTypeView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     """
@@ -107,6 +110,7 @@ class OnboardingChooseReportTypeView(
 class OnboardingSetupScanOOIInfoView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     """
@@ -190,7 +194,11 @@ class OnboardingSetupScanOOIAddView(
 
 
 class OnboardingClearanceLevelIntroductionView(
-    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, TemplateView
+    OrganizationPermissionRequiredMixin,
+    KatIntroductionStepsMixin,
+    OnboardingBreadcrumbsMixin,
+    OrganizationView,
+    TemplateView,
 ):
     """
     6. Explanation what clearance levels mean.
@@ -233,6 +241,7 @@ class OnboardingAcknowledgeClearanceLevelView(
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     OOIClearanceMixin,
+    OrganizationView,
     TemplateView,
 ):
     """
@@ -360,10 +369,11 @@ class OnboardingSetupScanOOIDetailView(
 class OnboardingReportView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     """
-    10. The user already started th scan and is now waiting till scans are finished to generate the report.
+    10. The user already started the scan and is now waiting till scans are finished to generate the report.
     Onboarding finished and member onboarded, next step will be the actual report.
     """
 
@@ -460,6 +470,7 @@ class OnboardingOrganizationSetupView(
 class OnboardingOrganizationUpdateView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionAdminStepsMixin,
+    OrganizationView,
     UpdateView,
 ):
     """
@@ -504,7 +515,7 @@ class OnboardingIndemnificationSetupView(
 
 
 class OnboardingAccountSetupIntroView(
-    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView
+    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, TemplateView
 ):
     """
     Step 4: Split flow to or continue with single account or continue to multiple account creation
@@ -515,8 +526,10 @@ class OnboardingAccountSetupIntroView(
     permission_required = "tools.add_organizationmember"
 
 
-class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, FormView):
-    account_type = None
+class OnboardingAccountCreationMixin(
+    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, FormView
+):
+    account_type: str | None = None
     permission_required = "tools.add_organizationmember"
 
     def get_form_kwargs(self):
@@ -529,7 +542,9 @@ class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, KatInt
 # Account setup for multiple user accounts: redteam, admins, clients
 
 
-class OnboardingChooseUserTypeView(OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
+class OnboardingChooseUserTypeView(
+    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, TemplateView
+):
     """
     Step 1: Introduction about how to create multiple user accounts
     """

@@ -23,6 +23,10 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
     def get_form(self, **kwargs):
         settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
 
+        # This helps mypy understand that self.plugin_schema can't be None
+        # because of the check in dispatch()
+        assert self.plugin_schema is not None
+
         return PluginSchemaForm(self.plugin_schema, settings, **self.get_form_kwargs())
 
     def dispatch(self, request, *args, **kwargs):

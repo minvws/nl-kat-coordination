@@ -70,7 +70,7 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
                 _("Settings for plugin {} successfully deleted.").format(self.plugin.name),
             )
         except RequestException as e:
-            if e.response.status_code == 404:
+            if e.response and e.response.status_code == 404:
                 messages.add_message(
                     request,
                     messages.WARNING,
