@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import List, Optional, Union
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -34,19 +33,15 @@ logger = getLogger(__name__)
 
 
 class SinglePluginView(OrganizationView):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.katalogus_client: Optional[KATalogusClientV1] = None
-        self.plugin_schema = None
-        self.plugin: Union[KATalogusBoefje, KATalogusNormalizer] = None
+    katalogus_client: KATalogusClientV1
+    plugin: KATalogusBoefje | KATalogusNormalizer
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, plugin_id: str, **kwargs):
         """
         Prepare organization info and KAT-alogus API client.
         """
-        super().setup(request, *args, **kwargs)
+        super().setup(request, *args, plugin_id=plugin_id, **kwargs)
         self.katalogus_client = get_katalogus(self.organization.code)
-        plugin_id = kwargs.get("plugin_id")
 
         try:
             self.plugin = self.katalogus_client.get_plugin(plugin_id)
@@ -71,11 +66,11 @@ class SinglePluginView(OrganizationView):
 
     def is_required_field(self, field: str) -> bool:
         """Check whether this field should be required, defaults to False."""
-        return self.plugin_schema and field in self.plugin_schema.get("required", [])
+        return bool(self.plugin_schema and field in self.plugin_schema.get("required", []))
 
     def is_secret_field(self, field: str) -> bool:
         """Check whether this field should be secret, defaults to False."""
-        return self.plugin_schema and field in self.plugin_schema.get("secret", [])
+        return bool(self.plugin_schema and field in self.plugin_schema.get("secret", []))
 
 
 class NormalizerMixin(OctopoesView):
@@ -98,7 +93,7 @@ class BoefjeMixin(OctopoesView):
     this mixin provides the methods to construct the boefjes for the OOI's and run them.
     """
 
-    def run_boefje(self, katalogus_boefje: KATalogusBoefje, ooi: Optional[OOI]) -> None:
+    def run_boefje(self, katalogus_boefje: KATalogusBoefje, ooi: OOI | None) -> None:
         boefje_task = BoefjeTask(
             boefje=Boefje.model_validate(katalogus_boefje.model_dump()),
             input_ooi=ooi.reference if ooi else None,
@@ -111,7 +106,7 @@ class BoefjeMixin(OctopoesView):
     def run_boefje_for_oois(
         self,
         boefje: KATalogusBoefje,
-        oois: List[OOI],
+        oois: list[OOI],
     ) -> None:
         if not oois and not boefje.consumes:
             self.run_boefje(boefje, None)

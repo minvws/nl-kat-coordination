@@ -1,5 +1,3 @@
-from typing import Dict, Optional
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management import BaseCommand
@@ -28,7 +26,7 @@ class Command(BaseCommand):
 
 
 def add_superuser(email: str, password: str):
-    user_kwargs = {
+    user_kwargs: dict[str, str | bool] = {
         "email": email,
         "password": password,
         "full_name": "End-to-end Superuser",
@@ -39,8 +37,8 @@ def add_superuser(email: str, password: str):
     add_user(user_kwargs)
 
 
-def add_test_user(email: str, password: str, group_name: Optional[str] = None):
-    user_kwargs = {
+def add_test_user(email: str, password: str, group_name: str | None = None):
+    user_kwargs: dict[str, str | bool] = {
         "email": email,
         "password": password,
         "full_name": "End-to-end user",
@@ -49,7 +47,7 @@ def add_test_user(email: str, password: str, group_name: Optional[str] = None):
     add_user(user_kwargs, group_name)
 
 
-def add_user(user_kwargs: Dict[str, str], group_name: Optional[str] = None):
+def add_user(user_kwargs: dict[str, str | bool], group_name: str | None = None):
     """
     Creates a test user with the given user_kwargs.
     User is optionally added to group group_name.

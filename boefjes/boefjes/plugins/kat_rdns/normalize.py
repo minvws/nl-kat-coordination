@@ -1,4 +1,4 @@
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 from dns.message import from_text
 from dns.rdtypes.ANY.PTR import PTR
@@ -10,7 +10,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
     input_ = normalizer_meta.raw_data.boefje_meta.arguments["input"]
     answers = raw.decode()

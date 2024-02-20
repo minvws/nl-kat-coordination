@@ -1,8 +1,7 @@
-from abc import ABC
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, Set, TypedDict
+from typing import Any, TypedDict
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -15,22 +14,25 @@ logger = getLogger(__name__)
 
 
 class ReportPlugins(TypedDict):
-    required: List[str]
-    optional: List[str]
+    required: list[str]
+    optional: list[str]
 
 
-class Report(ABC):
+class BaseReport:
     id: str
     name: str
     description: str
-    plugins: ReportPlugins
-    input_ooi_types: Set[OOIType]
     template_path: str = "report.html"
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+
+class Report(BaseReport):
+    plugins: ReportPlugins
+    input_ooi_types: set[OOIType]
+
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
 
     def collect_data(self, input_oois: set[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
@@ -39,7 +41,7 @@ class Report(ABC):
         return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
 
     @classmethod
-    def class_attributes(cls) -> Dict[str, any]:
+    def class_attributes(cls) -> dict[str, Any]:
         return {
             "id": cls.id,
             "name": cls.name,
@@ -83,37 +85,23 @@ class Report(ABC):
         return hostnames_by_input_ooi
 
 
-class AggregateReportSubReports(TypedDict):
-    required: list[type[Report]]
-    optional: list[type[Report]]
+class MultiReport(BaseReport):
+    plugins: ReportPlugins
+    input_ooi_types: set[OOIType]
 
-
-class AggregateReport(ABC):
-    id: str
-    name: str
-    description: str
-    reports: AggregateReportSubReports
-    template_path: str = "report.html"
-
-    def __init__(self, octopoes_api_connector):
-        self.octopoes_api_connector = octopoes_api_connector
-
-    def post_process_data(self, data: Dict[str, Any], valid_time: datetime) -> Dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError
 
 
-class MultiReport(ABC):
-    id: str
-    name: str
-    description: str
-    plugins: ReportPlugins
-    input_ooi_types: Set[OOIType]
-    template_path: str = "report.html"
+class AggregateReportSubReports(TypedDict):
+    required: list[type[Report] | type[MultiReport]]
+    optional: list[type[Report] | type[MultiReport]]
 
-    def __init__(self, octopoes_api_connector):
-        self.octopoes_api_connector = octopoes_api_connector
 
-    def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+class AggregateReport(BaseReport):
+    reports: AggregateReportSubReports
+
+    def post_process_data(self, data: dict[str, Any], valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
 
 

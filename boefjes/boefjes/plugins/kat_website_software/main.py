@@ -1,5 +1,4 @@
 import platform
-from typing import List, Tuple, Union
 
 import docker
 
@@ -18,7 +17,7 @@ def run_wappalyzer(url: str) -> str:
     return client.containers.run(WAPPALYZER_IMAGE, ["wappalyzer", url], remove=True).decode()
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
 
     hostname = input_["netloc"]["name"]

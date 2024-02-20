@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import Dict
 
 from sqlalchemy.orm import Session
 
@@ -21,7 +20,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
 
         super().__init__(session)
 
-    def upsert(self, values: Dict, organisation_id: str, plugin_id: str) -> None:
+    def upsert(self, values: dict, organisation_id: str, plugin_id: str) -> None:
         encrypted_values = self.encryption.encode(json.dumps(values))
 
         try:
@@ -37,7 +36,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
             )
             self.session.add(setting_in_db)
 
-    def get_all(self, organisation_id: str, plugin_id: str) -> Dict:
+    def get_all(self, organisation_id: str, plugin_id: str) -> dict:
         try:
             instance = self._db_instance_by_id(organisation_id, plugin_id)
         except SettingsNotFound:
@@ -74,7 +73,7 @@ def create_setting_storage(session) -> SettingsStorage:
 
 
 def create_encrypter():
-    encrypter = IdentityMiddleware()
+    encrypter: EncryptMiddleware = IdentityMiddleware()
     if get_context().env.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
         encrypter = NaclBoxMiddleware(
             get_context().env.katalogus_private_key_b64,

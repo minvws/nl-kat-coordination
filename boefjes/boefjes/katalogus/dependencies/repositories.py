@@ -1,5 +1,5 @@
 import logging
-from typing import Iterator
+from collections.abc import Iterator
 
 from boefjes.katalogus.storage.interfaces import RepositoryStorage
 from boefjes.sql.db import session_managed_iterator

@@ -1,4 +1,3 @@
-from typing import Dict, List, Optional, Type
 from uuid import UUID
 
 from pydantic import BaseModel, Field
@@ -11,29 +10,29 @@ from bytes.models import BoefjeMeta, MimeType, NormalizerMeta, RawData, RawDataM
 class BoefjeMetaFilter(BaseModel):
     organization: str
 
-    boefje_id: Optional[str] = None
-    input_ooi: Optional[str] = "*"
+    boefje_id: str | None = None
+    input_ooi: str | None = "*"
     limit: int = 1
     offset: int = 0
     descending: bool = True
 
 
 class NormalizerMetaFilter(BaseModel):
-    organization: Optional[str] = None
-    normalizer_id: Optional[str] = None
-    raw_id: Optional[UUID] = None
+    organization: str | None = None
+    normalizer_id: str | None = None
+    raw_id: UUID | None = None
     limit: int = 1
     offset: int = 0
     descending: bool = True
 
 
 class RawDataFilter(BaseModel):
-    organization: Optional[str] = None
-    boefje_meta_id: Optional[UUID] = None
-    normalized: Optional[bool] = None
-    mime_types: List[MimeType] = Field(default_factory=list)
-    limit: Optional[int] = 1
-    offset: Optional[int] = 0
+    organization: str | None = None
+    boefje_meta_id: UUID | None = None
+    normalized: bool | None = None
+    mime_types: list[MimeType] = Field(default_factory=list)
+    limit: int | None = 1
+    offset: int | None = 0
 
     def apply(self, query: Query) -> Query:
         if self.boefje_meta_id:
@@ -58,7 +57,7 @@ class MetaDataRepository:
     def __enter__(self) -> None:
         pass
 
-    def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
+    def __exit__(self, _exc_type: type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         pass
 
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
@@ -67,7 +66,7 @@ class MetaDataRepository:
     def get_boefje_meta_by_id(self, boefje_meta_id: UUID) -> BoefjeMeta:
         raise NotImplementedError()
 
-    def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> List[BoefjeMeta]:
+    def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
         raise NotImplementedError()
 
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
@@ -76,7 +75,7 @@ class MetaDataRepository:
     def get_normalizer_meta_by_id(self, normalizer_meta_id: UUID) -> NormalizerMeta:
         raise NotImplementedError()
 
-    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> List[NormalizerMeta]:
+    def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
         raise NotImplementedError()
 
     def save_raw(self, raw: RawData) -> UUID:
@@ -85,16 +84,16 @@ class MetaDataRepository:
     def get_raw_by_id(self, raw_id: UUID) -> RawData:
         raise NotImplementedError()
 
-    def get_raw(self, query_filter: RawDataFilter) -> List[RawDataMeta]:
+    def get_raw(self, query_filter: RawDataFilter) -> list[RawDataMeta]:
         raise NotImplementedError()
 
-    def has_raw(self, boefje_meta: BoefjeMeta, mime_types: List[MimeType]) -> bool:
+    def has_raw(self, boefje_meta: BoefjeMeta, mime_types: list[MimeType]) -> bool:
         raise NotImplementedError()
 
-    def get_raw_file_count_per_organization(self) -> Dict[str, int]:
+    def get_raw_file_count_per_organization(self) -> dict[str, int]:
         raise NotImplementedError()
 
-    def get_raw_file_count_per_mime_type(self, query_filter: RawDataFilter) -> Dict[str, int]:
+    def get_raw_file_count_per_mime_type(self, query_filter: RawDataFilter) -> dict[str, int]:
         raise NotImplementedError()
 
     def get_raw_meta_by_id(self, raw_id: UUID) -> RawDataMeta:

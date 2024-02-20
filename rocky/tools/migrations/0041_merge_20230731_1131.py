@@ -9,4 +9,4 @@ class Migration(migrations.Migration):
         ("tools", "0040_update_admin_permission"),
     ]
 
-    operations = []
+    operations: list = []

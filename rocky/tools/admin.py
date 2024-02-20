@@ -2,11 +2,12 @@ import json
 from json import JSONDecodeError
 
 import tagulous.admin
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models import JSONField
 from django.forms import widgets
+from django.http import HttpResponseRedirect
 
-from rocky.admin import AdminErrorMessageMixin
+from rocky.exceptions import RockyError
 from tools.models import Indemnification, OOIInformation, Organization, OrganizationMember, OrganizationTag
 
 
@@ -24,6 +25,7 @@ class JSONInfoWidget(widgets.Textarea):
             return super().format_value(value)
 
 
+@admin.register(OOIInformation)
 class OOIInformationAdmin(admin.ModelAdmin):
     # makes sure that the order stays the same
     fields = ("id", "data", "consult_api")
@@ -43,8 +45,15 @@ class OOIInformationAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 
-class OrganizationAdmin(AdminErrorMessageMixin, admin.ModelAdmin):
+class OrganizationAdmin(admin.ModelAdmin):
     list_display = ["name", "code", "tags"]
+
+    def add_view(self, request, *args, **kwargs):
+        try:
+            return super().add_view(request, *args, **kwargs)
+        except RockyError as e:
+            self.message_user(request, str(e), level=messages.ERROR)
+            return HttpResponseRedirect(request.get_full_path())
 
     def get_readonly_fields(self, request, obj=None):
         # Obj is None when adding an organization and in that case we don't make
@@ -57,10 +66,12 @@ class OrganizationAdmin(AdminErrorMessageMixin, admin.ModelAdmin):
             return []
 
 
+@admin.register(OrganizationMember)
 class OrganizationMemberAdmin(admin.ModelAdmin):
     list_display = ("user", "organization")
 
 
+@admin.register(Indemnification)
 class IndemnificationAdmin(admin.ModelAdmin):
     list_display = ("organization", "user")
 
@@ -71,12 +82,9 @@ class IndemnificationAdmin(admin.ModelAdmin):
             return []
 
 
+@admin.register(OrganizationTag)
 class OrganizationTagAdmin(admin.ModelAdmin):
     pass
 
 
 tagulous.admin.register(Organization, OrganizationAdmin)
-admin.site.register(OrganizationMember, OrganizationMemberAdmin)
-admin.site.register(Indemnification, IndemnificationAdmin)
-admin.site.register(OOIInformation, OOIInformationAdmin)
-admin.site.register(OrganizationTag, OrganizationTagAdmin)

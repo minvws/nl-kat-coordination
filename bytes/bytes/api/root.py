@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Optional, Union
+from typing import Any
 
 import prometheus_client
 from fastapi import APIRouter, Depends
@@ -24,15 +24,15 @@ logger = logging.getLogger(__name__)
 class ServiceHealth(BaseModel):
     service: str
     healthy: bool = False
-    version: Optional[str] = None
+    version: str | None = None
     additional: Any = None
-    results: List["ServiceHealth"] = Field(default_factory=list)
+    results: list["ServiceHealth"] = Field(default_factory=list)
 
 
 ServiceHealth.update_forward_refs()
 
 
-def validation_exception_handler(_: Request, exc: Union[RequestValidationError, ValidationError]) -> JSONResponse:
+def validation_exception_handler(_: Request, exc: RequestValidationError | ValidationError) -> JSONResponse:
     logger.critical(exc)
     return JSONResponse(
         {

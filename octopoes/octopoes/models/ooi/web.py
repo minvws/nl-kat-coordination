@@ -1,6 +1,6 @@
 from abc import ABC
 from enum import Enum
-from typing import Dict, Literal, Optional
+from typing import Literal
 
 from pydantic import AnyUrl
 
@@ -27,7 +27,7 @@ class Website(OOI):
 
     ip_service: Reference = ReferenceField(IPService, max_issue_scan_level=0, max_inherit_scan_level=4)
     hostname: Reference = ReferenceField(Hostname, max_inherit_scan_level=4)
-    certificate: Optional[Reference] = ReferenceField(X509Certificate, default=None, max_issue_scan_level=1)
+    certificate: Reference | None = ReferenceField(X509Certificate, default=None, max_issue_scan_level=1)
 
     _natural_key_attrs = ["ip_service", "hostname"]
 
@@ -90,7 +90,7 @@ class HTTPResource(OOI):
 
     website: Reference = ReferenceField(Website, max_issue_scan_level=0, max_inherit_scan_level=4)
     web_url: Reference = ReferenceField(WebURL, max_issue_scan_level=1, max_inherit_scan_level=4)
-    redirects_to: Optional[Reference] = ReferenceField(WebURL, default=None)
+    redirects_to: Reference | None = ReferenceField(WebURL, default=None)
 
     _natural_key_attrs = ["website", "web_url"]
 
@@ -147,7 +147,7 @@ class URL(OOI):
     network: Reference = ReferenceField(Network)
     raw: AnyUrl
 
-    web_url: Optional[Reference] = ReferenceField(WebURL, max_issue_scan_level=2, default=None)
+    web_url: Reference | None = ReferenceField(WebURL, max_issue_scan_level=2, default=None)
 
     _natural_key_attrs = ["network", "raw"]
 
@@ -212,7 +212,7 @@ class ImageMetadata(OOI):
     object_type: Literal["ImageMetadata"] = "ImageMetadata"
 
     resource: Reference = ReferenceField(HTTPResource, max_issue_scan_level=0, max_inherit_scan_level=4)
-    image_info: Dict
+    image_info: dict
 
     _natural_key_attrs = ["resource"]
     _reverse_relation_names = {"resource": "ImageMetaData"}
@@ -298,10 +298,10 @@ class SecurityTXT(OOI):
     website: Reference = ReferenceField("Website", max_issue_scan_level=0, max_inherit_scan_level=4)
     url: Reference = ReferenceField("URL", max_issue_scan_level=0, max_inherit_scan_level=4)
 
-    redirects_to: Optional[Reference] = ReferenceField(
+    redirects_to: Reference | None = ReferenceField(
         "SecurityTXT", max_issue_scan_level=2, max_inherit_scan_level=0, default=None
     )
-    security_txt: Optional[str] = None
+    security_txt: str | None = None
 
     _natural_key_attrs = ["website", "url"]
     _reverse_relation_names = {
