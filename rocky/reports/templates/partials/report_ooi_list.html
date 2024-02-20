@@ -31,25 +31,29 @@
                    href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
             </div>
         {% else %}
+            {% if channel != "generate_report" %}
+                <p class="explanation"
+                   role="group"
+                   aria-label="{% translate "explanation select all" %}">
+                    <span>{% translate "Explanation 'Continue with all OOIs'" %}:</span>
+                    {% blocktrans trimmed %}
+                        This option will select all OOIs (+ current filters)
+                        for {{ organization }} organization.
+                    {% endblocktrans %}
+                </p>
+                <form method="get" class="inline" action="{{ next }}">
+                    {% include "forms/report_form_fields.html" %}
+
+                    <button type="submit" class="button" name="ooi" value="all">
+                        {% translate "Continue with all OOIs" %}<span class="icon ti-chevron-right"></span>
+                    </button>
+                </form>
+            {% endif %}
             <form method="get"
                   action="{{ next }}"
                   class="inline layout-wide checkboxes_required">
                 {% include "forms/report_form_fields.html" %}
 
-                {% if channel != "generate_report" %}
-                    <p class="explanation"
-                       role="group"
-                       aria-label="{% translate "explanation select all" %}">
-                        <span>{% translate "Explanation 'Continue with all OOIs'" %}:</span>
-                        {% blocktrans trimmed %}
-                            This option will select all OOIs (+ current filters)
-                            for {{ organization }} organization.
-                        {% endblocktrans %}
-                    </p>
-                    <button type="submit" class="button" name="ooi" value="all">
-                        {% translate "Continue with all OOIs" %}<span class="icon ti-chevron-right"></span>
-                    </button>
-                {% endif %}
                 <table>
                     <caption class="visually-hidden">{% translate "Objects:" %}</caption>
                     <thead>
