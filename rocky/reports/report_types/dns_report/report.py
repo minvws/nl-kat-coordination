@@ -29,21 +29,19 @@ class DNSReport(Report):
 
         findings = []
         records = []
-        security = {
-            "spf": True,
-            "dkim": True,
-            "dmarc": True,
-            "dnssec": True,
-            "caa": True
-        }
+        security = {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True}
         for ooi_type, ooi in tree.items():
             if isinstance(ooi, Finding):
                 for check in ["caa", "dkim", "dmarc", "dnssec", "spf"]:
                     if "NO-%s" % check.upper() in ooi.finding_type.tokenized.id:
                         security[check] = False
-                if "KAT-INVALID-SPF" == ooi.finding_type.tokenized.id:
+                if ooi.finding_type.tokenized.id == "KAT-INVALID-SPF":
                     security["spf"] = False
-                if ooi.finding_type.tokenized.id in ("KAT-INVALID-SPF", "KAT-NAMESERVER-NO-IPV6", "KAT-NAMESERVER-NO-TWO-IPV6"):
+                if ooi.finding_type.tokenized.id in (
+                    "KAT-INVALID-SPF",
+                    "KAT-NAMESERVER-NO-IPV6",
+                    "KAT-NAMESERVER-NO-TWO-IPV6",
+                ):
                     findings.append(ooi)
             elif isinstance(ooi, DNSRecord):
                 records.append(
@@ -56,9 +54,4 @@ class DNSReport(Report):
                 )
         records = sorted(records, key=lambda x: x["type"])
 
-        return {
-            "input_ooi": input_ooi,
-            "records": records,
-            "security": security,
-            "findings": findings
-        }
+        return {"input_ooi": input_ooi, "records": records, "security": security, "findings": findings}
