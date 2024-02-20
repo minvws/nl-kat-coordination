@@ -147,8 +147,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, Any]]]:
         error_reports = []
-        report_data = {}
-        by_type = {}
+        report_data: dict[str, dict[str, dict[str, Any]]] = {}
+        by_type: dict[str, list[str]] = {}
 
         for ooi in self.selected_oois:
             ooi_type = Reference.from_str(ooi).class_

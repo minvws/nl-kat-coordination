@@ -5,6 +5,7 @@ from typing import Any
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import OOI, Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
@@ -30,7 +31,7 @@ class MailReport(Report):
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
         except ObjectNotFoundException as e:
             logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
-            raise ObjectNotFoundException(e)
+            raise
 
         if ooi.reference.class_type == Hostname:
             hostnames = [ooi]
@@ -82,9 +83,9 @@ class MailReport(Report):
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
         all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
 
-        filtered_measures = self.group_by_source(
+        filtered_finding_types = self.group_by_source(
             self.octopoes_api_connector.query_many("Hostname.<ooi[is Finding].finding_type", valid_time, all_hostnames),
-            lambda ooi: ooi.id in MAIL_FINDINGS,
+            lambda ooi: ooi.id in MAIL_FINDING_TYPES,
         )
 
         result = {}
@@ -96,24 +97,13 @@ class MailReport(Report):
             number_of_dkim = number_of_hostnames
 
             for hostname in hostname_references:
-                measures = filtered_measures.get(hostname, [])
-                mail_security_measures[hostname] = measures
+                finding_types = filtered_finding_types.get(hostname, [])
 
-                number_of_spf -= (
-                    1
-                    if list(filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures[hostname]))
-                    else 0
-                )
-                number_of_dmarc -= (
-                    1
-                    if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", mail_security_measures[hostname]))
-                    else 0
-                )
-                number_of_dkim -= (
-                    1
-                    if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", mail_security_measures[hostname]))
-                    else 0
-                )
+                number_of_spf -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", finding_types)) else 0
+                number_of_dmarc -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", finding_types)) else 0
+                number_of_dkim -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", finding_types)) else 0
+
+                mail_security_measures[hostname] = finding_types
 
             result[input_ooi] = {
                 "input_ooi": input_ooi,

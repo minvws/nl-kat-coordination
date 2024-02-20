@@ -1,7 +1,7 @@
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any, TypedDict, TypeVar
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
@@ -26,6 +26,9 @@ class BaseReport:
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
+
+
+T_BaseReport = TypeVar("T_BaseReport", bound="BaseReport")
 
 
 class Report(BaseReport):
@@ -55,7 +58,7 @@ class Report(BaseReport):
     def group_by_source(query_result: list[tuple[str, OOIType]], check=None) -> dict[str, list[OOIType]]:
         """Transform a query-many result from [(ref1, obj1), (ref1, obj2), ...] into {ref1: [obj1, obj2], ...}"""
 
-        result = {}
+        result: dict[str, list[OOIType]] = {}
 
         for source, ooi in query_result:
             if source not in result:
@@ -94,8 +97,8 @@ class MultiReport(BaseReport):
 
 
 class AggregateReportSubReports(TypedDict):
-    required: list[type[Report] | type[MultiReport]]
-    optional: list[type[Report] | type[MultiReport]]
+    required: list[type[Report]]
+    optional: list[type[Report]]
 
 
 class AggregateReport(BaseReport):

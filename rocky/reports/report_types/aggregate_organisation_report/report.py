@@ -444,7 +444,7 @@ def aggregate_reports(
     selected_report_types: list[str],
     valid_time: datetime,
 ) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
-    by_type = {}
+    by_type: dict[str, list[str]] = {}
 
     for ooi in input_ooi_references:
         if ooi.get_object_type() not in by_type:
@@ -454,7 +454,7 @@ def aggregate_reports(
 
     all_types = [
         t
-        for t in AggregateOrganisationReport.reports["required"] + report.reports["optional"]
+        for t in AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
         if t.id in selected_report_types
     ]
     report_data: dict[str, Any] = {}
@@ -467,7 +467,7 @@ def aggregate_reports(
             results = report_type(connector).collect_data(oois, valid_time)
         except ObjectNotFoundException:
             logger.error("Object not found")
-            errors.append(report_type)
+            errors.append(report_type.id)
             continue
 
         for ooi, data in results.items():
