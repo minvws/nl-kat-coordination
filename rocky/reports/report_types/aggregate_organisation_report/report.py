@@ -452,7 +452,11 @@ def aggregate_reports(
 
         by_type[ooi.get_object_type()].append(str(ooi.reference))
 
-    all_types = [t for t in AggregateOrganisationReport.reports["required"] + report.reports["optional"] if t.id in selected_report_types]
+    all_types = [
+        t
+        for t in AggregateOrganisationReport.reports["required"] + report.reports["optional"]
+        if t.id in selected_report_types
+    ]
     report_data: dict[str, Any] = {}
     errors = []
 
