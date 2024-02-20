@@ -59,7 +59,6 @@ DENY_ORGANIZATION_CODES = [
     "keiko",
     "octopoes",
     "rocky",
-    "fmea",
 ]
 
 
