@@ -81,10 +81,12 @@ repos:
     exclude: |
       (?x)(
       ^boefjes/boefjes/plugins |
+      ^boefjes/tools |
       ^keiko/templates |
       ^mula/whitelist\.py$ |
       ^octopoes/ |
-      ^rocky/ |
+      ^rocky/fmea/ |
+      ^rocky/whitelist\.py$ |
       /tests/ |
       docs/source/conf\.py$ |
       setup\.py$

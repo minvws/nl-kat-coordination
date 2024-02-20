@@ -94,3 +94,5 @@ class Command(BaseCommand):
 
         if options["id"]:
             return Organization.objects.get(pk=options["id"])
+
+        return None

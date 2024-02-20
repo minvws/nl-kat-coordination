@@ -202,6 +202,6 @@ class TaskTest(TestCase):
         assert Path(path / "__pycache__/pytest__init__.cpython-311.pyc").is_file()
         assert Path(path / "__pycache__/pytest_main.cpython-311.pyc").is_file()
 
-        assert boefje_resource_1.runnable_hash == "05b87bc4a93bdcf8c4a931278f90c413e5f2fa47c23b28fdf28b5304f8a82374"
+        assert boefje_resource_1.runnable_hash == "4bae5e869bd17759bf750bf357fdee1eedff5768d407248b8ddcb63d0abdee19"
         assert boefje_resource_2.runnable_hash == "e0c46fb915778b06f69cd5934b2157733cef84d67fc89c563c5bbd965ad52949"
         assert boefje_resource_3.runnable_hash == "0185c90d3d1a4dc1490ec918374f84e8a480101f98db14d434638147dd82c626"

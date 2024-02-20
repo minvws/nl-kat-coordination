@@ -40,7 +40,6 @@ class SafeConnectionsReport(Report):
         sc_ips = {}
         number_of_ips = len(ips)
         number_of_available = number_of_ips
-        finding_types = []
 
         for ip in ips:
             finding_types = self.octopoes_api_connector.query(
@@ -51,8 +50,6 @@ class SafeConnectionsReport(Report):
             )
 
             cipher_findings = list(filter(lambda finding: finding.id in CIPHER_FINDINGS, finding_types))
-            finding_types.extend(cipher_findings)
-
             sc_ips[ip.reference] = cipher_findings
             number_of_available -= 1 if cipher_findings else 0
 
@@ -61,5 +58,4 @@ class SafeConnectionsReport(Report):
             "sc_ips": sc_ips,
             "number_of_available": number_of_available,
             "number_of_ips": number_of_ips,
-            "finding_types": finding_types,
         }

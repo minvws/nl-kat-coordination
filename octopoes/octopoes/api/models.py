@@ -44,6 +44,15 @@ class Declaration(BaseModel):
     task_id: uuid.UUID | None = None
 
 
+class Affirmation(BaseModel):
+    """Used by Octopoes Connector to describe request body"""
+
+    ooi: OOIType
+    valid_time: datetime
+    method: str | None = None
+    task_id: uuid.UUID | None = None
+
+
 class ScanProfileDeclaration(BaseModel):
     reference: Reference
     level: int
@@ -64,4 +73,13 @@ class ValidatedDeclaration(BaseModel):
     ooi: OOIType
     valid_time: AwareDatetime
     method: str | None = "manual"
-    task_id: uuid.UUID | None = Field(default_factory=lambda: uuid.uuid4())
+    task_id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
+
+
+class ValidatedAffirmation(BaseModel):
+    """Used by Octopoes API to validate and parse correctly"""
+
+    ooi: OOIType
+    valid_time: AwareDatetime
+    method: str | None = "hydration"
+    task_id: uuid.UUID | None = Field(default_factory=uuid.uuid4)

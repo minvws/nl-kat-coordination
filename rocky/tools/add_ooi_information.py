@@ -79,7 +79,7 @@ def service_info(value) -> tuple[str, str]:
 
 # from: https://newbedev.com/how-to-parse-table-with-rowspan-and-colspan
 def table_to_2d(table_tag):
-    rowspans = []  # track pending rowspans
+    rowspans_list: list = []  # track pending rowspans
     rows = table_tag.find_all("tr")
 
     # first scan, see how many column_names we need
@@ -95,11 +95,11 @@ def table_to_2d(table_tag):
         # to the last cell; ignore it elsewhere.
         colcount = max(
             colcount,
-            sum(int(c.get("colspan", 1)) or 1 for c in cells[:-1]) + len(cells[-1:]) + len(rowspans),
+            sum(int(c.get("colspan", 1)) or 1 for c in cells[:-1]) + len(cells[-1:]) + len(rowspans_list),
         )
         # update rowspan bookkeeping; 0 is a span to the bottom.
-        rowspans += [int(c.get("rowspan", 1)) or len(rows) - r for c in cells]
-        rowspans = [s - 1 for s in rowspans if s > 1]
+        rowspans_list += [int(c.get("rowspan", 1)) or len(rows) - r for c in cells]
+        rowspans_list = [s - 1 for s in rowspans_list if s > 1]
 
     # it doesn't matter if there are still rowspan numbers 'active'; no extra
     # rows to show in the table means the larger than 1 rowspan numbers in the
@@ -109,7 +109,7 @@ def table_to_2d(table_tag):
     table = [[None] * colcount for row in rows]
 
     # fill matrix from row data
-    rowspans = {}  # track pending rowspans, column number mapping to count
+    rowspans: dict = {}  # track pending rowspans, column number mapping to count
     for row, row_elem in enumerate(rows):
         span_offset = 0  # how many column_names are skipped due to row and colspans
         for col, cell in enumerate(row_elem.find_all(["td", "th"], recursive=False)):
@@ -141,7 +141,7 @@ def table_to_2d(table_tag):
 
 def _map_usage_value(value: str) -> bool:
     value = value.lower().strip()
-    return value is not None and value and value != "no"
+    return bool(value and value != "no")
 
 
 def wiki_port_tables() -> list[_PortInfo]:

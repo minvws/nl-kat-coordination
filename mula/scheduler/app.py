@@ -53,7 +53,7 @@ class App:
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
 
-        threading.excepthook = self.unhandled_exception  # type: ignore
+        threading.excepthook = self.unhandled_exception
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
 

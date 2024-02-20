@@ -1,6 +1,6 @@
-from account.mixins import OrganizationView
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from tools.models import Organization
 from tools.view_helpers import StepsMixin
 
 ONBOARDING_PERMISSIONS = (
@@ -12,7 +12,9 @@ ONBOARDING_PERMISSIONS = (
 DNS_REPORT_LEAST_CLEARANCE_LEVEL = 1
 
 
-class KatIntroductionStepsMixin(StepsMixin, OrganizationView):
+class KatIntroductionStepsMixin(StepsMixin):
+    organization: Organization
+
     def build_steps(self):
         steps = [
             {
@@ -36,6 +38,8 @@ class KatIntroductionStepsMixin(StepsMixin, OrganizationView):
 
 
 class KatIntroductionRegistrationStepsMixin(StepsMixin):
+    organization: Organization
+
     def build_steps(self):
         steps = [
             {
@@ -52,7 +56,9 @@ class KatIntroductionRegistrationStepsMixin(StepsMixin):
         return steps
 
 
-class KatIntroductionAdminStepsMixin(StepsMixin, OrganizationView):
+class KatIntroductionAdminStepsMixin(StepsMixin):
+    organization: Organization
+
     def build_steps(self):
         steps = [
             {
