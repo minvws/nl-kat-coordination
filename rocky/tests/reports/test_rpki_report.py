@@ -16,15 +16,10 @@ def test_rpki_report_no_ip(mock_octopoes_api_connector, valid_time, hostname):
     data = report.generate_data(str(hostname.reference), valid_time)
 
     assert data["rpki_ips"] == {}
-    assert all(
-        v == 0
-        for v in [
-            data["number_of_available"],
-            data["number_of_compliant"],
-            data["number_of_valid"],
-            data["number_of_ips"],
-        ]
-    )
+    assert data["number_of_available"] == 0
+    assert data["number_of_compliant"] == 0
+    assert data["number_of_valid"] == 0
+    assert data["number_of_ips"] == 0
 
 
 def test_rpki_ip_valid(mock_octopoes_api_connector, valid_time, hostname, ipaddressv4, service):
