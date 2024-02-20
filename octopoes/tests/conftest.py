@@ -35,8 +35,9 @@ from octopoes.models.types import (
     Website,
 )
 from octopoes.repositories.ooi_repository import OOIRepository, XTDBOOIRepository
+from octopoes.repositories.origin_parameter_repository import XTDBOriginParameterRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
-from octopoes.repositories.scan_profile_repository import ScanProfileRepository
+from octopoes.repositories.scan_profile_repository import ScanProfileRepository, XTDBScanProfileRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
 
@@ -238,14 +239,72 @@ def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
     return connector
 
 
-@pytest.fixture
-def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session)
+class MockEventManager:
+    def __init__(self):
+        self.queue = []
+        self.processed = [0]
+
+    def publish(self, event) -> None:
+        self.queue.append(event)
+
+    def unprocessed(self) -> list:
+        retval = self.queue[self.processed[-1] :]
+        self.processed.append(len(self.queue))
+        return retval
+
+    def process_events(self, xtdb_octopoes_service: OctopoesService) -> int:
+        targets = self.unprocessed()
+        for event in targets:
+            xtdb_octopoes_service.process_event(event)
+        xtdb_octopoes_service.commit()
+        return len(targets)
+
+    def complete_process_events(self, xtdb_octopoes_service: OctopoesService, repeat: int = 3) -> int:
+        retval = 0
+        for _ in range(repeat):
+            while True:
+                val = self.process_events(xtdb_octopoes_service)
+                if val == 0:
+                    break
+                retval += val
+        return retval
 
 
 @pytest.fixture
-def xtdb_origin_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session)
+def event_manager(xtdb_session: XTDBSession) -> Mock:
+    return MockEventManager()
+
+
+@pytest.fixture
+def xtdb_ooi_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOOIRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_origin_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_origin_parameter_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginParameterRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_scan_profile_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBScanProfileRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_octopoes_service(
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_origin_repository: XTDBOriginRepository,
+    xtdb_origin_parameter_repository: XTDBOriginParameterRepository,
+    xtdb_scan_profile_repository: XTDBScanProfileRepository,
+) -> OctopoesService:
+    return OctopoesService(
+        xtdb_ooi_repository, xtdb_origin_repository, xtdb_origin_parameter_repository, xtdb_scan_profile_repository
+    )
 
 
 @pytest.fixture

@@ -8,7 +8,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from pydantic import AwareDatetime
 from requests import RequestException
 
-from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
+from octopoes.api.models import ServiceHealth, ValidatedAffirmation, ValidatedDeclaration, ValidatedObservation
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
@@ -294,9 +294,25 @@ def save_declaration(
         method=declaration.method if declaration.method else "manual",
         source=declaration.ooi.reference,
         result=[declaration.ooi.reference],
-        task_id=declaration.task_id if declaration.task_id else str(uuid.uuid4()),
+        task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
     )
     octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time)
+    octopoes.commit()
+
+
+@router.post("/affirmations", tags=["Origins"])
+def save_affirmation(
+    affirmation: ValidatedAffirmation,
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> None:
+    origin = Origin(
+        origin_type=OriginType.AFFIRMATION,
+        method=affirmation.method if affirmation.method else "hydration",
+        source=affirmation.ooi.reference,
+        result=[affirmation.ooi.reference],
+        task_id=affirmation.task_id if affirmation.task_id else uuid.uuid4(),
+    )
+    octopoes.save_origin(origin, [affirmation.ooi], affirmation.valid_time)
     octopoes.commit()
 
 
