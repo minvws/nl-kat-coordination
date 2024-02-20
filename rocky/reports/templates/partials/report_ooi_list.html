@@ -31,7 +31,7 @@
                    href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
             </div>
         {% else %}
-            {% if channel != "generate_report" %}
+            {% if channel == "aggregate_report" %}
                 <p class="explanation"
                    role="group"
                    aria-label="{% translate "explanation select all" %}">
