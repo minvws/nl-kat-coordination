@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any, TypedDict
 
 from django.utils.translation import gettext_lazy as _
 
@@ -11,6 +11,11 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
+
+
+class RPKIData(TypedDict):
+    exists: bool
+    valid: bool
 
 
 class RPKIReport(Report):
@@ -24,7 +29,7 @@ class RPKIReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "rpki_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         try:
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
         except ObjectNotFoundException as e:
@@ -38,7 +43,7 @@ class RPKIReport(Report):
         else:
             ips = [ooi]
 
-        rpki_ips = {}
+        rpki_ips: dict[Reference, RPKIData] = {}
         number_of_ips = len(ips)
         number_of_compliant = number_of_ips
         number_of_available = number_of_ips
@@ -47,11 +52,9 @@ class RPKIReport(Report):
             finding_types = self.octopoes_api_connector.query(
                 "IPAddress.<ooi[is Finding].finding_type", valid_time, ip.reference
             )
-            rpki_ips[ip.reference] = {}
             exists = not any([finding_type for finding_type in finding_types if finding_type.id in ["KAT-NO-RPKI"]])
             valid = not any([finding_type for finding_type in finding_types if finding_type.id in ["KAT-EXPIRED-RPKI"]])
-            rpki_ips[ip.reference]["exists"] = exists
-            rpki_ips[ip.reference]["valid"] = valid
+            rpki_ips[ip.reference] = {"exists": exists, "valid": valid}
             number_of_available -= 1 if not exists else 0
             number_of_valid -= 1 if not valid else 0
             number_of_compliant -= 1 if not (exists and valid) else 0

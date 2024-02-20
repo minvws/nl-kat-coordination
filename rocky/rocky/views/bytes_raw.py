@@ -2,7 +2,6 @@ import json
 import logging
 import zipfile
 from io import BytesIO
-from typing import Dict, List
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -34,7 +33,7 @@ class BytesRawView(OrganizationView):
             return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
-def zip_data(raws: Dict[str, bytes], raw_metas: List[Dict]) -> BytesIO:
+def zip_data(raws: dict[str, bytes], raw_metas: list[dict]) -> BytesIO:
     zf_buffer = BytesIO()
 
     with zipfile.ZipFile(zf_buffer, "w", zipfile.ZIP_DEFLATED) as zf:

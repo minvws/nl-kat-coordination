@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from collections.abc import Sequence
+from typing import Any
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -11,6 +12,7 @@ from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
+from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
@@ -135,6 +137,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     template_name = "generate_report.html"
     current_step = 6
+    report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
         if not self.are_plugins_enabled(self.plugins):
@@ -142,7 +145,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             messages.add_message(self.request, messages.WARNING, warning_message)
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
+    def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, Any]]]:
         error_reports = []
         report_data = {}
         by_type = {}
@@ -153,7 +156,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             if ooi_type not in by_type:
                 by_type[ooi_type] = []
 
-            by_type[ooi_type].append(ooi)
+                by_type[ooi_type].append(ooi)
 
         for report_type in self.report_types:
             oois = {
@@ -161,12 +164,12 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             }
 
             try:
-                results = report_type(self.octopoes_api_connector).collect_data(oois, self.valid_time)
+                results = report_type(self.octopoes_api_connector).collect_data(oois, self.observed_at)
             except ObjectNotFoundException:
-                error_reports.append(report_type)
+                error_reports.append(report_type.id)
                 continue
             except StopIteration:
-                error_reports.append(report_type)
+                error_reports.append(report_type.id)
                 continue
 
             for ooi, data in results.items():
@@ -178,7 +181,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
             report_types = ", ".join(set(error_reports))
-            date = self.valid_time.date()
+            date = self.observed_at.date()
             error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
                 "report_types": report_types,
                 "date": date,

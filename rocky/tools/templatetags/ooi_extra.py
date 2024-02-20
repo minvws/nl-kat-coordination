@@ -1,5 +1,5 @@
 import json
-from typing import Any, List, Set, Type
+from typing import Any
 from urllib import parse
 
 from django import template
@@ -32,12 +32,12 @@ def sum_list(array):
 
 
 @register.simple_tag()
-def get_scan_levels() -> List[str]:
+def get_scan_levels() -> list[str]:
     return list(map(str, range(1, 5)))
 
 
 @register.filter
-def ooi_types_to_strings(ooi_types: Set[Type[OOI]]):
+def ooi_types_to_strings(ooi_types: set[type[OOI]]):
     return [ooi_type.get_ooi_type() for ooi_type in ooi_types]
 
 

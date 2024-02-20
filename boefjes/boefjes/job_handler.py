@@ -1,9 +1,10 @@
 import logging
 import os
 import traceback
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -21,7 +22,7 @@ from boefjes.job_models import (
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
-from octopoes.api.models import Declaration, Observation
+from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanProfile
 from octopoes.models.exception import ObjectNotFoundException
@@ -67,7 +68,7 @@ def _serialize_value(value: Any, required: bool) -> Any:
             return None
     if isinstance(value, Enum):
         return value.value
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         return value
     else:
         return str(value)
@@ -86,7 +87,7 @@ def get_octopoes_api_connector(org_code: str) -> OctopoesAPIConnector:
     return OctopoesAPIConnector(str(settings.octopoes_api), org_code)
 
 
-def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: List[str]) -> Dict[str, str]:
+def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str]) -> dict[str, str]:
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = requests.get(
@@ -190,7 +191,7 @@ class NormalizerHandler(Handler):
         self,
         job_runner: NormalizerJobRunner,
         bytes_client: BytesAPIClient,
-        whitelist: Optional[Dict[str, int]] = None,
+        whitelist: dict[str, int] | None = None,
         octopoes_factory: Callable[[str], OctopoesAPIConnector] = get_octopoes_api_connector,
     ):
         self.job_runner = job_runner
@@ -209,7 +210,15 @@ class NormalizerHandler(Handler):
             results = self.job_runner.run(normalizer_meta, raw)
             connector = self.octopoes_factory(normalizer_meta.raw_data.boefje_meta.organization)
 
+            logger.info("Obtained results %s", str(results))
+
             for observation in results.observations:
+                parsed_oois = [self._parse_ooi(result) for result in observation.results]
+                for parsed_ooi in parsed_oois:
+                    if parsed_ooi.primary_key == observation.input_ooi:
+                        logger.warning(
+                            'Normalizer "%s" returned input [%s]', normalizer_meta.normalizer.id, observation.input_ooi
+                        )
                 reference = Reference.from_str(observation.input_ooi)
                 connector.save_observation(
                     Observation(
@@ -217,7 +226,9 @@ class NormalizerHandler(Handler):
                         source=reference,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
-                        result=[self._parse_ooi(result) for result in observation.results],
+                        result=[
+                            parsed_ooi for parsed_ooi in parsed_oois if parsed_ooi.primary_key != observation.input_ooi
+                        ],
                     )
                 )
 
@@ -226,6 +237,16 @@ class NormalizerHandler(Handler):
                     Declaration(
                         method=normalizer_meta.normalizer.id,
                         ooi=self._parse_ooi(declaration.ooi),
+                        task_id=normalizer_meta.id,
+                        valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                    )
+                )
+
+            for affirmation in results.affirmations:
+                connector.save_affirmation(
+                    Affirmation(
+                        method=normalizer_meta.normalizer.id,
+                        ooi=self._parse_ooi(affirmation.ooi),
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )

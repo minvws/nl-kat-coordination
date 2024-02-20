@@ -275,26 +275,22 @@ def test_query_for_system_report(
                 )
             ],
             "services": list(
-                set(
-                    [
+                {
+                    str(x.name)
+                    for x in octopoes_api_connector.query(
+                        "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                        valid_time,
+                        ip.reference,
+                    )
+                }.union(
+                    {
                         str(x.name)
                         for x in octopoes_api_connector.query(
-                            "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                            "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
                             valid_time,
                             ip.reference,
                         )
-                    ]
-                ).union(
-                    set(
-                        [
-                            str(x.name)
-                            for x in octopoes_api_connector.query(
-                                "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
-                                valid_time,
-                                ip.reference,
-                            )
-                        ]
-                    )
+                    }
                 )
             ),
             "websites": [

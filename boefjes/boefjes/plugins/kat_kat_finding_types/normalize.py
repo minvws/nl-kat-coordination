@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
@@ -18,7 +18,7 @@ SEVERITY_SCORE_LOOKUP = {
 }
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     kat_finding_type_id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
     data = json.loads(raw)
 
@@ -28,12 +28,15 @@ def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI
 
     risk_score = SEVERITY_SCORE_LOOKUP[risk_severity]
 
-    yield KATFindingType(
-        id=kat_finding_type_id,
-        description=finding_type_information.get("description", None),
-        source=finding_type_information.get("source", None),
-        impact=finding_type_information.get("impact", None),
-        recommendation=finding_type_information.get("recommendation", None),
-        risk_severity=risk_severity,
-        risk_score=risk_score,
-    )
+    yield {
+        "type": "affirmation",
+        "ooi": KATFindingType(
+            id=kat_finding_type_id,
+            description=finding_type_information.get("description", None),
+            source=finding_type_information.get("source", None),
+            impact=finding_type_information.get("impact", None),
+            recommendation=finding_type_information.get("recommendation", None),
+            risk_severity=risk_severity,
+            risk_score=risk_score,
+        ).dict(),
+    }

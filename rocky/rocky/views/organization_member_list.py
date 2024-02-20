@@ -1,6 +1,6 @@
 from enum import Enum
 
-from account.mixins import OrganizationPermissionRequiredMixin
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import models
@@ -26,6 +26,7 @@ class PageActions(Enum):
 class OrganizationMemberListView(
     OrganizationPermissionRequiredMixin,
     OrganizationMemberBreadcrumbsMixin,
+    OrganizationView,
     ListView,
 ):
     model = OrganizationMember

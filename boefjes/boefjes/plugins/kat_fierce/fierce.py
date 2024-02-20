@@ -83,7 +83,7 @@ def head_request(url, timeout=2):
         conn.request("HEAD", "/")
         resp = conn.getresponse()
         return resp.getheaders()
-    except (ConnectionError, socket.gaierror, socket.timeout, OSError):
+    except (ConnectionError, socket.gaierror, TimeoutError, OSError):
         return []
     finally:
         conn.close()
@@ -310,7 +310,7 @@ def fierce(**kwargs):
     random_subdomain = str(random.randint(1e10, 1e11))  # noqa DUO102, non-cryptographic random use
     random_domain = concatenate_subdomains(domain, [random_subdomain])
     wildcard = query(resolver, random_domain, record_type="A", tcp=kwargs["tcp"])
-    wildcard_ips = set(rr.address for rr in wildcard.rrset) if wildcard else set()
+    wildcard_ips = {rr.address for rr in wildcard.rrset} if wildcard else set()
 
     subdomains = get_subdomains(kwargs["subdomains"], kwargs["subdomain_file"])
 
