@@ -38,7 +38,7 @@ class IPv6Report(Report):
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
         except ObjectNotFoundException as e:
             logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
-            raise ObjectNotFoundException(e)
+            raise
 
         if ooi.reference.class_type == IPAddressV4 or ooi.reference.class_type == IPAddressV6:
             path = Path.parse("IPAddress.<address [is ResolvedHostname].hostname")
@@ -48,8 +48,9 @@ class IPv6Report(Report):
 
         results = {}
         for hostname in hostnames:
-            path = Path.parse("Hostname.<hostname [is ResolvedHostname].address")
-            ips = self.octopoes_api_connector.query(path=path, source=hostname.reference, valid_time=valid_time)
+            ips = self.octopoes_api_connector.query(
+                "Hostname.<hostname [is ResolvedHostname].address", valid_time, hostname.reference
+            )
 
             results = {
                 hostname.name: {"enabled": any(ip.reference.class_type == IPAddressV6 for ip in ips)}
@@ -57,3 +58,21 @@ class IPv6Report(Report):
             }
 
         return results
+
+    def collect_data(self, input_oois: set[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
+        all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
+
+        query = "Hostname.<hostname [is ResolvedHostname].address"
+        ips = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+        )
+
+        result = {}
+        for input_ooi, hostnames in hostnames_by_input_ooi.items():
+            result[input_ooi] = {
+                hostname_ref.tokenized.name: {"enabled": any(ip.class_type == IPAddressV6 for ip in ips[input_ooi])}
+                for hostname_ref in hostnames
+            }
+
+        return result

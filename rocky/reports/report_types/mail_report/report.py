@@ -23,32 +23,16 @@ class MailReport(Report):
     template_path = "mail_report/report.html"
 
     def collect_data(self, input_oois: set[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
-        refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
-        hostname_refs_by_input_ooi = {ref: [ref] for ref in refs if ref.class_type == Hostname}
-        ip_refs = [ref for ref in refs if ref.class_type in (IPAddressV4, IPAddressV6)]
+        hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
+        all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
 
-        for input_ooi, ip_hostname in self.octopoes_api_connector.query_many(
-            "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ip_refs
-        ):
-            if input_ooi not in hostname_refs_by_input_ooi:
-                hostname_refs_by_input_ooi[input_ooi] = []
-
-            hostname_refs_by_input_ooi[input_ooi].append(ip_hostname.reference)
-
-        all_hostnames = [h for key, hostnames in hostname_refs_by_input_ooi.items() for h in hostnames]
-        filtered_measures = {}
-
-        for input_ooi, finding_type in self.octopoes_api_connector.query_many(
-            "Hostname.<ooi[is Finding].finding_type", valid_time, all_hostnames
-        ):
-            if input_ooi not in filtered_measures:
-                filtered_measures[input_ooi] = []
-
-            if finding_type.id in MAIL_FINDINGS:
-                filtered_measures[input_ooi].append(finding_type)
+        filtered_measures = self.group_by_source(
+            self.octopoes_api_connector.query_many("Hostname.<ooi[is Finding].finding_type", valid_time, all_hostnames),
+            lambda ooi: ooi.id in MAIL_FINDINGS,
+        )
 
         result = {}
-        for input_ooi, hostname_references in hostname_refs_by_input_ooi.items():
+        for input_ooi, hostname_references in hostnames_by_input_ooi.items():
             mail_security_measures = {}
             number_of_hostnames = len(hostname_references)
             number_of_spf = number_of_hostnames

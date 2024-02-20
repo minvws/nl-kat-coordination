@@ -125,3 +125,46 @@ class NameServerSystemReport(Report):
             "name_server_checks": name_server_checks,
             "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
         }
+
+    def collect_data(self, input_oois: set[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
+        all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
+
+        query = "Hostname.<ooi[is Finding].finding_type"
+        hostname_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            lambda ooi: ooi.id in ["KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC"],
+        )
+        query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type"
+        port_finding_types = self.group_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            lambda ooi: ooi.id in ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
+        )
+
+        result = {}
+
+        for input_ooi, hostname_references in hostnames_by_input_ooi.items():
+            name_server_checks = NameServerChecks()
+            finding_types = {}
+
+            for hostname in hostname_references:
+                check = NameServerCheck()
+                check.no_uncommon_ports = not any(port_finding_types.get(hostname, []))
+                check.has_dnssec = "KAT-NO-DNSSEC" not in [x.id for x in hostname_finding_types.get(hostname, [])]
+                check.has_valid_dnssec = check.has_dnssec and "KAT-INVALID-DNSSEC" not in [
+                    x.id for x in hostname_finding_types.get(hostname, [])
+                ]
+
+                name_server_checks.checks.append(check)
+
+                for finding_type in port_finding_types.get(hostname, []) + hostname_finding_types.get(hostname, []):
+                    if finding_type.risk_severity not in [None, RiskLevelSeverity.PENDING] and finding_type.description:
+                        finding_types[finding_type.id] = finding_type
+
+            result[input_ooi] = {
+                "input_ooi": input_ooi,
+                "name_server_checks": name_server_checks,
+                "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
+            }
+
+        return result
