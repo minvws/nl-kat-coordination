@@ -1,7 +1,8 @@
 import threading
 import typing
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Dict, Optional
+from typing import Any
 
 import requests
 from requests.models import HTTPError
@@ -16,7 +17,7 @@ ClientSessionMethod = Callable[..., Any]
 
 def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     @wraps(function)
-    def wrapper(self, *args, **kwargs):  # type: ignore
+    def wrapper(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
         except HTTPError as error:
@@ -44,7 +45,7 @@ class Bytes(HTTPService):
             password: A string representing the password.
             timeout: An integer representing the timeout.
         """
-        self.credentials: Dict[str, str] = {
+        self.credentials: dict[str, str] = {
             "username": user,
             "password": password,
         }
@@ -74,7 +75,7 @@ class Bytes(HTTPService):
 
     @retry_with_login
     @exception_handler
-    def get_last_run_boefje(self, boefje_id: str, input_ooi: str, organization_id: str) -> Optional[BoefjeMeta]:
+    def get_last_run_boefje(self, boefje_id: str, input_ooi: str, organization_id: str) -> BoefjeMeta | None:
         url = f"{self.host}/bytes/boefje_meta"
         response = self.get(
             url=url,
@@ -96,7 +97,7 @@ class Bytes(HTTPService):
 
     @retry_with_login
     @exception_handler
-    def get_last_run_boefje_by_organisation_id(self, organization_id: str) -> Optional[BoefjeMeta]:
+    def get_last_run_boefje_by_organisation_id(self, organization_id: str) -> BoefjeMeta | None:
         url = f"{self.host}/bytes/boefje_meta"
         response = self.get(
             url=url,

@@ -9,4 +9,4 @@ class Migration(migrations.Migration):
         ("tools", "0035_update_perms_move_and_clear_groups"),
     ]
 
-    operations = []
+    operations: list = []

@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from ipaddress import IPv4Address
-from typing import List, Literal, cast
+from typing import Literal, cast
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
@@ -35,7 +35,7 @@ class OOIRepositoryTest(TestCase):
         class TestOOIClass(OOI):
             object_type: Literal["TestOOIClass"] = "TestOOIClass"
             id: str = "test_id"
-            multiple_refs: List[Reference] = ReferenceField(Network)
+            multiple_refs: list[Reference] = ReferenceField(Network)
             _natural_key_attrs = ["id"]
 
         internet = Network(name="internet")
