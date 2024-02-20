@@ -585,7 +585,7 @@ def cipher_finding_type():
         risk_score=6.0,
         risk_severity=RiskLevelSeverity.MEDIUM,
     )
- 
+
 
 @pytest.fixture
 def finding_type_kat_no_spf():
