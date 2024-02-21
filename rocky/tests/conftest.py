@@ -557,7 +557,18 @@ def finding_types():
 
 
 @pytest.fixture
-def tree_data():
+def tree_data_no_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {},
+    }
+
+
+@pytest.fixture
+def tree_data_findings():
     return {
         "root": {
             "reference": "Finding|Network|testnetwork|KAT-0001",
@@ -572,6 +583,18 @@ def tree_data():
             "Finding|Network|testnetwork|KAT-0001": {
                 "object_type": "Finding",
                 "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0002",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
                 "ooi": "Network|testnetwork",
                 "finding_type": "KATFindingType|KAT-0001",
             },
