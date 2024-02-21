@@ -29,7 +29,7 @@ class TLSReport(Report):
         suites_with_findings = []
         ref = Reference.from_str(input_ooi)
         tree = self.octopoes_api_connector.get_tree(
-            ref, depth=TREE_DEPTH, types={TLSCipher, Finding}, valid_time=valid_time
+            ref, valid_time=valid_time, depth=TREE_DEPTH, types={TLSCipher, Finding}
         ).store
         for pk, ooi in tree.items():
             if ooi.ooi_type == "TLSCipher":
