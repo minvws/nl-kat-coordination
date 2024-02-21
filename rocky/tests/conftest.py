@@ -560,7 +560,7 @@ def finding_types():
 def tree_data():
     return {
         "root": {
-            "reference": "Finding|Network|testnetwork|KAT-000",
+            "reference": "Finding|Network|testnetwork|KAT-0001",
             "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
         },
         "store": {
@@ -569,11 +569,11 @@ def tree_data():
                 "primary_key": "Network|testnetwork",
                 "name": "testnetwork",
             },
-            "Finding|Network|testnetwork|KAT-000": {
+            "Finding|Network|testnetwork|KAT-0001": {
                 "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-000",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
                 "ooi": "Network|testnetwork",
-                "finding_type": "KATFindingType|KAT-000",
+                "finding_type": "KATFindingType|KAT-0001",
             },
         },
     }
