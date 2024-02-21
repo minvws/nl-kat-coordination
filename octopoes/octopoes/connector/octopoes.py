@@ -126,22 +126,16 @@ class OctopoesAPIConnector:
         limit: int | None = None,
         indices: list[int] | None = None,
     ) -> list[TransactionRecord]:
-        res = self.session.get(
-            f"/{self.client}/object-history",
-            # TODO: Requests doesn't support bool as type in params. This method
-            # is only called once without any of the optional arguments, so the
-            # question is whether we need to do the work to support this
-            # properly or just remove all the unused arguments?
-            params={  # type: ignore[arg-type]
-                "reference": str(reference),
-                "sort_order": sort_order,
-                "with_docs": with_docs,
-                "has_doc": has_doc,
-                "offset": offset,
-                "limit": limit,
-                "indices": indices,
-            },
-        )
+        params: dict[str, str | int | list[int] | None] = {
+            "reference": str(reference),
+            "sort_order": sort_order,
+            "with_docs": with_docs,
+            "has_doc": has_doc,
+            "offset": offset,
+            "limit": limit,
+            "indices": indices,
+        }
+        res = self.session.get(f"/{self.client}/object-history", params=params)
         return TypeAdapter(list[TransactionRecord]).validate_json(res.content)
 
     def get_tree(
