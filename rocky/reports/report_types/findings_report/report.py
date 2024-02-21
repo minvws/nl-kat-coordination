@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -24,7 +24,7 @@ class FindingsReport(Report):
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         reference = Reference.from_str(input_ooi)
         findings = []
         finding_types = {}

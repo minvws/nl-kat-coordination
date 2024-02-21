@@ -611,8 +611,8 @@ def tree_data_findings():
         },
     }
 
-  
-@pytest.fixture  
+
+@pytest.fixture
 def cipher_finding_types():
     return [
         KATFindingType(
