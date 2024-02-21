@@ -1,5 +1,5 @@
 import contextlib
-import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from django import forms
@@ -63,10 +63,17 @@ class ObservedAtForm(BaseRockyForm):
     observed_at = forms.DateField(
         label=_("Date"),
         widget=DateInput(format="%Y-%m-%d"),
-        initial=lambda: datetime.datetime.now(tz=datetime.timezone.utc),
+        initial=lambda: datetime.now(tz=timezone.utc).date(),
         required=True,
         help_text=OBSERVED_AT_HELP_TEXT,
     )
+
+    def clean_observed_at(self):
+        observed_at = self.cleaned_data["observed_at"]
+        now = datetime.now(tz=timezone.utc)
+        if observed_at > now.date():
+            raise forms.ValidationError(_("The selected date is in the future. Please select a different date."))
+        return observed_at
 
 
 class LabeledCheckboxInput(forms.CheckboxInput):
@@ -89,25 +96,20 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
     input_type = "checkbox"
     template_name = "forms/widgets/checkbox_group_columns.html"
     option_template_name = "forms/widgets/checkbox_option.html"
-    required_options: list[str] = None
-    toggle_all_button = None
+    required_options: list[str]
     wrap_label = True
 
     def __init__(
         self,
         required_options: list[str] | None = None,
-        toggle_all_button: bool | None = None,
         *args,
         **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
-        if toggle_all_button is not None:
-            self.toggle_all_button = toggle_all_button
         self.required_options = required_options or []
 
     def get_context(self, name, value, attrs) -> dict[str, Any]:
         context = super().get_context(name, value, attrs)
-        context["toggle_all_button"] = self.toggle_all_button
         return context
 
     def create_option(self, *arg, **kwargs) -> dict[str, Any]:

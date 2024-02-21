@@ -530,6 +530,16 @@ def finding():
 
 
 @pytest.fixture
+def no_rpki_finding_type():
+    return KATFindingType(id="KAT-NO-RPKI")
+
+
+@pytest.fixture
+def expired_rpki_finding_type():
+    return KATFindingType(id="KAT-EXPIRED-RPKI")
+
+
+@pytest.fixture
 def finding_types():
     return [
         KATFindingType(
@@ -600,6 +610,70 @@ def tree_data_findings():
             },
         },
     }
+
+  
+@pytest.fixture  
+def cipher_finding_types():
+    return [
+        KATFindingType(
+            id="KAT-RECOMMENDATION-BAD-CIPHER",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=3.0,
+            risk_severity=RiskLevelSeverity.RECOMMENDATION,
+        ),
+        KATFindingType(
+            id="KAT-CRITICAL-BAD-CIPHER",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=10.0,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+    ]
+
+
+@pytest.fixture
+def cipher_finding_type():
+    return KATFindingType(
+        id="KAT-MEDIUM-BAD-CIPHER",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.0,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_spf():
+    return KATFindingType(
+        id="KAT-NO-SPF",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dmarc():
+    return KATFindingType(
+        id="KAT-NO-DMARC",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dkim():
+    return KATFindingType(
+        id="KAT-NO-DKIM",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
 
 
 @pytest.fixture
@@ -686,15 +760,15 @@ def get_stub_path(file_name: str) -> Path:
     return Path(__file__).parent / "stubs" / file_name
 
 
-def get_boefjes_data() -> dict:
+def get_boefjes_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
-def get_normalizers_data() -> dict:
+def get_normalizers_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
 
 
-def get_plugins_data() -> dict:
+def get_plugins_data() -> list[dict]:
     return get_boefjes_data() + get_normalizers_data()
 
 

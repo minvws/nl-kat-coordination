@@ -18,16 +18,11 @@ class OOITreeView(BaseOOIDetailView):
         return filter_ooi_tree(tree_dict, filtered_types)
 
     def get_connector_form_kwargs(self):
+        kwargs = super().get_connector_form_kwargs()
+
         tree_dict = self.get_tree_dict()
-
         ooi_types = get_ooi_types_from_tree(tree_dict, True)
-
-        kwargs = {
-            "ooi_types": ooi_types,
-        }
-
-        if "observed_at" in self.request.GET:
-            kwargs.update({"data": self.request.GET})
+        kwargs.update({"ooi_types": ooi_types})
 
         return kwargs
 

@@ -15,7 +15,7 @@ class OOIFindingListView(OOIFindingManager, BaseOOIDetailView):
         breadcrumbs.append(self.get_last_breadcrumb())
         return breadcrumbs
 
-    def get_last_breadcrumb(self):
+    def get_last_breadcrumb(self) -> Breadcrumb:
         return {
             "url": get_ooi_url("ooi_findings", self.ooi.primary_key, self.organization.code),
             "text": _("Object findings"),

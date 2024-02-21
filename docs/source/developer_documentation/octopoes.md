@@ -370,7 +370,7 @@ ref.tokenized.address.address # '2001:db8::1'
 
 ### OctopoesAPIConnector
 
-The OctopoesAPIConnector class provides a python interface for connecting with Octopoes API.
+The OctopoesAPIConnector class provides a Python interface for connecting with Octopoes API.
 It provides several methods for doing CRUD operations for the objects/entities.
 
 #### Querying objects

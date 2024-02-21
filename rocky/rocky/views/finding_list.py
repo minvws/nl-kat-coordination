@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Iterable
 from typing import Any
 
 from django.urls.base import reverse_lazy
@@ -27,7 +28,7 @@ def sort_by_severity_desc(findings) -> list[dict[str, Any]]:
 
 def generate_findings_metadata(
     findings: FindingList,
-    severity_filter: list[RiskLevelSeverity] | None = None,
+    severity_filter: Iterable[RiskLevelSeverity] | None = None,
 ) -> list[dict[str, Any]]:
     findings_meta = []
 
@@ -54,7 +55,6 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.severities = self.get_severities()
-        self.valid_time = self.get_observed_at()
         self.muted_findings = request.GET.get("muted_findings", "non-muted")
 
         self.exclude_muted = self.muted_findings == "non-muted"
@@ -63,7 +63,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def get_queryset(self) -> FindingList:
         return FindingList(
             octopoes_connector=self.octopoes_api_connector,
-            valid_time=self.valid_time,
+            valid_time=self.observed_at,
             severities=self.severities,
             exclude_muted=self.exclude_muted,
             only_muted=self.only_muted,
@@ -72,7 +72,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
-        context["valid_time"] = self.valid_time
+        context["valid_time"] = self.observed_at
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["only_muted"] = self.only_muted

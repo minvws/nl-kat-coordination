@@ -2,11 +2,12 @@ import json
 from json import JSONDecodeError
 
 import tagulous.admin
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models import JSONField
 from django.forms import widgets
+from django.http import HttpResponseRedirect
 
-from rocky.admin import AdminErrorMessageMixin
+from rocky.exceptions import RockyError
 from tools.models import Indemnification, OOIInformation, Organization, OrganizationMember, OrganizationTag
 
 
@@ -44,8 +45,15 @@ class OOIInformationAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 
-class OrganizationAdmin(AdminErrorMessageMixin, admin.ModelAdmin):
+class OrganizationAdmin(admin.ModelAdmin):
     list_display = ["name", "code", "tags"]
+
+    def add_view(self, request, *args, **kwargs):
+        try:
+            return super().add_view(request, *args, **kwargs)
+        except RockyError as e:
+            self.message_user(request, str(e), level=messages.ERROR)
+            return HttpResponseRedirect(request.get_full_path())
 
     def get_readonly_fields(self, request, obj=None):
         # Obj is None when adding an organization and in that case we don't make

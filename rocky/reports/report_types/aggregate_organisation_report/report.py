@@ -1,5 +1,6 @@
 from datetime import datetime
 from logging import getLogger
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -41,8 +42,8 @@ class AggregateOrganisationReport(AggregateReport):
     }
     template_path = "aggregate_organisation_report/report.html"
 
-    def post_process_data(self, data, valid_time):
-        systems = {"services": {}}
+    def post_process_data(self, data: dict[str, Any], valid_time) -> dict[str, Any]:
+        systems: dict[str, dict[str, Any]] = {"services": {}}
         services = {}
         open_ports = {}
         ipv6 = {}
@@ -53,8 +54,8 @@ class AggregateOrganisationReport(AggregateReport):
         unique_ips = set()
         unique_hostnames = set()
         terms = []
-        rpki = {"rpki_ips": {}}
-        safe_connections = {"sc_ips": {}}
+        rpki_ips = {}
+        safe_connections_ips = {}
         recommendations = []
         total_systems_basic_security = 0
 
@@ -109,12 +110,10 @@ class AggregateOrganisationReport(AggregateReport):
                         vulnerabilities[ip] = vulnerabilities_data
 
                 if report_id == RPKIReport.id:
-                    rpki["rpki_ips"].update({ip: value for ip, value in report_specific_data["rpki_ips"].items()})
+                    rpki_ips.update({ip: value for ip, value in report_specific_data["rpki_ips"].items()})
 
                 if report_id == SafeConnectionsReport.id:
-                    safe_connections["sc_ips"].update(
-                        {ip: value for ip, value in report_specific_data["sc_ips"].items()}
-                    )
+                    safe_connections_ips.update({ip: value for ip, value in report_specific_data["sc_ips"].items()})
 
         mail_report_data = self.collect_system_specific_data(data, services, SystemType.MAIL, MailReport.id)
         web_report_data = self.collect_system_specific_data(data, services, SystemType.WEB, WebSystemReport.id)
@@ -125,10 +124,10 @@ class AggregateOrganisationReport(AggregateReport):
                 terms.append(str(system))
 
         # Basic security cleanup
-        basic_security = {"rpki": {}, "system_specific": {}, "safe_connections": {}}
+        basic_security: dict[str, Any] = {"rpki": {}, "system_specific": {}, "safe_connections": {}}
 
         # Safe connections
-        for ip, findings in safe_connections["sc_ips"].items():
+        for ip, findings in safe_connections_ips.items():
             ip_services = systems["services"][str(ip)]["services"]
 
             for service in ip_services:
@@ -150,7 +149,7 @@ class AggregateOrganisationReport(AggregateReport):
                 recommendations.extend({finding_type.recommendation for finding_type in findings})
 
         # RPKI
-        for ip, compliance in rpki["rpki_ips"].items():
+        for ip, compliance in rpki_ips.items():
             ip_services = systems["services"][str(ip)]["services"]
 
             for service in services:
@@ -198,20 +197,20 @@ class AggregateOrganisationReport(AggregateReport):
             }
 
             for ip in systems_for_service:
-                if ip not in rpki["rpki_ips"]:
+                if ip not in rpki_ips:
                     continue
 
                 basic_security["summary"][service]["rpki"]["number_of_compliant"] += (
-                    1 if rpki["rpki_ips"][ip]["exists"] and rpki["rpki_ips"][ip]["valid"] else 0
+                    1 if rpki_ips[ip]["exists"] and rpki_ips[ip]["valid"] else 0
                 )
                 basic_security["summary"][service]["rpki"]["total"] += 1
 
             for ip in systems_for_service:
-                if ip not in safe_connections["sc_ips"]:
+                if ip not in safe_connections_ips:
                     continue
 
                 basic_security["summary"][service]["safe_connections"]["number_of_compliant"] += (
-                    1 if not safe_connections["sc_ips"][ip] else 0
+                    1 if not safe_connections_ips[ip] else 0
                 )
                 basic_security["summary"][service]["safe_connections"]["total"] += 1
 
@@ -415,10 +414,10 @@ class AggregateOrganisationReport(AggregateReport):
             "config_oois": config_oois,
         }
 
-    def collect_system_specific_data(self, data, services, system_type: SystemType, report_id: str):
+    def collect_system_specific_data(self, data, services, system_type: str, report_id: str) -> dict[str, Any]:
         """Given a system, return a list of report data from the right sub-reports based on the related report_id"""
 
-        report_data = {}
+        report_data: dict[str, Any] = {}
 
         for service, systems_for_service in services.items():
             # Search for reports where the input ooi relates to the current service, based on ip or hostname
@@ -444,16 +443,18 @@ def aggregate_reports(
     input_ooi_references: list[OOI],
     selected_report_types: list[str],
     valid_time: datetime,
-):
+) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
     aggregate_report = AggregateOrganisationReport(connector)
-    report_data = {}
+    report_data: dict[str, Any] = {}
     error_oois = []
 
     for ooi in input_ooi_references:
         report_data[ooi.primary_key] = {}
         try:
             for options, report_types in aggregate_report.reports.items():
-                for report_type in report_types:
+                # Mypy doesn't support TypedDict and .values()
+                # https://github.com/python/mypy/issues/7981
+                for report_type in report_types:  # type: ignore[attr-defined]
                     if (
                         Reference.from_str(ooi).class_type in report_type.input_ooi_types
                         and report_type.id in selected_report_types

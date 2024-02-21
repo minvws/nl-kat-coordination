@@ -1,8 +1,6 @@
-from abc import ABCMeta
-
 from octopoes.models import OOI, Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
-from reports.report_types.definitions import Report
+from reports.report_types.definitions import AggregateReport, MultiReport, Report
 from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
@@ -53,14 +51,14 @@ def get_report_types_for_ooi(ooi_pk: str) -> list[type[Report]]:
     return [report for report in REPORTS if ooi_type in report.input_ooi_types]
 
 
-def get_report_types_for_oois(ooi_pks: list[str]) -> set[type[Report]]:
+def get_report_types_for_oois(ooi_pks: list[str]) -> set[type[Report] | type[MultiReport]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
     return {report for ooi_pk in ooi_pks for report in get_report_types_for_ooi(ooi_pk)}
 
 
-def get_report_by_id(report_id: str) -> type[Report]:
+def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport]:
     """
     Get report type by id
     """
@@ -70,7 +68,7 @@ def get_report_by_id(report_id: str) -> type[Report]:
     raise ValueError(f"Report with id {report_id} not found")
 
 
-def get_reports(report_ids: list[str]) -> list[Report]:
+def get_reports(report_ids: list[str]) -> list[type[Report] | type[MultiReport]]:
     return [get_report_by_id(report_id) for report_id in report_ids]
 
 
@@ -78,19 +76,19 @@ def get_plugins_for_report_ids(reports: list[str]) -> dict[str, set[str]]:
     """
     Get all boefjes that are required and optional for a given list of reports
     """
-    required_boefjes = set()
-    optional_boefjes = set()
+    required_boefjes: set[str] = set()
+    optional_boefjes: set[str] = set()
 
-    reports = get_reports(reports)
-
-    for report in reports:
+    for report in get_reports(reports):
         required_boefjes.update(report.plugins["required"])
         optional_boefjes.update(report.plugins["optional"])
 
     return {"required": required_boefjes, "optional": optional_boefjes}
 
 
-def get_report_types_from_aggregate_report(aggregate_report: ABCMeta) -> dict[str, set[type[Report]]]:
+def get_report_types_from_aggregate_report(
+    aggregate_report: type[AggregateReport],
+) -> dict[str, set[type[Report] | type[MultiReport]]]:
     required_reports = set()
     optional_reports = set()
 
@@ -100,9 +98,11 @@ def get_report_types_from_aggregate_report(aggregate_report: ABCMeta) -> dict[st
     return {"required": required_reports, "optional": optional_reports}
 
 
-def get_ooi_types_from_aggregate_report(aggregate_report: ABCMeta) -> set[type[OOI]]:
+def get_ooi_types_from_aggregate_report(aggregate_report: type[AggregateReport]) -> set[type[OOI]]:
     ooi_types = set()
     for reports in aggregate_report.reports.values():
-        for report in reports:
+        # Mypy doesn't support TypedDict and .values()
+        # https://github.com/python/mypy/issues/7981
+        for report in reports:  # type: ignore[attr-defined]
             ooi_types.update(report.input_ooi_types)
     return ooi_types

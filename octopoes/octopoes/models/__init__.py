@@ -6,9 +6,7 @@ from typing import (
     Any,
     ClassVar,
     Literal,
-    Optional,
     TypeVar,
-    Union,
 )
 
 from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
