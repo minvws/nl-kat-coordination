@@ -46,7 +46,7 @@ def run_normalizer(boefje_meta, inputdata):
 
 
 def pytest_generate_tests(metafunc):
-    test_files = get_test_files(TESTPATH)
+    test_files = get_test_files(TESTS_PATH)
     if 'test_input' in metafunc.fixturenames:
         # Generate test cases based on the test_data list
         metafunc.parametrize('test_input,expected_output', test_files)
