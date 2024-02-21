@@ -4,10 +4,7 @@ from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings
 from boefjes.katalogus.models import Organisation, Repository
-from boefjes.katalogus.storage.interfaces import (
-    OrganisationNotFound,
-    OrganisationStorage,
-)
+from boefjes.katalogus.storage.interfaces import OrganisationNotFound, OrganisationStorage
 from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.db_models import OrganisationInDB, RepositoryInDB
 from boefjes.sql.repository_storage import SQLRepositoryStorage

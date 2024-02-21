@@ -1,17 +1,8 @@
 from django.contrib import admin
 
-from fmea.forms import (
-    FailureModeAffectedObjectForm,
-    FailureModeEffectForm,
-    FailureModeForm,
-)
+from fmea.forms import FailureModeAffectedObjectForm, FailureModeEffectForm, FailureModeForm
 
-from .models import (
-    FailureMode,
-    FailureModeAffectedObject,
-    FailureModeEffect,
-    FailureModeTreeObject,
-)
+from .models import FailureMode, FailureModeAffectedObject, FailureModeEffect, FailureModeTreeObject
 
 
 @admin.register(FailureMode)

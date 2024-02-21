@@ -5,12 +5,7 @@ from collections.abc import Iterable
 from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_snyk import check_version
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import (
-    CVEFindingType,
-    Finding,
-    KATFindingType,
-    SnykFindingType,
-)
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, SnykFindingType
 
 logger = logging.getLogger(__name__)
 

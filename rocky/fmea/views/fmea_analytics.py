@@ -5,11 +5,7 @@ from django.views.generic import TemplateView, View
 from django.views.generic.detail import DetailView
 from tools.view_helpers import Breadcrumb
 
-from fmea.models import (
-    DEPARTMENTS,
-    FailureMode,
-    FailureModeAffectedObject,
-)
+from fmea.models import DEPARTMENTS, FailureMode, FailureModeAffectedObject
 from fmea.tools import html_to_pdf
 from fmea.views.view_helpers import FMEABreadcrumbsMixin
 

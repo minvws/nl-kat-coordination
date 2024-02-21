@@ -17,13 +17,7 @@ from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PRO
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types, type_by_name
-from rocky.views.mixins import (
-    ConnectorFormMixin,
-    OctopoesView,
-    OOIList,
-    SingleOOIMixin,
-    SingleOOITreeMixin,
-)
+from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
 
 
 class OOIFilterView(ConnectorFormMixin, OctopoesView):
