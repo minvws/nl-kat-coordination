@@ -1,8 +1,9 @@
 import json
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
 from logging import getLogger
+from typing import overload
 
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
@@ -77,7 +78,17 @@ class OctopoesService:
         self.origin_parameter_repository = origin_parameter_repository
         self.scan_profile_repository = scan_profile_repository
 
+    @overload
+    def _populate_scan_profiles(self, oois: ValuesView[OOI], valid_time: datetime) -> ValuesView[OOI]:
+        ...
+
+    @overload
     def _populate_scan_profiles(self, oois: list[OOI], valid_time: datetime) -> list[OOI]:
+        ...
+
+    def _populate_scan_profiles(
+        self, oois: list[OOI] | ValuesView[OOI], valid_time: datetime
+    ) -> list[OOI] | ValuesView[OOI]:
         logger.debug("Populating scan profiles for %s oois", len(oois))
 
         ooi_cache: dict[str, OOI] = {str(ooi.reference): ooi for ooi in oois}
@@ -132,7 +143,7 @@ class OctopoesService:
         reference: Reference,
         valid_time: datetime,
         search_types: set[type[OOI]] | None = None,
-        depth: int | None = 1,
+        depth: int = 1,
     ):
         tree = self.ooi_repository.get_tree(reference, valid_time, search_types, depth)
         self._populate_scan_profiles(tree.store.values(), valid_time)
@@ -154,7 +165,7 @@ class OctopoesService:
             try:
                 self.ooi_repository.get(origin.source, valid_time)
             except ObjectNotFoundException:
-                return
+                raise ValueError("Origin source of observation does not exist")
 
         for ooi in oois:
             self.ooi_repository.save(ooi, valid_time=valid_time)
@@ -176,7 +187,7 @@ class OctopoesService:
             return
 
         try:
-            level = self.scan_profile_repository.get(origin.source, valid_time).level
+            level = self.scan_profile_repository.get(origin.source, valid_time).level.value
         except ObjectNotFoundException:
             level = 0
 
@@ -343,6 +354,9 @@ class OctopoesService:
 
     # OOI events
     def _on_create_ooi(self, event: OOIDBEvent) -> None:
+        if event.new_data is None:
+            raise ValueError("Create event new_data should not be None")
+
         ooi = event.new_data
 
         # keep old scan profile, or create new scan profile
@@ -393,6 +407,9 @@ class OctopoesService:
                         self.origin_parameter_repository.save(origin_parameter, event.valid_time)
 
     def _on_update_ooi(self, event: OOIDBEvent) -> None:
+        if event.new_data is None:
+            raise ValueError("Update event new_data should not be None")
+
         inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.new_data.reference)
         inference_params = self.origin_parameter_repository.list_by_reference(
             event.new_data.reference, valid_time=event.valid_time
@@ -405,6 +422,9 @@ class OctopoesService:
             self._run_inference(inference_origin, event.valid_time)
 
     def _on_delete_ooi(self, event: OOIDBEvent) -> None:
+        if event.old_data is None:
+            raise ValueError("Update event old_data should not be None")
+
         reference = event.old_data.reference
 
         # delete related origins to which it is a source
@@ -426,38 +446,53 @@ class OctopoesService:
 
     # Origin events
     def _on_create_origin(self, event: OriginDBEvent) -> None:
+        if event.new_data is None:
+            raise ValueError("Create event new_data should not be None")
+
         if event.new_data.origin_type == OriginType.INFERENCE:
             self._run_inference(event.new_data, event.valid_time)
 
     def _on_update_origin(self, event: OriginDBEvent) -> None:
+        if event.new_data is None or event.old_data is None:
+            raise ValueError("Update event new_data and old_data should not be None")
+
         dereferenced_oois = event.old_data - event.new_data
         for reference in dereferenced_oois:
             self._delete_ooi(reference, event.valid_time)
 
     def _on_delete_origin(self, event: OriginDBEvent) -> None:
+        if event.old_data is None:
+            raise ValueError("Delete event old_data should not be None")
+
         for reference in event.old_data.result:
             self._delete_ooi(reference, event.valid_time)
 
     # Origin parameter events
     def _on_create_origin_parameter(self, event: OriginParameterDBEvent) -> None:
+        if event.new_data is None:
+            raise ValueError("Create event new_data should not be None")
+
         # Run the bit/origin
         try:
             origin = self.origin_repository.get(event.new_data.origin_id, event.valid_time)
             self._run_inference(origin, event.valid_time)
         except ObjectNotFoundException:
-            return
+            pass
 
     def _on_update_origin_parameter(self, event: OriginParameterDBEvent) -> None:
         # update of origin_parameter is not possible, since both fields are unique
         ...
 
     def _on_delete_origin_parameter(self, event: OriginParameterDBEvent) -> None:
+        if event.old_data is None:
+            raise ValueError("Delete event old_data should not be None")
+
         # Run the bit/origin
         try:
             origin = self.origin_repository.get(event.old_data.origin_id, event.valid_time)
             self._run_inference(origin, event.valid_time)
         except ObjectNotFoundException:
-            return
+            pass
 
     def _run_inferences(self, event: ScanProfileDBEvent) -> None:
         inference_origins = self.origin_repository.list_origins(event.valid_time, source=event.reference)
@@ -505,14 +540,16 @@ class OctopoesService:
             segment = path.segments[0]
             for neighbour in neighbours:
                 segment_inheritance = get_max_scan_level_inheritance(segment)
-                if (
-                    segment_inheritance is None
-                    or neighbour.reference in visited
-                    or neighbour.scan_profile.level < last_inheritance_level
-                ):
+                if segment_inheritance is None or neighbour.reference in visited:
                     continue
 
-                inherited_level = min(get_max_scan_level_inheritance(segment), neighbour.scan_profile.level)
+                if neighbour.scan_profile is None:
+                    raise ValueError("neighbour scan_profile is None")
+
+                if neighbour.scan_profile.level < last_inheritance_level:
+                    continue
+
+                inherited_level = min(get_max_scan_level_inheritance(segment) or 0, neighbour.scan_profile.level)
                 inheritances.append(
                     InheritanceSection(
                         segment=str(segment),
@@ -549,7 +586,7 @@ class OctopoesService:
 
     def recalculate_bits(self) -> int:
         valid_time = datetime.now(timezone.utc)
-        bit_counter = Counter()
+        bit_counter: Counter[str] = Counter()
 
         # loop over all bit definitions and add origins and origin params
         bit_definitions = get_bit_definitions()

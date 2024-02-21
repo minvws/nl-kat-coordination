@@ -40,8 +40,8 @@ class XTDBHTTPSession(requests.Session):
         self._base_url = base_url
         self.headers["Accept"] = "application/json"
 
-    def request(self, method: str, url: str | bytes, **kwargs) -> requests.Response:
-        return super().request(method, self._base_url + str(url), **kwargs)
+    def request(self, method: str | bytes, url: str | bytes, *args, **kwargs) -> requests.Response:
+        return super().request(method, self._base_url + str(url), *args, **kwargs)
 
 
 class XTDBStatus(BaseModel):
@@ -187,8 +187,8 @@ class XTDBSession:
     def __init__(self, client: XTDBHTTPClient):
         self.client = client
 
-        self._operations = []
-        self.post_commit_callbacks = []
+        self._operations: list[Operation] = []
+        self.post_commit_callbacks: list[Callable[[], None]] = []
 
     def __enter__(self):
         return self

@@ -43,7 +43,6 @@ class Aliased:
 
 
 Ref = type[OOI] | Aliased
-A = Aliased
 
 
 @dataclass
@@ -92,8 +91,11 @@ class Query:
 
         ooi_type = path.segments[-1].target_type
         query = cls(ooi_type)
-        target_ref = None
+        target_ref: Ref
         alias_map: dict[str, Ref] = {}
+
+        if not path.segments:
+            return query
 
         for segment in path.segments:
             source_ref = alias_map.get(segment.source_type.get_object_type(), segment.source_type)
@@ -103,9 +105,9 @@ class Query:
 
             if segment.target_type.get_object_type() not in alias_map:
                 target_ref = segment.target_type
-                alias_map[target_ref.get_object_type()] = target_ref
+                alias_map[segment.target_type.get_object_type()] = target_ref
             else:
-                target_ref = A(segment.target_type)
+                target_ref = Aliased(segment.target_type)
                 alias_map[segment.target_type.get_object_type()] = target_ref
 
             if segment.direction is Direction.OUTGOING:
@@ -113,8 +115,8 @@ class Query:
             else:
                 query = query.where(target_ref, **{segment.property_name: source_ref})
 
-        if target_ref:  # Make sure we use the last reference in the path as a target
-            query.result_type = target_ref
+        # Make sure we use the last reference in the path as a target
+        query.result_type = target_ref
 
         return query
 
@@ -265,5 +267,8 @@ class Query:
     def __str__(self) -> str:
         return self._compile()
 
-    def __eq__(self, other: "Query"):
+    def __eq__(self, other: object):
+        if not isinstance(other, Query):
+            return NotImplemented
+
         return str(self) == str(other)

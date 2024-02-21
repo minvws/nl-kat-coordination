@@ -112,7 +112,7 @@ class BoefjeMixin(OctopoesView):
             self.run_boefje(boefje, None)
 
         for ooi in oois:
-            if ooi.scan_profile.level < boefje.scan_level:
+            if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level:
                 try:
                     self.raise_clearance_level(ooi.reference, boefje.scan_level)
                 except IndemnificationNotPresentException:

@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from datetime import datetime
 from logging import getLogger
 from typing import Any
@@ -16,7 +16,6 @@ from katalogus.client import Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI
-from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import MultiReport, Report, ReportType
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
@@ -107,7 +106,7 @@ class BaseReportView(OOIFilterView):
                 logger.warning("No data could be found for '%s' ", ooi_id)
         return oois
 
-    def get_ooi_filter_forms(self, ooi_types: set[OOIType]) -> dict[str, Form]:
+    def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
                 sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]), self.request.GET

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, TypedDict
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models.types import OOIType
+from octopoes.models import OOI
 
 REPORTS_DIR = Path(__file__).parent
 logger = getLogger(__name__)
@@ -27,7 +27,7 @@ class BaseReport:
 
 class Report(BaseReport):
     plugins: ReportPlugins
-    input_ooi_types: set[OOIType]
+    input_ooi_types: set[type[OOI]]
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
@@ -46,7 +46,7 @@ class Report(BaseReport):
 
 class MultiReport(BaseReport):
     plugins: ReportPlugins
-    input_ooi_types: set[OOIType]
+    input_ooi_types: set[type[OOI]]
 
     def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError

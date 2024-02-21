@@ -36,9 +36,9 @@ class IPv6Report(Report):
         """
         try:
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
-        except ObjectNotFoundException as e:
-            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
-            raise ObjectNotFoundException(e)
+        except ObjectNotFoundException:
+            logger.error("No data found for OOI '%s' on date %s.", str(ooi), str(valid_time))
+            raise
 
         if ooi.reference.class_type == IPAddressV4 or ooi.reference.class_type == IPAddressV6:
             path = Path.parse("IPAddress.<address [is ResolvedHostname].hostname")

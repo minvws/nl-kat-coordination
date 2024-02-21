@@ -10,7 +10,7 @@ from octopoes.models.ooi.network import IPAddress, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
 from octopoes.models.path import Path
-from octopoes.xtdb.query import A, InvalidField, Query
+from octopoes.xtdb.query import Aliased, InvalidField, Query
 
 
 def test_basic_field_where_clause():
@@ -201,8 +201,8 @@ def test_create_query_from_path_abstract():
 
 
 def test_aliased_query():
-    h1 = A(Hostname, UUID("4b4afa7e-5b76-4506-a373-069216b051c2"))
-    h2 = A(Hostname, UUID("98076f7a-7606-47ac-85b7-b511ee21ae42"))
+    h1 = Aliased(Hostname, UUID("4b4afa7e-5b76-4506-a373-069216b051c2"))
+    h2 = Aliased(Hostname, UUID("98076f7a-7606-47ac-85b7-b511ee21ae42"))
     query = (
         Query(DNSAAAARecord)
         .where(DNSAAAARecord, hostname=h1)
@@ -269,8 +269,8 @@ def test_build_system_query_with_path_segments(mocker):
     uuid_mock = mocker.patch("octopoes.xtdb.query.uuid4")
     uuid_mock.side_effect = uuid_batch
 
-    resolved_hostname_alias = A(ResolvedHostname)
-    hostname_alias = A(Hostname)
+    resolved_hostname_alias = Aliased(ResolvedHostname)
+    hostname_alias = Aliased(Hostname)
 
     query = (
         Query(hostname_alias)
