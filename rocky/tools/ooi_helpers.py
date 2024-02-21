@@ -104,7 +104,7 @@ def get_ooi_dict(ooi: OOI) -> dict:
 
 
 def get_tree_meta(tree_node: dict, depth: int, location: str) -> dict:
-    tree_meta = {
+    tree_meta: dict[str, Any] = {
         "depth": depth,
         "location": location,
         "child_count": "0",  # TO_DO ? child_count doesn't exist in template if not a string
@@ -237,7 +237,7 @@ OOI_TYPES_WITHOUT_FINDINGS = [name for name, cls_ in OOI_TYPES.items() if cls_ n
 
 
 def get_or_create_ooi(
-    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime = None
+    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime | None = None
 ) -> tuple[OOI, bool | datetime]:
     _now = datetime.now(timezone.utc)
     if observed_at is None:
@@ -255,7 +255,7 @@ def get_or_create_ooi(
 
 
 def create_ooi(
-    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime = None
+    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime | None = None
 ) -> None:
     if observed_at is None:
         observed_at = datetime.now(timezone.utc)

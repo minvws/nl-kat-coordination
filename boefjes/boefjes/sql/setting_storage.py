@@ -73,7 +73,7 @@ def create_setting_storage(session) -> SettingsStorage:
 
 
 def create_encrypter():
-    encrypter = IdentityMiddleware()
+    encrypter: EncryptMiddleware = IdentityMiddleware()
     if get_context().env.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
         encrypter = NaclBoxMiddleware(
             get_context().env.katalogus_private_key_b64,

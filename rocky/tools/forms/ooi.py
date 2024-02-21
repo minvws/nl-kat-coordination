@@ -64,7 +64,7 @@ class SelectOOIForm(BaseRockyForm):
         self,
         oois: list[OOI],
         organization_code: str,
-        mandatory_fields: list = None,
+        mandatory_fields: list | None = None,
         *args,
         **kwargs,
     ):

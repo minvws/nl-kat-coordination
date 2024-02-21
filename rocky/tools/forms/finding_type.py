@@ -140,16 +140,13 @@ CVE-2021-00000""",
     def __init__(
         self,
         connector: OctopoesAPIConnector,
-        ooi_list: list[dict[str, str]],
+        ooi_list: list[tuple[str, str]],
         *args,
         **kwargs,
     ):
         self.octopoes_connector = connector
         super().__init__(*args, **kwargs)
-        self.set_choices_for_field("ooi_id", ooi_list)
-
-    def set_choices_for_field(self, field, choices: list[dict[str, str]]):
-        self.fields[field].widget.choices = choices
+        self.set_choices_for_widget("ooi_id", ooi_list)
 
     def clean_date(self):
         data = self.cleaned_data["date"]
