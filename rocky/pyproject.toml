@@ -91,9 +91,6 @@ addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered -m 'not slo
 DJANGO_SETTINGS_MODULE = "rocky.settings_test"
 markers = ["slow: marks tests as slow"]
 
-[tool.coverage.run]
-omit = ["fmea/*"]
-
 [tool.djlint]
 max_line_length = 120
 blank_line_after_tag = "load,extends,include"
