@@ -288,16 +288,12 @@ class OctopoesAPIConnector:
         self,
         path: str,
         valid_time: datetime,
-        sources: list[OOI | Reference | str] = None,
-        offset: int = DEFAULT_OFFSET,
-        limit: int = DEFAULT_LIMIT,
+        sources: list[OOI | Reference | str],
     ) -> list[tuple[str, OOIType]]:
         params = {
             "path": path,
             "sources": [str(ooi) for ooi in sources],
             "valid_time": valid_time,
-            "offset": offset,
-            "limit": limit,
         }
 
         result = self.session.get(f"/{self.client}/query-many", params=params).json()

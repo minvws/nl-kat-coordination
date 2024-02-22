@@ -82,8 +82,8 @@ class Query:
 
         return self
 
-    def where_in(self, ooi_type: Ref, **kwargs) -> "Query":
-        """Allows for filtering on multiple values for a specific field. Assumes these values are strings for now."""
+    def where_in(self, ooi_type: Ref, **kwargs: list[str]) -> "Query":
+        """Allows for filtering on multiple values for a specific field."""
 
         for field_name, values in kwargs.items():
             self._where_field_in(ooi_type, field_name, values)
@@ -160,6 +160,23 @@ class Query:
         return self
 
     def _where_field_is(self, ref: Ref, field_name: str, value: Ref | str | set[str]) -> None:
+        """
+        We need isinstance(value, type) checks to verify value is an OOIType, as issubclass() fails on non-classes:
+
+            >>> value = Network
+            >>> isinstance(value, OOIType)
+            False
+            >>> isinstance(value, OOI)
+            False
+            >>> isinstance(value, type)
+            True
+            >>> issubclass(value, OOI)
+            True
+            >>> issubclass(3, OOI)
+            Traceback (most recent call last):
+              [...]
+            TypeError: issubclass() arg 1 must be a class
+        """
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
 
         if field_name not in ooi_type.model_fields:
@@ -175,10 +192,10 @@ class Query:
                 self._add_or_statement_for_abstract_types(ref, field_name, f'"{value}"')
                 return
 
-            if not isinstance(value, type):
+            if not isinstance(value, type | Aliased):
                 raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
 
-            if issubclass(value, OOI):
+            if isinstance(value, Aliased) or issubclass(value, OOI):
                 self._add_or_statement_for_abstract_types(
                     ref,
                     field_name,

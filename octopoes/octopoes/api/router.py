@@ -157,19 +157,10 @@ def query(
 @router.get("/query-many", tags=["Objects"])
 def query_many(
     path: str,
-    sources: list[Reference] = Query(None),
+    sources: list[Reference] = Query(),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    offset: int = DEFAULT_OFFSET,
-    limit: int = DEFAULT_LIMIT,
 ):
-    if not sources:
-        return []
-
-    object_path = ObjectPath.parse(path)
-    if not object_path.segments:
-        raise HTTPException(status_code=400, detail="No path components provided.")
-
     """
     How does this work and why do we do this?
 
@@ -189,14 +180,19 @@ def query_many(
      .where_in(object_path.segments[0].source_type, primary_key=sources)    # and ?Network.primary_key in ["1", ...]"
     """
 
+    if not sources:
+        return []
+
+    object_path = ObjectPath.parse(path)
+    if not object_path.segments:
+        raise HTTPException(status_code=400, detail="No path components provided.")
+
     q = XTDBQuery.from_path(object_path)
     source_alias = A(object_path.segments[0].source_type, field="primary_key")
 
     return octopoes.ooi_repository.query(
         q.find(source_alias)
         .pull(q.result_type)
-        .offset(offset)
-        .limit(limit)
         .where(object_path.segments[0].source_type, primary_key=source_alias)
         .where_in(object_path.segments[0].source_type, primary_key=sources),
         valid_time,

@@ -195,6 +195,16 @@ def test_create_query_from_path_abstract():
     assert query.format() == expected_query
 
 
+def test_value_for_abstract_class_check():
+    Query(IPAddress).where(IPAddress, network=Network).where(Network, name="test")
+    Query(IPAddress).where(IPAddress, network=A(Network)).where(Network, name="test")
+
+    with pytest.raises(InvalidField) as ctx:
+        Query(IPAddress).where(IPAddress, network=3).where(Network, name="test")
+
+    assert "value '3' for abstract class fields should be a string or an OOI Type" in ctx.exconly()
+
+
 def test_aliased_query():
     h1 = A(Hostname, UUID("4b4afa7e-5b76-4506-a373-069216b051c2"))
     h2 = A(Hostname, UUID("98076f7a-7606-47ac-85b7-b511ee21ae42"))

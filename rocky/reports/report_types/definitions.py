@@ -1,3 +1,4 @@
+from collections.abc import Callable, Iterable
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
@@ -38,7 +39,7 @@ class Report(BaseReport):
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
 
-    def collect_data(self, input_oois: set[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
         """Generate data for multiple OOIs. Child classes can override this method to improve performance."""
 
         return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
@@ -55,7 +56,10 @@ class Report(BaseReport):
         }
 
     @staticmethod
-    def group_by_source(query_result: list[tuple[str, OOIType]], check=None) -> dict[str, list[OOIType]]:
+    def group_by_source(
+        query_result: list[tuple[str, OOIType]],
+        check: Callable[[OOIType], bool] | None = None,
+    ) -> dict[str, list[OOIType]]:
         """Transform a query-many result from [(ref1, obj1), (ref1, obj2), ...] into {ref1: [obj1, obj2], ...}"""
 
         result: dict[str, list[OOIType]] = {}
@@ -65,11 +69,11 @@ class Report(BaseReport):
                 result[source] = []
 
             if not check or check(ooi):
-                result[source].append(ooi.reference)
+                result[source].append(ooi)
 
         return result
 
-    def to_hostnames(self, input_oois: set[str], valid_time: datetime) -> dict[str, list[Reference]]:
+    def to_hostnames(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
         """Turn a list of either Hostname and IPAddress reference strings into a list of related hostnames."""
 
         refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
