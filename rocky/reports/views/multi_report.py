@@ -126,7 +126,9 @@ class MultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView):
     def multi_reports_for_oois(self) -> dict[str, dict[str, Any]]:
         report = MultiOrganizationReport(self.octopoes_api_connector)
 
-        return report.post_process_data(collect_report_data(self.octopoes_api_connector, self.selected_oois))
+        return report.post_process_data(
+            collect_report_data(self.octopoes_api_connector, self.selected_oois, self.observed_at)
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
