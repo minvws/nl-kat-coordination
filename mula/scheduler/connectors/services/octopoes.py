@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import OOI, Organisation
 
@@ -36,6 +38,7 @@ class Octopoes(HTTPService):
             "scan_level": {s for s in scan_level},
             "offset": 0,
             "limit": 1,
+            "valid_time": datetime.now(timezone.utc),
         }
 
         # Get the total count of objects
@@ -66,6 +69,7 @@ class Octopoes(HTTPService):
         params = {
             "amount": str(n),
             "scan_level": {s for s in scan_level},
+            "valid_time": datetime.now(timezone.utc),
         }
 
         response = self.get(url, params=params)
@@ -76,7 +80,7 @@ class Octopoes(HTTPService):
     def get_object(self, organisation_id: str, reference: str) -> OOI:
         """Get an ooi from octopoes"""
         url = f"{self.host}/{organisation_id}"
-        response = self.get(url, params={"reference": reference})
+        response = self.get(url, params={"reference": reference, "valid_time": datetime.now(timezone.utc)})
         return OOI(**response.json())
 
     def is_healthy(self) -> bool:
