@@ -30,7 +30,6 @@ soupsieve = "^2.3.2.post1"
 sqlparse = "^0.4.4"
 typing-extensions = "^4.4.0"
 urllib3 = "^2.0.3"
-xhtml2pdf = "^0.2.11"
 dnspython = "^2.1.0"
 django-password-validators = "^1.7.1"
 colorama = "^0.4.6"
@@ -44,7 +43,6 @@ strenum = "^0.4.15"
 django-rest-knox = { git = "https://github.com/jazzband/django-rest-knox", rev = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9" }
 
 # temp fix to pass build, remove later when https://github.com/xhtml2pdf/xhtml2pdf/issues/589 is solved
-reportlab = "^3.6.13"
 
 # OpenTelemetry
 opentelemetry-sdk = "^1.19.0"
