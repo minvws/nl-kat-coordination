@@ -28,12 +28,14 @@ Setup Test
     Await Sync
 
 List Findings
-    ${response}    Get    ${OCTOPOES_URI}/findings
+    ${params}    Create Dictionary    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/findings    params=${params}
     ${response_data}    Set Variable    ${response.json()}
     RETURN    ${response_data}
 
 Get Count Per Severity
-    ${response}    Get    ${OCTOPOES_URI}/findings/count_by_severity
+    ${params}    Create Dictionary    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/findings/count_by_severity    params=${params}
     ${response_data}    Set Variable    ${response.json()}
     RETURN    ${response_data}
 
