@@ -1,18 +1,19 @@
 import glob
 from pathlib import Path
-from unittest import TestCase
 
 from pydantic import parse_obj_as
 
 from boefjes.job_handler import serialize_ooi
 from boefjes.plugins.kat_leakix.normalize import run
 from octopoes.models.types import OOIType
-from tests.loading import get_boefje_meta,  get_normalizer_meta
+from tests.loading import get_boefje_meta, get_normalizer_meta
 
 TESTS_PATH = "boefjes/plugins/*/tests/normalizer/*test-input*"
 
+
 def get_dummy_data(filename: str) -> bytes:
     return Path(filename).read_bytes()
+
 
 def get_test_files(testpath):
     """Finds all files with the test-input filename and the related output files"""
