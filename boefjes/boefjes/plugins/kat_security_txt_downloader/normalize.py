@@ -9,7 +9,10 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
-
+from octopoes.models.types import (
+    KATFindingType,
+    Finding
+)
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     results = json.loads(raw)
@@ -27,6 +30,14 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         yield url_original
         url = URL(raw=details["url"], network=Network(name=input_["hostname"]["network"]["name"]).reference)
         yield url
+        if path == '.well-known/security.txt':
+            rfc_compliant = True
+        elif path == 'security.txt':
+            ft = KATFindingType(id="KAT-LEGACY-SECURITY-LOCATION")
+            yield ft
+            yield Finding(description='Only legacy Security.txt location found.', 
+                          finding_type=ft.reference,
+                          ooi=url.reference)
         url_parts = urlparse(details["url"])
         # we need to check if the website of the response is the same as the input website
         if (
