@@ -59,7 +59,6 @@ python-multipart = "^0.0.9"
 
 [tool.poetry.group.dev.dependencies]
 iniconfig = "^2.0.0"
-lazy-object-proxy = "^1.7.1"
 packaging = "^23.0"
 pluggy = "^1.0.0"
 pyparsing = "^3.0.9"
