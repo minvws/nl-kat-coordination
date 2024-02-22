@@ -631,6 +631,59 @@ def finding_type_kat_no_dkim():
 
 
 @pytest.fixture
+def finding_type_kat_uncommon_open_port():
+    return KATFindingType(
+        id="KAT-UNCOMMON-OPEN-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_open_sysadmin_port():
+    return KATFindingType(
+        id="KAT-OPEN-SYSADMIN-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=8.5,
+        risk_severity=RiskLevelSeverity.HIGH,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_open_database_port():
+    return KATFindingType(
+        id="KAT-OPEN-DATABASE-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.5,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dnssec():
+    return KATFindingType(
+        id="KAT-NO-DNSSEC",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_severity=RiskLevelSeverity.PENDING,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_invalid_dnssec():
+    return KATFindingType(
+        id="KAT-INVALID-DNSSEC",
+        recommendation="Fake recommendation...",
+        risk_score=3.0,
+        risk_severity=RiskLevelSeverity.LOW,
+    )
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {

@@ -265,7 +265,9 @@ def test_multi_report(
 
     multi_report = MultiOrganizationReport(octopoes_api_connector)
     multi_report_data = collect_report_data(
-        octopoes_api_connector, [str(report_data_object.reference), str(report_data_object_2.reference)]
+        octopoes_api_connector,
+        [str(report_data_object.reference), str(report_data_object_2.reference)],
+        valid_time,
     )
     multi_data = multi_report.post_process_data(multi_report_data)
     assert multi_data["organizations"] == [octopoes_api_connector.client, octopoes_api_connector_2.client]
