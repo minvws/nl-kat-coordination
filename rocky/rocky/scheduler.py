@@ -131,7 +131,7 @@ class LazyTaskList:
     ):
         self.scheduler_client = scheduler_client
         self.kwargs = kwargs
-        self._count = None
+        self._count: int | None = None
 
     @property
     def count(self) -> int:
@@ -223,7 +223,7 @@ class SchedulerClient:
             boefje_name=boefje_name,
         )
 
-    def get_task_details(self, organization_code: str, task_id: str) -> Task | None:
+    def get_task_details(self, organization_code: str, task_id: str) -> Task:
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
         res.raise_for_status()
         task_details = Task.model_validate_json(res.content)
