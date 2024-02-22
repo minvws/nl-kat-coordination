@@ -12,20 +12,6 @@ files = [
 ]
 
 [[package]]
-name = "arabic-reshaper"
-version = "3.0.0"
-description = "Reconstruct Arabic sentences to be used in applications that do not support Arabic"
-optional = false
-python-versions = "*"
-files = [
-    {file = "arabic_reshaper-3.0.0-py3-none-any.whl", hash = "sha256:3f71d5034bb694204a239a6f1ebcf323ac3c5b059de02259235e2016a1a5e2dc"},
-    {file = "arabic_reshaper-3.0.0.tar.gz", hash = "sha256:ffcd13ba5ec007db71c072f5b23f420da92ac7f268512065d49e790e62237099"},
-]
-
-[package.extras]
-with-fonttools = ["fonttools (>=4.0)"]
-
-[[package]]
 name = "asgiref"
 version = "3.7.2"
 description = "ASGI specs, helper code, and adapters"
@@ -41,17 +27,6 @@ typing-extensions = {version = ">=4", markers = "python_version < \"3.11\""}
 
 [package.extras]
 tests = ["mypy (>=0.800)", "pytest", "pytest-asyncio"]
-
-[[package]]
-name = "asn1crypto"
-version = "1.5.1"
-description = "Fast ASN.1 parser and serializer with definitions for private keys, public keys, certificates, CRL, OCSP, CMS, PKCS#3, PKCS#7, PKCS#8, PKCS#12, PKCS#5, X.509 and TSP"
-optional = false
-python-versions = "*"
-files = [
-    {file = "asn1crypto-1.5.1-py2.py3-none-any.whl", hash = "sha256:db4e40728b728508912cbb3d44f19ce188f218e9eba635821bb4b68564f8fd67"},
-    {file = "asn1crypto-1.5.1.tar.gz", hash = "sha256:13ae38502be632115abf8a24cbe5f4da52e3b5231990aff31123c805306ccb9c"},
-]
 
 [[package]]
 name = "attrs"
@@ -511,60 +486,6 @@ tomli = {version = "*", optional = true, markers = "python_full_version <= \"3.1
 
 [package.extras]
 toml = ["tomli"]
-
-[[package]]
-name = "cryptography"
-version = "42.0.3"
-description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "cryptography-42.0.3-cp37-abi3-macosx_10_12_universal2.whl", hash = "sha256:de5086cd475d67113ccb6f9fae6d8fe3ac54a4f9238fd08bfdb07b03d791ff0a"},
-    {file = "cryptography-42.0.3-cp37-abi3-macosx_10_12_x86_64.whl", hash = "sha256:935cca25d35dda9e7bd46a24831dfd255307c55a07ff38fd1a92119cffc34857"},
-    {file = "cryptography-42.0.3-cp37-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:20100c22b298c9eaebe4f0b9032ea97186ac2555f426c3e70670f2517989543b"},
-    {file = "cryptography-42.0.3-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2eb6368d5327d6455f20327fb6159b97538820355ec00f8cc9464d617caecead"},
-    {file = "cryptography-42.0.3-cp37-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:39d5c93e95bcbc4c06313fc6a500cee414ee39b616b55320c1904760ad686938"},
-    {file = "cryptography-42.0.3-cp37-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:3d96ea47ce6d0055d5b97e761d37b4e84195485cb5a38401be341fabf23bc32a"},
-    {file = "cryptography-42.0.3-cp37-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:d1998e545081da0ab276bcb4b33cce85f775adb86a516e8f55b3dac87f469548"},
-    {file = "cryptography-42.0.3-cp37-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:93fbee08c48e63d5d1b39ab56fd3fdd02e6c2431c3da0f4edaf54954744c718f"},
-    {file = "cryptography-42.0.3-cp37-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:90147dad8c22d64b2ff7331f8d4cddfdc3ee93e4879796f837bdbb2a0b141e0c"},
-    {file = "cryptography-42.0.3-cp37-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:4dcab7c25e48fc09a73c3e463d09ac902a932a0f8d0c568238b3696d06bf377b"},
-    {file = "cryptography-42.0.3-cp37-abi3-win32.whl", hash = "sha256:1e935c2900fb53d31f491c0de04f41110351377be19d83d908c1fd502ae8daa5"},
-    {file = "cryptography-42.0.3-cp37-abi3-win_amd64.whl", hash = "sha256:762f3771ae40e111d78d77cbe9c1035e886ac04a234d3ee0856bf4ecb3749d54"},
-    {file = "cryptography-42.0.3-cp39-abi3-macosx_10_12_universal2.whl", hash = "sha256:0d3ec384058b642f7fb7e7bff9664030011ed1af8f852540c76a1317a9dd0d20"},
-    {file = "cryptography-42.0.3-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:35772a6cffd1f59b85cb670f12faba05513446f80352fe811689b4e439b5d89e"},
-    {file = "cryptography-42.0.3-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:04859aa7f12c2b5f7e22d25198ddd537391f1695df7057c8700f71f26f47a129"},
-    {file = "cryptography-42.0.3-cp39-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:c3d1f5a1d403a8e640fa0887e9f7087331abb3f33b0f2207d2cc7f213e4a864c"},
-    {file = "cryptography-42.0.3-cp39-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:df34312149b495d9d03492ce97471234fd9037aa5ba217c2a6ea890e9166f151"},
-    {file = "cryptography-42.0.3-cp39-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:de4ae486041878dc46e571a4c70ba337ed5233a1344c14a0790c4c4be4bbb8b4"},
-    {file = "cryptography-42.0.3-cp39-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:0fab2a5c479b360e5e0ea9f654bcebb535e3aa1e493a715b13244f4e07ea8eec"},
-    {file = "cryptography-42.0.3-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:25b09b73db78facdfd7dd0fa77a3f19e94896197c86e9f6dc16bce7b37a96504"},
-    {file = "cryptography-42.0.3-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:d5cf11bc7f0b71fb71af26af396c83dfd3f6eed56d4b6ef95d57867bf1e4ba65"},
-    {file = "cryptography-42.0.3-cp39-abi3-win32.whl", hash = "sha256:0fea01527d4fb22ffe38cd98951c9044400f6eff4788cf52ae116e27d30a1ba3"},
-    {file = "cryptography-42.0.3-cp39-abi3-win_amd64.whl", hash = "sha256:2619487f37da18d6826e27854a7f9d4d013c51eafb066c80d09c63cf24505306"},
-    {file = "cryptography-42.0.3-pp310-pypy310_pp73-macosx_10_12_x86_64.whl", hash = "sha256:ead69ba488f806fe1b1b4050febafdbf206b81fa476126f3e16110c818bac396"},
-    {file = "cryptography-42.0.3-pp310-pypy310_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:20180da1b508f4aefc101cebc14c57043a02b355d1a652b6e8e537967f1e1b46"},
-    {file = "cryptography-42.0.3-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:5fbf0f3f0fac7c089308bd771d2c6c7b7d53ae909dce1db52d8e921f6c19bb3a"},
-    {file = "cryptography-42.0.3-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:c23f03cfd7d9826cdcbad7850de67e18b4654179e01fe9bc623d37c2638eb4ef"},
-    {file = "cryptography-42.0.3-pp39-pypy39_pp73-macosx_10_12_x86_64.whl", hash = "sha256:db0480ffbfb1193ac4e1e88239f31314fe4c6cdcf9c0b8712b55414afbf80db4"},
-    {file = "cryptography-42.0.3-pp39-pypy39_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:6c25e1e9c2ce682d01fc5e2dde6598f7313027343bd14f4049b82ad0402e52cd"},
-    {file = "cryptography-42.0.3-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:9541c69c62d7446539f2c1c06d7046aef822940d248fa4b8962ff0302862cc1f"},
-    {file = "cryptography-42.0.3-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:1b797099d221df7cce5ff2a1d272761d1554ddf9a987d3e11f6459b38cd300fd"},
-    {file = "cryptography-42.0.3.tar.gz", hash = "sha256:069d2ce9be5526a44093a0991c450fe9906cdf069e0e7cd67d9dee49a62b9ebe"},
-]
-
-[package.dependencies]
-cffi = {version = ">=1.12", markers = "platform_python_implementation != \"PyPy\""}
-
-[package.extras]
-docs = ["sphinx (>=5.3.0)", "sphinx-rtd-theme (>=1.1.1)"]
-docstest = ["pyenchant (>=1.6.11)", "readme-renderer", "sphinxcontrib-spelling (>=4.0.1)"]
-nox = ["nox"]
-pep8test = ["check-sdist", "click", "mypy", "ruff"]
-sdist = ["build"]
-ssh = ["bcrypt (>=3.1.5)"]
-test = ["certifi", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-xdist"]
-test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "cssbeautifier"
@@ -1998,20 +1919,6 @@ files = [
 ]
 
 [[package]]
-name = "oscrypto"
-version = "1.3.0"
-description = "TLS (SSL) sockets, key generation, encryption, decryption, signing, verification and KDFs using the OS crypto libraries. Does not require a compiler, and relies on the OS for patching. Works on Windows, OS X and Linux/BSD."
-optional = false
-python-versions = "*"
-files = [
-    {file = "oscrypto-1.3.0-py2.py3-none-any.whl", hash = "sha256:2b2f1d2d42ec152ca90ccb5682f3e051fb55986e1b170ebde472b133713e7085"},
-    {file = "oscrypto-1.3.0.tar.gz", hash = "sha256:6f5fef59cb5b3708321db7cca56aed8ad7e662853351e7991fcf60ec606d47a4"},
-]
-
-[package.dependencies]
-asn1crypto = ">=1.5.1"
-
-[[package]]
 name = "overrides"
 version = "7.7.0"
 description = "A decorator to automatically detect mismatch when overriding a method."
@@ -2380,64 +2287,6 @@ plugins = ["importlib-metadata"]
 windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
-name = "pyhanko"
-version = "0.21.0"
-description = "Tools for stamping and signing PDF files"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "pyHanko-0.21.0-py3-none-any.whl", hash = "sha256:0a4de2c26a55c85ee6da79fc995a7fc6a61b7520270f03251caf8977ba27ccb8"},
-    {file = "pyHanko-0.21.0.tar.gz", hash = "sha256:e5609fb8a0b8d60168999cffaa382f0361066cb429204ad2b76e84e6e7f5eb93"},
-]
-
-[package.dependencies]
-asn1crypto = ">=1.5.1"
-click = ">=8.1.3"
-cryptography = ">=41.0.5"
-pyhanko-certvalidator = ">=0.26.2,<0.27"
-pyyaml = ">=6.0"
-qrcode = ">=7.3.1"
-requests = ">=2.31.0"
-tzlocal = ">=4.3"
-
-[package.extras]
-async-http = ["aiohttp (>=3.9.0,<3.10.0)"]
-docs = ["sphinx", "sphinx-rtd-theme"]
-etsi = ["xsdata (>=23.8,<24.0)"]
-extra-pubkey-algs = ["oscrypto (>=1.2.1)"]
-image-support = ["Pillow (>=7.2.0)", "python-barcode (==0.15.1)"]
-live-test = ["certomancer-csc-dummy (==0.2.3)", "certomancer[pkcs12,web-api] (>=0.11.0,<0.12.0)", "pyHanko[async-http,extra-pubkey-algs,testing-basic,xmp]", "pytest-aiohttp (>=1.0.4,<1.1.0)", "pytest-cov (>=4.0,<4.2)"]
-mypy = ["pyHanko[async-http,etsi,extra-pubkey-algs,image-support,opentype,pkcs11,xmp]", "types-PyYAML", "types-python-dateutil", "types-requests", "types-tzlocal"]
-opentype = ["fonttools (>=4.33.3)", "uharfbuzz (>=0.25.0,<0.38.0)"]
-pkcs11 = ["python-pkcs11 (>=0.7.0,<0.8.0)"]
-testing = ["certomancer-csc-dummy (==0.2.3)", "pyHanko[async-http,extra-pubkey-algs,image-support,opentype,pkcs11,testing-basic,xmp]", "pyHanko[etsi]", "pytest-aiohttp (>=1.0.4,<1.1.0)"]
-testing-basic = ["backports.zoneinfo[tzdata]", "certomancer (==0.11.*)", "freezegun (>=1.1.0)", "pytest (>=6.1.1)", "pytest-asyncio (==0.21.1)", "pytest-cov (>=4.0,<4.2)", "requests-mock (>=1.8.0)"]
-xmp = ["defusedxml (>=0.7.1,<0.8.0)"]
-
-[[package]]
-name = "pyhanko-certvalidator"
-version = "0.26.3"
-description = "Validates X.509 certificates and paths; forked from wbond/certvalidator"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "pyhanko-certvalidator-0.26.3.tar.gz", hash = "sha256:47fba8e9dbf846d766f2e0a453572dd4b25b2f1397847a31fe892c8eb00391f5"},
-    {file = "pyhanko_certvalidator-0.26.3-py3-none-any.whl", hash = "sha256:e386c87e202ff1caacf5fd941da6c3509e79db54dbd7b43c6550ceebe5e67077"},
-]
-
-[package.dependencies]
-asn1crypto = ">=1.5.1"
-cryptography = ">=41.0.5"
-oscrypto = ">=1.1.0"
-requests = ">=2.31.0"
-uritools = ">=3.0.1"
-
-[package.extras]
-async-http = ["aiohttp (>=3.8,<3.10)"]
-mypy = ["pyhanko-certvalidator[testing]", "types-requests"]
-testing = ["aiohttp (>=3.8,<3.10)", "freezegun (>=1.1.0)", "pyhanko-certvalidator[async-http]", "pytest (>=6.1.1)", "pytest-aiohttp (>=1.0.4,<1.1.0)", "pytest-cov (>=4.0,<4.2)"]
-
-[[package]]
 name = "pynacl"
 version = "1.5.0"
 description = "Python binding to the Networking and Cryptography (NaCl) library"
@@ -2476,24 +2325,6 @@ files = [
 
 [package.extras]
 diagrams = ["jinja2", "railroad-diagrams"]
-
-[[package]]
-name = "pypdf"
-version = "4.0.1"
-description = "A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files"
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "pypdf-4.0.1-py3-none-any.whl", hash = "sha256:fe7c313c7e8074a516eae9d9df0111b7b9769f7a210479af7a342d27270ef81a"},
-    {file = "pypdf-4.0.1.tar.gz", hash = "sha256:871badcfe335dd68b6b563aa7646288c6b86f9ceecffb21e86341261d65d8173"},
-]
-
-[package.extras]
-crypto = ["PyCryptodome", "cryptography"]
-dev = ["black", "flit", "pip-tools", "pre-commit (<2.18.0)", "pytest-cov", "pytest-socket", "pytest-timeout", "pytest-xdist", "wheel"]
-docs = ["myst_parser", "sphinx", "sphinx_rtd_theme"]
-full = ["Pillow (>=8.0.0)", "PyCryptodome", "cryptography"]
-image = ["Pillow (>=8.0.0)"]
 
 [[package]]
 name = "pyphen"
@@ -2671,20 +2502,6 @@ pytest = ">=5.0"
 
 [package.extras]
 dev = ["pre-commit", "pytest-asyncio", "tox"]
-
-[[package]]
-name = "python-bidi"
-version = "0.4.2"
-description = "Pure python implementation of the BiDi layout algorithm"
-optional = false
-python-versions = "*"
-files = [
-    {file = "python-bidi-0.4.2.tar.gz", hash = "sha256:5347f71e82b3e9976dc657f09ded2bfe39ba8d6777ca81a5b2c56c30121c496e"},
-    {file = "python_bidi-0.4.2-py2.py3-none-any.whl", hash = "sha256:50eef6f6a0bbdd685f9e8c207f3c9050f5b578d0a46e37c76a9c4baea2cc2e13"},
-]
-
-[package.dependencies]
-six = "*"
 
 [[package]]
 name = "python-dateutil"
@@ -2955,67 +2772,6 @@ files = [
     {file = "regex-2023.12.25-cp39-cp39-win_amd64.whl", hash = "sha256:e693e233ac92ba83a87024e1d32b5f9ab15ca55ddd916d878146f4e3406b5c91"},
     {file = "regex-2023.12.25.tar.gz", hash = "sha256:29171aa128da69afdf4bde412d5bedc335f2ca8fcfe4489038577d05f16181e5"},
 ]
-
-[[package]]
-name = "reportlab"
-version = "3.6.13"
-description = "The Reportlab Toolkit"
-optional = false
-python-versions = ">=3.7,<4"
-files = [
-    {file = "reportlab-3.6.13-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:a0330322c6c8123745ac7667fcc6ae3e0de3b73c15bdfaa28c788a9eaa0f50da"},
-    {file = "reportlab-3.6.13-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:753485bb2b18cbd11340e227e4aaf9bde3bb64f83406dfa011e92ad0231a42c9"},
-    {file = "reportlab-3.6.13-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:58ea3471b9b4b8e7952bd357e8487789da11213470be328ffb3e5b7d7690c2c7"},
-    {file = "reportlab-3.6.13-cp310-cp310-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:f1993a68c0edc45895d3df350d01b0456efe79aaf309cef777762742be501f2a"},
-    {file = "reportlab-3.6.13-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:ca8eb7a6607f8a664187a330bab9f8d11c9f81ed885e063dfbb29a130944a72a"},
-    {file = "reportlab-3.6.13-cp310-cp310-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:57add04824bca89a130f9d428ace1b003cce4061386e0ec2a1b45b554ffe7aa3"},
-    {file = "reportlab-3.6.13-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e98965c6e60d76ff63989d9400ae8e65efd67c665d785b377f438f166a57c053"},
-    {file = "reportlab-3.6.13-cp310-cp310-win32.whl", hash = "sha256:3cb0da4975dbade6cc2ea6b0b0b17578af266dc3f669e959648f3306af993369"},
-    {file = "reportlab-3.6.13-cp310-cp310-win_amd64.whl", hash = "sha256:65b441e22d8fe93154567a30662d8539e639b78142815afcaf92b388846eb3c1"},
-    {file = "reportlab-3.6.13-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:d59e62faa03003be81aa14d37ac34ea110e5ac59c8678fd4c0daa7d8b8f42096"},
-    {file = "reportlab-3.6.13-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:afb418409e0d323c6cb5e3be7ea4d14dfbf8a07eb03ab0b0062904cacf819878"},
-    {file = "reportlab-3.6.13-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a477f652e6c417ad40387a8498d9ad827421006f156aab16f67adc9b81699a72"},
-    {file = "reportlab-3.6.13-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:0b94e4f65a5f77a631cc010c9a7892d69e33f3251b760639dcc76420e138ce95"},
-    {file = "reportlab-3.6.13-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:7efdf68e97e8fea8683bfc17f25747fefbda729b9018bc2e3221658ac41ee0bd"},
-    {file = "reportlab-3.6.13-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:e28a8d9cf462e2b4c9e71abd0630f9ec245d88b976b283b0dbb4602c9ddb3938"},
-    {file = "reportlab-3.6.13-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d95fc8bc177a009053548c6d851a513b2147c465a5e8fea82287ea22d6825c4e"},
-    {file = "reportlab-3.6.13-cp311-cp311-win32.whl", hash = "sha256:48eadd93237c7e2739525c74cf6615dd6c1a767c839f4b0d7c12167dc0b09911"},
-    {file = "reportlab-3.6.13-cp311-cp311-win_amd64.whl", hash = "sha256:cca2d4c783f985b91b98e80d09ac79b6ed3f317a729cba5ba86edfe5eb9a2d9c"},
-    {file = "reportlab-3.6.13-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:149718c3eaee937f28094325f0dd9ae1add3172c2dacbb93ff5403f37c9d3c57"},
-    {file = "reportlab-3.6.13-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:8260c002e4845a5af65908d5ee2099bcc25a16c7646c5c417fa27f1e4b844bc1"},
-    {file = "reportlab-3.6.13-cp37-cp37m-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:8e4983486d419daa45cade40874bb869976e27ba11f77fb4b9ae32417284ade7"},
-    {file = "reportlab-3.6.13-cp37-cp37m-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:6ea46fef07c588fef84d1164d4788fef322b39feb2bfb2df0a0706181dff79b8"},
-    {file = "reportlab-3.6.13-cp37-cp37m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:e5949f3b4e207fa7901c0cc3b49470b2a3372617a47dfbc892db31c2b56af296"},
-    {file = "reportlab-3.6.13-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b0d91663d450c11404ec189ebc5a4abdf20f7c4eca5954a920427cdbf5601525"},
-    {file = "reportlab-3.6.13-cp37-cp37m-win32.whl", hash = "sha256:269c59e508df08be498ab9e5278addb2cc16989677a03f800b17f8a31f8c5cc7"},
-    {file = "reportlab-3.6.13-cp37-cp37m-win_amd64.whl", hash = "sha256:21d6b6bcdecee9c7ce047156d0553a30d736b8172629e4c0fcacab35ba261f3b"},
-    {file = "reportlab-3.6.13-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:36568d3cb4101a210c4d821d9101635c2ef6e06bd649335938c01eb197f50c5d"},
-    {file = "reportlab-3.6.13-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:a043cff1781ddb2a0ba0e8e760a79fc5be2430957c4f2a1f51bd4528cc53178f"},
-    {file = "reportlab-3.6.13-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:dbddadca6f08212732e83a60e30a42cfc7d2695892cedea208b3c3e7131c9993"},
-    {file = "reportlab-3.6.13-cp38-cp38-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:faeebde62f0f6ad86985bec5685411260393d2eb7ba907972da56af586b644e8"},
-    {file = "reportlab-3.6.13-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:ff09a0a1e5cef05309ac09dfc5185e8151d927bcf45470d2f540c96260f8a355"},
-    {file = "reportlab-3.6.13-cp38-cp38-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:bbdbba1ec3498b17eefca14d424ee90bb95b53e1423ecb22f1c17733c3406559"},
-    {file = "reportlab-3.6.13-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ba6f533b262f4ee1636b754992bb2fb349df0500d765ac9be014a375c047f4db"},
-    {file = "reportlab-3.6.13-cp38-cp38-win32.whl", hash = "sha256:7ff89011b5ee30209b3106641e3b7b4959f10aa6e9d6f3030205123c178f605d"},
-    {file = "reportlab-3.6.13-cp38-cp38-win_amd64.whl", hash = "sha256:8f00175f8e12e6f7d3a01309de6d7008fac94a2cdce6837ad066f0961472c9e5"},
-    {file = "reportlab-3.6.13-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:a4dbc28fede7f504b9ac65ce9cbea35585e999d63f9fa68bc73f5a75b4929302"},
-    {file = "reportlab-3.6.13-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:9f869286fcefa7f8e89e38448309891ff110ad74f58a7317ec204f3d4b8ad5f5"},
-    {file = "reportlab-3.6.13-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e13a4e81761636591f5b60104f6e1eec70832ffd9aa781db68d7ebb576970d4b"},
-    {file = "reportlab-3.6.13-cp39-cp39-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:6fdac930dfdc6227720545ec44fdb396e92d53ec227a6f5ae58cc8cb9a6cbe89"},
-    {file = "reportlab-3.6.13-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:701290747662d2b3be49fc0de33898ecc9ce3fafe0e2887d406e24693465e5ae"},
-    {file = "reportlab-3.6.13-cp39-cp39-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:7b690bc30f58931b0abd47635d93a43a82d67972e83a6511cc8adbcd7da25310"},
-    {file = "reportlab-3.6.13-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6172481e8acffcf72042653e977281fbd807a41705a39456d92d2606d8b8c5e2"},
-    {file = "reportlab-3.6.13-cp39-cp39-win32.whl", hash = "sha256:5a460f4c0c30bdf9d7bef46a816671a4386a9253670a53d35c694c666544261f"},
-    {file = "reportlab-3.6.13-cp39-cp39-win_amd64.whl", hash = "sha256:11a71c314183532d889ad4b3941f61c3fe4bfdda769c768a7f02d93cb69dd1bb"},
-    {file = "reportlab-3.6.13.tar.gz", hash = "sha256:6f75d33f7a3720cf47371ab63ced0f0ebd1aeb6db19386ae92f8977a09be9611"},
-]
-
-[package.dependencies]
-pillow = ">=9.0.0"
-
-[package.extras]
-fttextpath = ["freetype-py (>=2.3.0,<2.4)"]
-rlpycairo = ["rlPyCairo (>=0.1.0)"]
 
 [[package]]
 name = "requests"
@@ -3414,22 +3170,6 @@ release = ["twine"]
 test = ["pylint", "pytest", "pytest-black", "pytest-cov", "pytest-pylint"]
 
 [[package]]
-name = "svglib"
-version = "1.5.1"
-description = "A pure-Python library for reading and converting SVG"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "svglib-1.5.1.tar.gz", hash = "sha256:3ae765d3a9409ee60c0fb4d24c2deb6a80617aa927054f5bcd7fc98f0695e587"},
-]
-
-[package.dependencies]
-cssselect2 = ">=0.2.0"
-lxml = "*"
-reportlab = "*"
-tinycss2 = ">=0.6.0"
-
-[[package]]
 name = "tinycss2"
 version = "1.2.1"
 description = "A tiny CSS parser"
@@ -3519,34 +3259,6 @@ python-versions = ">=2"
 files = [
     {file = "tzdata-2024.1-py2.py3-none-any.whl", hash = "sha256:9068bc196136463f5245e51efda838afa15aaeca9903f49050dfa2679db4d252"},
     {file = "tzdata-2024.1.tar.gz", hash = "sha256:2674120f8d891909751c38abcdfd386ac0a5a1127954fbc332af6b5ceae07efd"},
-]
-
-[[package]]
-name = "tzlocal"
-version = "5.2"
-description = "tzinfo object for the local timezone"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "tzlocal-5.2-py3-none-any.whl", hash = "sha256:49816ef2fe65ea8ac19d19aa7a1ae0551c834303d5014c6d5a62e4cbda8047b8"},
-    {file = "tzlocal-5.2.tar.gz", hash = "sha256:8d399205578f1a9342816409cc1e46a93ebd5755e39ea2d85334bea911bf0e6e"},
-]
-
-[package.dependencies]
-tzdata = {version = "*", markers = "platform_system == \"Windows\""}
-
-[package.extras]
-devenv = ["check-manifest", "pytest (>=4.3)", "pytest-cov", "pytest-mock (>=3.3)", "zest.releaser"]
-
-[[package]]
-name = "uritools"
-version = "4.0.2"
-description = "URI parsing, classification and composition"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "uritools-4.0.2-py3-none-any.whl", hash = "sha256:607b15eae1e7b69a120f463a7d98f91a56671e1ab92aae13f8e1f25c017fe60e"},
-    {file = "uritools-4.0.2.tar.gz", hash = "sha256:04df2b787d0eb76200e8319382a03562fbfe4741fd66c15506b08d3b8211d573"},
 ]
 
 [[package]]
@@ -3759,27 +3471,6 @@ files = [
 ]
 
 [[package]]
-name = "xhtml2pdf"
-version = "0.2.11"
-description = "PDF generator using HTML and CSS"
-optional = false
-python-versions = "*"
-files = [
-    {file = "xhtml2pdf-0.2.11.tar.gz", hash = "sha256:1b81630a10eba833ddeda16933fd6625471f16b93c352d954f552e5a608e7465"},
-]
-
-[package.dependencies]
-arabic-reshaper = ">=3.0.0"
-html5lib = ">=1.0.1"
-Pillow = ">=8.1.1"
-pyHanko = ">=0.12.1"
-pyhanko-certvalidator = ">=0.19.5"
-pypdf = ">=3.1.0"
-python-bidi = ">=0.4.2"
-reportlab = ">=3.5.53,<4"
-svglib = ">=1.2.1"
-
-[[package]]
 name = "zipp"
 version = "3.17.0"
 description = "Backport of pathlib-compatible object wrapper for zip files"
@@ -3870,4 +3561,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "056d0d63f0f6cd8b38c21488a88189adad1e5526ba5218286b799556aba6a048"
+content-hash = "73dd0e19c27e22d9d27f33de45a019bf019b896f7738eefb5283d105f1909dfd"
