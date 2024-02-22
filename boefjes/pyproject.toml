@@ -63,7 +63,6 @@ pydantic-settings = "^2.0.3"
 opentelemetry-instrumentation = "^0.41b0"
 # required by kat_webpage_analysis/check_images normalizer
 pillow = "^10.2.0"
-certifi = "^2024.2.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

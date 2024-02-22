@@ -12,7 +12,6 @@ authors = ["MinVWS <maintainer@openkat.nl>"]
 [tool.poetry.dependencies]
 python = "^3.11"
 requests = "^2.31.0"
-certifi = "^2024.2.2"
 
 [tool.poetry.scripts]
 cveapi = 'cveapi:run'
