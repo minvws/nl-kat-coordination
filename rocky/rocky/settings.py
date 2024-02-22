@@ -142,6 +142,7 @@ INSTALLED_APPS = [
     "two_factor",
     "account",
     "tools",
+    "fmea",
     "crisis_room",
     "onboarding",
     "katalogus",
