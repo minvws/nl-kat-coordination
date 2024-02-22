@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Any
 
 from django.conf import settings
@@ -11,6 +12,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
     get_plugins_for_report_ids,
@@ -145,6 +147,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     template_name = "aggregate_report.html"
     current_step = 6
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+    report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
         if "json" in self.request.GET and self.request.GET["json"] == "true":
@@ -177,13 +180,13 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     def generate_reports_for_oois(self) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data, error_oois = aggregate_reports(
-            self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.valid_time
+            self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.observed_at
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_oois:
             oois = ", ".join(set(error_oois))
-            date = self.valid_time.date()
+            date = self.observed_at.date()
             error_message = _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.") % {
                 "oois": oois,
                 "date": date,

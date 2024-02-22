@@ -34,7 +34,7 @@ ClientSessionMethod = Callable[..., Any]
 
 def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     @wraps(function)
-    def wrapper(self, *args, **kwargs):  # type: ignore
+    def wrapper(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
         except HTTPError as error:

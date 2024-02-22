@@ -29,7 +29,7 @@ class RFC3161HashRepository(HashRepository):
 
         assert rfc3161ng.get_timestamp(time_stamp_token)
 
-        return self.timestamper.check(time_stamp_token, data=secure_hash.encode())  # type: ignore
+        return self.timestamper.check(time_stamp_token, data=secure_hash.encode())
 
     def get_signing_provider_url(self) -> str | None:
         """Get the specific signing provider url"""

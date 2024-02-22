@@ -19,14 +19,15 @@ class Command(BaseCommand):
 
     def get_permissions(self, codenames):
         permission_objects = []
-        permission = None
         if codenames:
             for codename in codenames:
                 try:
                     permission = Permission.objects.get(codename=codename)
+                except Permission.DoesNotExist:
+                    raise ObjectDoesNotExist("Permission:" + codename + " does not exist.")
+                else:
                     permission_objects.append(permission.id)
-                except permission.DoesNotExist:
-                    raise ObjectDoesNotExist("Permission:" + str(permission) + " does not exist.")
+
         return permission_objects
 
     def setup_kat_groups(self):

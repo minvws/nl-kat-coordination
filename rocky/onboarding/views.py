@@ -58,6 +58,8 @@ User = get_user_model()
 
 
 class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
+    organization: Organization
+
     def build_breadcrumbs(self):
         return [
             {
@@ -82,6 +84,7 @@ class OnboardingStart(OrganizationView):
 class OnboardingIntroductionView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     template_name = "step_1_introduction.html"
@@ -92,6 +95,7 @@ class OnboardingIntroductionView(
 class OnboardingChooseReportInfoView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     template_name = "step_2a_choose_report_info.html"
@@ -102,6 +106,7 @@ class OnboardingChooseReportInfoView(
 class OnboardingChooseReportTypeView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     template_name = "step_2b_choose_report_type.html"
@@ -112,6 +117,7 @@ class OnboardingChooseReportTypeView(
 class OnboardingSetupScanSelectPluginsView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     template_name = "step_3g_setup_scan_select_plugins.html"
@@ -157,6 +163,7 @@ class OnboardingSetupScanSelectPluginsView(
 class OnboardingSetupScanOOIInfoView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     template_name = "step_3a_setup_scan_ooi_info.html"
@@ -335,7 +342,11 @@ class OnboardingSetupScanOOIDetailView(
 
 
 class OnboardingClearanceLevelIntroductionView(
-    OrganizationPermissionRequiredMixin, KatIntroductionStepsMixin, OnboardingBreadcrumbsMixin, TemplateView
+    OrganizationPermissionRequiredMixin,
+    KatIntroductionStepsMixin,
+    OnboardingBreadcrumbsMixin,
+    OrganizationView,
+    TemplateView,
 ):
     template_name = "step_3d_clearance_level_introduction.html"
     permission_required = "tools.can_set_clearance_level"
@@ -374,6 +385,7 @@ class OnboardingAcknowledgeClearanceLevelView(
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     OOIClearanceMixin,
+    OrganizationView,
     TemplateView,
 ):
     template_name = "step_3e_trusted_acknowledge_clearance_level.html"
@@ -391,6 +403,7 @@ class OnboardingSetClearanceLevelView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
+    OrganizationView,
     FormView,
 ):
     template_name = "step_3f_set_clearance_level.html"
@@ -420,6 +433,7 @@ class OnboardingSetClearanceLevelView(
 class OnboardingReportView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
+    OrganizationView,
     TemplateView,
 ):
     template_name = "step_4_report.html"
@@ -547,6 +561,7 @@ class OnboardingOrganizationSetupView(
 class OnboardingOrganizationUpdateView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionAdminStepsMixin,
+    OrganizationView,
     UpdateView,
 ):
     """
@@ -591,7 +606,7 @@ class OnboardingIndemnificationSetupView(
 
 
 class OnboardingAccountSetupIntroView(
-    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView
+    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, TemplateView
 ):
     """
     Step 4: Split flow to or continue with single account or continue to multiple account creation
@@ -602,8 +617,10 @@ class OnboardingAccountSetupIntroView(
     permission_required = "tools.add_organizationmember"
 
 
-class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, FormView):
-    account_type = None
+class OnboardingAccountCreationMixin(
+    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, FormView
+):
+    account_type: str | None = None
     permission_required = "tools.add_organizationmember"
 
     def get_form_kwargs(self):
@@ -616,7 +633,9 @@ class OnboardingAccountCreationMixin(OrganizationPermissionRequiredMixin, KatInt
 # Account setup for multiple user accounts: redteam, admins, clients
 
 
-class OnboardingChooseUserTypeView(OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, TemplateView):
+class OnboardingChooseUserTypeView(
+    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, TemplateView
+):
     """
     Step 1: Introduction about how to create multiple user accounts
     """
