@@ -201,7 +201,7 @@ class OnboardingSetupScanOOIAddView(
         bytes_client = get_bytes_client(self.organization.code)
 
         for field_name, params in self.hidden_form_fields.items():
-            ooi, created = get_or_create_ooi(self.octopoes_api_connector, bytes_client, params["ooi"])
+            ooi, created = get_or_create_ooi(self.octopoes_api_connector, bytes_client, params["ooi"], self.observed_at)
             hidden_fields[field_name] = ooi.primary_key
 
             if created:

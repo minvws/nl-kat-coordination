@@ -4,7 +4,7 @@ import traceback
 from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
 import requests
 from pydantic.tools import parse_obj_as
@@ -260,7 +260,8 @@ class NormalizerHandler(Handler):
             if validated_scan_profiles:
                 connector.save_many_scan_profiles(
                     [self._parse_scan_profile(scan_profile) for scan_profile in results.scan_profiles],
-                    valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
+                    # Mypy doesn't seem to be able to figure out that ended_at is a datetime
+                    valid_time=cast(datetime, normalizer_meta.raw_data.boefje_meta.ended_at),
                 )
         finally:
             normalizer_meta.ended_at = datetime.now(timezone.utc)

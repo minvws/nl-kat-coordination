@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from time import sleep
 from typing import Any
 
@@ -163,7 +164,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         # Transform into OOI
         try:
             new_ooi = self.ooi_class.parse_obj(form.cleaned_data)
-            create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi)
+            create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi, datetime.now(timezone.utc))
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))
         except ValidationError as exception:
