@@ -91,7 +91,6 @@ repos:
       ^octopoes/octopoes/repositories |
       ^octopoes/octopoes/xtdb |
       ^octopoes/tools |
-      ^rocky/fmea/ |
       ^rocky/whitelist\.py$ |
       /tests/ |
       docs/source/conf\.py$ |
