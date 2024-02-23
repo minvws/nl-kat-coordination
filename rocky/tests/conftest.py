@@ -833,8 +833,3 @@ def listed_hostnames(network):
         Hostname(network=network.reference, name="e.example.com"),
         Hostname(network=network.reference, name="f.example.com"),
     ]
-
-
-@pytest.fixture
-def now_formatted(valid_time):
-    return valid_time.strftime("%Y-%m-%d")
