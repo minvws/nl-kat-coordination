@@ -248,40 +248,40 @@ class WebSystemReport(Report):
         all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
 
         query = "Hostname.<hostname[is Website].<website[is HTTPResource].<ooi[is Finding].finding_type"
-        csp_finding_types = self.group_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), lambda ooi: ooi.id == "KAT-NO-CSP"
+        csp_finding_types = self.group_finding_types_by_source(
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), ["KAT-NO-CSP"]
         )
         query = (
             "Hostname.<hostname[is Website].<website[is HTTPResource].<resource[is HTTPHeader]"
             ".<ooi[is Finding].finding_type"
         )
-        csp_vulnerabilities_finding_types = self.group_by_source(
+        csp_vulnerabilities_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            lambda ooi: ooi.id == "KAT-CSP-VULNERABILITIES",
+            ["KAT-CSP-VULNERABILITIES"],
         )
         query = "Hostname.<netloc[is HostnameHTTPURL].<ooi[is Finding].finding_type"
-        url_finding_types = self.group_by_source(
+        url_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            lambda ooi: ooi.id == "KAT-NO-HTTPS-REDIRECT",
+            ["KAT-NO-HTTPS-REDIRECT"],
         )
         query = "Hostname.<hostname[is Website].<ooi[is Finding].finding_type"
-        no_certificate_finding_types = self.group_by_source(
+        no_certificate_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            lambda ooi: ooi.id == "KAT-NO-CERTIFICATE",
+            ["KAT-NO-CERTIFICATE"],
         )
         query = "Hostname.<hostname[is Website].<website[is SecurityTXT]"
-        has_security_txt_finding_types = self.group_by_source(
+        has_security_txt_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames)
         )
         query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type"
-        port_finding_types = self.group_by_source(
+        port_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            lambda ooi: ooi.id in ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
+            ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
         )
         query = "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type"
-        certificate_finding_types = self.group_by_source(
+        certificate_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            lambda ooi: ooi.id in ["KAT-CERTIFICATE-EXPIRED", "KAT-CERTIFICATE-EXPIRING-SOON"],
+            ["KAT-CERTIFICATE-EXPIRED", "KAT-CERTIFICATE-EXPIRING-SOON"],
         )
 
         result = {}

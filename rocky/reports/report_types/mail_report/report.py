@@ -51,21 +51,21 @@ class MailReport(Report):
 
             number_of_spf -= (
                 1
-                if list(
+                if any(
                     filter(lambda finding_type: finding_type.id == "KAT-NO-SPF", finding_types[hostname.primary_key])
                 )
                 else 0
             )
             number_of_dmarc -= (
                 1
-                if list(
+                if any(
                     filter(lambda finding_type: finding_type.id == "KAT-NO-DMARC", finding_types[hostname.primary_key])
                 )
                 else 0
             )
             number_of_dkim -= (
                 1
-                if list(
+                if any(
                     filter(lambda finding_type: finding_type.id == "KAT-NO-DKIM", finding_types[hostname.primary_key])
                 )
                 else 0
@@ -84,9 +84,9 @@ class MailReport(Report):
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
         all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
 
-        filtered_finding_types = self.group_by_source(
+        filtered_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many("Hostname.<ooi[is Finding].finding_type", valid_time, all_hostnames),
-            lambda ooi: ooi.id in MAIL_FINDING_TYPES,
+            MAIL_FINDING_TYPES,
         )
 
         result = {}
@@ -100,9 +100,9 @@ class MailReport(Report):
             for hostname in hostname_references:
                 finding_types = filtered_finding_types.get(hostname, [])
 
-                number_of_spf -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", finding_types)) else 0
-                number_of_dmarc -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", finding_types)) else 0
-                number_of_dkim -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", finding_types)) else 0
+                number_of_spf -= 1 if any(filter(lambda finding: finding.id == "KAT-NO-SPF", finding_types)) else 0
+                number_of_dmarc -= 1 if any(filter(lambda finding: finding.id == "KAT-NO-DMARC", finding_types)) else 0
+                number_of_dkim -= 1 if any(filter(lambda finding: finding.id == "KAT-NO-DKIM", finding_types)) else 0
 
                 mail_security_measures[hostname] = finding_types
 

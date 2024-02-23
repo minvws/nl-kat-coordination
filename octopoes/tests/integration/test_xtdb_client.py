@@ -149,12 +149,12 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
 
 
 def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
-    network = Network(name="testnetwork")
-    network2 = Network(name="testnetwork2")
-    xtdb_session.put(XTDBOOIRepository.serialize(network), valid_time)
-    xtdb_session.put(XTDBOOIRepository.serialize(network2), valid_time)
+    network = XTDBOOIRepository.serialize(Network(name="testnetwork"))
+    network2 = XTDBOOIRepository.serialize(Network(name="testnetwork2"))
+    xtdb_session.put(network, valid_time)
+    xtdb_session.put(network2, valid_time)
     xtdb_session.put(
-        XTDBOOIRepository.serialize(Hostname(network=network2.reference, name="secondhostname")), valid_time
+        XTDBOOIRepository.serialize(Hostname(network="Network|testnetwork2", name="secondhostname")), valid_time
     )
     xtdb_session.commit()
 
@@ -164,15 +164,15 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
 
     query = Query.from_path(Path.parse("Hostname.network")).where_in(Network, name=["testnetwork2"])
     result = xtdb_session.client.query(query)
-    assert len(result) == 1
+    assert result == [[network2]]
 
     query = Query.from_path(Path.parse("Hostname.network")).where_in(Network, name=["testnetwork", "testnetwork2"])
     result = xtdb_session.client.query(query)
-    assert len(result) == 1
+    assert result == [[network2]]
 
     query = Query(Network).where_in(Network, primary_key=["Network|testnetwork", "Network|testnetwork2"])
     result = xtdb_session.client.query(query)
-    assert len(result) == 2
+    assert result == [[network], [network2]]
 
     pk = A(Network, field="primary_key")
     query = (

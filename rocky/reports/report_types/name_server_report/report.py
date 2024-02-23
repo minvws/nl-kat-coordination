@@ -108,10 +108,10 @@ class NameServerSystemReport(Report):
                 )
                 if x.id in ["KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC"]
             ]
-            check.has_dnssec = "KAT-NO-DNSSEC" not in [x.id for x in hostname_finding_types]
-            check.has_valid_dnssec = check.has_dnssec and "KAT-INVALID-DNSSEC" not in [
+            check.has_dnssec = "KAT-NO-DNSSEC" not in (x.id for x in hostname_finding_types)
+            check.has_valid_dnssec = check.has_dnssec and "KAT-INVALID-DNSSEC" not in (
                 x.id for x in hostname_finding_types
-            ]
+            )
 
             name_server_checks.checks.append(check)
 
@@ -132,14 +132,14 @@ class NameServerSystemReport(Report):
         all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
 
         query = "Hostname.<ooi[is Finding].finding_type"
-        hostname_finding_types = self.group_by_source(
+        hostname_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            lambda ooi: ooi.id in ["KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC"],
+            ["KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC"],
         )
         query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type"
-        port_finding_types = self.group_by_source(
+        port_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            lambda ooi: ooi.id in ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
+            ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
         )
 
         result = {}

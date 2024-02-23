@@ -8,7 +8,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
-from octopoes.models.types import OOIType
+from octopoes.models.types import FindingTypeType, OOIType
 
 REPORTS_DIR = Path(__file__).parent
 logger = getLogger(__name__)
@@ -29,7 +29,7 @@ class BaseReport:
         self.octopoes_api_connector = octopoes_api_connector
 
 
-T_BaseReport = TypeVar("T_BaseReport", bound="BaseReport")
+BaseReportType = TypeVar("BaseReportType", bound="BaseReport")
 
 
 class Report(BaseReport):
@@ -72,6 +72,16 @@ class Report(BaseReport):
                 result[source].append(ooi)
 
         return result
+
+    @staticmethod
+    def group_finding_types_by_source(
+        query_result: list[tuple[str, OOIType]],
+        keep_ids: list[str] | None = None,
+    ) -> dict[str, list[OOIType]]:
+        if keep_ids:
+            return Report.group_by_source(query_result, lambda x: x.id in keep_ids)
+
+        return Report.group_by_source(query_result)
 
     def to_hostnames(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
         """Turn a list of either Hostname and IPAddress reference strings into a list of related hostnames."""

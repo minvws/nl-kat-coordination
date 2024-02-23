@@ -67,9 +67,7 @@ class IPv6Report(Report):
         all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
 
         query = "Hostname.<hostname [is ResolvedHostname].address"
-        ips = self.group_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-        )
+        ips = self.group_by_source(self.octopoes_api_connector.query_many(query, valid_time, all_hostnames))
 
         result = {}
         for input_ooi, hostnames in hostnames_by_input_ooi.items():
