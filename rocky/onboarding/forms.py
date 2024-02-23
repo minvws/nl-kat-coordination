@@ -54,3 +54,12 @@ class OnboardingOOIForm(OOIForm):
 
     def get_fields(self):
         return self.generate_form_fields(self.hidden_ooi_fields)
+
+
+class OnboardingCreateObjectURLForm(forms.Form):
+    """
+    Custom URL field form especially for onboarding. No need of web_url and network object.
+    When entering an URL, the network object will be automatically created.
+    """
+
+    url = forms.URLField(label="URL", label_suffix="", required=True)

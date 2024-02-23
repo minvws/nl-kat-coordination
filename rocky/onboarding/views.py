@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import BadRequest
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
@@ -19,6 +19,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from katalogus.client import get_katalogus
 from reports.report_types.dns_report.report import DNSReport
+from reports.views.base import get_selection
 from requests import HTTPError
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import (
@@ -26,10 +27,9 @@ from tools.ooi_helpers import (
 )
 from tools.view_helpers import Breadcrumb, get_ooi_url
 
-from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
-from octopoes.models.types import type_by_name
-from onboarding.forms import OnboardingOOIForm, OnboardingSetClearanceLevelForm
+from octopoes.models.ooi.web import URL
+from onboarding.forms import OnboardingCreateObjectURLForm, OnboardingSetClearanceLevelForm
 from onboarding.view_helpers import (
     DNS_REPORT_LEAST_CLEARANCE_LEVEL,
     ONBOARDING_PERMISSIONS,
@@ -39,13 +39,12 @@ from onboarding.view_helpers import (
     OnboardingBreadcrumbsMixin,
     RegistrationBreadcrumbsMixin,
 )
-from rocky.bytes_client import get_bytes_client
 from rocky.exceptions import (
     RockyError,
 )
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
-from rocky.views.ooi_view import BaseOOIFormView, SingleOOITreeMixin
+from rocky.views.ooi_view import SingleOOITreeMixin
 
 User = get_user_model()
 
@@ -125,7 +124,8 @@ class OnboardingSetupScanOOIInfoView(
 class OnboardingSetupScanOOIAddView(
     OrganizationPermissionRequiredMixin,
     KatIntroductionStepsMixin,
-    BaseOOIFormView,
+    SingleOOITreeMixin,
+    FormView,
 ):
     """
     5. The user will create the object (URL object for example). Shows a form to create object.
@@ -134,62 +134,30 @@ class OnboardingSetupScanOOIAddView(
     template_name = "step_3b_setup_scan_ooi_add.html"
     current_step = 3
     permission_required = "tools.can_scan_organization"
-    form_class = OnboardingOOIForm
-    hidden_form_fields = {
-        "network": {
-            "ooi": Network(name="internet"),
-        }
-    }
+    form_class = OnboardingCreateObjectURLForm
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.ooi_class = self.get_ooi_class()
-
-    def get_hidden_form_fields(self):
-        hidden_fields = {}
-        bytes_client = get_bytes_client(self.organization.code)
-
-        for field_name, params in self.hidden_form_fields.items():
-            ooi, created = get_or_create_ooi(self.octopoes_api_connector, bytes_client, params["ooi"])
-            hidden_fields[field_name] = ooi.primary_key
-
-            if created:
-                messages.success(
-                    self.request,
-                    _(
-                        "OpenKAT added the following required object to your object list to complete your request: {}"
-                    ).format(str(ooi)),
-                )
-        return hidden_fields
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        hidden_fields = self.get_hidden_form_fields()
-        kwargs.update({"hidden_fields": hidden_fields, "initial": hidden_fields})
-
-        return kwargs
-
-    def get_ooi_class(self) -> type[OOI]:
-        try:
-            return type_by_name(self.kwargs["ooi_type"])
-        except KeyError:
-            raise Http404("OOI not found")
-
-    def get_ooi_success_url(self, ooi: OOI) -> str:
-        self.request.session["ooi_id"] = ooi.primary_key
-        return get_ooi_url("step_clearance_level_introduction", ooi.primary_key, self.organization.code)
+    def form_valid(self, form):
+        cleaned_url = form.cleaned_data["url"]
+        url = URL(network=Network(name="internet").reference, raw=cleaned_url)
+        ooi, _ = get_or_create_ooi(self.octopoes_api_connector, self.bytes_client, url)
+        selection = {"ooi": ooi.primary_key, "report_type": self.request.GET.get("report_type", "")}
+        return redirect(
+            reverse("step_clearance_level_introduction", kwargs={"organization_code": self.organization.code})
+            + get_selection(self.request, selection)
+        )
 
     def build_breadcrumbs(self) -> list[Breadcrumb]:
         return super().build_breadcrumbs() + [
             {
-                "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code}),
+                "url": reverse("ooi_add_type_select", kwargs={"organization_code": self.organization.code})
+                + get_selection(self.request),
                 "text": _("Creating an object"),
             },
         ]
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["type"] = self.ooi_class.get_ooi_type()
+        context["type"] = ""
         return context
 
 
@@ -208,14 +176,14 @@ class OnboardingClearanceLevelIntroductionView(
     permission_required = "tools.can_set_clearance_level"
     current_step = 3
 
-    def get_boefjes_tiles(self):
+    def get_boefjes_tiles(self) -> list[dict[str, Any]]:
         tiles = [
             {
                 "id": "dns_zone",
                 "type": "boefje",
                 "scan_level": "l1",
                 "name": "DNS-Zone",
-                "description": "Fetch the parent DNS zone of a hostname",
+                "description": _("Fetch the parent DNS zone of a hostname"),
                 "enabled": False,
             },
             {
@@ -223,7 +191,7 @@ class OnboardingClearanceLevelIntroductionView(
                 "type": "boefje",
                 "scan_level": "l3",
                 "name": "Fierce",
-                "description": "Finds subdomains by brute force",
+                "description": _("Finds subdomains by brute force"),
                 "enabled": False,
             },
         ]
@@ -231,7 +199,7 @@ class OnboardingClearanceLevelIntroductionView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ooi"] = self.request.GET.get("ooi_id", None)
+        context["ooi"] = self.request.GET.get("ooi", None)
         context["boefjes"] = self.get_boefjes_tiles()
         return context
 
@@ -332,7 +300,10 @@ class OnboardingSetupScanSelectPluginsView(
             try:
                 get_katalogus(self.organization.code).enable_boefje_by_id(selected_plugin)
             except HTTPError:
-                messages.error(request, _("Plugins enabling went wrong."))
+                messages.error(
+                    request,
+                    _("An error occurred while enabling {}. The plugin is not available.").format(selected_plugin),
+                )
                 return self.get(request, *args, **kwargs)
 
         messages.success(request, _("Plugins successfully enabled."))
