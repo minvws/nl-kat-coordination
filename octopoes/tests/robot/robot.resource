@@ -111,7 +111,8 @@ Await Sync
     Wait For XTDB Synced
 
 Get Objects
-    ${response}    Get    ${OCTOPOES_URI}/objects
+    ${params}    Get Valid Time Params
+    ${response}    Get    ${OCTOPOES_URI}/objects    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
     Should Be Equal    ${response.headers["content-type"]}    application/json
     ${response_data}    Set Variable    ${response.json()}
@@ -158,12 +159,18 @@ Recalculate Scan Profiles
 
 Verify Object Present
     [Arguments]    ${reference}
-    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${reference}
+    ${params}    Create Dictionary
+    ...    reference=${reference}
+    ...    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/object    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
 
 Verify Object Not Present
     [Arguments]    ${reference}
-    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${reference}    expected_status=404
+    ${params}    Create Dictionary
+    ...    reference=${reference}
+    ...    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/object    params=${params}    expected_status=404
 
 Create XTDB node
     ${response}    Post    ${OCTOPOES_URI}/node

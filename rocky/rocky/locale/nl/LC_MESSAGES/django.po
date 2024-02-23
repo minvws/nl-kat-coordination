@@ -5,21 +5,22 @@
 # Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2023.
 # 跨性别 <github@lgbt.sh>, 2023.
 # Madelon Dohmen <maddohmen@hotmail.com>, 2023, 2024.
+# PAUL MICHIEL VAN DER BLONK <blonkm@gmail.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 19:01+0000\n"
-"PO-Revision-Date: 2024-01-10 15:06+0000\n"
-"Last-Translator: Madelon Dohmen <maddohmen@hotmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/nl/>\n"
+"POT-Creation-Date: 2024-02-19 15:41+0000\n"
+"PO-Revision-Date: 2024-02-21 19:02+0000\n"
+"Last-Translator: PAUL MICHIEL VAN DER BLONK <blonkm@gmail.com>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -31,6 +32,7 @@ msgstr "Belangrijke datums"
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -304,6 +306,10 @@ msgstr ""
 msgid "date joined"
 msgstr "startdatum"
 
+#: account/models.py
+msgid "name"
+msgstr ""
+
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr "Account gegevens"
@@ -352,8 +358,8 @@ msgid ""
 "                        "
 msgstr ""
 "\n"
-"                            U heeft geen vrijwaring om objecten te "
-"scannen.<br>\n"
+"                            U heeft geen vrijwaring om objecten te scannen."
+"<br>\n"
 "               Neem contact op met de beheerder om u het nodige "
 "vrijwaringsniveau te geven.\n"
 "                        "
@@ -378,14 +384,9 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                            \"Withdraw acceptance of level L%(acl)s "
-"clearance and responsibility\"\n"
+"                            Withdraw L%(acl)s clearance and responsibility\n"
 "                    "
 msgstr ""
-"\n"
-"                            \"Acceptatie van vrijwaringsniveau L%(acl)s en "
-"verantwoordelijkheid intrekken\"\n"
-"                    "
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI clearance"
@@ -401,21 +402,16 @@ msgid ""
 msgstr ""
 "U krijgt vrijwaring voor niveau L%(tcl)s van uw beheerder. Voordat u OOI-"
 "vrijwaringsniveaus kunt wijzigen tot dit niveau, moet u deze toestemming "
-"accepteren. Onthoud: <strong>met grote macht komt grote "
-"verantwoordelijkheid.</strong>"
+"accepteren. Onthoud: <strong>met grote macht komt grote verantwoordelijkheid."
+"</strong>"
 
 #: account/templates/account_detail.html
 #, python-format
 msgid ""
 "\n"
-"                        \"Accept level L%(tcl)s clearance and "
-"responsibility\"\n"
+"                        Accept level L%(tcl)s clearance and responsibility\n"
 "                    "
 msgstr ""
-"\n"
-"                        \"Accepteer vrijwaringsniveau L%(tcl)s en "
-"verantwoordelijkheid\"\n"
-"                    "
 
 #: account/templates/password_reset.html
 msgid "Use the form below to reset your password."
@@ -424,13 +420,13 @@ msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Back"
-msgstr "Terug"
+msgid "Send"
+msgstr "Verstuur"
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Send"
-msgstr "Verstuur"
+msgid "Back"
+msgstr "Terug"
 
 #: account/templates/password_reset_confirm.html
 msgid "Confirm reset password"
@@ -509,12 +505,12 @@ msgid "Please contact the system administrator."
 msgstr "Neem contact op met de systeembeheerder."
 
 #: account/templates/recover_email.html
-msgid "Back to Home"
-msgstr "Terug naar Home"
-
-#: account/templates/recover_email.html
 msgid "Back to login"
 msgstr "Terug naar login"
+
+#: account/templates/recover_email.html
+msgid "Back to Home"
+msgstr "Terug naar Home"
 
 #: account/templates/registration_email.html
 #, python-format
@@ -722,7 +718,7 @@ msgstr "Effect"
 
 #: fmea/forms.py
 msgid "Severity Level"
-msgstr "Beveilgingsnivo"
+msgstr "Beveiligingsnivo"
 
 #: fmea/forms.py
 msgid "Name a possible effect of any type of failure mode that can occur."
@@ -1545,7 +1541,6 @@ msgstr "Plug-in"
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
-#: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr "Waarde"
@@ -1783,24 +1778,6 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting\n"
-"                "
-msgid_plural ""
-"\n"
-"                  Add settings\n"
-"                "
-msgstr[0] ""
-"\n"
-"                  Instelling toevoegen\n"
-"                "
-msgstr[1] ""
-"\n"
-"                  Insellingen toevoegen\n"
-"                "
-
-#: katalogus/templates/plugin_settings_add.html
-msgid ""
-"\n"
 "                  Add setting and enable boefje\n"
 "                "
 msgid_plural ""
@@ -1815,6 +1792,18 @@ msgstr[1] ""
 "\n"
 "                  Instellingen toevoegen en Boefje aanzetten\n"
 "                "
+
+#: katalogus/templates/plugin_settings_add.html
+msgid ""
+"\n"
+"                Add setting\n"
+"              "
+msgid_plural ""
+"\n"
+"                Add settings\n"
+"              "
+msgstr[0] ""
+msgstr[1] ""
 
 #: katalogus/templates/plugin_settings_delete.html
 msgid "Delete settings"
@@ -2249,14 +2238,14 @@ msgstr "Admin details"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Go back to previous step"
-msgstr "Ga terug naar vorige stap"
+msgid "Skip this step"
+msgstr "Sla over"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Skip this step"
-msgstr "Sla over"
+#: onboarding/templates/account/step_6_account_setup_client.html
+msgid "Go back to previous step"
+msgstr "Ga terug naar vorige stap"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer account setup"
@@ -2403,6 +2392,7 @@ msgstr ""
 "heeft gevonden en mogelijke oplossingen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
+#: reports/report_types/dns_report/report.html
 msgid "Data"
 msgstr "Data"
 
@@ -3083,6 +3073,10 @@ msgid "Selected objects"
 msgstr "Geselecteerde objecten"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Currently filtered on"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_summary.html
 msgid "Selected Report Types"
@@ -3234,6 +3228,11 @@ msgid "OpenKAT Aggregate Report"
 msgstr "OpenKAT Geaggregeerd Rapport"
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Export"
+msgstr "Exporteer"
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: rocky/templates/oois/ooi_report.html
 #: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
@@ -3248,11 +3247,15 @@ msgid "This is the OpenKAT report for organization"
 msgstr "Dit is het OpenKAT rapport voor organisatie"
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/templates/partials/report_header.html
+msgid "Created with data from"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Observed at:"
-msgstr "Gezien op:"
+msgid "Created on"
+msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -3378,6 +3381,10 @@ msgstr "Hostnamen gescand"
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Terms in report"
 msgstr "Termen in rapport"
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Observed at:"
+msgstr "Gezien op:"
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/vulnerability_report/report.html
@@ -3574,43 +3581,40 @@ msgstr ""
 "op en beheren deze met behulp van een gestandaardiseerd formaat."
 
 #: reports/report_types/dns_report/report.html
-msgid "IP address lookup"
-msgstr "Ip-adres opzoeken"
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "warning"
-msgstr "waarschuwing"
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
-msgstr "Waarschuwing"
+msgid "Records found"
+msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid ""
-"You have less than one webserver that is reachable over IPv6, which is "
-"<strong>not</strong> in compliance to internet.nl standards."
+"The table below gives an overview of the DNS records that were found for the "
+"abovementioned DNSZone."
 msgstr ""
-"U heeft minder dan één webserver die bereikbaar is over IPv6. Hiermee worden "
-"de standaarden die internet.nl heeft aanbevolen <strong>niet</strong> "
-"nageleefd."
 
 #: reports/report_types/dns_report/report.html
-msgid "Other records found"
-msgstr "Andere gevonden records"
+msgid ""
+"\n"
+"                    <strong>Disclaimer:</strong>\n"
+"                    Not all DNSRecords are parsed in OpenKAT.\n"
+"                    DNS record types that are parsed and could be displayed "
+"in the table are:\n"
+"                "
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "All existing DNS record types can be found here"
+msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Record"
 msgstr "Record"
 
 #: reports/report_types/dns_report/report.html
-msgid "Found by"
-msgstr "Gevonden door"
+msgid "TTL"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "minutes"
+msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Security measures"
@@ -3727,6 +3731,10 @@ msgid "This is the OpenKAT Sector rapport."
 msgstr "Dit is het OpenKAT Sector Rapport."
 
 #: reports/report_types/multi_organization_report/introduction.html
+msgid "Created with date from"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
 msgid "This sector contains"
 msgstr "Deze sector bevat"
 
@@ -3816,6 +3824,14 @@ msgstr "Voorval"
 #: reports/report_types/multi_organization_report/report.py
 msgid "Multi Organization Report"
 msgstr "Multi-Organisatie Rapport"
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Best scoring security check"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Worst scoring security check"
+msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
 msgid ""
@@ -4227,17 +4243,38 @@ msgid "Go to the object page"
 msgstr "Ga naar de objectpagina"
 
 #: reports/templates/partials/report_ooi_list.html
+msgid "explanation select all"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Explanation 'Continue with all OOIs'"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#, python-format
+msgid ""
+"This option will select all OOIs (+ current filters) for %(organization)s "
+"organization."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with all OOIs"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 msgid "Objects:"
 msgstr "Objecten:"
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html
 msgid "Clearance type"
 msgstr "Vrijwaringstype"
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Setup report"
-msgstr "Rapport opstellen"
+#: reports/templates/partials/report_types_selection.html
+msgid "Continue with selection"
+msgstr "Doorgaan met selectie"
 
 #: reports/templates/partials/report_setup_scan.html
 #: rocky/views/organization_add.py
@@ -4342,6 +4379,10 @@ msgstr[0] "Geselecteerd object"
 msgstr[1] "Geselecteerde objecten"
 
 #: reports/templates/partials/report_types_selection.html
+msgid "You have selected all objects in previous step."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
 msgstr "Beschikbare rapporttypes"
 
@@ -4352,10 +4393,6 @@ msgstr "Alle rapporten die beschikbaar zijn voor uw selectie."
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
 msgstr "Selecteer alle rapporttypes"
-
-#: reports/templates/partials/report_types_selection.html
-msgid "Continue with selection"
-msgstr "Doorgaan met selectie"
 
 #: reports/templates/summary/report_summary.html
 msgid "Selected Plugins for scans"
@@ -4393,6 +4430,17 @@ msgstr "Selecteer minstens één OOI om verder te gaan."
 msgid "Select at least one report type to proceed."
 msgstr "Selecteer minstens één rapporttype om door te gaan."
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#, python-format
+msgid ""
+"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+msgstr ""
+
+#: reports/views/base.py
+#, python-format
+msgid "Report type '%s' does not exist."
+msgstr ""
+
 #: reports/views/generate_report.py
 msgid "This report may not show all the data as some plugins are not enabled."
 msgstr ""
@@ -4410,6 +4458,10 @@ msgstr "Selecteer OOI's"
 #: tools/forms/base.py
 msgid "Date"
 msgstr "Datum"
+
+#: tools/forms/base.py
+msgid "The selected date is in the future. Please select a different date."
+msgstr ""
 
 #: tools/forms/boefje.py
 msgid ""
@@ -4675,7 +4727,7 @@ msgstr "Diepte van de boom."
 msgid "Only CSV file supported"
 msgstr "Alleen CSV ondersteund"
 
-#: tools/forms/upload_csv.py tools/forms/upload_raw.py
+#: tools/forms/upload_csv.py
 msgid "File could not be decoded"
 msgstr "Bestand kon niet gedecodeerd worden"
 
@@ -4714,10 +4766,6 @@ msgstr "Objecttype"
 #: tools/forms/upload_oois.py
 msgid "Choose a type of which objects are added."
 msgstr "Selecteer een type waarvan objecten worden toegevoegd."
-
-#: tools/forms/upload_raw.py
-msgid "Organization code(s) for raw does not exist in our database"
-msgstr "Organisatiecode in CSV bestaat niet in onze database"
 
 #: tools/forms/upload_raw.py
 msgid "Mime types"
@@ -5127,6 +5175,18 @@ msgstr "Welkom"
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "User overview:"
 msgstr "Gebruikersoverzicht:"
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "warning"
+msgstr "waarschuwing"
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Warning"
+msgstr "Waarschuwing"
 
 #: rocky/templates/dashboard_redteam.html
 msgid "Organization code missing"
@@ -6252,11 +6312,6 @@ msgid "Upload CSV"
 msgstr "Upload een CSV"
 
 #: rocky/templates/partials/ooi_list_toolbar.html
-#: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "Export"
-msgstr "Exporteer"
-
-#: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Download as JSON"
 msgstr "Sla op als JSON"
 
@@ -6298,7 +6353,7 @@ msgstr "Totaal aantal voorvallen"
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total per severity overview:"
-msgstr ""
+msgstr "Overzicht totalen per ernst:"
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Unique"
@@ -6671,13 +6726,13 @@ msgid "You don't have any backup codes yet."
 msgstr "U heeft nog geen backup codes."
 
 #: rocky/templates/two_factor/core/backup_tokens.html
+msgid "Generate Tokens"
+msgstr "Tokens Genereren"
+
+#: rocky/templates/two_factor/core/backup_tokens.html
 #: rocky/templates/two_factor/core/setup_complete.html
 msgid "Back to Account Security"
 msgstr "Terug naar Accountbeveiliging"
-
-#: rocky/templates/two_factor/core/backup_tokens.html
-msgid "Generate Tokens"
-msgstr "Tokens Genereren"
 
 #: rocky/templates/two_factor/core/login.html
 msgid "You are logged in."
@@ -6933,6 +6988,10 @@ msgstr "Verfraaid"
 #: rocky/views/indemnification_add.py
 msgid "Indemnification successfully set."
 msgstr "Vrijwaringsniveau ingesteld."
+
+#: rocky/views/mixins.py
+msgid "The selected date is in the future."
+msgstr ""
 
 #: rocky/views/mixins.py
 msgid "Can not parse date, falling back to show current date."
@@ -7276,6 +7335,13 @@ msgstr ""
 "optioneel wordt een tweede kolom 'netwerk' ondersteund "
 
 #: rocky/views/upload_csv.py
+msgid ""
+"Clearance levels can be controlled by a column 'clearance' taking numerical "
+"values 0, 1, 2, 3, and 4 for the corresponding clearance level (other values "
+"are ignored) "
+msgstr ""
+
+#: rocky/views/upload_csv.py
 msgid "Object(s) could not be created for row number(s): "
 msgstr "Object(en) konden niet worden aangemaakt voor rijnummer(s): "
 
@@ -7291,6 +7357,70 @@ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                            \"Withdraw acceptance of level L%(acl)s "
+#~ "clearance and responsibility\"\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                            \"Acceptatie van vrijwaringsniveau L%(acl)s "
+#~ "en verantwoordelijkheid intrekken\"\n"
+#~ "                    "
+
+#, python-format
+#~ msgid ""
+#~ "\n"
+#~ "                        \"Accept level L%(tcl)s clearance and "
+#~ "responsibility\"\n"
+#~ "                    "
+#~ msgstr ""
+#~ "\n"
+#~ "                        \"Accepteer vrijwaringsniveau L%(tcl)s en "
+#~ "verantwoordelijkheid\"\n"
+#~ "                    "
+
+#~ msgid ""
+#~ "\n"
+#~ "                  Add setting\n"
+#~ "                "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                  Add settings\n"
+#~ "                "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                  Instelling toevoegen\n"
+#~ "                "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                  Insellingen toevoegen\n"
+#~ "                "
+
+#~ msgid "IP address lookup"
+#~ msgstr "Ip-adres opzoeken"
+
+#~ msgid ""
+#~ "You have less than one webserver that is reachable over IPv6, which is "
+#~ "<strong>not</strong> in compliance to internet.nl standards."
+#~ msgstr ""
+#~ "U heeft minder dan één webserver die bereikbaar is over IPv6. Hiermee "
+#~ "worden de standaarden die internet.nl heeft aanbevolen <strong>niet</"
+#~ "strong> nageleefd."
+
+#~ msgid "Other records found"
+#~ msgstr "Andere gevonden records"
+
+#~ msgid "Found by"
+#~ msgstr "Gevonden door"
+
+#~ msgid "Setup report"
+#~ msgstr "Rapport opstellen"
+
+#~ msgid "Organization code(s) for raw does not exist in our database"
+#~ msgstr "Organisatiecode in CSV bestaat niet in onze database"
 
 #~ msgid "Scan OOI"
 #~ msgstr "Scan OOI"
