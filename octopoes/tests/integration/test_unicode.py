@@ -15,11 +15,11 @@ from octopoes.models.origin import OriginType
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
-use_unicode = False
+use_unicode = True
 names = ["🐱", "★.com", "🐈"] if use_unicode else ["cat", "xn--p3h.com", "boefje"]
 
 
-def test_unicode_operations(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+def test_unicode_network(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name=names[0])
     octopoes_api_connector.save_declaration(
         Declaration(
@@ -27,6 +27,21 @@ def test_unicode_operations(octopoes_api_connector: OctopoesAPIConnector, valid_
             valid_time=valid_time,
         )
     )
+
+    time.sleep(1)
+
+    assert octopoes_api_connector.list_objects(types={Network}, valid_time=valid_time).count == 1
+
+
+def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+    network = Network(name="internet")
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=network,
+            valid_time=valid_time,
+        )
+    )
+
     hostname = Hostname(network=network.reference, name=names[1])
     task_id = uuid.uuid4()
 
@@ -43,10 +58,8 @@ def test_unicode_operations(octopoes_api_connector: OctopoesAPIConnector, valid_
     scanprof = DeclaredScanProfile(reference=hostname.reference, level=ScanLevel.L2)
     octopoes_api_connector.save_scan_profile(scanprof, valid_time)
 
-    time.sleep(3)
+    time.sleep(1)
 
-    assert octopoes_api_connector.list_objects(types={Network}, valid_time=valid_time).count == 1
-    assert octopoes_api_connector.list_objects(types={Hostname}, valid_time=valid_time).count == 1
     assert octopoes_api_connector.list_objects(types={Network, Hostname}, valid_time=valid_time).count == 2
 
     origins = octopoes_api_connector.list_origins(task_id=task_id, valid_time=valid_time)
