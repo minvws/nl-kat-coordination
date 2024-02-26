@@ -19,14 +19,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
 from requests import Response
-from tools.models import (
-    GROUP_ADMIN,
-    GROUP_CLIENT,
-    GROUP_REDTEAM,
-    Indemnification,
-    Organization,
-    OrganizationMember,
-)
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
