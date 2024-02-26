@@ -44,7 +44,8 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     input_ooi = Reference.from_str(boefje_meta.input_ooi)
     output = json.loads(raw)
-
+    if not output:
+        return
     tls_dict = {}
     for item in output:
         cipher = parse_cipher(item)

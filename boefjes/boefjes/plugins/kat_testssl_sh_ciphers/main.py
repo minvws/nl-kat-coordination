@@ -2,6 +2,7 @@ import logging
 from ipaddress import ip_address
 
 import docker
+from requests import RequestException
 
 from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
@@ -26,13 +27,14 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         detach=True,
     )
 
-    container.wait()
-
-    output = get_file_from_container(container, "tmp/output.json")
-
     try:
+        container.wait(timeout=300)
+        output = get_file_from_container(container, "tmp/output.json")
+    except (docker.errors.DockerException, RequestException) as e:
+        logging.warning("DockerException occurred: %s", e)
+        container.stop()
+        output = ""
+    finally:
         container.remove()
-    except Exception as e:
-        logging.warning(e)
 
     return [(set(), output)]
