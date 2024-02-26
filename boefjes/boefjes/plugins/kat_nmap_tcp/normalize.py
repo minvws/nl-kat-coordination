@@ -6,14 +6,7 @@ from libnmap.parser import NmapParser
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.network import (
-    IPAddressV4,
-    IPAddressV6,
-    IPPort,
-    Network,
-    PortState,
-    Protocol,
-)
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.service import IPService, Service
 
 
@@ -26,7 +19,6 @@ def get_ip_ports_and_service(host: NmapHost, network: Network, netblock: Referen
             if host.ipv4
             else IPAddressV6(network=network.reference, address=host.address, netblock=netblock)
         )
-        yield ip
 
         for port, protocol in open_ports:
             service: NmapService = host.get_service(port, protocol)

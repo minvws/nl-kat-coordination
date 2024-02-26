@@ -1,14 +1,14 @@
 import uuid
 from collections import Counter
 from collections.abc import Generator
-from datetime import datetime, timezone
+from datetime import datetime
 from logging import getLogger
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
 from pydantic import AwareDatetime
 from requests import RequestException
 
-from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
+from octopoes.api.models import ServiceHealth, ValidatedAffirmation, ValidatedDeclaration, ValidatedObservation
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
@@ -19,14 +19,7 @@ from octopoes.config.settings import (
 )
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfile,
-    ScanProfileBase,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileBase, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
@@ -50,13 +43,7 @@ def extract_client(client: str = Path(...)) -> str:
     return client
 
 
-def extract_valid_time(valid_time: AwareDatetime | None = Query(None)) -> datetime:
-    if valid_time is None:
-        return datetime.now(timezone.utc)
-    return valid_time
-
-
-def extract_required_valid_time(valid_time: AwareDatetime) -> datetime:
+def extract_valid_time(valid_time: AwareDatetime) -> datetime:
     return valid_time
 
 
@@ -294,9 +281,25 @@ def save_declaration(
         method=declaration.method if declaration.method else "manual",
         source=declaration.ooi.reference,
         result=[declaration.ooi.reference],
-        task_id=declaration.task_id if declaration.task_id else str(uuid.uuid4()),
+        task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
     )
     octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time)
+    octopoes.commit()
+
+
+@router.post("/affirmations", tags=["Origins"])
+def save_affirmation(
+    affirmation: ValidatedAffirmation,
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> None:
+    origin = Origin(
+        origin_type=OriginType.AFFIRMATION,
+        method=affirmation.method if affirmation.method else "hydration",
+        source=affirmation.ooi.reference,
+        result=[affirmation.ooi.reference],
+        task_id=affirmation.task_id if affirmation.task_id else uuid.uuid4(),
+    )
+    octopoes.save_origin(origin, [affirmation.ooi], affirmation.valid_time)
     octopoes.commit()
 
 
@@ -314,7 +317,7 @@ def list_scan_profiles(
 def save_scan_profile(
     scan_profile: ScanProfile = Body(discriminator="scan_profile_type"),
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_required_valid_time),
+    valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     try:
         old_scan_profile = octopoes.scan_profile_repository.get(scan_profile.reference, valid_time)
@@ -345,7 +348,7 @@ def save_many(
 @router.get("/scan_profiles/recalculate", tags=["Scan Profiles"])
 def recalculate_scan_profiles(
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_required_valid_time),
+    valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     octopoes.recalculate_scan_profiles(valid_time)
     octopoes.commit()

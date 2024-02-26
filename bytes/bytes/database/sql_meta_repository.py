@@ -9,15 +9,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from bytes.config import Settings, get_settings
 from bytes.database.db import SQL_BASE, get_engine
 from bytes.database.db_models import BoefjeMetaInDB, NormalizerMetaInDB, RawFileInDB, SigningProviderInDB
-from bytes.models import (
-    Boefje,
-    BoefjeMeta,
-    MimeType,
-    Normalizer,
-    NormalizerMeta,
-    RawData,
-    RawDataMeta,
-)
+from bytes.models import Boefje, BoefjeMeta, MimeType, Normalizer, NormalizerMeta, RawData, RawDataMeta
 from bytes.raw.file_raw_repository import create_raw_repository
 from bytes.repositories.hash_repository import HashRepository
 from bytes.repositories.meta_repository import BoefjeMetaFilter, MetaDataRepository, NormalizerMetaFilter, RawDataFilter
@@ -235,7 +227,7 @@ def create_meta_data_repository() -> Iterator[MetaDataRepository]:
 
 
 class ObjectNotFoundException(Exception):
-    def __init__(self, cls: type[SQL_BASE], **kwargs):  # type: ignore
+    def __init__(self, cls: type[SQL_BASE], **kwargs):
         super().__init__(f"The object of type {cls} was not found for query parameters {kwargs}")
 
 

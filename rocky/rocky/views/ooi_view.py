@@ -1,7 +1,8 @@
+from datetime import datetime, timezone
 from time import sleep
 from typing import Any
 
-from django import http
+from django import forms, http
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -17,13 +18,7 @@ from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PRO
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types, type_by_name
-from rocky.views.mixins import (
-    ConnectorFormMixin,
-    OctopoesView,
-    OOIList,
-    SingleOOIMixin,
-    SingleOOITreeMixin,
-)
+from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
 
 
 class OOIFilterView(ConnectorFormMixin, OctopoesView):
@@ -38,7 +33,6 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.valid_time = self.get_observed_at()
         self.filtered_ooi_types = request.GET.getlist("ooi_type", [])
         self.clearance_levels = request.GET.getlist("clearance_level", [])
         self.clearance_types = request.GET.getlist("clearance_type", [])
@@ -71,7 +65,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observed_at"] = self.valid_time
+        context["observed_at"] = self.observed_at
         context["observed_at_form"] = self.get_connector_form()
 
         context["ooi_types_selection"] = self.filtered_ooi_types
@@ -93,7 +87,7 @@ class BaseOOIListView(OOIFilterView, ListView):
         return OOIList(
             self.octopoes_api_connector,
             ooi_types=self.get_ooi_types(),
-            valid_time=self.get_observed_at(),
+            valid_time=self.observed_at,
             scan_level=self.get_ooi_scan_levels(),
             scan_profile_type=self.get_ooi_profile_types(),
         )
@@ -101,7 +95,7 @@ class BaseOOIListView(OOIFilterView, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["total_oois"] = len(self.object_list)  # will be auto set on get_queryset()
+        context["total_oois"] = len(self.object_list)
         return context
 
 
@@ -115,11 +109,12 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
 
         context["ooi"] = self.ooi
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["observed_at"] = self.get_observed_at()
+        context["observed_at"] = self.observed_at
 
         return context
 
     def build_breadcrumbs(self) -> list[Breadcrumb]:
+        start: Breadcrumb
         if isinstance(self.ooi, Finding):
             start = {
                 "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),
@@ -140,8 +135,8 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
 
 
 class BaseOOIFormView(SingleOOIMixin, FormView):
-    ooi_class: type[OOI] = None
-    form_class = OOIForm
+    ooi_class: type[OOI]
+    form_class: forms.Form = OOIForm
 
     def get_ooi_class(self):
         return self.ooi.__class__ if hasattr(self, "ooi") else None
@@ -169,7 +164,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         # Transform into OOI
         try:
             new_ooi = self.ooi_class.parse_obj(form.cleaned_data)
-            create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi)
+            create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi, datetime.now(timezone.utc))
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))
         except ValidationError as exception:

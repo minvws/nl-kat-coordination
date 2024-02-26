@@ -9,4 +9,4 @@ class Migration(migrations.Migration):
         ("tools", "0030_auto_20230227_1458"),
     ]
 
-    operations = []
+    operations: list = []

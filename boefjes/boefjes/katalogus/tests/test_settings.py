@@ -4,7 +4,6 @@ from unittest import TestCase
 from nacl.public import PrivateKey
 
 from boefjes.katalogus.dependencies.encryption import NaclBoxMiddleware
-from boefjes.katalogus.models import Base64Str
 
 
 class TestSettingsEncryption(TestCase):
@@ -12,7 +11,7 @@ class TestSettingsEncryption(TestCase):
         sk = PrivateKey.generate()
         sk_b64 = base64.b64encode(bytes(sk)).decode()
         pub_b64 = base64.b64encode(bytes(sk.public_key)).decode()
-        self.encryption = NaclBoxMiddleware(private_key=Base64Str(sk_b64), public_key=Base64Str(pub_b64))
+        self.encryption = NaclBoxMiddleware(private_key=sk_b64, public_key=pub_b64)
 
     def test_encode_decode(self):
         msg = "The president is taking the underpass"

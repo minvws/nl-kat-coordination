@@ -197,6 +197,9 @@ class RabbitMQ(Listener):
         self.logger.debug("RabbitMQ connection closed")
 
     def _close_callback(self):
-        self.channel.stop_consuming()
-        self.channel.close()
-        self.connection.close()
+        if self.channel:
+            self.channel.stop_consuming()
+            self.channel.close()
+
+        if self.connection:
+            self.connection.close()

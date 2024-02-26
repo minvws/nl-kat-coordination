@@ -2,14 +2,7 @@ from __future__ import annotations
 
 import abc
 from enum import Enum, IntEnum
-from typing import (
-    Any,
-    ClassVar,
-    Literal,
-    Optional,
-    TypeVar,
-    Union,
-)
+from typing import Any, ClassVar, Literal, TypeVar
 
 from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema

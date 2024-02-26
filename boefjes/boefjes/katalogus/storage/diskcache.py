@@ -3,10 +3,7 @@ from pathlib import Path
 from diskcache import Cache
 
 from boefjes.katalogus.models import Organisation, Repository
-from boefjes.katalogus.storage.interfaces import (
-    OrganisationStorage,
-    RepositoryStorage,
-)
+from boefjes.katalogus.storage.interfaces import OrganisationStorage, RepositoryStorage
 
 # todo: improve duplicate code
 

@@ -6,7 +6,7 @@ from functools import cached_property
 import requests.exceptions
 from account.mixins import OrganizationView
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, get_katalogus
@@ -14,13 +14,8 @@ from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
 from tools.models import Organization
-from tools.ooi_helpers import (
-    get_knowledge_base_data_for_ooi_store,
-)
-from tools.view_helpers import (
-    convert_date_to_datetime,
-    get_ooi_url,
-)
+from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
+from tools.view_helpers import convert_date_to_datetime, get_ooi_url
 
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -54,14 +49,23 @@ class OOIAttributeError(AttributeError):
 
 
 class ObservedAtMixin:
-    def get_observed_at(self) -> datetime:
+    request: HttpRequest
+
+    @cached_property
+    def observed_at(self) -> datetime:
         observed_at = self.request.GET.get("observed_at", None)
         if not observed_at:
             return datetime.now(timezone.utc)
 
         try:
             datetime_format = "%Y-%m-%d"
-            return convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
+            date_time = convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
+            if date_time.date() > datetime.now(timezone.utc).date():
+                messages.warning(
+                    self.request,
+                    _("The selected date is in the future."),
+                )
+            return date_time
         except ValueError:
             try:
                 ret = datetime.fromisoformat(observed_at)
@@ -75,29 +79,21 @@ class ObservedAtMixin:
 
 
 class OctopoesView(ObservedAtMixin, OrganizationView):
-    def get_single_ooi(self, pk: str, observed_at: datetime | None = None) -> OOI:
+    def get_single_ooi(self, pk: str) -> OOI:
         try:
             ref = Reference.from_str(pk)
-            return self.octopoes_api_connector.get(ref, valid_time=observed_at)
+            return self.octopoes_api_connector.get(ref, valid_time=self.observed_at)
         except Exception as e:
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
-            self.handle_connector_exception(e)
-
-    def get_ooi_tree(self, pk: str, depth: int, observed_at: datetime | None = None) -> ReferenceTree:
-        try:
-            ref = Reference.from_str(pk)
-            return self.octopoes_api_connector.get_tree(ref, depth=depth, valid_time=observed_at)
-        except Exception as e:
             self.handle_connector_exception(e)
 
     def get_origins(
         self,
         reference: Reference,
-        valid_time: datetime | None,
         organization: Organization,
     ) -> tuple[list[OriginData], list[OriginData], list[OriginData]]:
         try:
-            origins = self.octopoes_api_connector.list_origins(valid_time, result=reference)
+            origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
@@ -130,15 +126,8 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
 
         raise exception
 
-    def get_depth(self, default_depth=DEPTH_DEFAULT) -> int:
-        try:
-            depth = int(self.request.GET.get("depth", default_depth))
-            return min(depth, DEPTH_MAX)
-        except ValueError:
-            return default_depth
-
     def get_scan_profile_inheritance(self, ooi: OOI) -> list[InheritanceSection]:
-        return self.octopoes_api_connector.get_scan_profile_inheritance(ooi.reference)
+        return self.octopoes_api_connector.get_scan_profile_inheritance(ooi.reference, self.observed_at)
 
 
 class OOIList:
@@ -223,9 +212,9 @@ class FindingList:
     def count(self) -> int:
         return self.octopoes_connector.list_findings(
             severities=self.severities,
+            valid_time=self.valid_time,
             exclude_muted=self.exclude_muted,
             only_muted=self.only_muted,
-            valid_time=self.valid_time,
             limit=0,
         ).count
 
@@ -240,9 +229,9 @@ class FindingList:
                 limit = key.stop - offset
             findings = self.octopoes_connector.list_findings(
                 severities=self.severities,
+                valid_time=self.valid_time,
                 exclude_muted=self.exclude_muted,
                 only_muted=self.only_muted,
-                valid_time=self.valid_time,
                 offset=offset,
                 limit=limit,
             ).items
@@ -267,17 +256,14 @@ class FindingList:
 
 
 class ConnectorFormMixin:
-    connector_form_class: type[ObservedAtForm] = None
-    connector_form_initial = {}
+    connector_form_class: type[ObservedAtForm]
+    request: HttpRequest
 
     def get_connector_form_kwargs(self) -> dict:
-        kwargs = {
-            "initial": self.connector_form_initial.copy(),
-        }
-
         if "observed_at" in self.request.GET:
-            kwargs.update({"data": self.request.GET})
-        return kwargs
+            return {"data": self.request.GET}
+        else:
+            return {}
 
     def get_connector_form(self) -> ObservedAtForm:
         return self.connector_form_class(**self.get_connector_form_kwargs())
@@ -285,7 +271,6 @@ class ConnectorFormMixin:
 
 class SingleOOIMixin(OctopoesView):
     ooi: OOI
-    tree: ReferenceTree
 
     def get_ooi_id(self) -> str:
         if "ooi_id" not in self.request.GET:
@@ -293,11 +278,11 @@ class SingleOOIMixin(OctopoesView):
 
         return self.request.GET["ooi_id"]
 
-    def get_ooi(self, pk: str | None = None, observed_at: datetime | None = None) -> OOI:
+    def get_ooi(self, pk: str | None = None) -> OOI:
         if pk is None:
             pk = self.get_ooi_id()
 
-        return self.get_single_ooi(pk, observed_at)
+        return self.get_single_ooi(pk)
 
     def get_breadcrumb_list(self):
         start = {
@@ -336,25 +321,33 @@ class SingleOOIMixin(OctopoesView):
 class SingleOOITreeMixin(SingleOOIMixin):
     tree: ReferenceTree
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.depth = self.get_depth()
+    def get_depth(self):
+        try:
+            return min(int(self.request.GET.get("depth", DEPTH_DEFAULT)), DEPTH_MAX)
+        except ValueError:
+            return DEPTH_DEFAULT
 
-    def get_ooi(self, pk: str = None, observed_at: datetime | None = None) -> OOI:
+    def get_ooi(self, pk: str | None = None, observed_at: datetime | None = None) -> OOI:
         if pk is None:
             pk = self.get_ooi_id()
 
         if observed_at is None:
-            observed_at = self.get_observed_at()
+            observed_at = self.observed_at
 
-        return self.get_object_from_tree(pk, observed_at)
+        ref = Reference.from_str(pk)
+        depth = self.get_depth()
 
-    def get_object_from_tree(self, pk: str, observed_at: datetime | None = None) -> OOI:
-        self.tree = self.get_ooi_tree(pk, self.depth, observed_at)
+        try:
+            self.tree = self.octopoes_api_connector.get_tree(ref, valid_time=observed_at, depth=depth)
+        except Exception as e:
+            self.handle_connector_exception(e)
+
         return self.tree.store[str(self.tree.root.reference)]
 
 
 class SeveritiesMixin:
+    request: HttpRequest
+
     def get_severities(self) -> set[RiskLevelSeverity]:
         severities = set()
         for severity in self.request.GET.getlist("severity"):

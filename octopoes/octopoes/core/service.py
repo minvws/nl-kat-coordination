@@ -14,13 +14,7 @@ from octopoes.config.settings import (
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     Settings,
 )
-from octopoes.events.events import (
-    DBEvent,
-    OOIDBEvent,
-    OriginDBEvent,
-    OriginParameterDBEvent,
-    ScanProfileDBEvent,
-)
+from octopoes.events.events import DBEvent, OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent
 from octopoes.models import (
     OOI,
     DeclaredScanProfile,
@@ -147,7 +141,10 @@ class OctopoesService:
         origin.result = [ooi.reference for ooi in oois]
 
         # When an Origin is saved while the source OOI does not exist, reject saving the results
-        if origin.origin_type != OriginType.DECLARATION and origin.source not in origin.result:
+        if (
+            origin.origin_type not in [OriginType.DECLARATION, OriginType.AFFIRMATION]
+            and origin.source not in origin.result
+        ):
             try:
                 self.ooi_repository.get(origin.source, valid_time)
             except ObjectNotFoundException:

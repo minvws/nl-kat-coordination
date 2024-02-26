@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -104,7 +104,7 @@ def get_ooi_dict(ooi: OOI) -> dict:
 
 
 def get_tree_meta(tree_node: dict, depth: int, location: str) -> dict:
-    tree_meta = {
+    tree_meta: dict[str, Any] = {
         "depth": depth,
         "location": location,
         "child_count": "0",  # TO_DO ? child_count doesn't exist in template if not a string
@@ -237,29 +237,16 @@ OOI_TYPES_WITHOUT_FINDINGS = [name for name, cls_ in OOI_TYPES.items() if cls_ n
 
 
 def get_or_create_ooi(
-    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime = None
-) -> tuple[OOI, bool | datetime]:
-    _now = datetime.now(timezone.utc)
-    if observed_at is None:
-        observed_at = _now
-
+    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime
+) -> tuple[OOI, bool]:
     try:
         return api_connector.get(ooi.reference, observed_at), False
     except ObjectNotFoundException:
-        if observed_at < _now:
-            # don't create an OOI when expected observed_at is in the past
-            raise ValueError(f"OOI not found and unable to create at {observed_at}")
-
         create_ooi(api_connector, bytes_client, ooi, observed_at)
-        return ooi, datetime.now(timezone.utc)
+        return ooi, True
 
 
-def create_ooi(
-    api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime = None
-) -> None:
-    if observed_at is None:
-        observed_at = datetime.now(timezone.utc)
-
+def create_ooi(api_connector: OctopoesAPIConnector, bytes_client: BytesClient, ooi: OOI, observed_at: datetime) -> None:
     task_id = uuid4()
     declaration = Declaration(ooi=ooi, valid_time=observed_at, task_id=str(task_id))
     bytes_client.add_manual_proof(task_id, BytesClient.raw_from_declarations([declaration]))

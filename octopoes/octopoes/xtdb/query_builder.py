@@ -1,10 +1,7 @@
 import re
 from collections.abc import Iterator
 
-from octopoes.xtdb.related_field_generator import (
-    FieldSet,
-    RelatedFieldNode,
-)
+from octopoes.xtdb.related_field_generator import FieldSet, RelatedFieldNode
 
 
 def join_csv(values: Iterator[any]) -> str:

@@ -1,4 +1,5 @@
 import json
+from collections.abc import Set
 from datetime import datetime
 from uuid import UUID
 
@@ -6,7 +7,7 @@ import requests
 from pydantic import TypeAdapter
 from requests import HTTPError, Response
 
-from octopoes.api.models import Declaration, Observation, ServiceHealth
+from octopoes.api.models import Affirmation, Declaration, Observation, ServiceHealth
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
@@ -14,13 +15,7 @@ from octopoes.config.settings import (
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
 )
 from octopoes.connector import DecodeException, RemoteException
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfile,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
@@ -54,12 +49,12 @@ class OctopoesAPISession(requests.Session):
 
     def request(
         self,
-        method: str,
+        method: str | bytes,
         url: str | bytes,
-        params: dict | None = None,
+        *args,
         **kwargs,
     ) -> requests.Response:
-        response = super().request(method, f"{self._base_uri}{url}", params, **kwargs)
+        response = super().request(method, f"{self._base_uri}{str(url)}", *args, **kwargs)
         self._verify_response(response)
         return response
 
@@ -90,15 +85,15 @@ class OctopoesAPIConnector:
     def list_objects(
         self,
         types: set[type[OOI]],
-        valid_time: datetime | None = None,
+        valid_time: datetime,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
         scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOIType]:
-        params = {
+        params: dict[str, str | int | list[str] | set[str]] = {
             "types": [t.__name__ for t in types],
-            "valid_time": valid_time,
+            "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
             "scan_level": {s.value for s in scan_level},
@@ -107,10 +102,10 @@ class OctopoesAPIConnector:
         res = self.session.get(f"/{self.client}/objects", params=params)
         return TypeAdapter(Paginated[OOIType]).validate_json(res.content)
 
-    def get(self, reference: Reference, valid_time: datetime | None = None) -> OOI:
+    def get(self, reference: Reference, valid_time: datetime) -> OOI:
         res = self.session.get(
             f"/{self.client}/object",
-            params={"reference": str(reference), "valid_time": valid_time},
+            params={"reference": str(reference), "valid_time": str(valid_time)},
         )
         return TypeAdapter(OOIType).validate_json(res.content)
 
@@ -125,43 +120,37 @@ class OctopoesAPIConnector:
         limit: int | None = None,
         indices: list[int] | None = None,
     ) -> list[TransactionRecord]:
-        res = self.session.get(
-            f"/{self.client}/object-history",
-            params={
-                "reference": str(reference),
-                "sort_order": sort_order,
-                "with_docs": with_docs,
-                "has_doc": has_doc,
-                "offset": offset,
-                "limit": limit,
-                "indices": indices,
-            },
-        )
+        params: dict[str, str | int | list[int] | None] = {
+            "reference": str(reference),
+            "sort_order": sort_order,
+            "with_docs": with_docs,
+            "has_doc": has_doc,
+            "offset": offset,
+            "limit": limit,
+            "indices": indices,
+        }
+        res = self.session.get(f"/{self.client}/object-history", params=params)
         return TypeAdapter(list[TransactionRecord]).validate_json(res.content)
 
     def get_tree(
         self,
         reference: Reference,
-        types: set | None = None,
-        depth: int | None = 1,
-        valid_time: datetime | None = None,
+        valid_time: datetime,
+        types: Set = frozenset(),
+        depth: int = 1,
     ) -> ReferenceTree:
-        if types is None:
-            types = set()
-        res = self.session.get(
-            f"/{self.client}/tree",
-            params={
-                "reference": str(reference),
-                "types": [t.__name__ for t in types],
-                "depth": depth,
-                "valid_time": valid_time,
-            },
-        )
+        params: dict[str, str | int | list[str]] = {
+            "reference": str(reference),
+            "types": [t.__name__ for t in types],
+            "depth": depth,
+            "valid_time": str(valid_time),
+        }
+        res = self.session.get(f"/{self.client}/tree", params=params)
         return ReferenceTree.model_validate_json(res.content)
 
     def list_origins(
         self,
-        valid_time: datetime | None = None,
+        valid_time: datetime,
         source: Reference | None = None,
         result: Reference | None = None,
         task_id: UUID | None = None,
@@ -170,7 +159,7 @@ class OctopoesAPIConnector:
         res = self.session.get(
             f"/{self.client}/origins",
             params={
-                "valid_time": valid_time,
+                "valid_time": str(valid_time),
                 "source": source,
                 "result": result,
                 "task_id": str(task_id) if task_id else None,
@@ -186,28 +175,31 @@ class OctopoesAPIConnector:
     def save_declaration(self, declaration: Declaration) -> None:
         self.session.post(f"/{self.client}/declarations", data=declaration.model_dump_json())
 
+    def save_affirmation(self, affirmation: Affirmation) -> None:
+        self.session.post(f"/{self.client}/affirmations", data=affirmation.model_dump_json())
+
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
         self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.model_dump_json())
 
-    def save_many_scan_profiles(self, scan_profiles: list[ScanProfile], valid_time: datetime | None = None) -> None:
-        params = {"valid_time": valid_time}
+    def save_many_scan_profiles(self, scan_profiles: list[ScanProfile], valid_time: datetime) -> None:
+        params = {"valid_time": str(valid_time)}
         self.session.post(
             f"/{self.client}/scan_profiles/save_many",
             params=params,
             json=[json.loads(scan_profile.model_dump_json()) for scan_profile in scan_profiles],
         )
 
-    def delete(self, reference: Reference, valid_time: datetime | None = None) -> None:
-        params = {"reference": str(reference), "valid_time": valid_time}
+    def delete(self, reference: Reference, valid_time: datetime) -> None:
+        params = {"reference": str(reference), "valid_time": str(valid_time)}
         self.session.delete(f"/{self.client}/", params=params)
 
-    def delete_many(self, references: list[Reference], valid_time: datetime | None = None) -> None:
-        params = {"valid_time": valid_time}
+    def delete_many(self, references: list[Reference], valid_time: datetime) -> None:
+        params = {"valid_time": str(valid_time)}
         self.session.post(f"/{self.client}/objects/delete_many", params=params, json=[str(ref) for ref in references])
 
-    def list_origin_parameters(self, origin_id: set[str], valid_time: datetime | None = None) -> list[OriginParameter]:
-        params = {"origin_id": origin_id, "valid_time": valid_time}
+    def list_origin_parameters(self, origin_id: set[str], valid_time: datetime) -> list[OriginParameter]:
+        params = {"origin_id": origin_id, "valid_time": str(valid_time)}
         res = self.session.get(f"/{self.client}/origin_parameters", params=params)
         return TypeAdapter(list[OriginParameter]).validate_json(res.content)
 
@@ -217,29 +209,27 @@ class OctopoesAPIConnector:
     def delete_node(self):
         self.session.delete(f"/{self.client}/node")
 
-    def get_scan_profile_inheritance(
-        self, reference: Reference, valid_time: datetime | None = None
-    ) -> list[InheritanceSection]:
-        params = {"reference": str(reference), "valid_time": valid_time}
+    def get_scan_profile_inheritance(self, reference: Reference, valid_time: datetime) -> list[InheritanceSection]:
+        params = {"reference": str(reference), "valid_time": str(valid_time)}
         res = self.session.get(f"/{self.client}/scan_profiles/inheritance", params=params)
         return TypeAdapter(list[InheritanceSection]).validate_json(res.content)
 
-    def count_findings_by_severity(self, valid_time: datetime | None = None) -> dict[str, int]:
-        params = {"valid_time": valid_time}
+    def count_findings_by_severity(self, valid_time: datetime) -> dict[str, int]:
+        params = {"valid_time": str(valid_time)}
         res = self.session.get(f"/{self.client}/findings/count_by_severity", params=params)
         return res.json()
 
     def list_findings(
         self,
         severities: set[RiskLevelSeverity],
+        valid_time: datetime,
         exclude_muted: bool = True,
         only_muted: bool = False,
-        valid_time: datetime | None = None,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
     ) -> Paginated[Finding]:
-        params = {
-            "valid_time": valid_time,
+        params: dict[str, str | int | list[str] | set[str]] = {
+            "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
             "severities": {s.value for s in severities},
@@ -272,7 +262,7 @@ class OctopoesAPIConnector:
         params = {
             "path": path,
             "source": source,
-            "valid_time": valid_time,
+            "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
         }

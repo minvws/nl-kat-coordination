@@ -3,13 +3,7 @@ from django.contrib.auth.models import Group
 from django.core.management import BaseCommand
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
-from tools.models import (
-    GROUP_ADMIN,
-    GROUP_CLIENT,
-    GROUP_REDTEAM,
-    Organization,
-    OrganizationMember,
-)
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 
 User = get_user_model()
 
@@ -26,7 +20,7 @@ class Command(BaseCommand):
 
 
 def add_superuser(email: str, password: str):
-    user_kwargs = {
+    user_kwargs: dict[str, str | bool] = {
         "email": email,
         "password": password,
         "full_name": "End-to-end Superuser",
@@ -38,7 +32,7 @@ def add_superuser(email: str, password: str):
 
 
 def add_test_user(email: str, password: str, group_name: str | None = None):
-    user_kwargs = {
+    user_kwargs: dict[str, str | bool] = {
         "email": email,
         "password": password,
         "full_name": "End-to-end user",
@@ -47,7 +41,7 @@ def add_test_user(email: str, password: str, group_name: str | None = None):
     add_user(user_kwargs, group_name)
 
 
-def add_user(user_kwargs: dict[str, str], group_name: str | None = None):
+def add_user(user_kwargs: dict[str, str | bool], group_name: str | None = None):
     """
     Creates a test user with the given user_kwargs.
     User is optionally added to group group_name.

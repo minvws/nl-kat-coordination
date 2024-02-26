@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 19:01+0000\n"
+"POT-Creation-Date: 2024-02-19 15:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -26,6 +26,7 @@ msgstr ""
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -285,6 +286,10 @@ msgstr ""
 msgid "date joined"
 msgstr ""
 
+#: account/models.py
+msgid "name"
+msgstr ""
+
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr ""
@@ -351,8 +356,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                            \"Withdraw acceptance of level L%(acl)s "
-"clearance and responsibility\"\n"
+"                            Withdraw L%(acl)s clearance and responsibility\n"
 "                    "
 msgstr ""
 
@@ -373,8 +377,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        \"Accept level L%(tcl)s clearance and "
-"responsibility\"\n"
+"                        Accept level L%(tcl)s clearance and responsibility\n"
 "                    "
 msgstr ""
 
@@ -384,12 +387,12 @@ msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Back"
+msgid "Send"
 msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Send"
+msgid "Back"
 msgstr ""
 
 #: account/templates/password_reset_confirm.html
@@ -463,11 +466,11 @@ msgid "Please contact the system administrator."
 msgstr ""
 
 #: account/templates/recover_email.html
-msgid "Back to Home"
+msgid "Back to login"
 msgstr ""
 
 #: account/templates/recover_email.html
-msgid "Back to login"
+msgid "Back to Home"
 msgstr ""
 
 #: account/templates/registration_email.html
@@ -1426,7 +1429,6 @@ msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
-#: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr ""
@@ -1634,11 +1636,11 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting\n"
+"                  Add setting and enable boefje\n"
 "                "
 msgid_plural ""
 "\n"
-"                  Add settings\n"
+"                  Add settings and enable boefje\n"
 "                "
 msgstr[0] ""
 msgstr[1] ""
@@ -1646,12 +1648,12 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting and enable boefje\n"
-"                "
+"                Add setting\n"
+"              "
 msgid_plural ""
 "\n"
-"                  Add settings and enable boefje\n"
-"                "
+"                Add settings\n"
+"              "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2032,13 +2034,13 @@ msgstr ""
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Go back to previous step"
+msgid "Skip this step"
 msgstr ""
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Skip this step"
+#: onboarding/templates/account/step_6_account_setup_client.html
+msgid "Go back to previous step"
 msgstr ""
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
@@ -2165,6 +2167,7 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_2a_choose_report_info.html
+#: reports/report_types/dns_report/report.html
 msgid "Data"
 msgstr ""
 
@@ -2705,6 +2708,10 @@ msgid "Selected objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Currently filtered on"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_summary.html
 msgid "Selected Report Types"
@@ -2848,6 +2855,11 @@ msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Export"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: rocky/templates/oois/ooi_report.html
 #: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
@@ -2862,10 +2874,14 @@ msgid "This is the OpenKAT report for organization"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/templates/partials/report_header.html
+msgid "Created with data from"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Observed at:"
+msgid "Created on"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -2977,6 +2993,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.py
 msgid "Terms in report"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Observed at:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -3128,31 +3148,27 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "IP address lookup"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "warning"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
+msgid "Records found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid ""
-"You have less than one webserver that is reachable over IPv6, which is "
-"<strong>not</strong> in compliance to internet.nl standards."
+"The table below gives an overview of the DNS records that were found for the "
+"abovementioned DNSZone."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Other records found"
+msgid ""
+"\n"
+"                    <strong>Disclaimer:</strong>\n"
+"                    Not all DNSRecords are parsed in OpenKAT.\n"
+"                    DNS record types that are parsed and could be displayed "
+"in the table are:\n"
+"                "
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "All existing DNS record types can be found here"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3160,7 +3176,11 @@ msgid "Record"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Found by"
+msgid "TTL"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "minutes"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3272,6 +3292,10 @@ msgid "This is the OpenKAT Sector rapport."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
+msgid "Created with date from"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
 msgid "This sector contains"
 msgstr ""
 
@@ -3358,6 +3382,14 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/report.py
 msgid "Multi Organization Report"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Best scoring security check"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Worst scoring security check"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
@@ -3749,16 +3781,37 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+msgid "explanation select all"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Explanation 'Continue with all OOIs'"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#, python-format
+msgid ""
+"This option will select all OOIs (+ current filters) for %(organization)s "
+"organization."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with all OOIs"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 msgid "Objects:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html
 msgid "Clearance type"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Setup report"
+#: reports/templates/partials/report_types_selection.html
+msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3850,6 +3903,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
+msgid "You have selected all objects in previous step."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
 msgstr ""
 
@@ -3859,10 +3916,6 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
-msgstr ""
-
-#: reports/templates/partials/report_types_selection.html
-msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
@@ -3901,6 +3954,17 @@ msgstr ""
 msgid "Select at least one report type to proceed."
 msgstr ""
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#, python-format
+msgid ""
+"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+msgstr ""
+
+#: reports/views/base.py
+#, python-format
+msgid "Report type '%s' does not exist."
+msgstr ""
+
 #: reports/views/generate_report.py
 msgid "This report may not show all the data as some plugins are not enabled."
 msgstr ""
@@ -3915,6 +3979,10 @@ msgstr ""
 
 #: tools/forms/base.py
 msgid "Date"
+msgstr ""
+
+#: tools/forms/base.py
+msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
@@ -4176,7 +4244,7 @@ msgstr ""
 msgid "Only CSV file supported"
 msgstr ""
 
-#: tools/forms/upload_csv.py tools/forms/upload_raw.py
+#: tools/forms/upload_csv.py
 msgid "File could not be decoded"
 msgstr ""
 
@@ -4214,10 +4282,6 @@ msgstr ""
 
 #: tools/forms/upload_oois.py
 msgid "Choose a type of which objects are added."
-msgstr ""
-
-#: tools/forms/upload_raw.py
-msgid "Organization code(s) for raw does not exist in our database"
 msgstr ""
 
 #: tools/forms/upload_raw.py
@@ -4591,6 +4655,18 @@ msgstr ""
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "User overview:"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "warning"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Warning"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
@@ -5644,11 +5720,6 @@ msgid "Upload CSV"
 msgstr ""
 
 #: rocky/templates/partials/ooi_list_toolbar.html
-#: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "Export"
-msgstr ""
-
-#: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Download as JSON"
 msgstr ""
 
@@ -6031,12 +6102,12 @@ msgid "You don't have any backup codes yet."
 msgstr ""
 
 #: rocky/templates/two_factor/core/backup_tokens.html
-#: rocky/templates/two_factor/core/setup_complete.html
-msgid "Back to Account Security"
+msgid "Generate Tokens"
 msgstr ""
 
 #: rocky/templates/two_factor/core/backup_tokens.html
-msgid "Generate Tokens"
+#: rocky/templates/two_factor/core/setup_complete.html
+msgid "Back to Account Security"
 msgstr ""
 
 #: rocky/templates/two_factor/core/login.html
@@ -6258,6 +6329,10 @@ msgstr ""
 
 #: rocky/views/indemnification_add.py
 msgid "Indemnification successfully set."
+msgstr ""
+
+#: rocky/views/mixins.py
+msgid "The selected date is in the future."
 msgstr ""
 
 #: rocky/views/mixins.py
@@ -6559,6 +6634,13 @@ msgstr ""
 msgid ""
 "For IPAddressV4 and IPAddressV6 object types, a column of 'address' is "
 "required, optionally a second column 'network' is supported "
+msgstr ""
+
+#: rocky/views/upload_csv.py
+msgid ""
+"Clearance levels can be controlled by a column 'clearance' taking numerical "
+"values 0, 1, 2, 3, and 4 for the corresponding clearance level (other values "
+"are ignored) "
 msgstr ""
 
 #: rocky/views/upload_csv.py

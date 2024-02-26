@@ -98,7 +98,7 @@ class OOIDetailView(
 
     def get_current_ooi(self) -> OOI | None:
         # self.ooi is already the current state of the OOI
-        if self.get_observed_at().date() == datetime.utcnow().date():
+        if self.observed_at.date() == datetime.utcnow().date():
             return self.ooi
         try:
             return self.get_ooi(pk=self.get_ooi_id(), observed_at=datetime.now(timezone.utc))
@@ -161,30 +161,31 @@ class OOIDetailView(
         context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
         context["ooi"] = self.ooi
 
-        declarations, observations, inferences = self.get_origins(
-            self.ooi.reference, self.get_observed_at(), self.organization
-        )
+        declarations, observations, inferences = self.get_origins(self.ooi.reference, self.organization)
 
         inference_params = self.octopoes_api_connector.list_origin_parameters(
-            {inference.origin.id for inference in inferences}
+            {inference.origin.id for inference in inferences},
+            self.observed_at,
         )
         inference_params_per_inference = defaultdict(list)
         for inference_param in inference_params:
             inference_params_per_inference[inference_param.origin_id].append(inference_param)
 
+        inference_origin_params: list[tuple] = []
         for inference in inferences:
-            inference.params = inference_params_per_inference.get(inference.origin.id, [])
+            inference_origin_params.append((inference, inference_params_per_inference[inference.origin.id]))
 
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
+        context["inference_origin_params"] = inference_origin_params
         context["member"] = self.organization_member
 
         # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = self.get_observed_at()
+        context["observed_at"] = self.observed_at
         context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects(context["observed_at"])
