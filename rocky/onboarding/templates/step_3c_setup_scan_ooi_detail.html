@@ -21,6 +21,7 @@
                     {% endblocktranslate %}
                 </p>
             </div>
+            {{ ooi.raw.dns_zone }}
             <div>
                 <p>{% translate "URL" %}</p>
                 <dl>
@@ -49,12 +50,6 @@
                         </dd>
                     </div>
                     <div>
-                        <dt>{% translate "DNS Zone" %}</dt>
-                        <dd>
-                            {{ ooi.raw.tld }}
-                        </dd>
-                    </div>
-                    <div>
                         <dt>{% translate "Network" %}</dt>
                         <dd>
                             {{ ooi.network }}
@@ -63,7 +58,8 @@
                 </dl>
             </div>
             <div class="button-container">
-                <a href="{% url "step_report" organization.code %}" class="button">{% translate "Start scanning" %}</a>
+                <a href="{% url "step_report" organization.code %}?{{ request.GET.urlencode }}"
+                   class="button">{% translate "Start scanning" %}</a>
                 {% if organization %}
                     <a href="{% url "complete_onboarding" organization.code %}"
                        class="button ghost">{% translate "Skip onboarding" %}</a>

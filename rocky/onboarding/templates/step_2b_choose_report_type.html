@@ -34,17 +34,17 @@
                       class="inline">
                     <div class="button-container">
                         {% if organization %}
-                            <button name="report-type" value="dns-report" type="submit" class="button">{% translate "DNS report" %}</button>
+                            <button name="report_type" value="dns-report" type="submit" class="button">{% translate "DNS report" %}</button>
+                        {% endif %}
+                        <a href="" class="button disabled">Pen test</a>
+                        <a href="" class="button disabled">Mail report</a>
+                        <a href="" class="button disabled">DigiD</a>
+                        {% if organization %}
+                            <a href="{% url "complete_onboarding" organization.code %}"
+                               class="button ghost">{% translate "Skip onboarding" %}</a>
                         {% endif %}
                     </div>
                 </form>
-                <a href="" class="button disabled">Pen test</a>
-                <a href="" class="button disabled">Mail report</a>
-                <a href="" class="button disabled">DigiD</a>
-                {% if organization %}
-                    <a href="{% url "complete_onboarding" organization.code %}"
-                       class="button ghost">{% translate "Skip onboarding" %}</a>
-                {% endif %}
             </div>
         </section>
     </main>

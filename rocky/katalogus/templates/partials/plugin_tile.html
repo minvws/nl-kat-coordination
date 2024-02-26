@@ -5,9 +5,9 @@
     {% if add_checkbox %}
         <input type="checkbox"
                form="{{ form_id }}"
-               name="selected_plugins"
+               name="plugin"
                value="{{ plugin.id }}"
-               {% if required %}checked{% endif %} />
+               {% if checked %}checked{% endif %} />
     {% endif %}
     <img src="{% url "plugin_cover" organization_code=organization.code plugin_id=plugin.id %}"
          alt="boefje placeholder image" />
