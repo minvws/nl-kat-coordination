@@ -131,7 +131,7 @@ class XTDBHTTPClient:
         res = self._session.post(
             f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
-            data=str(query),
+            data=str(query).encode("utf-8"),
             headers={"Content-Type": "application/edn"},
         )
         self._verify_response(res)
@@ -144,7 +144,7 @@ class XTDBHTTPClient:
     def submit_transaction(self, operations: list[Operation]) -> None:
         res = self._session.post(
             f"{self.client_url()}/submit-tx",
-            data=Transaction(operations=operations).json(by_alias=True),
+            data=Transaction(operations=operations).json(by_alias=True).encode("utf-8"),
             headers={"Content-Type": "application/json"},
         )
 

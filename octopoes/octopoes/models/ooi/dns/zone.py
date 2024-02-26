@@ -47,17 +47,18 @@ class Hostname(OOI):
         "registered_domain": "subdomains",
     }
 
-    @field_validator("name")
-    @classmethod
-    def hostname_valid(cls, v: str) -> str:
-        for c in v:
-            if c not in VALID_HOSTNAME_CHARACTERS:
-                raise ValueError(f"Invalid hostname character: {c}")
+    #FIXME: issue #2525
+    #@field_validator("name")
+    #@classmethod
+    #def hostname_valid(cls, v: str) -> str:
+    #    for c in v:
+    #        if c not in VALID_HOSTNAME_CHARACTERS:
+    #            raise ValueError(f"Invalid hostname character: {c}")
 
-        if v.endswith("-"):
-            raise ValueError("Hostname must not end with a hyphen")
+    #    if v.endswith("-"):
+    #        raise ValueError("Hostname must not end with a hyphen")
 
-        return v
+    #    return v
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:

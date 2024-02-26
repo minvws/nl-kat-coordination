@@ -170,17 +170,17 @@ class OctopoesAPIConnector:
         return TypeAdapter(list[Origin]).validate_json(res.content)
 
     def save_observation(self, observation: Observation) -> None:
-        self.session.post(f"/{self.client}/observations", data=observation.model_dump_json())
+        self.session.post(f"/{self.client}/observations", data=observation.model_dump_json().encode("utf-8"))
 
     def save_declaration(self, declaration: Declaration) -> None:
-        self.session.post(f"/{self.client}/declarations", data=declaration.model_dump_json())
+        self.session.post(f"/{self.client}/declarations", data=declaration.model_dump_json().encode("utf-8"))
 
     def save_affirmation(self, affirmation: Affirmation) -> None:
-        self.session.post(f"/{self.client}/affirmations", data=affirmation.model_dump_json())
+        self.session.post(f"/{self.client}/affirmations", data=affirmation.model_dump_json().encode("utf-8"))
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
-        self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.model_dump_json())
+        self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.model_dump_json().encode("utf-8"))
 
     def save_many_scan_profiles(self, scan_profiles: list[ScanProfile], valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}
