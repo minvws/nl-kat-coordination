@@ -79,7 +79,7 @@ class OOIReportPDFView(SingleOOITreeMixin):
                     self.organization.code,
                     valid_time.date(),
                     ooi,
-                    self.depth,
+                    self.get_depth(),
                     origin=f"{request.scheme}://{request.get_host()}",
                 ),
             )

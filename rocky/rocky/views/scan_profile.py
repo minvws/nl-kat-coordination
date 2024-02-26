@@ -8,11 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from tools.forms.ooi import SetClearanceLevelForm
 from tools.models import Indemnification
-from tools.view_helpers import (
-    Breadcrumb,
-    get_mandatory_fields,
-    get_ooi_url,
-)
+from tools.view_helpers import Breadcrumb, get_mandatory_fields, get_ooi_url
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile
 from rocky.views.ooi_detail import OOIDetailView

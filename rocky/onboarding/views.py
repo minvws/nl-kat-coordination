@@ -1,10 +1,7 @@
 from typing import Any
 
 from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
-from account.mixins import (
-    OrganizationPermissionRequiredMixin,
-    OrganizationView,
-)
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from account.views import OOIClearanceMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -22,9 +19,7 @@ from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import get_selection
 from requests import HTTPError
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
-from tools.ooi_helpers import (
-    get_or_create_ooi,
-)
+from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb, get_ooi_url
 
 from octopoes.models.ooi.network import Network
@@ -39,9 +34,7 @@ from onboarding.view_helpers import (
     OnboardingBreadcrumbsMixin,
     RegistrationBreadcrumbsMixin,
 )
-from rocky.exceptions import (
-    RockyError,
-)
+from rocky.exceptions import RockyError
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
 from rocky.views.ooi_view import SingleOOITreeMixin
@@ -246,8 +239,8 @@ class OnboardingSetClearanceLevelView(
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         ooi_id = self.request.GET.get("ooi_id")
         ooi = self.get_ooi(ooi_id)
-        level = DNS_REPORT_LEAST_CLEARANCE_LEVEL
-        if not self.can_raise_clearance_level(ooi, level):
+
+        if not self.can_raise_clearance_level(ooi, DNS_REPORT_LEAST_CLEARANCE_LEVEL):
             return self.get(request, *args, **kwargs)
         return redirect(get_ooi_url("step_setup_scan_select_plugins", ooi_id, self.organization.code))
 

@@ -19,14 +19,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
 from requests import Response
-from tools.models import (
-    GROUP_ADMIN,
-    GROUP_CLIENT,
-    GROUP_REDTEAM,
-    Indemnification,
-    Organization,
-    OrganizationMember,
-)
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
@@ -530,6 +523,16 @@ def finding():
 
 
 @pytest.fixture
+def no_rpki_finding_type():
+    return KATFindingType(id="KAT-NO-RPKI")
+
+
+@pytest.fixture
+def expired_rpki_finding_type():
+    return KATFindingType(id="KAT-EXPIRED-RPKI")
+
+
+@pytest.fixture
 def finding_types():
     return [
         KATFindingType(
@@ -617,6 +620,59 @@ def finding_type_kat_no_dkim():
         recommendation="Fake recommendation...",
         risk_score=9.5,
         risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_uncommon_open_port():
+    return KATFindingType(
+        id="KAT-UNCOMMON-OPEN-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_open_sysadmin_port():
+    return KATFindingType(
+        id="KAT-OPEN-SYSADMIN-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=8.5,
+        risk_severity=RiskLevelSeverity.HIGH,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_open_database_port():
+    return KATFindingType(
+        id="KAT-OPEN-DATABASE-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.5,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dnssec():
+    return KATFindingType(
+        id="KAT-NO-DNSSEC",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_severity=RiskLevelSeverity.PENDING,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_invalid_dnssec():
+    return KATFindingType(
+        id="KAT-INVALID-DNSSEC",
+        recommendation="Fake recommendation...",
+        risk_score=3.0,
+        risk_severity=RiskLevelSeverity.LOW,
     )
 
 
@@ -810,3 +866,16 @@ class MockOctopoesAPIConnector:
 @pytest.fixture
 def mock_octopoes_api_connector(valid_time):
     return MockOctopoesAPIConnector(valid_time)
+
+
+@pytest.fixture
+def listed_hostnames(network):
+    return [
+        Hostname(network=network.reference, name="example.com"),
+        Hostname(network=network.reference, name="a.example.com"),
+        Hostname(network=network.reference, name="b.example.com"),
+        Hostname(network=network.reference, name="c.example.com"),
+        Hostname(network=network.reference, name="d.example.com"),
+        Hostname(network=network.reference, name="e.example.com"),
+        Hostname(network=network.reference, name="f.example.com"),
+    ]
