@@ -1,9 +1,6 @@
 from datetime import datetime, timezone
 
-from crisis_room.views import (
-    CrisisRoomView,
-    OrganizationFindingCountPerSeverity,
-)
+from crisis_room.views import CrisisRoomView, OrganizationFindingCountPerSeverity
 from django.urls import resolve, reverse
 from pytest_django.asserts import assertContains
 

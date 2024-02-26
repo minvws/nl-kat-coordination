@@ -8,14 +8,8 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 from sqlalchemy.orm import Session
 
-from boefjes.katalogus.clients import (
-    PluginRepositoryClient,
-    PluginRepositoryClientInterface,
-)
-from boefjes.katalogus.local_repository import (
-    LocalPluginRepository,
-    get_local_repository,
-)
+from boefjes.katalogus.clients import PluginRepositoryClient, PluginRepositoryClientInterface
+from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.katalogus.models import RESERVED_LOCAL_ID, PluginType, Repository
 from boefjes.katalogus.storage.interfaces import (
     NotFound,
