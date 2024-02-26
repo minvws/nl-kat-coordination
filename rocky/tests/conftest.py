@@ -900,3 +900,16 @@ class MockOctopoesAPIConnector:
 @pytest.fixture
 def mock_octopoes_api_connector(valid_time):
     return MockOctopoesAPIConnector(valid_time)
+
+
+@pytest.fixture
+def listed_hostnames(network):
+    return [
+        Hostname(network=network.reference, name="example.com"),
+        Hostname(network=network.reference, name="a.example.com"),
+        Hostname(network=network.reference, name="b.example.com"),
+        Hostname(network=network.reference, name="c.example.com"),
+        Hostname(network=network.reference, name="d.example.com"),
+        Hostname(network=network.reference, name="e.example.com"),
+        Hostname(network=network.reference, name="f.example.com"),
+    ]
