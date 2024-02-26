@@ -7,12 +7,5 @@
             {% include "partials/report_severity_totals_table.html" %}
 
         </div>
-        {% if data.total_occurrences > 0 %}
-            <div class="nota-bene">
-                <span>{% translate "See:" %} <a href="https://nvd.nist.gov/vuln-metrics/cvss"
-    target="_blank"
-    rel="noopener noreferrer">https://nvd.nist.gov/vuln-metrics/cvss</a></span>
-            </div>
-        {% endif %}
     </div>
 </section>
