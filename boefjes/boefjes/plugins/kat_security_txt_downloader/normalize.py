@@ -20,6 +20,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     website_original = Reference.from_str(boefje_meta.input_ooi)
     input_ = boefje_meta.arguments["input"]
 
+    rfc_compliant = False
     for path, details in results.items():
         if details["content"] is None:
             continue
@@ -30,12 +31,13 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         yield url_original
         url = URL(raw=details["url"], network=Network(name=input_["hostname"]["network"]["name"]).reference)
         yield url
+        # Check for legacy url https://www.rfc-editor.org/rfc/rfc9116#section-3-1
         if path == '.well-known/security.txt':
             rfc_compliant = True
-        elif path == 'security.txt':
+        elif path == 'security.txt' and not rfc_compliant:
             ft = KATFindingType(id="KAT-LEGACY-SECURITY-LOCATION")
             yield ft
-            yield Finding(description='Only legacy Security.txt location found.', 
+            yield Finding(description="Only legacy Security.txt location found.", 
                           finding_type=ft.reference,
                           ooi=url.reference)
         url_parts = urlparse(details["url"])
