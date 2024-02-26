@@ -561,7 +561,7 @@ def web_report_finding_types():
         KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
     ]
 
-  
+
 @pytest.fixture
 def no_rpki_finding_type():
     return KATFindingType(id="KAT-NO-RPKI")
