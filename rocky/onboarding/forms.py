@@ -1,11 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
-from tools.forms.ooi_form import OOIForm
 from tools.forms.settings import SCAN_LEVEL_CHOICES
 
-from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI
 from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
 
 User = get_user_model()
@@ -39,21 +36,6 @@ class OnboardingSetClearanceLevelForm(forms.Form):
             },
         ),
     )
-
-
-class OnboardingOOIForm(OOIForm):
-    """
-    hidden_fields - key (field name) value (field value) pair that will rendered as hidden field
-    """
-
-    def __init__(
-        self, hidden_fields: dict[str, str], ooi_class: type[OOI], connector: OctopoesAPIConnector, *args, **kwargs
-    ):
-        self.hidden_ooi_fields = hidden_fields
-        super().__init__(ooi_class, connector, *args, **kwargs)
-
-    def get_fields(self):
-        return self.generate_form_fields(self.hidden_ooi_fields)
 
 
 class OnboardingCreateObjectURLForm(forms.Form):
