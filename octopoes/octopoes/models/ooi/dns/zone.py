@@ -3,7 +3,7 @@ from __future__ import annotations
 import string
 from typing import Annotated, Literal
 
-from pydantic import StringConstraints, field_validator
+from pydantic import StringConstraints
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import IPAddress, Network
@@ -47,18 +47,7 @@ class Hostname(OOI):
         "registered_domain": "subdomains",
     }
 
-    #FIXME: issue #2525
-    #@field_validator("name")
-    #@classmethod
-    #def hostname_valid(cls, v: str) -> str:
-    #    for c in v:
-    #        if c not in VALID_HOSTNAME_CHARACTERS:
-    #            raise ValueError(f"Invalid hostname character: {c}")
-
-    #    if v.endswith("-"):
-    #        raise ValueError("Hostname must not end with a hyphen")
-
-    #    return v
+    # FIXME: issue #2525
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:

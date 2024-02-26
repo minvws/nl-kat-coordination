@@ -180,7 +180,9 @@ class OctopoesAPIConnector:
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
-        self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.model_dump_json().encode("utf-8"))
+        self.session.put(
+            f"/{self.client}/scan_profiles", params=params, data=scan_profile.model_dump_json().encode("utf-8")
+        )
 
     def save_many_scan_profiles(self, scan_profiles: list[ScanProfile], valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}
