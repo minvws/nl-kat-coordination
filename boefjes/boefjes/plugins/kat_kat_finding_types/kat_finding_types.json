@@ -546,10 +546,10 @@
         "recommendation": "Set a CAA record to limit which CA's are allowed to issue certs."
     },
     "KAT-LEGACY-SECURITY-LOCATION": {
-        "description": "This website only has a legacy security.txt location.",
+        "description": "This website only has a legacy location security.txt file.",
         "source": "https://www.rfc-editor.org/rfc/rfc9116#section-3-1",
         "risk": "info",
         "impact": null,
-        "recommendation": "Add a securty.txt file location in the .well-known folder."
+        "recommendation": "Add a security.txt file location in the .well-known folder."
     }
 }
