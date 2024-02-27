@@ -20,11 +20,17 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     else:
         args = f" --jsonfile tmp/output.json --server-preference {address}:{ip_port}"
 
+    environment_vars = {
+        "OPENSSL_TIMEOUT": 30,
+        "CONNECT_TIMEOUT": 30,
+    }
+
     client = docker.from_env()
     container = client.containers.run(
         SSL_TEST_IMAGE,
         args,
         detach=True,
+        environment=environment_vars,
     )
 
     try:
