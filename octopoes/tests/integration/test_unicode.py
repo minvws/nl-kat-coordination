@@ -45,6 +45,9 @@ def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         )
     )
 
+    with pytest.raises(ValueError):
+        Hostname(network=network.reference, name="%@.com")
+
     hostname = Hostname(network=network.reference, name=NAMES[1])
     task_id = uuid.uuid4()
 

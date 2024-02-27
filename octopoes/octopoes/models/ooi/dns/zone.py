@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import string
 from typing import Annotated, Literal
 
 from pydantic import StringConstraints, field_validator
@@ -7,6 +8,8 @@ from pydantic import StringConstraints, field_validator
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.network import IPAddress, Network
 from octopoes.models.persistence import ReferenceField
+
+VALID_HOSTNAME_CHARACTERS = string.ascii_letters + string.digits + "-."
 
 
 class DNSZone(OOI):
@@ -48,6 +51,10 @@ class Hostname(OOI):
     @classmethod
     def hostname_valid(cls, v: str) -> str:
         v = v.encode("idna").decode()
+
+        for c in v:
+            if c not in VALID_HOSTNAME_CHARACTERS:
+                raise ValueError(f"Invalid hostname character: {c}")
 
         if v.endswith("-"):
             raise ValueError("Hostname must not end with a hyphen")
