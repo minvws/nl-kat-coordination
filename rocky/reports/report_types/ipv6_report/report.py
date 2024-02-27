@@ -72,7 +72,7 @@ class IPv6Report(Report):
         result = {}
         for input_ooi, hostnames in hostnames_by_input_ooi.items():
             result[input_ooi] = {
-                hostname_ref.tokenized.name: {"enabled": any(ip.class_type == IPAddressV6 for ip in ips[input_ooi])}
+                hostname_ref.tokenized.name: {"enabled": any(ip.reference.class_type == IPAddressV6 for ip in ips[input_ooi])}
                 for hostname_ref in hostnames
             }
 

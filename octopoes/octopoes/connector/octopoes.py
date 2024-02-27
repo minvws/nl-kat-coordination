@@ -277,6 +277,9 @@ class OctopoesAPIConnector:
         valid_time: datetime,
         sources: list[OOI | Reference | str],
     ) -> list[tuple[str, OOIType]]:
+        if not sources:
+            return []
+
         params = {
             "path": path,
             "sources": [str(ooi) for ooi in sources],
