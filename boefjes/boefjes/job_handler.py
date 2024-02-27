@@ -179,7 +179,7 @@ class BoefjeHandler(Handler):
                             logger.warning(
                                 "Invalid mime-type encountered in output for boefje %s[%s]",
                                 boefje_meta.boefje.id,
-                                str(boefje_meta.id)
+                                str(boefje_meta.id),
                             )
                         else:
                             valid_mimetypes.add(mimetype)
