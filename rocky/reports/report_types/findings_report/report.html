@@ -47,10 +47,12 @@
                                 <ul class="accordion break-title">
                                     {% for occurrence in info.occurrences %}
                                         <li>
-                                            <button aria-expanded="false">{{ occurrence.ooi.human_readable }}</button>
+                                            <button aria-expanded="false">{{ occurrence.finding.ooi.human_readable }}</button>
                                             <div aria-labelledby="finding-details">
+                                                <h2>{% translate "First seen" %}</h2>
+                                                <p>{{ occurrence.first_seen }}</p>
                                                 <h2>{% translate "Description" %}</h2>
-                                                <p>{{ occurrence.description }}</p>
+                                                <p>{{ occurrence.finding.description }}</p>
                                             </div>
                                         </li>
                                     {% endfor %}

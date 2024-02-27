@@ -24,6 +24,11 @@ class FindingsReport(Report):
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
 
+    def get_finding_valid_time_history(self, reference: str) -> list[datetime]:
+        transaction_record = self.octopoes_api_connector.get_history(reference=reference)
+        valid_time_history = [transaction.valid_time for transaction in transaction_record]
+        return valid_time_history
+
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         reference = Reference.from_str(input_ooi)
         findings = []
@@ -48,6 +53,13 @@ class FindingsReport(Report):
                 finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
                 severity = finding_type.risk_severity.name.lower()
                 total_by_severity[severity] += 1
+
+                time_history = self.get_finding_valid_time_history(finding.primary_key)
+
+                if time_history:
+                    first_seen = str(time_history[0])
+
+                finding = {"finding": finding, "first_seen": first_seen}
 
                 if finding_type.id in finding_types:
                     finding_types[finding_type.id]["occurrences"].append(finding)
