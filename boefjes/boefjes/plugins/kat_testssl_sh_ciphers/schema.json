@@ -6,7 +6,8 @@
       "title": "TIMEOUT",
       "type": "integer",
       "description": "Timeout for requests in the test ssl script",
-      "default": 30
+      "default": 30,
+      "minimum": 0
     }
   }
 }
