@@ -6,11 +6,7 @@ from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import RESERVED_LOCAL_ID, Bit, Boefje, Normalizer, Repository
 from boefjes.katalogus.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.katalogus.storage.memory import (
-    PluginStatesStorageMemory,
-    RepositoryStorageMemory,
-    SettingsStorageMemory,
-)
+from boefjes.katalogus.storage.memory import PluginStatesStorageMemory, RepositoryStorageMemory, SettingsStorageMemory
 
 
 def get_plugin_seed():

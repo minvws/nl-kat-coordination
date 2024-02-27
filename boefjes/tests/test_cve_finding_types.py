@@ -3,9 +3,7 @@ from unittest import TestCase
 from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_cve_finding_types.normalize import run
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from octopoes.models.types import (
-    CVEFindingType,
-)
+from octopoes.models.types import CVEFindingType
 from tests.loading import get_dummy_data
 
 

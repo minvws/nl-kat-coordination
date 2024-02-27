@@ -8,11 +8,7 @@ from requests import HTTPError
 
 from octopoes.events.events import OperationType, ScanProfileDBEvent
 from octopoes.events.manager import EventManager
-from octopoes.models import (
-    Reference,
-    ScanProfile,
-    ScanProfileBase,
-)
+from octopoes.models import Reference, ScanProfile, ScanProfileBase
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.repositories.repository import Repository
 from octopoes.xtdb import FieldSet
