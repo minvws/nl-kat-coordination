@@ -4,7 +4,7 @@ from os import getenv
 
 import docker
 from docker.errors import APIError
-from requests.exceptions import ReadTimeout 
+from requests.exceptions import ReadTimeout
 
 from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
