@@ -6,9 +6,7 @@ from dns.rdtypes.ANY.SOA import SOA
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
-from octopoes.models.ooi.dns.records import (
-    DNSSOARecord,
-)
+from octopoes.models.ooi.dns.records import DNSSOARecord
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.network import Network
 

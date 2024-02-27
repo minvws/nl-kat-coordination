@@ -5,15 +5,7 @@ from typing import Any
 from uuid import UUID
 
 from bytes.config import BASE_DIR
-from bytes.models import (
-    Boefje,
-    BoefjeMeta,
-    MimeType,
-    Normalizer,
-    NormalizerMeta,
-    RawData,
-    RawDataMeta,
-)
+from bytes.models import Boefje, BoefjeMeta, MimeType, Normalizer, NormalizerMeta, RawData, RawDataMeta
 
 
 def load_stub(relative_path: str) -> dict[str, Any]:

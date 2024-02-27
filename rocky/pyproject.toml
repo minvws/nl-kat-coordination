@@ -7,32 +7,17 @@ license = "EUPL"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-asgiref = "^3.6.0"
 beautifulsoup4 = "^4.11.2"
-certifi = "^2023.7.22"
 Django = "^4.2.7"
-django-formtools = "^2.4.1"
-django-otp = "^1.1.3"
-django-phonenumber-field = "^6.1.0"
 django-two-factor-auth = "^1.14.0"
 django-environ = "^0.11.2"
-idna = "^3.4"
 jsonschema = "^4.17.0"
-lxml = "^4.9.2"
 phonenumbers = "^8.12.57"
 psycopg2 = "^2.9.6"
 pydantic = "^2.4.2"
 python-dotenv = "^1.0.0"
-qrcode = "^7.3.1"
 requests = "^2.31.0"
-six = "^1.16.0"
-soupsieve = "^2.3.2.post1"
-sqlparse = "^0.4.4"
-typing-extensions = "^4.4.0"
-urllib3 = "^2.0.3"
-dnspython = "^2.1.0"
 django-password-validators = "^1.7.1"
-colorama = "^0.4.6"
 django-csp = "^3.7"
 djangorestframework = "^3.14.0"
 django-tagulous = "^1.3.3"
@@ -41,8 +26,6 @@ django-compressor = { git = "https://github.com/dekkers/django-compressor", rev 
 django-weasyprint = "^2.2.1"
 strenum = "^0.4.15"
 django-rest-knox = { git = "https://github.com/jazzband/django-rest-knox", rev = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9" }
-
-# temp fix to pass build, remove later when https://github.com/xhtml2pdf/xhtml2pdf/issues/589 is solved
 
 # OpenTelemetry
 opentelemetry-sdk = "^1.19.0"
@@ -54,8 +37,10 @@ whitenoise = {extras = ["brotli"], version = "^6.5.0"}
 opentelemetry-instrumentation = "^0.41b0"
 opentelemetry-instrumentation-fastapi = "^0.41b0"
 granian = "^1.0.2"
-pydantic-settings = "^2.0.3"
+
+# These used in octopoes parts that are used by rocky
 pyparsing = "^3.1.1"
+pydantic-settings = "^2.0.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -77,9 +62,6 @@ pytest-mock = "^3.11.1"
 model-mommy = "^2.0.0"
 factory-boy = "^3.2.1"
 
-# NOTE: pip does not yet support hash verification for git dependencies;
-# rocky's requirements-dev.txt unfortunately has no hashing until then
-# f6eb4cbb9112b5aa933313d79e4da823adb41e1e -> Remove pip import in setup.py
 django-admin-auto-tests = { git = "https://github.com/dekkers/django-admin-auto-tests", rev = "f6eb4cbb9112b5aa933313d79e4da823adb41e1e" }
 
 [build-system]

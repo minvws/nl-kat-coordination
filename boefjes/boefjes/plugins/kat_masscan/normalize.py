@@ -5,14 +5,7 @@ from collections.abc import Iterable, Iterator
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.network import (
-    IPAddressV4,
-    IPAddressV6,
-    IPPort,
-    Network,
-    PortState,
-    Protocol,
-)
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 
 
 def get_ip_ports_and_service(ip_with_ports: dict, network: Network, netblock: Reference) -> Iterator[OOI]:
