@@ -1,5 +1,6 @@
 import logging
 from ipaddress import ip_address
+from os import getenv
 
 import docker
 from requests import RequestException
@@ -20,9 +21,11 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     else:
         args = f" --jsonfile tmp/output.json --server-preference {address}:{ip_port}"
 
+    timeout = getenv("TIMEOUT", 30)
+
     environment_vars = {
-        "OPENSSL_TIMEOUT": 30,
-        "CONNECT_TIMEOUT": 30,
+        "OPENSSL_TIMEOUT": timeout,
+        "CONNECT_TIMEOUT": timeout,
     }
 
     client = docker.from_env()
@@ -39,7 +42,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     except (docker.errors.DockerException, RequestException) as e:
         logging.warning("DockerException occurred: %s", e)
         container.stop()
-        output = ""
+        raise TimeoutError("Timeout occurred while running testssl.sh")
     finally:
         container.remove()
 

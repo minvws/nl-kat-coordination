@@ -1,0 +1,12 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "TIMEOUT": {
+      "title": "TIMEOUT",
+      "type": "integer",
+      "description": "Timeout for requests in the test ssl script",
+      "default": 30
+    }
+  }
+}
