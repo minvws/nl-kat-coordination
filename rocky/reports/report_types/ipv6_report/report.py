@@ -42,7 +42,7 @@ class IPv6Report(Report):
             raise
 
         if ooi.reference.class_type == IPAddressV4 or ooi.reference.class_type == IPAddressV6:
-            path = Path.parse("IPAddress.<address [is ResolvedHostname].hostname")
+            path = Path.parse("IPAddress.<address[is ResolvedHostname].hostname")
             hostnames = self.octopoes_api_connector.query(path=path, source=ooi.reference, valid_time=valid_time)
         else:
             hostnames = [ooi]
@@ -52,7 +52,7 @@ class IPv6Report(Report):
             if ooi.reference.class_type == IPAddressV6:
                 return {hostname.name: {"enabled": True} for hostname in hostnames}
             ips = self.octopoes_api_connector.query(
-                "Hostname.<hostname [is ResolvedHostname].address", valid_time, hostname.reference
+                "Hostname.<hostname[is ResolvedHostname].address", valid_time, hostname.reference
             )
 
             results = {
@@ -66,7 +66,7 @@ class IPv6Report(Report):
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
         all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
 
-        query = "Hostname.<hostname [is ResolvedHostname].address"
+        query = "Hostname.<hostname[is ResolvedHostname].address"
         ips = self.group_by_source(self.octopoes_api_connector.query_many(query, valid_time, all_hostnames))
 
         result = {}
