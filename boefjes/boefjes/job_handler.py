@@ -23,6 +23,8 @@ from octopoes.models import OOI, Reference, ScanProfile
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.types import OOIType
 
+MIMETYPE_MIN_LENGTH = 5 # two chars before, and 2 chars after the slash ought to be reasonable
+
 logger = logging.getLogger(__name__)
 
 bytes_api_client = BytesAPIClient(
@@ -171,8 +173,16 @@ class BoefjeHandler(Handler):
 
             if boefje_results:
                 for boefje_added_mime_types, output in boefje_results:
+                    valid_mimetypes = set()
+                    for mimetype in boefje_added_mime_types:
+                        if len(mimetype) < MIMETYPE_MIN_LENGTH or '/' not in mimetype:
+                            logger.warning(
+                                "Invalid mime-type encountered in output for boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id)
+                            )
+                        else:
+                            valid_mimetypes.add(mimetype)
                     raw_file_id = self.bytes_client.save_raw(
-                        boefje_meta.id, output, mime_types.union(boefje_added_mime_types)
+                        boefje_meta.id, output, mime_types.union(valid_mimetypes)
                     )
                     logger.debug(
                         "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
