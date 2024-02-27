@@ -31,10 +31,13 @@ def test_unicode_network(octopoes_api_connector: OctopoesAPIConnector, valid_tim
     time.sleep(1)
 
     assert octopoes_api_connector.list_objects(types={Network}, valid_time=valid_time).count == 1
+    network_object = octopoes_api_connector.list_objects(types={Network}, valid_time=valid_time).items[0]
+    assert network_object.name == names[0]
+    assert network_object.reference == network.reference
 
 
 def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
-    network = Network(name="internet")
+    network = Network(name=names[0])
     octopoes_api_connector.save_declaration(
         Declaration(
             ooi=network,
@@ -55,12 +58,20 @@ def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         )
     )
 
-    scanprof = DeclaredScanProfile(reference=hostname.reference, level=ScanLevel.L2)
-    octopoes_api_connector.save_scan_profile(scanprof, valid_time)
+    scan_profile = DeclaredScanProfile(reference=hostname.reference, level=ScanLevel.L2)
+    octopoes_api_connector.save_scan_profile(scan_profile, valid_time)
 
     time.sleep(1)
 
     assert octopoes_api_connector.list_objects(types={Network, Hostname}, valid_time=valid_time).count == 2
+
+    network_object = octopoes_api_connector.list_objects(types={Network}, valid_time=valid_time).items[0]
+    assert network_object.name == names[0]
+    assert network_object.reference == network.reference
+
+    hostname_object = octopoes_api_connector.list_objects(types={Hostname}, valid_time=valid_time).items[0]
+    assert hostname_object.name == names[1].encode("idna").decode()
+    assert hostname_object.reference == hostname.reference
 
     origins = octopoes_api_connector.list_origins(task_id=task_id, valid_time=valid_time)
     assert origins[0].dict() == {
