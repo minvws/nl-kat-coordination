@@ -745,7 +745,7 @@ class XTDBOOIRepository(OOIRepository):
             for item in result:
                 try:
                     parsed_result.append(self.deserialize(item))
-                except ValueError:
+                except (ValueError, TypeError):
                     parsed_result.append(item)
 
             if len(parsed_result) == 1:

@@ -50,25 +50,13 @@ class MailReport(Report):
             finding_types[hostname.primary_key] = self._get_mail_finding_types(valid_time, hostname.reference)
 
             number_of_spf -= (
-                1
-                if list(
-                    filter(lambda finding_type: finding_type.id == "KAT-NO-SPF", finding_types[hostname.primary_key])
-                )
-                else 0
+                1 if any(finding.id == "KAT-NO-SPF" for finding in finding_types[hostname.primary_key]) else 0
             )
             number_of_dmarc -= (
-                1
-                if list(
-                    filter(lambda finding_type: finding_type.id == "KAT-NO-DMARC", finding_types[hostname.primary_key])
-                )
-                else 0
+                1 if any(finding.id == "KAT-NO-DMARC" for finding in finding_types[hostname.primary_key]) else 0
             )
             number_of_dkim -= (
-                1
-                if list(
-                    filter(lambda finding_type: finding_type.id == "KAT-NO-DKIM", finding_types[hostname.primary_key])
-                )
-                else 0
+                1 if any(finding.id == "KAT-NO-DKIM" for finding in finding_types[hostname.primary_key]) else 0
             )
 
         return {
@@ -100,9 +88,9 @@ class MailReport(Report):
             for hostname in hostname_references:
                 finding_types = filtered_finding_types.get(hostname, [])
 
-                number_of_spf -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", finding_types)) else 0
-                number_of_dmarc -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", finding_types)) else 0
-                number_of_dkim -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", finding_types)) else 0
+                number_of_spf -= 1 if any(finding.id == "KAT-NO-SPF" for finding in finding_types) else 0
+                number_of_dmarc -= 1 if any(finding.id == "KAT-NO-DMARC" for finding in finding_types) else 0
+                number_of_dkim -= 1 if any(finding.id == "KAT-NO-DKIM" for finding in finding_types) else 0
 
                 mail_security_measures[hostname] = finding_types
 
