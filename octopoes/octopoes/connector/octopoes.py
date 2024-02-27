@@ -280,7 +280,7 @@ class OctopoesAPIConnector:
         params = {
             "path": path,
             "sources": [str(ooi) for ooi in sources],
-            "valid_time": valid_time,
+            "valid_time": str(valid_time),
         }
 
         result = self.session.get(f"/{self.client}/query-many", params=params).json()

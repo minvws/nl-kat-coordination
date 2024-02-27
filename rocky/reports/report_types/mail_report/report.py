@@ -51,21 +51,21 @@ class MailReport(Report):
 
             number_of_spf -= (
                 1
-                if any(
+                if list(
                     filter(lambda finding_type: finding_type.id == "KAT-NO-SPF", finding_types[hostname.primary_key])
                 )
                 else 0
             )
             number_of_dmarc -= (
                 1
-                if any(
+                if list(
                     filter(lambda finding_type: finding_type.id == "KAT-NO-DMARC", finding_types[hostname.primary_key])
                 )
                 else 0
             )
             number_of_dkim -= (
                 1
-                if any(
+                if list(
                     filter(lambda finding_type: finding_type.id == "KAT-NO-DKIM", finding_types[hostname.primary_key])
                 )
                 else 0
@@ -100,9 +100,9 @@ class MailReport(Report):
             for hostname in hostname_references:
                 finding_types = filtered_finding_types.get(hostname, [])
 
-                number_of_spf -= 1 if any(filter(lambda finding: finding.id == "KAT-NO-SPF", finding_types)) else 0
-                number_of_dmarc -= 1 if any(filter(lambda finding: finding.id == "KAT-NO-DMARC", finding_types)) else 0
-                number_of_dkim -= 1 if any(filter(lambda finding: finding.id == "KAT-NO-DKIM", finding_types)) else 0
+                number_of_spf -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", finding_types)) else 0
+                number_of_dmarc -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", finding_types)) else 0
+                number_of_dkim -= 1 if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", finding_types)) else 0
 
                 mail_security_measures[hostname] = finding_types
 
