@@ -5,50 +5,50 @@
         <caption class="visually-hidden">{% translate "Total per severity overview:" %}</caption>
         <thead>
             <tr>
-                <th>{% translate "Severity" %}</th>
-                <th>{% translate "Finding types" %}</th>
+                <th>{% translate "Risk level" %}</th>
+                <th>{% translate "FindingTypes" %}</th>
                 <th>{% translate "Occurrences" %}</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>
-                    <span class="critical">critical</span>
+                    <span class="critical">Critical</span>
                 </td>
                 <td class="number">{{ data.total_by_severity_per_finding_type.critical }}</td>
                 <td class="number">{{ data.total_by_severity.critical }}</td>
             </tr>
             <tr>
                 <td>
-                    <span class="high">high</span>
+                    <span class="high">High</span>
                 </td>
                 <td class="number">{{ data.total_by_severity_per_finding_type.high }}</td>
                 <td class="number">{{ data.total_by_severity.high }}</td>
             </tr>
             <tr>
                 <td>
-                    <span class="medium">medium</span>
+                    <span class="medium">Medium</span>
                 </td>
                 <td class="number">{{ data.total_by_severity_per_finding_type.medium }}</td>
                 <td class="number">{{ data.total_by_severity.medium }}</td>
             </tr>
             <tr>
                 <td>
-                    <span class="low">low</span>
+                    <span class="low">Low</span>
                 </td>
                 <td class="number">{{ data.total_by_severity_per_finding_type.low }}</td>
                 <td class="number">{{ data.total_by_severity.low }}</td>
             </tr>
             <tr>
                 <td>
-                    <span class="recommendation">recommendation</span>
+                    <span class="recommendation">Recommendation</span>
                 </td>
                 <td class="number">{{ data.total_by_severity_per_finding_type.recommendation }}</td>
                 <td class="number">{{ data.total_by_severity.recommendation }}</td>
             </tr>
             <tfoot>
                 <tr>
-                    <td>Total findings</td>
+                    <td>Total</td>
                     <td class="number">{{ data.total_finding_types }}</td>
                     <td class="number">{{ data.total_occurrences }}</td>
                 </tr>
