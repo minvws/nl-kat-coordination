@@ -8,7 +8,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
-from octopoes.models.types import FindingTypeType, OOIType
+from octopoes.models.types import OOIType
 
 REPORTS_DIR = Path(__file__).parent
 logger = getLogger(__name__)
