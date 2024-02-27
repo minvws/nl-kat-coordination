@@ -476,6 +476,20 @@ def cve_finding_type_2019_8331() -> CVEFindingType:
 
 
 @pytest.fixture
+def cve_finding_type_2019_2019() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-2019-2019",
+        description="In ce_t4t_data_cback of ce_t4t.cc, there is a possible out-of-bound read due to a missing bounds "
+        "check. This could lead to local information disclosure with no additional execution privileges "
+        "needed. User interaction is needed for exploitation.Product: AndroidVersions: Android-7.0 "
+        "Android-7.1.1 Android-7.1.2 Android-8.0 Android-8.1 Android-9Android ID: A-115635871",
+        source="https://cve.circl.lu/cve/CVE-2019-2019",
+        risk_score=6.5,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
 def cve_finding_2019_8331() -> Finding:
     return Finding(
         finding_type=Reference.from_str("CVEFindingType|CVE-2019-8331"),
@@ -484,6 +498,19 @@ def cve_finding_2019_8331() -> Finding:
         ),
         proof=None,
         description="Vulnerability CVE-2019-8331 detected",
+        reproduce=None,
+    )
+
+
+@pytest.fixture
+def cve_finding_2019_2019() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2019-2019"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2019-2019"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2019-2019 detected",
         reproduce=None,
     )
 
