@@ -74,7 +74,7 @@ def test_openapi():
     assert response.status_code == 200
 
 
-def test_get_scan_profiles(requests_mock, patch_pika):
+def test_get_scan_profiles(requests_mock, patch_pika, valid_time):
     requests_mock.real_http = True
     scan_profile = {
         "type": "ScanProfile",
@@ -88,7 +88,7 @@ def test_get_scan_profiles(requests_mock, patch_pika):
         json=[[scan_profile]],
         status_code=200,
     )
-    response = client.get("/_dev/scan_profiles")
+    response = client.get("/_dev/scan_profiles", params={"valid_time": str(valid_time)})
     assert response.status_code == 200
     assert response.json() == [{"level": 0, "reference": "Hostname|internet|mispo.es", "scan_profile_type": "empty"}]
 
@@ -115,7 +115,7 @@ def test_delete_node(requests_mock):
     assert response.status_code == 200
 
 
-def test_count_findings_by_severity(requests_mock, patch_pika, caplog):
+def test_count_findings_by_severity(requests_mock, patch_pika, caplog, valid_time):
     logger = logging.getLogger("octopoes")
     logger.propagate = True
 
@@ -147,7 +147,7 @@ def test_count_findings_by_severity(requests_mock, patch_pika, caplog):
         status_code=200,
     )
     with caplog.at_level(logging.WARNING):
-        response = client.get("/_dev/findings/count_by_severity")
+        response = client.get("/_dev/findings/count_by_severity", params={"valid_time": str(valid_time)})
     assert response.status_code == 200
     assert response.json() == {
         "critical": 0,

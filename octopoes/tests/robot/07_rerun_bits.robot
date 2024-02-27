@@ -13,7 +13,7 @@ Rerun bits
     Await Sync
 
     # check that only two origins exist, one observation, and one inference
-    Verify Origin Present    Hostname|internet|example.com    2
+    Verify Origin Present    Hostname|internet|example.com    2    ${VALID_TIME}
 
     # add the new bit to the bits folder and restart containers
     ${container_id_worker}    Run    docker ps -aqf 'name=octopoes-ci_octopoes_api_worker'
@@ -32,17 +32,20 @@ Rerun bits
 
     # make sure that new origin still does not exist
     Await Sync
-    Verify Origin Present    Hostname|internet|example.com    2
+    Verify Origin Present    Hostname|internet|example.com    2    ${VALID_TIME}
 
-    ${response}    Post    ${OCTOPOES_URI}/bits/recalculate
+    ${params}    Create Dictionary    valid_time=${VALID_TIME}
+    ${response}    Post    ${OCTOPOES_URI}/bits/recalculate    params=${params}
     Await Sync
-    Verify Origin Present    Hostname|internet|example.com    3
+    ${date}    Get Current Date    time_zone=UTC
+    Verify Origin Present    Hostname|internet|example.com    3    ${date}+00:00
 
 
 *** Keywords ***
 Verify Origin Present
-    [Arguments]    ${reference}    ${expected_amout_of_origins}
-    ${response}    Get    ${OCTOPOES_URI}/origins    params=result=${reference}
+    [Arguments]    ${reference}    ${expected_amout_of_origins}    ${valid_time_argument}
+    ${params}    Create Dictionary    result=${reference}    valid_time=${valid_time_argument}
+    ${response}    Get    ${OCTOPOES_URI}/origins    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
     ${length}    Get Length    ${response.json()}
     Should Be Equal As Integers    ${length}    ${expected_amout_of_origins}

@@ -1,7 +1,7 @@
 import uuid
 from collections import Counter
 from collections.abc import Generator
-from datetime import datetime, timezone
+from datetime import datetime
 from logging import getLogger
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
@@ -19,14 +19,7 @@ from octopoes.config.settings import (
 )
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfile,
-    ScanProfileBase,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileBase, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
@@ -51,13 +44,7 @@ def extract_client(client: str = Path(...)) -> str:
     return client
 
 
-def extract_valid_time(valid_time: AwareDatetime | None = Query(None)) -> datetime:
-    if valid_time is None:
-        return datetime.now(timezone.utc)
-    return valid_time
-
-
-def extract_required_valid_time(valid_time: AwareDatetime) -> datetime:
+def extract_valid_time(valid_time: AwareDatetime) -> datetime:
     return valid_time
 
 
@@ -376,7 +363,7 @@ def list_scan_profiles(
 def save_scan_profile(
     scan_profile: ScanProfile = Body(discriminator="scan_profile_type"),
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_required_valid_time),
+    valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     try:
         old_scan_profile = octopoes.scan_profile_repository.get(scan_profile.reference, valid_time)
@@ -407,7 +394,7 @@ def save_many(
 @router.get("/scan_profiles/recalculate", tags=["Scan Profiles"])
 def recalculate_scan_profiles(
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_required_valid_time),
+    valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     octopoes.recalculate_scan_profiles(valid_time)
     octopoes.commit()

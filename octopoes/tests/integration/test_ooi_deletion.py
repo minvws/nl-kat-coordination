@@ -38,10 +38,10 @@ def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     hostname = Hostname(network=network.reference, name=url)
     octopoes_api_connector.save_declaration(Declaration(ooi=hostname, valid_time=valid_time))
 
-    original_size = len(octopoes_api_connector.list_origins(task_id={}))
+    original_size = len(octopoes_api_connector.list_origins(task_id={}, valid_time=valid_time))
     assert original_size >= 2
     octopoes_api_connector.recalculate_bits()
-    bits_size = len(octopoes_api_connector.list_origins(task_id={}))
+    bits_size = len(octopoes_api_connector.list_origins(task_id={}, valid_time=valid_time))
     assert bits_size >= original_size
 
     nxd = NXDOMAIN(hostname=hostname.reference)
@@ -56,17 +56,17 @@ def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     )
     octopoes_api_connector.recalculate_bits()
 
-    octopoes_api_connector.delete(network.reference)
-    octopoes_api_connector.delete(hostname.reference)
+    octopoes_api_connector.delete(network.reference, valid_time=valid_time)
+    octopoes_api_connector.delete(hostname.reference, valid_time=valid_time)
 
     # This sleep is here because otherwise on some systems this test will fail
     # Delete when issue #2083 is resolved...
     time.sleep(2)
-    assert len(octopoes_api_connector.list_origins(task_id={})) < bits_size
+    assert len(octopoes_api_connector.list_origins(task_id={}, valid_time=valid_time)) < bits_size
 
     octopoes_api_connector.recalculate_bits()
 
-    assert len(octopoes_api_connector.list_origins(task_id={})) < original_size
+    assert len(octopoes_api_connector.list_origins(task_id={}, valid_time=valid_time)) < original_size
 
 
 def test_events_created_through_crud(xtdb_octopoes_service: OctopoesService, event_manager: Mock, valid_time: datetime):

@@ -19,14 +19,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
 from requests import Response
-from tools.models import (
-    GROUP_ADMIN,
-    GROUP_CLIENT,
-    GROUP_REDTEAM,
-    Indemnification,
-    Organization,
-    OrganizationMember,
-)
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
@@ -483,6 +476,20 @@ def cve_finding_type_2019_8331():
 
 
 @pytest.fixture
+def cve_finding_type_2019_2019():
+    return CVEFindingType(
+        id="CVE-2019-2019",
+        description="In ce_t4t_data_cback of ce_t4t.cc, there is a possible out-of-bound read due to a missing bounds "
+        "check. This could lead to local information disclosure with no additional execution privileges "
+        "needed. User interaction is needed for exploitation.Product: AndroidVersions: Android-7.0 "
+        "Android-7.1.1 Android-7.1.2 Android-8.0 Android-8.1 Android-9Android ID: A-115635871",
+        source="https://cve.circl.lu/cve/CVE-2019-2019",
+        risk_score=6.5,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
 def cve_finding_2019_8331():
     return Finding(
         finding_type=Reference.from_str("CVEFindingType|CVE-2019-8331"),
@@ -491,6 +498,19 @@ def cve_finding_2019_8331():
         ),
         proof=None,
         description="Vulnerability CVE-2019-8331 detected",
+        reproduce=None,
+    )
+
+
+@pytest.fixture
+def cve_finding_2019_2019():
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2019-2019"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2019-2019"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2019-2019 detected",
         reproduce=None,
     )
 
@@ -627,6 +647,59 @@ def finding_type_kat_no_dkim():
         recommendation="Fake recommendation...",
         risk_score=9.5,
         risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_uncommon_open_port():
+    return KATFindingType(
+        id="KAT-UNCOMMON-OPEN-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_open_sysadmin_port():
+    return KATFindingType(
+        id="KAT-OPEN-SYSADMIN-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=8.5,
+        risk_severity=RiskLevelSeverity.HIGH,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_open_database_port():
+    return KATFindingType(
+        id="KAT-OPEN-DATABASE-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.5,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dnssec():
+    return KATFindingType(
+        id="KAT-NO-DNSSEC",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_severity=RiskLevelSeverity.PENDING,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_invalid_dnssec():
+    return KATFindingType(
+        id="KAT-INVALID-DNSSEC",
+        recommendation="Fake recommendation...",
+        risk_score=3.0,
+        risk_severity=RiskLevelSeverity.LOW,
     )
 
 
@@ -820,3 +893,16 @@ class MockOctopoesAPIConnector:
 @pytest.fixture
 def mock_octopoes_api_connector(valid_time):
     return MockOctopoesAPIConnector(valid_time)
+
+
+@pytest.fixture
+def listed_hostnames(network):
+    return [
+        Hostname(network=network.reference, name="example.com"),
+        Hostname(network=network.reference, name="a.example.com"),
+        Hostname(network=network.reference, name="b.example.com"),
+        Hostname(network=network.reference, name="c.example.com"),
+        Hostname(network=network.reference, name="d.example.com"),
+        Hostname(network=network.reference, name="e.example.com"),
+        Hostname(network=network.reference, name="f.example.com"),
+    ]

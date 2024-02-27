@@ -6,14 +6,7 @@ from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_binaryedge.services.normalize import get_name_from_cpe
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
-from octopoes.models.ooi.network import (
-    IPAddressV4,
-    IPAddressV6,
-    IPPort,
-    Network,
-    PortState,
-    Protocol,
-)
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
 

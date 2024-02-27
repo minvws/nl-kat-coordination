@@ -10,16 +10,9 @@ from requests import HTTPError, RequestException
 from rest_framework.status import HTTP_404_NOT_FOUND
 from tools.view_helpers import schedule_task
 
-from katalogus.client import (
-    Boefje as KATalogusBoefje,
-)
-from katalogus.client import (
-    KATalogusClientV1,
-    get_katalogus,
-)
-from katalogus.client import (
-    Normalizer as KATalogusNormalizer,
-)
+from katalogus.client import Boefje as KATalogusBoefje
+from katalogus.client import KATalogusClientV1, get_katalogus
+from katalogus.client import Normalizer as KATalogusNormalizer
 from octopoes.models import OOI
 from rocky.exceptions import (
     AcknowledgedClearanceLevelTooLowException,
