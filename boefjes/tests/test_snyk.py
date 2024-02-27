@@ -5,11 +5,7 @@ from boefjes.job_models import BoefjeMeta, NormalizerMeta
 from boefjes.plugins.kat_snyk.main import run as run_boefje
 from boefjes.plugins.kat_snyk.normalize import run
 from octopoes.models.ooi.findings import SnykFindingType
-from octopoes.models.types import (
-    CVEFindingType,
-    Finding,
-    Software,
-)
+from octopoes.models.types import CVEFindingType, Finding, Software
 from tests.loading import get_dummy_data
 
 

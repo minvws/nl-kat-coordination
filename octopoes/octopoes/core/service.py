@@ -15,13 +15,7 @@ from octopoes.config.settings import (
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     Settings,
 )
-from octopoes.events.events import (
-    DBEvent,
-    OOIDBEvent,
-    OriginDBEvent,
-    OriginParameterDBEvent,
-    ScanProfileDBEvent,
-)
+from octopoes.events.events import DBEvent, OOIDBEvent, OriginDBEvent, OriginParameterDBEvent, ScanProfileDBEvent
 from octopoes.models import (
     OOI,
     DeclaredScanProfile,

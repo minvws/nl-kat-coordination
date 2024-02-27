@@ -6,11 +6,7 @@ from django import forms
 from django.forms import Widget
 from django.utils.translation import gettext_lazy as _
 
-from tools.forms.settings import (
-    OBSERVED_AT_HELP_TEXT,
-    Choices,
-    ChoicesGroups,
-)
+from tools.forms.settings import OBSERVED_AT_HELP_TEXT, Choices, ChoicesGroups
 
 
 class BaseRockyModelForm(forms.ModelForm):

@@ -14,13 +14,8 @@ from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
 from tools.forms.settings import DEPTH_DEFAULT, DEPTH_MAX
 from tools.models import Organization
-from tools.ooi_helpers import (
-    get_knowledge_base_data_for_ooi_store,
-)
-from tools.view_helpers import (
-    convert_date_to_datetime,
-    get_ooi_url,
-)
+from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
+from tools.view_helpers import convert_date_to_datetime, get_ooi_url
 
 from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector

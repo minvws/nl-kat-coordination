@@ -19,14 +19,7 @@ from octopoes.config.settings import (
 )
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfile,
-    ScanProfileBase,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileBase, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity

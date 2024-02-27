@@ -19,12 +19,7 @@ from octopoes.config.settings import (
 )
 from octopoes.events.events import OOIDBEvent, OperationType
 from octopoes.events.manager import EventManager
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity

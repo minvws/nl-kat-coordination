@@ -4,18 +4,8 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import OOI
-from tools.forms.base import (
-    BaseRockyForm,
-    CheckboxTable,
-    LabeledCheckboxInput,
-    ObservedAtForm,
-)
-from tools.forms.settings import (
-    DEPTH_DEFAULT,
-    DEPTH_HELP_TEXT,
-    DEPTH_MAX,
-    SCAN_LEVEL_CHOICES,
-)
+from tools.forms.base import BaseRockyForm, CheckboxTable, LabeledCheckboxInput, ObservedAtForm
+from tools.forms.settings import DEPTH_DEFAULT, DEPTH_HELP_TEXT, DEPTH_MAX, SCAN_LEVEL_CHOICES
 
 
 class OOIReportSettingsForm(ObservedAtForm):

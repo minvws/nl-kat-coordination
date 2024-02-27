@@ -12,12 +12,7 @@ from two_factor.utils import default_device
 from two_factor.views import LoginView, SetupView
 from two_factor.views.utils import class_view_decorator
 
-from account.forms import (
-    LoginForm,
-    TwoFactorBackupTokenForm,
-    TwoFactorSetupTokenForm,
-    TwoFactorVerifyTokenForm,
-)
+from account.forms import LoginForm, TwoFactorBackupTokenForm, TwoFactorSetupTokenForm, TwoFactorVerifyTokenForm
 
 User = get_user_model()
 

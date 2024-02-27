@@ -15,13 +15,7 @@ from octopoes.config.settings import (
     DEFAULT_SCAN_PROFILE_TYPE_FILTER,
 )
 from octopoes.connector import DecodeException, RemoteException
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfile,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
