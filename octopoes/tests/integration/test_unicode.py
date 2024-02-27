@@ -15,8 +15,7 @@ from octopoes.models.origin import OriginType
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
 
-USE_UNICODE = True
-NAMES = ["🐱", "★.com", "🐈"] if USE_UNICODE else ["cat", "xn--p3h.com", "boefje"]
+NAMES = ["🐱", "★.com", "🐈"]
 
 
 def test_unicode_network(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
