@@ -43,7 +43,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     except (APIError, RequestException) as e:
         logging.warning("DockerException occurred: %s", e)
         container.stop()
-        raise TimeoutError("Timeout occurred while running testssl.sh")
+        raise Exception("Timeout occurred while running testssl.sh")
     finally:
         container.remove()
 
