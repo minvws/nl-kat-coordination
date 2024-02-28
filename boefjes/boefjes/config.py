@@ -62,6 +62,10 @@ class Settings(BaseSettings):
         validation_alias="KATALOGUS_DB_URI",
     )
 
+    db_connection_pool_size: int = Field(
+        16, description="Database connection pool size", validation_alias="KATALOGUS_DB_CONNECTION_POOL_SIZE"
+    )
+
     scheduler_api: AnyHttpUrl = Field(
         ..., examples=["http://localhost:8004"], description="Mula API URL", validation_alias="SCHEDULER_API"
     )
