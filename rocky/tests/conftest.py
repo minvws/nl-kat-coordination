@@ -427,7 +427,7 @@ def lazy_task_list_with_boefje(task) -> MagicMock:
 
 
 @pytest.fixture
-def network():
+def network() -> Network:
     return Network(
         name="testnetwork",
         scan_profile=DeclaredScanProfile(reference=Reference.from_str("Network|testnetwork"), level=ScanLevel.L1),
@@ -435,22 +435,22 @@ def network():
 
 
 @pytest.fixture
-def ipaddressv4(network):
+def ipaddressv4(network) -> IPAddressV4:
     return IPAddressV4(network=network.reference, address=IPv4Address("192.0.2.1"))
 
 
 @pytest.fixture
-def ipaddressv6(network):
+def ipaddressv6(network) -> IPAddressV6:
     return IPAddressV6(network=network.reference, address=IPv6Address("2001:db8::1"))
 
 
 @pytest.fixture
-def ip_port(ipaddressv4):
+def ip_port(ipaddressv4) -> IPPort:
     return IPPort(address=ipaddressv4.reference, port=80, protocol=Protocol.TCP)
 
 
 @pytest.fixture
-def hostname(network):
+def hostname(network) -> Hostname:
     return Hostname(name="example.com", network=network.reference)
 
 
@@ -473,7 +473,7 @@ def security_txt(website: Website, url: URL):
 
 
 @pytest.fixture
-def service():
+def service() -> Service:
     return Service(name="domain")
 
 
@@ -483,12 +483,12 @@ def ip_service(ip_port: IPPort, service: Service):
 
 
 @pytest.fixture
-def software():
+def software() -> Software:
     return Software(name="DICOM")
 
 
 @pytest.fixture
-def cve_finding_type_2019_8331():
+def cve_finding_type_2019_8331() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-2019-8331",
         description="In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or "
@@ -500,7 +500,21 @@ def cve_finding_type_2019_8331():
 
 
 @pytest.fixture
-def cve_finding_2019_8331():
+def cve_finding_type_2019_2019() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-2019-2019",
+        description="In ce_t4t_data_cback of ce_t4t.cc, there is a possible out-of-bound read due to a missing bounds "
+        "check. This could lead to local information disclosure with no additional execution privileges "
+        "needed. User interaction is needed for exploitation.Product: AndroidVersions: Android-7.0 "
+        "Android-7.1.1 Android-7.1.2 Android-8.0 Android-8.1 Android-9Android ID: A-115635871",
+        source="https://cve.circl.lu/cve/CVE-2019-2019",
+        risk_score=6.5,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def cve_finding_2019_8331() -> Finding:
     return Finding(
         finding_type=Reference.from_str("CVEFindingType|CVE-2019-8331"),
         ooi=Reference.from_str(
@@ -513,7 +527,20 @@ def cve_finding_2019_8331():
 
 
 @pytest.fixture
-def cve_finding_type_no_score():
+def cve_finding_2019_2019() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2019-2019"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2019-2019"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2019-2019 detected",
+        reproduce=None,
+    )
+
+
+@pytest.fixture
+def cve_finding_type_no_score() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-0000-0001",
         description="CVE Finding without scopre",
@@ -523,7 +550,7 @@ def cve_finding_type_no_score():
 
 
 @pytest.fixture
-def cve_finding_no_score():
+def cve_finding_no_score() -> Finding:
     return Finding(
         finding_type=Reference.from_str("CVEFindingType|CVE-0000-0001"),
         ooi=Reference.from_str(
@@ -536,7 +563,7 @@ def cve_finding_no_score():
 
 
 @pytest.fixture
-def finding():
+def finding() -> Finding:
     return Finding(
         finding_type=Reference.from_str("KATFindingType|KAT-0001"),
         ooi=Reference.from_str("Network|testnetwork"),
@@ -563,17 +590,17 @@ def web_report_finding_types():
 
 
 @pytest.fixture
-def no_rpki_finding_type():
+def no_rpki_finding_type() -> KATFindingType:
     return KATFindingType(id="KAT-NO-RPKI")
 
 
 @pytest.fixture
-def expired_rpki_finding_type():
+def expired_rpki_finding_type() -> KATFindingType:
     return KATFindingType(id="KAT-EXPIRED-RPKI")
 
 
 @pytest.fixture
-def finding_types():
+def finding_types() -> list[KATFindingType]:
     return [
         KATFindingType(
             id="KAT-0001",
@@ -600,7 +627,7 @@ def finding_types():
 
 
 @pytest.fixture
-def cipher_finding_types():
+def cipher_finding_types() -> list[KATFindingType]:
     return [
         KATFindingType(
             id="KAT-RECOMMENDATION-BAD-CIPHER",
@@ -620,7 +647,7 @@ def cipher_finding_types():
 
 
 @pytest.fixture
-def cipher_finding_type():
+def cipher_finding_type() -> KATFindingType:
     return KATFindingType(
         id="KAT-MEDIUM-BAD-CIPHER",
         description="Fake description...",
@@ -631,7 +658,7 @@ def cipher_finding_type():
 
 
 @pytest.fixture
-def finding_type_kat_no_spf():
+def finding_type_kat_no_spf() -> KATFindingType:
     return KATFindingType(
         id="KAT-NO-SPF",
         description="Fake description...",
@@ -642,7 +669,7 @@ def finding_type_kat_no_spf():
 
 
 @pytest.fixture
-def finding_type_kat_no_dmarc():
+def finding_type_kat_no_dmarc() -> KATFindingType:
     return KATFindingType(
         id="KAT-NO-DMARC",
         description="Fake description...",
@@ -653,7 +680,7 @@ def finding_type_kat_no_dmarc():
 
 
 @pytest.fixture
-def finding_type_kat_no_dkim():
+def finding_type_kat_no_dkim() -> KATFindingType:
     return KATFindingType(
         id="KAT-NO-DKIM",
         description="Fake description...",
@@ -664,7 +691,7 @@ def finding_type_kat_no_dkim():
 
 
 @pytest.fixture
-def finding_type_kat_uncommon_open_port():
+def finding_type_kat_uncommon_open_port() -> KATFindingType:
     return KATFindingType(
         id="KAT-UNCOMMON-OPEN-PORT",
         description="Fake description...",
@@ -675,7 +702,7 @@ def finding_type_kat_uncommon_open_port():
 
 
 @pytest.fixture
-def finding_type_kat_open_sysadmin_port():
+def finding_type_kat_open_sysadmin_port() -> KATFindingType:
     return KATFindingType(
         id="KAT-OPEN-SYSADMIN-PORT",
         description="Fake description...",
@@ -686,7 +713,7 @@ def finding_type_kat_open_sysadmin_port():
 
 
 @pytest.fixture
-def finding_type_kat_open_database_port():
+def finding_type_kat_open_database_port() -> KATFindingType:
     return KATFindingType(
         id="KAT-OPEN-DATABASE-PORT",
         description="Fake description...",
@@ -697,7 +724,7 @@ def finding_type_kat_open_database_port():
 
 
 @pytest.fixture
-def finding_type_kat_no_dnssec():
+def finding_type_kat_no_dnssec() -> KATFindingType:
     return KATFindingType(
         id="KAT-NO-DNSSEC",
         description="Fake description...",
@@ -707,7 +734,7 @@ def finding_type_kat_no_dnssec():
 
 
 @pytest.fixture
-def finding_type_kat_invalid_dnssec():
+def finding_type_kat_invalid_dnssec() -> KATFindingType:
     return KATFindingType(
         id="KAT-INVALID-DNSSEC",
         recommendation="Fake recommendation...",
@@ -909,7 +936,7 @@ def mock_octopoes_api_connector(valid_time):
 
 
 @pytest.fixture
-def listed_hostnames(network):
+def listed_hostnames(network) -> list[Hostname]:
     return [
         Hostname(network=network.reference, name="example.com"),
         Hostname(network=network.reference, name="a.example.com"),
