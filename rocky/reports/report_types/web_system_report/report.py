@@ -202,7 +202,7 @@ class WebSystemReport(Report):
 
             result[input_ooi] = {
                 "input_ooi": input_ooi,
-                "web_checks": WebChecks(),
+                "web_checks": checks,
                 "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
             }
 
