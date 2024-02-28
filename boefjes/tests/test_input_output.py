@@ -1,6 +1,4 @@
-import glob
 import json
-import os
 from pathlib import Path
 
 from pydantic import parse_obj_as
@@ -20,11 +18,11 @@ def get_dummy_data(filename: str) -> bytes:
 def get_test_files(testpath):
     """Finds all files with the test-input filename and the related output files"""
     tests = []
-    for input_filename in glob.glob(testpath):
+    for input_filename in Path('.').glob(testpath):
         input_data = get_dummy_data(input_filename)
         output_data = json.loads(get_dummy_data(input_filename.replace("input", "output")))
         ooi_data_filename = input_filename.replace("input", "ooi")
-        if os.path.isfile(ooi_data_filename):
+        if Path(ooi_data_filename).is_file():
             input_ooi_data = json.loads(get_dummy_data(ooi_data_filename))
         else:
             input_ooi_data = None
@@ -32,7 +30,7 @@ def get_test_files(testpath):
     return tests
 
 
-def create_boefje_meta(input_ooi = None):
+def create_boefje_meta(input_ooi=None):
     if not input_ooi:
         input_ooi = {
             "object_type": "HostnameHTTPURL",
@@ -62,20 +60,20 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize("test_input,expected_output,input_ooi_data", test_files)
 
 
-def field_filter(filter, objects):
-    """Walks over a list of objects and removes unknown fields by checking the field keys for 
-    each object agains the filters allow list for that object type."""
-    for object in objects:
-        if filter[object['type']]:
+def field_filter(filters, objectlist):
+    """Walks over a list of objects and removes unknown fields by checking the field keys for
+    each object against the filters allow list for that object type."""
+    for object in objectlist:
+        if filters[object["type"]]:
             for objectfield in list(object.keys()):
-                if objectfield not in filter[object['type']]:
-                    del(object[objectfield])
-    return objects
+                if objectfield not in filters[object["type"]]:
+                    del object[objectfield]
+    return objectlist
 
 
 def test_input_output(test_input, expected_output, input_ooi_data):
     results = set(run_normalizer(create_boefje_meta(input_ooi_data), test_input))
-    extra_in_given = results - expected_output # this expects the yielded objects to be hasheable.
+    extra_in_given = results - expected_output  # this expects the yielded objects to be hasheable.
     extra_in_expected = expected_output - results
     assert not extra_in_given
     assert not extra_in_expected
