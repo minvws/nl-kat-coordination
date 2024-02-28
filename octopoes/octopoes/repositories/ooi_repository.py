@@ -732,7 +732,7 @@ class XTDBOOIRepository(OOIRepository):
 
         return Paginated(
             count=count,
-            items=self.query(finding_query, valid_time),
+            items=[x[0] for x in self.query(finding_query, valid_time)],
         )
 
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
