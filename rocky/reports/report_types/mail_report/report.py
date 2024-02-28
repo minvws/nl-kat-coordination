@@ -35,7 +35,7 @@ class MailReport(Report):
         result = {
             ooi: {
                 "input_ooi": ooi,
-                "finding_types": [],
+                "finding_types": {},
                 "number_of_hostnames": 0,
                 "number_of_spf": 0,
                 "number_of_dmarc": 0,
