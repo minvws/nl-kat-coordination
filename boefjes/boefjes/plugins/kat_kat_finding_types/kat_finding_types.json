@@ -18,7 +18,7 @@
         "source": "https://owasp.org/www-project-secure-headers/#div-headers",
         "risk": "recommendation",
         "impact": "When the value of this header is not set to master- only, Adobe Flash or Adobe Acrobat (and possibly other software) can also look at cross-domain configuration files hosted at the web server.",
-        "recommendation": "This header is not supported by default by Mozilla. If this header is required for your environemnt: Set the HTTP header X-Permitted-Cross- Domain-Policies: none in all HTTP responses. Use value master-only if a Flash or Acrobat cross- domain configuration file is used that is placed in the root of the web server"
+        "recommendation": "This header is not supported by default by Mozilla. If this header is required for your environment: Set the HTTP header X-Permitted-Cross- Domain-Policies: none in all HTTP responses. Use value master-only if a Flash or Acrobat cross- domain configuration file is used that is placed in the root of the web server"
     },
     "KAT-NO-EXPLICIT-XSS-PROTECTION": {
         "description": "This is a deprecated header previously used to prevent against Cross-Site-Scripting attacks. Support in modern browsers could introduce XSS attacks again.",
@@ -234,7 +234,7 @@
         "description": "A Dicom server is exposed.",
         "source": "https://en.wikipedia.org/wiki/DICOM",
         "risk": "critical",
-        "impact": "Impact depends on segmenation and where the server is reachable from.",
+        "impact": "Impact depends on segmentation and where the server is reachable from.",
         "recommendation": "Validate whether this server should actually be exposed."
     },
     "KAT-10-OR-MORE-NEW-PORTS-OPEN": {
