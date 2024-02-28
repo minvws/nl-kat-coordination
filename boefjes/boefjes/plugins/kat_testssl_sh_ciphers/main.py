@@ -4,7 +4,7 @@ from os import getenv
 
 import docker
 from docker.errors import APIError
-from requests.exceptions import ReadTimeout
+from requests.exceptions import RequestException
 
 from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
@@ -40,7 +40,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     try:
         container.wait(timeout=300)
         output = get_file_from_container(container, "tmp/output.json")
-    except (APIError, ReadTimeout) as e:
+    except (APIError, RequestException) as e:
         logging.warning("DockerException occurred: %s", e)
         container.stop()
         raise TimeoutError("Timeout occurred while running testssl.sh")
