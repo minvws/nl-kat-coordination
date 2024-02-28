@@ -136,6 +136,8 @@ class Settings(BaseSettings):
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
 
+    db_connection_pool_size: int = Field(16, description="Database connection pool size")
+
     model_config = SettingsConfigDict(env_prefix="BYTES_")
 
     @classmethod
