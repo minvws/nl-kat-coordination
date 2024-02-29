@@ -48,14 +48,16 @@
                     {% translate type as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
 
-                    <button type="submit">{% translate "Create object" %}</button>
-                </form>
-                {% if organization %}
                     <div class="button-container">
-                        <a href="{% url "complete_onboarding" organization.code %}"
-                           class="button ghost">{% translate "Skip onboarding" %}</a>
-                    </div>
-                {% endif %}
+                        <button type="submit">{% translate "Create object" %}</button>
+                        {% if organization %}
+                            <div class="button-container">
+                                <a href="{% url "complete_onboarding" organization.code %}"
+                                   class="button ghost">{% translate "Skip onboarding" %}</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </form>
             </div>
         </section>
     </main>

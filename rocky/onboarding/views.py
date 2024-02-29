@@ -246,12 +246,13 @@ class OnboardingSetClearanceLevelView(
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        self.url = self.request.GET.get("ooi", "")
         self.report_type = self.request.GET.get("report_type", "")
-        self.selection = {"ooi": self.ooi.primary_key, "report_type": self.report_type}
+        self.selection = {"ooi": self.url, "report_type": self.report_type}
 
     def form_valid(self, form):
-        if not self.can_raise_clearance_level(self.ooi, DNS_REPORT_LEAST_CLEARANCE_LEVEL):
+        ooi = self.get_ooi(self.url)
+        if not self.can_raise_clearance_level(ooi, DNS_REPORT_LEAST_CLEARANCE_LEVEL):
             return self.get(self.request, self.args, self.kwargs)
         return redirect(
             reverse("step_setup_scan_select_plugins", kwargs={"organization_code": self.organization.code})
@@ -260,7 +261,7 @@ class OnboardingSetClearanceLevelView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["ooi"] = self.ooi
+        context["ooi"] = self.url
         return context
 
 
@@ -361,20 +362,29 @@ class OnboardingReportView(
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        ooi = self.get_ooi(request.GET.get("ooi", ""))
-        report_type = request.GET.get("report_type", "")
-        hostname = Hostname(name=ooi.raw.host, network=ooi.network)
-        self.selection = {
-            "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-            "ooi": hostname.primary_key,
-            "report_type": report_type,
-        }
+        self.report_type = request.GET.get("report_type", "")
+        self.ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        self.hostname = self.get_hostname_from_url_tree()
+
+    def get_hostname_from_url_tree(self) -> Hostname:
+        tree = self.octopoes_api_connector.get_tree(
+            self.ooi.primary_key, valid_time=datetime.now(timezone.utc), depth=2
+        )
+        hostname_ref = tree.store[self.ooi.web_url].netloc
+        return tree.store[str(hostname_ref)]
 
     def post(self, request, *args, **kwargs):
+        selection = {
+            "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+            "ooi": self.hostname.primary_key,
+            "report_type": self.report_type,
+        }
+
         self.set_member_onboarded()
+
         return redirect(
             reverse("generate_report_view", kwargs={"organization_code": self.organization.code})
-            + get_selection(self.request, self.selection)
+            + get_selection(self.request, selection)
         )
 
     def set_member_onboarded(self):

@@ -27,6 +27,7 @@ from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
 from octopoes.models.ooi.service import Service
 from octopoes.models.ooi.software import Software
+from octopoes.models.ooi.web import URL
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.transaction import TransactionRecord
 from rocky.scheduler import Task
@@ -430,6 +431,20 @@ def network():
     return Network(
         name="testnetwork",
         scan_profile=DeclaredScanProfile(reference=Reference.from_str("Network|testnetwork"), level=ScanLevel.L1),
+    )
+
+
+@pytest.fixture
+def url(network):
+    return URL(
+        object_type="URL",
+        scan_profile=DeclaredScanProfile(
+            scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
+        ),
+        primary_key="URL|testnetwork|http://example.com/",
+        network=network.reference,
+        raw="http://example.com",
+        web_url=Reference("HostnameHTTPURL|http|testnetwork|example.com|80|/"),
     )
 
 
