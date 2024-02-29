@@ -5,7 +5,7 @@ from typing import Any
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from reports.report_types.definitions import AggregateReport
@@ -444,27 +444,39 @@ def aggregate_reports(
     selected_report_types: list[str],
     valid_time: datetime,
 ) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
-    aggregate_report = AggregateOrganisationReport(connector)
-    report_data: dict[str, Any] = {}
-    error_oois = []
+    by_type: dict[str, list[str]] = {}
 
     for ooi in input_ooi_references:
-        report_data[ooi.primary_key] = {}
+        if ooi.get_object_type() not in by_type:
+            by_type[ooi.get_object_type()] = []
+
+        by_type[ooi.get_object_type()].append(str(ooi.reference))
+
+    all_types = [
+        t
+        for t in AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+        if t.id in selected_report_types
+    ]
+    report_data: dict[str, Any] = {}
+    errors = []
+
+    for report_type in all_types:
+        oois = {x for ooi_type in report_type.input_ooi_types for x in by_type.get(ooi_type.get_object_type(), [])}
+
         try:
-            for options, report_types in aggregate_report.reports.items():
-                # Mypy doesn't support TypedDict and .values()
-                # https://github.com/python/mypy/issues/7981
-                for report_type in report_types:  # type: ignore[attr-defined]
-                    if (
-                        Reference.from_str(ooi).class_type in report_type.input_ooi_types
-                        and report_type.id in selected_report_types
-                    ):
-                        report = report_type(connector)
-                        data = report.generate_data(ooi.primary_key, valid_time=valid_time)
-                        report_data[ooi.primary_key][report_type.id] = data
+            results = report_type(connector).collect_data(oois, valid_time)
         except ObjectNotFoundException:
-            logger.error("Object not found: %s", ooi.primary_key)
-            error_oois.append(ooi.primary_key)
+            logger.error("Object not found")
+            errors.append(report_type.id)
+            continue
+
+        for ooi, data in results.items():
+            if ooi not in report_data:
+                report_data[ooi] = {}
+
+            report_data[ooi][report_type.id] = data
+
+    aggregate_report = AggregateOrganisationReport(connector)
     post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
 
-    return aggregate_report, post_processed_data, report_data, error_oois
+    return aggregate_report, post_processed_data, report_data, errors
