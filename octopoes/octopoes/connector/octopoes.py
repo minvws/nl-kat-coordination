@@ -170,17 +170,34 @@ class OctopoesAPIConnector:
         return TypeAdapter(list[Origin]).validate_json(res.content)
 
     def save_observation(self, observation: Observation) -> None:
-        self.session.post(f"/{self.client}/observations", data=observation.model_dump_json())
+        self.session.post(
+            f"/{self.client}/observations",
+            headers={"Content-Type": "application/json"},
+            data=observation.model_dump_json().encode(),
+        )
 
     def save_declaration(self, declaration: Declaration) -> None:
-        self.session.post(f"/{self.client}/declarations", data=declaration.model_dump_json())
+        self.session.post(
+            f"/{self.client}/declarations",
+            headers={"Content-Type": "application/json"},
+            data=declaration.model_dump_json().encode(),
+        )
 
     def save_affirmation(self, affirmation: Affirmation) -> None:
-        self.session.post(f"/{self.client}/affirmations", data=affirmation.model_dump_json())
+        self.session.post(
+            f"/{self.client}/affirmations",
+            headers={"Content-Type": "application/json"},
+            data=affirmation.model_dump_json().encode(),
+        )
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
         params = {"valid_time": str(valid_time)}
-        self.session.put(f"/{self.client}/scan_profiles", params=params, data=scan_profile.model_dump_json())
+        self.session.put(
+            f"/{self.client}/scan_profiles",
+            params=params,
+            headers={"Content-Type": "application/json"},
+            data=scan_profile.model_dump_json().encode(),
+        )
 
     def save_many_scan_profiles(self, scan_profiles: list[ScanProfile], valid_time: datetime) -> None:
         params = {"valid_time": str(valid_time)}
@@ -255,13 +272,13 @@ class OctopoesAPIConnector:
         self,
         path: str,
         valid_time: datetime,
-        source: Reference | str | None = None,
+        source: OOI | Reference | str | None = None,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
     ) -> list[OOI]:
         params = {
             "path": path,
-            "source": source,
+            "source": source.reference if isinstance(source, OOI) else source,
             "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
@@ -270,3 +287,22 @@ class OctopoesAPIConnector:
             TypeAdapter(OOIType).validate_python(ooi)
             for ooi in self.session.get(f"/{self.client}/query", params=params).json()
         ]
+
+    def query_many(
+        self,
+        path: str,
+        valid_time: datetime,
+        sources: list[OOI | Reference | str],
+    ) -> list[tuple[str, OOIType]]:
+        if not sources:
+            return []
+
+        params = {
+            "path": path,
+            "sources": [str(ooi) for ooi in sources],
+            "valid_time": str(valid_time),
+        }
+
+        result = self.session.get(f"/{self.client}/query-many", params=params).json()
+
+        return TypeAdapter(list[tuple[str, OOIType]]).validate_python(result)

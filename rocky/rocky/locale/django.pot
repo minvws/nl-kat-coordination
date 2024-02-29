@@ -3051,6 +3051,10 @@ msgstr ""
 msgid "Advice"
 msgstr ""
 
+#: reports/report_types/vulnerability_report/report.html
+msgid "No findings have been found on this system."
+msgstr ""
+
 #: reports/report_types/vulnerability_report/report.py
 msgid "Vulnerability Report"
 msgstr ""

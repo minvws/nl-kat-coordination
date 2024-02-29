@@ -201,8 +201,23 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert len(results) == 1
     assert str(results[0].port) == "443"
 
-    results = octopoes_api_connector.query(query, valid_time, source=hostnames[0].reference)
+    results = octopoes_api_connector.query(query, valid_time, source=hostnames[0])
     assert len(results) == 0
 
-    results = octopoes_api_connector.query(query, valid_time, source=hostnames[1].reference)
+    results = octopoes_api_connector.query(query, valid_time, source=hostnames[1])
     assert len(results) == 1
+
+    query = "Hostname.<hostname[is DNSNSRecord]"
+    assert len(octopoes_api_connector.query(query, valid_time, hostnames[0])) == 1
+    assert len(octopoes_api_connector.query(query, valid_time, hostnames[1])) == 1
+    assert len(octopoes_api_connector.query(query, valid_time, hostnames[2])) == 1
+    assert len(octopoes_api_connector.query(query, valid_time, hostnames[3])) == 0
+
+    result = octopoes_api_connector.query_many(
+        query,
+        valid_time,
+        [hostnames[0], hostnames[1], hostnames[2], hostnames[3]],
+    )
+    assert len(result) == 3
+    assert result[0][0] == hostnames[0].reference
+    assert result[0][1] == dns_ns_records[0]

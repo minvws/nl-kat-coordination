@@ -730,12 +730,28 @@ class XTDBOOIRepository(OOIRepository):
             }}
         """
 
-        res = self.session.client.query(finding_query, valid_time)
-        findings = [self.deserialize(x[0]) for x in res]
         return Paginated(
             count=count,
-            items=findings,
+            items=[x[0] for x in self.query(finding_query, valid_time)],
         )
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI]:
-        return [self.deserialize(row[0]) for row in self.session.client.query(query, valid_time=valid_time)]
+    def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
+        results = self.session.client.query(query, valid_time=valid_time)
+
+        parsed_results = []
+        for result in results:
+            parsed_result = []
+
+            for item in result:
+                try:
+                    parsed_result.append(self.deserialize(item))
+                except (ValueError, TypeError):
+                    parsed_result.append(item)
+
+            if len(parsed_result) == 1:
+                parsed_results.append(parsed_result[0])
+                continue
+
+            parsed_results.append(tuple(parsed_result))
+
+        return parsed_results
