@@ -231,9 +231,10 @@ class Query:
             value = value.replace('"', r"\"")
             new_values.append(f'"{value}"')
 
-        types_to_check = [ooi_type]
         if ooi_type in get_abstract_types():
             types_to_check = ooi_type.strict_subclasses()
+        else:
+            types_to_check = [ooi_type]
 
         self._where_clauses.append(
             self._or_statement_for_multiple_values(self._get_object_alias(ref), types_to_check, field_name, new_values)
