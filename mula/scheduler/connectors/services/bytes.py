@@ -4,8 +4,8 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
-import requests
-from requests.models import HTTPError
+import httpx
+from httpx import HTTPError, HTTPStatusError
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import BoefjeMeta
@@ -20,7 +20,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     def wrapper(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
-        except HTTPError as error:
+        except HTTPStatusError as error:
             if error.response.status_code != 401:
                 raise error from HTTPError
 
@@ -59,7 +59,7 @@ class Bytes(HTTPService):
             self.headers.update({"Authorization": f"bearer {self.get_token()}"})
 
     @staticmethod
-    def _verify_response(response: requests.Response) -> None:
+    def _verify_response(response: httpx.Response) -> None:
         response.raise_for_status()
 
     def get_token(self) -> str:

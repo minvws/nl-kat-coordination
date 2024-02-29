@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-import requests
+import httpx
 from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
@@ -1288,8 +1288,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            requests.exceptions.RetryError(),
-            requests.exceptions.ConnectionError(),
+            httpx.ConnectError,
+            httpx.ConnectError,
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1339,8 +1339,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            requests.exceptions.RetryError(),
-            requests.exceptions.ConnectionError(),
+            httpx.ConnectError,
+            httpx.ConnectError,
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1492,8 +1492,8 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_random_objects.side_effect = [
-            requests.exceptions.RetryError(),
-            requests.exceptions.ConnectionError(),
+            httpx.ConnectError,
+            httpx.ConnectError,
         ]
 
         # Act
