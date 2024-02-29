@@ -44,12 +44,12 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in hostnames + [network]], valid_time
     )
 
-    assert octopoes_api_connector.list_objects(types={Network}).count == 1
-    assert octopoes_api_connector.list_objects(types={Hostname}).count == 10
-    assert octopoes_api_connector.list_objects(types={Network, Hostname}).count == 11
+    assert octopoes_api_connector.list_objects(types={Network}, valid_time=valid_time).count == 1
+    assert octopoes_api_connector.list_objects(types={Hostname}, valid_time=valid_time).count == 10
+    assert octopoes_api_connector.list_objects(types={Network, Hostname}, valid_time=valid_time).count == 11
 
-    assert len(octopoes_api_connector.list_origins(task_id=uuid.uuid4())) == 0
-    origins = octopoes_api_connector.list_origins(task_id=task_id)
+    assert len(octopoes_api_connector.list_origins(task_id=uuid.uuid4(), valid_time=valid_time)) == 0
+    origins = octopoes_api_connector.list_origins(task_id=task_id, valid_time=valid_time)
     assert len(origins) == 1
     assert origins[0].dict() == {
         "method": "normalizer_id",
@@ -59,11 +59,13 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
         "task_id": task_id,
     }
 
-    assert len(octopoes_api_connector.list_origins(result=hostnames[0].reference)) == 1
+    assert len(octopoes_api_connector.list_origins(result=hostnames[0].reference, valid_time=valid_time)) == 1
 
     # Delete even-numbered test hostnames
-    octopoes_api_connector.delete_many([Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)])
-    assert octopoes_api_connector.list_objects(types={Network, Hostname}).count == 6
+    octopoes_api_connector.delete_many(
+        [Reference.from_str(f"Hostname|test|test{i}") for i in range(0, 10, 2)], valid_time=valid_time
+    )
+    assert octopoes_api_connector.list_objects(types={Network, Hostname}, valid_time=valid_time).count == 6
 
 
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
@@ -199,8 +201,23 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert len(results) == 1
     assert str(results[0].port) == "443"
 
-    results = octopoes_api_connector.query(query, valid_time, source=hostnames[0].reference)
+    results = octopoes_api_connector.query(query, valid_time, source=hostnames[0])
     assert len(results) == 0
 
-    results = octopoes_api_connector.query(query, valid_time, source=hostnames[1].reference)
+    results = octopoes_api_connector.query(query, valid_time, source=hostnames[1])
     assert len(results) == 1
+
+    query = "Hostname.<hostname[is DNSNSRecord]"
+    assert len(octopoes_api_connector.query(query, valid_time, hostnames[0])) == 1
+    assert len(octopoes_api_connector.query(query, valid_time, hostnames[1])) == 1
+    assert len(octopoes_api_connector.query(query, valid_time, hostnames[2])) == 1
+    assert len(octopoes_api_connector.query(query, valid_time, hostnames[3])) == 0
+
+    result = octopoes_api_connector.query_many(
+        query,
+        valid_time,
+        [hostnames[0], hostnames[1], hostnames[2], hostnames[3]],
+    )
+    assert len(result) == 3
+    assert result[0][0] == hostnames[0].reference
+    assert result[0][1] == dns_ns_records[0]

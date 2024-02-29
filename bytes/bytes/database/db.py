@@ -2,7 +2,7 @@ import logging
 from functools import lru_cache
 
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import declarative_base
 
 logger = logging.getLogger(__name__)
@@ -11,11 +11,13 @@ SQL_BASE = declarative_base()
 
 
 @lru_cache(maxsize=1)
-def get_engine(db_uri: str) -> Engine:
-    logger.info("Connecting to database..")
+def get_engine(db_uri: str, pool_size: int) -> Engine:
+    """Returns database engine according to config settings."""
+    db_uri_redacted = make_url(name_or_url=str(db_uri)).render_as_string(hide_password=True)
+    logger.info("Connecting to database %s with pool size %s...", db_uri_redacted, pool_size)
 
-    engine = create_engine(db_uri, pool_pre_ping=True, pool_size=25)
+    engine = create_engine(db_uri, pool_pre_ping=True, pool_size=pool_size)
 
-    logger.info("Connected to database")
+    logger.info("Connected to database %s.", db_uri_redacted)
 
     return engine

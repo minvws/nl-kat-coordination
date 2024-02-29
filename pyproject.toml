@@ -27,21 +27,6 @@ paths = ["."]
 
 
 [tool.ruff]
-# Enable classic flake8, pyflakes, eradicate, and tidyimport
-# To be extended with DJ, PT, RUF, C90, D, PL, RET
-select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A", "S"]
-ignore = [
-     "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
-     "SIM108", # Ternary operator is not always more readable
-     "S101", # Assert use is normal in pytest tests
-     "S104", # Binding to all is normal in containers
-     "S105", # Disabled because of false positives
-     "S106", # Disabled because of false positives
-     "S308", # Mark_safe usage is okay
-     "S324", # Insecure hash functions can still be useful
-     "S603", # Disabled because of false positives
-     "S607", # Disabled because of false positives
-]
 fix = true
 
 # Exclude a variety of commonly ignored directories.
@@ -76,11 +61,27 @@ line-length = 120
 # Support Python 3.10 and higher
 target-version = "py310"
 
+[tool.ruff.lint]
+# Enable classic flake8, pyflakes, eradicate, and tidyimport
+# To be extended with DJ, PT, RUF, C90, D, PL, RET
+select = ["E", "F", "ERA", "W", "TID", "I", "G", "INP", "T20", "UP", "ISC", "PTH", "SIM", "PLC", "A", "S"]
+ignore = [
+     "A003", # Built-in shadowing is usually not a problem and some built-ins have very generic names
+     "SIM108", # Ternary operator is not always more readable
+     "S101", # Assert use is normal in pytest tests
+     "S104", # Binding to all is normal in containers
+     "S105", # Disabled because of false positives
+     "S106", # Disabled because of false positives
+     "S308", # Mark_safe usage is okay
+     "S324", # Insecure hash functions can still be useful
+     "S603", # Disabled because of false positives
+     "S607", # Disabled because of false positives
+]
+
 # Add "Example" to allowed code comments
 task-tags = ["Example", "todo", "TODO", "FIXME"]
 
-
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401","F403"]
 "whitelist.py" = ["F821", "INP"]
 "rocky/*/migrations/*.py" = ["E501"]
@@ -97,9 +98,11 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 "scripts/*.py" = ["INP001", "T201"]
 "cveapi/cveapi.py" = ["INP001"]
 
-[tool.ruff.flake8-tidy-imports]
-[tool.ruff.flake8-tidy-imports.banned-api]
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
 "rocky.settings".msg = "Use django.conf.settings"
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
 
 [tool.codespell]
 ignore-words-list = 'edn,juxt'
@@ -122,5 +125,5 @@ sphinx = "<8"
 sphinx_rtd_theme = "2.0.0"
 sphinxcontrib-mermaid = "^0.9.2"
 myst-parser = "^2.0.0"
-settings-doc = "^3.0.0"
+settings-doc = "^4.0.0"
 colorama = "0.4.6" # Required on all platforms, not just win32

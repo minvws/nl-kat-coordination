@@ -84,8 +84,13 @@ repos:
       ^boefjes/tools |
       ^keiko/templates |
       ^mula/whitelist\.py$ |
-      ^octopoes/ |
-      ^rocky/fmea/ |
+      ^octopoes/bits |
+      ^octopoes/octopoes/core |
+      ^octopoes/octopoes/events |
+      ^octopoes/octopoes/models |
+      ^octopoes/octopoes/repositories |
+      ^octopoes/octopoes/xtdb |
+      ^octopoes/tools |
       ^rocky/whitelist\.py$ |
       /tests/ |
       docs/source/conf\.py$ |

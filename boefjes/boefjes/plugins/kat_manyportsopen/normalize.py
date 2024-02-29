@@ -15,9 +15,10 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
 
     connector = OctopoesAPIConnector(str(settings.octopoes_api), boefje_meta.organization)
 
+    current_time = datetime.now(timezone.utc)
     # Get current ports
     try:
-        current_tree = connector.get_tree(ooi, types={IPPort}, depth=1)
+        current_tree = connector.get_tree(ooi, valid_time=current_time, types={IPPort}, depth=1)
     except ObjectNotFoundException:
         # This IP doesn't exist anymore
         return
@@ -28,9 +29,9 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             current_ports.add(ooi.port)
 
     # Get ports from a week ago
-    last_week = datetime.now(timezone.utc) - timedelta(days=7)
+    last_week = current_time - timedelta(days=7)
     try:
-        old_tree = connector.get_tree(ooi, types={IPPort}, depth=1, valid_time=last_week)
+        old_tree = connector.get_tree(ooi, valid_time=last_week, types={IPPort}, depth=1)
     except ObjectNotFoundException:
         # This IP was not known a week ago
         return

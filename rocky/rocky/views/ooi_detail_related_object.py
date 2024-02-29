@@ -4,9 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from tools.ooi_helpers import (
-    format_attr_name,
-)
+from tools.ooi_helpers import format_attr_name
 from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with_querystring
 
 from octopoes.models import OOI
