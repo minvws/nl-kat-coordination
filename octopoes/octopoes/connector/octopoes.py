@@ -272,13 +272,13 @@ class OctopoesAPIConnector:
         self,
         path: str,
         valid_time: datetime,
-        source: Reference | str | None = None,
+        source: OOI | Reference | str | None = None,
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
     ) -> list[OOI]:
         params = {
             "path": path,
-            "source": source,
+            "source": source.reference if isinstance(source, OOI) else source,
             "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
@@ -287,3 +287,22 @@ class OctopoesAPIConnector:
             TypeAdapter(OOIType).validate_python(ooi)
             for ooi in self.session.get(f"/{self.client}/query", params=params).json()
         ]
+
+    def query_many(
+        self,
+        path: str,
+        valid_time: datetime,
+        sources: list[OOI | Reference | str],
+    ) -> list[tuple[str, OOIType]]:
+        if not sources:
+            return []
+
+        params = {
+            "path": path,
+            "sources": [str(ooi) for ooi in sources],
+            "valid_time": str(valid_time),
+        }
+
+        result = self.session.get(f"/{self.client}/query-many", params=params).json()
+
+        return TypeAdapter(list[tuple[str, OOIType]]).validate_python(result)

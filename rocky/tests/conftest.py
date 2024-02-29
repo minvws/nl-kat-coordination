@@ -30,6 +30,7 @@ from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.transaction import TransactionRecord
+from octopoes.models.types import OOIType
 from rocky.scheduler import Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
@@ -908,6 +909,20 @@ class MockOctopoesAPIConnector:
         limit: int = 50,
     ) -> list[OOI]:
         return self.queries[path][source]
+
+    def query_many(
+        self,
+        path: str,
+        valid_time: datetime,
+        sources: list[OOI | Reference | str],
+    ) -> list[tuple[str, OOIType]]:
+        result = []
+
+        for source in sources:
+            for ooi in self.queries[path][source]:
+                result.append((source, ooi))
+
+        return result
 
     def get_history(self, reference: Reference) -> list[TransactionRecord]:
         return [
