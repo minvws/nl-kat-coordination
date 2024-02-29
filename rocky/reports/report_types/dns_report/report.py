@@ -70,4 +70,4 @@ class DNSReport(Report):
 
         records = sorted(records, key=lambda x: x["type"])
 
-        return {"input_ooi": input_ooi, "records": records, "security": security, "finding_types": finding_types}
+        return {"input_ooi": input_ooi, "records": records, "security": security, "finding_types": finding_types_sorted}
