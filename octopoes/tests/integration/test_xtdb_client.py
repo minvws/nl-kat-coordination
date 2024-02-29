@@ -185,7 +185,7 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
         .where_in(Network, primary_key=["Network|testnetwork", "Network|testnetwork2"])
     )
     result = xtdb_session.client.query(query, valid_time)
-    assert result == [["Network|testnetwork", network], ['Network|testnetwork2', network2]]
+    assert result == [["Network|testnetwork", network], ["Network|testnetwork2", network2]]
 
     # router logic
     object_path = Path.parse("Hostname.<hostname[is DNSNSRecord]")
