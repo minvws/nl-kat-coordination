@@ -151,8 +151,8 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def test_get_normalizers_for_mime_type_request_exception(self, mock_get_normalizers_by_org_id_and_type):
         # Mocks
         mock_get_normalizers_by_org_id_and_type.side_effect = [
-            httpx.ConnectError,
-            httpx.ConnectError,
+            httpx.ConnectError("Connection error"),
+            httpx.ConnectError("Connection error"),
         ]
 
         # Act

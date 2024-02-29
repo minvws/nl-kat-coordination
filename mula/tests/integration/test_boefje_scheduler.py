@@ -1288,8 +1288,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            httpx.ConnectError,
-            httpx.ConnectError,
+            httpx.ConnectError("Connection error"),
+            httpx.ConnectError("Connection error"),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1339,8 +1339,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            httpx.ConnectError,
-            httpx.ConnectError,
+            httpx.ConnectError("Connection error"),
+            httpx.ConnectError("Connection error"),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1492,8 +1492,8 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_random_objects.side_effect = [
-            httpx.ConnectError,
-            httpx.ConnectError,
+            httpx.ConnectError("Connection error"),
+            httpx.ConnectError("Connection error"),
         ]
 
         # Act
