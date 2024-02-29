@@ -27,7 +27,7 @@ class DNSReport(Report):
         tree = self.octopoes_api_connector.get_tree(ref, valid_time, depth=3, types={DNSRecord, Finding}).store
 
         findings = []
-        finding_types = {}
+        finding_types: dict[str, dict] = {}
         records = []
         security = {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True}
 
