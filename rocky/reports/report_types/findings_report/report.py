@@ -32,7 +32,7 @@ class FindingsReport(Report):
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         reference = Reference.from_str(input_ooi)
         findings = []
-        finding_types = {}
+        finding_types: dict[str, Any] = {}
         total_by_severity = {}
         total_by_severity_per_finding_type = {}
 
@@ -70,13 +70,15 @@ class FindingsReport(Report):
             except ObjectNotFoundException:
                 logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
 
-        finding_types = sorted(finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True)
+        sorted_finding_types: list[Any] = sorted(
+            finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
+        )
 
         summary = {
             "total_by_severity": total_by_severity,
             "total_by_severity_per_finding_type": total_by_severity_per_finding_type,
-            "total_finding_types": len(finding_types),
+            "total_finding_types": len(sorted_finding_types),
             "total_occurrences": sum(total_by_severity.values()),
         }
 
-        return {"finding_types": finding_types, "summary": summary}
+        return {"finding_types": sorted_finding_types, "summary": summary}
