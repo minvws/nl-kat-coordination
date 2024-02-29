@@ -12,7 +12,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.findings import CVEFindingType, KATFindingType, RetireJSFindingType, RiskLevelSeverity, Finding
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RetireJSFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -166,6 +166,7 @@ def seed_system(
         + resources
         + headers
         + finding_types
+        + findings
         + urls
         + security_txts
         + certificates

@@ -94,16 +94,7 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
 
 
 def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois):
-    seed = seed_system(octopoes_api_connector, valid_time)
-
-    findings = [
-        Finding(finding_type=seed["finding_types"][-3].reference, ooi=seed["instances"][1].reference),
-        Finding(finding_type=seed["finding_types"][-2].reference, ooi=seed["instances"][1].reference),
-        Finding(finding_type=seed["finding_types"][-1].reference, ooi=seed["instances"][1].reference),
-    ]
-
-    for finding in findings:
-        octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
+    seed_system(octopoes_api_connector, valid_time)
 
     reports: list[type[Report] | type[MultiReport]] = (
         AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
@@ -159,18 +150,31 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         },
     }
     assert data["ipv6"] == {"example.com": {"enabled": True, "systems": ["Dicom", "Mail", "Other", "Web"]}}
-    assert data["vulnerabilities"] == {
-        "IPAddressV4|test|192.0.2.3": {
-            "vulnerabilities": {},
-            "title": "192.0.2.3",
-            "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
-        },
-        "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
-            "vulnerabilities": {},
-            "title": "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
-        },
+    assert data["vulnerabilities"]["IPAddressV4|test|192.0.2.3"]["summary"] == {
+        "total_findings": 6,
+        "total_criticals": 0,
+        "terms": ["CVE-2018-20677", "CVE-2019-8331", "RetireJS-jquerymigrate-f3a3"],
+        "recommendations": [],
     }
+
+    v4_vulnerabilities = data["vulnerabilities"]["IPAddressV4|test|192.0.2.3"]
+    assert v4_vulnerabilities["title"] == "192.0.2.3"
+    assert v4_vulnerabilities["vulnerabilities"]["CVE-2018-20677"]["occurrences"] == 2
+    assert v4_vulnerabilities["vulnerabilities"]["RetireJS-jquerymigrate-f3a3"]["occurrences"] == 2
+    assert v4_vulnerabilities["vulnerabilities"]["CVE-2019-8331"]["occurrences"] == 2
+
+    v6_vulnerabilities = data["vulnerabilities"]["IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]
+    assert v6_vulnerabilities["title"] == "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"
+    assert v6_vulnerabilities["summary"] == {
+        "total_findings": 6,
+        "total_criticals": 0,
+        "terms": ["CVE-2018-20677", "CVE-2019-8331", "RetireJS-jquerymigrate-f3a3"],
+        "recommendations": [],
+    }
+    assert v6_vulnerabilities["title"] == "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"
+    assert v6_vulnerabilities["vulnerabilities"]["CVE-2018-20677"]["occurrences"] == 2
+    assert v6_vulnerabilities["vulnerabilities"]["RetireJS-jquerymigrate-f3a3"]["occurrences"] == 2
+    assert v6_vulnerabilities["vulnerabilities"]["CVE-2019-8331"]["occurrences"] == 2
 
     assert data["basic_security"]["summary"]["Dicom"] == {
         "rpki": {"number_of_compliant": 1, "total": 1},
@@ -232,7 +236,7 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         "safe_connections": {"number_of_compliant": 1, "total": 1},
     }
 
-    assert data["total_findings"] == 0
+    assert data["total_findings"] == 3
     assert data["total_systems"] == 2
 
 
@@ -242,16 +246,8 @@ def test_multi_report(
     valid_time,
     hostname_oois,
 ):
-    seed = seed_system(octopoes_api_connector, valid_time)
+    seed_system(octopoes_api_connector, valid_time)
     seed_system(octopoes_api_connector_2, valid_time)
-
-    findings = [
-        Finding(finding_type=seed["finding_types"][-3].reference, ooi=seed["instances"][1].reference),
-        Finding(finding_type=seed["finding_types"][-2].reference, ooi=seed["instances"][1].reference),
-        Finding(finding_type=seed["finding_types"][-1].reference, ooi=seed["instances"][1].reference),
-    ]
-    for finding in findings:
-        octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
 
     reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
     report_ids = [report_type.id for report_type in reports]
@@ -291,7 +287,7 @@ def test_multi_report(
 
     assert multi_data["basic_security_score"] == 100
     assert multi_data["total_critical_vulnerabilities"] == 0
-    assert multi_data["total_findings"] == 3
+    assert multi_data["total_findings"] == 6
     assert multi_data["total_systems"] == 4
     assert multi_data["total_hostnames"] == 14
     assert multi_data["service_counts"] == {"Mail": 2, "Web": 4, "Dicom": 2, "Other": 2}
@@ -328,13 +324,21 @@ def test_multi_report(
         },
         {
             "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "vulnerabilities": {},
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report-2",
             "services": ["Web"],
         },
         {
             "asset": "IPAddressV4|test|192.0.2.3",
-            "vulnerabilities": {},
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report-2",
             "services": ["Dicom", "Mail", "Other", "Web"],
         },
@@ -422,9 +426,9 @@ def test_multi_report(
         },
     }
     assert multi_data["system_vulnerabilities"] == {
-        "CVE-2018-20677": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
-        "CVE-2019-8331": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
-        "RetireJS-jquerymigrate-f3a3": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
+        "CVE-2018-20677": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "CVE-2019-8331": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "RetireJS-jquerymigrate-f3a3": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
     }
     assert multi_data["ipv6"] == {
         "Dicom": {"total": 2, "enabled": 2},
