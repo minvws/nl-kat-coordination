@@ -1,10 +1,7 @@
 from typing import Any
 
 from account.forms import MemberRegistrationForm, OnboardingOrganizationUpdateForm, OrganizationForm
-from account.mixins import (
-    OrganizationPermissionRequiredMixin,
-    OrganizationView,
-)
+from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
 from account.views import OOIClearanceMixin
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -21,20 +18,14 @@ from katalogus.client import get_katalogus
 from tools.forms.boefje import SelectBoefjeForm
 from tools.forms.ooi_form import OOIForm
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
-from tools.ooi_helpers import (
-    create_object_tree_item_from_ref,
-    filter_ooi_tree,
-    get_or_create_ooi,
-)
+from tools.ooi_helpers import create_object_tree_item_from_ref, filter_ooi_tree, get_or_create_ooi
 from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, get_ooi_url
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.network import Network
 from octopoes.models.types import type_by_name
-from onboarding.forms import (
-    OnboardingSetClearanceLevelForm,
-)
+from onboarding.forms import OnboardingSetClearanceLevelForm
 from onboarding.view_helpers import (
     DNS_REPORT_LEAST_CLEARANCE_LEVEL,
     ONBOARDING_PERMISSIONS,
@@ -210,7 +201,7 @@ class OnboardingSetupScanOOIAddView(
         bytes_client = get_bytes_client(self.organization.code)
 
         for field_name, params in self.hidden_form_fields.items():
-            ooi, created = get_or_create_ooi(self.octopoes_api_connector, bytes_client, params["ooi"])
+            ooi, created = get_or_create_ooi(self.octopoes_api_connector, bytes_client, params["ooi"], self.observed_at)
             hidden_fields[field_name] = ooi.primary_key
 
             if created:

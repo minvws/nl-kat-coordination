@@ -51,7 +51,7 @@ def get_report_types_for_ooi(ooi_pk: str) -> list[type[Report]]:
     return [report for report in REPORTS if ooi_type in report.input_ooi_types]
 
 
-def get_report_types_for_oois(ooi_pks: list[str]) -> set[type[Report] | type[MultiReport]]:
+def get_report_types_for_oois(ooi_pks: list[str]) -> set[type[Report]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
@@ -88,7 +88,7 @@ def get_plugins_for_report_ids(reports: list[str]) -> dict[str, set[str]]:
 
 def get_report_types_from_aggregate_report(
     aggregate_report: type[AggregateReport],
-) -> dict[str, set[type[Report] | type[MultiReport]]]:
+) -> dict[str, set[type[Report]]]:
     required_reports = set()
     optional_reports = set()
 

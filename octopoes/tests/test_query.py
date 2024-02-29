@@ -89,11 +89,6 @@ def test_invalid_field_types():
 
     assert ctx.exconly() == "octopoes.xtdb.query.InvalidField: <class 'octopoes.xtdb.query.InvalidField'> is not an OOI"
 
-    with pytest.raises(InvalidField) as ctx:
-        Query(Network).where(Network, name=Network)
-
-    assert ctx.exconly() == 'octopoes.xtdb.query.InvalidField: "name" is not a relation of Network'
-
 
 def test_allow_string_for_foreign_keys():
     query = Query(Network).where(Finding, ooi="Network|internet")
@@ -198,6 +193,16 @@ def test_create_query_from_path_abstract():
     [ IPPort :object_type "IPPort" ]]}}"""
 
     assert query.format() == expected_query
+
+
+def test_value_for_abstract_class_check():
+    Query(IPAddress).where(IPAddress, network=Network).where(Network, name="test")
+    Query(IPAddress).where(IPAddress, network=A(Network)).where(Network, name="test")
+
+    with pytest.raises(InvalidField) as ctx:
+        Query(IPAddress).where(IPAddress, network=3).where(Network, name="test")
+
+    assert "value '3' for abstract class fields should be a string or an OOI Type" in ctx.exconly()
 
 
 def test_aliased_query():
@@ -310,3 +315,32 @@ def test_build_system_query_with_path_segments(mocker):
 
     assert str(query) == str(path_query)
     assert query == path_query
+
+
+def test_build_parth_query_with_multiple_sources(mocker):
+    mocker.patch("octopoes.xtdb.query.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
+
+    query = Query(Website).where_in(Website, primary_key=["test_pk", "second_test_pk"])
+    assert (
+        query.format()
+        == """{:query {:find [(pull Website [*])] :where [
+    (or [ Website :Website/primary_key "test_pk" ] [ Website :Website/primary_key "second_test_pk" ] )
+    [ Website :object_type "Website" ]]}}"""
+    )
+
+    pk = A(Website, field="primary_key")
+    query = (
+        Query(Website)
+        .find(pk)
+        .pull(Website)
+        .where(Website, primary_key=pk)
+        .where_in(Website, primary_key=["test_pk", "second_test_pk"])
+    )
+
+    assert (
+        query.format()
+        == """{:query {:find [?311d6399-4bb4-4830-b077-661cc3f4f2c1?primary_key (pull Website [*])] :where [
+    (or [ Website :Website/primary_key "test_pk" ] [ Website :Website/primary_key "second_test_pk" ] )
+    [ Website :Website/primary_key ?311d6399-4bb4-4830-b077-661cc3f4f2c1?primary_key ]
+    [ Website :object_type "Website" ]]}}"""
+    )

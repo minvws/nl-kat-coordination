@@ -161,12 +161,11 @@ class OOIDetailView(
         context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
         context["ooi"] = self.ooi
 
-        declarations, observations, inferences = self.get_origins(
-            self.ooi.reference, self.observed_at, self.organization
-        )
+        declarations, observations, inferences = self.get_origins(self.ooi.reference, self.organization)
 
         inference_params = self.octopoes_api_connector.list_origin_parameters(
-            {inference.origin.id for inference in inferences}
+            {inference.origin.id for inference in inferences},
+            self.observed_at,
         )
         inference_params_per_inference = defaultdict(list)
         for inference_param in inference_params:

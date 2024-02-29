@@ -15,7 +15,15 @@ Bit With Scan Level 1
     Declare Scan Profile    Hostname|internet|example.com    1
     Await Sync
     Wait Until Keyword Succeeds    60s    1s    Object List Should Contain    KATFindingType|KAT-NXDOMAIN
-    Wait Until Keyword Succeeds    60s    1s    Object List Should Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
+    Wait Until Keyword Succeeds
+    ...    60s
+    ...    1s
+    ...    Object List Should Contain
+    ...    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
     Declare Scan Profile    Hostname|internet|example.com    0
     Await Sync
-    Wait Until Keyword Succeeds    60s    1s    Object List Should Not Contain    Finding|Hostname|internet|example.com|KAT-NXDOMAIN
+    Wait Until Keyword Succeeds
+    ...    60s
+    ...    1s
+    ...    Object List Should Not Contain
+    ...    Finding|Hostname|internet|example.com|KAT-NXDOMAIN

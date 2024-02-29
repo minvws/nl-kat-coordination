@@ -1,12 +1,4 @@
-from sqlalchemy import (
-    Boolean,
-    Column,
-    ForeignKey,
-    Integer,
-    String,
-    Table,
-    UniqueConstraint,
-)
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from boefjes.sql.db import SQL_BASE
