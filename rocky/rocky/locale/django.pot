@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-26 15:05+0000\n"
+"POT-Creation-Date: 2024-02-29 12:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1203,6 +1203,10 @@ msgstr ""
 
 #: onboarding/forms.py tools/forms/ooi.py
 msgid "explanation-clearance-level"
+msgstr ""
+
+#: onboarding/forms.py
+msgid "Please enter a valid URL starting with 'http://' or 'https://'."
 msgstr ""
 
 #: onboarding/templates/account/step_1_registration_intro.html
@@ -3385,9 +3389,9 @@ msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#, python-format
 msgid ""
-"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+"No data could be found for %(report_types). Object(s) did not exist on "
+"%(date)s."
 msgstr ""
 
 #: reports/views/base.py
