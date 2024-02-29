@@ -17,7 +17,7 @@ from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import MultiReport, Report, ReportType
+from reports.report_types.definitions import BaseReportType, MultiReport, Report, ReportType
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import OOIFilterView
@@ -113,16 +113,14 @@ class BaseReportView(OOIFilterView):
             )
         }
 
-    def get_report_types_for_generate_report(
-        self, reports: set[type[Report] | type[MultiReport]]
-    ) -> list[dict[str, str]]:
+    def get_report_types_for_generate_report(self, reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
         return [
             {"id": report_type.id, "name": report_type.name, "description": report_type.description}
             for report_type in reports
         ]
 
     def get_report_types_for_aggregate_report(
-        self, reports_dict: dict[str, set[type[Report] | type[MultiReport]]]
+        self, reports_dict: dict[str, set[type[Report]]]
     ) -> dict[str, list[dict[str, str]]]:
         report_types = {}
         for option, reports in reports_dict.items():

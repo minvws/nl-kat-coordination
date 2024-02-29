@@ -127,11 +127,11 @@ class OOIRepository(Repository):
     def list_findings(
         self,
         severities,
+        valid_time,
         exclude_muted,
         only_muted,
         offset,
         limit,
-        valid_time,
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
@@ -141,7 +141,7 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI]:
+    def query(self, query: Query, valid_time: datetime) -> list[OOI | tuple]:
         raise NotImplementedError
 
 
@@ -665,16 +665,17 @@ class XTDBOOIRepository(OOIRepository):
         path_start_alias = path.segments[0].source_type
         query = Query.from_path(path).where(path_start_alias, primary_key=ooi.primary_key)
 
-        return self.query(query, valid_time)
+        # query() can return different types depending on the query
+        return self.query(query, valid_time)  # type: ignore[return-value]
 
     def list_findings(
         self,
         severities: set[RiskLevelSeverity],
+        valid_time: datetime,
         exclude_muted=False,
         only_muted=False,
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
-        valid_time: datetime | None = None,
     ) -> Paginated[Finding]:
         # clause to find risk_severity
         concrete_finding_types = to_concrete({FindingType})
@@ -738,12 +739,28 @@ class XTDBOOIRepository(OOIRepository):
             }}
         """
 
-        res = self.session.client.query(finding_query, valid_time)
-        findings = [self.deserialize(x[0]) for x in res]
         return Paginated(
             count=count,
-            items=findings,
+            items=[x[0] for x in self.query(finding_query, valid_time)],
         )
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI]:
-        return [self.deserialize(row[0]) for row in self.session.client.query(query, valid_time=valid_time)]
+    def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
+        results = self.session.client.query(query, valid_time=valid_time)
+
+        parsed_results: list[OOI | tuple] = []
+        for result in results:
+            parsed_result = []
+
+            for item in result:
+                try:
+                    parsed_result.append(self.deserialize(item))
+                except (ValueError, TypeError):
+                    parsed_result.append(item)
+
+            if len(parsed_result) == 1:
+                parsed_results.append(parsed_result[0])
+                continue
+
+            parsed_results.append(tuple(parsed_result))
+
+        return parsed_results
