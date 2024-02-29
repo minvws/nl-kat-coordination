@@ -231,8 +231,12 @@ class Query:
             value = value.replace('"', r"\"")
             new_values.append(f'"{value}"')
 
+        types_to_check = [ooi_type]
+        if ooi_type in get_abstract_types():
+            types_to_check = ooi_type.strict_subclasses()
+
         self._where_clauses.append(
-            self._or_statement_for_multiple_values(self._get_object_alias(ref), ooi_type, field_name, new_values)
+            self._or_statement_for_multiple_values(self._get_object_alias(ref), types_to_check, field_name, new_values)
         )
 
     def _add_where_statement(self, ref: Ref, field_name: str, to_alias: str) -> None:
@@ -272,10 +276,12 @@ class Query:
         return f"(or {' '.join(relationships)} )"
 
     def _or_statement_for_multiple_values(
-        self, from_alias: str, ooi_type: type[OOI], field_name: str, to_aliases: list[str]
+        self, from_alias: str, ooi_types: list[type[OOI]], field_name: str, to_aliases: list[str]
     ) -> str:
         relationships = [
-            self._relationship(from_alias, ooi_type.get_object_type(), field_name, to_alias) for to_alias in to_aliases
+            self._relationship(from_alias, ooi_type.get_object_type(), field_name, to_alias)
+            for to_alias in to_aliases
+            for ooi_type in ooi_types
         ]
 
         return f"(or {' '.join(relationships)} )"

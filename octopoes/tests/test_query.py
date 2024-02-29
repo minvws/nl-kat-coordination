@@ -344,3 +344,31 @@ def test_build_parth_query_with_multiple_sources(mocker):
     [ Website :Website/primary_key ?311d6399-4bb4-4830-b077-661cc3f4f2c1?primary_key ]
     [ Website :object_type "Website" ]]}}"""
     )
+
+
+def test_build_parth_query_with_multiple_sources_for_abstract_type(mocker):
+    mocker.patch("octopoes.xtdb.query.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
+
+    object_path = Path.parse("IPAddress.network")
+    pk = A(IPAddress, field="primary_key")
+    query = (
+        Query.from_path(object_path)
+        .find(pk)
+        .pull(IPAddress)
+        .where(IPAddress, network=Network)
+        .where(IPAddress, primary_key=pk)
+        .where_in(IPAddress, primary_key=["1", "2"])
+    )
+    assert (
+        str(query) == "{:query {:find [?311d6399-4bb4-4830-b077-661cc3f4f2c1?primary_key (pull IPAddress [*])] :where ["
+        " (or [ IPAddress :IPAddressV4/network Network ] [ IPAddress :IPAddressV6/network Network ] )"
+        " (or "
+        '[ IPAddress :IPAddressV4/primary_key "1" ] '
+        '[ IPAddress :IPAddressV6/primary_key "1" ] '
+        '[ IPAddress :IPAddressV4/primary_key "2" ] '
+        '[ IPAddress :IPAddressV6/primary_key "2" ] )'
+        " (or [ IPAddress :IPAddressV4/primary_key ?311d6399-4bb4-4830-b077-661cc3f4f2c1?primary_key ] "
+        "[ IPAddress :IPAddressV6/primary_key ?311d6399-4bb4-4830-b077-661cc3f4f2c1?primary_key ] )"
+        ' (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )'
+        ' [ Network :object_type "Network" ]]}}'
+    )

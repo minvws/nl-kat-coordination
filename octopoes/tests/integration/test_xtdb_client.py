@@ -8,7 +8,7 @@ from requests import HTTPError
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.network import IPAddress, IPAddressV4, Network
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
@@ -156,6 +156,9 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
     xtdb_session.put(
         XTDBOOIRepository.serialize(Hostname(network="Network|testnetwork2", name="secondhostname")), valid_time
     )
+    xtdb_session.put(
+        XTDBOOIRepository.serialize(IPAddressV4(network="Network|testnetwork2", address="127.0.0.1")), valid_time
+    )
     xtdb_session.commit()
 
     query = Query.from_path(Path.parse("Hostname.network")).where_in(Network, name=["testnetwork1"])
@@ -198,6 +201,18 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
     )
 
     assert len(xtdb_session.client.query(query, valid_time)) == 0
+
+    object_path = Path.parse("IPAddress.network")
+    pk = A(IPAddress, field="primary_key")
+    query = (
+        Query.from_path(object_path)
+        .find(pk)
+        .pull(IPAddress)
+        .where(IPAddress, network=Network)
+        .where(IPAddress, primary_key=pk)
+        .where_in(IPAddress, primary_key=["IPAddressV4|testnetwork2|127.0.0.1", "IPAddressV4|testnetwork|0.0.0.0"])
+    )
+    assert len(xtdb_session.client.query(query, valid_time)) == 1
 
 
 def test_entity_history(xtdb_session: XTDBSession, valid_time: datetime):
