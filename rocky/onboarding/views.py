@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
 from katalogus.client import Plugin, get_katalogus
+from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import get_selection
 from requests import HTTPError
@@ -278,7 +279,7 @@ class OnboardingSetupScanSelectPluginsView(
     template_name = "step_3g_setup_scan_select_plugins.html"
     permission_required = "tools.can_enable_disable_boefje"
     current_step = 3
-    plugins: dict[str, list[str]] = DNSReport.plugins
+    plugins: ReportPlugins = DNSReport.plugins
 
     def get_plugins(self) -> dict[str, list[Plugin]]:
         plugins = {}
