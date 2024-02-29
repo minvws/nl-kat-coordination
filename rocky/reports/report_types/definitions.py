@@ -101,6 +101,24 @@ class Report(BaseReport):
 
         return hostnames_by_input_ooi
 
+    def to_ips(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
+        """Turn a list of either Hostname and IPAddress reference strings into a list of related ips."""
+
+        refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
+
+        ips_by_input_ooi = {str(ref): [ref] for ref in refs if ref.class_type in [IPAddressV4, IPAddressV6]}
+        hostname_refs = [ref for ref in refs if ref.class_type == Hostname]
+
+        for input_ooi, hostname_ip in self.octopoes_api_connector.query_many(
+            "Hostname.<hostname[is ResolvedHostname].address", valid_time, hostname_refs
+        ):
+            if input_ooi not in ips_by_input_ooi:
+                ips_by_input_ooi[input_ooi] = []
+
+            ips_by_input_ooi[input_ooi].append(hostname_ip.reference)
+
+        return ips_by_input_ooi
+
 
 class MultiReport(BaseReport):
     plugins: ReportPlugins

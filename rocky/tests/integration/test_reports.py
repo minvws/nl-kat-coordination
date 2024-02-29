@@ -94,7 +94,16 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
 
 
 def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois):
-    seed_system(octopoes_api_connector, valid_time)
+    seed = seed_system(octopoes_api_connector, valid_time)
+
+    findings = [
+        Finding(finding_type=seed["finding_types"][-3].reference, ooi=seed["instances"][1].reference),
+        Finding(finding_type=seed["finding_types"][-2].reference, ooi=seed["instances"][1].reference),
+        Finding(finding_type=seed["finding_types"][-1].reference, ooi=seed["instances"][1].reference),
+    ]
+
+    for finding in findings:
+        octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
 
     reports: list[type[Report] | type[MultiReport]] = (
         AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
@@ -222,6 +231,9 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         },
         "safe_connections": {"number_of_compliant": 1, "total": 1},
     }
+
+    assert data["total_findings"] == 0
+    assert data["total_systems"] == 2
 
 
 def test_multi_report(

@@ -12,7 +12,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.findings import CVEFindingType, KATFindingType, RetireJSFindingType, RiskLevelSeverity
+from octopoes.models.ooi.findings import CVEFindingType, KATFindingType, RetireJSFindingType, RiskLevelSeverity, Finding
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -144,6 +144,12 @@ def seed_system(
         RetireJSFindingType(
             id="RetireJS-jquerymigrate-f3a3", risk_severity=RiskLevelSeverity.MEDIUM, description="test"
         ),
+    ]
+
+    findings = [
+        Finding(finding_type=finding_types[-3].reference, ooi=instances[1].reference),
+        Finding(finding_type=finding_types[-2].reference, ooi=instances[1].reference),
+        Finding(finding_type=finding_types[-1].reference, ooi=instances[1].reference),
     ]
 
     oois = (
