@@ -214,6 +214,7 @@ class Settings(BaseSettings):
     db_uri: PostgresDsn = Field(
         ..., example="postgresql://xx:xx@host:5432/scheduler", description="Scheduler Postgres DB URI"
     )
+    db_connection_pool_size: int = Field(25, description="Database connection pool size")
 
     @classmethod
     def settings_customise_sources(
