@@ -69,7 +69,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_mime_type_count(self, query_filter: RawDataFilter) -> dict[str, str]:
-        params = query_filter.dict()
+        params = query_filter.model_dump(exclude_none=True)
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
         response = self.client.get("/bytes/mime_types", params=params)
@@ -79,9 +79,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        response = self.client.post(
-            "/bytes/boefje_meta", content=boefje_meta.model_dump_json()
-        )  # todo: check if this works
+        response = self.client.post("/bytes/boefje_meta", content=boefje_meta.model_dump_json())
 
         self._verify_response(response)
 
@@ -95,7 +93,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
-        response = self.client.get("/bytes/boefje_meta", params=query_filter.dict())
+        response = self.client.get("/bytes/boefje_meta", params=query_filter.model_dump(exclude_none=True))
         self._verify_response(response)
 
         boefje_meta_json = response.json()
@@ -103,9 +101,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self.client.post(
-            "/bytes/normalizer_meta", content=normalizer_meta.model_dump_json()
-        )  # todo: check if this works
+        response = self.client.post("/bytes/normalizer_meta", content=normalizer_meta.model_dump_json())
 
         self._verify_response(response)
 
@@ -119,7 +115,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
-        response = self.client.get("/bytes/normalizer_meta", params=query_filter.dict())
+        response = self.client.get("/bytes/normalizer_meta", params=query_filter.model_dump(exclude_none=True))
         self._verify_response(response)
 
         normalizer_meta_json = response.json()
@@ -153,7 +149,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:
-        params = query_filter.dict()
+        params = query_filter.model_dump(exclude_none=True)
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
         response = self.client.get("/bytes/raw", params=params)
