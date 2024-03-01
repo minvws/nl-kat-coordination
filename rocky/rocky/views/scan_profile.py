@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Any, Dict, List
+from typing import Any
 
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -8,11 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from tools.forms.ooi import SetClearanceLevelForm
 from tools.models import Indemnification
-from tools.view_helpers import (
-    Breadcrumb,
-    get_mandatory_fields,
-    get_ooi_url,
-)
+from tools.view_helpers import Breadcrumb, get_mandatory_fields, get_ooi_url
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile
 from rocky.exceptions import (
@@ -27,7 +23,7 @@ class ScanProfileDetailView(OOIDetailView, FormView):
     template_name = "scan_profiles/scan_profile_detail.html"
     form_class = SetClearanceLevelForm
 
-    def get_context_data(self, **kwargs) -> Dict[str, Any]:
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["user"] = self.organization_member
@@ -136,7 +132,7 @@ class ScanProfileResetView(OOIDetailView):
         )
         return redirect(get_ooi_url("scan_profile_detail", self.ooi.primary_key, self.organization.code))
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(
             {

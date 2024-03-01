@@ -4,11 +4,7 @@ from typing import Any
 
 from pydantic import AwareDatetime
 
-from bytes.models import (
-    HashingAlgorithm,
-    RawData,
-    SecureHash,
-)
+from bytes.models import HashingAlgorithm, RawData, SecureHash
 
 logger = logging.getLogger(__name__)
 

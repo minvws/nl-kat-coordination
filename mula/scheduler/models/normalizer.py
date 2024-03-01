@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -9,8 +8,8 @@ class Normalizer(BaseModel):
     """Normalizer representation."""
 
     id: str
-    name: Optional[str] = None
-    version: Optional[str] = None
+    name: str | None = None
+    version: str | None = None
 
 
 class NormalizerMeta(BaseModel):
@@ -18,6 +17,6 @@ class NormalizerMeta(BaseModel):
 
     id: uuid.UUID
     normalizer: Normalizer
-    raw_file_id: Optional[str]
+    raw_file_id: str | None
     started_at: datetime.datetime
     ended_at: datetime.datetime

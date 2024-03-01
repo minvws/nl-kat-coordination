@@ -1,5 +1,3 @@
-from typing import List
-
 from django.utils.translation import gettext_lazy as _
 from tools.forms.ooi import OoiTreeSettingsForm
 from tools.ooi_helpers import create_object_tree_item_from_ref, filter_ooi_tree, get_ooi_types_from_tree
@@ -20,20 +18,15 @@ class OOITreeView(BaseOOIDetailView):
         return filter_ooi_tree(tree_dict, filtered_types)
 
     def get_connector_form_kwargs(self):
+        kwargs = super().get_connector_form_kwargs()
+
         tree_dict = self.get_tree_dict()
-
         ooi_types = get_ooi_types_from_tree(tree_dict, True)
-
-        kwargs = {
-            "ooi_types": ooi_types,
-        }
-
-        if "observed_at" in self.request.GET:
-            kwargs.update({"data": self.request.GET})
+        kwargs.update({"ooi_types": ooi_types})
 
         return kwargs
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(self.get_last_breadcrumb())
         return breadcrumbs

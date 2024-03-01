@@ -44,7 +44,7 @@ CSV_CRITERIA = [
 
 
 class OrganizationMemberAddAccountTypeView(
-    OrganizationPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, FormView
+    OrganizationPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, OrganizationView, FormView
 ):
     """
     View to create a new member starting with choosing the account type.
@@ -79,7 +79,9 @@ class OrganizationMemberAddAccountTypeView(
         return breadcrumbs
 
 
-class OrganizationMemberAddView(OrganizationPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, FormView):
+class OrganizationMemberAddView(
+    OrganizationPermissionRequiredMixin, OrganizationMemberBreadcrumbsMixin, OrganizationView, FormView
+):
     """
     View to create a new member.
     """

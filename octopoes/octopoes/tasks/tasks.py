@@ -3,7 +3,6 @@ import uuid
 from datetime import datetime, timezone
 from logging import config, getLogger
 from pathlib import Path
-from typing import Dict
 
 import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
@@ -45,7 +44,7 @@ log = get_task_logger(__name__)
 
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
-def handle_event(event: Dict):
+def handle_event(event: dict):
     try:
         parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
 

@@ -1,12 +1,13 @@
 import logging
 import os
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any
 
 from pydantic import ValidationError
 
 from boefjes.job_models import (
     BoefjeMeta,
     InvalidReturnValueNormalizer,
+    NormalizerAffirmation,
     NormalizerDeclaration,
     NormalizerMeta,
     NormalizerObservation,
@@ -35,14 +36,15 @@ class TemporaryEnvironment:
         return os.environ
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        os.environ = self._original_environment
+        os.environ.clear()
+        os.environ.update(self._original_environment)
 
 
 class LocalBoefjeJobRunner(BoefjeJobRunner):
     def __init__(self, local_repository: LocalPluginRepository):
         self.local_repository = local_repository
 
-    def run(self, boefje_meta: BoefjeMeta, environment: Dict[str, str]) -> List[Tuple[set, Union[bytes, str]]]:
+    def run(self, boefje_meta: BoefjeMeta, environment: dict[str, str]) -> list[tuple[set, bytes | str]]:
         logger.info("Running local boefje plugin")
 
         boefjes = self.local_repository.resolve_boefjes()
@@ -73,8 +75,8 @@ class LocalNormalizerJobRunner(NormalizerJobRunner):
 
         return self._parse_results(normalizer_meta, results)
 
-    def _parse_results(self, normalizer_meta: NormalizerMeta, results: List[Any]) -> NormalizerOutput:
-        parsed: List[NormalizerResult] = [self._parse(result) for result in results]
+    def _parse_results(self, normalizer_meta: NormalizerMeta, results: list[Any]) -> NormalizerOutput:
+        parsed: list[NormalizerResult] = [self._parse(result) for result in results]
 
         if oois := [ooi for ooi in parsed if isinstance(ooi.item, NormalizerPlainOOI)]:
             if not normalizer_meta.raw_data.boefje_meta.input_ooi:
@@ -99,13 +101,14 @@ class LocalNormalizerJobRunner(NormalizerJobRunner):
         return NormalizerOutput(
             observations=observations,
             declarations=[result.item for result in parsed if isinstance(result.item, NormalizerDeclaration)],
+            affirmations=[result.item for result in parsed if isinstance(result.item, NormalizerAffirmation)],
             scan_profiles=[result.item for result in parsed if isinstance(result.item, NormalizerScanProfile)],
         )
 
     @staticmethod
     def _parse(result: Any) -> NormalizerResult:
         if not isinstance(result, dict):  # Must be an OOI or ScanProfile. Should be phased out with Octopoes dependency
-            if not isinstance(result, (OOI, DeclaredScanProfile)):
+            if not isinstance(result, OOI | DeclaredScanProfile):
                 raise UnsupportedReturnTypeNormalizer(str(type(result)))
 
             result = result.dict()

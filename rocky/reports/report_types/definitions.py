@@ -1,10 +1,13 @@
-from abc import ABC
+from collections.abc import Callable, Iterable
 from datetime import datetime
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, Set, TypedDict
+from typing import Any, TypedDict, TypeVar
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import Reference
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.types import OOIType
 
 REPORTS_DIR = Path(__file__).parent
@@ -12,31 +15,37 @@ logger = getLogger(__name__)
 
 
 class ReportPlugins(TypedDict):
-    required: List[str]
-    optional: List[str]
+    required: list[str]
+    optional: list[str]
 
 
-class AggregateReportSubReports(TypedDict):
-    required: List[str]
-    optional: List[str]
-
-
-class Report(ABC):
+class BaseReport:
     id: str
     name: str
     description: str
-    plugins: ReportPlugins
-    input_ooi_types: Set[OOIType]
     template_path: str = "report.html"
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+
+BaseReportType = TypeVar("BaseReportType", bound="BaseReport")
+
+
+class Report(BaseReport):
+    plugins: ReportPlugins
+    input_ooi_types: set[OOIType]
+
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
 
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        """Generate data for multiple OOIs. Child classes can override this method to improve performance."""
+
+        return {input_ooi: self.generate_data(input_ooi, valid_time) for input_ooi in input_oois}
+
     @classmethod
-    def class_attributes(cls) -> Dict[str, any]:
+    def class_attributes(cls) -> dict[str, Any]:
         return {
             "id": cls.id,
             "name": cls.name,
@@ -46,33 +55,70 @@ class Report(ABC):
             "template_path": cls.template_path,
         }
 
+    @staticmethod
+    def group_by_source(
+        query_result: list[tuple[str, OOIType]],
+        check: Callable[[OOIType], bool] | None = None,
+    ) -> dict[str, list[OOIType]]:
+        """Transform a query-many result from [(ref1, obj1), (ref1, obj2), ...] into {ref1: [obj1, obj2], ...}"""
 
-class AggregateReport(ABC):
-    id: str
-    name: str
-    description: str
-    reports: AggregateReportSubReports
-    template_path: str = "report.html"
+        result: dict[str, list[OOIType]] = {}
 
-    def __init__(self, octopoes_api_connector):
-        self.octopoes_api_connector = octopoes_api_connector
+        for source, ooi in query_result:
+            if source not in result:
+                result[source] = []
 
-    def post_process_data(self, data: Dict[str, Any], valid_time: datetime) -> Dict[str, Any]:
+            if not check or check(ooi):
+                result[source].append(ooi)
+
+        return result
+
+    @staticmethod
+    def group_finding_types_by_source(
+        query_result: list[tuple[str, OOIType]],
+        keep_ids: list[str] | None = None,
+    ) -> dict[str, list[OOIType]]:
+        if keep_ids:
+            return Report.group_by_source(query_result, lambda x: x.id in keep_ids)
+
+        return Report.group_by_source(query_result)
+
+    def to_hostnames(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
+        """Turn a list of either Hostname and IPAddress reference strings into a list of related hostnames."""
+
+        refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
+
+        hostnames_by_input_ooi = {str(ref): [ref] for ref in refs if ref.class_type == Hostname}
+        ip_refs = [ref for ref in refs if ref.class_type in (IPAddressV4, IPAddressV6)]
+
+        for input_ooi, ip_hostname in self.octopoes_api_connector.query_many(
+            "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ip_refs
+        ):
+            if input_ooi not in hostnames_by_input_ooi:
+                hostnames_by_input_ooi[input_ooi] = []
+
+            hostnames_by_input_ooi[input_ooi].append(ip_hostname.reference)
+
+        return hostnames_by_input_ooi
+
+
+class MultiReport(BaseReport):
+    plugins: ReportPlugins
+    input_ooi_types: set[OOIType]
+
+    def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError
 
 
-class MultiReport(ABC):
-    id: str
-    name: str
-    description: str
-    plugins: ReportPlugins
-    input_ooi_types: Set[OOIType]
-    template_path: str = "report.html"
+class AggregateReportSubReports(TypedDict):
+    required: list[type[Report]]
+    optional: list[type[Report]]
 
-    def __init__(self, octopoes_api_connector):
-        self.octopoes_api_connector = octopoes_api_connector
 
-    def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+class AggregateReport(BaseReport):
+    reports: AggregateReportSubReports
+
+    def post_process_data(self, data: dict[str, Any], valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
 
 

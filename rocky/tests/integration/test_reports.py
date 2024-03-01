@@ -1,6 +1,7 @@
 from dataclasses import asdict
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.definitions import MultiReport, Report
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.web_system_report.report import WebSystemReport
@@ -18,7 +19,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
 
     report = WebSystemReport(octopoes_api_connector)
     input_ooi = "Hostname|test|example.com"
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
     assert len(data["finding_types"]) == 1
@@ -41,7 +42,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ooi=Reference.from_str("HTTPResource|test|192.0.2.3|tcp|25|smtp|test|example.com|http|test|example.com|80|/"),
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
-    checks = report.generate_data(input_ooi, valid_time)["web_checks"].checks
+    checks = report.collect_data([input_ooi], valid_time)[input_ooi]["web_checks"].checks
     assert checks[0].has_csp is False
     assert checks[0].has_no_csp_vulnerabilities is False
 
@@ -50,7 +51,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ooi=Reference.from_str("Website|test|192.0.2.3|tcp|25|smtp|test|example.com"),
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
     assert data["web_checks"].checks[0].offers_https is False
 
     assert len(data["finding_types"]) == 3
@@ -61,7 +62,7 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
 
     report = SystemReport(octopoes_api_connector)
     input_ooi = "Hostname|test|example.com"
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
     assert data["summary"] == {
@@ -95,7 +96,9 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
 def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois):
     seed_system(octopoes_api_connector, valid_time)
 
-    reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+    reports: list[type[Report] | type[MultiReport]] = (
+        AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+    )
     report_ids = [report_type.id for report_type in reports]
     _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
 
@@ -243,13 +246,13 @@ def test_multi_report(
     _, data, report_data, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
     _, data_2, report_data_2, _ = aggregate_reports(octopoes_api_connector_2, hostname_oois, report_ids, valid_time)
 
-    report_data = ReportData(
+    report_data_object = ReportData(
         organization_code=octopoes_api_connector.client,
         organization_name="Test name",
         organization_tags=["test1"],
         data={"post_processed_data": data, "report_data": report_data},
     )
-    report_data_2 = ReportData(
+    report_data_object_2 = ReportData(
         organization_code=octopoes_api_connector_2.client,
         organization_name="Name2",
         organization_tags=["test1", "test2", "test3"],
@@ -257,12 +260,14 @@ def test_multi_report(
     )
 
     # Save second organization info in the first organization
-    octopoes_api_connector.save_declaration(Declaration(ooi=report_data, valid_time=valid_time))
-    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_2, valid_time=valid_time))
+    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_object, valid_time=valid_time))
+    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_object_2, valid_time=valid_time))
 
     multi_report = MultiOrganizationReport(octopoes_api_connector)
     multi_report_data = collect_report_data(
-        octopoes_api_connector, [str(report_data.reference), str(report_data_2.reference)]
+        octopoes_api_connector,
+        [str(report_data_object.reference), str(report_data_object_2.reference)],
+        valid_time,
     )
     multi_data = multi_report.post_process_data(multi_report_data)
     assert multi_data["organizations"] == [octopoes_api_connector.client, octopoes_api_connector_2.client]

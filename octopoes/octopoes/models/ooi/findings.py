@@ -1,6 +1,6 @@
 from enum import Enum
 from functools import total_ordering
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import AnyUrl
 
@@ -34,13 +34,13 @@ class RiskLevelSeverity(Enum):
 class FindingType(OOI):
     id: str
 
-    description: Optional[str] = None
-    source: Optional[AnyUrl] = None
-    impact: Optional[str] = None
-    recommendation: Optional[str] = None
+    description: str | None = None
+    source: AnyUrl | None = None
+    impact: str | None = None
+    recommendation: str | None = None
 
-    risk_score: Optional[float] = None
-    risk_severity: Optional[RiskLevelSeverity] = None
+    risk_score: float | None = None
+    risk_severity: RiskLevelSeverity | None = None
 
     _natural_key_attrs = ["id"]
     _traversable = False
@@ -83,9 +83,9 @@ class Finding(OOI):
 
     finding_type: Reference = ReferenceField(FindingType)
     ooi: Reference = ReferenceField(OOI)
-    proof: Optional[str] = None
-    description: Optional[str] = None
-    reproduce: Optional[str] = None
+    proof: str | None = None
+    description: str | None = None
+    reproduce: str | None = None
 
     @property
     def natural_key(self) -> str:
@@ -105,7 +105,7 @@ class MutedFinding(OOI):
     object_type: Literal["MutedFinding"] = "MutedFinding"
 
     finding: Reference = ReferenceField(Finding)
-    reason: Optional[str] = None
+    reason: str | None = None
 
     _natural_key_attrs = ["finding"]
     _reverse_relation_names = {"finding": "mutes"}

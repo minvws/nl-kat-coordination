@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -15,6 +15,7 @@ from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 from tools.view_helpers import reschedule_task
 
+from katalogus.client import Boefje as KATalogusBoefje
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.plugin_settings_list import PluginSettingsListView
@@ -130,6 +131,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
 
     template_name = "boefje_detail.html"
     limit_ooi_list = 9999
+    plugin: KATalogusBoefje
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -221,14 +223,16 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
 
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
-        return self.octopoes_api_connector.list(self.plugin.consumes, limit=self.limit_ooi_list).items
+        return self.octopoes_api_connector.list_objects(
+            self.plugin.consumes, valid_time=datetime.now(timezone.utc), limit=self.limit_ooi_list
+        ).items
 
     def get_form_filtered_consumable_oois(self):
         """Return a list of oois that is filtered for oois that meets clearance level."""
         oois = self.get_form_consumable_oois()
         return [ooi for ooi in oois if ooi.scan_profile.level >= self.plugin.scan_level.value]
 
-    def get_oois(self, selected_oois: List[str]) -> Dict[str, Any]:
+    def get_oois(self, selected_oois: list[str]) -> dict[str, Any]:
         oois_with_clearance = []
         oois_without_clearance = []
         for ooi in selected_oois:

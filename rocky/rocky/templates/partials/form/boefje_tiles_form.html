@@ -8,12 +8,12 @@
         {% for choices in checkbox_group_table_form %}{{ choices }}{% endfor %}
     {% endif %}
     <div class="button-container">
+        <button type="submit"
+                class="{{ btn_class }}"
+                {% if btn_disabled %}disabled{% endif %}>{{ btn_text }}</button>
         {% if skip_onboarding == "yes" and organization.code %}
             <a href="{% url "complete_onboarding" organization.code %}"
                class="button ghost">{% translate "Skip onboarding" %}</a>
         {% endif %}
-        <button type="submit"
-                class="{{ btn_class }}"
-                {% if btn_disabled %}disabled{% endif %}>{{ btn_text }}</button>
     </div>
 </form>
