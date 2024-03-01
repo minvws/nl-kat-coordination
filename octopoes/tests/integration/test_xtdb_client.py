@@ -14,7 +14,7 @@ from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
-from octopoes.xtdb.query import A, Query
+from octopoes.xtdb.query import Aliased, Query
 from tests.conftest import seed_system
 
 logger = logging.getLogger(__name__)
@@ -151,14 +151,13 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
 def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
     network = XTDBOOIRepository.serialize(Network(name="testnetwork"))
     network2 = XTDBOOIRepository.serialize(Network(name="testnetwork2"))
+    ipv4 = XTDBOOIRepository.serialize(IPAddressV4(network="Network|testnetwork2", address="127.0.0.1"))
     xtdb_session.put(network, valid_time)
     xtdb_session.put(network2, valid_time)
     xtdb_session.put(
         XTDBOOIRepository.serialize(Hostname(network="Network|testnetwork2", name="secondhostname")), valid_time
     )
-    xtdb_session.put(
-        XTDBOOIRepository.serialize(IPAddressV4(network="Network|testnetwork2", address="127.0.0.1")), valid_time
-    )
+    xtdb_session.put(ipv4, valid_time)
     xtdb_session.commit()
 
     query = Query.from_path(Path.parse("Hostname.network")).where_in(Network, name=["testnetwork1"])
@@ -177,7 +176,7 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
     result = xtdb_session.client.query(query)
     assert result == [[network], [network2]]
 
-    pk = A(Network, field="primary_key")
+    pk = Aliased(Network, field="primary_key")
     query = (
         Query(Network)
         .find(pk)
@@ -185,13 +184,13 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
         .where(Network, primary_key=pk)
         .where_in(Network, primary_key=["Network|testnetwork", "Network|testnetwork2"])
     )
-    result = xtdb_session.client.query(query)
-    assert len(result) == 2
+    result = xtdb_session.client.query(query, valid_time)
+    assert result == [["Network|testnetwork", network], ["Network|testnetwork2", network2]]
 
     # router logic
     object_path = Path.parse("Hostname.<hostname[is DNSNSRecord]")
     sources = ["Network|testnetwork", "Network|testnetwork2"]
-    source_pk_alias = A(object_path.segments[0].source_type, field="primary_key")
+    source_pk_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
     query = (
         Query.from_path(object_path)
         .find(source_pk_alias)
@@ -199,11 +198,10 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
         .where(object_path.segments[0].source_type, primary_key=source_pk_alias)
         .where_in(object_path.segments[0].source_type, primary_key=sources)
     )
-
     assert len(xtdb_session.client.query(query, valid_time)) == 0
 
     object_path = Path.parse("IPAddress.network")
-    pk = A(IPAddress, field="primary_key")
+    pk = Aliased(IPAddress, field="primary_key")
     query = (
         Query.from_path(object_path)
         .find(pk)
@@ -212,7 +210,7 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
         .where(IPAddress, primary_key=pk)
         .where_in(IPAddress, primary_key=["IPAddressV4|testnetwork2|127.0.0.1", "IPAddressV4|testnetwork|0.0.0.0"])
     )
-    assert len(xtdb_session.client.query(query, valid_time)) == 1
+    assert xtdb_session.client.query(query, valid_time) == [["IPAddressV4|testnetwork2|127.0.0.1", ipv4]]
 
 
 def test_entity_history(xtdb_session: XTDBSession, valid_time: datetime):

@@ -24,8 +24,8 @@ class TLSReport(Report):
     template_path = "tls_report/report.html"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
-        suites = {}
-        findings = []
+        suites: dict = {}
+        findings: list[Finding] = []
         suites_with_findings = []
         ref = Reference.from_str(input_ooi)
         tree = self.octopoes_api_connector.get_tree(
@@ -40,7 +40,7 @@ class TLSReport(Report):
         for protocol, cipher_suites in suites.items():
             for suite in cipher_suites:
                 for finding in findings:
-                    if suite["cipher_suite_name"] in finding.description:
+                    if finding.description and suite["cipher_suite_name"] in finding.description:
                         suites_with_findings.append(suite["cipher_suite_name"])
 
         return {

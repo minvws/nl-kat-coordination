@@ -32,7 +32,7 @@ from octopoes.models.types import type_by_name
 from octopoes.version import __version__
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
-from octopoes.xtdb.query import A
+from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
 
 logger = getLogger(__name__)
@@ -144,7 +144,7 @@ def query(
 @router.get("/query-many", tags=["Objects"])
 def query_many(
     path: str,
-    sources: list[Reference] = Query(),
+    sources: list[str] = Query(),
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
 ):
@@ -175,7 +175,7 @@ def query_many(
         raise HTTPException(status_code=400, detail="No path components provided.")
 
     q = XTDBQuery.from_path(object_path)
-    source_alias = A(object_path.segments[0].source_type, field="primary_key")
+    source_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
 
     return octopoes.ooi_repository.query(
         q.find(source_alias)
@@ -407,10 +407,13 @@ def get_scan_profile_inheritance(
     reference: Reference = Depends(extract_reference),
 ) -> list[InheritanceSection]:
     ooi = octopoes.get_ooi(reference, valid_time)
+    if not ooi.scan_profile:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OOI does not have a scanprofile")
+
     start = InheritanceSection(
         reference=ooi.reference, level=ooi.scan_profile.level, scan_profile_type=ooi.scan_profile.scan_profile_type
     )
-    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED:
+    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED.value:
         return [start]
     return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
 
@@ -427,11 +430,11 @@ def list_findings(
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
         severities,
+        valid_time,
         exclude_muted,
         only_muted,
         offset,
         limit,
-        valid_time,
     )
 
 

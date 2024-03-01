@@ -101,6 +101,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
             reference=new_scan_profile.reference,
             old_data=old_scan_profile,
             new_data=new_scan_profile,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -112,6 +113,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
             reference=scan_profile.reference,
             valid_time=valid_time,
             old_data=scan_profile,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 

@@ -1,6 +1,5 @@
 # Copyright: 2022, ECP, NLnet Labs and the Internet.nl contributors
 # SPDX-License-Identifier: Apache-2.0
-import contextlib
 import ipaddress
 
 from pyparsing import (
@@ -40,16 +39,13 @@ def _parse_ipv6(tokens):
 
     """
     match = str(tokens[0])
-    ipv6 = None
     try:
-        ipv6 = ipaddress.IPv6Address(match)
+        return str(ipaddress.IPv6Address(match))
     except ipaddress.AddressValueError:
-        with contextlib.suppress(ipaddress.AddressValueError, ipaddress.NetmaskValueError):
-            ipv6 = ipaddress.IPv6Network(match, strict=False)
-
-    if not ipv6:
-        raise ParseException("Non valid IPv6 address/network.")
-    return str(ipv6)
+        try:
+            return str(ipaddress.IPv6Network(match, strict=False))
+        except (ipaddress.AddressValueError, ipaddress.NetmaskValueError) as e:
+            raise ParseException("Non valid IPv6 address/network.") from e
 
 
 SP = White(ws=" ", exact=1).suppress()

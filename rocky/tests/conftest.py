@@ -628,6 +628,52 @@ def finding_types() -> list[KATFindingType]:
 
 
 @pytest.fixture
+def tree_data_no_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {},
+    }
+
+
+@pytest.fixture
+def tree_data_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {
+            "Network|testnetwork": {
+                "object_type": "Network",
+                "primary_key": "Network|testnetwork",
+                "name": "testnetwork",
+            },
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0002",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+        },
+    }
+
+
+@pytest.fixture
 def cipher_finding_types() -> list[KATFindingType]:
     return [
         KATFindingType(
@@ -899,6 +945,11 @@ class MockOctopoesAPIConnector:
 
     def get(self, reference: Reference, valid_time: datetime | None = None) -> OOI:
         return self.oois[reference]
+
+    def get_tree(
+        self, reference: Reference, types: set | None = None, depth: int | None = 1, valid_time: datetime | None = None
+    ):
+        return self.tree[reference]
 
     def query(
         self,

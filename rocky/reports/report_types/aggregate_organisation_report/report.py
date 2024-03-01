@@ -468,11 +468,11 @@ def aggregate_reports(
             errors.append(report_type.id)
             continue
 
-        for ooi, data in results.items():
-            if ooi not in report_data:
-                report_data[ooi] = {}
+        for ooi_str, data in results.items():
+            if ooi_str not in report_data:
+                report_data[ooi_str] = {}
 
-            report_data[ooi][report_type.id] = data
+            report_data[ooi_str][report_type.id] = data
 
     aggregate_report = AggregateOrganisationReport(connector)
     post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import Reference
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from octopoes.models.types import OOIType
@@ -34,7 +34,7 @@ BaseReportType = TypeVar("BaseReportType", bound="BaseReport")
 
 class Report(BaseReport):
     plugins: ReportPlugins
-    input_ooi_types: set[OOIType]
+    input_ooi_types: set[type[OOI]]
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         raise NotImplementedError
@@ -130,7 +130,7 @@ class Report(BaseReport):
 
 class MultiReport(BaseReport):
     plugins: ReportPlugins
-    input_ooi_types: set[OOIType]
+    input_ooi_types: set[type[OOI]]
 
     def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         raise NotImplementedError

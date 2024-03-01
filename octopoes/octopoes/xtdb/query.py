@@ -26,7 +26,7 @@ class Aliased:
     needs the same Hostname to be both the DNSNSRecord.hostname and the DNSNSRecord.name_server_hostname.
 
     But if we use
-        >>> hostname = A(Hostname)
+        >>> hostname = Aliased(Hostname)
         >>> Query(DNSAAAARecord)
         >>>     .where(DNSAAAARecord, hostname=hostname)
         >>>     .where(DNSNSRecord, name_server_hostname=hostname)
@@ -47,7 +47,6 @@ class Aliased:
 
 
 Ref = type[OOI] | Aliased
-A = Aliased
 
 
 @dataclass
@@ -104,8 +103,11 @@ class Query:
 
         ooi_type = path.segments[-1].target_type
         query = cls(ooi_type)
-        target_ref = None
+        target_ref: Ref
         alias_map: dict[str, Ref] = {}
+
+        if not path.segments:
+            return query
 
         for segment in path.segments:
             source_ref = alias_map.get(segment.source_type.get_object_type(), segment.source_type)
@@ -115,9 +117,9 @@ class Query:
 
             if segment.target_type.get_object_type() not in alias_map:
                 target_ref = segment.target_type
-                alias_map[target_ref.get_object_type()] = target_ref
+                alias_map[segment.target_type.get_object_type()] = target_ref
             else:
-                target_ref = A(segment.target_type)
+                target_ref = Aliased(segment.target_type)
                 alias_map[segment.target_type.get_object_type()] = target_ref
 
             if segment.direction is Direction.OUTGOING:
@@ -125,8 +127,8 @@ class Query:
             else:
                 query = query.where(target_ref, **{segment.property_name: source_ref})
 
-        if target_ref:  # Make sure we use the last reference in the path as a target
-            query.result_type = target_ref
+        # Make sure we use the last reference in the path as a target
+        query.result_type = target_ref
 
         return query
 
@@ -231,9 +233,10 @@ class Query:
             value = value.replace('"', r"\"")
             new_values.append(f'"{value}"')
 
-        types_to_check = [ooi_type]
         if ooi_type in get_abstract_types():
             types_to_check = ooi_type.strict_subclasses()
+        else:
+            types_to_check = [ooi_type]
 
         self._where_clauses.append(
             self._or_statement_for_multiple_values(self._get_object_alias(ref), types_to_check, field_name, new_values)
@@ -339,5 +342,8 @@ class Query:
     def __str__(self) -> str:
         return self._compile()
 
-    def __eq__(self, other: "Query"):
+    def __eq__(self, other: object):
+        if not isinstance(other, Query):
+            return NotImplemented
+
         return str(self) == str(other)
