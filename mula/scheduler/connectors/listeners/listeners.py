@@ -91,8 +91,9 @@ class RabbitMQ(Listener):
         self.prefetch_count: int = prefetch_count
         self.func: Callable = func
 
-        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10,
-                                                                               thread_name_prefix=f"Listener-TPE-{self.__class__.__name__}")
+        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(
+            max_workers=10, thread_name_prefix=f"Listener-TPE-{self.__class__.__name__}"
+        )
         self.connection: pika.BlockingConnection | None = None
         self.channel: pika.BlockingConnection.channel | None = None
         self.connect(self.queue, self.durable, self.prefetch_count)
@@ -147,11 +148,11 @@ class RabbitMQ(Listener):
             raise exc
 
     def callback(
-            self,
-            channel: pika.channel.Channel,
-            method: pika.spec.Basic.Deliver,
-            properties: pika.spec.BasicProperties,
-            body: bytes,
+        self,
+        channel: pika.channel.Channel,
+        method: pika.spec.Basic.Deliver,
+        properties: pika.spec.BasicProperties,
+        body: bytes,
     ) -> None:
         """Callback function that is called when a message is received on the
         queue.
