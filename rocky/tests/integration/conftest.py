@@ -53,6 +53,7 @@ def seed_system(
     valid_time: datetime,
     test_hostname: str = "example.com",
     test_ip: str = "192.0.2.3",
+    test_ipv6: str = "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
 ) -> dict[str, list[OOI]]:
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
@@ -69,7 +70,7 @@ def seed_system(
 
     addresses = [
         IPAddressV4(network=network.reference, address=ip_address(test_ip)),
-        IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230")),
+        IPAddressV6(network=network.reference, address=ip_address(test_ipv6)),
     ]
     ports = [
         IPPort(address=addresses[0].reference, protocol="tcp", port=25),
