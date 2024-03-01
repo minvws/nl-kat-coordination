@@ -84,11 +84,15 @@ class Report(BaseReport):
         return Report.group_by_source(query_result)
 
     def to_hostnames(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
-        """Turn a list of either Hostname and IPAddress reference strings into a list of related hostnames."""
+        """
+        Turn a list of either Hostname and IPAddress references into a list of related hostnames, grouped by input ooi.
+
+        If an input ooi is an IP without hostnames, the key will still be present but the list will be empty.
+        """
 
         refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
 
-        hostnames_by_input_ooi = {str(ref): [ref] for ref in refs if ref.class_type == Hostname}
+        hostnames_by_input_ooi = {str(ref): [ref] if ref.class_type == Hostname else [] for ref in refs}
         ip_refs = [ref for ref in refs if ref.class_type in (IPAddressV4, IPAddressV6)]
 
         for input_ooi, ip_hostname in self.octopoes_api_connector.query_many(
@@ -102,11 +106,15 @@ class Report(BaseReport):
         return hostnames_by_input_ooi
 
     def to_ips(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
-        """Turn a list of either Hostname and IPAddress reference strings into a list of related ips."""
+        """
+        Turn a list of either Hostname and IPAddress reference strings into a list of related ips.
+
+        If an input ooi is a Hostname without ips, the key will still be present but the list will be empty.
+        """
 
         refs = [Reference.from_str(input_ooi) for input_ooi in input_oois]
 
-        ips_by_input_ooi = {str(ref): [ref] for ref in refs if ref.class_type in [IPAddressV4, IPAddressV6]}
+        ips_by_input_ooi = {str(ref): [ref] if ref.class_type in [IPAddressV4, IPAddressV6] else [] for ref in refs}
         hostname_refs = [ref for ref in refs if ref.class_type == Hostname]
 
         for input_ooi, hostname_ip in self.octopoes_api_connector.query_many(
