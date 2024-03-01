@@ -201,7 +201,7 @@ def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
     assert len(xtdb_session.client.query(query, valid_time)) == 0
 
     object_path = Path.parse("IPAddress.network")
-    pk = A(IPAddress, field="primary_key")
+    pk = Aliased(IPAddress, field="primary_key")
     query = (
         Query.from_path(object_path)
         .find(pk)
