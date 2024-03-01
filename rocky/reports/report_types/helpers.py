@@ -2,6 +2,7 @@ from octopoes.models import OOI, Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import AggregateReport, MultiReport, Report
 from reports.report_types.dns_report.report import DNSReport
+from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
@@ -27,6 +28,7 @@ REPORTS = [
     OpenPortsReport,
     IPv6Report,
     VulnerabilityReport,
+    FindingsReport,
 ]
 AGGREGATE_REPORTS = [AggregateOrganisationReport]
 
