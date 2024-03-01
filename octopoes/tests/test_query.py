@@ -350,7 +350,7 @@ def test_build_parth_query_with_multiple_sources_for_abstract_type(mocker):
     mocker.patch("octopoes.xtdb.query.uuid4", return_value=UUID("311d6399-4bb4-4830-b077-661cc3f4f2c1"))
 
     object_path = Path.parse("IPAddress.network")
-    pk = A(IPAddress, field="primary_key")
+    pk = Aliased(IPAddress, field="primary_key")
     query = (
         Query.from_path(object_path)
         .find(pk)
