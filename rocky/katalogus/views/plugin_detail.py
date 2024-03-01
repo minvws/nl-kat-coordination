@@ -237,7 +237,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
         oois_without_clearance = []
         for ooi in selected_oois:
             ooi_object = self.get_single_ooi(pk=ooi)
-            if ooi_object.scan_profile.level >= self.plugin.scan_level.value:
+            if ooi_object.scan_profile and ooi_object.scan_profile.level >= self.plugin.scan_level.value:
                 oois_with_clearance.append(ooi_object)
             else:
                 oois_without_clearance.append(ooi_object.primary_key)
