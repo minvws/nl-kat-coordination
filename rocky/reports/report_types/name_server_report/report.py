@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
 from logging import getLogger
@@ -6,6 +5,8 @@ from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
+from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
@@ -65,46 +66,62 @@ class NameServerSystemReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "name_server_report/report.html"
 
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
-        hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
-        all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
+        hostnames = []
 
-        query = "Hostname.<ooi[is Finding].finding_type"
-        hostname_finding_types = self.group_finding_types_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            ["KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC"],
-        )
-        query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type"
-        port_finding_types = self.group_finding_types_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
-        )
+        try:
+            ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
+        except ObjectNotFoundException:
+            logger.error("No data found for OOI '%s' on date %s.", ooi, valid_time)
+            raise
 
-        result = {
-            ooi: {"input_ooi": ooi, "name_server_checks": NameServerChecks(), "finding_types": []} for ooi in input_oois
+        if ooi.reference.class_type == Hostname:
+            hostnames = [ooi]
+
+        elif ooi.reference.class_type in (IPAddressV4, IPAddressV6):
+            hostnames = self.octopoes_api_connector.query(
+                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, ooi.reference
+            )
+
+        name_server_checks = NameServerChecks()
+        finding_types = {}
+
+        for hostname in hostnames:
+            check = NameServerCheck()
+
+            port_finding_types = [
+                x
+                for x in self.octopoes_api_connector.query(
+                    "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type",
+                    valid_time,
+                    hostname.reference,
+                )
+                if x.id in ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"]
+            ]
+            check.no_uncommon_ports = not any(port_finding_types)
+
+            hostname_finding_types = [
+                x
+                for x in self.octopoes_api_connector.query(
+                    "Hostname.<ooi[is Finding].finding_type", valid_time, hostname.reference
+                )
+                if x.id in ["KAT-NO-DNSSEC", "KAT-INVALID-DNSSEC"]
+            ]
+            check.has_dnssec = "KAT-NO-DNSSEC" not in [x.id for x in hostname_finding_types]
+            check.has_valid_dnssec = check.has_dnssec and "KAT-INVALID-DNSSEC" not in [
+                x.id for x in hostname_finding_types
+            ]
+
+            name_server_checks.checks.append(check)
+
+            for finding_type in port_finding_types + hostname_finding_types:
+                if finding_type.risk_severity in [None, RiskLevelSeverity.PENDING] or not finding_type.description:
+                    continue
+
+                finding_types[finding_type.id] = finding_type
+
+        return {
+            "input_ooi": input_ooi,
+            "name_server_checks": name_server_checks,
+            "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
         }
-
-        for input_ooi, hostname_references in hostnames_by_input_ooi.items():
-            finding_types = {}
-            checks = NameServerChecks()
-            for hostname in hostname_references:
-                check = NameServerCheck()
-                check.no_uncommon_ports = not any(port_finding_types.get(hostname, []))
-                check.has_dnssec = "KAT-NO-DNSSEC" not in [x.id for x in hostname_finding_types.get(hostname, [])]
-                check.has_valid_dnssec = check.has_dnssec and "KAT-INVALID-DNSSEC" not in [
-                    x.id for x in hostname_finding_types.get(hostname, [])
-                ]
-
-                checks.checks.append(check)
-
-                for finding_type in port_finding_types.get(hostname, []) + hostname_finding_types.get(hostname, []):
-                    if finding_type.risk_severity not in [None, RiskLevelSeverity.PENDING] and finding_type.description:
-                        finding_types[finding_type.id] = finding_type
-
-            result[input_ooi] = {
-                "input_ooi": input_ooi,
-                "name_server_checks": checks,
-                "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
-            }
-
-        return result

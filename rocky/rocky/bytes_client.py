@@ -139,7 +139,7 @@ class BytesClient:
 
         return metas
 
-    def get_normalizer_meta(self, normalizer_meta_id: str) -> dict:
+    def get_normalizer_meta(self, normalizer_meta_id: uuid.UUID) -> dict:
         # Note: we assume organization permissions are handled before requesting raw data.
 
         response = self.session.get(f"{self.base_url}/bytes/normalizer_meta/{normalizer_meta_id}")
