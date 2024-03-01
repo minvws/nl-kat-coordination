@@ -98,7 +98,7 @@ class SystemReport(Report):
         result = {}
 
         for input_ooi, ips in ips_by_input_ooi.items():
-            ip_services = {}
+            ip_services: dict[str, dict[str, Any]] = {}
 
             for ip in ips:
                 ip_services[ip] = {
