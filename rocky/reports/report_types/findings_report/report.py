@@ -8,7 +8,7 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.types import ALL_TYPES
-from reports.report_types.definitions import Report
+from reports.report_types.definitions import Report, ReportPlugins
 
 logger = getLogger(__name__)
 
@@ -20,7 +20,7 @@ class FindingsReport(Report):
     id = "findings-report"
     name = _("Findings Report")
     description = _("Shows all the finding types and their occurrences.")
-    plugins: dict = {"required": [], "optional": []}
+    plugins: ReportPlugins = {"required": [], "optional": []}
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
 
