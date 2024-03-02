@@ -134,6 +134,7 @@ class XTDBOriginRepository(OriginRepository):
                 valid_time=valid_time,
                 old_data=old_origin,
                 new_data=origin,
+                client=self.event_manager.client,
             )
             self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -144,5 +145,6 @@ class XTDBOriginRepository(OriginRepository):
             operation_type=OperationType.DELETE,
             valid_time=valid_time,
             old_data=origin,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))

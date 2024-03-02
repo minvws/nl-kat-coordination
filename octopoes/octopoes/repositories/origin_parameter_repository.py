@@ -107,6 +107,7 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             valid_time=valid_time,
             old_data=old_origin_parameter,
             new_data=origin_parameter,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -117,5 +118,6 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             operation_type=OperationType.DELETE,
             valid_time=valid_time,
             old_data=origin_parameter,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))

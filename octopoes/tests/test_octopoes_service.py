@@ -6,7 +6,7 @@ import pytest
 from bits.definitions import BitDefinition
 
 from octopoes.events.events import OOIDBEvent, OperationType, OriginDBEvent, ScanProfileDBEvent
-from octopoes.models import EmptyScanProfile, Reference
+from octopoes.models import EmptyScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, IPAddressV4, Network
 from octopoes.models.origin import Origin, OriginType
@@ -112,7 +112,7 @@ def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner
             source=Reference.from_str("Hostname|internet|example.com"),
         )
     ]
-    octopoes_service.scan_profile_repository.get.return_value = Mock(level=2)
+    octopoes_service.scan_profile_repository.get.return_value = Mock(level=ScanLevel.L2)
     octopoes_service.ooi_repository.get.return_value = Mock()
     octopoes_service.origin_parameter_repository.list_by_origin.return_value = {}
     octopoes_service.ooi_repository.load_bulk.return_value = {}
@@ -127,6 +127,7 @@ def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner
         old_data=old_data,
         new_data=new_data,
         reference="test_reference",
+        client="_dev",
     )
 
     octopoes_service.process_event(event)

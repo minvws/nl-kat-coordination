@@ -48,7 +48,7 @@ class DNSReport(Report):
                 records.append(
                     {
                         "type": ooi.dns_record_type,
-                        "ttl": round(ooi.ttl / 60),
+                        "ttl": round(ooi.ttl / 60) if ooi.ttl else "",
                         "name": ooi.hostname.tokenized.name,
                         "content": ooi.value,
                     }

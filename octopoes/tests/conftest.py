@@ -243,6 +243,7 @@ class MockEventManager:
     def __init__(self):
         self.queue = []
         self.processed = [0]
+        self.client = "test"
 
     def publish(self, event) -> None:
         self.queue.append(event)
@@ -314,7 +315,7 @@ def mock_xtdb_session():
 
 @pytest.fixture
 def origin_repository(mock_xtdb_session):
-    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session)
+    yield XTDBOriginRepository(Mock(spec=EventManager, client="test"), mock_xtdb_session)
 
 
 def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: XTDBOriginRepository, valid_time):

@@ -93,9 +93,8 @@ DnsRecordType = (
     | ResolvedHostname
     | NXDOMAIN
 )
-FindingTypeType = (
-    FindingType
-    | ADRFindingType
+ConcreteFindingTypeType = (
+    ADRFindingType
     | KATFindingType
     | CVEFindingType
     | RetireJSFindingType
@@ -103,7 +102,9 @@ FindingTypeType = (
     | CAPECFindingType
     | SnykFindingType
 )
-NetworkType = Network | IPAddress | IPAddressV4 | IPAddressV6 | AutonomousSystem | IPV4NetBlock | IPV6NetBlock | IPPort
+FindingTypeType = FindingType | ConcreteFindingTypeType
+ConcreteNetworkType = Network | IPAddressV4 | IPAddressV6 | AutonomousSystem | IPV4NetBlock | IPV6NetBlock | IPPort
+NetworkType = ConcreteNetworkType | IPAddress
 ServiceType = Service | IPService | TLSCipher
 SoftwareType = Software | SoftwareInstance
 WebType = (
@@ -135,11 +136,11 @@ MonitoringType = Application | Incident
 ConfigType = Config
 ReportsType = ReportData
 
-OOIType = (
+ConcreteOOIType = (
     CertificateType
     | DnsType
     | DnsRecordType
-    | NetworkType
+    | ConcreteNetworkType
     | ServiceType
     | SoftwareType
     | WebType
@@ -151,11 +152,13 @@ OOIType = (
     | EmailSecurityType
     | Finding
     | MutedFinding
-    | FindingTypeType
+    | ConcreteFindingTypeType
     | ConfigType
     | Question
     | ReportsType
 )
+
+OOIType = ConcreteOOIType | NetworkType | FindingTypeType
 
 
 def get_all_types(cls_: type[OOI]) -> Iterator[type[OOI]]:

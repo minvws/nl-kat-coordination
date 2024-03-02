@@ -2,7 +2,7 @@ import logging
 import os
 import traceback
 from collections.abc import Callable
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, cast
 
@@ -30,24 +30,6 @@ bytes_api_client = BytesAPIClient(
     username=settings.bytes_username,
     password=settings.bytes_password,
 )
-
-
-def _find_ooi_in_past(reference: Reference, connector: OctopoesAPIConnector, lookback_days: int = 4) -> OOI:
-    # Source OOIs may not live in XTDB since we currently have TTLs in place (to be removed soon).
-    valid_time = datetime.now(timezone.utc)
-
-    for days_in_past in range(lookback_days):
-        try:
-            return connector.get(reference, valid_time=valid_time)
-        except ObjectNotFoundException:
-            logger.debug(
-                "Object %s not found in Octopoes, looking into other valid times...",
-                reference,
-            )
-            date = datetime.now(timezone.utc) - timedelta(days=days_in_past)
-            valid_time = date.replace(hour=0, minute=0, second=0, microsecond=0)
-
-    raise ObjectNotFoundException(f"Object {reference} not found in Octopoes")
 
 
 def _serialize_value(value: Any, required: bool) -> Any:
@@ -113,12 +95,10 @@ class BoefjeHandler(Handler):
         job_runner: BoefjeJobRunner,
         local_repository: LocalPluginRepository,
         bytes_client: BytesAPIClient,
-        octopoes_factory=get_octopoes_api_connector,
     ):
         self.job_runner = job_runner
         self.local_repository = local_repository
         self.bytes_client = bytes_client
-        self.octopoes_factory = octopoes_factory
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
@@ -136,12 +116,15 @@ class BoefjeHandler(Handler):
             return docker_runner.run()
 
         if boefje_meta.input_ooi:
-            boefje_meta.arguments["input"] = serialize_ooi(
-                _find_ooi_in_past(
-                    Reference.from_str(boefje_meta.input_ooi),
-                    self.octopoes_factory(boefje_meta.organization),
+            reference = Reference.from_str(boefje_meta.input_ooi)
+            try:
+                ooi = get_octopoes_api_connector(boefje_meta.organization).get(
+                    reference, valid_time=datetime.now(timezone.utc)
                 )
-            )
+            except ObjectNotFoundException as e:
+                raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+
+            boefje_meta.arguments["input"] = serialize_ooi(ooi)
 
         env_keys = boefje_resource.environment_keys
 
