@@ -114,7 +114,7 @@ class OOIRepository(Repository):
         reference: Reference,
         valid_time: datetime,
         search_types: set[type[OOI]] | None = None,
-        depth: int | None = 1,
+        depth: int = 1,
     ) -> ReferenceTree:
         raise NotImplementedError
 
@@ -127,10 +127,11 @@ class OOIRepository(Repository):
     def list_findings(
         self,
         severities,
+        valid_time,
         exclude_muted,
+        only_muted,
         offset,
         limit,
-        valid_time,
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
@@ -140,7 +141,7 @@ class OOIRepository(Repository):
     def list_related(self, ooi: OOI, path: Path, valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
-    def query(self, query: Query, valid_time: datetime) -> list[OOI]:
+    def query(self, query: Query, valid_time: datetime) -> list[OOI | tuple]:
         raise NotImplementedError
 
 
@@ -153,7 +154,7 @@ class XTDBReferenceNode(RootModel):
         # Apparently relations can be joined to Null values..?!?
         if pk_prefix not in self.root:
             return None
-        reference = Reference.from_str(self.root.pop(pk_prefix))
+        reference = Reference.from_str(cast(str, self.root.pop(pk_prefix)))
         children = {}
         for name, value in self.root.items():
             if isinstance(value, XTDBReferenceNode):
@@ -224,10 +225,13 @@ class XTDBOOIRepository(OOIRepository):
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
-            return self.deserialize(res)
         except HTTPError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
+
+            raise
+
+        return self.deserialize(res)
 
     def get_history(
         self,
@@ -253,6 +257,8 @@ class XTDBOOIRepository(OOIRepository):
         except HTTPError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
+
+            raise
 
     def load_bulk(self, references: set[Reference], valid_time: datetime) -> dict[str, OOI]:
         ids = list(map(str, references))
@@ -358,11 +364,11 @@ class XTDBOOIRepository(OOIRepository):
         reference: Reference,
         valid_time: datetime,
         search_types: set[type[OOI]] | None = None,
-        depth: int | None = 1,
+        depth: int = 1,
     ) -> ReferenceTree:
         if search_types is None:
             search_types = {OOI}
-        search_types = to_concrete(search_types)
+        concrete_search_types = to_concrete(search_types)
 
         results = self._get_tree_level({reference}, depth=depth, valid_time=valid_time)
 
@@ -371,7 +377,7 @@ class XTDBOOIRepository(OOIRepository):
         except IndexError:
             raise ObjectNotFoundException(str(reference))
 
-        reference_node.filter_children(lambda child_node: child_node.reference.class_type in search_types)
+        reference_node.filter_children(lambda child_node: child_node.reference.class_type in concrete_search_types)
 
         store = self.load_bulk(reference_node.collect_references(), valid_time)
         return ReferenceTree(root=reference_node, store=store)
@@ -396,7 +402,7 @@ class XTDBOOIRepository(OOIRepository):
     def _get_tree_level(
         self,
         references: set[Reference],
-        depth: int | None = 1,
+        depth: int = 1,
         exclude: set[Reference] | None = None,
         valid_time: datetime | None = None,
     ) -> list[ReferenceNode]:
@@ -509,7 +515,7 @@ class XTDBOOIRepository(OOIRepository):
         return query
 
     def get_neighbours(
-        self, reference: Reference, valid_time: datetime, paths: set[Path] = None
+        self, reference: Reference, valid_time: datetime, paths: set[Path] | None = None
     ) -> dict[Path, list[OOI]]:
         query = self.construct_neighbour_query(reference, paths)
 
@@ -581,6 +587,7 @@ class XTDBOOIRepository(OOIRepository):
             valid_time=valid_time,
             old_data=old_ooi,
             new_data=new_ooi,
+            client=self.event_manager.client,
         )
 
         # After transaction, send event
@@ -599,6 +606,7 @@ class XTDBOOIRepository(OOIRepository):
             operation_type=OperationType.DELETE,
             valid_time=valid_time,
             old_data=ooi,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -657,16 +665,17 @@ class XTDBOOIRepository(OOIRepository):
         path_start_alias = path.segments[0].source_type
         query = Query.from_path(path).where(path_start_alias, primary_key=ooi.primary_key)
 
-        return self.query(query, valid_time)
+        # query() can return different types depending on the query
+        return self.query(query, valid_time)  # type: ignore[return-value]
 
     def list_findings(
         self,
         severities: set[RiskLevelSeverity],
+        valid_time: datetime,
         exclude_muted=False,
         only_muted=False,
         offset=DEFAULT_OFFSET,
         limit=DEFAULT_LIMIT,
-        valid_time: datetime | None = None,
     ) -> Paginated[Finding]:
         # clause to find risk_severity
         concrete_finding_types = to_concrete({FindingType})
@@ -738,7 +747,7 @@ class XTDBOOIRepository(OOIRepository):
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
         results = self.session.client.query(query, valid_time=valid_time)
 
-        parsed_results = []
+        parsed_results: list[OOI | tuple] = []
         for result in results:
             parsed_result = []
 

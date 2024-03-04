@@ -42,9 +42,9 @@ class SystemReport(Report):
 
         try:
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
-        except ObjectNotFoundException as e:
-            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
-            raise ObjectNotFoundException(e)
+        except ObjectNotFoundException:
+            logger.error("No data found for OOI '%s' on date %s.", ooi, valid_time)
+            raise
 
         if ooi.reference.class_type == Hostname:
             ips = self.octopoes_api_connector.query(
@@ -53,7 +53,7 @@ class SystemReport(Report):
         elif ooi.reference.class_type in (IPAddressV4, IPAddressV6):
             ips = [ooi]
 
-        ip_services = {}
+        ip_services: dict[Reference, dict[str, list[Reference | str]]] = {}
 
         service_mapping = {
             "http": SystemType.WEB,

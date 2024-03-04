@@ -8,7 +8,7 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.types import ALL_TYPES
-from reports.report_types.definitions import Report
+from reports.report_types.definitions import Report, ReportPlugins
 
 logger = getLogger(__name__)
 
@@ -20,11 +20,11 @@ class FindingsReport(Report):
     id = "findings-report"
     name = _("Findings Report")
     description = _("Shows all the finding types and their occurrences.")
-    plugins = {"required": [], "optional": []}
+    plugins: ReportPlugins = {"required": [], "optional": []}
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
 
-    def get_finding_valid_time_history(self, reference: str) -> list[datetime]:
+    def get_finding_valid_time_history(self, reference: Reference) -> list[datetime]:
         transaction_record = self.octopoes_api_connector.get_history(reference=reference)
         valid_time_history = [transaction.valid_time for transaction in transaction_record]
         return valid_time_history
@@ -54,17 +54,19 @@ class FindingsReport(Report):
                 severity = finding_type.risk_severity.name.lower()
                 total_by_severity[severity] += 1
 
-                time_history = self.get_finding_valid_time_history(finding.primary_key)
+                time_history = self.get_finding_valid_time_history(finding.reference)
 
                 if time_history:
                     first_seen = str(time_history[0])
+                else:
+                    first_seen = "-"
 
-                finding = {"finding": finding, "first_seen": first_seen}
+                finding_dict = {"finding": finding, "first_seen": first_seen}
 
                 if finding_type.id in finding_types:
-                    finding_types[finding_type.id]["occurrences"].append(finding)
+                    finding_types[finding_type.id]["occurrences"].append(finding_dict)
                 else:
-                    finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
+                    finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding_dict]}
                     total_by_severity_per_finding_type[severity] += 1
 
             except ObjectNotFoundException:

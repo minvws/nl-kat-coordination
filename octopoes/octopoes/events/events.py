@@ -19,7 +19,7 @@ class DBEvent(BaseModel):
     entity_type: str
     operation_type: OperationType
     valid_time: datetime
-    client: str | None = None
+    client: str
 
     @property
     def primary_key(self) -> str:
@@ -33,7 +33,9 @@ class OOIDBEvent(DBEvent):
 
     @property
     def primary_key(self) -> str:
-        return self.new_data.primary_key if self.new_data else self.old_data.primary_key
+        # There doesn't seem to be an easy way to tell mypy that if new_data is
+        # None then old_data is never None.
+        return self.new_data.primary_key if self.new_data else self.old_data.primary_key  # type: ignore[union-attr]
 
 
 class OriginDBEvent(DBEvent):
@@ -43,7 +45,9 @@ class OriginDBEvent(DBEvent):
 
     @property
     def primary_key(self) -> str:
-        return self.new_data.id if self.new_data else self.old_data.id
+        # There doesn't seem to be an easy way to tell mypy that if new_data is
+        # None then old_data is never None.
+        return self.new_data.id if self.new_data else self.old_data.id  # type: ignore[union-attr]
 
 
 class OriginParameterDBEvent(DBEvent):
@@ -53,7 +57,9 @@ class OriginParameterDBEvent(DBEvent):
 
     @property
     def primary_key(self) -> str:
-        return self.new_data.id if self.new_data else self.old_data.id
+        # There doesn't seem to be an easy way to tell mypy that if new_data is
+        # None then old_data is never None.
+        return self.new_data.id if self.new_data else self.old_data.id  # type: ignore[union-attr]
 
 
 class ScanProfileDBEvent(DBEvent):

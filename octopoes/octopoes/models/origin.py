@@ -17,7 +17,7 @@ class Origin(BaseModel):
     origin_type: OriginType
     method: str
     source: Reference
-    result: list[Reference] | None = Field(default_factory=list)
+    result: list[Reference] = Field(default_factory=list)
     task_id: UUID | None = None
 
     def __sub__(self, other) -> set[Reference]:
