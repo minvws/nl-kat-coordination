@@ -100,6 +100,6 @@ class BoefjeMixin(OctopoesView):
             self.run_boefje(boefje, None)
 
         for ooi in oois:
-            if ooi.scan_profile.level < boefje.scan_level:
+            if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level:
                 self.can_raise_clearance_level(ooi, boefje.scan_level)
             self.run_boefje(boefje, ooi)
