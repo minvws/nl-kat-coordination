@@ -257,9 +257,11 @@ def test_onboarding_select_plugins(
     request,
     member,
     rf,
-    mock_mixins_katalogus,
+    mocker,
+    mock_organization_view_octopoes,
     url,
 ):
+    mocker.patch("onboarding.views.get_katalogus")
     member = request.getfixturevalue(member)
     request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi": url.primary_key}), member.user)
 
