@@ -1,13 +1,7 @@
 from __future__ import annotations
 
-import abc
 from enum import Enum, IntEnum
-from typing import (
-    Any,
-    ClassVar,
-    Literal,
-    TypeVar,
-)
+from typing import Any, ClassVar, Literal, TypeVar
 
 from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
@@ -79,7 +73,7 @@ class ScanProfileType(Enum):
     EMPTY = "empty"
 
 
-class ScanProfileBase(BaseModel, abc.ABC):
+class ScanProfileBase(BaseModel):
     scan_profile_type: str
     reference: Reference
     level: ScanLevel
@@ -113,14 +107,14 @@ class InheritedScanProfile(ScanProfileBase):
 ScanProfile = EmptyScanProfile | InheritedScanProfile | DeclaredScanProfile
 
 
-class OOI(BaseModel, abc.ABC):
-    object_type: Literal["OOI"]
+class OOI(BaseModel):
+    object_type: str
 
     scan_profile: ScanProfile | None = None
 
-    _natural_key_attrs: list[str] = []
-    _reverse_relation_names: dict[str, str] = {}
-    _information_value: list[str] = []
+    _natural_key_attrs: ClassVar[list[str]] = []
+    _reverse_relation_names: ClassVar[dict[str, str]] = {}
+    _information_value: ClassVar[list[str]] = []
     _traversable: ClassVar[bool] = True
 
     primary_key: str = ""
@@ -192,7 +186,7 @@ class OOI(BaseModel, abc.ABC):
 
     @classmethod
     def get_reverse_relation_name(cls, attr: str) -> str:
-        return cls._reverse_relation_names.default.get(attr, f"{cls.get_object_type()}_{attr}")
+        return cls._reverse_relation_names.get(attr, f"{cls.get_object_type()}_{attr}")
 
     @classmethod
     def get_tokenized_primary_key(cls, natural_key: str):
@@ -234,10 +228,10 @@ def format_id_short(id_: str) -> str:
 class PrimaryKeyToken(RootModel):
     root: dict[str, str | PrimaryKeyToken]
 
-    def __getattr__(self, item) -> str | PrimaryKeyToken:
+    def __getattr__(self, item) -> Any:
         return self.root[item]
 
-    def __getitem__(self, item) -> str | PrimaryKeyToken:
+    def __getitem__(self, item) -> Any:
         return self.root[item]
 
 
@@ -251,12 +245,11 @@ def get_leaf_subclasses(cls: type[OOI]) -> set[type[OOI]]:
     return set().union(*child_sets)
 
 
-def build_token_tree(ooi_class: type[OOI]) -> dict:
-    tokens = {}
+def build_token_tree(ooi_class: type[OOI]) -> dict[str, dict | str]:
+    tokens: dict[str, dict | str] = {}
 
-    for attribute in ooi_class._natural_key_attrs.default:
+    for attribute in ooi_class._natural_key_attrs:
         field = ooi_class.model_fields[attribute]
-        value = ""
 
         if field.annotation in (Reference, Reference | None):
             from octopoes.models.types import related_object_type
@@ -265,7 +258,7 @@ def build_token_tree(ooi_class: type[OOI]) -> dict:
             trees = [build_token_tree(related_class) for related_class in get_leaf_subclasses(related_class)]
 
             # combine trees
-            value = {key: value_ for tree in trees for key, value_ in tree.items()}
-
-        tokens[attribute] = value
+            tokens[attribute] = {key: value_ for tree in trees for key, value_ in tree.items()}
+        else:
+            tokens[attribute] = ""
     return tokens

@@ -2,6 +2,7 @@ from octopoes.models import OOI, Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import AggregateReport, MultiReport, Report
 from reports.report_types.dns_report.report import DNSReport
+from reports.report_types.findings_report.report import FindingsReport
 from reports.report_types.ipv6_report.report import IPv6Report
 from reports.report_types.mail_report.report import MailReport
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport
@@ -27,6 +28,7 @@ REPORTS = [
     OpenPortsReport,
     IPv6Report,
     VulnerabilityReport,
+    FindingsReport,
 ]
 AGGREGATE_REPORTS = [AggregateOrganisationReport]
 
@@ -49,7 +51,7 @@ def get_report_types_for_ooi(ooi_pk: str) -> list[type[Report]]:
     return [report for report in REPORTS if ooi_type in report.input_ooi_types]
 
 
-def get_report_types_for_oois(ooi_pks: list[str]) -> set[type[Report] | type[MultiReport]]:
+def get_report_types_for_oois(ooi_pks: list[str]) -> set[type[Report]]:
     """
     Get all report types that can be generated for a given list of OOIs
     """
@@ -86,7 +88,7 @@ def get_plugins_for_report_ids(reports: list[str]) -> dict[str, set[str]]:
 
 def get_report_types_from_aggregate_report(
     aggregate_report: type[AggregateReport],
-) -> dict[str, set[type[Report] | type[MultiReport]]]:
+) -> dict[str, set[type[Report]]]:
     required_reports = set()
     optional_reports = set()
 

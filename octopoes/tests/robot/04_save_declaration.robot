@@ -20,7 +20,8 @@ Add Several Append Origins
 *** Keywords ***
 Verify Origin Present
     [Arguments]    ${reference}    ${origin_task_id}
-    ${response}    Get    ${OCTOPOES_URI}/origins    params=result=${reference}
+    ${params}    Create Dictionary    result=${reference}    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/origins    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
     ${length}    Get Length    ${response.json()}
     Should Be Equal As Integers    ${length}    1

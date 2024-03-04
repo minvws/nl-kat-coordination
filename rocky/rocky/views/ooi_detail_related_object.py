@@ -4,9 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from tools.ooi_helpers import (
-    format_attr_name,
-)
+from tools.ooi_helpers import format_attr_name
 from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with_querystring
 
 from octopoes.models import OOI
@@ -47,7 +45,7 @@ class OOIFindingManager(SingleOOITreeMixin):
         counter = Counter({severity: 0 for severity in RiskLevelSeverity})
         for finding in self.get_findings():
             finding_type: FindingType | None = self.tree.store.get(str(finding.finding_type), None)
-            if finding_type is not None:
+            if finding_type is not None and finding_type.risk_severity is not None:
                 counter.update([finding_type.risk_severity])
             else:
                 counter.update([RiskLevelSeverity.UNKNOWN])
@@ -55,7 +53,7 @@ class OOIFindingManager(SingleOOITreeMixin):
 
     def get_finding_details_sorted_by_score_desc(self) -> list[tuple[Finding, FindingType]]:
         finding_details = self.get_finding_details()
-        return list(sorted(finding_details, key=lambda x: x[1].risk_score, reverse=True))
+        return list(sorted(finding_details, key=lambda x: x[1].risk_score or 0, reverse=True))
 
     def get_finding_details(self) -> list[tuple[Finding, FindingType]]:
         return [(finding, self.tree.store[str(finding.finding_type)]) for finding in self.get_findings()]

@@ -1,4 +1,3 @@
-from abc import ABC
 from enum import Enum
 from typing import Literal
 
@@ -47,7 +46,7 @@ class WebScheme(Enum):
     HTTPS = "https"
 
 
-class WebURL(OOI, ABC):
+class WebURL(OOI):
     network: Reference = ReferenceField(Network)
 
     scheme: WebScheme

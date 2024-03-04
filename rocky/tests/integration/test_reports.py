@@ -19,7 +19,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
 
     report = WebSystemReport(octopoes_api_connector)
     input_ooi = "Hostname|test|example.com"
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
     assert len(data["finding_types"]) == 1
@@ -42,7 +42,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ooi=Reference.from_str("HTTPResource|test|192.0.2.3|tcp|25|smtp|test|example.com|http|test|example.com|80|/"),
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
-    checks = report.generate_data(input_ooi, valid_time)["web_checks"].checks
+    checks = report.collect_data([input_ooi], valid_time)[input_ooi]["web_checks"].checks
     assert checks[0].has_csp is False
     assert checks[0].has_no_csp_vulnerabilities is False
 
@@ -51,7 +51,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ooi=Reference.from_str("Website|test|192.0.2.3|tcp|25|smtp|test|example.com"),
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
     assert data["web_checks"].checks[0].offers_https is False
 
     assert len(data["finding_types"]) == 3
@@ -62,7 +62,7 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
 
     report = SystemReport(octopoes_api_connector)
     input_ooi = "Hostname|test|example.com"
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
     assert data["summary"] == {
@@ -265,7 +265,9 @@ def test_multi_report(
 
     multi_report = MultiOrganizationReport(octopoes_api_connector)
     multi_report_data = collect_report_data(
-        octopoes_api_connector, [str(report_data_object.reference), str(report_data_object_2.reference)]
+        octopoes_api_connector,
+        [str(report_data_object.reference), str(report_data_object_2.reference)],
+        valid_time,
     )
     multi_data = multi_report.post_process_data(multi_report_data)
     assert multi_data["organizations"] == [octopoes_api_connector.client, octopoes_api_connector_2.client]

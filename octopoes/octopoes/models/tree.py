@@ -26,12 +26,12 @@ class ReferenceNode(BaseModel):
         return filter_fn(self)
 
     def collect_references(self) -> set[Reference]:
-        child_references = set()
+        child_references: set[Reference] = set()
         for child_name, children in self.children.items():
             child_references_ = [child.collect_references() for child in children]
             # merge list of sets
-            child_references_ = set().union(*child_references_)
-            child_references = child_references.union(child_references_)
+            child_references_merged = set().union(*child_references_)
+            child_references = child_references.union(child_references_merged)
 
         return {self.reference}.union(child_references)
 

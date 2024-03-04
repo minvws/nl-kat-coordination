@@ -85,8 +85,7 @@ repos:
       ^boefjes/tools |
       ^keiko/templates |
       ^mula/whitelist\.py$ |
-      ^octopoes/ |
-      ^rocky/fmea/ |
+      ^octopoes/tools |
       ^rocky/whitelist\.py$ |
       /tests/ |
       docs/source/conf\.py$ |
