@@ -22,7 +22,7 @@ from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization,
 from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb
 
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
@@ -282,15 +282,12 @@ class OnboardingSetupScanSelectPluginsView(
     plugins: ReportPlugins = DNSReport.plugins
 
     def get_plugins(self) -> dict[str, list[Plugin]]:
-        plugins = {}
+        all_plugins = {}
         for required_optional, plugin_ids in self.plugins.items():
-            plugins[required_optional] = [
-                get_katalogus(self.organization.code).get_plugin(plugin_id)
-                for plugin_id in plugin_ids  # type: ignore
-                if get_katalogus(self.organization.code).get_plugin(plugin_id).scan_level
-                <= DNS_REPORT_LEAST_CLEARANCE_LEVEL
-            ]
-        return plugins
+            plugins = [get_katalogus(self.organization.code).get_plugin(plugin_id) for plugin_id in plugin_ids]
+            all_plugins[required_optional] = plugins
+
+        return all_plugins
 
     def post(self, request, *args, **kwargs):
         selected_plugins = request.POST.getlist("plugin", [])
@@ -369,7 +366,7 @@ class OnboardingReportView(
 
     def get_hostname_from_url_tree(self) -> Hostname:
         tree = self.octopoes_api_connector.get_tree(
-            self.ooi.primary_key, valid_time=datetime.now(timezone.utc), depth=2
+            Reference.from_str(self.ooi.primary_key), valid_time=datetime.now(timezone.utc), depth=2
         )
         hostname_ref = tree.store[self.ooi.web_url].netloc
         return tree.store[str(hostname_ref)]

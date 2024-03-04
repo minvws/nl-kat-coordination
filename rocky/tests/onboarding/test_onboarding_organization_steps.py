@@ -110,7 +110,6 @@ def test_onboarding_setup_scan_detail(request, member, rf):
 def test_onboarding_setup_scan_detail_create_ooi(
     request, member, rf, mock_organization_view_octopoes, url, mock_bytes_client
 ):
-    mock_organization_view_octopoes().get.return_value = url
     member = request.getfixturevalue(member)
 
     response = OnboardingSetupScanOOIAddView.as_view()(
@@ -121,13 +120,11 @@ def test_onboarding_setup_scan_detail_create_ooi(
         ooi_type="URL",
         organization_code=member.organization.code,
     )
-    print(response.__dict__)
+
     assert response.status_code == 302
 
 
 def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organization_view_octopoes, url):
-    mock_organization_view_octopoes().get.return_value = url
-
     response = OnboardingClearanceLevelIntroductionView.as_view()(
         setup_request(rf.get("step_clearance_level_introduction", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
@@ -145,8 +142,6 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organi
 
 
 def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organization_view_octopoes, url):
-    mock_organization_view_octopoes().get.return_value = url
-
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
         setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
@@ -193,8 +188,6 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
 def test_onboarding_acknowledge_clearance_level_no_clearance(
     rf, redteam_member, clearance_level, mock_organization_view_octopoes, url
 ):
-    mock_organization_view_octopoes().get.return_value = url
-
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
         setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
@@ -264,7 +257,7 @@ def test_onboarding_select_plugins(
     request,
     member,
     rf,
-    mock_models_katalogus,
+    mock_mixins_katalogus,
     url,
 ):
     member = request.getfixturevalue(member)
