@@ -6,6 +6,9 @@ metrics from its `/metrics` endpoint. These metrics can be used to monitor the
 performance and health of the scheduler. These metrics can be collected and
 visualized by using a monitoring system like Prometheus.
 
+To enable metrics collection, add `SCHEDULER_COLLECT_METRICS=true` to
+your `.env` file.
+
 The following is a detailed explanation of the scheduler metrics:
 
 | Metric                       | Description                                                               |
