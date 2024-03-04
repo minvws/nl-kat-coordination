@@ -10,8 +10,6 @@ The following is a detailed explanation of the scheduler metrics:
 
 | Metric                       | Description                                                               |
 | ---------------------------- | ------------------------------------------------------------------------- |
-| scheduler_cpu_usage          | The CPU usage of the scheduler.                                           |
-| scheduler_memory_usage       | The memory usage of the scheduler                                         |
 | scheduler_qsize              | The number of items that are queued on a scheduler queue per organization |
 | scheduler_task_status_counts | The number of tasks per status, per organization                          |
 
