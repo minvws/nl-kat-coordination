@@ -49,7 +49,7 @@ class ScanProfileDetailView(OOIDetailView, FormView):
     def get_initial(self):
         initial = super().get_initial()
 
-        if not isinstance(self.ooi.scan_profile, InheritedScanProfile):
+        if self.ooi.scan_profile and not isinstance(self.ooi.scan_profile, InheritedScanProfile):
             initial["level"] = self.ooi.scan_profile.level
 
         return initial
@@ -60,7 +60,7 @@ class ScanProfileResetView(OOIDetailView):
 
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
-        if self.ooi.scan_profile.scan_profile_type != "declared":
+        if not self.ooi.scan_profile or self.ooi.scan_profile.scan_profile_type != "declared":
             messages.add_message(
                 self.request,
                 messages.WARNING,

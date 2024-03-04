@@ -1,5 +1,5 @@
 import json
-from collections.abc import Set
+from collections.abc import Sequence, Set
 from datetime import datetime
 from uuid import UUID
 
@@ -91,7 +91,7 @@ class OctopoesAPIConnector:
         scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOIType]:
-        params: dict[str, str | int | list[str] | set[str]] = {
+        params: dict[str, str | int | list[str] | set[str | int]] = {
             "types": [t.__name__ for t in types],
             "valid_time": str(valid_time),
             "offset": offset,
@@ -163,7 +163,7 @@ class OctopoesAPIConnector:
                 "source": source,
                 "result": result,
                 "task_id": str(task_id) if task_id else None,
-                "origin_type": origin_type,
+                "origin_type": str(origin_type) if origin_type else None,
             },
         )
 
@@ -292,7 +292,7 @@ class OctopoesAPIConnector:
         self,
         path: str,
         valid_time: datetime,
-        sources: list[OOI | Reference | str],
+        sources: Sequence[OOI | Reference | str],
     ) -> list[tuple[str, OOIType]]:
         if not sources:
             return []

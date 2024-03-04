@@ -82,10 +82,12 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
     def get_single_ooi(self, pk: str) -> OOI:
         try:
             ref = Reference.from_str(pk)
-            return self.octopoes_api_connector.get(ref, valid_time=self.observed_at)
+            ooi = self.octopoes_api_connector.get(ref, valid_time=self.observed_at)
         except Exception as e:
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
             self.handle_connector_exception(e)
+
+        return ooi
 
     def get_origins(
         self,
@@ -97,7 +99,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
-                if origin.origin.origin_type != OriginType.OBSERVATION:
+                if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
                     continue
 
                 try:

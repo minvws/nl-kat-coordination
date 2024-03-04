@@ -78,8 +78,6 @@ class EventManager:
                 raise
 
     def _publish(self, event: DBEvent) -> None:
-        event.client = self.client
-
         # schedule celery event processor
         self.celery_app.send_task(
             "octopoes.tasks.tasks.handle_event",
@@ -98,10 +96,11 @@ class EventManager:
         if not isinstance(event, ScanProfileDBEvent):
             return
 
-        incremented = (event.operation_type == OperationType.CREATE and event.new_data.level > 0) or (
+        # There doesn't seem to be an easy way to tell mypy when old_data or new_data is None.
+        incremented = (event.operation_type == OperationType.CREATE and event.new_data.level > 0) or (  # type: ignore[union-attr]
             event.operation_type == OperationType.UPDATE
             and event.old_data
-            and event.new_data.level > event.old_data.level
+            and event.new_data.level > event.old_data.level  # type: ignore[union-attr]
         )
 
         if incremented:
@@ -109,7 +108,7 @@ class EventManager:
                 {
                     "primary_key": event.reference,
                     "object_type": event.reference.class_,
-                    "scan_profile": event.new_data.dict(),
+                    "scan_profile": event.new_data.dict(),  # type: ignore[union-attr]
                 }
             )
 
@@ -123,7 +122,7 @@ class EventManager:
             logger.debug(
                 "Published scan_profile_increment [primary_key=%s] [level=%s]",
                 format_id_short(event.primary_key),
-                event.new_data.level,
+                event.new_data.level,  # type: ignore[union-attr]
             )
 
         # publish mutations
@@ -131,8 +130,8 @@ class EventManager:
 
         if event.operation_type != OperationType.DELETE:
             mutation.value = AbstractOOI(
-                primary_key=event.new_data.reference,
-                object_type=event.new_data.reference.class_,
+                primary_key=event.new_data.reference,  # type: ignore[union-attr]
+                object_type=event.new_data.reference.class_,  # type: ignore[union-attr]
                 scan_profile=event.new_data,
             )
 

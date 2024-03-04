@@ -1,11 +1,11 @@
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Annotated, Any
 
 from pydantic import AwareDatetime, BaseModel, Field
 
 from octopoes.models import Reference
-from octopoes.models.types import OOIType
+from octopoes.models.types import ConcreteOOIType, OOIType
 
 
 class ServiceHealth(BaseModel):
@@ -59,18 +59,21 @@ class ScanProfileDeclaration(BaseModel):
     valid_time: datetime
 
 
+ValidatedOOIType = Annotated[ConcreteOOIType, Field(discriminator="object_type")]
+
+
 # API models (timezone validation and pydantic parsing)
 class ValidatedObservation(_BaseObservation):
     """Used by Octopoes API to validate and parse correctly"""
 
-    result: list[OOIType]
+    result: list[ValidatedOOIType]
     valid_time: AwareDatetime
 
 
 class ValidatedDeclaration(BaseModel):
     """Used by Octopoes API to validate and parse correctly"""
 
-    ooi: OOIType
+    ooi: ValidatedOOIType
     valid_time: AwareDatetime
     method: str | None = "manual"
     task_id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
@@ -79,7 +82,7 @@ class ValidatedDeclaration(BaseModel):
 class ValidatedAffirmation(BaseModel):
     """Used by Octopoes API to validate and parse correctly"""
 
-    ooi: OOIType
+    ooi: ValidatedOOIType
     valid_time: AwareDatetime
     method: str | None = "hydration"
     task_id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
