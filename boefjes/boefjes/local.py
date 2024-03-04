@@ -2,6 +2,7 @@ import logging
 import os
 from typing import Any, Dict, List, Tuple, Union
 
+from octopoes.models import OOI, DeclaredScanProfile
 from pydantic import ValidationError
 
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
@@ -21,7 +22,6 @@ from boefjes.job_models import (
 )
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
-from octopoes.models import OOI, DeclaredScanProfile
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +47,6 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
 
     def run(self, boefje_meta: BoefjeMeta, environment: Dict[str, str]) -> List[Tuple[set, Union[bytes, str]]]:
         logger.info("Running local boefje plugin")
-
-        task_id = str(boefje_meta.id)
-        self.scheduler_client.patch_task(task_id, TaskStatus.RUNNING)
 
         boefjes = self.local_repository.resolve_boefjes()
         boefje_resource = boefjes[boefje_meta.boefje.id]

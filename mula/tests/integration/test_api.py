@@ -6,8 +6,8 @@ from types import SimpleNamespace
 from unittest import mock
 
 from fastapi.testclient import TestClient
-from scheduler import config, models, server, storage
 
+from scheduler import config, models, server, storage
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler
@@ -604,7 +604,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"status": "dispatched"})
         self.assertEqual(200, response.status_code)
         self.assertEqual("dispatched", response.json().get("status"))
-        self.assertIsNotNone(response.json().get("queued"))
+        self.assertIsNotNone(response.json().get("dispatched_at"))
 
     def test_patch_task_empty(self):
         # Patch a task with empty body

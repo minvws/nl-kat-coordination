@@ -241,6 +241,8 @@ def _start_working(
 
     while True:
         p_item = task_queue.get()
+        scheduler_client.patch_task(p_item.id, TaskStatus.RUNNING)  # Note: implicitly, we have p_item.id == task_id
+
         status = TaskStatus.FAILED
         handling_tasks[os.getpid()] = str(p_item.id)
 

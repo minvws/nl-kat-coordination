@@ -57,56 +57,36 @@ class Task(BaseModel):
 
     status: TaskStatus
 
-    # Durations
-    pending: Optional[timedelta] = None
-    queued: Optional[timedelta] = None
-    dispatched: Optional[timedelta] = None
-    running: Optional[timedelta] = None
-
     meta: Optional[dict] = None
 
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # Status transition timestamps
+    pending_at: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc))
+    queued_at: Optional[datetime] = None
+    dispatched_at: Optional[datetime] = None
+    running_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
 
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def update_status(self, status: TaskStatus) -> None:
-        """Update and calculate the duration of the task status transition."""
+        """Update and log the status transition."""
         from_status = self.status
         to_status = status
-
         now_utc = datetime.now(timezone.utc)
-        t0 = (
-            self.created_at
-            + (self.pending or timedelta())
-            + (self.queued or timedelta())
-            + (self.dispatched or timedelta())
-            + (self.running or timedelta())
-        )
 
-        if from_status == TaskStatus.PENDING and to_status in (
-            TaskStatus.QUEUED,
-            TaskStatus.CANCELLED,
-            TaskStatus.FAILED,
-        ):
-            self.pending = now_utc - t0
-        elif from_status == TaskStatus.QUEUED and to_status in (
-            TaskStatus.DISPATCHED,
-            TaskStatus.CANCELLED,
-            TaskStatus.FAILED,
-        ):
-            self.queued = now_utc - t0
-        elif from_status == TaskStatus.DISPATCHED and to_status in (
-            TaskStatus.RUNNING,
-            TaskStatus.CANCELLED,
-            TaskStatus.FAILED,
-        ):
-            self.dispatched = now_utc - t0
+        if from_status == TaskStatus.PENDING and to_status in (TaskStatus.QUEUED,):
+            self.queued_at = now_utc
+        elif from_status == TaskStatus.QUEUED and to_status in (TaskStatus.DISPATCHED,):
+            self.dispatched_at = now_utc
+        elif from_status == TaskStatus.DISPATCHED and to_status in (TaskStatus.RUNNING,):
+            self.running_at = now_utc
         elif from_status == TaskStatus.RUNNING and to_status in (
             TaskStatus.COMPLETED,
             TaskStatus.FAILED,
             TaskStatus.CANCELLED,
         ):
-            self.running = now_utc - t0
+            self.completed_at = now_utc
 
         self.status = to_status
 
@@ -131,12 +111,13 @@ class TaskDB(Base):
         default=TaskStatus.PENDING,
     )
 
-    pending = Column(Interval)
-    queued = Column(Interval)
-    dispatched = Column(Interval)
-    running = Column(Interval)
-
     meta = Column(JSONB)
+
+    pending_at = Column(DateTime(timezone=True), nullable=True, server_default=func.now())
+    queued_at = Column(DateTime(timezone=True), nullable=True)
+    dispatched_at = Column(DateTime(timezone=True), nullable=True)
+    running_at = Column(DateTime(timezone=True), nullable=True)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
 
     created_at = Column(
         DateTime(timezone=True),
