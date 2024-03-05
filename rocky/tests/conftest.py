@@ -912,6 +912,113 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
 
 
 @pytest.fixture
+def tree_data_no_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {},
+    }
+
+
+@pytest.fixture
+def tree_data_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {
+            "Network|testnetwork": {
+                "object_type": "Network",
+                "primary_key": "Network|testnetwork",
+                "name": "testnetwork",
+            },
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0002",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+        },
+    }
+
+
+@pytest.fixture
+def tree_data_tls_findings_and_suites():
+    return {
+        "root": {
+            "reference": "",
+            "children": {"ooi": [{"reference": "", "children": {}}]},
+        },
+        "store": {
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "description": "Fake description with cipher_suite_name ECDHE-RSA-AES128-SHA",
+                "finding_type": "KATFindingType|KAT-RECOMMENDATION-BAD-CIPHER",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "description": "Fake description with cipher_suite_name ECDHE-RSA-AES256-SHA",
+                "finding_type": "KATFindingType|KAT-MEDIUM-BAD-CIPHER",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "description": "Fake description...",
+                "finding_type": "KATFindingType|KAT-CRITICAL-BAD-CIPHER",
+            },
+            "TLSCipher|Network|testnetwork|KAT-0004": {
+                "object_type": "TLSCipher",
+                "primary_key": "TLSCipher|Network|testnetwork|KAT-0004|tcp|443|https",
+                "ip_service": "IPService",
+                "ooi": "Network|testnetwork",
+                "suites": {
+                    "TLSv1": [
+                        {
+                            "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+                            "encryption_algorithm": "AES",
+                            "cipher_suite_name": "ECDHE-RSA-AES128-SHA",
+                            "bits": 128,
+                            "key_size": 256,
+                            "key_exchange_algorithm": "ECDH",
+                            "cipher_suite_code": "xc013",
+                        },
+                        {
+                            "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+                            "encryption_algorithm": "AES",
+                            "cipher_suite_name": "ECDHE-RSA-AES256-SHA",
+                            "bits": 256,
+                            "key_size": 256,
+                            "key_exchange_algorithm": "ECDH",
+                            "cipher_suite_code": "xc014",
+                        },
+                    ],
+                },
+            },
+        },
+    }
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {
@@ -1091,8 +1198,8 @@ class MockOctopoesAPIConnector:
         result = []
 
         for source in sources:
-            for ooi in self.queries[path][source]:
-                result.append((source, ooi))
+            for ooi in self.queries[path][str(source)]:
+                result.append((str(source), ooi))
 
         return result
 

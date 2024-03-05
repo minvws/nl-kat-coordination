@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
@@ -5,11 +6,8 @@ from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
-from octopoes.models.path import Path
 from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
@@ -29,33 +27,24 @@ class IPv6Report(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "ipv6_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
         """
         For hostnames, check whether they point to ipv6 addresses.
         For ip addresses, check all hostnames that point to them, and check whether they point to ipv6 addresses.
         """
-        try:
-            ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
-        except ObjectNotFoundException:
-            logger.error("No data found for OOI '%s' on date %s.", ooi, valid_time)
-            raise
+        hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
+        all_hostnames = list({h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames})
 
-        if ooi.reference.class_type == IPAddressV4 or ooi.reference.class_type == IPAddressV6:
-            path = Path.parse("IPAddress.<address [is ResolvedHostname].hostname")
-            hostnames = self.octopoes_api_connector.query(path=path, source=ooi.reference, valid_time=valid_time)
-        else:
-            hostnames = [ooi]
+        query = "Hostname.<hostname[is ResolvedHostname].address"
+        ips = self.group_by_source(self.octopoes_api_connector.query_many(query, valid_time, all_hostnames))
 
-        results = {}
-        for hostname in hostnames:
-            if ooi.reference.class_type == IPAddressV6:
-                return {hostname.name: {"enabled": True} for hostname in hostnames}
-            path = Path.parse("Hostname.<hostname [is ResolvedHostname].address")
-            ips = self.octopoes_api_connector.query(path=path, source=hostname.reference, valid_time=valid_time)
-
-            results = {
-                hostname.name: {"enabled": any(ip.reference.class_type == IPAddressV6 for ip in ips)}
-                for hostname in hostnames
+        result: dict[str, dict[str, Any]] = {ooi: {} for ooi in input_oois}
+        for input_ooi, hostnames in hostnames_by_input_ooi.items():
+            result[input_ooi] = {
+                hostname_ref.tokenized.name: {
+                    "enabled": any(ip.reference.class_type == IPAddressV6 for ip in ips.get(hostname_ref, []))
+                }
+                for hostname_ref in hostnames
             }
 
-        return results
+        return result
