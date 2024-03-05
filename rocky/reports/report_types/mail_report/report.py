@@ -25,7 +25,7 @@ class MailReport(Report):
 
     def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
-        all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
+        all_hostnames = list({h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames})
 
         filtered_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many("Hostname.<ooi[is Finding].finding_type", valid_time, all_hostnames),
