@@ -20,16 +20,8 @@ def test_tls_report_multiple_findings_and_suites(
     mock_octopoes_api_connector,
     valid_time,
     ip_service,
-    cipher_finding_type,
-    cipher_finding_types,
     tree_data_tls_findings_and_suites,
 ):
-    mock_octopoes_api_connector.oois = {
-        ip_service.reference: ip_service,
-        cipher_finding_types[0].reference: cipher_finding_types[0],
-        cipher_finding_types[1].reference: cipher_finding_types[1],
-        cipher_finding_type.reference: cipher_finding_type,
-    }
     mock_octopoes_api_connector.tree = {
         ip_service.reference: ReferenceTree.model_validate(tree_data_tls_findings_and_suites),
     }
