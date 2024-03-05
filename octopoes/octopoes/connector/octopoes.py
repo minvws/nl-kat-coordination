@@ -26,11 +26,10 @@ from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 
 
-# todo: set default headers (accept-content, etc.)
 class OctopoesAPIConnector:
     """
     Methods on this Connector can throw
-        - requests.exceptions.RequestException if HTTP connection to Octopoes API fails
+        - httpx.HTTPError if HTTP connection to Octopoes API fails
         - connector.ObjectNotFoundException if the OOI node cannot be found
         - connector.RemoteException if an error occurs inside Octopoes API
     """
@@ -71,13 +70,13 @@ class OctopoesAPIConnector:
         scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
         scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
     ) -> Paginated[OOIType]:
-        params: dict[str, str | int | list[str] | set[str | int]] = {
+        params: dict[str, str | int | list[str | int]] = {
             "types": [t.__name__ for t in types],
             "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
-            "scan_level": {s.value for s in scan_level},
-            "scan_profile_type": {s.value for s in scan_profile_type},
+            "scan_level": [s.value for s in scan_level],
+            "scan_profile_type": [s.value for s in scan_profile_type],
         }
         res = self.session.get(f"/{self.client}/objects", params=params)
         return TypeAdapter(Paginated[OOIType]).validate_json(res.content)
@@ -109,6 +108,7 @@ class OctopoesAPIConnector:
             "limit": limit,
             "indices": indices,
         }
+        params = {k: v for k, v in params.items() if v is not None}  # filter out None values
         res = self.session.get(f"/{self.client}/object-history", params=params)
         return TypeAdapter(list[TransactionRecord]).validate_json(res.content)
 
@@ -136,15 +136,17 @@ class OctopoesAPIConnector:
         task_id: UUID | None = None,
         origin_type: OriginType | None = None,
     ) -> list[Origin]:
+        params = {
+            "valid_time": str(valid_time),
+            "source": source,
+            "result": result,
+            "task_id": str(task_id) if task_id else None,
+            "origin_type": str(origin_type) if origin_type else None,
+        }
+        params = {k: v for k, v in params.items() if v is not None}  # filter out None values
         res = self.session.get(
             f"/{self.client}/origins",
-            params={
-                "valid_time": str(valid_time),
-                "source": source,
-                "result": result,
-                "task_id": str(task_id) if task_id else None,
-                "origin_type": str(origin_type) if origin_type else None,
-            },
+            params=params,
         )
 
         return TypeAdapter(list[Origin]).validate_json(res.content)
@@ -263,6 +265,8 @@ class OctopoesAPIConnector:
             "offset": offset,
             "limit": limit,
         }
+        params = {k: v for k, v in params.items() if v is not None}  # filter out None values
+
         return [
             TypeAdapter(OOIType).validate_python(ooi)
             for ooi in self.session.get(f"/{self.client}/query", params=params).json()
