@@ -6,8 +6,8 @@ from types import SimpleNamespace
 from unittest import mock
 
 from fastapi.testclient import TestClient
-
 from scheduler import config, models, server, storage
+
 from tests.factories import OrganisationFactory
 from tests.mocks import queue as mock_queue
 from tests.mocks import scheduler as mock_scheduler

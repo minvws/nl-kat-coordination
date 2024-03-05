@@ -5,7 +5,7 @@ from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, Interval, String
+from sqlalchemy import Column, DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
@@ -57,14 +57,14 @@ class Task(BaseModel):
 
     status: TaskStatus
 
-    meta: Optional[dict] = None
+    meta: dict | None = None
 
     # Status transition timestamps
-    pending_at: Optional[datetime] = Field(default_factory=lambda: datetime.now(timezone.utc))
-    queued_at: Optional[datetime] = None
-    dispatched_at: Optional[datetime] = None
-    running_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    pending_at: datetime | None = Field(default_factory=lambda: datetime.now(timezone.utc))
+    queued_at: datetime | None = None
+    dispatched_at: datetime | None = None
+    running_at: datetime | None = None
+    completed_at: datetime | None = None
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
