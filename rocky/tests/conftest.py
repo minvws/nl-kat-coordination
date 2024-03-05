@@ -912,52 +912,6 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
 
 
 @pytest.fixture
-def tree_data_no_findings():
-    return {
-        "root": {
-            "reference": "Finding|Network|testnetwork|KAT-0001",
-            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
-        },
-        "store": {},
-    }
-
-
-@pytest.fixture
-def tree_data_findings():
-    return {
-        "root": {
-            "reference": "Finding|Network|testnetwork|KAT-0001",
-            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
-        },
-        "store": {
-            "Network|testnetwork": {
-                "object_type": "Network",
-                "primary_key": "Network|testnetwork",
-                "name": "testnetwork",
-            },
-            "Finding|Network|testnetwork|KAT-0001": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0001",
-                "ooi": "Network|testnetwork",
-                "finding_type": "KATFindingType|KAT-0001",
-            },
-            "Finding|Network|testnetwork|KAT-0002": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0002",
-                "ooi": "Network|testnetwork",
-                "finding_type": "KATFindingType|KAT-0002",
-            },
-            "Finding|Network|testnetwork|KAT-0003": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0003",
-                "ooi": "Network|testnetwork",
-                "finding_type": "KATFindingType|KAT-0001",
-            },
-        },
-    }
-
-
-@pytest.fixture
 def tree_data_tls_findings_and_suites():
     return {
         "root": {
