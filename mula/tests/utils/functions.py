@@ -2,10 +2,9 @@ import uuid
 from typing import Any, ClassVar
 
 import pydantic
+from scheduler import models
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
-
-from scheduler import models
 
 
 class TestModel(pydantic.BaseModel):

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from sqlalchemy import exc
 
@@ -19,13 +19,13 @@ class ScheduleStore:
     def get_schedules(
         self,
         scheduler_id: str,
-        enabled: Optional[bool] = None,
-        min_deadline: Optional[datetime] = None,
-        max_deadline: Optional[datetime] = None,
-        filters: Optional[FilterRequest] = None,
-        offset: Optional[int] = 0,
-        limit: Optional[int] = 100,
-    ) -> Tuple[List[models.Schedule], int]:
+        enabled: bool | None = None,
+        min_deadline: datetime | None = None,
+        max_deadline: datetime | None = None,
+        filters: FilterRequest | None = None,
+        offset: int | None = 0,
+        limit: int | None = 100,
+    ) -> tuple[list[models.Schedule], int]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.ScheduleDB)
 
@@ -55,7 +55,7 @@ class ScheduleStore:
             return schedules, count
 
     @retry()
-    def get_schedule_by_id(self, schedule_id: str) -> Optional[models.Schedule]:
+    def get_schedule_by_id(self, schedule_id: str) -> models.Schedule | None:
         with self.dbconn.session.begin() as session:
             schedule_orm = session.query(models.ScheduleDB).filter(models.ScheduleDB.id == schedule_id).first()
             if schedule_orm is None:
@@ -66,7 +66,7 @@ class ScheduleStore:
             return schedule
 
     @retry()
-    def get_schedule_by_hash(self, schedule_hash: str) -> Optional[models.Schedule]:
+    def get_schedule_by_hash(self, schedule_hash: str) -> models.Schedule | None:
         with self.dbconn.session.begin() as session:
             schedule_orm = (
                 session.query(models.ScheduleDB)
@@ -82,7 +82,7 @@ class ScheduleStore:
             return schedule
 
     @retry()
-    def create_schedule(self, schedule: models.Schedule) -> Optional[models.Schedule]:
+    def create_schedule(self, schedule: models.Schedule) -> models.Schedule | None:
         with self.dbconn.session.begin() as session:
             schedule_orm = models.ScheduleDB(**schedule.model_dump(exclude={"tasks"}))
             session.add(schedule_orm)

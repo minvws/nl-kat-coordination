@@ -9,9 +9,17 @@ from opentelemetry import trace
 
 from scheduler import context, models, queues, rankers
 from scheduler.connectors import listeners
-from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
-                              Organisation, Plugin, PrioritizedItem,
-                              ScanProfileMutation, TaskStatus)
+from scheduler.models import (
+    OOI,
+    Boefje,
+    BoefjeTask,
+    MutationOperationType,
+    Organisation,
+    Plugin,
+    PrioritizedItem,
+    ScanProfileMutation,
+    TaskStatus,
+)
 from scheduler.storage import filters
 
 from .scheduler import Scheduler

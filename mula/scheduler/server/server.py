@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 import fastapi
 import prometheus_client
@@ -7,8 +7,7 @@ import structlog
 import uvicorn
 from fastapi import BackgroundTasks, status
 from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
-    OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
@@ -319,14 +318,14 @@ class Server:
     def list_schedules(
         self,
         request: fastapi.Request,
-        scheduler_id: Optional[str] = None,
-        enabled: Optional[bool] = None,
-        min_deadline: Optional[datetime.datetime] = None,
-        max_deadline: Optional[datetime.datetime] = None,
+        scheduler_id: str | None = None,
+        enabled: bool | None = None,
+        min_deadline: datetime.datetime | None = None,
+        max_deadline: datetime.datetime | None = None,
         offset: int = 0,
         limit: int = 10,
-        filters: Optional[storage.filters.FilterRequest] = None,
-        schedule: Optional[models.ScheduleRequest] = None,
+        filters: storage.filters.FilterRequest | None = None,
+        schedule: models.ScheduleRequest | None = None,
     ) -> Any:
         if schedule is not None and request.method == "POST":
             created_schedule = fastapi.encoders.jsonable_encoder(self.create_schedule(schedule))
@@ -423,7 +422,7 @@ class Server:
 
         return models.Schedule(**schedule.model_dump())
 
-    def patch_schedule(self, schedule_id: str, item: Dict) -> Any:
+    def patch_schedule(self, schedule_id: str, item: dict) -> Any:
         if len(item) == 0:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -640,7 +639,7 @@ class Server:
 
         return models.TaskRun(**task.model_dump())
 
-    def patch_task(self, task_id: str, item: Dict, background_tasks: BackgroundTasks) -> Any:
+    def patch_task(self, task_id: str, item: dict, background_tasks: BackgroundTasks) -> Any:
         if len(item) == 0:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

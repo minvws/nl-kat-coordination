@@ -1,15 +1,15 @@
 import abc
 import threading
 import time
+from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Optional
 
 import structlog
 from opentelemetry import trace
 
-from scheduler import (connectors, context, models, queues, rankers, storage,
-                       utils)
+from scheduler import connectors, context, models, queues, rankers, storage, utils
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -67,7 +67,7 @@ class Scheduler(abc.ABC):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.queue: queues.PriorityQueue = queue
-        self.callback: Optional[Callable[[], Any]] = callback
+        self.callback: Callable[[], Any] | None = callback
 
         # Settings
         self.max_tries: int = max_tries
@@ -85,7 +85,7 @@ class Scheduler(abc.ABC):
         # Threads
         self.lock: threading.Lock = threading.Lock()
         self.stop_event_threads: threading.Event = threading.Event()
-        self.threads: List[thread.ThreadRunner] = []
+        self.threads: list[thread.ThreadRunner] = []
         self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
 
     @abc.abstractmethod
@@ -298,8 +298,8 @@ class Scheduler(abc.ABC):
         self.ctx.datastores.task_store.create_task(task)
 
     def pop_item_from_queue(
-        self, filters: Optional[storage.filters.FilterRequest] = None
-    ) -> Optional[models.PrioritizedItem]:
+        self, filters: storage.filters.FilterRequest | None = None
+    ) -> models.PrioritizedItem | None:
         """Pop an item from the queue.
 
         Args:

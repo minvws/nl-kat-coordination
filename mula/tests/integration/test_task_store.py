@@ -7,6 +7,7 @@ from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
+
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 

@@ -5,18 +5,17 @@ from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
 
-from scheduler.utils import GUID, cron
+from scheduler.utils import GUID
 
 from .base import Base
 from .boefje import Boefje
-from .errors import ValidationError
 from .normalizer import Normalizer
 from .queue import PrioritizedItem
 from .raw_data import RawData

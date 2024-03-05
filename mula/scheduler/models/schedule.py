@@ -1,15 +1,12 @@
 import uuid
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import Optional
 
-import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
-from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
-from sqlalchemy.sql.expression import text
 
 from scheduler.utils import GUID, cron
 
@@ -31,12 +28,12 @@ class Schedule(BaseModel):
     # Priority item specification
     p_item: PrioritizedItem
 
-    tasks: List[TaskRun] = []
+    tasks: list[TaskRun] = []
 
-    cron_expression: Optional[str] = None
+    cron_expression: str | None = None
 
-    deadline_at: Optional[datetime] = None
-    evaluated_at: Optional[datetime] = None
+    deadline_at: datetime | None = None
+    evaluated_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

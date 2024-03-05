@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -8,7 +8,7 @@ class PrioritizedItemRequest(BaseModel):
     """Request model for prioritized items used in the server."""
 
     priority: int
-    data: Dict = Field(default_factory=dict)
+    data: dict = Field(default_factory=dict)
 
 
 class ScheduleRequest(BaseModel):
@@ -16,8 +16,8 @@ class ScheduleRequest(BaseModel):
 
     enabled: bool = True
 
-    p_item: Dict = Field(default_factory=dict)
+    p_item: dict = Field(default_factory=dict)
 
-    cron_expression: Optional[str] = None
+    cron_expression: str | None = None
 
-    deadline_at: Optional[datetime] = None
+    deadline_at: datetime | None = None
