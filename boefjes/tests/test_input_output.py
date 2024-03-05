@@ -18,7 +18,7 @@ def get_dummy_data(filename: str) -> bytes:
 def get_test_files(testpath):
     """Finds all files with the test-input filename and the related output files"""
     tests = []
-    for input_filename in Path('.').glob(testpath):
+    for input_filename in Path().glob(testpath):
         input_data = get_dummy_data(input_filename)
         output_data = json.loads(get_dummy_data(input_filename.replace("input", "output")))
         ooi_data_filename = input_filename.replace("input", "ooi")
@@ -63,11 +63,11 @@ def pytest_generate_tests(metafunc):
 def field_filter(filters, objectlist):
     """Walks over a list of objects and removes unknown fields by checking the field keys for
     each object against the filters allow list for that object type."""
-    for object in objectlist:
-        if filters[object["type"]]:
-            for objectfield in list(object.keys()):
-                if objectfield not in filters[object["type"]]:
-                    del object[objectfield]
+    for ooi in objectlist:
+        if filters[ooi["type"]]:
+            for objectfield in list(ooi.keys()):
+                if objectfield not in filters[ooi["type"]]:
+                    del ooi[objectfield]
     return objectlist
 
 
