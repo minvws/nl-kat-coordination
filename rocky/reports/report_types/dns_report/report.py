@@ -66,7 +66,9 @@ class DNSReport(Report):
             except ObjectNotFoundException:
                 logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
 
-        finding_types_sorted = sorted(finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True)
+        finding_types_sorted = sorted(
+            finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
+        )
 
         records = sorted(records, key=lambda x: x["type"])
 
