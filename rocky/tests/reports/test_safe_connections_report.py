@@ -13,7 +13,7 @@ def test_safe_connections_report_no_finding_types(mock_octopoes_api_connector, v
 
     report = SafeConnectionsReport(mock_octopoes_api_connector)
 
-    data = report.generate_data(str(hostname.reference), valid_time)
+    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
 
     assert data["sc_ips"] == {}
     assert data["number_of_available"] == 0
@@ -35,7 +35,7 @@ def test_safe_connections_report_single_cipher_finding_type(
 
     report = SafeConnectionsReport(mock_octopoes_api_connector)
 
-    data = report.generate_data(str(ipaddressv4.reference), valid_time)
+    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
     assert data["sc_ips"][ipaddressv4.reference] == [cipher_finding_type]
     assert data["number_of_available"] == 0
@@ -57,7 +57,7 @@ def test_safe_connections_report_multiple_cipher_finding_types(
 
     report = SafeConnectionsReport(mock_octopoes_api_connector)
 
-    data = report.generate_data(str(ipaddressv4.reference), valid_time)
+    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
     assert data["sc_ips"][ipaddressv4.reference] == cipher_finding_types
     assert data["number_of_available"] == 0
@@ -79,7 +79,7 @@ def test_safe_connections_report_no_cipher_finding_types(
 
     report = SafeConnectionsReport(mock_octopoes_api_connector)
 
-    data = report.generate_data(str(ipaddressv4.reference), valid_time)
+    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
     assert data["sc_ips"][ipaddressv4.reference] == []
     assert data["number_of_available"] == 1
