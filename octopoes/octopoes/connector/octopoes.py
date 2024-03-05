@@ -3,9 +3,9 @@ from collections.abc import Sequence, Set
 from datetime import datetime
 from uuid import UUID
 
-import requests
+import httpx
+from httpx import HTTPError, Response
 from pydantic import TypeAdapter
-from requests import HTTPError, Response
 
 from octopoes.api.models import Affirmation, Declaration, Observation, ServiceHealth
 from octopoes.config.settings import (
@@ -26,11 +26,20 @@ from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 
 
-class OctopoesAPISession(requests.Session):
-    def __init__(self, base_url: str):
-        super().__init__()
+# todo: set default headers (accept-content, etc.)
+class OctopoesAPIConnector:
+    """
+    Methods on this Connector can throw
+        - requests.exceptions.RequestException if HTTP connection to Octopoes API fails
+        - connector.ObjectNotFoundException if the OOI node cannot be found
+        - connector.RemoteException if an error occurs inside Octopoes API
+    """
 
-        self._base_uri = base_url
+    def __init__(self, base_uri: str, client: str):
+        self.base_uri = base_uri
+        self.client = client
+
+        self.session = httpx.Client(base_url=base_uri, event_hooks={"response": [self._verify_response]})
 
     @staticmethod
     def _verify_response(response: Response) -> None:
@@ -46,35 +55,6 @@ class OctopoesAPISession(requests.Session):
             raise error
         except json.decoder.JSONDecodeError as error:
             raise DecodeException("JSON decode error") from error
-
-    def request(
-        self,
-        method: str | bytes,
-        url: str | bytes,
-        *args,
-        **kwargs,
-    ) -> requests.Response:
-        response = super().request(method, f"{self._base_uri}{str(url)}", *args, **kwargs)
-        self._verify_response(response)
-        return response
-
-
-# todo: set default headers (accept-content, etc.)
-class OctopoesAPIConnector:
-
-    """
-    Methods on this Connector can throw
-        - requests.exceptions.RequestException if HTTP connection to Octopoes API fails
-        - connector.ObjectNotFoundException if the OOI node cannot be found
-        - connector.RemoteException if an error occurs inside Octopoes API
-    """
-
-    def __init__(self, base_uri: str, client: str):
-        base_uri = base_uri.rstrip("/")
-        self.base_uri = base_uri
-        self.client = client
-
-        self.session = OctopoesAPISession(base_uri)
 
     def root_health(self) -> ServiceHealth:
         return ServiceHealth.model_validate_json(self.session.get("/health").content)
@@ -173,21 +153,21 @@ class OctopoesAPIConnector:
         self.session.post(
             f"/{self.client}/observations",
             headers={"Content-Type": "application/json"},
-            data=observation.model_dump_json().encode(),
+            content=observation.model_dump_json().encode(),
         )
 
     def save_declaration(self, declaration: Declaration) -> None:
         self.session.post(
             f"/{self.client}/declarations",
             headers={"Content-Type": "application/json"},
-            data=declaration.model_dump_json().encode(),
+            content=declaration.model_dump_json().encode(),
         )
 
     def save_affirmation(self, affirmation: Affirmation) -> None:
         self.session.post(
             f"/{self.client}/affirmations",
             headers={"Content-Type": "application/json"},
-            data=affirmation.model_dump_json().encode(),
+            content=affirmation.model_dump_json().encode(),
         )
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
@@ -196,7 +176,7 @@ class OctopoesAPIConnector:
             f"/{self.client}/scan_profiles",
             params=params,
             headers={"Content-Type": "application/json"},
-            data=scan_profile.model_dump_json().encode(),
+            content=scan_profile.model_dump_json().encode(),
         )
 
     def save_many_scan_profiles(self, scan_profiles: list[ScanProfile], valid_time: datetime) -> None:

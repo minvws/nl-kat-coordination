@@ -8,7 +8,7 @@ import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
 from celery.utils.log import get_task_logger
 from pydantic import TypeAdapter
-from requests import HTTPError
+from httpx import HTTPError
 
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
 from octopoes.connector.katalogus import KATalogusClientV1
