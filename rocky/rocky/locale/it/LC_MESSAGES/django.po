@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-19 15:41+0000\n"
+"POT-Creation-Date: 2024-02-29 13:52+0000\n"
 "PO-Revision-Date: 2023-11-16 20:05+0000\n"
 "Last-Translator: Luca Racchetti <razzo1987@gmail.com>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/openkat/nl-kat-"
@@ -590,710 +590,6 @@ msgstr ""
 "Impossibile ottenere l'elenco delle scoperte per l'organizzazione {}, "
 "controlla i log del server per ulteriori dettagli."
 
-#: fmea/forms.py
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Failure mode"
-msgstr "Modalità di guasto"
-
-#: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/boefje_detail.html
-#: katalogus/templates/normalizer_detail.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
-#: rocky/templates/oois/ooi_detail.html
-#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
-msgid "Description"
-msgstr "Descrizione"
-
-#: fmea/forms.py
-msgid "Frequency Level"
-msgstr "Livello di Frequenza"
-
-#: fmea/forms.py
-msgid "Detectability Level"
-msgstr "Livello di Rilevabilità"
-
-#: fmea/forms.py
-msgid "Effect(s)"
-msgstr "Effetto/i"
-
-#: fmea/forms.py
-msgid "Describe in one sentence what type of failure mode you are creating."
-msgstr "Descrivi in una frase che tipo di modalità di guasto stai creando."
-
-#: fmea/forms.py
-msgid "Describe the failure mode in details."
-msgstr "Descrivi in dettaglio la modalità di guasto."
-
-#: fmea/forms.py
-msgid ""
-"From 1 to 5, how often does this failure mode occurs. 1: Almost unthinkable "
-"and 5: occurs daily."
-msgstr ""
-"Da 1 a 5, quanto spesso si verifica questa modalità di guasto. 1: Quasi "
-"impensabile e 5: si verifica quotidianamente."
-
-#: fmea/forms.py
-msgid ""
-"Is this failure mode easy detectable? Give it a score from 1 to 5. 1: always "
-"detectable and 5: almost undetectable."
-msgstr ""
-"Questa modalità di guasto è facilmente rilevabile? Assegnale un punteggio da "
-"1 a 5. 1: sempre rilevabile e 5: quasi indetectabile."
-
-#: fmea/forms.py
-msgid "Describe the type of failure mode"
-msgstr "Descrivi il tipo di modalità di guasto"
-
-#: fmea/forms.py
-msgid "explanation-failure-mode"
-msgstr "spiegazione-modalità-di-guasto"
-
-#: fmea/forms.py
-msgid "Describe in more detail what the failure mode is about."
-msgstr "Descrivi in dettaglio di cosa si tratta la modalità di guasto."
-
-#: fmea/forms.py
-msgid "explanation-description"
-msgstr "spiegazione-descrizione"
-
-#: fmea/forms.py
-msgid "explanation-frequency-level"
-msgstr "spiegazione-livello-di-frequenza"
-
-#: fmea/forms.py
-msgid "explanation-detectability_level"
-msgstr "spiegazione-livello-di-rilevabilità"
-
-#: fmea/forms.py
-msgid "You must at least set a failure mode."
-msgstr "Devi impostare almeno una modalità di guasto."
-
-#: fmea/forms.py
-msgid "Choose a frequency level."
-msgstr "Scegli un livello di frequenza."
-
-#: fmea/forms.py
-msgid "Choose a detectability level."
-msgstr "Scegli un livello di rilevabilità."
-
-#: fmea/forms.py
-msgid "Choose at least one effect."
-msgstr "Scegli almeno un effetto."
-
-#: fmea/forms.py
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Affected Department"
-msgstr "Dipartimento Interessato"
-
-#: fmea/forms.py
-msgid "Affected Objects"
-msgstr "Oggetti Interessati"
-
-#: fmea/forms.py
-msgid "Choose a failure mode which applies to "
-msgstr "Scegli una modalità di guasto applicabile a"
-
-#: fmea/forms.py
-msgid "When this failure mode occurs, which department is affected?"
-msgstr ""
-"Quando questa modalità di guasto si verifica, quale dipartimento è "
-"interessato?"
-
-#: fmea/forms.py
-msgid "Which objects does this failure mode affect when it occurs?"
-msgstr ""
-"Quali oggetti sono interessati da questa modalità di guasto quando si "
-"verifica?"
-
-#: fmea/forms.py
-msgid "explanation-affected-ooi-type"
-msgstr "spiegazione-tipo-di-oggetto-interessato"
-
-#: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Effect"
-msgstr "Effetto"
-
-#: fmea/forms.py
-msgid "Severity Level"
-msgstr "Livello di Gravità"
-
-#: fmea/forms.py
-msgid "Name a possible effect of any type of failure mode that can occur."
-msgstr ""
-"Nome di un possibile effetto di qualsiasi tipo di modalità di guasto che può "
-"verificarsi."
-
-#: fmea/forms.py
-msgid ""
-"Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
-msgstr ""
-"Descrivi la gravità di questo effetto, ad esempio 1: non grave e 5: "
-"catastrofico"
-
-#: fmea/forms.py
-msgid "Describe a possible effect for FMEA"
-msgstr "Descrivi un possibile effetto per FMEA"
-
-#: fmea/forms.py
-msgid "explanation-effect"
-msgstr "spiegazione-effetto"
-
-#: fmea/forms.py
-msgid "explanation-severity-level"
-msgstr "spiegazione-livello-di-gravità"
-
-#: fmea/forms.py
-msgid "The effect is required."
-msgstr "L'effetto è obbligatorio."
-
-#: fmea/forms.py
-msgid "This effect already exists."
-msgstr "Questo effetto esiste già."
-
-#: fmea/forms.py
-msgid "Choose a severity level."
-msgstr "Scegli un livello di gravità."
-
-#: fmea/models.py
-msgid "Finances"
-msgstr "Finanze"
-
-#: fmea/models.py
-msgid "Marketing"
-msgstr "Marketing"
-
-#: fmea/models.py
-msgid "Human Resources"
-msgstr "Risorse Umane"
-
-#: fmea/models.py
-msgid "Research & Development"
-msgstr "Ricerca & Sviluppo"
-
-#: fmea/models.py
-msgid "Administration"
-msgstr "Amministrazione"
-
-#: fmea/models.py
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/service_health.html rocky/templates/footer.html
-#: rocky/templates/health.html
-msgid "Service"
-msgstr "Servizio"
-
-#: fmea/models.py
-msgid "Level 1: Not Severe"
-msgstr "Livello 1: Non Grave"
-
-#: fmea/models.py
-msgid "Level 2: Harmful"
-msgstr "Livello 2: Dannoso"
-
-#: fmea/models.py
-msgid "Level 3: Severe"
-msgstr "Livello 3: Grave"
-
-#: fmea/models.py
-msgid "Level 4: Very Harmful"
-msgstr "Livello 4: Molto Dannoso"
-
-#: fmea/models.py
-msgid "Level 5: Catastrophic"
-msgstr "Livello 5: Catastrofico"
-
-#: fmea/models.py
-msgid "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
-msgstr ""
-"Livello 1: Molto Raro. L'incidente (quasi) non si verifica, quasi "
-"impensabile."
-
-#: fmea/models.py
-msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
-msgstr ""
-"Livello 2: Raro. Gli incidenti si verificano meno di una volta all'anno "
-"(3-5)."
-
-#: fmea/models.py
-msgid "Level 3: Occurs. Incidents occur several times a year."
-msgstr ""
-"Livello 3: Si Verifica. Gli incidenti si verificano diverse volte all'anno."
-
-#: fmea/models.py
-msgid "Level 4: Regularly. Incidents occur weekly."
-msgstr "Livello 4: Regolarmente. Gli incidenti si verificano settimanalmente."
-
-#: fmea/models.py
-msgid "Level 5: Frequent. Incidents occur daily."
-msgstr "Livello 5: Frequente. Gli incidenti si verificano quotidianamente."
-
-#: fmea/models.py
-msgid ""
-"Level 1: Always Detectable. Incident (almost) never occurs, almost "
-"unthinkable."
-msgstr ""
-"Livello 1: Sempre Rilevabile. L'incidente (quasi) non si verifica, quasi "
-"impensabile."
-
-#: fmea/models.py
-msgid ""
-"Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
-msgstr ""
-"Livello 2: Generalmente Rilevabile. Gli incidenti si verificano meno di una "
-"volta all'anno (3-5)."
-
-#: fmea/models.py
-msgid "Level 3: Detectable. Failure mode is detectable with effort."
-msgstr "Livello 3: Rilevabile. La modalità di guasto è rilevabile con sforzo."
-
-#: fmea/models.py
-msgid "Level 4: Poorly Detectable. Detecting the failure mode is difficult."
-msgstr ""
-"Livello 4: Scarsamente Rilevabile. La rilevazione della modalità di guasto è "
-"difficile."
-
-#: fmea/models.py
-msgid ""
-"Level 5: Almost Undetectable. Failure mode detection is very difficult or "
-"nearly impossible."
-msgstr ""
-"Livello 5: Quasi Individuabile. La rilevazione della modalità di guasto è "
-"molto difficile o quasi impossibile."
-
-#: fmea/models.py fmea/templates/fmea/fmea_failure_mode_list.html
-#: fmea/views/view_helpers.py
-msgid "Failure modes"
-msgstr "Modalità di Guasto"
-
-#: fmea/models.py fmea/views/view_helpers.py
-msgid "Failure Mode Affected Objects"
-msgstr "Oggetti Interessati dalla Modalità di Guasto"
-
-#: fmea/templates/fmea/fmea_department_heatmap.html
-msgid "FMEA Departments Heatmap:"
-msgstr "Mappa Termica dei Dipartimenti FMEA:"
-
-#: fmea/templates/fmea/fmea_department_heatmap.html
-msgid "No data to build heatmap"
-msgstr "Nessun dato per costruire la mappa termica"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-msgid "Failure mode affected object table:"
-msgstr "Tabella degli oggetti interessati dalla modalità di guasto:"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Affected Object"
-msgstr "Oggetto Interessato"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-#: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
-#: fmea/views/fmea_failure_mode_effect.py
-#: katalogus/templates/plugin_settings_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
-#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
-msgid "Edit"
-msgstr "Modifica"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-msgid "Failure mode affected objects cannot be found."
-msgstr ""
-"Gli oggetti interessati dalla modalità di guasto non possono essere trovati."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "Define which objects are affected for a failure mode"
-msgstr "Definisci quali oggetti sono interessati da una modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "Failure mode affected objects"
-msgstr "Oggetti interessati dalla modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "Save"
-msgstr "Salva"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-#: rocky/templates/forms/json_schema_form.html
-#: rocky/templates/organizations/organization_add.html
-#: rocky/templates/organizations/organization_member_add.html
-#: rocky/templates/organizations/organization_member_add_account_type.html
-#: rocky/templates/partials/elements/ooi_detail_settings.html
-#: rocky/templates/partials/elements/ooi_report_settings.html
-#: rocky/templates/partials/form/indemnification_add_form.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/two_factor/_wizard_actions.html
-msgid "Submit"
-msgstr "Invia"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "No failure mode yet defined."
-msgstr "Nessuna modalità di guasto ancora definita."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "To add affected objects to a failure mode, first create one."
-msgstr ""
-"Per aggiungere oggetti interessati a una modalità di guasto, prima crea una."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Create failure mode"
-msgstr "Crea modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Failure mode affected objects table:"
-msgstr "Tabella degli oggetti interessati alla modalità di guasto:"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "No failure mode affected objects yet defined."
-msgstr "Nessun oggetto interessato alla modalità di guasto ancora definito."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Create failure mode Affected Objects"
-msgstr "Crea oggetti interessati alla modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Departments failure modes"
-msgstr "Modalità di guasto dei dipartimenti"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Failure modes and affected departments table:"
-msgstr "Tabella delle modalità di guasto e dei dipartimenti interessati:"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Failure Mode"
-msgstr "Modalità di Guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Affected Departments"
-msgstr "Dipartimenti interessati"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Nothing found."
-msgstr "Niente trovato."
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Failure mode properties"
-msgstr "Proprietà della modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Properties"
-msgstr "Proprietà"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Risk class"
-msgstr "Classe di rischio"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Frequency level"
-msgstr "Livello di frequenza"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Detectability level"
-msgstr "Livello di rilevabilità"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid ""
-"\n"
-"                        Effect and severity level\n"
-"                        "
-msgid_plural ""
-"\n"
-"                        Effects and severity levels\n"
-"                      "
-msgstr[0] ""
-"\n"
-"                        Livello di efficacia e gravità\n"
-"                        "
-msgstr[1] ""
-"\n"
-"                        Effetti e livelli di gravità\n"
-"                      "
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Failure mode effect"
-msgstr "Effetto della modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Failure mode effect properties"
-msgstr "Proprietà dell'effetto della modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Severity"
-msgstr "Gravità"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-msgid "FMEA effect and severity"
-msgstr "Effetto e gravità FMEA"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-msgid "FMEA effect"
-msgstr "Effetto FMEA"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Failure mode effects table:"
-msgstr "Tabella degli effetti della modalità di guasto:"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Severity level"
-msgstr "Livello di gravità"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "No failure mode effect yet defined."
-msgstr "Nessun effetto della modalità di guasto ancora definito."
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Create a failure mode effect"
-msgstr "Crea un effetto della modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create a new failure mode"
-msgstr "Crea una nuova modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "Failure mode and effects"
-msgstr "Modalità di guasto ed effetti"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "No failure mode effects created."
-msgstr "Nessun effetto della modalità di guasto creato."
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid ""
-"First create failure mode effects which can be added later to a failure mode."
-msgstr ""
-"Prima crea gli effetti della modalità di guasto che possono essere aggiunti "
-"successivamente a una modalità di guasto."
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create failure mode effects"
-msgstr "Crea gli effetti della modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Failure mode table:"
-msgstr "Tabella delle modalità di guasto:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Risk Class"
-msgstr "Classe di rischio"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Details"
-msgstr "Dettagli"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Sluit details"
-msgstr "Chiudi dettagli"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Description:"
-msgstr "Descrizione:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Frequency level:"
-msgstr "Livello di frequenza:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Detectability level:"
-msgstr "Livello di rilevabilità:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffect and severity level\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgid_plural ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffects and severity levels\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgstr[0] ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\teffetto e livello di sicurezza\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgstr[1] ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\teffetti e livelli di sicurezza\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Failure mode report"
-msgstr "Report della modalità di guasto"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/aggregate_organisation_report/summary.html
-#: reports/report_types/multi_organization_report/summary.html
-#: reports/templates/summary/report_summary.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
-#: rocky/views/ooi_tree.py
-msgid "Summary"
-msgstr "Sommario"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Failure mode: "
-msgstr "Modalità di guasto:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Severity: "
-msgstr "Gravità:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Detectability: "
-msgstr "Rilevabilità:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Frequency: "
-msgstr "Frequenza:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Effect: "
-msgstr "Effetto:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Description: "
-msgstr "Descrizione:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Affected Departments: "
-msgstr "Dipartimenti interessati:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Affected OOI's: "
-msgstr "OOI interessati:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Report cannot be viewed, failure mode not found."
-msgstr "Impossibile visualizzare il rapporto, modalità di guasto non trovata."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "FMEA introduction"
-msgstr "Introduzione all'FMEA"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid ""
-"FMEA (failure mode and effective analysis) is a step-by-step approach for "
-"collecting knowledge about possible points of failure in a design, "
-"manufacturing process, product or service."
-msgstr ""
-"L'FMEA (analisi delle modalità di guasto ed efficacia) è un approccio passo "
-"passo per raccogliere conoscenze sui possibili punti di guasto in un "
-"progetto, processo di produzione, prodotto o servizio."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid ""
-"Failure mode (FM) refers to the way in which something might break down and "
-"includes potential errors that may occur, especially errors that may affect "
-"a system. Effective analysis (EA) involves deciphering the consequences of "
-"those break downs by making sure that all failures can be detected, "
-"determining how frequently a failure might occur and identifying which "
-"potential failures should be prioritized."
-msgstr ""
-"La modalità di guasto (FM) si riferisce al modo in cui qualcosa potrebbe "
-"rompersi e include errori potenziali che possono verificarsi, in particolare "
-"errori che possono influenzare un sistema. L'analisi efficace (EA) comporta "
-"la decifrazione delle conseguenze di tali guasti, assicurandosi che tutti i "
-"guasti possano essere rilevati, determinando con quale frequenza un guasto "
-"potrebbe verificarsi e identificando quali guasti potenziali dovrebbero "
-"essere prioritari."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create affected objects of a failure mode"
-msgstr "Crea oggetti interessati di una modalità di guasto"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all failure modes"
-msgstr "Visualizza tutte le modalità di guasto"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all failure mode effects"
-msgstr "Visualizza tutti gli effetti delle modalità di guasto"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all affected objects for a failure modes"
-msgstr "Visualizza tutti gli oggetti interessati per una modalità di guasto"
-
-#: fmea/templates/fmea/fmea_index.html fmea/views/fmea_analytics.py
-msgid "Heatmap"
-msgstr "Mappa termica"
-
-#: fmea/tools.py
-msgid "--- Select an option ----"
-msgstr "--- Seleziona un'opzione ----"
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Failure mode affected objects successfully created."
-msgstr "Oggetti interessati dalla modalità di guasto creati con successo."
-
-#: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
-#: fmea/views/fmea_failure_mode_effect.py
-msgid "Create"
-msgstr "Crea"
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Treeobjects successfully added."
-msgstr "Oggetti dell'albero aggiunti con successo."
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Please select a department or ooi."
-msgstr "Si prega di selezionare un dipartimento o un OOI."
-
-#: fmea/views/fmea_analytics.py onboarding/templates/step_4_report.html
-msgid "Report"
-msgstr "Report"
-
-#: fmea/views/fmea_failure_mode.py
-msgid "Failure mode successfully created."
-msgstr "Modalità di guasto creata con successo."
-
-#: fmea/views/fmea_failure_mode_effect.py
-msgid "Failure mode effect successfully created."
-msgstr "Effetto della modalità di guasto creato con successo."
-
-#: fmea/views/view_helpers.py rocky/templates/dashboard_redteam.html
-msgid "FMEA"
-msgstr "FMEA"
-
-#: fmea/views/view_helpers.py
-msgid "Failure mode effects"
-msgstr "Effetti delle modalità di guasto"
-
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
 msgstr "Mostra tutto"
@@ -1369,6 +665,17 @@ msgstr ""
 #: katalogus/templates/boefje_detail.html
 msgid "Scan level"
 msgstr "Livello di scansione"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
+#: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
+msgid "Description"
+msgstr "Descrizione"
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
@@ -1881,6 +1188,13 @@ msgstr "Sì"
 msgid "No"
 msgstr "No"
 
+#: katalogus/templates/plugin_settings_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
+msgid "Edit"
+msgstr "Modifica"
+
 #: katalogus/views/change_clearance_level.py
 msgid "Session has terminated, please select objects again."
 msgstr ""
@@ -2125,6 +1439,22 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 msgid "Organization details"
 msgstr "Dettagli dell'organizzazione"
+
+#: onboarding/templates/account/step_2a_organization_setup.html
+#: onboarding/templates/account/step_4_account_setup_admin.html
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html
+#: onboarding/templates/account/step_6_account_setup_client.html
+#: rocky/templates/forms/json_schema_form.html
+#: rocky/templates/organizations/organization_add.html
+#: rocky/templates/organizations/organization_member_add.html
+#: rocky/templates/organizations/organization_member_add_account_type.html
+#: rocky/templates/partials/elements/ooi_detail_settings.html
+#: rocky/templates/partials/elements/ooi_report_settings.html
+#: rocky/templates/partials/form/indemnification_add_form.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/two_factor/_wizard_actions.html
+msgid "Submit"
+msgstr "Invia"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
@@ -2664,6 +1994,7 @@ msgstr "URL"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -3001,6 +2332,10 @@ msgid "Suggested plugins"
 msgstr "Plugin suggeriti"
 
 #: onboarding/templates/step_4_report.html
+msgid "Report"
+msgstr "Report"
+
+#: onboarding/templates/step_4_report.html
 msgid "Boefjes are scanning"
 msgstr "Boefjes stanno eseguendo la scansione"
 
@@ -3160,6 +2495,12 @@ msgstr ""
 #: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
 msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
+msgid "Service"
+msgstr "Servizio"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/service_health.html rocky/templates/health.html
@@ -3419,6 +2760,15 @@ msgid "Observed at:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/aggregate_organisation_report/summary.html
+#: reports/report_types/multi_organization_report/summary.html
+#: reports/templates/summary/report_summary.html
+#: rocky/templates/partials/ooi_report_severity_totals.html
+#: rocky/views/ooi_tree.py
+msgid "Summary"
+msgstr "Sommario"
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/vulnerability_report/report.html
 msgid "vulnerabilities on this system"
 msgstr ""
@@ -3482,12 +2832,14 @@ msgid "Compliance issue"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/findings_report/report.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Risk level"
@@ -3610,6 +2962,99 @@ msgstr ""
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
+msgstr "Rilevamenti"
+
+#: reports/report_types/findings_report/report.html
+msgid "Other findings found:"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "FindingType"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrences"
+msgstr "Occorrenze"
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Details"
+msgstr "Dettagli"
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Close details"
+msgstr "Chiudi dettagli"
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Open details"
+msgstr "Apri dettagli"
+
+#: reports/report_types/findings_report/report.html
+msgid "Impact"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Recommendation"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.py
+msgid "First seen"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "No findings have been found."
+msgstr ""
+
+#: reports/report_types/findings_report/report.py
+msgid "Findings Report"
+msgstr ""
+
+#: reports/report_types/findings_report/report.py
+msgid "Shows all the finding types and their occurrences."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -3788,10 +3233,6 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
 msgid "Overview of recommendations"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/recommendations.html
-msgid "Recommendation"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
@@ -3988,20 +3429,6 @@ msgstr ""
 msgid "No ciphers found for this IPService"
 msgstr ""
 
-#: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr "Rilevamenti"
-
 #: reports/report_types/tls_report/report.py
 msgid "TLS Report"
 msgstr ""
@@ -4017,35 +3444,11 @@ msgid "Vulnerabilities:"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrences"
-msgstr "Occorrenze"
-
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Close details"
-msgstr "Chiudi dettagli"
-
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Open details"
-msgstr "Apri dettagli"
-
-#: reports/report_types/vulnerability_report/report.html
 msgid "Advice"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "No findings have been found on this system."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
@@ -4062,10 +3465,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Source"
 msgstr "Fonte"
-
-#: reports/report_types/vulnerability_report/report.py
-msgid "First seen"
-msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Last seen"
@@ -4280,9 +3679,21 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 #: reports/views/generate_report.py
-#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate report"
 msgstr "Genera rapporto"
+
+#: reports/templates/partials/report_severity_totals.html
+msgid "Findings overview"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "FindingTypes"
+msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Table of contents"
@@ -4374,9 +3785,9 @@ msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#, python-format
 msgid ""
-"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+"No data could be found for %(report_types). Object(s) did not exist on "
+"%(date)s."
 msgstr ""
 
 #: reports/views/base.py
@@ -5060,6 +4471,15 @@ msgstr "Totale dei Rilevamenti"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid " Finding Details"
 msgstr "Dettagli Rilevamento"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Severity"
+msgstr "Gravità"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
@@ -6224,6 +5644,10 @@ msgid "Use the button below to add a related object. "
 msgstr "Usa il pulsante sottostante per aggiungere un oggetto correlato. "
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate findings report"
+msgstr ""
+
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute Finding"
 msgstr "Silenzia Rilevazione"
 
@@ -6297,10 +5721,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total occurrences"
 msgstr "Numero totale di occorrenze"
-
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total per severity overview:"
-msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Unique"
@@ -7317,6 +6737,485 @@ msgstr "Impossibile caricare il file raw su Bytes: codice di stato %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "File raw aggiunto con successo."
+
+#~ msgid "Failure mode"
+#~ msgstr "Modalità di guasto"
+
+#~ msgid "Frequency Level"
+#~ msgstr "Livello di Frequenza"
+
+#~ msgid "Detectability Level"
+#~ msgstr "Livello di Rilevabilità"
+
+#~ msgid "Effect(s)"
+#~ msgstr "Effetto/i"
+
+#~ msgid "Describe in one sentence what type of failure mode you are creating."
+#~ msgstr "Descrivi in una frase che tipo di modalità di guasto stai creando."
+
+#~ msgid "Describe the failure mode in details."
+#~ msgstr "Descrivi in dettaglio la modalità di guasto."
+
+#~ msgid ""
+#~ "From 1 to 5, how often does this failure mode occurs. 1: Almost "
+#~ "unthinkable and 5: occurs daily."
+#~ msgstr ""
+#~ "Da 1 a 5, quanto spesso si verifica questa modalità di guasto. 1: Quasi "
+#~ "impensabile e 5: si verifica quotidianamente."
+
+#~ msgid ""
+#~ "Is this failure mode easy detectable? Give it a score from 1 to 5. 1: "
+#~ "always detectable and 5: almost undetectable."
+#~ msgstr ""
+#~ "Questa modalità di guasto è facilmente rilevabile? Assegnale un punteggio "
+#~ "da 1 a 5. 1: sempre rilevabile e 5: quasi indetectabile."
+
+#~ msgid "Describe the type of failure mode"
+#~ msgstr "Descrivi il tipo di modalità di guasto"
+
+#~ msgid "explanation-failure-mode"
+#~ msgstr "spiegazione-modalità-di-guasto"
+
+#~ msgid "Describe in more detail what the failure mode is about."
+#~ msgstr "Descrivi in dettaglio di cosa si tratta la modalità di guasto."
+
+#~ msgid "explanation-description"
+#~ msgstr "spiegazione-descrizione"
+
+#~ msgid "explanation-frequency-level"
+#~ msgstr "spiegazione-livello-di-frequenza"
+
+#~ msgid "explanation-detectability_level"
+#~ msgstr "spiegazione-livello-di-rilevabilità"
+
+#~ msgid "You must at least set a failure mode."
+#~ msgstr "Devi impostare almeno una modalità di guasto."
+
+#~ msgid "Choose a frequency level."
+#~ msgstr "Scegli un livello di frequenza."
+
+#~ msgid "Choose a detectability level."
+#~ msgstr "Scegli un livello di rilevabilità."
+
+#~ msgid "Choose at least one effect."
+#~ msgstr "Scegli almeno un effetto."
+
+#~ msgid "Affected Department"
+#~ msgstr "Dipartimento Interessato"
+
+#~ msgid "Affected Objects"
+#~ msgstr "Oggetti Interessati"
+
+#~ msgid "Choose a failure mode which applies to "
+#~ msgstr "Scegli una modalità di guasto applicabile a"
+
+#~ msgid "When this failure mode occurs, which department is affected?"
+#~ msgstr ""
+#~ "Quando questa modalità di guasto si verifica, quale dipartimento è "
+#~ "interessato?"
+
+#~ msgid "Which objects does this failure mode affect when it occurs?"
+#~ msgstr ""
+#~ "Quali oggetti sono interessati da questa modalità di guasto quando si "
+#~ "verifica?"
+
+#~ msgid "explanation-affected-ooi-type"
+#~ msgstr "spiegazione-tipo-di-oggetto-interessato"
+
+#~ msgid "Effect"
+#~ msgstr "Effetto"
+
+#~ msgid "Severity Level"
+#~ msgstr "Livello di Gravità"
+
+#~ msgid "Name a possible effect of any type of failure mode that can occur."
+#~ msgstr ""
+#~ "Nome di un possibile effetto di qualsiasi tipo di modalità di guasto che "
+#~ "può verificarsi."
+
+#~ msgid ""
+#~ "Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
+#~ msgstr ""
+#~ "Descrivi la gravità di questo effetto, ad esempio 1: non grave e 5: "
+#~ "catastrofico"
+
+#~ msgid "Describe a possible effect for FMEA"
+#~ msgstr "Descrivi un possibile effetto per FMEA"
+
+#~ msgid "explanation-effect"
+#~ msgstr "spiegazione-effetto"
+
+#~ msgid "explanation-severity-level"
+#~ msgstr "spiegazione-livello-di-gravità"
+
+#~ msgid "The effect is required."
+#~ msgstr "L'effetto è obbligatorio."
+
+#~ msgid "This effect already exists."
+#~ msgstr "Questo effetto esiste già."
+
+#~ msgid "Choose a severity level."
+#~ msgstr "Scegli un livello di gravità."
+
+#~ msgid "Finances"
+#~ msgstr "Finanze"
+
+#~ msgid "Marketing"
+#~ msgstr "Marketing"
+
+#~ msgid "Human Resources"
+#~ msgstr "Risorse Umane"
+
+#~ msgid "Research & Development"
+#~ msgstr "Ricerca & Sviluppo"
+
+#~ msgid "Administration"
+#~ msgstr "Amministrazione"
+
+#~ msgid "Level 1: Not Severe"
+#~ msgstr "Livello 1: Non Grave"
+
+#~ msgid "Level 2: Harmful"
+#~ msgstr "Livello 2: Dannoso"
+
+#~ msgid "Level 3: Severe"
+#~ msgstr "Livello 3: Grave"
+
+#~ msgid "Level 4: Very Harmful"
+#~ msgstr "Livello 4: Molto Dannoso"
+
+#~ msgid "Level 5: Catastrophic"
+#~ msgstr "Livello 5: Catastrofico"
+
+#~ msgid ""
+#~ "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
+#~ msgstr ""
+#~ "Livello 1: Molto Raro. L'incidente (quasi) non si verifica, quasi "
+#~ "impensabile."
+
+#~ msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
+#~ msgstr ""
+#~ "Livello 2: Raro. Gli incidenti si verificano meno di una volta all'anno "
+#~ "(3-5)."
+
+#~ msgid "Level 3: Occurs. Incidents occur several times a year."
+#~ msgstr ""
+#~ "Livello 3: Si Verifica. Gli incidenti si verificano diverse volte "
+#~ "all'anno."
+
+#~ msgid "Level 4: Regularly. Incidents occur weekly."
+#~ msgstr ""
+#~ "Livello 4: Regolarmente. Gli incidenti si verificano settimanalmente."
+
+#~ msgid "Level 5: Frequent. Incidents occur daily."
+#~ msgstr "Livello 5: Frequente. Gli incidenti si verificano quotidianamente."
+
+#~ msgid ""
+#~ "Level 1: Always Detectable. Incident (almost) never occurs, almost "
+#~ "unthinkable."
+#~ msgstr ""
+#~ "Livello 1: Sempre Rilevabile. L'incidente (quasi) non si verifica, quasi "
+#~ "impensabile."
+
+#~ msgid ""
+#~ "Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
+#~ msgstr ""
+#~ "Livello 2: Generalmente Rilevabile. Gli incidenti si verificano meno di "
+#~ "una volta all'anno (3-5)."
+
+#~ msgid "Level 3: Detectable. Failure mode is detectable with effort."
+#~ msgstr ""
+#~ "Livello 3: Rilevabile. La modalità di guasto è rilevabile con sforzo."
+
+#~ msgid "Level 4: Poorly Detectable. Detecting the failure mode is difficult."
+#~ msgstr ""
+#~ "Livello 4: Scarsamente Rilevabile. La rilevazione della modalità di "
+#~ "guasto è difficile."
+
+#~ msgid ""
+#~ "Level 5: Almost Undetectable. Failure mode detection is very difficult or "
+#~ "nearly impossible."
+#~ msgstr ""
+#~ "Livello 5: Quasi Individuabile. La rilevazione della modalità di guasto è "
+#~ "molto difficile o quasi impossibile."
+
+#~ msgid "Failure modes"
+#~ msgstr "Modalità di Guasto"
+
+#~ msgid "Failure Mode Affected Objects"
+#~ msgstr "Oggetti Interessati dalla Modalità di Guasto"
+
+#~ msgid "FMEA Departments Heatmap:"
+#~ msgstr "Mappa Termica dei Dipartimenti FMEA:"
+
+#~ msgid "No data to build heatmap"
+#~ msgstr "Nessun dato per costruire la mappa termica"
+
+#~ msgid "Failure mode affected object table:"
+#~ msgstr "Tabella degli oggetti interessati dalla modalità di guasto:"
+
+#~ msgid "Affected Object"
+#~ msgstr "Oggetto Interessato"
+
+#~ msgid "Failure mode affected objects cannot be found."
+#~ msgstr ""
+#~ "Gli oggetti interessati dalla modalità di guasto non possono essere "
+#~ "trovati."
+
+#~ msgid "Define which objects are affected for a failure mode"
+#~ msgstr "Definisci quali oggetti sono interessati da una modalità di guasto"
+
+#~ msgid "Failure mode affected objects"
+#~ msgstr "Oggetti interessati dalla modalità di guasto"
+
+#~ msgid "Save"
+#~ msgstr "Salva"
+
+#~ msgid "No failure mode yet defined."
+#~ msgstr "Nessuna modalità di guasto ancora definita."
+
+#~ msgid "To add affected objects to a failure mode, first create one."
+#~ msgstr ""
+#~ "Per aggiungere oggetti interessati a una modalità di guasto, prima crea "
+#~ "una."
+
+#~ msgid "Create failure mode"
+#~ msgstr "Crea modalità di guasto"
+
+#~ msgid "Failure mode affected objects table:"
+#~ msgstr "Tabella degli oggetti interessati alla modalità di guasto:"
+
+#~ msgid "No failure mode affected objects yet defined."
+#~ msgstr "Nessun oggetto interessato alla modalità di guasto ancora definito."
+
+#~ msgid "Create failure mode Affected Objects"
+#~ msgstr "Crea oggetti interessati alla modalità di guasto"
+
+#~ msgid "Departments failure modes"
+#~ msgstr "Modalità di guasto dei dipartimenti"
+
+#~ msgid "Failure modes and affected departments table:"
+#~ msgstr "Tabella delle modalità di guasto e dei dipartimenti interessati:"
+
+#~ msgid "Failure Mode"
+#~ msgstr "Modalità di Guasto"
+
+#~ msgid "Affected Departments"
+#~ msgstr "Dipartimenti interessati"
+
+#~ msgid "Nothing found."
+#~ msgstr "Niente trovato."
+
+#~ msgid "Failure mode properties"
+#~ msgstr "Proprietà della modalità di guasto"
+
+#~ msgid "Properties"
+#~ msgstr "Proprietà"
+
+#~ msgid "Risk class"
+#~ msgstr "Classe di rischio"
+
+#~ msgid "Frequency level"
+#~ msgstr "Livello di frequenza"
+
+#~ msgid "Detectability level"
+#~ msgstr "Livello di rilevabilità"
+
+#~ msgid ""
+#~ "\n"
+#~ "                        Effect and severity level\n"
+#~ "                        "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                        Effects and severity levels\n"
+#~ "                      "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                        Livello di efficacia e gravità\n"
+#~ "                        "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                        Effetti e livelli di gravità\n"
+#~ "                      "
+
+#~ msgid "Failure mode effect"
+#~ msgstr "Effetto della modalità di guasto"
+
+#~ msgid "Failure mode effect properties"
+#~ msgstr "Proprietà dell'effetto della modalità di guasto"
+
+#~ msgid "FMEA effect and severity"
+#~ msgstr "Effetto e gravità FMEA"
+
+#~ msgid "FMEA effect"
+#~ msgstr "Effetto FMEA"
+
+#~ msgid "Failure mode effects table:"
+#~ msgstr "Tabella degli effetti della modalità di guasto:"
+
+#~ msgid "Severity level"
+#~ msgstr "Livello di gravità"
+
+#~ msgid "No failure mode effect yet defined."
+#~ msgstr "Nessun effetto della modalità di guasto ancora definito."
+
+#~ msgid "Create a failure mode effect"
+#~ msgstr "Crea un effetto della modalità di guasto"
+
+#~ msgid "Create a new failure mode"
+#~ msgstr "Crea una nuova modalità di guasto"
+
+#~ msgid "Failure mode and effects"
+#~ msgstr "Modalità di guasto ed effetti"
+
+#~ msgid "No failure mode effects created."
+#~ msgstr "Nessun effetto della modalità di guasto creato."
+
+#~ msgid ""
+#~ "First create failure mode effects which can be added later to a failure "
+#~ "mode."
+#~ msgstr ""
+#~ "Prima crea gli effetti della modalità di guasto che possono essere "
+#~ "aggiunti successivamente a una modalità di guasto."
+
+#~ msgid "Create failure mode effects"
+#~ msgstr "Crea gli effetti della modalità di guasto"
+
+#~ msgid "Failure mode table:"
+#~ msgstr "Tabella delle modalità di guasto:"
+
+#~ msgid "Risk Class"
+#~ msgstr "Classe di rischio"
+
+#~ msgid "Sluit details"
+#~ msgstr "Chiudi dettagli"
+
+#~ msgid "Description:"
+#~ msgstr "Descrizione:"
+
+#~ msgid "Frequency level:"
+#~ msgstr "Livello di frequenza:"
+
+#~ msgid "Detectability level:"
+#~ msgstr "Livello di rilevabilità:"
+
+#~ msgid ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffect and severity level\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgid_plural ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffects and severity levels\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgstr[0] ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\teffetto e livello di sicurezza\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgstr[1] ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\teffetti e livelli di sicurezza\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+
+#~ msgid "Failure mode report"
+#~ msgstr "Report della modalità di guasto"
+
+#~ msgid "Failure mode: "
+#~ msgstr "Modalità di guasto:"
+
+#~ msgid "Severity: "
+#~ msgstr "Gravità:"
+
+#~ msgid "Detectability: "
+#~ msgstr "Rilevabilità:"
+
+#~ msgid "Frequency: "
+#~ msgstr "Frequenza:"
+
+#~ msgid "Effect: "
+#~ msgstr "Effetto:"
+
+#~ msgid "Description: "
+#~ msgstr "Descrizione:"
+
+#~ msgid "Affected Departments: "
+#~ msgstr "Dipartimenti interessati:"
+
+#~ msgid "Affected OOI's: "
+#~ msgstr "OOI interessati:"
+
+#~ msgid "Report cannot be viewed, failure mode not found."
+#~ msgstr ""
+#~ "Impossibile visualizzare il rapporto, modalità di guasto non trovata."
+
+#~ msgid "FMEA introduction"
+#~ msgstr "Introduzione all'FMEA"
+
+#~ msgid ""
+#~ "FMEA (failure mode and effective analysis) is a step-by-step approach for "
+#~ "collecting knowledge about possible points of failure in a design, "
+#~ "manufacturing process, product or service."
+#~ msgstr ""
+#~ "L'FMEA (analisi delle modalità di guasto ed efficacia) è un approccio "
+#~ "passo passo per raccogliere conoscenze sui possibili punti di guasto in "
+#~ "un progetto, processo di produzione, prodotto o servizio."
+
+#~ msgid ""
+#~ "Failure mode (FM) refers to the way in which something might break down "
+#~ "and includes potential errors that may occur, especially errors that may "
+#~ "affect a system. Effective analysis (EA) involves deciphering the "
+#~ "consequences of those break downs by making sure that all failures can be "
+#~ "detected, determining how frequently a failure might occur and "
+#~ "identifying which potential failures should be prioritized."
+#~ msgstr ""
+#~ "La modalità di guasto (FM) si riferisce al modo in cui qualcosa potrebbe "
+#~ "rompersi e include errori potenziali che possono verificarsi, in "
+#~ "particolare errori che possono influenzare un sistema. L'analisi efficace "
+#~ "(EA) comporta la decifrazione delle conseguenze di tali guasti, "
+#~ "assicurandosi che tutti i guasti possano essere rilevati, determinando "
+#~ "con quale frequenza un guasto potrebbe verificarsi e identificando quali "
+#~ "guasti potenziali dovrebbero essere prioritari."
+
+#~ msgid "Create affected objects of a failure mode"
+#~ msgstr "Crea oggetti interessati di una modalità di guasto"
+
+#~ msgid "View all failure modes"
+#~ msgstr "Visualizza tutte le modalità di guasto"
+
+#~ msgid "View all failure mode effects"
+#~ msgstr "Visualizza tutti gli effetti delle modalità di guasto"
+
+#~ msgid "View all affected objects for a failure modes"
+#~ msgstr "Visualizza tutti gli oggetti interessati per una modalità di guasto"
+
+#~ msgid "Heatmap"
+#~ msgstr "Mappa termica"
+
+#~ msgid "--- Select an option ----"
+#~ msgstr "--- Seleziona un'opzione ----"
+
+#~ msgid "Failure mode affected objects successfully created."
+#~ msgstr "Oggetti interessati dalla modalità di guasto creati con successo."
+
+#~ msgid "Create"
+#~ msgstr "Crea"
+
+#~ msgid "Treeobjects successfully added."
+#~ msgstr "Oggetti dell'albero aggiunti con successo."
+
+#~ msgid "Please select a department or ooi."
+#~ msgstr "Si prega di selezionare un dipartimento o un OOI."
+
+#~ msgid "Failure mode successfully created."
+#~ msgstr "Modalità di guasto creata con successo."
+
+#~ msgid "Failure mode effect successfully created."
+#~ msgstr "Effetto della modalità di guasto creato con successo."
+
+#~ msgid "FMEA"
+#~ msgstr "FMEA"
+
+#~ msgid "Failure mode effects"
+#~ msgstr "Effetti delle modalità di guasto"
 
 #, python-format
 #~ msgid ""

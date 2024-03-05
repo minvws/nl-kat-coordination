@@ -283,7 +283,7 @@ class OctopoesAPIConnector:
 
         params = {
             "path": path,
-            "sources": [str(ooi) for ooi in sources],
+            "sources": {str(ooi) for ooi in sources},
             "valid_time": str(valid_time),
         }
 
