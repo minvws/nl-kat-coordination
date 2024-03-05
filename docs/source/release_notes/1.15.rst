@@ -74,4 +74,4 @@ Full Changelog
 ==============
 
 The full changelog can be found on `Github
-<https://github.com/minvws/nl-kat-coordination/releases/tag/v1.14.0>`_.
+<https://github.com/minvws/nl-kat-coordination/releases/tag/v1.15.0>`_.
