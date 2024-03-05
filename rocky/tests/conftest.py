@@ -970,8 +970,8 @@ class MockOctopoesAPIConnector:
         result = []
 
         for source in sources:
-            for ooi in self.queries[path][source]:
-                result.append((source, ooi))
+            for ooi in self.queries[path][str(source)]:
+                result.append((str(source), ooi))
 
         return result
 
