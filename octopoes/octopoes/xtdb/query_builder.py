@@ -1,13 +1,11 @@
 import re
-from collections.abc import Iterator
+from collections.abc import Iterable, Mapping
+from typing import Any
 
-from octopoes.xtdb.related_field_generator import (
-    FieldSet,
-    RelatedFieldNode,
-)
+from octopoes.xtdb.related_field_generator import FieldSet, RelatedFieldNode
 
 
-def join_csv(values: Iterator[any]) -> str:
+def join_csv(values: Iterable[Any]) -> str:
     return " ".join(values)
 
 
@@ -19,8 +17,8 @@ def str_val(val):
 
 
 def generate_pull_query(
-    field_set: FieldSet | None = FieldSet.ALL_FIELDS,
-    where: dict[str, str | int | list[str | int] | set[str | int]] | None = None,
+    field_set: FieldSet = FieldSet.ALL_FIELDS,
+    where: Mapping[str, str | int | list[str] | list[int] | set[str] | set[int]] | None = None,
     offset: int | None = None,
     limit: int | None = None,
     field_node: RelatedFieldNode | None = None,

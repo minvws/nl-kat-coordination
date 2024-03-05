@@ -1,7 +1,7 @@
 import uuid
 from collections import Counter
 from collections.abc import Generator
-from datetime import datetime, timezone
+from datetime import datetime
 from logging import getLogger
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
@@ -19,14 +19,7 @@ from octopoes.config.settings import (
 )
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfile,
-    ScanProfileBase,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileBase, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
@@ -39,6 +32,7 @@ from octopoes.models.types import type_by_name
 from octopoes.version import __version__
 from octopoes.xtdb.client import XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
+from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
 
 logger = getLogger(__name__)
@@ -50,13 +44,7 @@ def extract_client(client: str = Path(...)) -> str:
     return client
 
 
-def extract_valid_time(valid_time: AwareDatetime | None = Query(None)) -> datetime:
-    if valid_time is None:
-        return datetime.now(timezone.utc)
-    return valid_time
-
-
-def extract_required_valid_time(valid_time: AwareDatetime) -> datetime:
+def extract_valid_time(valid_time: AwareDatetime) -> datetime:
     return valid_time
 
 
@@ -151,6 +139,51 @@ def query(
         xtdb_query = xtdb_query.where(object_path.segments[0].source_type, primary_key=str(source))
 
     return octopoes.ooi_repository.query(xtdb_query, valid_time)
+
+
+@router.get("/query-many", tags=["Objects"])
+def query_many(
+    path: str,
+    sources: list[str] = Query(),
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+):
+    """
+    How does this work and why do we do this?
+
+    We want to fetch all results but be able to tie these back to the source that was used for a result.
+    If we query "Network.hostname" for a list of Networks ids, how do we know which hostname lives on which network?
+    The answer is to add the network id to the "select" statement, so the result is of the form
+
+        [(network_id_1, hostname1), (network_id_2, hostname3), ...]
+
+    Because you can only select variables in Datalog, "network_id_1" needs to be an Alias. Hence `source_alias`.
+    We need to tie that to the Network primary_key and add a where-in clause. The example projected on the code:
+
+    q = XTDBQuery.from_path(object_path)                                    # Adds "where ?Hostname.network = ?Network
+
+    q.find(source_alias).pull(query.result_type)                            # "select ?network_id, ?Hostname
+     .where(object_path.segments[0].source_type, primary_key=source_alias)  # where ?Network.primary_key = ?network_id
+     .where_in(object_path.segments[0].source_type, primary_key=sources)    # and ?Network.primary_key in ["1", ...]"
+    """
+
+    if not sources:
+        return []
+
+    object_path = ObjectPath.parse(path)
+    if not object_path.segments:
+        raise HTTPException(status_code=400, detail="No path components provided.")
+
+    q = XTDBQuery.from_path(object_path)
+    source_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
+
+    return octopoes.ooi_repository.query(
+        q.find(source_alias)
+        .pull(q.result_type)
+        .where(object_path.segments[0].source_type, primary_key=source_alias)
+        .where_in(object_path.segments[0].source_type, primary_key=sources),
+        valid_time,
+    )
 
 
 @router.post("/objects/load_bulk", tags=["Objects"])
@@ -330,7 +363,7 @@ def list_scan_profiles(
 def save_scan_profile(
     scan_profile: ScanProfile = Body(discriminator="scan_profile_type"),
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_required_valid_time),
+    valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     try:
         old_scan_profile = octopoes.scan_profile_repository.get(scan_profile.reference, valid_time)
@@ -361,7 +394,7 @@ def save_many(
 @router.get("/scan_profiles/recalculate", tags=["Scan Profiles"])
 def recalculate_scan_profiles(
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_required_valid_time),
+    valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     octopoes.recalculate_scan_profiles(valid_time)
     octopoes.commit()
@@ -374,10 +407,13 @@ def get_scan_profile_inheritance(
     reference: Reference = Depends(extract_reference),
 ) -> list[InheritanceSection]:
     ooi = octopoes.get_ooi(reference, valid_time)
+    if not ooi.scan_profile:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OOI does not have a scanprofile")
+
     start = InheritanceSection(
         reference=ooi.reference, level=ooi.scan_profile.level, scan_profile_type=ooi.scan_profile.scan_profile_type
     )
-    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED:
+    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED.value:
         return [start]
     return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
 
@@ -394,11 +430,11 @@ def list_findings(
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
         severities,
+        valid_time,
         exclude_muted,
         only_muted,
         offset,
         limit,
-        valid_time,
     )
 
 

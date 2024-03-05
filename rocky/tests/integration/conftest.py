@@ -9,7 +9,7 @@ from urllib3 import Retry
 
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import DeclaredScanProfile, Reference
+from octopoes.models import OOI, DeclaredScanProfile, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.findings import CVEFindingType, KATFindingType, RetireJSFindingType, RiskLevelSeverity
@@ -53,7 +53,7 @@ def seed_system(
     valid_time: datetime,
     test_hostname: str = "example.com",
     test_ip: str = "192.0.2.3",
-):
+) -> dict[str, list[OOI]]:
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
