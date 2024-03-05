@@ -25,7 +25,7 @@
         </tbody>
     </table>
 </div>
-{% if data.finding_types.measures %}
+{% if data.finding_types %}
     <div class="horizontal-scroll">
         <table>
             <caption class="visually-hidden">{% translate "Findings:" %}</caption>
@@ -36,11 +36,13 @@
                 </tr>
             </thead>
             <tbody>
-                {% for measure in data.finding_types.values %}
-                    <tr>
-                        <td>{{ measure.description }}</td>
-                        <td>{{ measure.risk_severity }}</td>
-                    </tr>
+                {% for values in data.finding_types.values %}
+                    {% for finding_type in values %}
+                        <tr>
+                            <td>{{ finding_type.description }}</td>
+                            <td>{{ finding_type.risk_severity }}</td>
+                        </tr>
+                    {% endfor %}
                 {% endfor %}
             </tbody>
         </table>
