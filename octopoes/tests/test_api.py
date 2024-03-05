@@ -26,7 +26,6 @@ def test_health(requests_mock, patch_pika):
         "size": 35488019,
     }
 
-    requests_mock.real_http = True
     requests_mock.get("http://testxtdb:3000/_xtdb/_dev/status", json=xtdb_status, status_code=200)
     response = client.get("/_dev/health")
     assert response.json() == {
@@ -48,7 +47,6 @@ def test_health(requests_mock, patch_pika):
 
 
 def test_health_no_xtdb_connection(requests_mock, patch_pika):
-    requests_mock.real_http = True
     requests_mock.get("http://testxtdb:3000/_xtdb/_dev/status", exc=requests.exceptions.ConnectTimeout)
     response = client.get("/_dev/health")
     assert response.json() == {
@@ -75,7 +73,6 @@ def test_openapi():
 
 
 def test_get_scan_profiles(requests_mock, patch_pika, valid_time):
-    requests_mock.real_http = True
     scan_profile = {
         "type": "ScanProfile",
         "level": 0,
@@ -94,7 +91,6 @@ def test_get_scan_profiles(requests_mock, patch_pika, valid_time):
 
 
 def test_create_node(requests_mock):
-    requests_mock.real_http = True
     requests_mock.post(
         "http://testxtdb:3000/_xtdb/create-node",
         json={"created": "true"},
@@ -105,7 +101,6 @@ def test_create_node(requests_mock):
 
 
 def test_delete_node(requests_mock):
-    requests_mock.real_http = True
     requests_mock.post(
         "http://testxtdb:3000/_xtdb/delete-node",
         json={"deleted": "true"},
@@ -119,7 +114,6 @@ def test_count_findings_by_severity(requests_mock, patch_pika, caplog, valid_tim
     logger = logging.getLogger("octopoes")
     logger.propagate = True
 
-    requests_mock.real_http = True
     xt_response = [
         [
             "KATFindingType|KAT-NO-DKIM",
