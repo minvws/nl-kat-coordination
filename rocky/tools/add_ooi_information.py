@@ -2,7 +2,6 @@ import datetime
 import logging
 from dataclasses import dataclass
 from itertools import product
-from typing import List, Optional, Tuple
 
 import requests
 from bs4 import BeautifulSoup
@@ -15,9 +14,9 @@ logger = logging.getLogger(__name__)
 @dataclass
 class _Service:
     name: str
-    port: Optional[int] = None
-    transport_protocol: Optional[str] = None
-    description: Optional[str] = None
+    port: int | None = None
+    transport_protocol: str | None = None
+    description: str | None = None
 
 
 @dataclass
@@ -27,12 +26,13 @@ class _PortInfo:
     description: str
 
 
-def iana_service_table(search_query: str) -> List[_Service]:
+def iana_service_table(search_query: str) -> list[_Service]:
     services = []
 
     response = requests.get(
         "https://www.iana.org/assignments/service-names-port-numbers/"
-        "service-names-port-numbers.xhtml?search=" + search_query
+        "service-names-port-numbers.xhtml?search=" + search_query,
+        timeout=30,
     )
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -54,13 +54,13 @@ def iana_service_table(search_query: str) -> List[_Service]:
                     description,
                 )
                 services.append(service)
-        except Exception:
+        except Exception:  # noqa: S110
             # just ignore on parse errors
             pass
     return services
 
 
-def service_info(value) -> Tuple[str, str]:
+def service_info(value) -> tuple[str, str]:
     """Provides information about IP Services such as common assigned ports for certain protocols and descriptions"""
     services = iana_service_table(value)
     source = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"
@@ -79,7 +79,7 @@ def service_info(value) -> Tuple[str, str]:
 
 # from: https://newbedev.com/how-to-parse-table-with-rowspan-and-colspan
 def table_to_2d(table_tag):
-    rowspans = []  # track pending rowspans
+    rowspans_list: list = []  # track pending rowspans
     rows = table_tag.find_all("tr")
 
     # first scan, see how many column_names we need
@@ -95,11 +95,11 @@ def table_to_2d(table_tag):
         # to the last cell; ignore it elsewhere.
         colcount = max(
             colcount,
-            sum(int(c.get("colspan", 1)) or 1 for c in cells[:-1]) + len(cells[-1:]) + len(rowspans),
+            sum(int(c.get("colspan", 1)) or 1 for c in cells[:-1]) + len(cells[-1:]) + len(rowspans_list),
         )
         # update rowspan bookkeeping; 0 is a span to the bottom.
-        rowspans += [int(c.get("rowspan", 1)) or len(rows) - r for c in cells]
-        rowspans = [s - 1 for s in rowspans if s > 1]
+        rowspans_list += [int(c.get("rowspan", 1)) or len(rows) - r for c in cells]
+        rowspans_list = [s - 1 for s in rowspans_list if s > 1]
 
     # it doesn't matter if there are still rowspan numbers 'active'; no extra
     # rows to show in the table means the larger than 1 rowspan numbers in the
@@ -109,7 +109,7 @@ def table_to_2d(table_tag):
     table = [[None] * colcount for row in rows]
 
     # fill matrix from row data
-    rowspans = {}  # track pending rowspans, column number mapping to count
+    rowspans: dict = {}  # track pending rowspans, column number mapping to count
     for row, row_elem in enumerate(rows):
         span_offset = 0  # how many column_names are skipped due to row and colspans
         for col, cell in enumerate(row_elem.find_all(["td", "th"], recursive=False)):
@@ -141,11 +141,11 @@ def table_to_2d(table_tag):
 
 def _map_usage_value(value: str) -> bool:
     value = value.lower().strip()
-    return value is not None and value and value != "no"
+    return bool(value and value != "no")
 
 
-def wiki_port_tables() -> List[_PortInfo]:
-    response = requests.get("https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers")
+def wiki_port_tables() -> list[_PortInfo]:
+    response = requests.get("https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers", timeout=30)
     soup = BeautifulSoup(response.text, "html.parser")
 
     rows = []
@@ -165,7 +165,7 @@ def wiki_port_tables() -> List[_PortInfo]:
             if _map_usage_value(tcp):
                 protocols.append("udp")
             description = description.strip()
-        except Exception:
+        except Exception:  # noqa: S112
             continue
 
         items.append(_PortInfo(port, protocols, description))
@@ -173,7 +173,7 @@ def wiki_port_tables() -> List[_PortInfo]:
     return items
 
 
-def port_info(number: str, protocol: str) -> Tuple[str, str]:
+def port_info(number: str, protocol: str) -> tuple[str, str]:
     """Provides possible or common protocols for operation of network applications behind TCP and UDP ports"""
     items = wiki_port_tables()
     source = "https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers"

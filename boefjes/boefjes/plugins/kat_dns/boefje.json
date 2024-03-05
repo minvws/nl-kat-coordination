@@ -5,5 +5,9 @@
     "consumes": [
         "Hostname"
     ],
+    "environment_keys": [
+        "RECORD_TYPES",
+        "REMOTE_NS"
+    ],
     "scan_level": 1
 }

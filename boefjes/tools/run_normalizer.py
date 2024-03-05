@@ -9,6 +9,8 @@ from pathlib import Path
 
 import click
 
+from boefjes.config import settings
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from boefjes.job_handler import NormalizerHandler, bytes_api_client
@@ -33,7 +35,9 @@ def run_normalizer(start_pdb, normalizer_id, raw_id):
 
     local_repository = get_local_repository()
 
-    handler = NormalizerHandler(LocalNormalizerJobRunner(local_repository))
+    handler = NormalizerHandler(
+        LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
+    )
     try:
         handler.handle(meta)
     except Exception:

@@ -1,5 +1,4 @@
 import json
-from typing import List, Tuple, Union
 
 import requests
 from bs4 import BeautifulSoup
@@ -8,7 +7,7 @@ from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.kat_snyk import check_version
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]["software"]
     software_name = input_["name"]
     software_version = input_["version"]
@@ -19,7 +18,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
         "cve_vulnerabilities": [],
     }
     url_snyk = f"https://snyk.io/vuln/npm:{software_name.lower().replace(' ', '-')}"
-    page = requests.get(url_snyk)
+    page = requests.get(url_snyk, timeout=30)
     soup = BeautifulSoup(page.content, "html.parser")
     tables = soup.find_all("table")
     for table in tables:
@@ -47,7 +46,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
                 if check_version.check_version_in(software_version, parsed_info["Vuln_versions"]):
                     # Check if there is a CVE code available for this vulnerability
                     url_snyk = f"https://snyk.io/vuln/{parsed_info['Vuln_href']}"
-                    vuln_page = requests.get(url_snyk)
+                    vuln_page = requests.get(url_snyk, timeout=30)
                     vuln_soup = BeautifulSoup(vuln_page.content, "html.parser")
                     cve_element = vuln_soup.select("[class='cve']")
                     cve_code = cve_element[0].text.split("\n")[0] if cve_element else ""

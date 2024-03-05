@@ -64,14 +64,9 @@ Empty Scan Profiles
 
 *** Keywords ***
 Setup Test
-    Start Monitoring    ${QUEUE_URI}
+    robot.Setup Test
     Insert Normalizer Output
     Await Sync
-
-Teardown Test
-    Cleanup
-    Await Sync
-    Stop Monitoring
 
 Set Scan Profile To Empty
     [Arguments]    ${reference}
@@ -85,7 +80,10 @@ Set Scan Profile To Empty
 
 Verify Scan Level
     [Arguments]    ${reference}    ${scan_level}
-    ${response}    Get    ${OCTOPOES_URI}/object    params=reference=${reference}
+    ${params}    Create Dictionary
+    ...    reference=${reference}
+    ...    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/object    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
     Should Be Equal    ${response.headers["content-type"]}    application/json
     ${response_data}    Set Variable    ${response.json()}
@@ -114,7 +112,6 @@ Verify Scan Profile Increment Queue
 
 Verify Scan LeveL Filter
     [Arguments]    ${scan_level}    ${expected_count}
-    ${params}    Get Valid Time Params
     ${params}    Create Dictionary
     ...    scan_level=${scan_level}
     ...    valid_time=${VALID_TIME}

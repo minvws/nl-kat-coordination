@@ -1,6 +1,7 @@
+from collections.abc import Iterable, Sequence
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List, Optional, Set, Type, Union
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -15,11 +16,23 @@ from katalogus.client import Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI
-from octopoes.models.types import OOIType
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import Report, ReportType
+from reports.report_types.definitions import BaseReportType, MultiReport, Report, ReportType
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
-from rocky.views.mixins import OctopoesView
+from rocky.views.mixins import OOIList
+from rocky.views.ooi_view import OOIFilterView
+
+REPORTS_PRE_SELECTION = {
+    "clearance_level": ["2", "3", "4"],
+    "clearance_type": "declared",
+}
+
+
+def get_selection(request: HttpRequest, pre_selection: dict[str, str | Sequence[str]] | None = None) -> str:
+    if pre_selection is not None:
+        return "?" + urlencode(pre_selection, True)
+    return "?" + urlencode(request.GET, True)
+
 
 logger = getLogger(__name__)
 
@@ -27,17 +40,12 @@ logger = getLogger(__name__)
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     current_step: int = 1
 
-    def get_selection(self, pre_selection: Optional[Dict[str, Union[str, List[str]]]] = None) -> str:
-        if pre_selection:
-            return "?" + urlencode(pre_selection, True)
-        return "?" + urlencode(self.request.GET, True)
-
     def get_kwargs(self):
         return {"organization_code": self.organization.code}
 
     def build_breadcrumbs(self):
         kwargs = self.get_kwargs()
-        selection = self.get_selection()
+        selection = get_selection(self.request)
 
         breadcrumbs = [
             {
@@ -68,18 +76,28 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return context
 
 
-class BaseReportView(OctopoesView):
+class BaseReportView(OOIFilterView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.valid_time = self.get_observed_at()
-        self.selected_oois = request.GET.getlist("ooi", [])
+        self.selected_oois = list(set(request.GET.getlist("ooi", [])))
         self.selected_report_types = request.GET.getlist("report_type", [])
 
-        self.report_types = self.get_report_types_from_choice()
+        self.report_types: Sequence[type[Report] | type[MultiReport]] = self.get_report_types_from_choice()
         report_ids = [report.id for report in self.report_types]
-        self.plugins = self.get_required_optional_plugins(get_plugins_for_report_ids(report_ids))
+        self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
+            get_plugins_for_report_ids(report_ids)
+        )
 
-    def get_oois(self) -> List[OOI]:
+    def get_oois(self) -> list[OOI]:
+        if "all" in self.selected_oois:
+            return self.octopoes_api_connector.list_objects(
+                self.get_ooi_types(),
+                valid_time=self.observed_at,
+                limit=OOIList.HARD_LIMIT,
+                scan_level=self.get_ooi_scan_levels(),
+                scan_profile_type=self.get_ooi_profile_types(),
+            ).items
+
         oois = []
         for ooi_id in self.selected_oois:
             try:
@@ -88,41 +106,48 @@ class BaseReportView(OctopoesView):
                 logger.warning("No data could be found for '%s' ", ooi_id)
         return oois
 
-    def get_ooi_filter_forms(self, ooi_types: Set[OOIType]) -> Dict[str, Form]:
+    def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
                 sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]), self.request.GET
             )
         }
 
-    def get_report_types_for_generate_report(self, reports: Set[Type[Report]]) -> List[Dict[str, str]]:
+    def get_report_types_for_generate_report(self, reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
         return [
             {"id": report_type.id, "name": report_type.name, "description": report_type.description}
             for report_type in reports
         ]
 
     def get_report_types_for_aggregate_report(
-        self, reports_dict: Dict[str, Set[Type[Report]]]
-    ) -> Dict[str, List[Dict[str, str]]]:
+        self, reports_dict: dict[str, set[type[Report]]]
+    ) -> dict[str, list[dict[str, str]]]:
         report_types = {}
         for option, reports in reports_dict.items():
             report_types[option] = self.get_report_types_for_generate_report(reports)
         return report_types
 
-    def get_required_optional_plugins(self, plugin_ids: Dict[str, Set[str]]) -> Dict[str, Plugin]:
+    def get_required_optional_plugins(
+        self, plugin_ids_dict: dict[str, set[str]]
+    ) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
         plugins = {}
-        for plugin, plugin_ids in plugin_ids.items():
+        for plugin, plugin_ids in plugin_ids_dict.items():
             plugins[plugin] = [get_katalogus(self.organization.code).get_plugin(plugin_id) for plugin_id in plugin_ids]
-        return plugins
 
-    def are_plugins_enabled(self, plugins_dict: Dict[str, Plugin]) -> bool:
-        enabled_plugins = []
+        all_plugins_enabled = {
+            plugin_type: all(plugin.enabled for plugin in plugin_list) for plugin_type, plugin_list in plugins.items()
+        }
+
+        return plugins, all_plugins_enabled
+
+    def are_plugins_enabled(self, plugins_dict: dict[str, list[Plugin]]) -> bool:
         for k, plugins in plugins_dict.items():
             for plugin in plugins:
-                enabled_plugins.append(plugin.enabled)
-        return all(enabled_plugins)
+                if not plugin.enabled:
+                    return False
+        return True
 
-    def get_report_types_from_choice(self) -> List[Type[Report]]:
+    def get_report_types_from_choice(self) -> list[type[Report] | type[MultiReport]]:
         report_types = []
         for report_type in self.selected_report_types:
             try:
@@ -131,10 +156,9 @@ class BaseReportView(OctopoesView):
             except ValueError:
                 error_message = _("Report type '%s' does not exist.") % report_type
                 messages.add_message(self.request, messages.ERROR, error_message)
-                pass
         return report_types
 
-    def get_report_types(self) -> List[ReportType]:
+    def get_report_types(self) -> list[ReportType]:
         return [
             {"id": report_type.id, "name": report_type.name, "description": report_type.description}
             for report_type in self.get_report_types_from_choice()
@@ -142,7 +166,6 @@ class BaseReportView(OctopoesView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["observed_at"] = self.valid_time
         context["created_at"] = datetime.now()
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types

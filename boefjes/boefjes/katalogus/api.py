@@ -1,6 +1,6 @@
 import json
 import logging.config
-from typing import Any, List, Optional
+from typing import Any
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -35,7 +35,7 @@ if settings.span_export_grpc_endpoint is not None:
 
     resource = Resource(attributes={SERVICE_NAME: "katalogus"})
     provider = TracerProvider(resource=resource)
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=settings.span_export_grpc_endpoint))
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint)))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 
@@ -57,9 +57,9 @@ def entity_not_found_handler(request: Request, exc: StorageError):
 class ServiceHealth(BaseModel):
     service: str
     healthy: bool = False
-    version: Optional[str] = None
+    version: str | None = None
     additional: Any = None
-    results: List["ServiceHealth"] = Field(default_factory=list)
+    results: list["ServiceHealth"] = Field(default_factory=list)
 
 
 ServiceHealth.update_forward_refs()

@@ -1,7 +1,7 @@
+from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import Callable, List, Optional
 
 import requests
 import structlog
@@ -9,17 +9,9 @@ from opentelemetry import trace
 
 from scheduler import context, models, queues, rankers
 from scheduler.connectors import listeners
-from scheduler.models import (
-    OOI,
-    Boefje,
-    BoefjeTask,
-    MutationOperationType,
-    Organisation,
-    Plugin,
-    PrioritizedItem,
-    ScanProfileMutation,
-    TaskStatus,
-)
+from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
+                              Organisation, Plugin, PrioritizedItem,
+                              ScanProfileMutation, TaskStatus)
 from scheduler.storage import filters
 
 from .scheduler import Scheduler
@@ -41,8 +33,8 @@ class BoefjeScheduler(Scheduler):
         ctx: context.AppContext,
         scheduler_id: str,
         organisation: Organisation,
-        queue: Optional[queues.PriorityQueue] = None,
-        callback: Optional[Callable[..., None]] = None,
+        queue: queues.PriorityQueue | None = None,
+        callback: Callable[..., None] | None = None,
     ):
         self.logger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
@@ -96,14 +88,14 @@ class BoefjeScheduler(Scheduler):
         self.listeners["scan_profile_mutations"] = listener
 
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-mutations",
+            name=f"BoefjeScheduler-{self.scheduler_id}-mutations",
             target=self.listeners["scan_profile_mutations"].listen,
             loop=False,
         )
 
         # New Boefjes
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-new_boefjes",
+            name=f"BoefjeScheduler-{self.scheduler_id}-new_boefjes",
             target=self.push_tasks_for_new_boefjes,
             interval=60.0,
         )
@@ -200,7 +192,9 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        with futures.ThreadPoolExecutor() as executor:
+        with futures.ThreadPoolExecutor(
+            thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
+        ) as executor:
             for boefje in boefjes:
                 executor.submit(
                     self.push_task,
@@ -242,7 +236,7 @@ class BoefjeScheduler(Scheduler):
         )
 
         for boefje in new_boefjes:
-            oois_by_object_type: List[OOI] = []
+            oois_by_object_type: list[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
                     self.organisation.id,
@@ -258,7 +252,9 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            with futures.ThreadPoolExecutor() as executor:
+            with futures.ThreadPoolExecutor(
+                thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
+            ) as executor:
                 for ooi in oois_by_object_type:
                     executor.submit(
                         self.push_task,
@@ -451,7 +447,9 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            with futures.ThreadPoolExecutor() as executor:
+            with futures.ThreadPoolExecutor(
+                thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-random"
+            ) as executor:
                 for boefje in boefjes:
                     executor.submit(
                         self.push_task,
@@ -662,7 +660,7 @@ class BoefjeScheduler(Scheduler):
         return False
 
     @tracer.start_as_current_span("boefje_push_task")
-    def push_task(self, boefje: Plugin, ooi: Optional[OOI], caller: str = "") -> None:
+    def push_task(self, boefje: Plugin, ooi: OOI | None, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -894,7 +892,7 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
-    def get_boefjes_for_ooi(self, ooi) -> List[Plugin]:
+    def get_boefjes_for_ooi(self, ooi) -> list[Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
 
         Args:

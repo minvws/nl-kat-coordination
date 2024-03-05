@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import fastapi
 import prometheus_client
@@ -7,7 +7,8 @@ import structlog
 import uvicorn
 from fastapi import BackgroundTasks, status
 from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import \
+    OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
@@ -36,7 +37,7 @@ class Server:
     def __init__(
         self,
         ctx: context.AppContext,
-        s: Dict[str, schedulers.Scheduler],
+        s: dict[str, schedulers.Scheduler],
     ):
         """Initializer of the Server class.
 
@@ -47,7 +48,7 @@ class Server:
 
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
-        self.schedulers: Dict[str, schedulers.Scheduler] = s
+        self.schedulers: dict[str, schedulers.Scheduler] = s
         self.config: settings.Settings = settings.Settings()
 
         self.api = fastapi.FastAPI()
@@ -97,7 +98,7 @@ class Server:
             path="/schedulers",
             endpoint=self.get_schedulers,
             methods=["GET"],
-            response_model=List[models.Scheduler],
+            response_model=list[models.Scheduler],
             status_code=status.HTTP_200_OK,
             description="List all schedulers",
         )
@@ -211,7 +212,7 @@ class Server:
             path="/queues",
             endpoint=self.get_queues,
             methods=["GET"],
-            response_model=List[models.Queue],
+            response_model=list[models.Queue],
             response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="List all queues",
@@ -230,7 +231,7 @@ class Server:
             path="/queues/{queue_id}/pop",
             endpoint=self.pop_queue,
             methods=["POST"],
-            response_model=Optional[models.PrioritizedItem],
+            response_model=models.PrioritizedItem | None,
             status_code=status.HTTP_200_OK,
             description="Pop an item from a queue",
         )
@@ -239,7 +240,7 @@ class Server:
             path="/queues/{queue_id}/push",
             endpoint=self.push_queue,
             methods=["POST"],
-            response_model=Optional[models.PrioritizedItem],
+            response_model=models.PrioritizedItem | None,
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
@@ -484,16 +485,16 @@ class Server:
     def list_tasks(
         self,
         request: fastapi.Request,
-        scheduler_id: Optional[str] = None,
-        task_type: Optional[str] = None,
-        status: Optional[str] = None,
+        scheduler_id: str | None = None,
+        task_type: str | None = None,
+        status: str | None = None,
         offset: int = 0,
         limit: int = 10,
-        min_created_at: Optional[datetime.datetime] = None,
-        max_created_at: Optional[datetime.datetime] = None,
-        input_ooi: Optional[str] = None,  # FIXME: deprecated
-        plugin_id: Optional[str] = None,  # FIXME: deprecated
-        filters: Optional[storage.filters.FilterRequest] = None,
+        min_created_at: datetime.datetime | None = None,
+        max_created_at: datetime.datetime | None = None,
+        input_ooi: str | None = None,  # FIXME: deprecated
+        plugin_id: str | None = None,  # FIXME: deprecated
+        filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
@@ -562,7 +563,7 @@ class Server:
             elif task_type == "normalizer":
                 f_plugin = storage.filters.Filter(
                     column="p_item",
-                    field="data__raw_data__boefje_meta__id",
+                    field="data__normalizer__id",
                     operator="eq",
                     value=plugin_id,
                 )
@@ -577,7 +578,7 @@ class Server:
                         ),
                         storage.filters.Filter(
                             column="p_item",
-                            field="data__raw_data__boefje_meta__id",
+                            field="data__normalizer__id",
                             operator="eq",
                             value=plugin_id,
                         ),
@@ -684,7 +685,7 @@ class Server:
 
         return updated_task
 
-    def get_task_stats(self, scheduler_id: Optional[str] = None) -> Optional[Dict[str, Dict[str, int]]]:
+    def get_task_stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         try:
             stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
         except Exception as exc:
@@ -716,7 +717,7 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str, filters: Optional[storage.filters.FilterRequest] = None) -> Any:
+    def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(

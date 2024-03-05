@@ -15,12 +15,11 @@ https://summoning.team/blog/vmware-vrealize-network-insight-ssh-key-rce-cve-2023
 """
 import logging
 import os
-from typing import List, Tuple, Union
 
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[str, bytes]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
     input_ = boefje_meta.arguments["input"]  # input is IPService
     ip_port = input_["ip_port"]
     if input_["service"]["name"] != "ssh":
@@ -51,7 +50,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[str, bytes]]]:
             ]
             try:
                 ssh_command = " ".join(ssh_command)
-                coutput = os.system(ssh_command)
+                coutput = os.system(ssh_command)  # noqa: S605
                 if coutput not in (0, 32512):  # 0 = it worked, 32512 = `exit` does not exists but we did connect
                     continue
                 return [
@@ -63,6 +62,6 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[str, bytes]]]:
                     )
                 ]
 
-            except Exception:
+            except Exception:  # noqa: S112
                 continue
     return [(set(), "No known keys allowed")]

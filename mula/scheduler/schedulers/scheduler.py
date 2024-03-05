@@ -6,9 +6,13 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 import structlog
+from opentelemetry import trace
 
-from scheduler import connectors, context, models, queues, rankers, storage, utils
+from scheduler import (connectors, context, models, queues, rankers, storage,
+                       utils)
 from scheduler.utils import thread
+
+tracer = trace.get_tracer(__name__)
 
 
 class Scheduler(abc.ABC):
@@ -42,7 +46,7 @@ class Scheduler(abc.ABC):
         ctx: context.AppContext,
         scheduler_id: str,
         queue: queues.PriorityQueue,
-        callback: Optional[Callable[..., None]] = None,
+        callback: Callable[..., None] | None = None,
         max_tries: int = -1,
     ):
         """Initialize the Scheduler.
@@ -69,11 +73,14 @@ class Scheduler(abc.ABC):
         self.max_tries: int = max_tries
         self.enabled: bool = True
         self.scheduler_id: str = scheduler_id
-        self._last_activity: Optional[datetime] = None
         self.deadline_ranker = rankers.DefaultDeadlineRanker(ctx=self.ctx)
+        self.queue: queues.PriorityQueue = queue
+        self.max_tries: int = max_tries
+        self.callback: Callable[[], Any] | None = callback
+        self._last_activity: datetime | None = None
 
         # Listeners
-        self.listeners: Dict[str, connectors.listeners.Listener] = {}
+        self.listeners: dict[str, connectors.listeners.Listener] = {}
 
         # Threads
         self.lock: threading.Lock = threading.Lock()
@@ -114,7 +121,7 @@ class Scheduler(abc.ABC):
 
         self.threads.append(t)
 
-    def push_items_to_queue(self, p_items: List[models.PrioritizedItem]) -> None:
+    def push_items_to_queue(self, p_items: list[models.PrioritizedItem]) -> None:
         """Push multiple PrioritizedItems to the queue.
 
         Args:
@@ -487,7 +494,7 @@ class Scheduler(abc.ABC):
         return self.queue.is_item_on_queue_by_hash(item_hash)
 
     @property
-    def last_activity(self) -> Optional[datetime]:
+    def last_activity(self) -> datetime | None:
         """Get the last activity of the scheduler."""
         with self.lock:
             return self._last_activity
@@ -498,7 +505,7 @@ class Scheduler(abc.ABC):
         with self.lock:
             self._last_activity = value
 
-    def dict(self) -> Dict[str, Any]:
+    def dict(self) -> dict[str, Any]:
         """Get a dict representation of the scheduler."""
         return {
             "id": self.scheduler_id,

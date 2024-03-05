@@ -15,7 +15,7 @@ jobs:
     outputs:
       packages: ${{ steps.filter.outputs.changes }}
     steps:
-    - uses: dorny/paths-filter@v2
+    - uses: dorny/paths-filter@v3
       if: github.event_name != 'push'
       id: filter
       with:

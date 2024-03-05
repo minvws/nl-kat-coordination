@@ -65,23 +65,23 @@ const plotData = (data) => {
   const elements = [];
 
   loopTree({}, data, (parent, obj) => {
-    if (obj["crux.db/id"]) {
+    if (obj["xt/id"]) {
       // add node to graph
       elements.push({
         data: {
-          id: obj["crux.db/id"],
-          label: obj["crux.db/id"],
+          id: obj["xt/id"],
+          label: obj["xt/id"],
           type: obj["ooi_type"] || "default",
         },
       });
 
-      if (parent["crux.db/id"]) {
+      if (parent["xt/id"]) {
         // add edge to graph
         elements.push({
           data: {
-            id: obj["crux.db/id"] + "_" + parent["crux.db/id"],
-            source: obj["crux.db/id"],
-            target: parent["crux.db/id"],
+            id: obj["xt/id"] + "_" + parent["xt/id"],
+            source: obj["xt/id"],
+            target: parent["xt/id"],
             type: obj["ooi_type"] || "default",
           },
         });
@@ -132,14 +132,14 @@ const renderMenu = () => {
  * @returns
  */
 const goToOoi = (ooiId) => {
-  const currentId = rootObj["crux.db/id"];
+  const currentId = rootObj["xt/id"];
 
   if (ooiId === currentId) {
     return;
   }
 
   window.location.href = window.location.href.replace(
-    rootObj["crux.db/id"],
+    rootObj["xt/id"],
     ooiId
   );
 };
@@ -152,8 +152,8 @@ window.addEventListener("load", () => {
   // Gather all id's
   window.ooi = new Set();
   loopTree({}, rootObj, (parent, obj) => {
-    if (obj["crux.db/id"]) {
-      window.ooi.add(obj["crux.db/id"]);
+    if (obj["xt/id"]) {
+      window.ooi.add(obj["xt/id"]);
     }
   });
   renderMenu();

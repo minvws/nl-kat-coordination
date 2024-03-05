@@ -1,7 +1,6 @@
 import json
 import re
 from os import getenv
-from typing import List, Tuple, Union
 from urllib.parse import quote_plus
 
 import requests
@@ -9,7 +8,7 @@ import requests
 from boefjes.job_models import BoefjeMeta
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     pk = boefje_meta.input_ooi
     results = []
     if re.match(pk, "IPAddressV4|.*") or re.match(pk, "IPAddressV6|.*"):
@@ -29,6 +28,7 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
             response = requests.get(
                 f"https://leakix.net/search?scope={scope}&q={dork}&page={page_counter}",
                 headers={"Accept": "application/json", "api-key": getenv("LEAKIX_API")},
+                timeout=30,
             )
             page_counter += 1
             if not response or not response.content:

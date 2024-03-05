@@ -1,6 +1,5 @@
 """Boefje script for scanning wordpress sites using wpscan"""
 from os import getenv
-from typing import List, Tuple, Union
 
 import docker
 
@@ -9,11 +8,11 @@ from boefjes.job_models import BoefjeMeta
 WPSCAN_IMAGE = "wpscanteam/wpscan:latest"
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
 
     if input_["software"]["name"] != "WordPress" or (
-        "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"]
+        "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"].dict()
     ):
         return [(set(), "")]
 

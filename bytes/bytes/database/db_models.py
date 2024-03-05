@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from bytes.database.db import SQL_BASE
 
 
-class BoefjeMetaInDB(SQL_BASE):  # type: ignore
+class BoefjeMetaInDB(SQL_BASE):
     __tablename__ = "boefje_meta"
 
     id = Column(UUID, primary_key=True)
@@ -24,7 +24,7 @@ class BoefjeMetaInDB(SQL_BASE):  # type: ignore
 Index("ix_boefje_meta_organization_boefje_id", BoefjeMetaInDB.organization, BoefjeMetaInDB.boefje_id)
 
 
-class SigningProviderInDB(SQL_BASE):  # type: ignore
+class SigningProviderInDB(SQL_BASE):
     __tablename__ = "signing_provider"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -32,7 +32,7 @@ class SigningProviderInDB(SQL_BASE):  # type: ignore
     url = Column(String(length=256), nullable=False, unique=True)
 
 
-class RawFileInDB(SQL_BASE):  # type: ignore
+class RawFileInDB(SQL_BASE):
     __tablename__ = "raw_file"
 
     id = Column(UUID, primary_key=True)
@@ -51,7 +51,7 @@ class RawFileInDB(SQL_BASE):  # type: ignore
     mime_types = Column(ARRAY(String(length=64)), default=lambda: [])
 
 
-class NormalizerMetaInDB(SQL_BASE):  # type: ignore
+class NormalizerMetaInDB(SQL_BASE):
     __tablename__ = "normalizer_meta"
 
     id = Column(UUID, primary_key=True)

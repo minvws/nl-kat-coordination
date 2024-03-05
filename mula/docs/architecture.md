@@ -51,8 +51,6 @@ combines data from the `Octopoes`, `Katalogus`, `Bytes` and `RabbitMQ` systems.
 
 ### C3 Component level
 
-### C3 Component level:
-
 When we take a closer look at the `scheduler` system itself we can identify
 several components. The 'Scheduler App' directs the creation and maintenance
 of a multitude of schedulers. Typically in a KAT installation 2 scheduler will
@@ -78,7 +76,7 @@ section we review how different dataflows, from the `boefjes` and the
 
 #### Design
 
-First, we wil use the `BoefjeScheduler` as an example. A `BoefjeScheduler` is
+First, we will use the `BoefjeScheduler` as an example. A `BoefjeScheduler` is
 tasked with creating tasks that are able to be picked up and processed by a
 'Task Runner'. The scheduler creates a `BoefjeTask` to the specification that
 the 'Task Runner' can interpret, namely in this instance of a `BoefjeTask`.
@@ -131,13 +129,20 @@ we will check the following:
 
   - check if the same task is already on the priority queue
 
-Important to note is that when a `BoefjeTask` is created and pushed onto the
-queue as a `PrioritizedItem` a new unique `TaskRun` is generated.[^1] This
-ensures that each task has its own dedicated `TaskRun` throughout its entire
-lifecycle. This approach maintains a distinct record for each task, providing
-an accurate and independent history of task statuses. This means that each
-execution of a `BoefjeTask`, regardless of whether it's the same task being
-repeated in the future, is tracked independently with its own unique `TaskRun`.
+> [!IMPORTANT]
+> Important to note is that when a `PrioritizedItem` is created and pushed onto
+> the queue. A `TaskRun` and `Schedule` is created for this item. Below we'll
+> explain the explain the role of these two entities in more detail.
+
+##### `TaskRun`
+
+When a `BoefjeTask` is created and pushed onto the queue as a `PrioritizedItem`
+a new unique `TaskRun` is generated.[^1] This ensures that each task has its
+own dedicated `TaskRun` throughout its entire lifecycle. This approach
+maintains a distinct record for each task, providing an accurate and
+independent history of task statuses. This means that each execution of a
+`BoefjeTask`, regardless of whether it's the same task being repeated in the
+future, is tracked independently with its own unique `TaskRun`.
 
 This approach ensures that the historical record of each task's execution is
 distinct, providing a clear and isolated view of each instance of the task's
@@ -148,8 +153,6 @@ tasks are currently running. You might know this overview from Rocky as the
 task list.
 
 ![diagram005](./img/diagram005.svg)
-
-##### `TaskRun`
 
 Whenever a task is created in the scheduler it flows through the system, to
 keep track of the status of this task throughout the system we update its
@@ -175,10 +178,10 @@ keep track of the status of this task throughout the system we update its
 
 ##### `Schedule`
 
-Since a task within the KAT implementation of the scheduler, generates findings
-at a specific moment in time. We want to account for additional findings or
-changes for the same task at a later moment in time. Meaning we want to be able
-to reschedule particular tasks.
+Since a task within the KAT implementation of the scheduler, can generate
+findings at a specific moment in time. We want to account for additional
+findings or changes for the same task at a later moment in time. Meaning we
+want to be able to reschedule particular tasks.
 
 In order to support this, every task that is executed by the
 `BoefjesScheduler` a `Schedule` is created. This `Schedule` contains
@@ -187,11 +190,25 @@ at a later moment in time.
 
 ![diagram006](./img/diagram006.svg)
 
-A `Schedule` supports a cron-like expression as schedule which makes it
+A `Schedule` supports a cron-like expression as schedule, which makes it
 possible to schedule tasks at certain intervals. When such an expression isn't
-set, the task will be scheduled at a future calculated date.
+set, the task will be scheduled at a future calculated date (deadline ranker
+calculation).
 
 To see how task will be rescheduled, refer to the 'Processes' section.
+
+#### Processes
+
+In order to create a `BoefjeTask` and trigger the dataflow we described above
+we have 4 different processes within a `BoefjeScheduler` that can create boefje
+tasks. Namely:
+
+1. scan profile mutations
+2. enabling of boefjes
+3. rescheduling of prior tasks
+4. manual scan job
+
+![diagram007](./img/diagram007.svg)
 
 #### Processes
 
@@ -521,9 +538,6 @@ task_runs {
     timestamp_with_time_zone modified_at
     jsonb p_item
     character_varying type
-}
-alembic_version {
-    character_varying version_num PK
 }
 items {
     uuid id PK

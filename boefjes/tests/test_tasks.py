@@ -3,7 +3,6 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List
 from unittest import TestCase, mock
 from uuid import UUID
 
@@ -81,7 +80,7 @@ class TaskTest(TestCase):
                 parameters=[],
             ),
         ]
-        self.plugins: List[PluginType] = self.boefjes + self.normalizers + self.bits
+        self.plugins: list[PluginType] = self.boefjes + self.normalizers + self.bits
         sys.path.append(str(Path(__file__).parent))
 
     def _get_boefje_meta(self):
@@ -108,8 +107,8 @@ class TaskTest(TestCase):
 
     @mock.patch("boefjes.job_handler.get_environment_settings", return_value={})
     @mock.patch("boefjes.job_handler.bytes_api_client")
-    @mock.patch("boefjes.job_handler._find_ooi_in_past")
-    def test_handle_boefje_with_exception(self, mock_find_ooi_in_past, mock_bytes_api_client, mock_get_env):
+    @mock.patch("boefjes.job_handler.get_octopoes_api_connector")
+    def test_handle_boefje_with_exception(self, mock_get_octopoes_api_connector, mock_bytes_api_client, mock_get_env):
         meta = BoefjeMeta(
             id="0dca59db-b339-47c4-bcc9-896fc18e2386",
             boefje={"id": "dummy_boefje_runtime_exception"},
@@ -121,7 +120,7 @@ class TaskTest(TestCase):
         local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
 
         with pytest.raises(RuntimeError):  # Bytes still saves exceptions before they are reraised
-            BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository).handle(meta)
+            BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, mock_bytes_api_client).handle(meta)
 
         mock_bytes_api_client.save_boefje_meta.assert_called_once_with(meta)
         mock_bytes_api_client.save_raw.assert_called_once()
@@ -203,6 +202,6 @@ class TaskTest(TestCase):
         assert Path(path / "__pycache__/pytest__init__.cpython-311.pyc").is_file()
         assert Path(path / "__pycache__/pytest_main.cpython-311.pyc").is_file()
 
-        assert boefje_resource_1.runnable_hash == "b07a0ecbb24e49843188a24e5298b9d614535c0ec1761e76366b6d8747515e7a"
-        assert boefje_resource_2.runnable_hash == "1d97b303499cc7ea79c4bb419a79bd5eea750c6430ddd759b7af22383e873a7e"
-        assert boefje_resource_3.runnable_hash == "67f956d89b2e2c5948f2090ac52eb752e2e65393df207180d8c24a6dea13b555"
+        assert boefje_resource_1.runnable_hash == "4bae5e869bd17759bf750bf357fdee1eedff5768d407248b8ddcb63d0abdee19"
+        assert boefje_resource_2.runnable_hash == "e0c46fb915778b06f69cd5934b2157733cef84d67fc89c563c5bbd965ad52949"
+        assert boefje_resource_3.runnable_hash == "0185c90d3d1a4dc1490ec918374f84e8a480101f98db14d434638147dd82c626"

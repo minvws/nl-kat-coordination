@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -22,12 +22,12 @@ class OpenPortsReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "open_ports_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         try:
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
-        except ObjectNotFoundException as e:
-            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
-            raise ObjectNotFoundException(e)
+        except ObjectNotFoundException:
+            logger.error("No data found for OOI '%s' on date %s.", ooi, valid_time)
+            raise
 
         if ooi.reference.class_type == Hostname:
             path = Path.parse("Hostname.<hostname [is ResolvedHostname].address")
@@ -36,7 +36,7 @@ class OpenPortsReport(Report):
                 return {}
             references = [ip.reference for ip in ips]
         else:
-            references = [ooi]
+            references = [ooi.reference]
 
         results = {}
         for ref in references:
@@ -57,7 +57,6 @@ class OpenPortsReport(Report):
                 )
                 port_numbers[port.port] = found_by_openkat
 
-                self.octopoes_api_connector.query("IPPort.<ip_port [is IPService].service", valid_time, port.reference)
                 services[port.port] = [
                     service.name
                     for service in self.octopoes_api_connector.query(
@@ -65,6 +64,6 @@ class OpenPortsReport(Report):
                     )
                 ]
 
-            results[ref] = {"ports": port_numbers, "hostnames": hostnames, "services": services}
+            results[str(ref)] = {"ports": port_numbers, "hostnames": hostnames, "services": services}
 
         return results

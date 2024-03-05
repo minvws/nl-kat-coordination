@@ -3,7 +3,6 @@ import json
 import logging
 import re
 from os import getenv
-from typing import List, Tuple, Union
 
 import dns.resolver
 from dns.name import Name
@@ -13,22 +12,22 @@ from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
-DEFAULT_RECORD_TYPES = set(("A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME"))
+DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME", "SOA"}
 
 
 class ZoneNotFoundException(Exception):
     pass
 
 
-def get_record_types() -> List[str]:
+def get_record_types() -> list[str]:
     requested_record_types = getenv("RECORD_TYPES", "")
     if not requested_record_types:
         return DEFAULT_RECORD_TYPES
-    requested_record_types = re.sub("[^A-Za-z,]", requested_record_types.upper(), "").split(",")
+    requested_record_types = list(map(lambda x: re.sub(r"[^A-Za-z]", "", x), requested_record_types.upper().split(",")))
     return list(set(requested_record_types).intersection(DEFAULT_RECORD_TYPES))
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     hostname = boefje_meta.arguments["input"]["name"]
 
     requested_dns_name = dns.name.from_text(hostname)
@@ -36,11 +35,16 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     nameserver = getenv("REMOTE_NS", str(settings.remote_ns))
     resolver.nameservers = [nameserver]
 
-    answers = [
-        get_parent_zone_soa(resolver, requested_dns_name),
-    ]
+    record_types = get_record_types()
+    answers = (
+        [
+            get_parent_zone_soa(resolver, requested_dns_name),
+        ]
+        if "SOA" in record_types
+        else []
+    )
 
-    for type_ in get_record_types():
+    for type_ in record_types:
         try:
             answer: Answer = resolver.resolve(hostname, type_)
             answers.append(answer)

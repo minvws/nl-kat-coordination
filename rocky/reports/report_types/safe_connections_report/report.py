@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -23,12 +23,12 @@ class SafeConnectionsReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "safe_connections_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         try:
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
-        except ObjectNotFoundException as e:
-            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
-            raise ObjectNotFoundException(e)
+        except ObjectNotFoundException:
+            logger.error("No data found for OOI '%s' on date %s.", ooi, valid_time)
+            raise
 
         if ooi.reference.class_type == Hostname:
             ips = self.octopoes_api_connector.query(
@@ -40,7 +40,6 @@ class SafeConnectionsReport(Report):
         sc_ips = {}
         number_of_ips = len(ips)
         number_of_available = number_of_ips
-        finding_types = []
 
         for ip in ips:
             finding_types = self.octopoes_api_connector.query(
@@ -51,8 +50,6 @@ class SafeConnectionsReport(Report):
             )
 
             cipher_findings = list(filter(lambda finding: finding.id in CIPHER_FINDINGS, finding_types))
-            finding_types.extend(cipher_findings)
-
             sc_ips[ip.reference] = cipher_findings
             number_of_available -= 1 if cipher_findings else 0
 
@@ -61,5 +58,4 @@ class SafeConnectionsReport(Report):
             "sc_ips": sc_ips,
             "number_of_available": number_of_available,
             "number_of_ips": number_of_ips,
-            "finding_types": finding_types,
         }

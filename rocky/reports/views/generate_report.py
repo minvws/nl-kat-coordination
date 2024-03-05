@@ -1,4 +1,5 @@
-from typing import Any, Dict
+from collections.abc import Sequence
+from typing import Any
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -11,15 +12,13 @@ from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
+from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
     get_report_types_for_oois,
 )
-from reports.views.base import (
-    BaseReportView,
-    ReportBreadcrumbs,
-)
+from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -27,7 +26,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
     def build_breadcrumbs(self):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
-        selection = self.get_selection()
+        selection = get_selection(self.request)
         breadcrumbs += [
             {
                 "url": reverse("generate_report_landing", kwargs=kwargs) + selection,
@@ -53,19 +52,16 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingGenerateReportView(BreadcrumbsGenerateReportView, TemplateView):
+class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
     """
     Landing page to start the 'Generate Report' flow.
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        kwargs = self.get_kwargs()
-        pre_selection = {
-            "clearance_level": ["2", "3", "4"],
-            "clearance_type": "declared",
-        }
-        selection = self.get_selection(pre_selection)
-        return redirect(reverse("generate_report_select_oois", kwargs=kwargs) + selection)
+        return redirect(
+            reverse("generate_report_select_oois", kwargs=self.get_kwargs())
+            + get_selection(request, REPORTS_PRE_SELECTION)
+        )
 
 
 class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):
@@ -79,6 +75,7 @@ class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportVi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["channel"] = "generate_report"
         context.update(self.get_ooi_filter_forms(self.ooi_types))
         return context
 
@@ -119,11 +116,17 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
         if not self.selected_report_types:
             error_message = _("Select at least one report type to proceed.")
             messages.add_message(self.request, messages.ERROR, error_message)
+
+        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
+            return redirect(reverse("generate_report_view", kwargs=kwargs) + get_selection(request))
+
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+        context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
+            get_plugins_for_report_ids(self.selected_report_types)
+        )
         return context
 
 
@@ -134,6 +137,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
     template_name = "generate_report.html"
     current_step = 6
+    report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
         if not self.are_plugins_enabled(self.plugins):
@@ -141,31 +145,49 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             messages.add_message(self.request, messages.WARNING, warning_message)
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> Dict[str, Dict[str, Dict[str, str]]]:
-        report_data = {}
-        error_oois = []
+    def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, Any]]]:
+        error_reports = []
+        report_data: dict[str, dict[str, dict[str, Any]]] = {}
+        by_type: dict[str, list[str]] = {}
+
         for ooi in self.selected_oois:
-            report_data[ooi] = {}
+            ooi_type = Reference.from_str(ooi).class_
+
+            if ooi_type not in by_type:
+                by_type[ooi_type] = []
+
+                by_type[ooi_type].append(ooi)
+
+        for report_type in self.report_types:
+            oois = {
+                ooi for ooi_type in report_type.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
+            }
+
             try:
-                for report_type in self.report_types:
-                    if Reference.from_str(ooi).class_type in report_type.input_ooi_types:
-                        report = report_type(self.octopoes_api_connector)
-                        data = report.generate_data(ooi, valid_time=self.valid_time)
-                        template = report.template_path
-                        report_data[ooi][report_type.name] = {"data": data, "template": template}
+                results = report_type(self.octopoes_api_connector).collect_data(oois, self.observed_at)
             except ObjectNotFoundException:
-                error_oois.append(ooi)
+                error_reports.append(report_type.id)
+                continue
             except StopIteration:
-                error_oois.append(ooi)
+                error_reports.append(report_type.id)
+                continue
+
+            for ooi, data in results.items():
+                if ooi not in report_data:
+                    report_data[ooi] = {}
+
+                report_data[ooi][report_type.name] = {"data": data, "template": report_type.template_path}
+
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
-        if error_oois:
-            oois = ", ".join(set(error_oois))
-            date = self.valid_time.date()
-            error_message = _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.") % {
-                "oois": oois,
+        if error_reports:
+            report_types = ", ".join(set(error_reports))
+            date = self.observed_at.date()
+            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
+                "report_types": report_types,
                 "date": date,
             }
             messages.add_message(self.request, messages.ERROR, error_message)
+
         return report_data
 
     def get_context_data(self, **kwargs):

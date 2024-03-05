@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Set
+from collections.abc import Callable
 
 from pydantic.main import BaseModel
 
@@ -10,7 +10,7 @@ from octopoes.models.types import OOIType
 
 class ReferenceNode(BaseModel):
     reference: Reference
-    children: Dict[str, List[ReferenceNode]]
+    children: dict[str, list[ReferenceNode]]
 
     def filter_children(self, filter_fn: Callable[[ReferenceNode], bool]):
         """
@@ -25,13 +25,13 @@ class ReferenceNode(BaseModel):
             return True
         return filter_fn(self)
 
-    def collect_references(self) -> Set[Reference]:
-        child_references = set()
+    def collect_references(self) -> set[Reference]:
+        child_references: set[Reference] = set()
         for child_name, children in self.children.items():
             child_references_ = [child.collect_references() for child in children]
             # merge list of sets
-            child_references_ = set().union(*child_references_)
-            child_references = child_references.union(child_references_)
+            child_references_merged = set().union(*child_references_)
+            child_references = child_references.union(child_references_merged)
 
         return {self.reference}.union(child_references)
 
@@ -46,4 +46,4 @@ class ReferenceTree(BaseModel):
     present in the tree, the `store`, for convenience."""
 
     root: ReferenceNode
-    store: Dict[str, OOIType]
+    store: dict[str, OOIType]

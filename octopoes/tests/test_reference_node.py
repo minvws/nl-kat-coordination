@@ -6,12 +6,12 @@ from octopoes.models.tree import ReferenceNode
 from octopoes.repositories.ooi_repository import XTDBReferenceNode
 
 xtdb_sample = {
-    "crux.db/id": "IPPort|internet|1.1.1.2|tcp|80",
+    "xt/id": "IPPort|internet|1.1.1.2|tcp|80",
     "IPPort/address": {
-        "crux.db/id": "IPAddressV4|internet|1.1.1.2",
+        "xt/id": "IPAddressV4|internet|1.1.1.2",
         "IPAddressV4/network": {
-            "crux.db/id": "Network|internet",
-            "IPAddressV6/_network": [{"crux.db/id": "IPAddressV6|internet|2001:1c00:2303:8f00:21c7:4dc2:5738:28af"}],
+            "xt/id": "Network|internet",
+            "IPAddressV6/_network": [{"xt/id": "IPAddressV6|internet|2001:1c00:2303:8f00:21c7:4dc2:5738:28af"}],
         },
     },
 }
@@ -19,71 +19,71 @@ xtdb_sample = {
 xtdb_sample_2 = {
     "child_dns_zones": [
         {
-            "crux.db/id": "DNSZone|internet|minvws.nl",
-            "hostnames": [{"crux.db/id": "Hostname|internet|minvws.nl"}],
+            "xt/id": "DNSZone|internet|minvws.nl",
+            "hostnames": [{"xt/id": "Hostname|internet|minvws.nl"}],
             "name_servers": [
-                {"crux.db/id": "Hostname|internet|ns3.ssonet.nl"},
-                {"crux.db/id": "Hostname|internet|ns2.ssonet.nl"},
-                {"crux.db/id": "Hostname|internet|ns1.ssonet.nl"},
+                {"xt/id": "Hostname|internet|ns3.ssonet.nl"},
+                {"xt/id": "Hostname|internet|ns2.ssonet.nl"},
+                {"xt/id": "Hostname|internet|ns1.ssonet.nl"},
             ],
-            "network": {"crux.db/id": "Network|internet"},
-            "soa": {"crux.db/id": "Hostname|internet|ns3.ssonet.nl"},
+            "network": {"xt/id": "Network|internet"},
+            "soa": {"xt/id": "Hostname|internet|ns3.ssonet.nl"},
         }
     ],
-    "crux.db/id": "DNSZone|internet|nl",
+    "xt/id": "DNSZone|internet|nl",
     "name_servers": [
         {
-            "crux.db/id": "Hostname|internet|ns3.dns.nl",
+            "xt/id": "Hostname|internet|ns3.dns.nl",
             "dns_zone": {},
-            "network": {"crux.db/id": "Network|internet"},
+            "network": {"xt/id": "Network|internet"},
         },
         {
-            "crux.db/id": "Hostname|internet|ns2.dns.nl",
+            "xt/id": "Hostname|internet|ns2.dns.nl",
             "dns_zone": {},
-            "network": {"crux.db/id": "Network|internet"},
+            "network": {"xt/id": "Network|internet"},
         },
         {
-            "crux.db/id": "Hostname|internet|ns1.dns.nl",
+            "xt/id": "Hostname|internet|ns1.dns.nl",
             "dns_zone": {},
-            "dns_zones": [{"crux.db/id": "DNSZone|internet|nl"}],
-            "network": {"crux.db/id": "Network|internet"},
+            "dns_zones": [{"xt/id": "DNSZone|internet|nl"}],
+            "network": {"xt/id": "Network|internet"},
         },
     ],
     "network": {
-        "crux.db/id": "Network|internet",
+        "xt/id": "Network|internet",
         "hostnames": [
-            {"crux.db/id": "Hostname|internet|mail.ssonet.nl"},
-            {"crux.db/id": "Hostname|internet|mail2.ssonet.nl"},
-            {"crux.db/id": "Hostname|internet|minvws.nl"},
-            {"crux.db/id": "Hostname|internet|ns1.dns.nl"},
-            {"crux.db/id": "Hostname|internet|ns1.ssonet.nl"},
-            {"crux.db/id": "Hostname|internet|ns2.dns.nl"},
-            {"crux.db/id": "Hostname|internet|ns2.ssonet.nl"},
-            {"crux.db/id": "Hostname|internet|ns3.dns.nl"},
-            {"crux.db/id": "Hostname|internet|ns3.ssonet.nl"},
+            {"xt/id": "Hostname|internet|mail.ssonet.nl"},
+            {"xt/id": "Hostname|internet|mail2.ssonet.nl"},
+            {"xt/id": "Hostname|internet|minvws.nl"},
+            {"xt/id": "Hostname|internet|ns1.dns.nl"},
+            {"xt/id": "Hostname|internet|ns1.ssonet.nl"},
+            {"xt/id": "Hostname|internet|ns2.dns.nl"},
+            {"xt/id": "Hostname|internet|ns2.ssonet.nl"},
+            {"xt/id": "Hostname|internet|ns3.dns.nl"},
+            {"xt/id": "Hostname|internet|ns3.ssonet.nl"},
         ],
         "ip_v4_addresses": [
-            {"crux.db/id": "IPAddressV4|internet|1.1.1.1"},
-            {"crux.db/id": "IPAddressV4|internet|147.181.98.150"},
+            {"xt/id": "IPAddressV4|internet|1.1.1.1"},
+            {"xt/id": "IPAddressV4|internet|147.181.98.150"},
         ],
     },
     "parent": {
         "hostnames": [
-            {"crux.db/id": "Hostname|internet|mail.ssonet.nl"},
-            {"crux.db/id": "Hostname|internet|mail2.ssonet.nl"},
-            {"crux.db/id": "Hostname|internet|ns1.dns.nl"},
-            {"crux.db/id": "Hostname|internet|ns1.ssonet.nl"},
-            {"crux.db/id": "Hostname|internet|ns2.dns.nl"},
-            {"crux.db/id": "Hostname|internet|ns2.ssonet.nl"},
-            {"crux.db/id": "Hostname|internet|ns3.dns.nl"},
-            {"crux.db/id": "Hostname|internet|ns3.ssonet.nl"},
+            {"xt/id": "Hostname|internet|mail.ssonet.nl"},
+            {"xt/id": "Hostname|internet|mail2.ssonet.nl"},
+            {"xt/id": "Hostname|internet|ns1.dns.nl"},
+            {"xt/id": "Hostname|internet|ns1.ssonet.nl"},
+            {"xt/id": "Hostname|internet|ns2.dns.nl"},
+            {"xt/id": "Hostname|internet|ns2.ssonet.nl"},
+            {"xt/id": "Hostname|internet|ns3.dns.nl"},
+            {"xt/id": "Hostname|internet|ns3.ssonet.nl"},
         ]
     },
     "soa": {
-        "crux.db/id": "Hostname|internet|ns1.dns.nl",
+        "xt/id": "Hostname|internet|ns1.dns.nl",
         "dns_zone": {},
-        "name_server_of": [{"crux.db/id": "DNSZone|internet|nl"}],
-        "network": {"crux.db/id": "Network|internet"},
+        "name_server_of": [{"xt/id": "DNSZone|internet|nl"}],
+        "network": {"xt/id": "Network|internet"},
     },
 }
 
@@ -105,7 +105,7 @@ class ReferenceNodeTest(TestCase):
 
     def test_xtdb_reference_node_to_reference_node(self):
         root = XTDBReferenceNode.parse_obj(xtdb_sample)
-        reference_node = root.to_reference_node("crux.db/id")
+        reference_node = root.to_reference_node("xt/id")
         self.assertEqual(
             "IPAddressV6|internet|2001:1c00:2303:8f00:21c7:4dc2:5738:28af",
             str(
@@ -125,12 +125,12 @@ class ReferenceNodeTest(TestCase):
         }
 
         root = XTDBReferenceNode.parse_obj(xtdb_sample)
-        reference_node = root.to_reference_node("crux.db/id")
+        reference_node = root.to_reference_node("xt/id")
 
         self.assertEqual(refs, reference_node.collect_references())
 
     def test_xtdb_data_to_reference_node_complext(self):
         root = XTDBReferenceNode.parse_obj(xtdb_sample_2)
-        reference_node = root.to_reference_node("crux.db/id")
+        reference_node = root.to_reference_node("xt/id")
 
         self.assertEqual("DNSZone|internet|nl", str(reference_node.reference))

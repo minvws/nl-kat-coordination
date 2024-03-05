@@ -3,8 +3,6 @@ import base64
 
 from nacl.public import Box, PrivateKey, PublicKey
 
-from boefjes.katalogus.models import Base64Str
-
 
 class EncryptMiddleware(abc.ABC):
     @abc.abstractmethod
@@ -29,7 +27,7 @@ class NaclBoxMiddleware(EncryptMiddleware):
     More info: https://pynacl.readthedocs.io/en/latest/public/
     """
 
-    def __init__(self, private_key: Base64Str, public_key: Base64Str):
+    def __init__(self, private_key: str, public_key: str):
         sk = PrivateKey(base64.b64decode(private_key))
         pk = PublicKey(base64.b64decode(public_key))
         self.box: Box = Box(sk, pk)

@@ -37,34 +37,28 @@ Load Bulk
 
 
 *** Keywords ***
-Setup Test
-    Start Monitoring    ${QUEUE_URI}
-
-Teardown Test
-    Cleanup
-    Await Sync
-    Stop Monitoring
-
 Verify Object List With Filter
     ${response_data}    Get Objects With ScanLevel 0
     Should Be Equal    ${response_data["count"]}    ${6}
 
 Get Objects With ScanLevel 0
-    ${response}    Get    ${OCTOPOES_URI}/objects    params=scan_level=0
+    ${params}    Create Dictionary    scan_level=0    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/objects    params=${params}
     ${response_data}    Set Variable    ${response.json()}
     Should Be Equal As Integers    ${response.status_code}    200
     RETURN    ${response_data}
 
 Length Of Random Object List With Filter Should Be
     [Arguments]    ${scan_levels}    ${expected_length}
-    ${params}    Create Dictionary    scan_level=${scan_levels}    amount=10
+    ${params}    Create Dictionary    scan_level=${scan_levels}    amount=10    valid_time=${VALID_TIME}
     ${response}    Get    ${OCTOPOES_URI}/objects/random    params=${params}
     Should Be Equal As Integers    ${response.status_code}    200
     Length Should Be    ${response.json()}    ${expected_length}
 
 Verify Bulk Load
     [Arguments]    ${references}
-    ${response}    Post    ${OCTOPOES_URI}/objects/load_bulk    json=@{references}
+    ${params}    Create Dictionary    valid_time=${VALID_TIME}
+    ${response}    Post    ${OCTOPOES_URI}/objects/load_bulk    json=@{references}    params=${params}
     Log    ${response.json()}
     Should Be Equal As Integers    ${response.status_code}    200
     FOR    ${reference}    IN    @{references}

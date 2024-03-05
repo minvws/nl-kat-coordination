@@ -2,7 +2,6 @@
 import logging
 import uuid
 from pathlib import Path
-from typing import List
 
 from fastapi import BackgroundTasks, Body, FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -35,7 +34,7 @@ def construct_api(settings: Settings) -> FastAPI:
 
         resource = Resource(attributes={SERVICE_NAME: "keiko"})
         provider = TracerProvider(resource=resource)
-        processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=settings.span_export_grpc_endpoint))
+        processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(settings.span_export_grpc_endpoint)))
         provider.add_span_processor(processor)
         trace.set_tracer_provider(provider)
 
@@ -44,7 +43,7 @@ def construct_api(settings: Settings) -> FastAPI:
     examples = get_samples(settings)
 
     @app.get("/templates")
-    def get_templates_() -> List[str]:
+    def get_templates_() -> list[str]:
         """Endpoint to list known templates."""
         return list(get_templates(settings))
 

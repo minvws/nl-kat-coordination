@@ -1,11 +1,10 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List, Set
+from typing import Any
 
 from requests import HTTPError
 
-from octopoes.config.settings import XTDBType
 from octopoes.events.events import OperationType, OriginParameterDBEvent
 from octopoes.events.manager import EventManager
 from octopoes.models import Reference
@@ -33,37 +32,32 @@ class OriginParameterRepository(Repository):
     def delete(self, origin_parameter: OriginParameter, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def list_by_origin(self, origin_id: Set[str], valid_time: datetime) -> List[OriginParameter]:
+    def list_by_origin(self, origin_id: set[str], valid_time: datetime) -> list[OriginParameter]:
         raise NotImplementedError
 
-    def list_by_reference(self, reference: Reference, valid_time: datetime) -> List[OriginParameter]:
+    def list_by_reference(self, reference: Reference, valid_time: datetime) -> list[OriginParameter]:
         raise NotImplementedError
 
 
 class XTDBOriginParameterRepository(OriginParameterRepository):
-    xtdb_type: XTDBType = XTDBType.CRUX
+    pk_prefix = "xt/id"
 
-    def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
+    def __init__(self, event_manager: EventManager, session: XTDBSession):
         super().__init__(event_manager)
         self.session = session
-        self.__class__.xtdb_type = xtdb_type
 
     def commit(self):
         self.session.commit()
 
     @classmethod
-    def pk_prefix(cls):
-        return "crux.db/id" if cls.xtdb_type == XTDBType.CRUX else "xt/id"
-
-    @classmethod
-    def serialize(cls, origin_parameter: OriginParameter) -> Dict[str, Any]:
+    def serialize(cls, origin_parameter: OriginParameter) -> dict[str, Any]:
         data = origin_parameter.dict()
-        data[cls.pk_prefix()] = origin_parameter.id
+        data[cls.pk_prefix] = origin_parameter.id
         data["type"] = origin_parameter.__class__.__name__
         return data
 
     @classmethod
-    def deserialize(cls, data: Dict[str, Any]) -> OriginParameter:
+    def deserialize(cls, data: dict[str, Any]) -> OriginParameter:
         return OriginParameter.parse_obj(data)
 
     def get(self, origin_parameter_id: str, valid_time: datetime) -> OriginParameter:
@@ -75,9 +69,8 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             else:
                 raise e
 
-    def list_by_origin(self, origin_id: Set[str], valid_time: datetime) -> List[OriginParameter]:
+    def list_by_origin(self, origin_id: set[str], valid_time: datetime) -> list[OriginParameter]:
         query = generate_pull_query(
-            self.xtdb_type,
             FieldSet.ALL_FIELDS,
             {
                 "origin_id": origin_id,
@@ -89,7 +82,6 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
 
     def list_by_reference(self, reference: Reference, valid_time: datetime):
         query = generate_pull_query(
-            self.xtdb_type,
             FieldSet.ALL_FIELDS,
             {
                 "reference": str(reference),
@@ -115,6 +107,7 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             valid_time=valid_time,
             old_data=old_origin_parameter,
             new_data=origin_parameter,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -125,5 +118,6 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             operation_type=OperationType.DELETE,
             valid_time=valid_time,
             old_data=origin_parameter,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))

@@ -2,10 +2,12 @@ import binascii
 import io
 import json
 import logging
+from datetime import datetime, timezone
+from ipaddress import IPv4Address, IPv6Address
 from os import urandom
 from pathlib import Path
-from typing import Dict
 from unittest.mock import MagicMock, patch
+from uuid import UUID
 
 import pytest
 from django.conf import settings
@@ -17,24 +19,29 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from katalogus.client import parse_plugin
 from requests import Response
-from tools.models import (
-    GROUP_ADMIN,
-    GROUP_CLIENT,
-    GROUP_REDTEAM,
-    Indemnification,
-    Organization,
-    OrganizationMember,
-)
+from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
-from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
-from octopoes.models.ooi.findings import Finding, KATFindingType, RiskLevelSeverity
-from octopoes.models.ooi.network import Network
+from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
+from octopoes.models.ooi.dns.zone import Hostname
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
+from octopoes.models.ooi.service import IPService, Service
+from octopoes.models.ooi.software import Software
+from octopoes.models.ooi.web import URL, SecurityTXT, Website
+from octopoes.models.origin import Origin, OriginType
+from octopoes.models.transaction import TransactionRecord
+from octopoes.models.types import OOIType
 from rocky.scheduler import Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
 # Quiet faker locale messages down in tests.
 logging.getLogger("faker").setLevel(logging.INFO)
+
+
+@pytest.fixture
+def valid_time():
+    return datetime.now(timezone.utc)
 
 
 @pytest.fixture(params=LANG_LIST)
@@ -421,7 +428,7 @@ def lazy_task_list_with_boefje(task) -> MagicMock:
 
 
 @pytest.fixture
-def network():
+def network() -> Network:
     return Network(
         name="testnetwork",
         scan_profile=DeclaredScanProfile(reference=Reference.from_str("Network|testnetwork"), level=ScanLevel.L1),
@@ -429,7 +436,135 @@ def network():
 
 
 @pytest.fixture
-def finding():
+def ipaddressv4(network) -> IPAddressV4:
+    return IPAddressV4(network=network.reference, address=IPv4Address("192.0.2.1"))
+
+
+@pytest.fixture
+def ipaddressv6(network) -> IPAddressV6:
+    return IPAddressV6(network=network.reference, address=IPv6Address("2001:db8::1"))
+
+
+@pytest.fixture
+def ip_port(ipaddressv4) -> IPPort:
+    return IPPort(address=ipaddressv4.reference, port=80, protocol=Protocol.TCP)
+
+
+@pytest.fixture
+def hostname(network) -> Hostname:
+    return Hostname(name="example.com", network=network.reference)
+
+
+@pytest.fixture
+def url(network):
+    return URL(raw="https://example.com/", network=network.reference)
+
+
+@pytest.fixture
+def website(ip_service: IPService, hostname: Hostname):
+    return Website(
+        ip_service=ip_service.reference,
+        hostname=hostname.reference,
+    )
+
+
+@pytest.fixture
+def security_txt(website: Website, url: URL):
+    return SecurityTXT(website=website.reference, url=url.reference, security_txt="example")
+
+
+@pytest.fixture
+def service() -> Service:
+    return Service(name="domain")
+
+
+@pytest.fixture
+def ip_service(ip_port: IPPort, service: Service):
+    return IPService(ip_port=ip_port.reference, service=service.reference)
+
+
+@pytest.fixture
+def software() -> Software:
+    return Software(name="DICOM")
+
+
+@pytest.fixture
+def cve_finding_type_2019_8331() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-2019-8331",
+        description="In Bootstrap before 3.4.1 and 4.3.x before 4.3.1, XSS is possible in the tooltip or "
+        "popover data-template attribute.",
+        source="https://cve.circl.lu/cve/CVE-2019-8331",
+        risk_score=6.1,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def cve_finding_type_2019_2019() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-2019-2019",
+        description="In ce_t4t_data_cback of ce_t4t.cc, there is a possible out-of-bound read due to a missing bounds "
+        "check. This could lead to local information disclosure with no additional execution privileges "
+        "needed. User interaction is needed for exploitation.Product: AndroidVersions: Android-7.0 "
+        "Android-7.1.1 Android-7.1.2 Android-8.0 Android-8.1 Android-9Android ID: A-115635871",
+        source="https://cve.circl.lu/cve/CVE-2019-2019",
+        risk_score=6.5,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def cve_finding_2019_8331() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2019-8331"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2019-8331"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2019-8331 detected",
+        reproduce=None,
+    )
+
+
+@pytest.fixture
+def cve_finding_2019_2019() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2019-2019"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2019-2019"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2019-2019 detected",
+        reproduce=None,
+    )
+
+
+@pytest.fixture
+def cve_finding_type_no_score() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-0000-0001",
+        description="CVE Finding without scopre",
+        source="https://cve.circl.lu/cve/CVE-0000-0001",
+        risk_severity=RiskLevelSeverity.UNKNOWN,
+    )
+
+
+@pytest.fixture
+def cve_finding_no_score() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-0000-0001"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-0000-0001"
+        ),
+        proof=None,
+        description="Vulnerability CVE-0000-0001 detected",
+        reproduce=None,
+    )
+
+
+@pytest.fixture
+def finding() -> Finding:
     return Finding(
         finding_type=Reference.from_str("KATFindingType|KAT-0001"),
         ooi=Reference.from_str("Network|testnetwork"),
@@ -440,7 +575,33 @@ def finding():
 
 
 @pytest.fixture
-def finding_types():
+def web_report_finding_types():
+    return [
+        KATFindingType(id="KAT-NO-CSP"),
+        KATFindingType(id="KAT-CSP-VULNERABILITIES"),
+        KATFindingType(id="KAT-NO-HTTPS-REDIRECT"),
+        KATFindingType(id="KAT-NO-CERTIFICATE"),
+        KATFindingType(id="KAT-NO-SECURITY-TXT"),
+        KATFindingType(id="KAT-UNCOMMON-OPEN-PORT"),
+        KATFindingType(id="KAT-OPEN-SYSADMIN-PORT"),
+        KATFindingType(id="KAT-OPEN-DATABASE-PORT"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRED"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
+    ]
+
+
+@pytest.fixture
+def no_rpki_finding_type() -> KATFindingType:
+    return KATFindingType(id="KAT-NO-RPKI")
+
+
+@pytest.fixture
+def expired_rpki_finding_type() -> KATFindingType:
+    return KATFindingType(id="KAT-EXPIRED-RPKI")
+
+
+@pytest.fixture
+def finding_types() -> list[KATFindingType]:
     return [
         KATFindingType(
             id="KAT-0001",
@@ -464,6 +625,169 @@ def finding_types():
             risk_severity=RiskLevelSeverity.LOW,
         ),
     ]
+
+
+@pytest.fixture
+def tree_data_no_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {},
+    }
+
+
+@pytest.fixture
+def tree_data_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {
+            "Network|testnetwork": {
+                "object_type": "Network",
+                "primary_key": "Network|testnetwork",
+                "name": "testnetwork",
+            },
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0002",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+        },
+    }
+
+
+@pytest.fixture
+def cipher_finding_types() -> list[KATFindingType]:
+    return [
+        KATFindingType(
+            id="KAT-RECOMMENDATION-BAD-CIPHER",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=3.0,
+            risk_severity=RiskLevelSeverity.RECOMMENDATION,
+        ),
+        KATFindingType(
+            id="KAT-CRITICAL-BAD-CIPHER",
+            description="Fake description...",
+            recommendation="Fake recommendation...",
+            risk_score=10.0,
+            risk_severity=RiskLevelSeverity.CRITICAL,
+        ),
+    ]
+
+
+@pytest.fixture
+def cipher_finding_type() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-MEDIUM-BAD-CIPHER",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.0,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_spf() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NO-SPF",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dmarc() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NO-DMARC",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dkim() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NO-DKIM",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_uncommon_open_port() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-UNCOMMON-OPEN-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_open_sysadmin_port() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-OPEN-SYSADMIN-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=8.5,
+        risk_severity=RiskLevelSeverity.HIGH,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_open_database_port() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-OPEN-DATABASE-PORT",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.5,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_dnssec() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NO-DNSSEC",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_severity=RiskLevelSeverity.PENDING,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_invalid_dnssec() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-INVALID-DNSSEC",
+        recommendation="Fake recommendation...",
+        risk_score=3.0,
+        risk_severity=RiskLevelSeverity.LOW,
+    )
 
 
 @pytest.fixture
@@ -550,15 +874,15 @@ def get_stub_path(file_name: str) -> Path:
     return Path(__file__).parent / "stubs" / file_name
 
 
-def get_boefjes_data() -> Dict:
+def get_boefjes_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_boefjes.json").read_text())
 
 
-def get_normalizers_data() -> Dict:
+def get_normalizers_data() -> list[dict]:
     return json.loads(get_stub_path("katalogus_normalizers.json").read_text())
 
 
-def get_plugins_data() -> Dict:
+def get_plugins_data() -> list[dict]:
     return get_boefjes_data() + get_normalizers_data()
 
 
@@ -609,3 +933,82 @@ def mock_scheduler_client_task_list(mocker):
     mock_scheduler_client_session.get.return_value = response
 
     return mock_scheduler_client_session
+
+
+class MockOctopoesAPIConnector:
+    oois: dict[Reference, OOI]
+    queries: dict[str, dict[Reference | str | None, list[OOI]]]
+    valid_time: datetime
+
+    def __init__(self, valid_time: datetime):
+        self.valid_time = valid_time
+
+    def get(self, reference: Reference, valid_time: datetime | None = None) -> OOI:
+        return self.oois[reference]
+
+    def get_tree(
+        self, reference: Reference, types: set | None = None, depth: int | None = 1, valid_time: datetime | None = None
+    ):
+        return self.tree[reference]
+
+    def query(
+        self,
+        path: str,
+        valid_time: datetime,
+        source: Reference | str | None = None,
+        offset: int = 0,
+        limit: int = 50,
+    ) -> list[OOI]:
+        return self.queries[path][source]
+
+    def query_many(
+        self,
+        path: str,
+        valid_time: datetime,
+        sources: list[OOI | Reference | str],
+    ) -> list[tuple[str, OOIType]]:
+        result = []
+
+        for source in sources:
+            for ooi in self.queries[path][source]:
+                result.append((source, ooi))
+
+        return result
+
+    def get_history(self, reference: Reference) -> list[TransactionRecord]:
+        return [
+            TransactionRecord(
+                txTime=self.valid_time,
+                txId=287,
+                validTime=self.valid_time,
+                contentHash="636a28da4792b9f5007143bb35bd37d48662df9b",
+            )
+        ]
+
+    def list_origins(
+        self,
+        valid_time: datetime | None = None,
+        source: Reference | None = None,
+        result: Reference | None = None,
+        task_id: UUID | None = None,
+        origin_type: OriginType | None = None,
+    ) -> list[Origin]:
+        return []
+
+
+@pytest.fixture
+def mock_octopoes_api_connector(valid_time):
+    return MockOctopoesAPIConnector(valid_time)
+
+
+@pytest.fixture
+def listed_hostnames(network) -> list[Hostname]:
+    return [
+        Hostname(network=network.reference, name="example.com"),
+        Hostname(network=network.reference, name="a.example.com"),
+        Hostname(network=network.reference, name="b.example.com"),
+        Hostname(network=network.reference, name="c.example.com"),
+        Hostname(network=network.reference, name="d.example.com"),
+        Hostname(network=network.reference, name="e.example.com"),
+        Hostname(network=network.reference, name="f.example.com"),
+    ]

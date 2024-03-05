@@ -3,7 +3,7 @@ import logging
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
-from typing import List, Optional
+from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, Response
 from pydantic import BaseModel, ConfigDict, Field
@@ -13,16 +13,12 @@ from uvicorn import Config, Server
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
 from boefjes.config import settings
-from boefjes.job_handler import (
-    _find_ooi_in_past,
-    get_environment_settings,
-    get_octopoes_api_connector,
-    serialize_ooi,
-)
+from boefjes.job_handler import get_environment_settings, get_octopoes_api_connector, serialize_ooi
 from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.plugins.models import _default_mime_types
 from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
 logger = logging.getLogger(__name__)
@@ -49,7 +45,7 @@ def run():
 
 
 class BoefjeInput(BaseModel):
-    task_id: str
+    task_id: UUID
     output_url: str
     boefje_meta: BoefjeMeta
     model_config = ConfigDict(extra="forbid")
@@ -61,14 +57,14 @@ class StatusEnum(str, Enum):
 
 
 class File(BaseModel):
-    name: Optional[str] = None
+    name: str | None = None
     content: str = Field(..., contentEncoding="base64")
-    tags: Optional[List[str]] = None
+    tags: list[str] | None = None
 
 
 class BoefjeOutput(BaseModel):
     status: StatusEnum
-    files: Optional[List[File]] = None
+    files: list[File] | None = None
 
 
 def get_scheduler_client():
@@ -90,7 +86,7 @@ async def root():
 
 @app.get("/api/v0/tasks/{task_id}", response_model=BoefjeInput)
 async def boefje_input(
-    task_id: str,
+    task_id: UUID,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     local_repository: LocalPluginRepository = Depends(get_local_repository),
 ):
@@ -107,7 +103,7 @@ async def boefje_input(
 
 @app.post("/api/v0/tasks/{task_id}")
 async def boefje_output(
-    task_id: str,
+    task_id: UUID,
     boefje_output: BoefjeOutput,
     scheduler_client: SchedulerAPIClient = Depends(get_scheduler_client),
     bytes_client: BytesAPIClient = Depends(get_bytes_client),
@@ -162,12 +158,13 @@ def create_boefje_meta(task, local_repository):
     input_ooi = task.p_item.data.input_ooi
     arguments = {}
     if input_ooi:
-        arguments["input"] = serialize_ooi(
-            _find_ooi_in_past(
-                Reference.from_str(input_ooi),
-                get_octopoes_api_connector(organization),
-            )
-        )
+        reference = Reference.from_str(input_ooi)
+        try:
+            ooi = get_octopoes_api_connector(organization).get(reference, valid_time=datetime.now(timezone.utc))
+        except ObjectNotFoundException as e:
+            raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+
+        arguments["input"] = serialize_ooi(ooi)
 
     boefje_meta = BoefjeMeta(
         id=task.id,

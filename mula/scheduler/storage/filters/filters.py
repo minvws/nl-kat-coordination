@@ -1,4 +1,4 @@
-from typing import Dict, List, Literal, Optional, Union
+from typing import Literal
 
 from pydantic import BaseModel
 
@@ -14,7 +14,7 @@ class Filter(BaseModel):
     """
 
     column: str
-    field: Optional[str] = None
+    field: str | None = None
     operator: Literal[
         "==",
         "eq",
@@ -47,7 +47,7 @@ class Filter(BaseModel):
         "@?",
         "@@",
     ]
-    value: Union[str, int, float, bool, None, List[str], List[int], List[float], List[bool], List[None]]
+    value: str | int | float | bool | None | list[str] | list[int] | list[float] | list[bool] | list[None]
 
 
 class FilterRequest(BaseModel):
@@ -58,7 +58,7 @@ class FilterRequest(BaseModel):
         a dictionary of lists.
     """
 
-    filters: Union[List["Filter"], Dict[str, List["Filter"]]]
+    filters: list["Filter"] | dict[str, list["Filter"]]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
