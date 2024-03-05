@@ -500,12 +500,11 @@ class XTDBOOIRepository(OOIRepository):
                         :query {{
                             :find [
                                 (pull ?e [
-                                    :xt/id
                                     {related_fields}
                                 ])
                             ]
                             :in [[ _xt_id ... ]]
-                            :where [[?e :xt/id _xt_id]]
+                            :where [[?e :xt/id _xt_id] [?e :object_type]]
                         }}
                         :in-args [[{reference}]]
                     }}""".format(
@@ -548,17 +547,12 @@ class XTDBOOIRepository(OOIRepository):
         for row in response:
             col = row[0]
             for value in col.values():
-                try:
-                    if value:
-                        if isinstance(value, list):
-                            for serialized in value:
-                                neighbours.add(self.deserialize(serialized))
-                        else:
-                            neighbours.add(self.deserialize(value))
-                except ValueError:
-                    # Is not an error, XTDB returns the foreign key as a string,
-                    # when related object is not found
-                    logger.info("Could not deserialize value [value=%s]", value)
+                if value:
+                    if isinstance(value, list):
+                        for serialized in value:
+                            neighbours.add(self.deserialize(serialized))
+                    else:
+                        neighbours.add(self.deserialize(value))
 
         return neighbours
 
