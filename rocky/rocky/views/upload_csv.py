@@ -1,7 +1,7 @@
 import csv
 import io
 from datetime import datetime, timezone
-from typing import Any, ClassVar, Dict
+from typing import Any, ClassVar
 from uuid import uuid4
 
 from account.mixins import OrganizationPermissionRequiredMixin, OrganizationView
@@ -49,8 +49,8 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
     template_name = "upload_csv.html"
     form_class = UploadOOICSVForm
     permission_required = "tools.can_scan_organization"
-    reference_cache: Dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
-    ooi_types: ClassVar[Dict[str, Any]] = {
+    reference_cache: dict[str, Any] = {"Network": {"internet": Network(name="internet")}}
+    ooi_types: ClassVar[dict[str, Any]] = {
         "Hostname": {"type": Hostname},
         "URL": {"type": URL},
         "Network": {"type": Network, "default": "internet", "argument": "name"},
@@ -79,7 +79,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         context["criteria"] = CSV_CRITERIA
         return context
 
-    def get_or_create_reference(self, ooi_type_name: str, value: str):
+    def get_or_create_reference(self, ooi_type_name: str, value: str | None):
         ooi_type_name = next(filter(lambda x: x.casefold() == ooi_type_name.casefold(), self.ooi_types.keys()))
 
         # get from cache
@@ -100,7 +100,7 @@ class UploadCSV(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
         return ooi
 
-    def get_ooi_from_csv(self, ooi_type_name: str, values: Dict[str, str]):
+    def get_ooi_from_csv(self, ooi_type_name: str, values: dict[str, str]):
         key = "clearance"
         level = int(values[key]) if key in values and values[key] in CLEARANCE_VALUES else None
         ooi_type = self.ooi_types[ooi_type_name]["type"]

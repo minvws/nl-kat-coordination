@@ -9,4 +9,4 @@ class Migration(migrations.Migration):
         ("tools", "0038_delete_job"),
     ]
 
-    operations = []
+    operations: list = []

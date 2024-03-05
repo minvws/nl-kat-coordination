@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 from strenum import StrEnum
@@ -37,14 +37,14 @@ class SystemReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "systems_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         ips = []
 
         try:
             ooi = self.octopoes_api_connector.get(Reference.from_str(input_ooi), valid_time)
-        except ObjectNotFoundException as e:
-            logger.error("No data found for OOI '%s' on date %s.", str(e), str(valid_time))
-            raise ObjectNotFoundException(e)
+        except ObjectNotFoundException:
+            logger.error("No data found for OOI '%s' on date %s.", ooi, valid_time)
+            raise
 
         if ooi.reference.class_type == Hostname:
             ips = self.octopoes_api_connector.query(
@@ -53,7 +53,7 @@ class SystemReport(Report):
         elif ooi.reference.class_type in (IPAddressV4, IPAddressV6):
             ips = [ooi]
 
-        ip_services = {}
+        ip_services: dict[Reference, dict[str, list[Reference | str]]] = {}
 
         service_mapping = {
             "http": SystemType.WEB,
@@ -87,27 +87,23 @@ class SystemReport(Report):
                     )
                 ],
                 "services": list(
-                    set(
-                        [
-                            service_mapping.get(str(x.name), SystemType.OTHER)
+                    {
+                        service_mapping.get(str(x.name), SystemType.OTHER)
+                        for x in self.octopoes_api_connector.query(
+                            "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                            valid_time,
+                            ip.reference,
+                        )
+                    }.union(
+                        {
+                            software_mapping[str(x.name)]
                             for x in self.octopoes_api_connector.query(
-                                "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                                "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
                                 valid_time,
                                 ip.reference,
                             )
-                        ]
-                    ).union(
-                        set(
-                            [
-                                software_mapping[str(x.name)]
-                                for x in self.octopoes_api_connector.query(
-                                    "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
-                                    valid_time,
-                                    ip.reference,
-                                )
-                                if str(x.name) in software_mapping
-                            ]
-                        )
+                            if str(x.name) in software_mapping
+                        }
                     ),
                 ),
             }
@@ -126,8 +122,11 @@ class SystemReport(Report):
         total_systems = len(ip_services)
         total_domains = 0
 
+        domains = set()
         for data in ip_services.values():
-            total_domains += len(data["hostnames"])
+            domains.update(data["hostnames"])
+
+        total_domains = len(domains)
 
         summary = {"total_systems": total_systems, "total_domains": total_domains}
 

@@ -5,7 +5,6 @@ import signal
 import sys
 import time
 from queue import Queue
-from typing import Dict, List, Optional, Tuple
 
 from pydantic import ValidationError
 from requests import HTTPError
@@ -41,7 +40,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
         self.handling_tasks = manager.dict()
-        self.workers: List[mp.Process] = []
+        self.workers: list[mp.Process] = []
 
         logger.setLevel(log_level)
 
@@ -184,16 +183,16 @@ class SchedulerWorkerManager(WorkerManager):
         except HTTPError:
             logger.exception("Could not get scheduler task[id=%s]", handling_task_id)
 
-    def _worker_args(self) -> Tuple:
+    def _worker_args(self) -> tuple:
         return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
 
-    def exit(self, queue_type: WorkerManager.Queue, signum: Optional[int] = None):
+    def exit(self, queue_type: WorkerManager.Queue, signum: int | None = None):
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
 
             if not self.task_queue.empty():
-                items: List[QueuePrioritizedItem] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
+                items: list[QueuePrioritizedItem] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
 
                 for p_item in items:
                     try:
@@ -224,7 +223,7 @@ class SchedulerWorkerManager(WorkerManager):
                 sys.exit()
 
 
-def _format_exit_code(exitcode: Optional[int]) -> str:
+def _format_exit_code(exitcode: int | None) -> str:
     if exitcode is None or exitcode >= 0:
         return f"exitcode={exitcode}"
 
@@ -235,7 +234,7 @@ def _start_working(
     task_queue: mp.Queue,
     handler: Handler,
     scheduler_client: SchedulerClientInterface,
-    handling_tasks: Dict[int, str],
+    handling_tasks: dict[int, str],
 ):
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 

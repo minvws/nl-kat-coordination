@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -21,11 +21,9 @@ class DNSReport(Report):
     input_ooi_types = {Hostname}
     template_path = "dns_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         ref = Reference.from_str(input_ooi)
-        tree = self.octopoes_api_connector.get_tree(
-            ref, depth=3, types={DNSRecord, Finding}, valid_time=valid_time
-        ).store
+        tree = self.octopoes_api_connector.get_tree(ref, valid_time, depth=3, types={DNSRecord, Finding}).store
 
         records = []
         security = {
@@ -44,7 +42,7 @@ class DNSReport(Report):
                 records.append(
                     {
                         "type": ooi.dns_record_type,
-                        "ttl": round(ooi.ttl / 60),
+                        "ttl": round(ooi.ttl / 60) if ooi.ttl else "",
                         "name": ooi.hostname.tokenized.name,
                         "content": ooi.value,
                     }

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -25,7 +25,7 @@ from tools.models import Organization
 pytestmark = pytest.mark.django_db
 
 
-def express_organization(organization: Organization) -> Dict[str, Any]:
+def express_organization(organization: Organization) -> dict[str, Any]:
     return {
         "id": organization.id,
         "name": organization.name,

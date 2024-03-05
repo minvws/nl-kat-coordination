@@ -5,6 +5,8 @@ from functools import partial, wraps
 
 import sqlalchemy
 
+from scheduler.config import settings
+
 logger = logging.getLogger(__name__)
 
 
@@ -16,13 +18,18 @@ class DBConn:
 
         serializer = partial(json.dumps, default=str)
 
+        db_uri_redacted = sqlalchemy.engine.make_url(name_or_url=str(dsn)).render_as_string(hide_password=True)
+        pool_size = settings.Settings().db_connection_pool_size
+
+        logger.info("Connecting to database %s with pool size %s...", db_uri_redacted, pool_size)
         self.engine = sqlalchemy.create_engine(
             dsn,
             pool_pre_ping=True,
-            pool_size=25,
+            pool_size=pool_size,
             pool_recycle=300,
             json_serializer=serializer,
         )
+        logger.info("Connected to database %s.", db_uri_redacted)
 
         if self.engine is None:
             raise Exception("Invalid datastore type")

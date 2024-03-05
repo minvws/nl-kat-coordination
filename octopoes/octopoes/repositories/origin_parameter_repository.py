@@ -1,7 +1,7 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List, Set
+from typing import Any
 
 from requests import HTTPError
 
@@ -32,10 +32,10 @@ class OriginParameterRepository(Repository):
     def delete(self, origin_parameter: OriginParameter, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def list_by_origin(self, origin_id: Set[str], valid_time: datetime) -> List[OriginParameter]:
+    def list_by_origin(self, origin_id: set[str], valid_time: datetime) -> list[OriginParameter]:
         raise NotImplementedError
 
-    def list_by_reference(self, reference: Reference, valid_time: datetime) -> List[OriginParameter]:
+    def list_by_reference(self, reference: Reference, valid_time: datetime) -> list[OriginParameter]:
         raise NotImplementedError
 
 
@@ -50,14 +50,14 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
         self.session.commit()
 
     @classmethod
-    def serialize(cls, origin_parameter: OriginParameter) -> Dict[str, Any]:
+    def serialize(cls, origin_parameter: OriginParameter) -> dict[str, Any]:
         data = origin_parameter.dict()
         data[cls.pk_prefix] = origin_parameter.id
         data["type"] = origin_parameter.__class__.__name__
         return data
 
     @classmethod
-    def deserialize(cls, data: Dict[str, Any]) -> OriginParameter:
+    def deserialize(cls, data: dict[str, Any]) -> OriginParameter:
         return OriginParameter.parse_obj(data)
 
     def get(self, origin_parameter_id: str, valid_time: datetime) -> OriginParameter:
@@ -69,7 +69,7 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             else:
                 raise e
 
-    def list_by_origin(self, origin_id: Set[str], valid_time: datetime) -> List[OriginParameter]:
+    def list_by_origin(self, origin_id: set[str], valid_time: datetime) -> list[OriginParameter]:
         query = generate_pull_query(
             FieldSet.ALL_FIELDS,
             {
@@ -107,6 +107,7 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             valid_time=valid_time,
             old_data=old_origin_parameter,
             new_data=origin_parameter,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -117,5 +118,6 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             operation_type=OperationType.DELETE,
             valid_time=valid_time,
             old_data=origin_parameter,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))

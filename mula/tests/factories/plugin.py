@@ -1,5 +1,3 @@
-from typing import List
-
 from factory import Factory, LazyFunction, Sequence, fuzzy
 from scheduler.models import Plugin
 
@@ -12,8 +10,8 @@ class PluginFactory(Factory):
 
     type: str = fuzzy.FuzzyChoice(["boefje"])
 
-    consumes: List[str] = LazyFunction(lambda: [])
+    consumes: list[str] = LazyFunction(lambda: [])
 
-    produces: List[str] = LazyFunction(lambda: [])
+    produces: list[str] = LazyFunction(lambda: [])
 
     enabled: bool = True

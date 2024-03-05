@@ -1,7 +1,7 @@
 import functools
 import socket
+from collections.abc import Callable
 from concurrent import futures
-from typing import Callable, Optional
 
 import pika
 import structlog
@@ -20,7 +20,7 @@ class Listener(Connector):
             The logger for the class.
     """
 
-    name: Optional[str] = None
+    name: str | None = None
 
     def __init__(self) -> None:
         super().__init__()
@@ -91,9 +91,11 @@ class RabbitMQ(Listener):
         self.prefetch_count: int = prefetch_count
         self.func: Callable = func
 
-        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
-        self.connection: Optional[pika.BlockingConnection] = None
-        self.channel: Optional[pika.BlockingConnection.channel] = None
+        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(
+            max_workers=10, thread_name_prefix=f"Listener-TPE-{self.__class__.__name__}"
+        )
+        self.connection: pika.BlockingConnection | None = None
+        self.channel: pika.BlockingConnection.channel | None = None
         self.connect(self.queue, self.durable, self.prefetch_count)
 
     def listen(self) -> None:
@@ -197,6 +199,9 @@ class RabbitMQ(Listener):
         self.logger.debug("RabbitMQ connection closed")
 
     def _close_callback(self):
-        self.channel.stop_consuming()
-        self.channel.close()
-        self.connection.close()
+        if self.channel:
+            self.channel.stop_consuming()
+            self.channel.close()
+
+        if self.connection:
+            self.connection.close()

@@ -2,7 +2,6 @@ import ipaddress
 import json
 import mimetypes
 from os import getenv
-from typing import List, Tuple, Union
 from urllib.parse import urlparse, urlunsplit
 
 import requests
@@ -14,7 +13,7 @@ from boefjes.job_models import BoefjeMeta
 ALLOWED_CONTENT_TYPES = mimetypes.types_map.values()
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     useragent = getenv("USERAGENT", default="OpenKAT")
 
