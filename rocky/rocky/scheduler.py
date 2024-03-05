@@ -268,3 +268,26 @@ class SchedulerClient:
 
 
 client = SchedulerClient(settings.SCHEDULER_API)
+
+
+class SchedulerPagintor:
+    client: SchedulerClient = SchedulerClient(settings.SCHEDULER_API)
+
+    def __init__(self, scheduler_id: str, limit: int = 0):
+        self.scheduler_id: str = scheduler_id
+        self.limit: int = limit
+
+    def get_page_objects(self, page_number: int = 1, **kwargs):
+        if self.limit == 0:
+            return SchedulerPagintor.client.list_tasks(
+                scheduler_id=self.scheduler_id,
+                offset=0,
+            )
+
+        offset = (page_number * self.limit) - self.limit
+
+        return SchedulerPagintor.client.list_tasks(
+            scheduler_id=self.scheduler_id,
+            limit=self.limit,
+            offset=offset,
+        )
