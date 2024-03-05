@@ -61,7 +61,10 @@ class Segment:
             self.source_type,
         )
 
-    def __eq__(self, other: Segment) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Segment):
+            return NotImplemented
+
         return (
             self.source_type == other.source_type
             and self.direction == other.direction
@@ -100,7 +103,10 @@ class Path:
         segments = ".".join(map(str, self.segments))
         return f"{start_type}.{segments}"
 
-    def __eq__(self, other: Path):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Path | str):
+            return NotImplemented
+
         return str(self) == str(other)
 
     def __lt__(self, other):

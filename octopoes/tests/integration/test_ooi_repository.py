@@ -8,7 +8,7 @@ from octopoes.models.ooi.network import Network
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
-from octopoes.xtdb.query import A, Query
+from octopoes.xtdb.query import Aliased, Query
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
@@ -36,7 +36,7 @@ def test_complex_query(xtdb_ooi_repository: XTDBOOIRepository, valid_time: datet
     # router logic
     object_path = Path.parse("Network.<network[is Hostname]")
     sources = ["Network|testnetwork", "Network|testnetwork2"]
-    source_pk_alias = A(object_path.segments[0].source_type, field="primary_key")
+    source_pk_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
     query = (
         Query.from_path(object_path)
         .find(source_pk_alias)

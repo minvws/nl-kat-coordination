@@ -2,7 +2,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
 from logging import getLogger
-from typing import Any
+from typing import Any, cast
 
 from django.utils.translation import gettext_lazy as _
 
@@ -203,7 +203,11 @@ class WebSystemReport(Report):
             result[input_ooi] = {
                 "input_ooi": input_ooi,
                 "web_checks": checks,
-                "finding_types": sorted(finding_types.values(), reverse=True, key=lambda x: x.risk_severity),
+                # We need cast here because mypy doesn't understand that we only add finding_types
+                # when risk level severity isn't None
+                "finding_types": sorted(
+                    finding_types.values(), reverse=True, key=lambda x: cast(RiskLevelSeverity, x.risk_severity)
+                ),
             }
 
         return result

@@ -35,13 +35,13 @@ def generate_findings_metadata(
     for finding in findings[: FindingList.HARD_LIMIT]:
         finding_type = finding.finding_type
 
-        if not severity_filter or finding_type.risk_severity in severity_filter:
+        if not severity_filter or (finding_type.risk_severity and finding_type.risk_severity in severity_filter):
             findings_meta.append(
                 {
                     "finding_number": 0,
                     "finding": finding,
                     "finding_type": finding_type,
-                    "severity": finding_type.risk_severity.name,
+                    "severity": finding_type.risk_severity.name if finding_type.risk_severity else "",
                     "risk_level_score": finding_type.risk_score,
                 }
             )

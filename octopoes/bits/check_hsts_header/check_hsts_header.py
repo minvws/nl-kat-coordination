@@ -14,7 +14,7 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) ->
     one_year = datetime.timedelta(days=365).total_seconds()
 
     max_age = int(config.get("max-age", one_year)) if config else one_year
-    findings: [str] = []
+    findings: list[str] = []
 
     headervalue = header.value.lower()
     if "includesubdomains" not in headervalue:

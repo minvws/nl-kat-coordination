@@ -83,7 +83,7 @@ class NormalizerScheduler(Scheduler):
         self.listeners["raw_data"] = listener
 
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-raw_file",
+            name=f"NormalizerScheduler-{self.scheduler_id}-raw_file",
             target=self.listeners["raw_data"].listen,
             loop=False,
         )
@@ -147,7 +147,9 @@ class NormalizerScheduler(Scheduler):
                 scheduler_id=self.scheduler_id,
             )
 
-        with futures.ThreadPoolExecutor() as executor:
+        with futures.ThreadPoolExecutor(
+            thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
+        ) as executor:
             for normalizer in normalizers.values():
                 executor.submit(
                     self.push_task,

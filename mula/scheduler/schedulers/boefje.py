@@ -94,21 +94,21 @@ class BoefjeScheduler(Scheduler):
         self.listeners["scan_profile_mutations"] = listener
 
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-mutations",
+            name=f"BoefjeScheduler-{self.scheduler_id}-mutations",
             target=self.listeners["scan_profile_mutations"].listen,
             loop=False,
         )
 
         # New Boefjes
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-new_boefjes",
+            name=f"BoefjeScheduler-{self.scheduler_id}-new_boefjes",
             target=self.push_tasks_for_new_boefjes,
             interval=60.0,
         )
 
         # Random OOI's from Octopoes
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-random",
+            name=f"BoefjeScheduler-{self.scheduler_id}-random",
             target=self.push_tasks_for_random_objects,
             interval=60.0,
         )
@@ -198,7 +198,9 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        with futures.ThreadPoolExecutor() as executor:
+        with futures.ThreadPoolExecutor(
+            thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
+        ) as executor:
             for boefje in boefjes:
                 executor.submit(
                     self.push_task,
@@ -256,7 +258,9 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            with futures.ThreadPoolExecutor() as executor:
+            with futures.ThreadPoolExecutor(
+                thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
+            ) as executor:
                 for ooi in oois_by_object_type:
                     executor.submit(
                         self.push_task,
@@ -321,7 +325,9 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            with futures.ThreadPoolExecutor() as executor:
+            with futures.ThreadPoolExecutor(
+                thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-random"
+            ) as executor:
                 for boefje in boefjes:
                     executor.submit(
                         self.push_task,
