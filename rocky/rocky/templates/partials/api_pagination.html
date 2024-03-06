@@ -1,0 +1,15 @@
+{% load i18n %}
+
+{% if object_list.pages %}
+    <nav class="pagination" aria-label="{% translate "List pagination" %}">
+        <ul>
+            {% for page in object_list.pages %}
+                <li>
+                    <a href="?page={{ page }}"
+                       aria-label="{% translate "Go to page" %} {{ page }}"
+                       {% if page|stringformat:"i" == request.GET.page %}aria-current="true"{% endif %}>{{ page }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endif %}

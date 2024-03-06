@@ -15,17 +15,17 @@
                 <h1>{% translate "Boefjes" %}</h1>
                 {% include "tasks/partials/task_filter.html" %}
 
-                {% if not object_list %}
+                {% if not object_list.results %}
                     <p class="emphasized">{% translate "There are no tasks for boefjes" %}</p>
                 {% else %}
                     <p class="emphasized">{% translate "List of tasks for boefjes" %}</p>
                     <div class="horizontal-scroll">
-                        {% include "tasks/partials/boefje_task_history.html" with task_history=object_list %}
+                        {% include "tasks/partials/boefje_task_history.html" with task_history=object_list.results %}
 
                     </div>
-                    {% include "partials/list_paginator.html" %}
-
                 {% endif %}
+                {% include "partials/api_pagination.html" %}
+
             </div>
         </section>
         {% include "tasks/partials/stats.html" %}

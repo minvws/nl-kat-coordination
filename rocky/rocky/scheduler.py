@@ -116,55 +116,6 @@ class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class PaginatedTasksResponse(BaseModel):
-    count: int
-    next: str | None = None
-    previous: str | None = None
-    results: list[Task]
-
-
-class LazyTaskList:
-    def __init__(
-        self,
-        scheduler_client: SchedulerClient,
-        **kwargs,
-    ):
-        self.scheduler_client = scheduler_client
-        self.kwargs = kwargs
-        self._count: int | None = None
-
-    @property
-    def count(self) -> int:
-        if self._count is None:
-            self._count = self.scheduler_client.list_tasks(
-                limit=0,
-                **self.kwargs,
-            ).count
-        return self._count
-
-    def __len__(self):
-        return self.count
-
-    def __getitem__(self, key) -> list[Task]:
-        if isinstance(key, slice):
-            offset = key.start or 0
-            limit = key.stop - offset
-        elif isinstance(key, int):
-            offset = key
-            limit = 1
-        else:
-            raise TypeError("Invalid slice argument type.")
-
-        res = self.scheduler_client.list_tasks(
-            limit=limit,
-            offset=offset,
-            **self.kwargs,
-        )
-
-        self._count = res.count
-        return res.results
-
-
 class SchedulerError(Exception):
     message = _("Connectivity issues with Mula.")
 
@@ -193,35 +144,10 @@ class SchedulerClient:
         self.session = requests.Session()
         self._base_uri = base_uri
 
-    def list_tasks(
-        self,
-        **kwargs,
-    ) -> PaginatedTasksResponse:
-        res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
-        return PaginatedTasksResponse.model_validate_json(res.content)
-
-    def get_lazy_task_list(
-        self,
-        scheduler_id: str,
-        task_type: str | None = None,
-        status: str | None = None,
-        min_created_at: datetime.datetime | None = None,
-        max_created_at: datetime.datetime | None = None,
-        input_ooi: str | None = None,
-        plugin_id: str | None = None,
-        boefje_name: str | None = None,
-    ) -> LazyTaskList:
-        return LazyTaskList(
-            self,
-            scheduler_id=scheduler_id,
-            type=task_type,
-            status=status,
-            min_created_at=min_created_at,
-            max_created_at=max_created_at,
-            input_ooi=input_ooi,
-            plugin_id=plugin_id,
-            boefje_name=boefje_name,
-        )
+    def list_tasks(self, **kwargs) -> dict[str, Any]:
+        response = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
+        response.raise_for_status()
+        return response.json()
 
     def get_task_details(self, organization_code: str, task_id: str) -> Task:
         res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
@@ -270,6 +196,12 @@ class SchedulerClient:
 client = SchedulerClient(settings.SCHEDULER_API)
 
 
+class PaginatedTasksResponse(BaseModel):
+    count: int = 0
+    results: list[Task] = []
+    pages: list[int] = []
+
+
 class SchedulerPagintor:
     client: SchedulerClient = SchedulerClient(settings.SCHEDULER_API)
 
@@ -277,17 +209,27 @@ class SchedulerPagintor:
         self.scheduler_id: str = scheduler_id
         self.limit: int = limit
 
-    def get_page_objects(self, page_number: int = 1, **kwargs):
+    def get_page_objects(self, page_number: int = 1, **kwargs) -> PaginatedTasksResponse:
         if self.limit == 0:
-            return SchedulerPagintor.client.list_tasks(
-                scheduler_id=self.scheduler_id,
-                offset=0,
+            tasks = SchedulerPagintor.client.list_tasks(scheduler_id=self.scheduler_id, offset=0, **kwargs)
+        else:
+            offset = (page_number * self.limit) - self.limit
+
+            tasks = SchedulerPagintor.client.list_tasks(
+                scheduler_id=self.scheduler_id, limit=self.limit, offset=offset, **kwargs
             )
+        task_list_details = {
+            "count": tasks["count"],
+            "results": tasks["results"],
+            "pages": self.get_page_numbers(tasks["count"]),
+        }
 
-        offset = (page_number * self.limit) - self.limit
+        return PaginatedTasksResponse(**task_list_details)
 
-        return SchedulerPagintor.client.list_tasks(
-            scheduler_id=self.scheduler_id,
-            limit=self.limit,
-            offset=offset,
-        )
+    def get_page_numbers(self, total_objects) -> list[int] | None:
+        if self.limit > 0 and self.limit < total_objects:
+            total_pages = int(total_objects / self.limit)
+            if total_objects % self.limit != 0:
+                total_pages += 1
+            return [i for i in range(1, total_pages + 1)]
+        return []

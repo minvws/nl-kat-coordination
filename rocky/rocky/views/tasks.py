@@ -33,13 +33,24 @@ class DownloadTaskDetail(OrganizationView):
         return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
 
 
-class TaskListView(OrganizationView, TemplateView):
+class SchedulerListView(OrganizationView, TemplateView):
     plugin_type: str
-    paginate_by: int = 10
+    paginate_by: int = 20
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.scheduler_id = self.plugin_type + "-" + self.organization.code
+        self.scheduler_id = f"{self.plugin_type}-{self.organization.code}"
+
+    def get_queryset(self):
+        try:
+            paginator = SchedulerPagintor(self.scheduler_id, self.paginate_by)
+            page_number = self.request.GET.get("page", 1)
+            return paginator.get_page_objects(int(page_number), **self.get_filters())
+
+        except HTTPError:
+            error_message = _("Fetching tasks failed: no connection with scheduler")
+            messages.add_message(self.request, messages.ERROR, error_message)
+        return []
 
     def get_filters(self):
         if self.request.GET.get("scan_history_from"):
@@ -59,17 +70,13 @@ class TaskListView(OrganizationView, TemplateView):
             "max_created_at": max_created_at,
         }
 
-    def get_queryset(self):
-        try:
-            paginator = SchedulerPagintor(self.scheduler_id, self.paginate_by)
-            page_kwarg = "page"
-            page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
-            return paginator.get_page_objects(int(page), **self.get_filters()).results
-        except HTTPError:
-            error_message = _("Fetching tasks failed: no connection with scheduler")
-            messages.add_message(self.request, messages.ERROR, error_message)
-        return []
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["object_list"] = self.get_queryset()
+        return context
 
+
+class TaskListView(SchedulerListView):
     def post(self, request, *args, **kwargs):
         self.handle_page_action(request.POST["action"])
 
@@ -103,15 +110,3 @@ class BoefjesTaskListView(BoefjeMixin, TaskListView):
 class NormalizersTaskListView(NormalizerMixin, TaskListView):
     template_name = "tasks/normalizers.html"
     plugin_type = "normalizer"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context["breadcrumbs"] = [
-            {
-                "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Tasks"),
-            },
-        ]
-
-        return context

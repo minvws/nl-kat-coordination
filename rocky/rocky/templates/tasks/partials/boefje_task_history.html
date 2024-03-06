@@ -5,6 +5,9 @@
     {% if not task_history %}
         {% translate "No scans found for this object." %}
     {% else %}
+        <p class="de-emphasized">
+            {% blocktranslate with length=object_list.results|length total=object_list.count %}Showing {{ length }} of {{ total }} tasks{% endblocktranslate %}
+        </p>
         <table rf-selector="table-scan-history">
             <thead>
                 <tr>
