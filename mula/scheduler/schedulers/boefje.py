@@ -9,9 +9,17 @@ from opentelemetry import trace
 
 from scheduler import context, models, queues, rankers
 from scheduler.connectors import listeners
-from scheduler.models import (OOI, Boefje, BoefjeTask, MutationOperationType,
-                              Organisation, Plugin, PrioritizedItem,
-                              ScanProfileMutation, TaskStatus)
+from scheduler.models import (
+    OOI,
+    Boefje,
+    BoefjeTask,
+    MutationOperationType,
+    Organisation,
+    Plugin,
+    PrioritizedItem,
+    ScanProfileMutation,
+    TaskStatus,
+)
 from scheduler.storage import filters
 
 from .scheduler import Scheduler
@@ -107,9 +115,7 @@ class BoefjeScheduler(Scheduler):
 
         # Push pending tasks to the queue
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-push_pending",
-            target=self.push_pending_tasks,
-            interval=60.0
+            name=f"scheduler-{self.scheduler_id}-push_pending", target=self.push_pending_tasks, interval=60.0
         )
 
         self.logger.info(
@@ -338,7 +344,7 @@ class BoefjeScheduler(Scheduler):
         )
 
         # TODO: here we need to determine if we need to push the task to the
-        # queue
+        # queue. This can either be based on time for instance.
 
         # NOTE: is_task_running does not account for the pending status atm.
 
@@ -679,12 +685,11 @@ class BoefjeScheduler(Scheduler):
             hash=task.hash,
         )
 
-        # TODO: Here we can check if we need to delay pushing the task on the
-        # queue. 
-        #
         # Determine here if you need to push it onto the queue or not.
         push = True
-        if 
+
+        # TODO: Here we can check if we need to delay pushing the task on the
+        # queue. Based on the type of Boefje we can delay the task.
 
         try:
             self.push_item_to_queue_with_timeout(p_item, self.max_tries, push)
