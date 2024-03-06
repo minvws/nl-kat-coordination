@@ -11,7 +11,7 @@ WPSCAN_IMAGE = "wpscanteam/wpscan:latest"
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
 
-    if input_["software"]["name"] != "WordPress")
+    if input_["software"]["name"] != "WordPress":
         return [(set("info/boefje",), "Not wordpress.")]
     if "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"].dict()):
         return [(set("info/boefje",), "No hostname available for input OOI.")]
