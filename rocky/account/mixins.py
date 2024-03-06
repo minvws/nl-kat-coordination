@@ -153,10 +153,7 @@ class OrganizationView(View):
         except IndemnificationNotPresentException:
             messages.error(
                 self.request,
-                _(
-                    "Could not raise clearance level of %s to L%s. \
-                Indemnification not present at organization %s."
-                )
+                _("Could not raise clearance level of %s to L%s. Indemnification not present at organization %s.")
                 % (
                     ooi.reference.human_readable,
                     level,
@@ -165,9 +162,8 @@ class OrganizationView(View):
             )
 
         except TrustedClearanceLevelTooLowException:
-            messages.add_message(
+            messages.error(
                 self.request,
-                messages.ERROR,
                 _(
                     "Could not raise clearance level of %s to L%s. "
                     "You were trusted a clearance level of L%s. "
@@ -180,9 +176,8 @@ class OrganizationView(View):
                 ),
             )
         except AcknowledgedClearanceLevelTooLowException:
-            messages.add_message(
+            messages.error(
                 self.request,
-                messages.ERROR,
                 _(
                     "Could not raise clearance level of %s to L%s. "
                     "You acknowledged a clearance level of L%s. "

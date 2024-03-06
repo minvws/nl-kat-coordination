@@ -438,7 +438,6 @@ def network() -> Network:
 @pytest.fixture
 def url(network) -> URL:
     return URL(
-        object_type="URL",
         scan_profile=DeclaredScanProfile(
             scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
         ),
