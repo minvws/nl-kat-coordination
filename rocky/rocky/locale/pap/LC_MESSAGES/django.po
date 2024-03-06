@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-19 15:41+0000\n"
+"POT-Creation-Date: 2024-02-29 13:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -576,694 +576,6 @@ msgstr ""
 "No por a optené lista di diskubrimentu pa e organisashon {}, kontrolá "
 "registro di servidor pa detayenan mas."
 
-#: fmea/forms.py
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Failure mode"
-msgstr "Failure mode"
-
-#: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/boefje_detail.html
-#: katalogus/templates/normalizer_detail.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
-#: rocky/templates/oois/ooi_detail.html
-#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
-msgid "Description"
-msgstr "Deklarashon"
-
-#: fmea/forms.py
-msgid "Frequency Level"
-msgstr "Nivél di frequensidat"
-
-#: fmea/forms.py
-msgid "Detectability Level"
-msgstr "Nivél di detectabilidat"
-
-#: fmea/forms.py
-msgid "Effect(s)"
-msgstr "Efekto"
-
-#: fmea/forms.py
-msgid "Describe in one sentence what type of failure mode you are creating."
-msgstr "Deskribi den un sentencia ki tipo di failure mode bo ta kreando."
-
-#: fmea/forms.py
-msgid "Describe the failure mode in details."
-msgstr "Reprodusí búskeda"
-
-#: fmea/forms.py
-msgid ""
-"From 1 to 5, how often does this failure mode occurs. 1: Almost unthinkable "
-"and 5: occurs daily."
-msgstr ""
-"Di 1 te 5, kwantu biaha e failure mode aki ta occurí. 1: Kasi imposibeli 5: "
-"occurí diariamente."
-
-#: fmea/forms.py
-msgid ""
-"Is this failure mode easy detectable? Give it a score from 1 to 5. 1: always "
-"detectable and 5: almost undetectable."
-msgstr ""
-"E failure mode aki por wordu detektá fasil? Duné un score for di 1 te 5. 1: "
-"semper detektábel i 5: kasi imposibel."
-
-#: fmea/forms.py
-msgid "Describe the type of failure mode"
-msgstr "Deskribi e tipo di failure mode"
-
-#: fmea/forms.py
-msgid "explanation-failure-mode"
-msgstr "splikashon-failure-mode"
-
-#: fmea/forms.py
-msgid "Describe in more detail what the failure mode is about."
-msgstr "Deskribi mas detayá kiko e failure mode aki ta."
-
-#: fmea/forms.py
-msgid "explanation-description"
-msgstr "splikashon-diskripshon"
-
-#: fmea/forms.py
-msgid "explanation-frequency-level"
-msgstr "splikashon-nivel-di-freqeuncia"
-
-#: fmea/forms.py
-msgid "explanation-detectability_level"
-msgstr "splikashon-nivel-detektebilidat"
-
-#: fmea/forms.py
-msgid "You must at least set a failure mode."
-msgstr "Bo mester por lo menos pone un failure mode."
-
-#: fmea/forms.py
-msgid "Choose a frequency level."
-msgstr "Nivél di frequensidat"
-
-#: fmea/forms.py
-msgid "Choose a detectability level."
-msgstr "Nivél di detectabilidat"
-
-#: fmea/forms.py
-msgid "Choose at least one effect."
-msgstr "Skohé por lo menos ùn efekto"
-
-#: fmea/forms.py
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Affected Department"
-msgstr "Departamentu afektá"
-
-#: fmea/forms.py
-msgid "Affected Objects"
-msgstr "Ophetonan afektá"
-
-#: fmea/forms.py
-msgid "Choose a failure mode which applies to "
-msgstr "Skohé un failure mode ku ta aplika na "
-
-#: fmea/forms.py
-msgid "When this failure mode occurs, which department is affected?"
-msgstr "Ora a failure mode aki occurí, kwa departamentu ta afekta?"
-
-#: fmea/forms.py
-msgid "Which objects does this failure mode affect when it occurs?"
-msgstr "Kwa opheto e failure mode aki ta afekta ora e occurí?"
-
-#: fmea/forms.py
-msgid "explanation-affected-ooi-type"
-msgstr "splikashon-tipo-di-ooi-afekta"
-
-#: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Effect"
-msgstr "Efekto"
-
-#: fmea/forms.py
-msgid "Severity Level"
-msgstr "Nivél di severedat"
-
-#: fmea/forms.py
-msgid "Name a possible effect of any type of failure mode that can occur."
-msgstr "Duna un ehempel di un posibel efekto di e failre mode aki."
-
-#: fmea/forms.py
-msgid ""
-"Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
-msgstr ""
-"Diskribi e seviridat di e efekto aki, por ehempel 1: no severo i 5: "
-"katastrófiko"
-
-#: fmea/forms.py
-msgid "Describe a possible effect for FMEA"
-msgstr "Deskibri un posibel efekto pa FMEA"
-
-#: fmea/forms.py
-msgid "explanation-effect"
-msgstr "splikashon-efekto"
-
-#: fmea/forms.py
-msgid "explanation-severity-level"
-msgstr "splikashon-nivel-severo"
-
-#: fmea/forms.py
-msgid "The effect is required."
-msgstr "E vak aki ta obligatorio"
-
-#: fmea/forms.py
-msgid "This effect already exists."
-msgstr "E organisashon aki ta eksistí kaba"
-
-#: fmea/forms.py
-msgid "Choose a severity level."
-msgstr "Nivel di rísiko"
-
-#: fmea/models.py
-msgid "Finances"
-msgstr "Finansiasnan"
-
-#: fmea/models.py
-msgid "Marketing"
-msgstr "Marketing"
-
-#: fmea/models.py
-msgid "Human Resources"
-msgstr "Human Resources"
-
-#: fmea/models.py
-msgid "Research & Development"
-msgstr "Research & Development"
-
-#: fmea/models.py
-msgid "Administration"
-msgstr "Indemnizashon"
-
-#: fmea/models.py
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/service_health.html rocky/templates/footer.html
-#: rocky/templates/health.html
-msgid "Service"
-msgstr "Sèrvicio"
-
-#: fmea/models.py
-msgid "Level 1: Not Severe"
-msgstr "Nivèl 1: No Severo"
-
-#: fmea/models.py
-msgid "Level 2: Harmful"
-msgstr "Nivel 2: Dañoso"
-
-#: fmea/models.py
-msgid "Level 3: Severe"
-msgstr "Nivel 3: Severo"
-
-#: fmea/models.py
-msgid "Level 4: Very Harmful"
-msgstr "Nivel 4: Hopi Dañoso"
-
-#: fmea/models.py
-msgid "Level 5: Catastrophic"
-msgstr "Nivel 5: Katastrófiko"
-
-#: fmea/models.py
-msgid "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
-msgstr ""
-"Nivel 1: Hopi Straño. Insidente (kasi) nunka ta okuri, kasi inpensabel."
-
-#: fmea/models.py
-msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
-msgstr "Nivel 2: Straño. Insidente ta okuri menos ku un biaha pa aña (3-5)."
-
-#: fmea/models.py
-msgid "Level 3: Occurs. Incidents occur several times a year."
-msgstr "Nivel 3: Ta okuri, Insidente ta okuri par di biaha pa aña."
-
-#: fmea/models.py
-msgid "Level 4: Regularly. Incidents occur weekly."
-msgstr "Nivel 4: Regularmente. Insidente ta pasa tur siman."
-
-#: fmea/models.py
-msgid "Level 5: Frequent. Incidents occur daily."
-msgstr "Nivel 5: Frquente. Incidente ta pasa tur dia."
-
-#: fmea/models.py
-msgid ""
-"Level 1: Always Detectable. Incident (almost) never occurs, almost "
-"unthinkable."
-msgstr ""
-"Nivel 1: Semper Detektabel. Insidente (kasi) nunka ta okuri, kasi imposibel."
-
-#: fmea/models.py
-msgid ""
-"Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
-msgstr ""
-"Nivel 2: Normalmente Dektetabel. Insidente ta okuri menos ku un biaha pa aña "
-"(3-5)."
-
-#: fmea/models.py
-msgid "Level 3: Detectable. Failure mode is detectable with effort."
-msgstr "Nivel 3: Detektabel. Faillure mode ta detektabel ku eksfuerzo."
-
-#: fmea/models.py
-msgid "Level 4: Poorly Detectable. Detecting the failure mode is difficult."
-msgstr "Nivel 4: Malu Detectabel. Detektá e failure mode ta difícil."
-
-#: fmea/models.py
-msgid ""
-"Level 5: Almost Undetectable. Failure mode detection is very difficult or "
-"nearly impossible."
-msgstr ""
-"Nivel 5: Pobremente Detektabel. Faillure mode detekshon ta hopi difisil òf "
-"kasi imposibel."
-
-#: fmea/models.py fmea/templates/fmea/fmea_failure_mode_list.html
-#: fmea/views/view_helpers.py
-msgid "Failure modes"
-msgstr "Failure modes"
-
-#: fmea/models.py fmea/views/view_helpers.py
-msgid "Failure Mode Affected Objects"
-msgstr "Failure Mode Ophetonan afektá"
-
-#: fmea/templates/fmea/fmea_department_heatmap.html
-msgid "FMEA Departments Heatmap:"
-msgstr "Departamento di FMEA Heatmap:"
-
-#: fmea/templates/fmea/fmea_department_heatmap.html
-msgid "No data to build heatmap"
-msgstr "Ningun data pa kontruí heatmap "
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-msgid "Failure mode affected object table:"
-msgstr "Failure mode tabèl di opheto afektá "
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Affected Object"
-msgstr "Ophetonan afektá"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-#: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
-#: fmea/views/fmea_failure_mode_effect.py
-#: katalogus/templates/plugin_settings_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
-#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
-msgid "Edit"
-msgstr "Editá"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-msgid "Failure mode affected objects cannot be found."
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "Define which objects are affected for a failure mode"
-msgstr "Defini kwa ophetonan ta afekta pa un failure mode"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "Failure mode affected objects"
-msgstr "No por decódifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "Save"
-msgstr "Warda"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-#: rocky/templates/forms/json_schema_form.html
-#: rocky/templates/organizations/organization_add.html
-#: rocky/templates/organizations/organization_member_add.html
-#: rocky/templates/organizations/organization_member_add_account_type.html
-#: rocky/templates/partials/elements/ooi_detail_settings.html
-#: rocky/templates/partials/elements/ooi_report_settings.html
-#: rocky/templates/partials/form/indemnification_add_form.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/two_factor/_wizard_actions.html
-msgid "Submit"
-msgstr "Abdiká"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "No failure mode yet defined."
-msgstr "Ningun failure mode ahinda defini"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "To add affected objects to a failure mode, first create one."
-msgstr "Pa agregá ophetonan afektá na un failure mode, krea un prome."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Create failure mode"
-msgstr "Krea failure mode"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Failure mode affected objects table:"
-msgstr "Failure mode tabèl di ophetonan afekta:"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "No failure mode affected objects yet defined."
-msgstr "Ningun failure mode ophetonan afekta ahinda defini."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Create failure mode Affected Objects"
-msgstr "Reprodusí búskeda"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Departments failure modes"
-msgstr "Failure modes departamentonan"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Failure modes and affected departments table:"
-msgstr "Failure modes i tabèl di departamentonan afekta:"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Failure Mode"
-msgstr "Failure Mode"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Affected Departments"
-msgstr "Departementonan Afektá"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Nothing found."
-msgstr "Nada enkontra."
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Failure mode properties"
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Properties"
-msgstr "Karakteristikanan"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Risk class"
-msgstr "Nivel di rísiko"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Frequency level"
-msgstr "Nivel di frequensidat"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Detectability level"
-msgstr "Nivel di detektabilidat"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid ""
-"\n"
-"                        Effect and severity level\n"
-"                        "
-msgid_plural ""
-"\n"
-"                        Effects and severity levels\n"
-"                      "
-msgstr[0] ""
-"\n"
-"                        Nivel di efekto i severidat\n"
-"                        "
-msgstr[1] ""
-"\n"
-"                        Nivel di efektonan i severidatnan\n"
-"                      "
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Failure mode effect"
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Failure mode effect properties"
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Severity"
-msgstr "Nivél di severedat"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-msgid "FMEA effect and severity"
-msgstr "FMEA efekto i seviridat"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-msgid "FMEA effect"
-msgstr "FMEA efekto"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Failure mode effects table:"
-msgstr "Tabèl di Efektonan di Modo di Falla"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Severity level"
-msgstr "Nivel di rísiko"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "No failure mode effect yet defined."
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Create a failure mode effect"
-msgstr "Reprodusí búskeda"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create a new failure mode"
-msgstr "Krea un failure mode nobo"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "Failure mode and effects"
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "No failure mode effects created."
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid ""
-"First create failure mode effects which can be added later to a failure mode."
-msgstr ""
-"Prome krea efektonan di failure mode pa despues añadi esaki na un failure "
-"mode."
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create failure mode effects"
-msgstr "Reprodusí búskeda"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Failure mode table:"
-msgstr "Tabèl di failure mode:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Risk Class"
-msgstr "Nivel di rísiko"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Details"
-msgstr "Detayes"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Sluit details"
-msgstr "Habri detayes"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Description:"
-msgstr "Deklarashon"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Frequency level:"
-msgstr "Nivel di frequencidat:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Detectability level:"
-msgstr "Nivel di detektabilidat"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffect and severity level\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgid_plural ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffects and severity levels\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgstr[0] ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNivel di efekto i severidat\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgstr[1] ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNivel di efektonan i severidatnan\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Failure mode report"
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/aggregate_organisation_report/summary.html
-#: reports/report_types/multi_organization_report/summary.html
-#: reports/templates/summary/report_summary.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
-#: rocky/views/ooi_tree.py
-msgid "Summary"
-msgstr "Resúmen"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Failure mode: "
-msgstr "No por decodifica e archivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Severity: "
-msgstr "Seviridat:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Detectability: "
-msgstr "Detektabilidat"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Frequency: "
-msgstr "Frequencia: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Effect: "
-msgstr "Efekto: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Description: "
-msgstr "Deklarashon: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Affected Departments: "
-msgstr "Departamentonan afekta: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Affected OOI's: "
-msgstr "OOI's afekta:"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Report cannot be viewed, failure mode not found."
-msgstr "Rapòrt no por wordu mira, no por haña failure mode."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "FMEA introduction"
-msgstr "FMEA introdukshon"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid ""
-"FMEA (failure mode and effective analysis) is a step-by-step approach for "
-"collecting knowledge about possible points of failure in a design, "
-"manufacturing process, product or service."
-msgstr ""
-"FMEA (failure mode and effective analysis) ta un enfoque paso a paso pa "
-"kolekta konosimentu tokante puntonan posibel di fayo den un diseño, proseso "
-"fabriká, produkto òf servicio."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid ""
-"Failure mode (FM) refers to the way in which something might break down and "
-"includes potential errors that may occur, especially errors that may affect "
-"a system. Effective analysis (EA) involves deciphering the consequences of "
-"those break downs by making sure that all failures can be detected, "
-"determining how frequently a failure might occur and identifying which "
-"potential failures should be prioritized."
-msgstr ""
-"Failure mode (FM) ta referi na e manera kaminda algu por posibelmente kibra "
-"i inkluí errornan potenshal ku por okuri, speshalmente errornan ku por "
-"afektá un sistema. Effective analysis (EA) ta envolvi den buska e "
-"konsekuensiasnan di loke por kibra dor di detekta tur failure modes, "
-"determiná kon frequente failure modes ta okuri i identifiká kwa failure "
-"modes mester wordu prioritisa."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create affected objects of a failure mode"
-msgstr "Kreá ophetonan afektá di un failure mode"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all failure modes"
-msgstr "Mustrami tur failue modes"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all failure mode effects"
-msgstr "Mustrami tur efektonan di failure mode"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all affected objects for a failure modes"
-msgstr "Mustrami tur ophetonan afektá pa failure modes"
-
-#: fmea/templates/fmea/fmea_index.html fmea/views/fmea_analytics.py
-msgid "Heatmap"
-msgstr "Mapa kayente"
-
-#: fmea/tools.py
-msgid "--- Select an option ----"
-msgstr "-- Selecta un opcion --"
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Failure mode affected objects successfully created."
-msgstr "Failure mode i ophetonan afektá a wòrdu kreá ku èksito."
-
-#: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
-#: fmea/views/fmea_failure_mode_effect.py
-msgid "Create"
-msgstr "Kreá"
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Treeobjects successfully added."
-msgstr "Mapa di ophetonan añadi ku èxito."
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Please select a department or ooi."
-msgstr "Por fabor selekta un departamentu òf ooi."
-
-#: fmea/views/fmea_analytics.py onboarding/templates/step_4_report.html
-msgid "Report"
-msgstr "Rapòrt"
-
-#: fmea/views/fmea_failure_mode.py
-msgid "Failure mode successfully created."
-msgstr "Failure mode a wòrdu kreá ku èksito."
-
-#: fmea/views/fmea_failure_mode_effect.py
-msgid "Failure mode effect successfully created."
-msgstr "Failure mode a wòrdu kreá ku èksito."
-
-#: fmea/views/view_helpers.py rocky/templates/dashboard_redteam.html
-msgid "FMEA"
-msgstr "FMEA"
-
-#: fmea/views/view_helpers.py
-msgid "Failure mode effects"
-msgstr "Efektonan di failure mode"
-
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
 msgstr "Mustra tur"
@@ -1339,6 +651,17 @@ msgstr ""
 #: katalogus/templates/boefje_detail.html
 msgid "Scan level"
 msgstr "Nivél di skan"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
+#: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
+msgid "Description"
+msgstr "Deklarashon"
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
@@ -1840,6 +1163,13 @@ msgstr "Si"
 msgid "No"
 msgstr "Nò"
 
+#: katalogus/templates/plugin_settings_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
+msgid "Edit"
+msgstr "Editá"
+
 #: katalogus/views/change_clearance_level.py
 msgid "Session has terminated, please select objects again."
 msgstr ""
@@ -2074,6 +1404,22 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 msgid "Organization details"
 msgstr "Detayes di organisashon"
+
+#: onboarding/templates/account/step_2a_organization_setup.html
+#: onboarding/templates/account/step_4_account_setup_admin.html
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html
+#: onboarding/templates/account/step_6_account_setup_client.html
+#: rocky/templates/forms/json_schema_form.html
+#: rocky/templates/organizations/organization_add.html
+#: rocky/templates/organizations/organization_member_add.html
+#: rocky/templates/organizations/organization_member_add_account_type.html
+#: rocky/templates/partials/elements/ooi_detail_settings.html
+#: rocky/templates/partials/elements/ooi_report_settings.html
+#: rocky/templates/partials/form/indemnification_add_form.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/two_factor/_wizard_actions.html
+msgid "Submit"
+msgstr "Abdiká"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
@@ -2602,6 +1948,7 @@ msgstr "URL"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -2928,6 +2275,10 @@ msgid "Suggested plugins"
 msgstr "Plugins sugerí"
 
 #: onboarding/templates/step_4_report.html
+msgid "Report"
+msgstr "Rapòrt"
+
+#: onboarding/templates/step_4_report.html
 msgid "Boefjes are scanning"
 msgstr "Boefjes ta bezig ta scan"
 
@@ -3086,6 +2437,12 @@ msgstr ""
 #: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
 msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
+msgid "Service"
+msgstr "Sèrvicio"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/service_health.html rocky/templates/health.html
@@ -3345,6 +2702,15 @@ msgid "Observed at:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/aggregate_organisation_report/summary.html
+#: reports/report_types/multi_organization_report/summary.html
+#: reports/templates/summary/report_summary.html
+#: rocky/templates/partials/ooi_report_severity_totals.html
+#: rocky/views/ooi_tree.py
+msgid "Summary"
+msgstr "Resúmen"
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/vulnerability_report/report.html
 msgid "vulnerabilities on this system"
 msgstr ""
@@ -3408,12 +2774,14 @@ msgid "Compliance issue"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/findings_report/report.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Risk level"
@@ -3536,6 +2904,99 @@ msgstr ""
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
+msgstr "Diskubrimentu"
+
+#: reports/report_types/findings_report/report.html
+msgid "Other findings found:"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "FindingType"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrences"
+msgstr "Occurencianan"
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Details"
+msgstr "Detayes"
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Close details"
+msgstr "Sera detayes"
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Open details"
+msgstr "Habri detayes"
+
+#: reports/report_types/findings_report/report.html
+msgid "Impact"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Recommendation"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.py
+msgid "First seen"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "No findings have been found."
+msgstr ""
+
+#: reports/report_types/findings_report/report.py
+msgid "Findings Report"
+msgstr ""
+
+#: reports/report_types/findings_report/report.py
+msgid "Shows all the finding types and their occurrences."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -3714,10 +3175,6 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
 msgid "Overview of recommendations"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/recommendations.html
-msgid "Recommendation"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
@@ -3914,20 +3371,6 @@ msgstr ""
 msgid "No ciphers found for this IPService"
 msgstr ""
 
-#: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr "Diskubrimentu"
-
 #: reports/report_types/tls_report/report.py
 msgid "TLS Report"
 msgstr ""
@@ -3943,35 +3386,11 @@ msgid "Vulnerabilities:"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrences"
-msgstr "Occurencianan"
-
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Close details"
-msgstr "Sera detayes"
-
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Open details"
-msgstr "Habri detayes"
-
-#: reports/report_types/vulnerability_report/report.html
 msgid "Advice"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "No findings have been found on this system."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
@@ -3988,10 +3407,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Source"
 msgstr "Orígen"
-
-#: reports/report_types/vulnerability_report/report.py
-msgid "First seen"
-msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Last seen"
@@ -4206,9 +3621,21 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 #: reports/views/generate_report.py
-#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate report"
 msgstr "Generá rapòrt"
+
+#: reports/templates/partials/report_severity_totals.html
+msgid "Findings overview"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "FindingTypes"
+msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Table of contents"
@@ -4300,9 +3727,9 @@ msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#, python-format
 msgid ""
-"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+"No data could be found for %(report_types). Object(s) did not exist on "
+"%(date)s."
 msgstr ""
 
 #: reports/views/base.py
@@ -4980,6 +4407,15 @@ msgstr "Diskubrimentu Totál"
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid " Finding Details"
 msgstr "Detayes di diskubrimentu"
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Severity"
+msgstr "Nivél di severedat"
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
@@ -6128,6 +5564,10 @@ msgid "Use the button below to add a related object. "
 msgstr "Huza e botón abou pa añadi un opheto relatá. "
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate findings report"
+msgstr ""
+
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute Finding"
 msgstr "Muta diskubrimentu"
 
@@ -6200,10 +5640,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total occurrences"
 msgstr "Occurencianan totál"
-
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total per severity overview:"
-msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Unique"
@@ -7198,6 +6634,464 @@ msgstr "No por a subi e arkivo na Bytes: status code %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Arkivo crudo añadi ku èxito."
+
+#~ msgid "Failure mode"
+#~ msgstr "Failure mode"
+
+#~ msgid "Frequency Level"
+#~ msgstr "Nivél di frequensidat"
+
+#~ msgid "Detectability Level"
+#~ msgstr "Nivél di detectabilidat"
+
+#~ msgid "Effect(s)"
+#~ msgstr "Efekto"
+
+#~ msgid "Describe in one sentence what type of failure mode you are creating."
+#~ msgstr "Deskribi den un sentencia ki tipo di failure mode bo ta kreando."
+
+#~ msgid "Describe the failure mode in details."
+#~ msgstr "Reprodusí búskeda"
+
+#~ msgid ""
+#~ "From 1 to 5, how often does this failure mode occurs. 1: Almost "
+#~ "unthinkable and 5: occurs daily."
+#~ msgstr ""
+#~ "Di 1 te 5, kwantu biaha e failure mode aki ta occurí. 1: Kasi imposibeli "
+#~ "5: occurí diariamente."
+
+#~ msgid ""
+#~ "Is this failure mode easy detectable? Give it a score from 1 to 5. 1: "
+#~ "always detectable and 5: almost undetectable."
+#~ msgstr ""
+#~ "E failure mode aki por wordu detektá fasil? Duné un score for di 1 te 5. "
+#~ "1: semper detektábel i 5: kasi imposibel."
+
+#~ msgid "Describe the type of failure mode"
+#~ msgstr "Deskribi e tipo di failure mode"
+
+#~ msgid "explanation-failure-mode"
+#~ msgstr "splikashon-failure-mode"
+
+#~ msgid "Describe in more detail what the failure mode is about."
+#~ msgstr "Deskribi mas detayá kiko e failure mode aki ta."
+
+#~ msgid "explanation-description"
+#~ msgstr "splikashon-diskripshon"
+
+#~ msgid "explanation-frequency-level"
+#~ msgstr "splikashon-nivel-di-freqeuncia"
+
+#~ msgid "explanation-detectability_level"
+#~ msgstr "splikashon-nivel-detektebilidat"
+
+#~ msgid "You must at least set a failure mode."
+#~ msgstr "Bo mester por lo menos pone un failure mode."
+
+#~ msgid "Choose a frequency level."
+#~ msgstr "Nivél di frequensidat"
+
+#~ msgid "Choose a detectability level."
+#~ msgstr "Nivél di detectabilidat"
+
+#~ msgid "Choose at least one effect."
+#~ msgstr "Skohé por lo menos ùn efekto"
+
+#~ msgid "Affected Department"
+#~ msgstr "Departamentu afektá"
+
+#~ msgid "Affected Objects"
+#~ msgstr "Ophetonan afektá"
+
+#~ msgid "Choose a failure mode which applies to "
+#~ msgstr "Skohé un failure mode ku ta aplika na "
+
+#~ msgid "When this failure mode occurs, which department is affected?"
+#~ msgstr "Ora a failure mode aki occurí, kwa departamentu ta afekta?"
+
+#~ msgid "Which objects does this failure mode affect when it occurs?"
+#~ msgstr "Kwa opheto e failure mode aki ta afekta ora e occurí?"
+
+#~ msgid "explanation-affected-ooi-type"
+#~ msgstr "splikashon-tipo-di-ooi-afekta"
+
+#~ msgid "Effect"
+#~ msgstr "Efekto"
+
+#~ msgid "Severity Level"
+#~ msgstr "Nivél di severedat"
+
+#~ msgid "Name a possible effect of any type of failure mode that can occur."
+#~ msgstr "Duna un ehempel di un posibel efekto di e failre mode aki."
+
+#~ msgid ""
+#~ "Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
+#~ msgstr ""
+#~ "Diskribi e seviridat di e efekto aki, por ehempel 1: no severo i 5: "
+#~ "katastrófiko"
+
+#~ msgid "Describe a possible effect for FMEA"
+#~ msgstr "Deskibri un posibel efekto pa FMEA"
+
+#~ msgid "explanation-effect"
+#~ msgstr "splikashon-efekto"
+
+#~ msgid "explanation-severity-level"
+#~ msgstr "splikashon-nivel-severo"
+
+#~ msgid "The effect is required."
+#~ msgstr "E vak aki ta obligatorio"
+
+#~ msgid "This effect already exists."
+#~ msgstr "E organisashon aki ta eksistí kaba"
+
+#~ msgid "Choose a severity level."
+#~ msgstr "Nivel di rísiko"
+
+#~ msgid "Finances"
+#~ msgstr "Finansiasnan"
+
+#~ msgid "Marketing"
+#~ msgstr "Marketing"
+
+#~ msgid "Human Resources"
+#~ msgstr "Human Resources"
+
+#~ msgid "Research & Development"
+#~ msgstr "Research & Development"
+
+#~ msgid "Administration"
+#~ msgstr "Indemnizashon"
+
+#~ msgid "Level 1: Not Severe"
+#~ msgstr "Nivèl 1: No Severo"
+
+#~ msgid "Level 2: Harmful"
+#~ msgstr "Nivel 2: Dañoso"
+
+#~ msgid "Level 3: Severe"
+#~ msgstr "Nivel 3: Severo"
+
+#~ msgid "Level 4: Very Harmful"
+#~ msgstr "Nivel 4: Hopi Dañoso"
+
+#~ msgid "Level 5: Catastrophic"
+#~ msgstr "Nivel 5: Katastrófiko"
+
+#~ msgid ""
+#~ "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
+#~ msgstr ""
+#~ "Nivel 1: Hopi Straño. Insidente (kasi) nunka ta okuri, kasi inpensabel."
+
+#~ msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
+#~ msgstr "Nivel 2: Straño. Insidente ta okuri menos ku un biaha pa aña (3-5)."
+
+#~ msgid "Level 3: Occurs. Incidents occur several times a year."
+#~ msgstr "Nivel 3: Ta okuri, Insidente ta okuri par di biaha pa aña."
+
+#~ msgid "Level 4: Regularly. Incidents occur weekly."
+#~ msgstr "Nivel 4: Regularmente. Insidente ta pasa tur siman."
+
+#~ msgid "Level 5: Frequent. Incidents occur daily."
+#~ msgstr "Nivel 5: Frquente. Incidente ta pasa tur dia."
+
+#~ msgid ""
+#~ "Level 1: Always Detectable. Incident (almost) never occurs, almost "
+#~ "unthinkable."
+#~ msgstr ""
+#~ "Nivel 1: Semper Detektabel. Insidente (kasi) nunka ta okuri, kasi "
+#~ "imposibel."
+
+#~ msgid ""
+#~ "Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
+#~ msgstr ""
+#~ "Nivel 2: Normalmente Dektetabel. Insidente ta okuri menos ku un biaha pa "
+#~ "aña (3-5)."
+
+#~ msgid "Level 3: Detectable. Failure mode is detectable with effort."
+#~ msgstr "Nivel 3: Detektabel. Faillure mode ta detektabel ku eksfuerzo."
+
+#~ msgid "Level 4: Poorly Detectable. Detecting the failure mode is difficult."
+#~ msgstr "Nivel 4: Malu Detectabel. Detektá e failure mode ta difícil."
+
+#~ msgid ""
+#~ "Level 5: Almost Undetectable. Failure mode detection is very difficult or "
+#~ "nearly impossible."
+#~ msgstr ""
+#~ "Nivel 5: Pobremente Detektabel. Faillure mode detekshon ta hopi difisil "
+#~ "òf kasi imposibel."
+
+#~ msgid "Failure modes"
+#~ msgstr "Failure modes"
+
+#~ msgid "Failure Mode Affected Objects"
+#~ msgstr "Failure Mode Ophetonan afektá"
+
+#~ msgid "FMEA Departments Heatmap:"
+#~ msgstr "Departamento di FMEA Heatmap:"
+
+#~ msgid "No data to build heatmap"
+#~ msgstr "Ningun data pa kontruí heatmap "
+
+#~ msgid "Failure mode affected object table:"
+#~ msgstr "Failure mode tabèl di opheto afektá "
+
+#~ msgid "Affected Object"
+#~ msgstr "Ophetonan afektá"
+
+#~ msgid "Failure mode affected objects cannot be found."
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid "Define which objects are affected for a failure mode"
+#~ msgstr "Defini kwa ophetonan ta afekta pa un failure mode"
+
+#~ msgid "Failure mode affected objects"
+#~ msgstr "No por decódifica e archivo"
+
+#~ msgid "Save"
+#~ msgstr "Warda"
+
+#~ msgid "No failure mode yet defined."
+#~ msgstr "Ningun failure mode ahinda defini"
+
+#~ msgid "To add affected objects to a failure mode, first create one."
+#~ msgstr "Pa agregá ophetonan afektá na un failure mode, krea un prome."
+
+#~ msgid "Create failure mode"
+#~ msgstr "Krea failure mode"
+
+#~ msgid "Failure mode affected objects table:"
+#~ msgstr "Failure mode tabèl di ophetonan afekta:"
+
+#~ msgid "No failure mode affected objects yet defined."
+#~ msgstr "Ningun failure mode ophetonan afekta ahinda defini."
+
+#~ msgid "Create failure mode Affected Objects"
+#~ msgstr "Reprodusí búskeda"
+
+#~ msgid "Departments failure modes"
+#~ msgstr "Failure modes departamentonan"
+
+#~ msgid "Failure modes and affected departments table:"
+#~ msgstr "Failure modes i tabèl di departamentonan afekta:"
+
+#~ msgid "Failure Mode"
+#~ msgstr "Failure Mode"
+
+#~ msgid "Affected Departments"
+#~ msgstr "Departementonan Afektá"
+
+#~ msgid "Nothing found."
+#~ msgstr "Nada enkontra."
+
+#~ msgid "Failure mode properties"
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid "Properties"
+#~ msgstr "Karakteristikanan"
+
+#~ msgid "Risk class"
+#~ msgstr "Nivel di rísiko"
+
+#~ msgid "Frequency level"
+#~ msgstr "Nivel di frequensidat"
+
+#~ msgid "Detectability level"
+#~ msgstr "Nivel di detektabilidat"
+
+#~ msgid ""
+#~ "\n"
+#~ "                        Effect and severity level\n"
+#~ "                        "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                        Effects and severity levels\n"
+#~ "                      "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                        Nivel di efekto i severidat\n"
+#~ "                        "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                        Nivel di efektonan i severidatnan\n"
+#~ "                      "
+
+#~ msgid "Failure mode effect"
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid "Failure mode effect properties"
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid "FMEA effect and severity"
+#~ msgstr "FMEA efekto i seviridat"
+
+#~ msgid "FMEA effect"
+#~ msgstr "FMEA efekto"
+
+#~ msgid "Failure mode effects table:"
+#~ msgstr "Tabèl di Efektonan di Modo di Falla"
+
+#~ msgid "Severity level"
+#~ msgstr "Nivel di rísiko"
+
+#~ msgid "No failure mode effect yet defined."
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid "Create a failure mode effect"
+#~ msgstr "Reprodusí búskeda"
+
+#~ msgid "Create a new failure mode"
+#~ msgstr "Krea un failure mode nobo"
+
+#~ msgid "Failure mode and effects"
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid "No failure mode effects created."
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid ""
+#~ "First create failure mode effects which can be added later to a failure "
+#~ "mode."
+#~ msgstr ""
+#~ "Prome krea efektonan di failure mode pa despues añadi esaki na un failure "
+#~ "mode."
+
+#~ msgid "Create failure mode effects"
+#~ msgstr "Reprodusí búskeda"
+
+#~ msgid "Failure mode table:"
+#~ msgstr "Tabèl di failure mode:"
+
+#~ msgid "Risk Class"
+#~ msgstr "Nivel di rísiko"
+
+#~ msgid "Sluit details"
+#~ msgstr "Habri detayes"
+
+#~ msgid "Description:"
+#~ msgstr "Deklarashon"
+
+#~ msgid "Frequency level:"
+#~ msgstr "Nivel di frequencidat:"
+
+#~ msgid "Detectability level:"
+#~ msgstr "Nivel di detektabilidat"
+
+#~ msgid ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffect and severity level\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgid_plural ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffects and severity levels\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgstr[0] ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNivel di efekto i severidat\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgstr[1] ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNivel di efektonan i severidatnan\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+
+#~ msgid "Failure mode report"
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid "Failure mode: "
+#~ msgstr "No por decodifica e archivo"
+
+#~ msgid "Severity: "
+#~ msgstr "Seviridat:"
+
+#~ msgid "Detectability: "
+#~ msgstr "Detektabilidat"
+
+#~ msgid "Frequency: "
+#~ msgstr "Frequencia: "
+
+#~ msgid "Effect: "
+#~ msgstr "Efekto: "
+
+#~ msgid "Description: "
+#~ msgstr "Deklarashon: "
+
+#~ msgid "Affected Departments: "
+#~ msgstr "Departamentonan afekta: "
+
+#~ msgid "Affected OOI's: "
+#~ msgstr "OOI's afekta:"
+
+#~ msgid "Report cannot be viewed, failure mode not found."
+#~ msgstr "Rapòrt no por wordu mira, no por haña failure mode."
+
+#~ msgid "FMEA introduction"
+#~ msgstr "FMEA introdukshon"
+
+#~ msgid ""
+#~ "FMEA (failure mode and effective analysis) is a step-by-step approach for "
+#~ "collecting knowledge about possible points of failure in a design, "
+#~ "manufacturing process, product or service."
+#~ msgstr ""
+#~ "FMEA (failure mode and effective analysis) ta un enfoque paso a paso pa "
+#~ "kolekta konosimentu tokante puntonan posibel di fayo den un diseño, "
+#~ "proseso fabriká, produkto òf servicio."
+
+#~ msgid ""
+#~ "Failure mode (FM) refers to the way in which something might break down "
+#~ "and includes potential errors that may occur, especially errors that may "
+#~ "affect a system. Effective analysis (EA) involves deciphering the "
+#~ "consequences of those break downs by making sure that all failures can be "
+#~ "detected, determining how frequently a failure might occur and "
+#~ "identifying which potential failures should be prioritized."
+#~ msgstr ""
+#~ "Failure mode (FM) ta referi na e manera kaminda algu por posibelmente "
+#~ "kibra i inkluí errornan potenshal ku por okuri, speshalmente errornan ku "
+#~ "por afektá un sistema. Effective analysis (EA) ta envolvi den buska e "
+#~ "konsekuensiasnan di loke por kibra dor di detekta tur failure modes, "
+#~ "determiná kon frequente failure modes ta okuri i identifiká kwa failure "
+#~ "modes mester wordu prioritisa."
+
+#~ msgid "Create affected objects of a failure mode"
+#~ msgstr "Kreá ophetonan afektá di un failure mode"
+
+#~ msgid "View all failure modes"
+#~ msgstr "Mustrami tur failue modes"
+
+#~ msgid "View all failure mode effects"
+#~ msgstr "Mustrami tur efektonan di failure mode"
+
+#~ msgid "View all affected objects for a failure modes"
+#~ msgstr "Mustrami tur ophetonan afektá pa failure modes"
+
+#~ msgid "Heatmap"
+#~ msgstr "Mapa kayente"
+
+#~ msgid "--- Select an option ----"
+#~ msgstr "-- Selecta un opcion --"
+
+#~ msgid "Failure mode affected objects successfully created."
+#~ msgstr "Failure mode i ophetonan afektá a wòrdu kreá ku èksito."
+
+#~ msgid "Create"
+#~ msgstr "Kreá"
+
+#~ msgid "Treeobjects successfully added."
+#~ msgstr "Mapa di ophetonan añadi ku èxito."
+
+#~ msgid "Please select a department or ooi."
+#~ msgstr "Por fabor selekta un departamentu òf ooi."
+
+#~ msgid "Failure mode successfully created."
+#~ msgstr "Failure mode a wòrdu kreá ku èksito."
+
+#~ msgid "Failure mode effect successfully created."
+#~ msgstr "Failure mode a wòrdu kreá ku èksito."
+
+#~ msgid "FMEA"
+#~ msgstr "FMEA"
+
+#~ msgid "Failure mode effects"
+#~ msgstr "Efektonan di failure mode"
 
 #, python-format
 #~ msgid ""

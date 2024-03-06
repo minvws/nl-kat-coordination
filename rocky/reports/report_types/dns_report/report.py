@@ -5,6 +5,7 @@ from typing import Any
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.dns.records import DNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
@@ -25,19 +26,24 @@ class DNSReport(Report):
         ref = Reference.from_str(input_ooi)
         tree = self.octopoes_api_connector.get_tree(ref, valid_time, depth=3, types={DNSRecord, Finding}).store
 
+        findings = []
+        finding_types: dict[str, dict] = {}
         records = []
-        security = {
-            "spf": True,
-            "dkim": True,
-            "dmarc": True,
-            "dnssec": True,
-            "caa": True,
-        }
+        security = {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True}
+
         for ooi_type, ooi in tree.items():
             if isinstance(ooi, Finding):
                 for check in ["caa", "dkim", "dmarc", "dnssec", "spf"]:
                     if "NO-%s" % check.upper() in ooi.finding_type.tokenized.id:
                         security[check] = False
+                if ooi.finding_type.tokenized.id == "KAT-INVALID-SPF":
+                    security["spf"] = False
+                if ooi.finding_type.tokenized.id in (
+                    "KAT-INVALID-SPF",
+                    "KAT-NAMESERVER-NO-IPV6",
+                    "KAT-NAMESERVER-NO-TWO-IPV6",
+                ):
+                    findings.append(ooi)
             elif isinstance(ooi, DNSRecord):
                 records.append(
                     {
@@ -47,10 +53,23 @@ class DNSReport(Report):
                         "content": ooi.value,
                     }
                 )
+
+        for finding in findings:
+            try:
+                finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
+
+                if finding_type.id in finding_types:
+                    finding_types[finding_type.id]["occurrences"].append(finding)
+                else:
+                    finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
+
+            except ObjectNotFoundException:
+                logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
+
+        finding_types_sorted = sorted(
+            finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
+        )
+
         records = sorted(records, key=lambda x: x["type"])
 
-        return {
-            "input_ooi": input_ooi,
-            "records": records,
-            "security": security,
-        }
+        return {"input_ooi": input_ooi, "records": records, "security": security, "finding_types": finding_types_sorted}
