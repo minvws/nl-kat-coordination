@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Optional, Union
+from typing import Any
 
 import fastapi
 import prometheus_client
@@ -133,7 +133,7 @@ class Server:
             path="/schedules",
             endpoint=self.list_schedules,
             methods=["GET", "POST"],
-            response_model=Union[PaginatedResponse, models.Schedule],
+            response_model=PaginatedResponse | models.Schedule,
             status_code=status.HTTP_200_OK,
             description="List all schedules",
         )

@@ -4,7 +4,7 @@ import time
 from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from opentelemetry import trace
@@ -67,16 +67,13 @@ class Scheduler(abc.ABC):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.queue: queues.PriorityQueue = queue
+        self.deadline_ranker = rankers.DefaultDeadlineRanker(ctx=self.ctx)
         self.callback: Callable[[], Any] | None = callback
 
-        # Settings
+        # Properties
+        self.scheduler_id: str = scheduler_id
         self.max_tries: int = max_tries
         self.enabled: bool = True
-        self.scheduler_id: str = scheduler_id
-        self.deadline_ranker = rankers.DefaultDeadlineRanker(ctx=self.ctx)
-        self.queue: queues.PriorityQueue = queue
-        self.max_tries: int = max_tries
-        self.callback: Callable[[], Any] | None = callback
         self._last_activity: datetime | None = None
 
         # Listeners
