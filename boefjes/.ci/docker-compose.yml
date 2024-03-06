@@ -13,7 +13,19 @@ services:
     env_file:
       - .ci/.env.test
     volumes:
-    - .:/app/boefjes
+      - .:/app/boefjes
+
+  boefjes:
+    build:
+      context: ..
+      dockerfile: boefjes/Dockerfile
+      args:
+        - ENVIRONMENT=dev
+    command: sh -c 'python -m pytest -v tests'
+    env_file:
+      - .ci/.env.test
+    volumes:
+      - .:/app/boefjes
 
   ci_katalogus-db:
     image: postgres:15

@@ -23,9 +23,12 @@ def test_one_process(manager: SchedulerWorkerManager, item_handler: MockHandler)
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
     assert len(patched_tasks) == 6
-    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
     assert patched_tasks[1] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
-    assert patched_tasks[2] == ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")
+    assert patched_tasks[2] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
+    assert patched_tasks[3] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert patched_tasks[4] == ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running")
+    assert patched_tasks[5] == ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")
 
 
 def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:
@@ -150,8 +153,12 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
 
     assert len(items) == 3
     assert len(patched_tasks) == 6
-    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
-    assert patched_tasks[2] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
+    assert patched_tasks[1] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert patched_tasks[2] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
+    assert patched_tasks[3] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert patched_tasks[4] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
+    assert patched_tasks[5] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
 
 
 def test_create_manager():

@@ -62,6 +62,13 @@ ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
 
 test: itest ## Run all tests.
 
+utest: ## Run the unit tests.
+	$(ci-docker-compose) build
+	$(ci-docker-compose) down --remove-orphans
+	$(ci-docker-compose) run --rm boefjes
+	$(ci-docker-compose) down
+
+
 itest: ## Run the integration tests.
 	$(ci-docker-compose) build
 	$(ci-docker-compose) down --remove-orphans
