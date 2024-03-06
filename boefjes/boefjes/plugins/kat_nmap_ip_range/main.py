@@ -58,7 +58,14 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             min_mask,
             ip_range.prefixlen,
         )
-        return [(set("info/boefje", ), "Skipping range due to unaccepted VSLM.")]
+        return [
+            (
+                set(
+                    "info/boefje",
+                ),
+                "Skipping range due to unaccepted VSLM.",
+            )
+        ]
 
     top_ports_tcp = int(getenv("TOP_PORTS_TCP", 250))
     top_ports_udp = int(getenv("TOP_PORTS_UDP", 10))
@@ -67,8 +74,8 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     results = []
     if top_ports_tcp:
-        results.append(set('boefje/nmap-tcp',), run_nmap(build_nmap_arguments(ip_range=ip_range, top_ports=top_ports_tcp, protocol_str="S")))
+        results.append((set(), run_nmap(build_nmap_arguments(ip_range=ip_range, top_ports=top_ports_tcp, protocol_str="S"))
     if top_ports_udp:
-        results.append(set('boefje/nmap-udp',), run_nmap(build_nmap_arguments(ip_range=ip_range, top_ports=top_ports_udp, protocol_str="U")))
+        results.append((set(), run_nmap(build_nmap_arguments(ip_range=ip_range, top_ports=top_ports_tcp, protocol_str="U"))
 
     return results
