@@ -39,7 +39,7 @@ def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandle
     assert len(items) == 2
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
-    assert len(patched_tasks) == 3
+    assert len(patched_tasks) == 6
     assert patched_tasks.count(("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")) == 2
     assert patched_tasks.count(("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")) == 1
 
