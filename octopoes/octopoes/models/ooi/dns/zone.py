@@ -50,6 +50,8 @@ class Hostname(OOI):
     @field_validator("name")
     @classmethod
     def hostname_valid(cls, v: str) -> str:
+        v = v.encode("idna").decode()
+
         for c in v:
             if c not in VALID_HOSTNAME_CHARACTERS:
                 raise ValueError(f"Invalid hostname character: {c}")
