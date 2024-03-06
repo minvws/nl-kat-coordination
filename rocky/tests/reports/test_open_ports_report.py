@@ -12,11 +12,14 @@ def test_open_ports_report_ip_no_port(mock_octopoes_api_connector, valid_time, s
         "IPAddress.<address[is ResolvedHostname].hostname": {
             ipaddressv4.reference: [hostname],
         },
+        "IPPort.<ip_port[is IPService].service": {
+            ip_port.reference: [],
+        },
     }
 
     report = OpenPortsReport(mock_octopoes_api_connector)
 
-    data = report.generate_data(str(ipaddressv4.reference), valid_time)
+    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
     assert data[ipaddressv4.reference] == {"ports": {}, "hostnames": [hostname.name], "services": {}}
 
@@ -34,14 +37,14 @@ def test_open_ports_report_ip_one_port(
         "IPAddress.<address[is ResolvedHostname].hostname": {
             ipaddressv4.reference: [hostname],
         },
-        "IPPort.<ip_port [is IPService].service": {
+        "IPPort.<ip_port[is IPService].service": {
             ip_port.reference: [service],
         },
     }
 
     report = OpenPortsReport(mock_octopoes_api_connector)
 
-    data = report.generate_data(str(ipaddressv4.reference), valid_time)
+    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
     assert data[ipaddressv4.reference] == {
         "ports": {80: False},
@@ -66,14 +69,14 @@ def test_open_ports_report_hostname_one_port(
         "IPAddress.<address[is ResolvedHostname].hostname": {
             ipaddressv4.reference: [hostname],
         },
-        "IPPort.<ip_port [is IPService].service": {
+        "IPPort.<ip_port[is IPService].service": {
             ip_port.reference: [service],
         },
     }
 
     report = OpenPortsReport(mock_octopoes_api_connector)
 
-    data = report.generate_data(str(hostname.reference), valid_time)
+    data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
 
     assert data[ipaddressv4.reference] == {
         "ports": {80: False},
