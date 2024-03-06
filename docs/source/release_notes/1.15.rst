@@ -19,7 +19,7 @@ New Features
  * More CSP checks have been added.
  * Scan profiles can be declared through normalizers.
  * It possible to select all OOIs for aggregate reports.
- * Plugin page in reporting flow is skipped if all plugins are anbled.
+ * Plugin page in reporting flow is skipped if all plugins are enabled.
  * Setting to limit size of IP range has been added to nmap boefje.
  * Added settings for database pool size config.
  * The KAT findings database has been updated.
