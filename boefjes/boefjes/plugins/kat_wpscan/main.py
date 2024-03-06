@@ -12,16 +12,37 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
 
     if input_["software"]["name"] != "WordPress":
-        return [(set("info/boefje",), "Not wordpress.")]
+        return [
+            (
+                set(
+                    "info/boefje",
+                ),
+                "Not wordpress.",
+            )
+        ]
     if "netloc" not in input_["ooi"] or "name" not in input_["ooi"]["netloc"].dict():
-        return [(set("info/boefje",), "No hostname available for input OOI.")]
+        return [
+            (
+                set(
+                    "info/boefje",
+                ),
+                "No hostname available for input OOI.",
+            )
+        ]
 
     hostname = input_["ooi"]["netloc"]["name"]
     path = input_["ooi"]["path"]
     scheme = input_["ooi"]["scheme"]
 
     if scheme != "https":
-        return [(set("info/boefje",), "To avoid double findings, we only scan https urls.")]
+        return [
+            (
+                set(
+                    "info/boefje",
+                ),
+                "To avoid double findings, we only scan https urls.",
+            )
+        ]
 
     url = f"{scheme}://{hostname}{path}"
 
