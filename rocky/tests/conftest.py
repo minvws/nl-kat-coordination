@@ -30,6 +30,7 @@ from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.transaction import TransactionRecord
+from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 from rocky.scheduler import Task
 
@@ -1129,8 +1130,8 @@ class MockOctopoesAPIConnector:
         return self.oois[reference]
 
     def get_tree(
-        self, reference: Reference, types: set | None = None, depth: int | None = 1, valid_time: datetime | None = None
-    ):
+        self, reference: Reference, valid_time: datetime, types: set = frozenset(), depth: int = 1
+    ) -> ReferenceTree:
         return self.tree[reference]
 
     def query(
