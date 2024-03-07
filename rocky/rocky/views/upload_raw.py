@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic.edit import FormView
-from requests import HTTPError
+from httpx import HTTPStatusError
 from tools.forms.upload_raw import UploadRawForm
 
 from rocky.bytes_client import get_bytes_client
@@ -62,7 +62,7 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
 
         try:
             get_bytes_client(self.organization.code).upload_raw(raw_file.read(), mime_types)
-        except HTTPError as e:
+        except HTTPStatusError as e:
             message = _("Raw file could not be uploaded to Bytes: status code %s") % e.response.status_code
 
             return self.add_error_notification(message)

@@ -6,7 +6,7 @@ from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogu
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from pytest_django.asserts import assertContains, assertNotContains
-from requests import Response
+from httpx import Response
 
 from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, get_normalizers_data, get_plugins_data, setup_request

@@ -2,8 +2,8 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
+from httpx import RequestError
 
-import requests.exceptions
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import Http404, HttpRequest
@@ -110,7 +110,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                     boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
                     origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
-                except requests.exceptions.RequestException as e:
+                except RequestError as e:
                     logger.error(e)
 
             return (
