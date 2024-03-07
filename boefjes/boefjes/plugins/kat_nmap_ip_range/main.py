@@ -58,14 +58,8 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             min_mask,
             ip_range.prefixlen,
         )
-        return [
-            (
-                set(
-                    "info/boefje",
-                ),
-                "Skipping range due to unaccepted VSLM.",
-            )
-        ]
+        infomimetype = set(("info/boefje",))
+        return [(infomimetype, "Skipping range due to unaccepted VSLM.")]
 
     top_ports_tcp = int(getenv("TOP_PORTS_TCP", 250))
     top_ports_udp = int(getenv("TOP_PORTS_UDP", 10))
