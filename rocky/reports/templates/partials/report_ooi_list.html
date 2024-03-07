@@ -52,8 +52,9 @@
             <form method="get"
                   action="{{ next }}"
                   class="inline layout-wide checkboxes_required">
-                {% include "forms/report_form_fields.html" %}
-
+                <input type="hidden"
+                       name="observed_at"
+                       value="{{ observed_at|date:"Y-m-d" }}">
                 <table>
                     <caption class="visually-hidden">{% translate "Objects:" %}</caption>
                     <thead>
