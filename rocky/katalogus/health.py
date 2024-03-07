@@ -1,6 +1,6 @@
 import logging
 
-from requests import RequestException
+from httpx import RequestError
 
 from katalogus.client import get_katalogus
 from rocky.health import ServiceHealth
@@ -12,8 +12,8 @@ def get_katalogus_health() -> ServiceHealth:
     try:
         katalogus_client = get_katalogus("")  # For the health endpoint the organization has no effect
         katalogus_health = katalogus_client.health()
-    except RequestException as ex:
-        logger.exception(ex)
+    except RequestError:
+        logger.exception("Error while retrieving KATalogus health state", exc_info=True)
         katalogus_health = ServiceHealth(
             service="katalogus",
             healthy=False,

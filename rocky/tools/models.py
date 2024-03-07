@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import KATalogusClientV1, get_katalogus
 from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
-from requests import RequestException
+from httpx import RequestError
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -180,7 +180,7 @@ class Organization(models.Model):
 
         try:
             health = katalogus_client.health()
-        except RequestException as e:
+        except RequestError as e:
             raise KATalogusDownException from e
 
         if not health.healthy:
@@ -193,7 +193,7 @@ class Organization(models.Model):
         octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
         try:
             health = octopoes_client.root_health()
-        except RequestException as e:
+        except RequestError as e:
             raise OctopoesDownException from e
 
         if not health.healthy:

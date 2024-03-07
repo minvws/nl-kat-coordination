@@ -8,11 +8,11 @@ from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
+from httpx import RequestError
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from requests.exceptions import RequestException
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification
@@ -92,7 +92,7 @@ class OOIDetailView(
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 
             return self.get(self.request, status_code=404, *self.args, **self.kwargs)
-        except RequestException as exception:
+        except RequestError as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
             return self.get(self.request, status_code=500, *self.args, **self.kwargs)
 
