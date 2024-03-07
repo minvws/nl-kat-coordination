@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Boolean, Column, DateTime, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -12,24 +12,18 @@ from scheduler.utils import GUID, cron
 from .base import Base
 from .errors import ValidationError
 from .queue import PrioritizedItem
-from .tasks import TaskRun
+from .tasks import Task, TaskRun
 
 
 class Schedule(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-
     scheduler_id: str
-
     enabled: bool = True
-
-    # Priority item specification
-    p_item: PrioritizedItem
-
-    tasks: list[TaskRun] = []
-
     cron_expression: str | None = None
+    task_id: uuid.UUID
+    task: Task
 
     deadline_at: datetime | None = None
     evaluated_at: datetime | None = None
@@ -54,9 +48,10 @@ class ScheduleDB(Base):
     scheduler_id = Column(String)
     enabled = Column(Boolean, nullable=False, default=True)
     p_item = Column(JSONB, nullable=False)
-    tasks = relationship(
-        "TaskRunDB", back_populates="schedule", order_by="TaskRunDB.created_at", cascade="all,delete-orphan"
-    )
+
+    task_id = Column(GUID, ForeignKey("tasks.id"))
+    task = relationship("TaskDB")
+
     cron_expression = Column(String, nullable=True)
 
     deadline_at = Column(

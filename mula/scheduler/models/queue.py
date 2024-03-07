@@ -2,13 +2,15 @@ import uuid
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from scheduler.utils import GUID
 
 from .base import Base
+from .tasks import Task
 
 
 class PrioritizedItem(BaseModel):
@@ -28,7 +30,8 @@ class PrioritizedItem(BaseModel):
 
     priority: int | None = 0
 
-    data: dict = Field(default_factory=dict)
+    task_id: uuid.UUID
+    task: Task
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -36,7 +39,7 @@ class PrioritizedItem(BaseModel):
 
 
 class PrioritizedItemDB(Base):
-    __tablename__ = "items"
+    __tablename__ = "p_items"
 
     id = Column(GUID, primary_key=True)
 
@@ -46,7 +49,8 @@ class PrioritizedItemDB(Base):
 
     priority = Column(Integer)
 
-    data = Column(JSONB, nullable=False)
+    task_id = Column(GUID, ForeignKey("tasks.id"))
+    task = relationship("TaskDB")
 
     created_at = Column(
         DateTime(timezone=True),

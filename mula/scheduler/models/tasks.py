@@ -17,7 +17,6 @@ from scheduler.utils import GUID
 from .base import Base
 from .boefje import Boefje
 from .normalizer import Normalizer
-from .queue import PrioritizedItem
 from .raw_data import RawData
 
 
@@ -45,6 +44,35 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
+class Task(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+
+    hash: str | None = Field(None, max_length=32)
+
+    data: dict = Field(default_factory=dict)
+
+    task_runs: list["TaskRun"] = []
+
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class TaskDB(Base):
+    __tablename__ = "tasks"
+
+    id = Column(GUID, primary_key=True)
+    hash = Column(String(32), nullable=True)  # TODO: unique=True
+    data = Column(JSONB, nullable=False)
+
+    # TODO: cascade
+    task_runs = relationship("TaskRunDB", back_populates="task")
+
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+
 class TaskRun(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -54,12 +82,10 @@ class TaskRun(BaseModel):
 
     type: str
 
-    # Item that was pushed onto the queue
-    p_item: PrioritizedItem
+    task: Task
+    task_id: uuid.UUID
 
     status: TaskStatus
-
-    schedule_id: uuid.UUID | None = None
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -78,10 +104,9 @@ class TaskRunDB(Base):
 
     type = Column(String)
 
-    p_item = Column(JSONB, nullable=False)
-
-    schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
-    schedule = relationship("ScheduleDB", back_populates="tasks")
+    # FIXME: ondelete
+    task_id = Column(GUID, ForeignKey("tasks.id", ondelete="SET NULL"), nullable=False)
+    task = relationship("TaskDB", backref="task_runs")
 
     status = Column(
         Enum(TaskStatus),
@@ -100,14 +125,6 @@ class TaskRunDB(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
-    )
-
-    __table_args__ = (
-        Index(
-            "ix_p_item_hash",
-            text("(p_item->>'hash')"),
-            created_at.desc(),
-        ),
     )
 
 
