@@ -40,6 +40,8 @@ services:
     image: postgres:15
     env_file:
       - .env.test
+    # ports:
+    #   - "127.0.0.1:5432:5432"
 
   ci_octopoes:
     build:
