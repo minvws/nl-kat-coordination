@@ -30,8 +30,7 @@ def iana_service_table(search_query: str) -> list[_Service]:
     services = []
 
     response = httpx.get(
-        "https://www.iana.org/assignments/service-names-port-numbers/"
-        "service-names-port-numbers.xhtml",
+        "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml",
         params={"search": search_query},
         timeout=30,
     )

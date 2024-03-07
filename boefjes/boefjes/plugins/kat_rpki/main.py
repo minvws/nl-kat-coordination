@@ -50,7 +50,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         (set(), json.dumps(results)),
         (
             set(
-                "rpki/cache-meta",
+                "r/c",
             ),
             json.dumps(rpki_meta),
         ),

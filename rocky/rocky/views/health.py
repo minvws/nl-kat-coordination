@@ -5,8 +5,8 @@ from django.http import JsonResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View
-from katalogus.health import get_katalogus_health
 from httpx import RequestError
+from katalogus.health import get_katalogus_health
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from rocky.bytes_client import get_bytes_client

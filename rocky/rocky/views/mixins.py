@@ -2,13 +2,13 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
-from httpx import RequestError
 
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from httpx import RequestError
 from katalogus.client import Boefje, get_katalogus
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm

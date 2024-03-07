@@ -3,8 +3,8 @@ from io import BytesIO
 import pytest
 from django.core.management import call_command
 from django.urls import resolve, reverse
+from httpx import HTTPError
 from pytest_django.asserts import assertContains
-from requests import HTTPError
 
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
 from octopoes.models.pagination import Paginated

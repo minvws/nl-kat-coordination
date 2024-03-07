@@ -8,7 +8,7 @@ from tests.conftest import setup_request
 
 
 def test_katalogus_plugin_listing(client_member, rf, mocker):
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
     mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = json.loads(

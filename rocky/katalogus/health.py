@@ -13,7 +13,7 @@ def get_katalogus_health() -> ServiceHealth:
         katalogus_client = get_katalogus("")  # For the health endpoint the organization has no effect
         katalogus_health = katalogus_client.health()
     except RequestError:
-        logger.exception("Error while retrieving KATalogus health state", exc_info=True)
+        logger.exception("Error while retrieving KATalogus health state")
         katalogus_health = ServiceHealth(
             service="katalogus",
             healthy=False,

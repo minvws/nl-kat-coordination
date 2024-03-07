@@ -4,8 +4,8 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
+from httpx import RequestError, Response
 from pytest_django.asserts import assertContains, assertNotContains
-from requests import RequestException, Response
 from tools.models import DENY_ORGANIZATION_CODES, Organization
 
 from rocky.views.indemnification_add import IndemnificationAddView
@@ -84,8 +84,8 @@ def test_add_organization_submit_success(rf, superuser_member, mocker, mock_mode
 
 
 def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
-    mock_requests = mocker.patch("katalogus.client.requests")
-    mock_requests.Session().get.side_effect = RequestException
+    mock_requests = mocker.patch("katalogus.client.httpx")
+    mock_requests.Session().get.side_effect = RequestError
 
     request = setup_request(
         rf.post(
@@ -102,7 +102,7 @@ def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
 
 
 def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker, mock_models_octopoes):
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_health_response = Response()
     mock_health_response.status_code = 200
     mock_health_response._content = b'{"service": "test", "healthy": true}'
@@ -111,7 +111,7 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
     mock_organization_exists_response.status_code = 404
 
     mock_requests.Session().get.side_effect = [mock_health_response, mock_organization_exists_response]
-    mock_requests.Session().post.side_effect = RequestException
+    mock_requests.Session().post.side_effect = RequestError
 
     request = setup_request(
         rf.post(
@@ -128,7 +128,7 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
 
 
 def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = Response()
     mock_response.status_code = 200
     mock_response._content = b'{"service": "test", "healthy": false}'
