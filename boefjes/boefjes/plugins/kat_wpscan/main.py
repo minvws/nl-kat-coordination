@@ -10,7 +10,7 @@ WPSCAN_IMAGE = "wpscanteam/wpscan:latest"
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
-    infomimetype = set(("info/boefje",))
+    infomimetype = {"info/boefje"}
 
     if input_["software"]["name"] != "WordPress":
         return [(infomimetype, "Not wordpress.")]
