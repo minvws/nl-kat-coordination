@@ -4,7 +4,7 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.urls import reverse
-from httpx import RequestError, Response
+from httpx import RequestError
 from pytest_django.asserts import assertContains, assertNotContains
 from tools.models import DENY_ORGANIZATION_CODES, Organization
 
@@ -85,7 +85,7 @@ def test_add_organization_submit_success(rf, superuser_member, mocker, mock_mode
 
 def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
     mock_requests = mocker.patch("katalogus.client.httpx")
-    mock_requests.Session().get.side_effect = RequestError
+    mock_requests.Client().get.side_effect = RequestError("KATalogus is down")
 
     request = setup_request(
         rf.post(
@@ -101,17 +101,10 @@ def test_add_organization_submit_katalogus_down(rf, superuser_member, mocker):
     assert "An issue occurred in KATalogus while creating the organization" in messages[0].message
 
 
-def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocker, mock_models_octopoes):
-    mock_requests = mocker.patch("katalogus.client.httpx")
-    mock_health_response = Response()
-    mock_health_response.status_code = 200
-    mock_health_response._content = b'{"service": "test", "healthy": true}'
-
-    mock_organization_exists_response = mocker.MagicMock()
-    mock_organization_exists_response.status_code = 404
-
-    mock_requests.Session().get.side_effect = [mock_health_response, mock_organization_exists_response]
-    mock_requests.Session().post.side_effect = RequestError
+def test_add_organization_submit_katalogus_exception(rf, superuser_member, mock_models_octopoes, httpx_mock):
+    httpx_mock.add_response(status_code=200, json={"service": "test", "healthy": True})  # mocking health page
+    httpx_mock.add_response(status_code=404)  # mocking organization page
+    httpx_mock.add_exception(RequestError("KATalogus is down"))  # mocking KATalogus API
 
     request = setup_request(
         rf.post(
@@ -127,12 +120,8 @@ def test_add_organization_submit_katalogus_exception(rf, superuser_member, mocke
     assert "An issue occurred in KATalogus while creating the organization" in messages[0].message
 
 
-def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, mocker):
-    mock_requests = mocker.patch("katalogus.client.httpx")
-    mock_response = Response()
-    mock_response.status_code = 200
-    mock_response._content = b'{"service": "test", "healthy": false}'
-    mock_requests.Session().get.return_value = mock_response
+def test_add_organization_submit_katalogus_not_healthy(rf, superuser_member, httpx_mock):
+    httpx_mock.add_response(status_code=200, json={"service": "test", "healthy": False})
 
     request = setup_request(
         rf.post(

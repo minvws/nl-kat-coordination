@@ -3,7 +3,7 @@ from io import BytesIO
 import pytest
 from django.core.management import call_command
 from django.urls import resolve, reverse
-from httpx import HTTPError
+from httpx import codes
 from pytest_django.asserts import assertContains
 
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
@@ -291,7 +291,7 @@ def test_pdf_report_command(tmp_path, client_member, network, finding_types, moc
     }
 
 
-def test_ooi_pdf_report_timeout(rf, client_member, mock_organization_view_octopoes, mocker, tree_data):
+def test_ooi_pdf_report_timeout(rf, client_member, mock_organization_view_octopoes, tree_data, httpx_mock):
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(tree_data)
 
     request = setup_request(
@@ -301,8 +301,7 @@ def test_ooi_pdf_report_timeout(rf, client_member, mock_organization_view_octopo
         reverse("ooi_report", kwargs={"organization_code": client_member.organization.code})
     )
 
-    mock_keiko_session = mocker.patch("rocky.views.ooi_report.keiko_client.session")
-    mock_keiko_session.post.side_effect = HTTPError
+    httpx_mock.add_response(status_code=codes.METHOD_NOT_ALLOWED)
 
     response = OOIReportPDFView.as_view()(request, organization_code=client_member.organization.code)
 

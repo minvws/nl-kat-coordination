@@ -1,7 +1,6 @@
 import pytest
 from django.core.exceptions import PermissionDenied
 from django.urls import resolve
-from httpx import Response, codes
 from katalogus.client import KATalogusClientV1, parse_plugin
 from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogusView, NormalizerListView
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
@@ -245,17 +244,10 @@ def test_katalogus_client_organization_exists(mocker):
     assert client.organization_exists() is True
 
 
-def test_katalogus_client(mocker):
-    mock_requests = mocker.patch("katalogus.client.httpx")
+def test_katalogus_client(httpx_mock):
+    httpx_mock.add_response(json={"service": "test", "healthy": False, "version": None, "additional": 2, "results": []})
 
-    mock_response = Response(
-        codes.OK,
-        content=b"""{"service": "test", "healthy": false, "version": null, "additional": 2,
-    "results": []}""",
-    )
-    mock_requests.Client().get.return_value = mock_response
-
-    client = KATalogusClientV1("test", "test")
+    client = KATalogusClientV1("http://test", "test")
 
     assert isinstance(client.health(), ServiceHealth)
     assert client.health().service == "test"
