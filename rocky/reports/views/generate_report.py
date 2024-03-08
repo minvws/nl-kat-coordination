@@ -156,7 +156,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             if ooi_type not in by_type:
                 by_type[ooi_type] = []
 
-                by_type[ooi_type].append(ooi)
+            by_type[ooi_type].append(ooi)
 
         for report_type in self.report_types:
             oois = {
