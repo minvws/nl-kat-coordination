@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "/bit/disallowed-csp-hostnames",
+  "type": "object",
+  "default": {},
+  "Port Configuration": "Root Schema",
+  "required": [],
+  "properties": {
+    "disallowed_hostnames": {
+      "description": "Comma separated list of disallowed hostnames in CSP headers",
+      "type": "string",
+      "pattern": "^(\\s*(,*)[^,]+,?\\s*)*$",
+      "default": "github.com,google.com"
+    }
+  }
+}
