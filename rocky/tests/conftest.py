@@ -29,6 +29,7 @@ from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.transaction import TransactionRecord
+from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 from rocky.scheduler import Task
 
@@ -627,6 +628,173 @@ def finding_types() -> list[KATFindingType]:
 
 
 @pytest.fixture
+def tree_data_no_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {},
+    }
+
+
+@pytest.fixture
+def tree_data_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {
+            "Network|testnetwork": {
+                "object_type": "Network",
+                "primary_key": "Network|testnetwork",
+                "name": "testnetwork",
+            },
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0002",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+        },
+    }
+
+
+@pytest.fixture
+def tree_data_dns_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-CAA",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-DKIM",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-DMARC",
+            },
+            "Finding|Network|testnetwork|KAT-0004": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0004",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-DNSSEC",
+            },
+            "Finding|Network|testnetwork|KAT-0005": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0005",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-SPF",
+            },
+            "Finding|Network|testnetwork|KAT-0006": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0006",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-INVALID-SPF",
+            },
+            "Finding|Network|testnetwork|KAT-0007": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0007",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NAMESERVER-NO-IPV6",
+            },
+            "Finding|Network|testnetwork|KAT-0008": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0008",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NAMESERVER-NO-TWO-IPV6",
+            },
+            "DNSSOARecord|Network|testnetwork|KAT-0009": {
+                "object_type": "DNSSOARecord",
+                "primary_key": "DNSSOARecord|Network|testnetwork|KAT-0009",
+                "hostname": "Hostname|internet|example.com",
+                "dns_record_type": "SOA",
+                "value": "fake value",
+                "ttl": 3600,
+                "soa_hostname": "Hostname|internet|example.com",
+            },
+            "DNSARecord|Network|testnetwork|KAT-00010": {
+                "object_type": "DNSARecord",
+                "primary_key": "DNSARecord|Network|testnetwork|KAT-00010",
+                "hostname": "Hostname|internet|example.com",
+                "dns_record_type": "A",
+                "value": "fake value",
+                "address": "IPAddressV4|internet|127.0.0.1",
+            },
+        },
+    }
+
+
+@pytest.fixture
+def finding_type_kat_no_caa() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NO-CAA",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_invalid_spf() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-INVALID-SPF",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.0,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_nameserver_no_ipv6() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NAMESERVER-NO-IPV6",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_two_ipv6() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NAMESERVER-NO-TWO-IPV6",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=1.0,
+        risk_severity=RiskLevelSeverity.LOW,
+    )
+
+
+@pytest.fixture
 def cipher_finding_types() -> list[KATFindingType]:
     return [
         KATFindingType(
@@ -741,52 +909,6 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
         risk_score=3.0,
         risk_severity=RiskLevelSeverity.LOW,
     )
-
-
-@pytest.fixture
-def tree_data_no_findings():
-    return {
-        "root": {
-            "reference": "Finding|Network|testnetwork|KAT-0001",
-            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
-        },
-        "store": {},
-    }
-
-
-@pytest.fixture
-def tree_data_findings():
-    return {
-        "root": {
-            "reference": "Finding|Network|testnetwork|KAT-0001",
-            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
-        },
-        "store": {
-            "Network|testnetwork": {
-                "object_type": "Network",
-                "primary_key": "Network|testnetwork",
-                "name": "testnetwork",
-            },
-            "Finding|Network|testnetwork|KAT-0001": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0001",
-                "ooi": "Network|testnetwork",
-                "finding_type": "KATFindingType|KAT-0001",
-            },
-            "Finding|Network|testnetwork|KAT-0002": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0002",
-                "ooi": "Network|testnetwork",
-                "finding_type": "KATFindingType|KAT-0002",
-            },
-            "Finding|Network|testnetwork|KAT-0003": {
-                "object_type": "Finding",
-                "primary_key": "Finding|Network|testnetwork|KAT-0003",
-                "ooi": "Network|testnetwork",
-                "finding_type": "KATFindingType|KAT-0001",
-            },
-        },
-    }
 
 
 @pytest.fixture
@@ -1009,8 +1131,8 @@ class MockOctopoesAPIConnector:
         return self.oois[reference]
 
     def get_tree(
-        self, reference: Reference, types: set | None = None, depth: int | None = 1, valid_time: datetime | None = None
-    ):
+        self, reference: Reference, valid_time: datetime, types: set = frozenset(), depth: int = 1
+    ) -> ReferenceTree:
         return self.tree[reference]
 
     def query(
