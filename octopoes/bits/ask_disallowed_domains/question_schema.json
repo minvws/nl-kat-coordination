@@ -11,6 +11,12 @@
       "type": "string",
       "pattern": "^(\\s*(,*)[^,]+,?\\s*)*$",
       "default": "github.com,google.com"
+    },
+    "disallow_url_shorteners": {
+      "description": "Do you want to disallow url shorteners in csp headers?",
+      "type": "string",
+      "pattern": "^(true|false)$",
+      "default": "true"
     }
   }
 }

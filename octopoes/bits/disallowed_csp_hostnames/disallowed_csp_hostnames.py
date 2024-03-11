@@ -16,7 +16,7 @@ def get_disallowed_hostnames_from_config(config, config_key, default):
     disallowed_hostnames = config.get(config_key, None)
     if disallowed_hostnames is None:
         return default
-    return list(disallowed_hostnames.split(",").strip(" ")) if disallowed_hostnames else []
+    return list(disallowed_hostnames.strip(" ").split(",")) if disallowed_hostnames else []
 
 
 def run(input_ooi: HTTPHeaderHostname, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
@@ -26,8 +26,10 @@ def run(input_ooi: HTTPHeaderHostname, additional_oois: list, config: dict[str, 
     if header.tokenized.key.lower() != "content-security-policy":
         return
 
+    disallow_url_shorteners = config.get("disallow_url_shorteners", "True").lower() == "true" if config else False
+
     hostname = header_hostname.hostname.tokenized.name
-    disallowed_domains = link_shorteners_list()
+    disallowed_domains = link_shorteners_list() if disallow_url_shorteners else []
     disallowed_hostnames_from_config = get_disallowed_hostnames_from_config(config, "disallowed_hostnames", [])
 
     disallowed_domains.extend(disallowed_hostnames_from_config)
