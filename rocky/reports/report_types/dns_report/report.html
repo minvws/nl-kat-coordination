@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<h2>{% translate "Records found" %}</h2>
+<h3>{% translate "Records found" %}</h3>
 {% if data.records %}
     <p>
         {% blocktranslate trimmed %}
@@ -49,7 +49,7 @@
 {% else %}
     <p>{% translate "No records have been found." %}</p>
 {% endif %}
-<h2>{% translate "Security measures" %}</h2>
+<h3>{% translate "Security measures" %}</h3>
 <div class="horizontal-scroll">
     <div class="column-3">
         <table>
@@ -116,7 +116,7 @@
     </div>
 </div>
 {% if data.finding_types %}
-    <h2>{% translate "Other findings found" %}</h2>
+    <h3>{% translate "Other findings found" %}</h3>
     <div class="horizontal-scroll">
         <table>
             <caption class="visually-hidden">{% translate "Other findings found:" %}</caption>

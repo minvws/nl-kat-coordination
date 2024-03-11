@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-07 10:28+0000\n"
+"POT-Creation-Date: 2024-03-11 16:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -519,8 +519,7 @@ msgstr ""
 msgid "Your session has timed out. Please login again."
 msgstr ""
 
-#: account/views/login.py reports/templates/partials/report_header.html
-#: rocky/templates/header.html
+#: account/views/login.py rocky/templates/header.html
 msgid "OpenKAT"
 msgstr ""
 
@@ -622,8 +621,8 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
-#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
-#: rocky/templates/oois/ooi_detail.html
+#: reports/templates/summary/report_asset_overview.html
+#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
 msgstr ""
@@ -926,19 +925,19 @@ msgstr ""
 
 #: katalogus/templates/partials/plugins.html
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Plugin name"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Plugin type"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Plugin description"
 msgstr ""
 
@@ -2092,7 +2091,7 @@ msgid "Appendix"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Selected objects"
 msgstr ""
 
@@ -2102,12 +2101,12 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Selected Report Types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr ""
 
@@ -2117,12 +2116,12 @@ msgid "Selected Plugins"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Plugin options"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Plugin scan level"
 msgstr ""
 
@@ -2178,7 +2177,9 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
 #: reports/report_types/multi_organization_report/asset_overview.html
+#: reports/templates/partials/generate_report_sidemenu.html
 #: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Asset overview"
 msgstr ""
 
@@ -2250,6 +2251,7 @@ msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/templates/partials/report_header.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Export"
 msgstr ""
@@ -2265,6 +2267,7 @@ msgid "Download JSON"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/templates/partials/report_header.html
 msgid "This is the OpenKAT report for organization"
 msgstr ""
 
@@ -2397,7 +2400,6 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
 #: reports/report_types/multi_organization_report/summary.html
-#: reports/templates/summary/report_summary.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
 msgid "Summary"
@@ -2817,7 +2819,7 @@ msgid "services are compliant"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
-#: reports/templates/generate_report.html
+#: reports/templates/partials/report_header.html
 msgid "Download report"
 msgstr ""
 
@@ -3096,7 +3098,7 @@ msgid "Good"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
-msgid "No ciphers found for this IPService"
+msgid "No ciphers found for this IPService."
 msgstr ""
 
 #: reports/report_types/tls_report/report.py
@@ -3194,7 +3196,13 @@ msgstr ""
 
 #: reports/templates/generate_report.html
 #: reports/templates/generate_report_pdf.html
+#: reports/templates/partials/generate_report_sidemenu.html
 msgid "for"
+msgstr ""
+
+#: reports/templates/partials/generate_report_sidemenu.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Table of contents"
 msgstr ""
 
 #: reports/templates/partials/main_navigation.html
@@ -3202,7 +3210,13 @@ msgid "Overview of reports"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
-msgid "Report for organization"
+msgid "OpenKAT Report"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid ""
+"All selected report types for the selected objects are displayed one below "
+"the other."
 msgstr ""
 
 #: reports/templates/partials/report_introduction.html
@@ -3366,10 +3380,6 @@ msgid "FindingTypes"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
-msgid "Table of contents"
-msgstr ""
-
-#: reports/templates/partials/report_sidemenu.html
 #: rocky/templates/oois/ooi_page_tabs.html
 msgid "Overview"
 msgstr ""
@@ -3418,7 +3428,13 @@ msgstr ""
 msgid "Toggle all report types"
 msgstr ""
 
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
+msgid ""
+"An overview of the selected objects, reports and plugins to generate this "
+"report."
+msgstr ""
+
+#: reports/templates/summary/report_asset_overview.html
 msgid "Selected Plugins for scans"
 msgstr ""
 
