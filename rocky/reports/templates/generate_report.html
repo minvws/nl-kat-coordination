@@ -7,19 +7,19 @@
     {% include "header.html" %}
 
     <main id="main-content" tabindex="-1" class="sidemenu choose-report report">
-        {% include "partials/report_sidemenu.html" %}
+        {% include "partials/generate_report_sidemenu.html" %}
 
         <article>
             {% include "partials/report_header.html" %}
             {% include "partials/report_introduction.html" %}
 
             <div class="chapter-numbers report-content">
-                {% include "summary/report_summary.html" %}
+                {% include "summary/report_asset_overview.html" %}
 
                 {% for ooi, report in report_data.items %}
                     {% for report_type,data in report.items %}
                         {% if data.data %}
-                            <section>
+                            <section id="{{ report_type }}-{{ ooi }}">
                                 <div>
                                     <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
                                     {% include data.template with data=data.data %}

@@ -1,0 +1,23 @@
+{% load i18n %}
+
+<nav data-open-label="Zijbalknavigatie"
+     data-close-label="Sluit zijbalknavigatie"
+     aria-label="Zijbalknavigatie">
+    <div>
+        <h2 class="heading-large">{% translate "Table of contents" %}</h2>
+        <ol class="chapter-numbers">
+            <li>
+                <a href="#asset-overview">{% translate "Asset overview" %}</a>
+            </li>
+            {% for ooi, report in report_data.items %}
+                {% for report_type,data in report.items %}
+                    {% if data.data %}
+                        <li>
+                            <a href="#{{ report_type }}-{{ ooi }}">{{ report_type }} {% translate "for" %} {{ ooi }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </ol>
+    </div>
+</nav>
