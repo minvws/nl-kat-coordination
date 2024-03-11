@@ -1,4 +1,5 @@
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.utils.translation import gettext_lazy as _
 
 
 class RockyPaginator(Paginator):
@@ -10,6 +11,7 @@ class RockyPaginator(Paginator):
         allow_empty_first_page: bool = True,
     ) -> None:
         super().__init__(object_list, per_page, orphans, allow_empty_first_page)
+
         if orphans != 0:
             raise ValueError("Setting orphans is not supported")
 
@@ -20,9 +22,9 @@ class RockyPaginator(Paginator):
                 raise ValueError
             number = int(number)
         except (TypeError, ValueError):
-            raise PageNotAnInteger(self.error_messages["invalid_page"])
+            raise PageNotAnInteger(_("That page number is not an integer"))
         if number < 1:
-            raise EmptyPage(self.error_messages["min_page"])
+            raise EmptyPage(_("That page number is less than 1"))
         return number
 
     def page(self, number):
@@ -32,5 +34,5 @@ class RockyPaginator(Paginator):
         top = bottom + self.per_page
         page_objects = self.object_list[bottom:top]
         if not page_objects and number > self.num_pages:
-            raise EmptyPage(self.error_messages["no_results"])
+            raise EmptyPage(_("That page contains no results"))
         return self._get_page(page_objects, number, self)
