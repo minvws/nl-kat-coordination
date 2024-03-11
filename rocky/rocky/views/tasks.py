@@ -37,6 +37,7 @@ class DownloadTaskDetail(OrganizationView):
 class TaskListView(OrganizationView, ListView):
     paginate_by = 20
     paginator_class = RockyPaginator
+    allow_empty = False
 
     def get_queryset(self):
         scheduler_id = self.plugin_type + "-" + self.organization.code
