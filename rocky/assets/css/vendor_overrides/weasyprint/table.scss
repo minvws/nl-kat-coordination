@@ -4,7 +4,14 @@
    values wrong when using CSS variables, so we have to specify them here
    without variables . */
 
+.horizontal-scroll {
+  max-width: 100%;
+}
+
 table {
+  max-width: 100%;
+  background-color: transparent;
+
   caption {
     color: #585858;
   }
@@ -26,6 +33,62 @@ table {
 
     &:last-of-type td {
       border-width: 0 0 1px;
+    }
+  }
+}
+
+main div,
+main section,
+main section > div,
+main article,
+main article > div {
+  form fieldset dl,
+  form dl,
+  dl {
+    > div {
+      display: block;
+    }
+  }
+}
+
+tr {
+  border: 1px dashed red;
+}
+
+tr.expanded-row {
+  border: 1px dashed blue;
+}
+
+tr:nth-child(even) td {
+  background-color: white;
+}
+
+tr.expanded-row td {
+  background-color: #eeecf8;
+}
+
+// .expando-button {
+//   display: none;
+// }
+
+table ul.accordion {
+  border: 1px dashed green;
+  width: 100%;
+  display: block;
+
+  &::before {
+    display: none;
+  }
+
+  li {
+    border: 1px dashed purple;
+
+    button {
+      display: inline;
+    }
+
+    > div {
+      display: block;
     }
   }
 }
