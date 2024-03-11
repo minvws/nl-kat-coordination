@@ -18,7 +18,10 @@
             </div>
         </div>
         <div>
-            <p>{% translate "This is the OpenKAT report for organization" %} {{ organization.name }}.</p>
+            <p>
+                {% translate "This is the OpenKAT report for organization" %} {{ organization.name }}.
+                {% translate "All selected report types for the selected objects are displayed one below the other." %}
+            </p>
             <p>
                 {% translate "Created with data from" %}: <strong>{{ observed_at }} {{ TIME_ZONE }}</strong>
             </p>
