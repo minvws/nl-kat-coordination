@@ -1,6 +1,7 @@
 from bits.disallowed_csp_hostnames.disallowed_csp_hostnames import run
 
 from octopoes.models import Reference
+from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeaderHostname
 
 
@@ -27,7 +28,10 @@ def test_disallowed_csp_headers_simple_finding():
 
     results = list(run(http_header_hostname, [], {}))
 
-    assert len(results) == 2
+    assert results[0] == KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP")
+    assert results[1] == Finding(
+        ooi=http_header_hostname.reference, finding_type=KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP").reference
+    )
 
 
 def test_disallowed_csp_headers_allow_url_shortener():
@@ -53,4 +57,7 @@ def test_disallowed_csp_headers_disallow_custom_hostname():
 
     results = list(run(http_header_hostname, [], {"disallowed_hostnames": "example.com"}))
 
-    assert len(results) == 2
+    assert results[0] == KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP")
+    assert results[1] == Finding(
+        ooi=http_header_hostname.reference, finding_type=KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP").reference
+    )
