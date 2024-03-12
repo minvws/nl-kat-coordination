@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-07 10:28+0000\n"
+"POT-Creation-Date: 2024-03-12 10:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3846,6 +3846,18 @@ msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
 "needs at least a clearance level of L{} in order to do a proper onboarding. "
 "Edit this member and change the clearance level if necessary."
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page number is not an integer"
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page number is less than 1"
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page contains no results"
 msgstr ""
 
 #: rocky/scheduler.py
