@@ -38,7 +38,7 @@ def test_disallowed_csp_headers_allow_url_shortener():
         ),
     )
 
-    results = list(run(http_header_hostname, [], {"disallow_url_shorteners": "false"}))
+    results = list(run(http_header_hostname, [], {"disallow_url_shorteners": False}))
 
     assert results == []
 
