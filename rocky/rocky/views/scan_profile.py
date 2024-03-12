@@ -3,7 +3,6 @@ from typing import Any
 
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from tools.forms.ooi import SetClearanceLevelForm
@@ -26,15 +25,6 @@ class ScanProfileDetailView(OOIDetailView, FormView):
             organization=self.organization
         ).exists()
         return context
-
-    def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
-        form = self.get_form()
-        if form.is_valid():
-            level = form.cleaned_data["level"]
-            if not self.can_raise_clearance_level(self.ooi, level):
-                return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
-        return self.get(request, *args, **kwargs)
 
     def get_initial(self):
         initial = super().get_initial()
