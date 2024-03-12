@@ -89,4 +89,6 @@
             </table>
         {% endif %}
     {% endfor %}
+{% else %}
+    <p>{% translate "No IPs have been found on this system." %}</p>
 {% endif %}

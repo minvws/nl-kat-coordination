@@ -25,13 +25,17 @@
                         <tr>
                             <td>{{ hostname }}</td>
                             <td>
-                                {% for system in info.systems %}
-                                    {% if not forloop.last %}
-                                        {{ system }},
-                                    {% else %}
-                                        {{ system }}
-                                    {% endif %}
-                                {% endfor %}
+                                {% if info.systems %}
+                                    {% for system in info.systems %}
+                                        {% if not forloop.last %}
+                                            {{ system }},
+                                        {% else %}
+                                            {{ system }}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    -
+                                {% endif %}
                             </td>
                             <td>
                                 {% if info.enabled %}

@@ -29,19 +29,27 @@
                         {# djLint formatting adds spaces before the comma. #}
                         {# djlint:off #}
                         <td>
-                            {% for port, found_by_openkat in detailed_data.ports.items %}
-                                {% if found_by_openkat %}
-                                    <strong><span class="visually-hidden">({% translate "Direct scan" %})</span>{{ port }}</strong>{% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
-                                {% else %}
-                                    {{ port }}{% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
-                                {% endif %}
-                            {% endfor %}
+                            {% if detailed_data.ports %}
+                                {% for port, found_by_openkat in detailed_data.ports.items %}
+                                    {% if found_by_openkat %}
+                                        <strong><span class="visually-hidden">({% translate "Direct scan" %})</span>{{ port }}</strong>{% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
+                                    {% else %}
+                                        {{ port }}{% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                -
+                            {% endif %}
 
                         </td>
                         <td>
-                            {% for hostnames in detailed_data.hostnames %}
-                                {{ hostnames }}{% if detailed_data.hostnames|length > 1 and not forloop.last %},{% endif %}
-                            {% endfor %}
+                            {% if detailed_data.hostnames %}
+                                {% for hostnames in detailed_data.hostnames %}
+                                    {{ hostnames }}{% if detailed_data.hostnames|length > 1 and not forloop.last %},{% endif %}
+                                {% endfor %}
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
                         {# djlint:on #}
                     </tr>
