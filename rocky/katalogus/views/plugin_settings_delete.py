@@ -69,20 +69,20 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
                 messages.SUCCESS,
                 _("Settings for plugin {} successfully deleted.").format(self.plugin.name),
             )
-        except HTTPStatusError as e:
-            if e.response.status_code == codes.NOT_FOUND:
+        except (HTTPStatusError, RequestError) as e:
+            if isinstance(e, HTTPStatusError) and e.response.status_code == codes.NOT_FOUND:
                 messages.add_message(
                     request,
                     messages.WARNING,
                     _("Plugin {} has no settings.").format(self.plugin.name),
                 )
-        except RequestError:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("Failed deleting Settings for plugin {}. Check the Katalogus logs for more info.").format(
-                    self.plugin.name
-                ),
-            )
+            else:
+                messages.add_message(
+                    request,
+                    messages.ERROR,
+                    _("Failed deleting Settings for plugin {}. Check the Katalogus logs for more info.").format(
+                        self.plugin.name
+                    ),
+                )
         finally:
             return HttpResponseRedirect(self.get_success_url())
