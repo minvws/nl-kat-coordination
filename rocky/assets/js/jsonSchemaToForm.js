@@ -332,7 +332,7 @@ function ContentFromPostObject(wrapper, identifier, path, schema){
       data = wrapper.elements[identifier+subpath].value;
     }
 
-    if (data){
+    if (data || fieldtype == 'boolean'){
       if (schema['properties'][fieldname]['type'] == 'number'){
         data = parseFloat(data);
       } else if (schema['properties'][fieldname]['type'] == 'integer'){
