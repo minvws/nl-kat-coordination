@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-29 12:54+0000\n"
+"POT-Creation-Date: 2024-03-12 13:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -253,8 +253,8 @@ msgstr ""
 #: account/mixins.py
 #, python-format
 msgid ""
-"Could not raise clearance level of %s to L%s.                 "
-"Indemnification not present at organization %s."
+"Could not raise clearance level of %s to L%s. Indemnification not present at "
+"organization %s."
 msgstr ""
 
 #: account/mixins.py
@@ -6091,10 +6091,6 @@ msgstr ""
 #: rocky/views/organization_settings.py
 #, python-brace-format
 msgid "Recalculated {number_of_bits} bits. Duration: {duration}"
-msgstr ""
-
-#: rocky/views/scan_profile.py
-msgid "Choose a valid level"
 msgstr ""
 
 #: rocky/views/scan_profile.py
