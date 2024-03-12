@@ -14,9 +14,8 @@
     },
     "disallow_url_shorteners": {
       "description": "Do you want to disallow url shorteners in csp headers?",
-      "type": "string",
-      "pattern": "^(true|false)$",
-      "default": "true"
+      "type": "boolean",
+      "default": true
     }
   }
 }
