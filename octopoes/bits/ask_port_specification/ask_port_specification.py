@@ -10,7 +10,7 @@ from octopoes.models.ooi.question import Question
 def run(
     input_ooi: Network,
     additional_oois: list,
-    config: dict[str, str],
+    config: dict,
 ) -> Iterator[OOI]:
     network = input_ooi
 

@@ -6,7 +6,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(hostname: Hostname, additional_oois: list[Finding | DNSNSRecord], config: dict[str, str]) -> Iterator[OOI]:
+def run(hostname: Hostname, additional_oois: list[Finding | DNSNSRecord], config: dict) -> Iterator[OOI]:
     no_ipv6_findings = [
         finding
         for finding in additional_oois

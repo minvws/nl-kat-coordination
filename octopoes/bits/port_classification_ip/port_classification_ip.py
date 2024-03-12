@@ -44,7 +44,7 @@ def get_ports_from_config(config, config_key, default):
     return list(map(int, ports.split(","))) if ports else []
 
 
-def run(input_ooi: IPPort, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: IPPort, additional_oois: list, config: dict) -> Iterator[OOI]:
     aggregate_findings = config.get("aggregate_findings", "False").lower() == "true" if config else False
     open_ports = []
 

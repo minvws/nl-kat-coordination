@@ -9,7 +9,7 @@ from octopoes.models.ooi.web import Website
 THRESHOLD = datetime.timedelta(weeks=2)
 
 
-def run(input_ooi: X509Certificate, additional_oois: list[Website], config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: X509Certificate, additional_oois: list[Website], config: dict) -> Iterator[OOI]:
     # only applies to OOIs referencing the certificate
     if input_ooi.expired:
         ft = KATFindingType(id="KAT-CERTIFICATE-EXPIRED")

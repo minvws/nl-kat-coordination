@@ -6,7 +6,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import Website
 
 
-def run(input_ooi: Hostname, additional_oois: list[Finding | Website], config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: list[Finding | Website], config: dict) -> Iterator[OOI]:
     # only websites have to comply with the internetnl rules
     websites = [websites for websites in additional_oois if isinstance(websites, Website)]
     if not websites:

@@ -8,7 +8,7 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(input_ooi: Hostname, additional_oois: list[DNSCAARecord | NXDOMAIN], config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: list[DNSCAARecord | NXDOMAIN], config: dict) -> Iterator[OOI]:
     caa_records = [ooi for ooi in additional_oois if isinstance(ooi, DNSCAARecord)]
     nxdomains = (ooi for ooi in additional_oois if isinstance(ooi, NXDOMAIN))
 

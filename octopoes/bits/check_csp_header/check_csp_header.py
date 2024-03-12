@@ -9,7 +9,7 @@ from octopoes.models.types import HTTPHeader
 NON_DECIMAL_FILTER = re.compile(r"[^\d.]+")
 
 
-def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: list, config: dict) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "content-security-policy":
         return

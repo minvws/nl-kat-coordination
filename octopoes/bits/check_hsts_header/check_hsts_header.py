@@ -6,7 +6,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import HTTPHeader
 
 
-def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: list, config: dict) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "strict-transport-security":
         return

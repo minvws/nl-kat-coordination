@@ -19,7 +19,7 @@ def get_disallowed_hostnames_from_config(config, config_key, default):
     return list(disallowed_hostnames.strip().split(",")) if disallowed_hostnames else []
 
 
-def run(input_ooi: HTTPHeaderHostname, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeaderHostname, additional_oois: list, config: dict) -> Iterator[OOI]:
     header_hostname = input_ooi
     header = header_hostname.header
 

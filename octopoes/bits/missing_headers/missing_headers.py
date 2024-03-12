@@ -5,7 +5,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
 
-def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, str]) -> Iterator[OOI]:
+def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict) -> Iterator[OOI]:
     if not additional_oois:
         return
 

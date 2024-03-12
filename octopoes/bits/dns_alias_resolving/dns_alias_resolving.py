@@ -6,9 +6,7 @@ from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.network import Network
 
 
-def run(
-    hostname: Hostname, additional_oois: list[DNSCNAMERecord | ResolvedHostname], config: dict[str, str]
-) -> Iterator[OOI]:
+def run(hostname: Hostname, additional_oois: list[DNSCNAMERecord | ResolvedHostname], config: dict) -> Iterator[OOI]:
     cname_records = [ooi for ooi in additional_oois if isinstance(ooi, DNSCNAMERecord)]
     resolved_hostnames = [ooi for ooi in additional_oois if isinstance(ooi, ResolvedHostname)]
 

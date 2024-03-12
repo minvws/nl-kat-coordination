@@ -7,9 +7,7 @@ from octopoes.models.ooi.web import HTTPHeaderHostname
 from octopoes.models.types import NXDOMAIN
 
 
-def run(
-    input_ooi: Hostname, additional_oois: list[NXDOMAIN | HTTPHeaderHostname], config: dict[str, str]
-) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: list[NXDOMAIN | HTTPHeaderHostname], config: dict) -> Iterator[OOI]:
     hostname_exists = True
     headers = []
     for ooi in additional_oois:

@@ -9,7 +9,7 @@ from octopoes.models.ooi.email_security import DKIMExists
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(input_ooi: Hostname, additional_oois: list[DKIMExists | NXDOMAIN], config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: list[DKIMExists | NXDOMAIN], config: dict) -> Iterator[OOI]:
     dkim_exists = [ooi for ooi in additional_oois if isinstance(ooi, DKIMExists)]
     nxdomains = (ooi for ooi in additional_oois if isinstance(ooi, NXDOMAIN))
 
