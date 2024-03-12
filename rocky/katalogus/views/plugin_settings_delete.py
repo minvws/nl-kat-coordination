@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from httpx import HTTPStatusError, codes
+from httpx import HTTPStatusError, RequestError, codes
 
 from katalogus.views.mixins import SinglePluginView
 
@@ -70,20 +70,19 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
                 _("Settings for plugin {} successfully deleted.").format(self.plugin.name),
             )
         except HTTPStatusError as e:
-            if e.response and e.response.status_code == codes.NOT_FOUND:
+            if e.response.status_code == codes.NOT_FOUND:
                 messages.add_message(
                     request,
                     messages.WARNING,
                     _("Plugin {} has no settings.").format(self.plugin.name),
                 )
-            else:
-                messages.add_message(
-                    request,
-                    messages.ERROR,
-                    _("Failed deleting Settings for plugin {}. Check the Katalogus logs for more info.").format(
-                        self.plugin.name
-                    ),
-                )
+        except RequestError:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("Failed deleting Settings for plugin {}. Check the Katalogus logs for more info.").format(
+                    self.plugin.name
+                ),
+            )
+        finally:
             return HttpResponseRedirect(self.get_success_url())
-
-        return HttpResponseRedirect(self.get_success_url())

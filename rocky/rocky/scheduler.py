@@ -10,7 +10,7 @@ from typing import Any
 import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPStatusError, codes
+from httpx import HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 
 from rocky.health import ServiceHealth
@@ -253,6 +253,8 @@ class SchedulerClient:
                 raise ConflictError()
             else:
                 raise SchedulerError()
+        except RequestError:
+            raise SchedulerError()
 
     def health(self) -> ServiceHealth:
         health_endpoint = self._client.get("/health")

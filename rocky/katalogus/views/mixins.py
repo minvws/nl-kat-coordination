@@ -6,7 +6,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPStatusError
+from httpx import HTTPError, HTTPStatusError
 from rest_framework.status import HTTP_404_NOT_FOUND
 from tools.view_helpers import schedule_task
 
@@ -42,7 +42,7 @@ class SinglePluginView(OrganizationView):
         except HTTPStatusError as e:
             if e.response.status_code == HTTP_404_NOT_FOUND:
                 raise Http404(f"Plugin {plugin_id} not found.")
-
+        except HTTPError:
             messages.add_message(
                 self.request,
                 messages.ERROR,

@@ -1,3 +1,4 @@
+import functools
 import logging
 from collections.abc import Callable
 from datetime import datetime, timezone
@@ -41,12 +42,17 @@ class XTDBStatus(BaseModel):
     size: int | None = None
 
 
+@functools.cache
+def _get_xtdb_http_session(base_url: str) -> httpx.Client:
+    return httpx.Client(
+        base_url=base_url, headers={"Accept": "application/json"}, transport=(httpx.HTTPTransport(retries=3))
+    )
+
+
 class XTDBHTTPClient:
     def __init__(self, base_url, client: str):
         self._client = client
-        self._session = httpx.Client(
-            base_url=base_url, headers={"Accept": "application/json"}, transport=(httpx.HTTPTransport(retries=3))
-        )
+        self._session = _get_xtdb_http_session(base_url)
 
     @staticmethod
     def _verify_response(response: Response) -> None:
