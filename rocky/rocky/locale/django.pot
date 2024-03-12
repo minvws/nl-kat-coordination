@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-11 16:46+0000\n"
+"POT-Creation-Date: 2024-03-12 16:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3020,6 +3020,11 @@ msgstr ""
 msgid "RPKI record does not exist."
 msgstr ""
 
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+msgid "No IPs have been found on this system."
+msgstr ""
+
 #: reports/report_types/rpki_report/report.py
 msgid "RPKI Report"
 msgstr ""
@@ -3048,6 +3053,10 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.html
 msgid "Selected assets:"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "No system types have been identified on this system."
 msgstr ""
 
 #: reports/report_types/systems_report/report.py
@@ -3120,7 +3129,7 @@ msgid "Advice"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-msgid "No findings have been found on this system."
+msgid "No vulnerabilities have been found on this system."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
