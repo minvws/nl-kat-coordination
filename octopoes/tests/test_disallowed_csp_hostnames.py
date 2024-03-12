@@ -28,10 +28,12 @@ def test_disallowed_csp_headers_simple_finding():
 
     results = list(run(http_header_hostname, [], {}))
 
-    assert results[0] == KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP")
-    assert results[1] == Finding(
-        ooi=http_header_hostname.reference, finding_type=KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP").reference
-    )
+    assert results == [
+        KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP"),
+        Finding(
+            ooi=http_header_hostname.reference, finding_type=KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP").reference
+        ),
+    ]
 
 
 def test_disallowed_csp_headers_allow_url_shortener():
@@ -57,7 +59,9 @@ def test_disallowed_csp_headers_disallow_custom_hostname():
 
     results = list(run(http_header_hostname, [], {"disallowed_hostnames": "example.com"}))
 
-    assert results[0] == KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP")
-    assert results[1] == Finding(
-        ooi=http_header_hostname.reference, finding_type=KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP").reference
-    )
+    assert results == [
+        KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP"),
+        Finding(
+            ooi=http_header_hostname.reference, finding_type=KATFindingType(id="KAT-DISALLOWED-DOMAIN-IN-CSP").reference
+        ),
+    ]
