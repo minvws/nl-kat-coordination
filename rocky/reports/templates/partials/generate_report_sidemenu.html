@@ -13,7 +13,7 @@
                 {% for report_type,data in report.items %}
                     {% if data.data %}
                         <li>
-                            <a href="#{{ report_type }}-{{ ooi }}">{{ report_type }} {% translate "for" %} {{ ooi }}</a>
+                            <a href="#{{ report_type }}-{{ ooi }}">{{ report_type }} {% translate "for" %} {{ data.ooi_human_readable }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}

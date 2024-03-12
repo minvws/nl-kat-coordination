@@ -173,10 +173,15 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                 continue
 
             for ooi, data in results.items():
+                ooi_human_readable = Reference.from_str(ooi).human_readable
                 if ooi not in report_data:
                     report_data[ooi] = {}
 
-                report_data[ooi][report_type.name] = {"data": data, "template": report_type.template_path}
+                report_data[ooi][report_type.name] = {
+                    "data": data,
+                    "template": report_type.template_path,
+                    "ooi_human_readable": ooi_human_readable,
+                }
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
