@@ -6,6 +6,7 @@ window.addEventListener('load', (event) => {
 var inputtypes = {
   'string': 'text',
   'integer': 'number',
+  'boolean': 'checkbox',
 }
 
 var formattypes = {
@@ -212,9 +213,11 @@ function renderfield(required, originalvalue, path, name, field) {
     });
   } else {
     if (!fieldformat) {
-      fieldformat = ['input',
+      fieldformat = [
+        'input',
         (field['type']?field['type']:'text'),
-        null];
+        null
+      ];
     }
     input = document.createElement(fieldformat[0]);
     input.type = fieldformat[1];
@@ -227,13 +230,12 @@ function renderfield(required, originalvalue, path, name, field) {
   if (field['pattern']) {
     input.pattern = field['pattern'];
   }
-  if (!field['format'] &&
-    field['type']) {
+  if (!field['format'] && field['type']) {
     input.type = (field['type'] in inputtypes ?
       inputtypes[field['type']]:
       field['type']);
   }
-  if (field['type'] === 'number'){
+  if (field['type'] == 'number'){
     if (field['multipleOf']){
       input.step = field['multipleOf'];
     } else {
@@ -251,6 +253,9 @@ function renderfield(required, originalvalue, path, name, field) {
     if (field['exclusiveMaximum']){
       input.max = field['exclusiveMaximum']-1;
     }
+  }
+  if (field['type'] == 'boolean' && field['default']){
+    input.checked = field['default'];
   }
   if (field['default']) {
     input.value = field['default'];
@@ -316,10 +321,13 @@ function ContentFromPostObject(wrapper, identifier, path, schema){
     subpath = path + '_' + fieldname;
     childschema = schema['properties'][fieldname];
     data = null;
-    if (schema['properties'][fieldname]['type'] == 'array'){
+    let fieldtype = schema['properties'][fieldname]['type'];
+    if (fieldtype == 'array'){
       data = ContentFromPostArray(wrapper, identifier, subpath, fieldname, childschema);
-    } else if (schema['properties'][fieldname]['type'] == 'object'){
+    } else if (fieldtype == 'object'){
       data = ContentFromPostObject(wrapper, identifier, subpath, childschema);
+    } else if (fieldtype == 'boolean'){
+      data = wrapper.elements[identifier+subpath].checked;
     } else if (wrapper.elements[identifier+subpath]){
       data = wrapper.elements[identifier+subpath].value;
     }
