@@ -1,10 +1,12 @@
 import uuid
 from typing import Any, ClassVar
 
+import mmh3
 import pydantic
-from scheduler import models
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
+
+from scheduler import models
 
 
 class TestModel(pydantic.BaseModel):
@@ -20,6 +22,10 @@ class TestModel(pydantic.BaseModel):
 
         if self.categories is None:
             self.categories = []
+
+    @property
+    def hash(self) -> str:
+        return mmh3.hash(f"{self.id}-{self.name}")
 
 
 def create_p_item_request(priority: int, data: TestModel | None = None) -> models.PrioritizedItemRequest:
@@ -42,10 +48,16 @@ def create_p_item(scheduler_id: str, priority: int, data: TestModel | None = Non
             name=uuid.uuid4().hex,
         )
 
+    # Create task
+    task = models.Task(
+        hash=data.hash,
+        data=data.model_dump(),
+    )
+
     return models.PrioritizedItem(
         scheduler_id=scheduler_id,
         priority=priority,
-        data=data.model_dump(),
+        task=task,
     )
 
 

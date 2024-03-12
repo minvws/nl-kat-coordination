@@ -263,9 +263,8 @@ class Scheduler(abc.ABC):
         schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(p_item.hash)
         if schedule_db is None:
             schedule_db = self.ctx.datastores.schedule_store.create_schedule(
-                models.Schedule(
+                models.TaskSchedule(
                     scheduler_id=self.scheduler_id,
-                    p_item=p_item,
                     deadline_at=datetime.now(timezone.utc) + timedelta(seconds=self.ctx.config.pq_grace_period),
                     created_at=datetime.now(timezone.utc),
                     modified_at=datetime.now(timezone.utc),

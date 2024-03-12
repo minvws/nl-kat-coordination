@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -11,11 +11,10 @@ from scheduler.utils import GUID, cron
 
 from .base import Base
 from .errors import ValidationError
-from .queue import PrioritizedItem
-from .tasks import Task, TaskRun
+from .tasks import Task
 
 
-class Schedule(BaseModel):
+class TaskSchedule(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -30,8 +29,6 @@ class Schedule(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    # TODO: index on the p_item.hash
-
     def validate(self):
         """Validate the schedule model"""
         if self.cron_expression is not None:
@@ -41,16 +38,15 @@ class Schedule(BaseModel):
                 raise ValidationError(f"Invalid cron expression: {self.cron_expression}") from exc
 
 
-class ScheduleDB(Base):
-    __tablename__ = "schedules"
+class TaskScheduleDB(Base):
+    __tablename__ = "task_schedules"
 
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String)
     enabled = Column(Boolean, nullable=False, default=True)
-    p_item = Column(JSONB, nullable=False)
 
     task_id = Column(GUID, ForeignKey("tasks.id"))
-    task = relationship("TaskDB")
+    task = relationship("TaskDB", back_populates="schedule")
 
     cron_expression = Column(String, nullable=True)
 
@@ -76,3 +72,5 @@ class ScheduleDB(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    __table_args__ = (UniqueConstraint("task_id"),)

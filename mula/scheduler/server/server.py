@@ -133,7 +133,7 @@ class Server:
             path="/schedules",
             endpoint=self.list_schedules,
             methods=["GET", "POST"],
-            response_model=PaginatedResponse | models.Schedule,
+            response_model=PaginatedResponse | models.TaskSchedule,
             status_code=status.HTTP_200_OK,
             description="List all schedules",
         )
@@ -142,7 +142,7 @@ class Server:
             path="/schedules/{schedule_id}",
             endpoint=self.get_schedule,
             methods=["GET"],
-            response_model=models.Schedule,
+            response_model=models.TaskSchedule,
             status_code=status.HTTP_200_OK,
             description="Get a schedule",
         )
@@ -151,7 +151,7 @@ class Server:
             path="/schedules/{schedule_id}",
             endpoint=self.patch_schedule,
             methods=["PATCH"],
-            response_model=models.Schedule,
+            response_model=models.TaskSchedule,
             status_code=status.HTTP_200_OK,
             description="Update a schedule",
         )
@@ -372,7 +372,7 @@ class Server:
 
     def create_schedule(self, schedule: models.ScheduleRequest) -> Any:
         try:
-            schedule = models.Schedule(**schedule.dict())
+            schedule = models.TaskSchedule(**schedule.dict())
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -420,7 +420,7 @@ class Server:
                 detail="schedule not found",
             )
 
-        return models.Schedule(**schedule.model_dump())
+        return models.TaskSchedule(**schedule.model_dump())
 
     def patch_schedule(self, schedule_id: str, item: dict) -> Any:
         if len(item) == 0:

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -50,7 +50,7 @@ class PrioritizedItemDB(Base):
     priority = Column(Integer)
 
     task_id = Column(GUID, ForeignKey("tasks.id"))
-    task = relationship("TaskDB")
+    task = relationship("TaskDB", back_populates="p_item")
 
     created_at = Column(
         DateTime(timezone=True),
@@ -64,6 +64,8 @@ class PrioritizedItemDB(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    __table_args__ = (UniqueConstraint("task_id"),)
 
 
 class Queue(BaseModel):
