@@ -1,4 +1,4 @@
-from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.core.paginator import EmptyPage, Page, PageNotAnInteger, Paginator
 from django.utils.translation import gettext_lazy as _
 
 
@@ -15,7 +15,7 @@ class RockyPaginator(Paginator):
         if orphans != 0:
             raise ValueError("Setting orphans is not supported")
 
-    def validate_number(self, number):
+    def validate_number(self, number) -> int:
         """Validate the given 1-based page number."""
         try:
             if isinstance(number, float) and not number.is_integer():
@@ -27,7 +27,7 @@ class RockyPaginator(Paginator):
             raise EmptyPage(_("That page number is less than 1"))
         return number
 
-    def page(self, number):
+    def page(self, number) -> Page:
         """Return a Page object per page number."""
         number = self.validate_number(number)
         bottom = (number - 1) * self.per_page
