@@ -28,23 +28,13 @@ class ScanProfileDetailView(OOIDetailView, FormView):
         return context
 
     def post(self, request, *args, **kwargs):
-        if not self.indemnification_present:
-            return self.get(request, status_code=403, *args, **kwargs)
-
         super().post(request, *args, **kwargs)
         form = self.get_form()
         if form.is_valid():
             level = form.cleaned_data["level"]
             if not self.can_raise_clearance_level(self.ooi, level):
-                return self.get(request, status=403, *args, **kwargs)
-            return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
-        else:
-            messages.add_message(
-                self.request,
-                messages.WARNING,
-                _("Choose a valid level").format(ooi_name=self.ooi.human_readable),
-            )
-        return redirect(get_ooi_url("scan_profile_detail", self.ooi.primary_key, self.organization.code))
+                return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
+        return self.get(request, *args, **kwargs)
 
     def get_initial(self):
         initial = super().get_initial()
