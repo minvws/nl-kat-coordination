@@ -18,7 +18,6 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     website_original = Reference.from_str(boefje_meta.input_ooi)
     input_ = boefje_meta.arguments["input"]
 
-    location_rfc_compliant = False
     for path, details in results.items():
         if details["content"] is None:
             continue
@@ -30,15 +29,6 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         url = URL(raw=details["url"], network=Network(name=input_["hostname"]["network"]["name"]).reference)
         yield url
 
-        # Check for legacy url https://www.rfc-editor.org/rfc/rfc9116#section-3-1
-        if path == ".well-known/security.txt":
-            location_rfc_compliant = True
-        elif path == "security.txt" and not location_rfc_compliant:
-            ft = KATFindingType(id="KAT-LEGACY-SECURITY-LOCATION")
-            yield ft
-            yield Finding(
-                description="Only legacy Security.txt location found.", finding_type=ft.reference, ooi=url.reference
-            )
         url_parts = urlparse(details["url"])
         # we need to check if the website of the response is the same as the input website
         if (
@@ -96,3 +86,11 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
                 security_txt=None,
             )
             yield security_txt_original
+
+    # Check for legacy url https://www.rfc-editor.org/rfc/rfc9116#section-3-1
+    if "security.txt" in results and ".well-known/security.txt" not in results:
+        ft = KATFindingType(id="KAT-LEGACY-SECURITY-LOCATION")
+        yield ft
+        yield Finding(
+            description="Only legacy Security.txt location found.", finding_type=ft.reference, ooi=website_original
+        )
