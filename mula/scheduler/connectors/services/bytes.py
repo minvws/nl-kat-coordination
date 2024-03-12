@@ -5,7 +5,7 @@ from functools import wraps
 from typing import Any
 
 import httpx
-from httpx import HTTPError, HTTPStatusError
+from httpx import HTTPStatusError
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import BoefjeMeta
@@ -22,7 +22,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
             return function(self, *args, **kwargs)
         except HTTPStatusError as error:
             if error.response.status_code != 401:
-                raise error from HTTPError
+                raise
 
             self.login()
             return function(self, *args, **kwargs)

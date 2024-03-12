@@ -69,7 +69,7 @@ class KATalogusClientV1:
         self.organization_uri = f"{base_uri}/v1/organisations/{organization}"
 
     def organization_exists(self) -> bool:
-        response = self.session.get(f"{self.organization_uri}")
+        response = self.session.get(self.organization_uri)
 
         return response.status_code != 404
 

@@ -119,7 +119,6 @@ class BytesAPIClient:
         )
 
         self._verify_response(response)
-        logger.error("response is: %s", response.json())
         return UUID(response.json()["id"])
 
     @retry_with_login

@@ -155,21 +155,21 @@ class OctopoesAPIConnector:
         self.session.post(
             f"/{self.client}/observations",
             headers={"Content-Type": "application/json"},
-            content=observation.model_dump_json().encode(),
+            content=observation.model_dump_json(),
         )
 
     def save_declaration(self, declaration: Declaration) -> None:
         self.session.post(
             f"/{self.client}/declarations",
             headers={"Content-Type": "application/json"},
-            content=declaration.model_dump_json().encode(),
+            content=declaration.model_dump_json(),
         )
 
     def save_affirmation(self, affirmation: Affirmation) -> None:
         self.session.post(
             f"/{self.client}/affirmations",
             headers={"Content-Type": "application/json"},
-            content=affirmation.model_dump_json().encode(),
+            content=affirmation.model_dump_json(),
         )
 
     def save_scan_profile(self, scan_profile: ScanProfile, valid_time: datetime):
@@ -178,7 +178,7 @@ class OctopoesAPIConnector:
             f"/{self.client}/scan_profiles",
             params=params,
             headers={"Content-Type": "application/json"},
-            content=scan_profile.model_dump_json().encode(),
+            content=scan_profile.model_dump_json(),
         )
 
     def save_many_scan_profiles(self, scan_profiles: list[ScanProfile], valid_time: datetime) -> None:

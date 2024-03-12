@@ -88,13 +88,15 @@ class BytesClient:
 
     def _save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
         response = self.session.post(
-            "/bytes/boefje_meta", content=boefje_meta.json(), headers={"content-type": "application/json"}
+            "/bytes/boefje_meta", content=boefje_meta.model_dump_json(), headers={"content-type": "application/json"}
         )
         response.raise_for_status()
 
     def _save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
         response = self.session.post(
-            "/bytes/normalizer_meta", content=normalizer_meta.json(), headers={"content-type": "application/json"}
+            "/bytes/normalizer_meta",
+            content=normalizer_meta.model_dump_json(),
+            headers={"content-type": "application/json"},
         )
 
         response.raise_for_status()

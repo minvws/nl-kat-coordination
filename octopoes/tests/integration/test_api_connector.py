@@ -21,7 +21,6 @@ if os.environ.get("CI") != "1":
 
 def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="test")
-    print("octopoes_api_connector url", octopoes_api_connector.base_uri)
     octopoes_api_connector.save_declaration(
         Declaration(
             ooi=network,

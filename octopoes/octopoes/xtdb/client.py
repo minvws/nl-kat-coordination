@@ -115,7 +115,7 @@ class XTDBHTTPClient:
         res = self._session.post(
             f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
-            content=str(query).encode(),
+            content=str(query),
             headers={"Content-Type": "application/edn"},
         )
         self._verify_response(res)
