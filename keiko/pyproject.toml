@@ -25,6 +25,7 @@ robotframework = "^7.0"
 robotframework-debuglibrary = "^2.3.0"
 robotframework-requests = "^0.9.3"
 pytest-dotenv = "^0.5.2"
+httpx = "^0.27.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
