@@ -185,7 +185,7 @@ class WebSystemReport(Report):
                     + no_certificate_finding_types.get(hostname, [])
                     + port_finding_types.get(hostname, [])
                     + certificate_finding_types.get(hostname, [])
-                    + security_txt_finding_types
+                    + security_txt_finding_types.get(hostname, [])
                 )
 
                 for finding_type in new_types:
