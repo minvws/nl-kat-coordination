@@ -21,6 +21,7 @@
                     {% endblocktranslate %}
                 </p>
             </div>
+            {{ ooi.raw.dns_zone }}
             <div>
                 <p>{% translate "URL" %}</p>
                 <dl>
@@ -49,28 +50,18 @@
                         </dd>
                     </div>
                     <div>
-                        <dt>{% translate "DNS Zone" %}</dt>
-                        <dd>
-                            {{ ooi.raw.tld }}
-                        </dd>
-                    </div>
-                    <div>
                         <dt>{% translate "Network" %}</dt>
                         <dd>
                             {{ ooi.network }}
                         </dd>
                     </div>
                 </dl>
-                <form method="post" class="inline">
-                    {% csrf_token %}
-                    <div class="button-container">
-                        <button type="submit" class="button">{% translate "Start scanning" %}</button>
-                        {% if organization %}
-                            <a href="{% url "complete_onboarding" organization.code %}"
-                               class="button ghost">{% translate "Skip onboarding" %}</a>
-                        {% endif %}
-                    </div>
-                </form>
+            </div>
+            <div class="button-container">
+                <a href="{% url "step_report" organization.code %}?{{ request.GET.urlencode }}"
+                   class="button">{% translate "Start scanning" %}</a>
+                <a href="{% url "complete_onboarding" organization.code %}"
+                   class="button ghost">{% translate "Skip onboarding" %}</a>
             </div>
         </section>
     </main>
