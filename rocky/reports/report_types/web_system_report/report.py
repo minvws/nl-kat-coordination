@@ -7,7 +7,7 @@ from typing import Any, cast
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.findings import KATFindingType, RiskLevelSeverity
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
