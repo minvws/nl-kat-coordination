@@ -61,12 +61,12 @@ def test_open_ports_report_ip_multiple_ports_sorting(
     }
     mock_octopoes_api_connector.queries = {
         "IPAddress.<address[is IPPort]": {
-            ipaddressv4.reference: [ip_port, ip_port_443],
+            ipaddressv4.reference: [ip_port_443, ip_port],
         },
         "IPAddress.<address[is ResolvedHostname].hostname": {
             ipaddressv4.reference: [hostname],
         },
-        "IPPort.<ip_port[is IPService].service": {ip_port.reference: [service], ip_port_443.reference: [service]},
+        "IPPort.<ip_port[is IPService].service": {ip_port_443.reference: [service], ip_port.reference: [service]},
     }
 
     report = OpenPortsReport(mock_octopoes_api_connector)
