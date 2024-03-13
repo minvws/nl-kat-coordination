@@ -15,7 +15,6 @@ from onboarding.views import (
     OnboardingSetupScanSelectPluginsView,
 )
 from pytest_django.asserts import assertContains
-from tools.view_helpers import get_ooi_url
 
 from tests.conftest import setup_request
 
@@ -88,12 +87,12 @@ def test_onboarding_setup_scan(request, member, rf):
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_setup_scan_detail(request, member, rf, mock_organization_view_octopoes, network):
-    mock_organization_view_octopoes().get.return_value = network
+def test_onboarding_setup_scan_detail(request, member, rf):
     member = request.getfixturevalue(member)
+
     response = OnboardingSetupScanOOIAddView.as_view()(
-        setup_request(rf.get("step_setup_scan_ooi_add"), member.user),
-        ooi_type="Network",
+        setup_request(rf.get("step_setup_scan_ooi_add", {"report_type": "dns-report"}), member.user),
+        ooi_type="URL",
         organization_code=member.organization.code,
     )
 
@@ -109,16 +108,13 @@ def test_onboarding_setup_scan_detail(request, member, rf, mock_organization_vie
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
 def test_onboarding_setup_scan_detail_create_ooi(
-    request, member, rf, mock_organization_view_octopoes, network, mock_bytes_client
+    request, member, rf, mock_organization_view_octopoes, url, mock_bytes_client
 ):
-    mock_organization_view_octopoes().get.return_value = network
     member = request.getfixturevalue(member)
 
     response = OnboardingSetupScanOOIAddView.as_view()(
         setup_request(
-            rf.post(
-                "step_setup_scan_ooi_add", {"network": "Network|internet", "raw": "http://example.org/", "web_url": ""}
-            ),
+            rf.post("step_setup_scan_ooi_add", {"url": url.raw}),
             member.user,
         ),
         ooi_type="URL",
@@ -126,23 +122,17 @@ def test_onboarding_setup_scan_detail_create_ooi(
     )
 
     assert response.status_code == 302
-    assert response.headers["Location"] == get_ooi_url(
-        "step_clearance_level_introduction", "URL|internet|http://example.org/", member.organization.code
-    )
 
 
-def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organization_view_octopoes, network):
-    mock_organization_view_octopoes().get.return_value = network
-    ooi_id = "Network|internet"
-
+def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organization_view_octopoes, url):
     response = OnboardingClearanceLevelIntroductionView.as_view()(
-        setup_request(rf.get("step_clearance_level_introduction", {"ooi_id": ooi_id}), redteam_member.user),
+        setup_request(rf.get("step_clearance_level_introduction", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
     assert response.status_code == 200
     assertContains(response, "OpenKAT introduction")
-    assertContains(response, "OOI clearance for " + ooi_id)
+    assertContains(response, "OOI clearance for " + url.primary_key)
     assertContains(response, "Introduction")
     assertContains(response, "How to know required clearance level")
     assertContains(response, "Fierce")
@@ -151,18 +141,15 @@ def test_onboarding_clearance_level_introduction(rf, redteam_member, mock_organi
     assertContains(response, "Continue")
 
 
-def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organization_view_octopoes, network):
-    mock_organization_view_octopoes().get.return_value = network
-    ooi_id = "Network|internet"
-
+def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organization_view_octopoes, url):
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
     assert response.status_code == 200
     assertContains(response, "OpenKAT introduction")
-    assertContains(response, "Setup scan - OOI clearance for " + ooi_id)
+    assertContains(response, "Setup scan - OOI clearance for " + url.primary_key)
     assertContains(response, "Trusted clearance level")
     assertContains(response, "Acknowledge clearance level")
     assertContains(response, "What is my clearance level?")
@@ -184,7 +171,7 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
     redteam_member.save()
 
     response_accept = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
@@ -199,13 +186,10 @@ def test_onboarding_acknowledge_clearance_level(rf, redteam_member, mock_organiz
 
 @pytest.mark.parametrize("clearance_level", [-1, 0])
 def test_onboarding_acknowledge_clearance_level_no_clearance(
-    rf, redteam_member, clearance_level, mock_organization_view_octopoes, network
+    rf, redteam_member, clearance_level, mock_organization_view_octopoes, url
 ):
-    mock_organization_view_octopoes().get.return_value = network
-    ooi_id = "Network|internet"
-
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
@@ -215,7 +199,7 @@ def test_onboarding_acknowledge_clearance_level_no_clearance(
     redteam_member.save()
 
     response = OnboardingAcknowledgeClearanceLevelView.as_view()(
-        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        setup_request(rf.get("step_acknowledge_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
     assertContains(response, "Unfortunately you cannot continue the onboarding.")
@@ -228,7 +212,7 @@ def test_onboarding_acknowledge_clearance_level_no_clearance(
         "You need at least a clearance level of <strong>L"
         + str(DNS_REPORT_LEAST_CLEARANCE_LEVEL)
         + "</strong> to scan <strong>"
-        + ooi_id
+        + url.primary_key
         + "</strong>",
     )
     assertContains(response, "Contact your administrator to receive a higher clearance.")
@@ -237,17 +221,14 @@ def test_onboarding_acknowledge_clearance_level_no_clearance(
 
 
 def test_onboarding_set_clearance_level(
-    rf, superuser_member, admin_member, redteam_member, client_member, mock_organization_view_octopoes, network
+    rf, superuser_member, admin_member, redteam_member, client_member, mock_organization_view_octopoes, url
 ):
-    mock_organization_view_octopoes().get.return_value = network
-    ooi_id = "Network|internet"
-
     response_superuser = OnboardingSetClearanceLevelView.as_view()(
-        setup_request(rf.get("step_set_clearance_level", {"ooi_id": ooi_id}), superuser_member.user),
+        setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), superuser_member.user),
         organization_code=superuser_member.organization.code,
     )
     response_redteam = OnboardingSetClearanceLevelView.as_view()(
-        setup_request(rf.get("step_set_clearance_level", {"ooi_id": ooi_id}), redteam_member.user),
+        setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), redteam_member.user),
         organization_code=redteam_member.organization.code,
     )
 
@@ -255,18 +236,18 @@ def test_onboarding_set_clearance_level(
     assert response_superuser.status_code == 200
 
     assertContains(response_redteam, "OpenKAT introduction")
-    assertContains(response_redteam, "Set clearance level for " + ooi_id)
+    assertContains(response_redteam, "Setup scan - Set clearance level for " + str(url.primary_key))
     assertContains(response_redteam, "Set clearance level")
     assertContains(response_redteam, "Skip onboarding")
 
     with pytest.raises(PermissionDenied):
         OnboardingSetClearanceLevelView.as_view()(
-            setup_request(rf.get("step_set_clearance_level", {"ooi_id": ooi_id}), admin_member.user),
+            setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), admin_member.user),
             organization_code=admin_member.organization.code,
         )
     with pytest.raises(PermissionDenied):
         OnboardingSetClearanceLevelView.as_view()(
-            setup_request(rf.get("step_set_clearance_level", {"ooi_id": ooi_id}), client_member.user),
+            setup_request(rf.get("step_set_clearance_level", {"ooi": url.primary_key}), client_member.user),
             organization_code=client_member.organization.code,
         )
 
@@ -276,15 +257,13 @@ def test_onboarding_select_plugins(
     request,
     member,
     rf,
-    mock_views_katalogus,
+    mocker,
     mock_organization_view_octopoes,
-    network,
+    url,
 ):
-    mock_organization_view_octopoes().get.return_value = network
+    mocker.patch("onboarding.views.get_katalogus")
     member = request.getfixturevalue(member)
-    request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi_id": "Network|internet"}), member.user)
-
-    request.session["clearance_level"] = "2"
+    request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi": url.primary_key}), member.user)
 
     response = OnboardingSetupScanSelectPluginsView.as_view()(request, organization_code=member.organization.code)
 
@@ -295,7 +274,7 @@ def test_onboarding_select_plugins(
     assertContains(response, "Boefjes")
     assertContains(response, "Normalizers")
     assertContains(response, "Bits")
-    assertContains(response, "Suggested plugins")
+    assertContains(response, "Required and suggested plugins")
     assertContains(response, "Skip onboarding")
     assertContains(response, "Enable and start scan")
 
@@ -305,27 +284,24 @@ def test_onboarding_select_plugins_perms(
     request,
     member,
     rf,
-    mock_views_katalogus,
-    mock_organization_view_octopoes,
-    network,
+    url,
 ):
-    mock_organization_view_octopoes().get.return_value = network
     member = request.getfixturevalue(member)
-    request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi_id": "Network|internet"}), member.user)
 
-    request.session["clearance_level"] = "2"
+    request = setup_request(rf.get("step_setup_scan_select_plugins", {"ooi": url.primary_key}), member.user)
+
     with pytest.raises(PermissionDenied):
         OnboardingSetupScanSelectPluginsView.as_view()(request, organization_code=member.organization.code)
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_ooi_detail_scan(request, member, rf, mock_organization_view_octopoes, network):
-    mock_organization_view_octopoes().get.return_value = network
+def test_onboarding_ooi_detail_scan(request, member, rf, mock_organization_view_octopoes, url):
     member = request.getfixturevalue(member)
-    request = setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi_id": "Network|internet"}), member.user)
-    request.session["clearance_level"] = "2"
 
-    response = OnboardingSetupScanOOIDetailView.as_view()(request, organization_code=member.organization.code)
+    response = OnboardingSetupScanOOIDetailView.as_view()(
+        setup_request(rf.get("step_setup_scan_ooi_detail", {"ooi": url.primary_key}), member.user),
+        organization_code=member.organization.code,
+    )
 
     assert response.status_code == 200
 
@@ -338,17 +314,22 @@ def test_onboarding_ooi_detail_scan(request, member, rf, mock_organization_view_
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_scanning_boefjes(request, member, rf, mock_organization_view_octopoes, network):
-    mock_organization_view_octopoes().get.return_value = network
+def test_onboarding_scanning_boefjes(request, member, rf, mock_organization_view_octopoes, url, hostname, valid_time):
     member = request.getfixturevalue(member)
+
     response = OnboardingReportView.as_view()(
-        setup_request(rf.get("step_report", {"ooi_id": "Network|internet"}), member.user),
+        setup_request(
+            rf.post(
+                "step_report",
+                {
+                    "observed_at": valid_time.strftime("%Y-%m-%d"),
+                    "ooi": url.primary_key,
+                    "report_type": "dns-report",
+                },
+            ),
+            member.user,
+        ),
         organization_code=member.organization.code,
     )
 
-    assert response.status_code == 200
-
-    assertContains(response, "KAT introduction")
-    assertContains(response, "Report")
-    assertContains(response, "Boefjes are scanning")
-    assertContains(response, "Open my DNS-report")
+    assert response.status_code == 302
