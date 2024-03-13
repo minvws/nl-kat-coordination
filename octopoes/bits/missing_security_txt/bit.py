@@ -1,6 +1,7 @@
 from bits.definitions import BitDefinition, BitParameterDefinition
 from octopoes.models.ooi.web import Website, SecurityTXT
 
+
 BIT = BitDefinition(
     id="missing_security_txt",
     consumes=Website,
