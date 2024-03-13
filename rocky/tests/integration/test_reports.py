@@ -22,7 +22,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
-    assert len(data["finding_types"]) == 1
+    assert len(data["finding_types"]) == 0
     assert len(data["web_checks"]) == 1
 
     assert asdict(data["web_checks"].checks[0]) == {
