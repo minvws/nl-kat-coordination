@@ -53,6 +53,33 @@ def test_open_ports_report_ip_one_port(
     }
 
 
+def test_open_ports_report_ip_multiple_ports_sorting(
+    mock_octopoes_api_connector, valid_time, service, hostname, ipaddressv4, ip_port, ip_port_443
+):
+    mock_octopoes_api_connector.oois = {
+        ipaddressv4.reference: ipaddressv4,
+    }
+    mock_octopoes_api_connector.queries = {
+        "IPAddress.<address[is IPPort]": {
+            ipaddressv4.reference: [ip_port, ip_port_443],
+        },
+        "IPAddress.<address[is ResolvedHostname].hostname": {
+            ipaddressv4.reference: [hostname],
+        },
+        "IPPort.<ip_port[is IPService].service": {ip_port.reference: [service], ip_port_443.reference: [service]},
+    }
+
+    report = OpenPortsReport(mock_octopoes_api_connector)
+
+    data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
+
+    assert data[ipaddressv4.reference] == {
+        "ports": {80: False, 443: False},
+        "hostnames": [hostname.name],
+        "services": {80: [service.name], 443: [service.name]},
+    }
+
+
 def test_open_ports_report_hostname_one_port(
     mock_octopoes_api_connector, valid_time, service, hostname, ipaddressv4, ip_port
 ):

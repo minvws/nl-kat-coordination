@@ -452,6 +452,11 @@ def ip_port(ipaddressv4) -> IPPort:
 
 
 @pytest.fixture
+def ip_port_443(ipaddressv4) -> IPPort:
+    return IPPort(address=ipaddressv4.reference, port=443, protocol=Protocol.TCP)
+
+
+@pytest.fixture
 def hostname(network) -> Hostname:
     return Hostname(name="example.com", network=network.reference)
 
