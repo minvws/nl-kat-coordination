@@ -5,15 +5,15 @@ Steps within a flow can be displayed using this partial.
   border-top: 1px solid $grey;
   width: 100%;
 
-  >ul {
+  > ul {
     padding: 1rem 0;
 
-    >li {
+    > li {
       font-weight: 400;
       list-style-type: none;
       opacity: 0.4;
 
-      >a {
+      > a {
         color: black;
         margin: 0;
         text-decoration: none;
@@ -29,19 +29,24 @@ Steps within a flow can be displayed using this partial.
       }
     }
 
-    >li:not(li[aria-label="current-step"] ~ li) {
+    /* Selects all steps until the active step */
+    > li:not(li[aria-label="current-step"] ~ li) {
       font-weight: 700;
       opacity: 1;
     }
   }
 
   @media (width >= 56rem) {
-    >ul {
+    > ul {
       display: flex;
       flex-direction: row;
-      padding: 2rem 0;
 
-      >li {
+      // padding: 2rem 0;
+      padding: 0;
+
+      > li {
+        margin-top: -1px;
+
         &::before {
           content: "\ea61";
           display: inline-flex;
@@ -55,6 +60,27 @@ Steps within a flow can be displayed using this partial.
           &::before {
             content: none;
           }
+        }
+      }
+
+      /* Selects all steps until the active step */
+      > li:not(li[aria-label="current-step"] ~ li) {
+        font-weight: 700;
+        opacity: 1;
+        border-top: 2px solid var(--colors-purrple-8);
+      }
+
+      > li[aria-label="current-step"] {
+        position: relative;
+
+        &::after {
+          border: 1px dashed red;
+          content: "test";
+          height: 1rem;
+          display: block;
+          position: absolute;
+          top: -1rem;
+          right: 0;
         }
       }
     }
