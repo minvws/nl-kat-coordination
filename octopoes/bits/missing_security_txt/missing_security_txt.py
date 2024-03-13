@@ -2,8 +2,7 @@ from collections.abc import Iterator
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
-from octopoes.models.ooi.web import Website, SecurityTXT
-
+from octopoes.models.ooi.web import SecurityTXT, Website
 
 def run(input_ooi: Website, additional_oois: list[SecurityTXT], config: dict[str, str]) -> Iterator[OOI]:
     if not additional_oois:
