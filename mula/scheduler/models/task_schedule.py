@@ -46,7 +46,7 @@ class TaskScheduleDB(Base):
     enabled = Column(Boolean, nullable=False, default=True)
 
     task_id = Column(GUID, ForeignKey("tasks.id"))
-    task = relationship("TaskDB", back_populates="schedule")
+    task = relationship("TaskDB")
 
     cron_expression = Column(String, nullable=True)
 

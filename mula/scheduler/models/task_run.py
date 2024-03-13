@@ -12,7 +12,7 @@ from sqlalchemy.sql.expression import text
 from scheduler.utils import GUID
 
 from .base import Base
-from .tasks import Task, TaskStatus
+from .task_status import TaskStatus
 
 
 class TaskRun(BaseModel):
@@ -24,7 +24,6 @@ class TaskRun(BaseModel):
 
     type: str
 
-    task: Task
     task_id: uuid.UUID
 
     status: TaskStatus

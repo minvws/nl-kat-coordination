@@ -1,4 +1,3 @@
-import enum
 import uuid
 from datetime import datetime, timezone
 from typing import ClassVar
@@ -18,40 +17,18 @@ from .base import Base
 from .boefje import Boefje
 from .normalizer import Normalizer
 from .raw_data import RawData
-
-
-class TaskStatus(str, enum.Enum):
-    # Task has been created but not yet queued
-    PENDING = "pending"
-
-    # Task has been pushed onto queue and is ready to be picked up
-    QUEUED = "queued"
-
-    # Task has been picked up by a worker
-    DISPATCHED = "dispatched"
-
-    # Task has been picked up by a worker, and the worker indicates that it is
-    # running.
-    RUNNING = "running"
-
-    # Task has been completed
-    COMPLETED = "completed"
-
-    # Task has failed
-    FAILED = "failed"
-
-    # Task has been cancelled
-    CANCELLED = "cancelled"
+from .task_run import TaskRun
+from .task_status import TaskStatus
 
 
 class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     hash: str | None = Field(None, max_length=32)
     data: dict = Field(default_factory=dict)
 
-    task_runs: list["TaskRun"] = []
+    task_runs: list[TaskRun] = []
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -66,6 +43,7 @@ class TaskDB(Base):
 
     # TODO: cascade
     task_runs = relationship("TaskRunDB", back_populates="task")
+    p_item = relationship("PrioritizedItemDB", uselist=False, back_populates="task")
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

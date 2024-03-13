@@ -25,7 +25,14 @@ class TestModel(pydantic.BaseModel):
 
     @property
     def hash(self) -> str:
-        return mmh3.hash(f"{self.id}-{self.name}")
+        return mmh3.hash_bytes(f"{self.id}-{self.name}").hex()
+
+
+def create_test_model() -> TestModel:
+    return TestModel(
+        id=uuid.uuid4().hex,
+        name=uuid.uuid4().hex,
+    )
 
 
 def create_p_item_request(priority: int, data: TestModel | None = None) -> models.PrioritizedItemRequest:
@@ -41,27 +48,29 @@ def create_p_item_request(priority: int, data: TestModel | None = None) -> model
     )
 
 
-def create_p_item(scheduler_id: str, priority: int, data: TestModel | None = None) -> models.PrioritizedItem:
-    if data is None:
-        data = TestModel(
-            id=uuid.uuid4().hex,
-            name=uuid.uuid4().hex,
-        )
-
-    # Create task
-    task = models.Task(
-        hash=data.hash,
-        data=data.model_dump(),
-    )
+def create_p_item(scheduler_id: str, priority: int, task: models.Task | None = None) -> models.PrioritizedItem:
+    if task is None:
+        task = create_task()
 
     return models.PrioritizedItem(
         scheduler_id=scheduler_id,
         priority=priority,
-        task=task,
+        task_id=task.id,
     )
 
 
-def create_task(p_item: models.PrioritizedItem) -> models.TaskRun:
+def create_task() -> models.Task:
+    return models.Task(
+        id=uuid.uuid4(),
+        hash=uuid.uuid4().hex,
+        data=TestModel(
+            id=uuid.uuid4().hex,
+            name=uuid.uuid4().hex,
+        ).model_dump(),
+    )
+
+
+def create_run(p_item: models.PrioritizedItem) -> models.TaskRun:
     return models.TaskRun(
         id=p_item.id,
         hash=p_item.hash,

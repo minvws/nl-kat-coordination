@@ -31,7 +31,7 @@ class PrioritizedItem(BaseModel):
     priority: int | None = 0
 
     task_id: uuid.UUID
-    task: Task
+    task: Task | None = None
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -45,6 +45,7 @@ class PrioritizedItemDB(Base):
 
     scheduler_id = Column(String)
 
+    # TODO: rename to task_hash? or remove and get it through the task?
     hash = Column(String(32), index=True)
 
     priority = Column(Integer)
@@ -64,8 +65,6 @@ class PrioritizedItemDB(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
-
-    __table_args__ = (UniqueConstraint("task_id"),)
 
 
 class Queue(BaseModel):

@@ -26,6 +26,7 @@ class PriorityQueueStore:
 
             if item_orm is None:
                 return None
+            breakpoint()
 
             return models.PrioritizedItem.model_validate(item_orm)
 
