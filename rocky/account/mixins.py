@@ -4,7 +4,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from tools.models import Indemnification, Organization, OrganizationMember
@@ -145,11 +146,14 @@ class OrganizationView(View):
 
         return True
 
-    def can_raise_clearance_level(self, ooi: OOI, level: int) -> bool:
+    def can_raise_clearance_level(
+        self, ooi: OOI, level: int
+    ) -> bool | HttpResponseRedirect | HttpResponsePermanentRedirect:
         try:
             self.raise_clearance_level(ooi.reference, level)
             messages.success(self.request, _("Clearance level has been set"))
             return True
+
         except IndemnificationNotPresentException:
             messages.error(
                 self.request,
@@ -160,6 +164,7 @@ class OrganizationView(View):
                     self.organization.name,
                 ),
             )
+            return redirect("indemnification_add", organization_code=self.organization.code)
 
         except TrustedClearanceLevelTooLowException:
             messages.error(
@@ -175,6 +180,8 @@ class OrganizationView(View):
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
+            return False
+
         except AcknowledgedClearanceLevelTooLowException:
             messages.error(
                 self.request,
@@ -189,7 +196,7 @@ class OrganizationView(View):
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
-        return False
+            return redirect("account_detail", organization_code=self.organization.code)
 
 
 class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):

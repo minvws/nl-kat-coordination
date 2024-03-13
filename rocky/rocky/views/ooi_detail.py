@@ -30,7 +30,6 @@ class PageActions(Enum):
     START_SCAN = "start_scan"
     SUBMIT_ANSWER = "submit_answer"
     RESCHEDULE_TASK = "reschedule_task"
-    CHANGE_CLEARANCE_LEVEL = "change_clearance_level"
 
 
 class OOIDetailView(
@@ -60,12 +59,6 @@ class OOIDetailView(
 
     def handle_page_action(self, action: str) -> bool:
         try:
-            if action == PageActions.CHANGE_CLEARANCE_LEVEL.value:
-                clearance_level = int(self.request.POST.get("level"))
-                if not self.can_raise_clearance_level(self.ooi, clearance_level):
-                    return redirect("account_detail", organization_code=self.organization.code)
-                return self.get(self.request, *self.args, **self.kwargs)
-
             if action == PageActions.RESCHEDULE_TASK.value:
                 task_id = self.request.POST.get("task_id")
                 reschedule_task(self.request, self.organization.code, task_id)

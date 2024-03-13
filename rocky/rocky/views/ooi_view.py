@@ -1,8 +1,7 @@
 from datetime import datetime, timezone
 from time import sleep
-from typing import Any
 
-from django import forms, http
+from django import forms
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -100,9 +99,9 @@ class BaseOOIListView(OOIFilterView, ListView):
 
 
 class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
-    def get(self, request: http.HttpRequest, *args: Any, **kwargs: Any) -> http.HttpResponse:
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.ooi = self.get_ooi()
-        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
