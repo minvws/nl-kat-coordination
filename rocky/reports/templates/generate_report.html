@@ -22,7 +22,7 @@
                             <section id="{{ report_type }}-{{ ooi }}">
                                 <div>
                                     <h2>{{ report_type }} {% translate "for" %} {{ data.ooi_human_readable }}</h2>
-                                    {% include data.template with data=data.data %}
+                                    {% include data.template with data=data.data show_introduction="yes" %}
 
                                 </div>
                             </section>

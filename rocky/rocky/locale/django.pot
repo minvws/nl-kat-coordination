@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 16:59+0000\n"
+"POT-Creation-Date: 2024-03-13 17:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2685,6 +2685,13 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
+msgid ""
+"This report shows the findings found on the system. The overview provides a "
+"summary, followed by a more detailed description of the findings in the next "
+"section."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
 #: reports/report_types/tls_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
@@ -2752,6 +2759,11 @@ msgstr ""
 
 #: reports/report_types/ipv6_report/report.py
 msgid "Check whether hostnames point to ipv6 addresses."
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid ""
+"The mail report shows the possible compliance issues related to mail servers."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
@@ -2939,6 +2951,10 @@ msgid "total"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
+msgid "Text about name server report???"
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
 msgid "Name server compliance:"
 msgstr ""
 
@@ -3052,6 +3068,10 @@ msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
+msgid "The system report shows which system types are connected to the system."
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
 msgid "Selected assets:"
 msgstr ""
 
@@ -3065,6 +3085,10 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Text about TLS report."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3121,6 +3145,12 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
+msgid ""
+"The table below shows the vulnerabilities that have been found on this "
+"system."
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
 msgid "Vulnerabilities:"
 msgstr ""
 
@@ -3153,6 +3183,10 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Evidence"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Text about web system report???"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html

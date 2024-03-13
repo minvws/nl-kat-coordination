@@ -1,5 +1,12 @@
 {% load i18n %}
 
+{% if show_introduction %}
+    <p>
+        {% blocktranslate trimmed %}
+            The system report shows which system types are connected to the system.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
 <div class="horizontal-scroll">
     {% if data.services %}
         <table>

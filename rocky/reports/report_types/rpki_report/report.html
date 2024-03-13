@@ -2,6 +2,8 @@
 
 {% if show_heading %}
     <h2>{% translate "Resource Public Key Infrastructure" %}</h2>
+{% endif %}
+{% if show_heading or show_introduction %}
     <p>
         {% blocktranslate trimmed %}
             This section contains basic security information about resource public key

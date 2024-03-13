@@ -1,5 +1,13 @@
 {% load i18n %}
 
+{% if show_introduction %}
+    <p>
+        {% blocktranslate trimmed %}
+            This report shows the findings found on the system.
+            The overview provides a summary, followed by a more detailed description of the findings in the next section.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
 <div class="horizontal-scroll">
     {% if data %}
         {% include "partials/report_severity_totals.html" with data=data.summary %}

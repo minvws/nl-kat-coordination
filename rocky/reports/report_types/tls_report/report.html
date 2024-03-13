@@ -1,6 +1,13 @@
 {% load i18n %}
 
 <h3>Ciphers</h3>
+{% if show_introduction %}
+    <p>
+        {% blocktranslate trimmed %}
+            Text about TLS report.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
 {% if data.suites %}
     <div class="horizontal-scroll">
         <table>

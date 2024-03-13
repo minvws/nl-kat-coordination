@@ -2,6 +2,8 @@
 
 {% if show_heading %}
     <h2>{% translate "Safe Connections" %}</h2>
+{% endif %}
+{% if show_heading or show_introduction %}
     <p>
         {% blocktranslate trimmed %}
             In this chapter we check if the connections of all the IP ports of the system are safe.
