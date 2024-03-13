@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-05 12:26+0000\n"
+"POT-Creation-Date: 2024-03-12 13:07+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -244,6 +244,32 @@ msgstr ""
 
 #: account/forms/token.py
 msgid "Backup token"
+msgstr ""
+
+#: account/mixins.py
+msgid "Clearance level has been set"
+msgstr ""
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. Indemnification not present at "
+"organization %s."
+msgstr ""
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You were trusted a clearance "
+"level of L%s. Contact your administrator to receive a higher clearance."
+msgstr ""
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
+"level of L%s. Please accept the clearance level first on your profile page "
+"to proceed."
 msgstr ""
 
 #: account/models.py
@@ -957,8 +983,7 @@ msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: tools/forms/boefje.py rocky/templates/scan.html
-#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr ""
@@ -1094,28 +1119,6 @@ msgid ""
 "Getting information for plugin {} failed. Please check the KATalogus logs."
 msgstr ""
 
-#: katalogus/views/mixins.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                             "
-"Indemnification not present at organization %s."
-msgstr ""
-
-#: katalogus/views/mixins.py onboarding/views.py rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You were trusted a clearance "
-"level of L%s. Contact your administrator to receive a higher clearance."
-msgstr ""
-
-#: katalogus/views/mixins.py onboarding/views.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level first on your profile page "
-"to proceed."
-msgstr ""
-
 #: katalogus/views/plugin_detail.py
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
@@ -1202,6 +1205,10 @@ msgstr ""
 
 #: onboarding/forms.py tools/forms/ooi.py
 msgid "explanation-clearance-level"
+msgstr ""
+
+#: onboarding/forms.py
+msgid "Please enter a valid URL starting with 'http://' or 'https://'."
 msgstr ""
 
 #: onboarding/templates/account/step_1_registration_intro.html
@@ -1459,7 +1466,7 @@ msgstr ""
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_4_report.html onboarding/views.py
+#: onboarding/templates/step_4_report.html onboarding/view_helpers.py
 msgid "OpenKAT introduction"
 msgstr ""
 
@@ -1528,6 +1535,7 @@ msgstr ""
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
 msgstr ""
@@ -1755,10 +1763,6 @@ msgid "scheme"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "DNS Zone"
-msgstr ""
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Network"
 msgstr ""
 
@@ -1976,8 +1980,11 @@ msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: reports/templates/partials/report_setup_scan.html
-msgid "Suggested plugins"
+msgid "Required and suggested plugins"
+msgstr ""
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+msgid "Enable and start scan"
 msgstr ""
 
 #: onboarding/templates/step_4_report.html
@@ -2041,25 +2048,32 @@ msgstr ""
 msgid "4: Account setup"
 msgstr ""
 
-#: onboarding/views.py
-msgid ""
-"OpenKAT added the following required object to your object list to complete "
-"your request: {}"
-msgstr ""
-
-#: onboarding/views.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                 "
-"Indemnification not present at organization %s."
-msgstr ""
-
-#: onboarding/views.py
-msgid "Clearance level has been set"
-msgstr ""
-
-#: onboarding/views.py
+#: onboarding/view_helpers.py
 msgid "OpenKAT Setup"
+msgstr ""
+
+#: onboarding/views.py
+msgid "Fetch the parent DNS zone of a hostname"
+msgstr ""
+
+#: onboarding/views.py
+msgid "Finds subdomains by brute force"
+msgstr ""
+
+#: onboarding/views.py
+msgid "Please select a plugin to proceed."
+msgstr ""
+
+#: onboarding/views.py
+msgid "Please select all required plugins to proceed."
+msgstr ""
+
+#: onboarding/views.py
+msgid "An error occurred while enabling {}. The plugin is not available."
+msgstr ""
+
+#: onboarding/views.py
+msgid "Plugins successfully enabled."
 msgstr ""
 
 #: onboarding/views.py
@@ -2587,6 +2601,10 @@ msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "minutes"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "No records have been found."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3338,6 +3356,10 @@ msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Suggested plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid ""
 "This report requires at least one of the following plugins to be enabled to "
 "generate the report:"
@@ -3479,11 +3501,6 @@ msgstr ""
 
 #: tools/forms/base.py
 msgid "The selected date is in the future. Please select a different date."
-msgstr ""
-
-#: tools/forms/boefje.py
-msgid ""
-"Not all required boefjes are selected. Please select all required boefjes."
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -6074,24 +6091,6 @@ msgstr ""
 #: rocky/views/organization_settings.py
 #, python-brace-format
 msgid "Recalculated {number_of_bits} bits. Duration: {duration}"
-msgstr ""
-
-#: rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                         "
-"Indemnification not present at organization %s."
-msgstr ""
-
-#: rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level below to proceed."
-msgstr ""
-
-#: rocky/views/scan_profile.py
-msgid "Choose a valid level"
 msgstr ""
 
 #: rocky/views/scan_profile.py
