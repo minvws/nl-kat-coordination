@@ -107,8 +107,8 @@ class TaskTest(TestCase):
 
     @mock.patch("boefjes.job_handler.get_environment_settings", return_value={})
     @mock.patch("boefjes.job_handler.bytes_api_client")
-    @mock.patch("boefjes.job_handler._find_ooi_in_past")
-    def test_handle_boefje_with_exception(self, mock_find_ooi_in_past, mock_bytes_api_client, mock_get_env):
+    @mock.patch("boefjes.job_handler.get_octopoes_api_connector")
+    def test_handle_boefje_with_exception(self, mock_get_octopoes_api_connector, mock_bytes_api_client, mock_get_env):
         meta = BoefjeMeta(
             id="0dca59db-b339-47c4-bcc9-896fc18e2386",
             boefje={"id": "dummy_boefje_runtime_exception"},

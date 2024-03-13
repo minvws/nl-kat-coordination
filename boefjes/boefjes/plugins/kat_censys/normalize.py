@@ -6,20 +6,10 @@ from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import (
-    IPPort,
-    Network,
-    PortState,
-    Protocol,
-)
+from octopoes.models.ooi.network import IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
-from octopoes.models.ooi.web import (
-    HTTPHeader,
-    HTTPResource,
-    IPAddressHTTPURL,
-    Website,
-)
+from octopoes.models.ooi.web import HTTPHeader, HTTPResource, IPAddressHTTPURL, Website
 
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:

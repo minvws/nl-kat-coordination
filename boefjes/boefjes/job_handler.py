@@ -2,7 +2,7 @@ import logging
 import os
 import traceback
 from collections.abc import Callable
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, cast
 
@@ -13,12 +13,7 @@ from requests import RequestException
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.docker_boefjes_runner import DockerBoefjesRunner
-from boefjes.job_models import (
-    BoefjeMeta,
-    NormalizerMeta,
-    NormalizerPlainOOI,
-    NormalizerScanProfile,
-)
+from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerPlainOOI, NormalizerScanProfile
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
@@ -28,6 +23,8 @@ from octopoes.models import OOI, Reference, ScanProfile
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.types import OOIType
 
+MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
+
 logger = logging.getLogger(__name__)
 
 bytes_api_client = BytesAPIClient(
@@ -35,24 +32,6 @@ bytes_api_client = BytesAPIClient(
     username=settings.bytes_username,
     password=settings.bytes_password,
 )
-
-
-def _find_ooi_in_past(reference: Reference, connector: OctopoesAPIConnector, lookback_days: int = 4) -> OOI:
-    # Source OOIs may not live in XTDB since we currently have TTLs in place (to be removed soon).
-    valid_time = datetime.now(timezone.utc)
-
-    for days_in_past in range(lookback_days):
-        try:
-            return connector.get(reference, valid_time=valid_time)
-        except ObjectNotFoundException:
-            logger.debug(
-                "Object %s not found in Octopoes, looking into other valid times...",
-                reference,
-            )
-            date = datetime.now(timezone.utc) - timedelta(days=days_in_past)
-            valid_time = date.replace(hour=0, minute=0, second=0, microsecond=0)
-
-    raise ObjectNotFoundException(f"Object {reference} not found in Octopoes")
 
 
 def _serialize_value(value: Any, required: bool) -> Any:
@@ -118,12 +97,10 @@ class BoefjeHandler(Handler):
         job_runner: BoefjeJobRunner,
         local_repository: LocalPluginRepository,
         bytes_client: BytesAPIClient,
-        octopoes_factory=get_octopoes_api_connector,
     ):
         self.job_runner = job_runner
         self.local_repository = local_repository
         self.bytes_client = bytes_client
-        self.octopoes_factory = octopoes_factory
 
     def handle(self, boefje_meta: BoefjeMeta) -> None:
         logger.info("Handling boefje %s[task_id=%s]", boefje_meta.boefje.id, str(boefje_meta.id))
@@ -141,12 +118,15 @@ class BoefjeHandler(Handler):
             return docker_runner.run()
 
         if boefje_meta.input_ooi:
-            boefje_meta.arguments["input"] = serialize_ooi(
-                _find_ooi_in_past(
-                    Reference.from_str(boefje_meta.input_ooi),
-                    self.octopoes_factory(boefje_meta.organization),
+            reference = Reference.from_str(boefje_meta.input_ooi)
+            try:
+                ooi = get_octopoes_api_connector(boefje_meta.organization).get(
+                    reference, valid_time=datetime.now(timezone.utc)
                 )
-            )
+            except ObjectNotFoundException as e:
+                raise ObjectNotFoundException(f"Object {reference} not found in Octopoes") from e
+
+            boefje_meta.arguments["input"] = serialize_ooi(ooi)
 
         env_keys = boefje_resource.environment_keys
 
@@ -176,9 +156,17 @@ class BoefjeHandler(Handler):
 
             if boefje_results:
                 for boefje_added_mime_types, output in boefje_results:
-                    raw_file_id = self.bytes_client.save_raw(
-                        boefje_meta.id, output, mime_types.union(boefje_added_mime_types)
-                    )
+                    valid_mimetypes = set()
+                    for mimetype in boefje_added_mime_types:
+                        if len(mimetype) < MIMETYPE_MIN_LENGTH or "/" not in mimetype:
+                            logger.warning(
+                                "Invalid mime-type encountered in output for boefje %s[%s]",
+                                boefje_meta.boefje.id,
+                                str(boefje_meta.id),
+                            )
+                        else:
+                            valid_mimetypes.add(mimetype)
+                    raw_file_id = self.bytes_client.save_raw(boefje_meta.id, output, mime_types.union(valid_mimetypes))
                     logger.debug(
                         "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
                     )
