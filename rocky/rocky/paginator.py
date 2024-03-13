@@ -6,7 +6,7 @@ class RockyPaginator(Paginator):
     def __init__(
         self,
         *args,
-        **kwargs,        
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
