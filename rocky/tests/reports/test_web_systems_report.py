@@ -1,7 +1,7 @@
 from reports.report_types.web_system_report.report import WebSystemReport
 
 
-def test_web_report_no_findings(mock_octopoes_api_connector, valid_time, hostname, security_txt):
+def test_web_report_no_findings(mock_octopoes_api_connector, valid_time, hostname):
     mock_octopoes_api_connector.oois = {
         hostname.reference: hostname,
     }
@@ -22,8 +22,8 @@ def test_web_report_no_findings(mock_octopoes_api_connector, valid_time, hostnam
         "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
             hostname.reference: [],
         },
-        "Hostname.<hostname[is Website].<website[is SecurityTXT]": {
-            hostname.reference: [security_txt],
+        "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
+            hostname.reference: [],
         },
         "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type": {
             hostname.reference: [],
@@ -63,8 +63,8 @@ def test_web_report_all_findings(
         "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
             hostname.reference: web_report_finding_types,
         },
-        "Hostname.<hostname[is Website].<website[is SecurityTXT]": {
-            hostname.reference: [],
+        "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
+            hostname.reference: web_report_finding_types,
         },
         "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort]."
         "<ooi[is Finding].finding_type": {
