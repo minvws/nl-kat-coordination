@@ -5,14 +5,12 @@ from django.utils.translation import gettext_lazy as _
 class RockyPaginator(Paginator):
     def __init__(
         self,
-        object_list,
-        per_page: int | str,
-        orphans: int = 0,
-        allow_empty_first_page: bool = True,
+        *args,
+        **kwargs,        
     ) -> None:
-        super().__init__(object_list, per_page, orphans, allow_empty_first_page)
+        super().__init__(*args, **kwargs)
 
-        if orphans != 0:
+        if self.orphans != 0:
             raise ValueError("Setting orphans is not supported")
 
     def validate_number(self, number) -> int:
