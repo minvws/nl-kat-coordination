@@ -5,8 +5,9 @@ from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
@@ -44,7 +45,7 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-class Task(BaseModel):
+class TaskRun(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -53,9 +54,12 @@ class Task(BaseModel):
 
     type: str
 
+    # Item that was pushed onto the queue
     p_item: PrioritizedItem
 
     status: TaskStatus
+
+    schedule_id: uuid.UUID | None = None
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -65,8 +69,8 @@ class Task(BaseModel):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
 
-class TaskDB(Base):
-    __tablename__ = "tasks"
+class TaskRunDB(Base):
+    __tablename__ = "task_runs"
 
     id = Column(GUID, primary_key=True)
 
@@ -75,6 +79,9 @@ class TaskDB(Base):
     type = Column(String)
 
     p_item = Column(JSONB, nullable=False)
+
+    schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
+    schedule = relationship("ScheduleDB", back_populates="tasks")
 
     status = Column(
         Enum(TaskStatus),
@@ -130,7 +137,7 @@ class BoefjeTask(BaseModel):
 
     id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
     boefje: Boefje
-    input_ooi: str | None
+    input_ooi: str | None = None
     organization: str
 
     dispatches: list[Normalizer] = Field(default_factory=list)

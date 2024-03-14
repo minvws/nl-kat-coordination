@@ -49,8 +49,8 @@ def create_p_item(scheduler_id: str, priority: int, data: TestModel | None = Non
     )
 
 
-def create_task(p_item: models.PrioritizedItem) -> models.Task:
-    return models.Task(
+def create_task(p_item: models.PrioritizedItem) -> models.TaskRun:
+    return models.TaskRun(
         id=p_item.id,
         hash=p_item.hash,
         type=TestModel.type,

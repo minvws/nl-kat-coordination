@@ -61,6 +61,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
             }
         )
 
@@ -90,6 +91,9 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.bytes.get_last_run_boefje"
         ).start()
 
+    def tearDown(self):
+        mock.patch.stopall()
+
     def test_is_allowed_to_run(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -98,6 +102,18 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
 
         # Act
         allowed_to_run = self.scheduler.is_task_allowed_to_run(ooi=ooi, boefje=boefje)
+
+        # Assert
+        self.assertTrue(allowed_to_run)
+
+    def test_is_allowed_to_run_no_ooi(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        # Act
+        allowed_to_run = self.scheduler.is_task_allowed_to_run(ooi=None, boefje=boefje)
 
         # Assert
         self.assertTrue(allowed_to_run)
@@ -162,7 +178,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -204,7 +220,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db_first = models.Task(
+        task_db_first = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -214,7 +230,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             modified_at=datetime.now(timezone.utc),
         )
 
-        task_db_second = models.Task(
+        task_db_second = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -357,7 +373,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -392,7 +408,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -430,7 +446,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -471,7 +487,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -507,7 +523,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -546,7 +562,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -585,7 +601,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -630,7 +646,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -805,6 +821,10 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+        # Schedule should be in datastore
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule_by_hash(task.hash)
+        self.assertEqual(schedule_db.p_item.hash, task.hash)
 
     def test_post_pop(self):
         """When a task is removed from the queue, its status should be updated"""
@@ -997,7 +1017,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertFalse(is_allowed)
 
 
-class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
+class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
     def setUp(self):
         super().setUp()
 
@@ -1019,6 +1039,9 @@ class ScanProfileTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_boefjes_for_ooi = mock.patch(
             "scheduler.schedulers.BoefjeScheduler.get_boefjes_for_ooi",
         ).start()
+
+    def tearDown(self):
+        mock.patch.stopall()
 
     def test_push_tasks_for_scan_profile_mutations(self):
         """Scan level change"""
@@ -1256,6 +1279,9 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.octopoes.get_objects_by_object_types"
         ).start()
 
+    def tearDown(self):
+        mock.patch.stopall()
+
     def test_push_tasks_for_new_boefjes(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -1442,6 +1468,9 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
             "scheduler.context.AppContext.services.octopoes.get_random_objects"
         ).start()
 
+    def tearDown(self):
+        mock.patch.stopall()
+
     def test_push_tasks_for_random_objects(self):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -1538,7 +1567,7 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
             hash=task.hash,
         )
 
-        task_db = models.Task(
+        task_db = models.TaskRun(
             id=p_item.id,
             scheduler_id=self.scheduler.scheduler_id,
             type="boefje",
@@ -1640,3 +1669,353 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+
+
+class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.mock_is_task_running = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.is_task_running",
+            return_value=False,
+        ).start()
+
+        self.mock_has_grace_period_passed = mock.patch(
+            "scheduler.schedulers.BoefjeScheduler.has_grace_period_passed",
+            return_value=True,
+        ).start()
+
+        self.mock_get_schedules = mock.patch(
+            "scheduler.context.AppContext.datastores.schedule_store.get_schedules",
+        ).start()
+
+        self.mock_get_object = mock.patch(
+            "scheduler.context.AppContext.services.octopoes.get_object",
+        ).start()
+
+        self.mock_get_plugin = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id",
+        ).start()
+
+    def tearDown(self):
+        mock.patch.stopall()
+
+    def test_push_tasks_for_rescheduling(self):
+        """When the dealine of schedules have passed, the resulting task should be added to the queue"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = ([schedule], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: new item should be on queue
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: new item is created with a similar task
+        peek = self.scheduler.queue.peek(0)
+        self.assertEqual(schedule_db.p_item.hash, peek.hash)
+
+        # Assert: task should be created, and should be the one that is queued
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(peek.id)
+        self.assertIsNotNone(task_db)
+        self.assertEqual(peek.id, task_db.id)
+
+    def test_push_tasks_for_rescheduling_no_ooi(self):
+        """When the deadline has passed, and when the resulting tasks doesn't
+        have an OOI, it should create a task.
+        """
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            input_ooi=None,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = ([schedule], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: new item should be on queue
+        self.assertEqual(1, self.scheduler.queue.qsize())
+
+        # Assert: new item is created with a similar task
+        peek = self.scheduler.queue.peek(0)
+        self.assertEqual(schedule_db.p_item.hash, peek.hash)
+
+        # Assert: task should be created, and should be the one that is queued
+        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(peek.id)
+        self.assertIsNotNone(task_db)
+        self.assertEqual(peek.id, task_db.id)
+
+    def test_push_tasks_for_rescheduling_ooi_not_found(self):
+        """When ooi isn't found anymore for the schedule, we disable the schedule"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = ([schedule], 1)
+        self.mock_get_object.return_value = None
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: item should not be on queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
+
+    def test_push_tasks_for_rescheduling_boefje_not_found(self):
+        """When boefje isn't found anymore for the schedule, we disable the schedule"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = ([schedule], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_plugin.return_value = None
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: item should not be on queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
+
+    def test_push_tasks_for_rescheduling_boefje_disabled(self):
+        """When boefje disabled for the schedule, we disable the schedule"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type], enabled=False)
+
+        task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = ([schedule], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: item should not be on queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
+
+    def test_push_tasks_for_rescheduling_boefje_doesnt_consume_ooi(self):
+        """When boefje doesn't consume the ooi, we disable the schedule"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=0, consumes=[])
+
+        task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = ([schedule], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: item should not be on queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
+
+    def test_push_tasks_for_rescheduling_boefje_cannot_scan_ooi(self):
+        """When boefje cannot scan the ooi, we disable the schedule"""
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        plugin = PluginFactory(scan_level=1, consumes=[ooi.object_type])
+
+        task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.model_dump()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
+
+        p_item = models.PrioritizedItem(
+            id=task.id,
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            data=task.model_dump(),
+            hash=task.hash,
+        )
+
+        schedule = models.Schedule(
+            scheduler_id=self.scheduler.scheduler_id,
+            hash=task.hash,
+            p_item=p_item,
+        )
+
+        schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
+
+        # Mocks
+        self.mock_get_schedules.return_value = ([schedule], 1)
+        self.mock_get_object.return_value = ooi
+        self.mock_get_plugin.return_value = plugin
+
+        # Act
+        self.scheduler.push_tasks_for_rescheduling()
+
+        # Assert: item should not be on queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+        # Assert: schedule should be disabled
+        schedule_db_disabled = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
+        self.assertFalse(schedule_db_disabled.enabled)
