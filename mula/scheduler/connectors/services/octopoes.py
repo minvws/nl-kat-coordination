@@ -68,7 +68,7 @@ class Octopoes(HTTPService):
 
         params = {
             "amount": str(n),
-            "scan_level": {s for s in scan_level},
+            "scan_level": [s for s in scan_level],
             "valid_time": datetime.now(timezone.utc),
         }
 

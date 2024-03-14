@@ -97,7 +97,7 @@ class BytesAPIClient:
 
         response = self._session.post(
             "/bytes/raw",
-            raw,
+            content=raw,
             headers=headers,
             params={"mime_types": mime_types, "boefje_meta_id": boefje_meta_id},
         )
