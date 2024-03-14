@@ -7,8 +7,8 @@ from enum import Enum
 from typing import Any, cast
 
 import requests
+from httpx import HTTPError
 from pydantic.tools import parse_obj_as
-from requests import RequestException
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
@@ -86,7 +86,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str
                     environment[katalogus_key] = value
 
         return {k: str(v) for k, v in environment.items() if k in environment_keys}
-    except RequestException:
+    except HTTPError:
         logger.exception("Error getting environment settings")
         raise
 

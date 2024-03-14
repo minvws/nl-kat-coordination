@@ -6,28 +6,12 @@ from typing import Any
 from uuid import UUID
 
 import requests
-from requests.adapters import HTTPAdapter
-from requests.models import HTTPError
+from httpx import Client, HTTPError, HTTPStatusError, HTTPTransport
 
-from boefjes.clients.scheduler_client import LogRetry
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
 logger = logging.getLogger(__name__)
-
-
-class BytesAPISession(requests.Session):
-    def __init__(self, base_url: str):
-        super().__init__()
-
-        self._base_url = base_url.rstrip("/")
-        self.headers["User-Agent"] = f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"
-
-    def request(self, method: str, url: str | bytes, **kwargs) -> requests.Response:  # type: ignore
-        url = self._base_url + str(url)
-
-        return super().request(method, url, **kwargs)
-
 
 ClientSessionMethod = Callable[..., Any]
 
@@ -38,7 +22,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
         try:
             return function(self, *args, **kwargs)
         except HTTPError as error:
-            if error.response.status_code != 401:
+            if isinstance(error, HTTPStatusError) and error.response.status_code != 401:
                 raise
 
             self.login()
@@ -49,11 +33,11 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
 
 class BytesAPIClient:
     def __init__(self, base_url: str, username: str, password: str):
-        self._session = BytesAPISession(base_url)
-
-        max_retries = LogRetry(total=6, backoff_factor=1, skip_log=True)
-        self._session.mount("https://", HTTPAdapter(max_retries=max_retries))
-        self._session.mount("http://", HTTPAdapter(max_retries=max_retries))
+        self._session = Client(
+            base_url=base_url,
+            headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"},
+            transport=(HTTPTransport(retries=6)),
+        )
 
         self.credentials = {
             "username": username,
