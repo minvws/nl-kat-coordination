@@ -35,7 +35,7 @@ class Octopoes(HTTPService):
 
         params = {
             "types": object_types,
-            "scan_level": {s for s in scan_level},
+            "scan_level": [s for s in scan_level],
             "offset": 0,
             "limit": 1,
             "valid_time": datetime.now(timezone.utc),

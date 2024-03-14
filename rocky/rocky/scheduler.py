@@ -195,6 +195,7 @@ class SchedulerClient:
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
         res = self._client.get("/tasks", params=kwargs)
         return PaginatedTasksResponse.model_validate_json(res.content)
 
