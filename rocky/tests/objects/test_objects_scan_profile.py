@@ -61,13 +61,16 @@ def test_scan_profile_submit(rf, redteam_member, mock_scheduler, mock_organizati
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
     query_string = urlencode({"ooi_id": "Network|testnetwork"}, doseq=True)
     request = setup_request(
-        rf.post(f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}", data={"level": "L1"}),
+        rf.post(
+            f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}",
+            data={"level": "1", "action": "change_clearance_level"},
+        ),
         redteam_member.user,
     )
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
-    assert response.status_code == 302
-    assert response.url == f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}"
+    assert response.status_code == 200
+    assertContains(response, "Clearance level has been set")
 
 
 def test_scan_profile_submit_no_indemnification(

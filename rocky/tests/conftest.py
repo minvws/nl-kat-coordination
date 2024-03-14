@@ -436,6 +436,19 @@ def network() -> Network:
 
 
 @pytest.fixture
+def url(network) -> URL:
+    return URL(
+        scan_profile=DeclaredScanProfile(
+            scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
+        ),
+        primary_key="URL|testnetwork|http://example.com/",
+        network=network.reference,
+        raw="http://example.com",
+        web_url=Reference("HostnameHTTPURL|http|testnetwork|example.com|80|/"),
+    )
+
+
+@pytest.fixture
 def ipaddressv4(network) -> IPAddressV4:
     return IPAddressV4(network=network.reference, address=IPv4Address("192.0.2.1"))
 
@@ -453,11 +466,6 @@ def ip_port(ipaddressv4) -> IPPort:
 @pytest.fixture
 def hostname(network) -> Hostname:
     return Hostname(name="example.com", network=network.reference)
-
-
-@pytest.fixture
-def url(network):
-    return URL(raw="https://example.com/", network=network.reference)
 
 
 @pytest.fixture

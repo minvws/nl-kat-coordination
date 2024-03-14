@@ -1,14 +1,16 @@
 from datetime import datetime, timezone
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 from tools.models import Indemnification, Organization, OrganizationMember
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import DeclaredScanProfile, Reference, ScanLevel
+from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from rocky.bytes_client import get_bytes_client
 from rocky.exceptions import (
     AcknowledgedClearanceLevelTooLowException,
@@ -142,6 +144,52 @@ class OrganizationView(View):
         )
 
         return True
+
+    def can_raise_clearance_level(self, ooi: OOI, level: int) -> bool:
+        try:
+            self.raise_clearance_level(ooi.reference, level)
+            messages.success(self.request, _("Clearance level has been set"))
+            return True
+        except IndemnificationNotPresentException:
+            messages.error(
+                self.request,
+                _("Could not raise clearance level of %s to L%s. Indemnification not present at organization %s.")
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization.name,
+                ),
+            )
+
+        except TrustedClearanceLevelTooLowException:
+            messages.error(
+                self.request,
+                _(
+                    "Could not raise clearance level of %s to L%s. "
+                    "You were trusted a clearance level of L%s. "
+                    "Contact your administrator to receive a higher clearance."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
+        except AcknowledgedClearanceLevelTooLowException:
+            messages.error(
+                self.request,
+                _(
+                    "Could not raise clearance level of %s to L%s. "
+                    "You acknowledged a clearance level of L%s. "
+                    "Please accept the clearance level first on your profile page to proceed."
+                )
+                % (
+                    ooi.reference.human_readable,
+                    level,
+                    self.organization_member.acknowledged_clearance_level,
+                ),
+            )
+        return False
 
 
 class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):
