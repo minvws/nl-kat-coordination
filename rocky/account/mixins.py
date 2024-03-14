@@ -148,11 +148,11 @@ class OrganizationView(View):
 
     def can_raise_clearance_level(
         self, ooi: OOI, level: int
-    ) -> bool | HttpResponseRedirect | HttpResponsePermanentRedirect:
+    ) -> tuple[bool, HttpResponseRedirect | HttpResponsePermanentRedirect]:
         try:
             self.raise_clearance_level(ooi.reference, level)
             messages.success(self.request, _("Clearance level has been set"))
-            return True
+            return (True, self.get(self.request, *self.args, **self.kwargs))
 
         except IndemnificationNotPresentException:
             messages.error(
@@ -164,7 +164,7 @@ class OrganizationView(View):
                     self.organization.name,
                 ),
             )
-            return redirect("indemnification_add", organization_code=self.organization.code)
+            return (False, redirect("indemnification_add", organization_code=self.organization.code))
 
         except TrustedClearanceLevelTooLowException:
             messages.error(
@@ -180,7 +180,7 @@ class OrganizationView(View):
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
-            return False
+            return (False, self.get(self.request, *self.args, **self.kwargs))
 
         except AcknowledgedClearanceLevelTooLowException:
             messages.error(
@@ -196,7 +196,7 @@ class OrganizationView(View):
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )
-            return redirect("account_detail", organization_code=self.organization.code)
+            return (False, redirect("account_detail", organization_code=self.organization.code))
 
 
 class OrganizationPermissionRequiredMixin(PermissionRequiredMixin):

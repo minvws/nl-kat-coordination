@@ -17,8 +17,8 @@ class ScanProfileDetailView(BaseOOIDetailView, FormView):
 
     def form_valid(self, form):
         clearance_level = form.cleaned_data["level"]
-        self.can_raise_clearance_level(self.ooi, clearance_level)
-        return self.get(self.request, *self.args, **self.kwargs)
+        _, response = self.can_raise_clearance_level(self.ooi, clearance_level)
+        return response
 
     def get_initial(self):
         initial = super().get_initial()
