@@ -216,7 +216,7 @@ class BoefjeScheduler(Scheduler):
         new_boefjes = None
         try:
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
-        except httpx.ConnectError:
+        except httpx.HTTPError:
             self.logger.warning(
                 "Failed to get new boefjes for organisation: %s from katalogus",
                 self.organisation.name,
@@ -249,7 +249,7 @@ class BoefjeScheduler(Scheduler):
                     boefje.consumes,
                     list(range(boefje.scan_level, 5)),
                 )
-            except httpx.ConnectError:
+            except httpx.HTTPError:
                 self.logger.warning(
                     "Could not get oois for organisation: %s from octopoes",
                     self.organisation.name,
@@ -287,7 +287,7 @@ class BoefjeScheduler(Scheduler):
                 n=self.ctx.config.pq_max_random_objects,
                 scan_level=[1, 2, 3, 4],
             )
-        except httpx.ConnectError:
+        except httpx.HTTPError:
             self.logger.warning(
                 "Could not get random oois for organisation: %s from octopoes",
                 self.organisation.name,

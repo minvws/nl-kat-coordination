@@ -21,8 +21,8 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     def wrapper(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
-        except HTTPError as error:
-            if isinstance(error, HTTPStatusError) and error.response.status_code != 401:
+        except HTTPStatusError as error:
+            if error.response.status_code != 401:
                 raise
 
             self.login()

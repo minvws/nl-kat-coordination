@@ -14,7 +14,7 @@ from django.db import models
 from django.db.models.signals import post_save, pre_save
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from httpx import RequestError
+from httpx import HTTPError
 from katalogus.client import KATalogusClientV1, get_katalogus
 from katalogus.exceptions import KATalogusDownException, KATalogusException, KATalogusUnhealthyException
 
@@ -180,7 +180,7 @@ class Organization(models.Model):
 
         try:
             health = katalogus_client.health()
-        except RequestError as e:
+        except HTTPError as e:
             raise KATalogusDownException from e
 
         if not health.healthy:
@@ -193,7 +193,7 @@ class Organization(models.Model):
         octopoes_client = OctopoesAPIConnector(settings.OCTOPOES_API, client=organization_code)
         try:
             health = octopoes_client.root_health()
-        except RequestError as e:
+        except HTTPError as e:
             raise OctopoesDownException from e
 
         if not health.healthy:

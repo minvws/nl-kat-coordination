@@ -43,7 +43,7 @@ class Connector:
             response = httpx.get(url, timeout=5)
             healthy = response.json().get("healthy")
             return healthy
-        except httpx.RequestError as exc:
+        except httpx.HTTPError as exc:
             self.logger.warning("Exception: %s", exc)
             return False
 

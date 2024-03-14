@@ -8,7 +8,7 @@ from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
-from httpx import RequestError
+from httpx import HTTPError
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
@@ -99,7 +99,7 @@ class OOIDetailView(
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 
             return self.get(self.request, status_code=404, *self.args, **self.kwargs)
-        except RequestError as exception:
+        except HTTPError as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
             return self.get(self.request, status_code=500, *self.args, **self.kwargs)
 

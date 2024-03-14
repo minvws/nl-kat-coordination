@@ -10,7 +10,7 @@ from typing import Any
 import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPStatusError, RequestError, codes
+from httpx import HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 
 from rocky.health import ServiceHealth
@@ -266,7 +266,7 @@ class SchedulerClient:
         try:
             res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
             res.raise_for_status()
-        except HTTPStatusError:
+        except HTTPError:
             raise SchedulerError()
         task_stats = json.loads(res.content)
         return task_stats

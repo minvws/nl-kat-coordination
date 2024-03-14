@@ -63,7 +63,10 @@ class UploadRaw(OrganizationPermissionRequiredMixin, OrganizationView, FormView)
         try:
             get_bytes_client(self.organization.code).upload_raw(raw_file.read(), mime_types)
         except HTTPStatusError as e:
-            message = _("Raw file could not be uploaded to Bytes: status code %s") % e.response.status_code
+            if isinstance(e, HTTPStatusError):
+                message = _("Raw file could not be uploaded to Bytes: status code %d") % e.response.status_code
+            else:
+                message = _("Raw file could not be uploaded to Bytes: %s") % str(e)
 
             return self.add_error_notification(message)
 

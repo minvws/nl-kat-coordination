@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from httpx import RequestError
+from httpx import HTTPError
 from katalogus.client import Boefje, get_katalogus
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
@@ -110,7 +110,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                     boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
                     origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
-                except RequestError as e:
+                except HTTPError as e:
                     logger.error(e)
 
             return (

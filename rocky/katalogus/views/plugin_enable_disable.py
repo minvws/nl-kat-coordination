@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from httpx import RequestError
+from httpx import HTTPError
 
 from katalogus.views.mixins import SinglePluginView
 
@@ -32,7 +32,7 @@ class PluginEnableDisableView(SinglePluginView):
 
         try:
             plugin_settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
-        except RequestError:
+        except HTTPError:
             messages.add_message(
                 self.request,
                 messages.ERROR,

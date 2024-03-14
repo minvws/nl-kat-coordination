@@ -66,7 +66,7 @@ class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
         self.session = httpx.Client(base_url=base_uri)
         self.organization = organization
-        self.organization_uri = f"{base_uri}/v1/organisations/{organization}"
+        self.organization_uri = f"/v1/organisations/{organization}"
 
     def organization_exists(self) -> bool:
         response = self.session.get(self.organization_uri)

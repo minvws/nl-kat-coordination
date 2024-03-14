@@ -34,10 +34,9 @@ class SinglePluginView(OrganizationView):
         try:
             self.plugin = self.katalogus_client.get_plugin(plugin_id)
             self.plugin_schema = self.katalogus_client.get_plugin_schema(plugin_id)
-        except HTTPStatusError as e:
-            if e.response.status_code == HTTP_404_NOT_FOUND:
+        except HTTPError as exc:
+            if isinstance(exc, HTTPStatusError) and exc.response.status_code == HTTP_404_NOT_FOUND:
                 raise Http404(f"Plugin {plugin_id} not found.")
-        except HTTPError:
             messages.add_message(
                 self.request,
                 messages.ERROR,

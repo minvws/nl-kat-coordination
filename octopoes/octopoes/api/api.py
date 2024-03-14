@@ -57,7 +57,7 @@ if settings.span_export_grpc_endpoint is not None:
 
 
 @app.exception_handler(RequestValidationError)
-def http_validation_exception_handler(request: Request, exc: RequestError) -> JSONResponse:
+def http_validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     logger.critical(exc)
     return JSONResponse(
         {

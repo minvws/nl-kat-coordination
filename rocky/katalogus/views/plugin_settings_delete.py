@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from httpx import HTTPStatusError, RequestError, codes
+from httpx import HTTPError, HTTPStatusError, codes
 
 from katalogus.views.mixins import SinglePluginView
 
@@ -69,7 +69,7 @@ class PluginSettingsDeleteView(OrganizationPermissionRequiredMixin, SinglePlugin
                 messages.SUCCESS,
                 _("Settings for plugin {} successfully deleted.").format(self.plugin.name),
             )
-        except (HTTPStatusError, RequestError) as e:
+        except HTTPError as e:
             if isinstance(e, HTTPStatusError) and e.response.status_code == codes.NOT_FOUND:
                 messages.add_message(
                     request,

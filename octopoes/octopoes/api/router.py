@@ -5,7 +5,7 @@ from datetime import datetime
 from logging import getLogger
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
-from httpx import RequestError
+from httpx import HTTPError
 from pydantic import AwareDatetime
 
 from octopoes.api.models import ServiceHealth, ValidatedAffirmation, ValidatedDeclaration, ValidatedObservation
@@ -94,7 +94,7 @@ def health(
             version=xtdb_status.version,
             additional=xtdb_status,
         )
-    except RequestError as ex:
+    except HTTPError as ex:
         xtdb_health = ServiceHealth(
             service="xtdb",
             healthy=False,
