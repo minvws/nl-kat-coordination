@@ -253,8 +253,8 @@ class OnboardingSetClearanceLevelView(
 
     def form_valid(self, form):
         ooi = self.get_ooi(self.url)
-        can_raise, response = self.can_raise_clearance_level(ooi, DNS_REPORT_LEAST_CLEARANCE_LEVEL)
-        if can_raise:
+        has_clearance, response = self.can_raise_clearance_level(ooi, DNS_REPORT_LEAST_CLEARANCE_LEVEL)
+        if has_clearance:
             return redirect(
                 reverse("step_setup_scan_select_plugins", kwargs={"organization_code": self.organization.code})
                 + get_selection(self.request, self.selection)
