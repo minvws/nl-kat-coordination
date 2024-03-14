@@ -227,11 +227,11 @@ class OctopoesAPIConnector:
         offset: int = DEFAULT_OFFSET,
         limit: int = DEFAULT_LIMIT,
     ) -> Paginated[Finding]:
-        params: dict[str, str | int | list[str] | set[str]] = {
+        params: dict[str, str | int | list[str]] = {
             "valid_time": str(valid_time),
             "offset": offset,
             "limit": limit,
-            "severities": {s.value for s in severities},
+            "severities": [s.value for s in severities],
             "exclude_muted": exclude_muted,
             "only_muted": only_muted,
         }
