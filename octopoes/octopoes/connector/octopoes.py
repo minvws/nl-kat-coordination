@@ -38,7 +38,7 @@ class OctopoesAPIConnector:
         self.base_uri = base_uri
         self.client = client
 
-        self.session = httpx.Client(base_url=base_uri, event_hooks={"response": [self._verify_response]})
+        self.session = httpx.Client(base_url=base_uri, timeout=30, event_hooks={"response": [self._verify_response]})
 
     @staticmethod
     def _verify_response(response: Response) -> None:
