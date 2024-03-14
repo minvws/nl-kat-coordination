@@ -17,6 +17,7 @@ from octopoes.config.settings import DEFAULT_SCAN_LEVEL_FILTER, DEFAULT_SCAN_PRO
 from octopoes.models import OOI, ScanLevel, ScanProfileType
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types, type_by_name
+from rocky.paginator import RockyPaginator
 from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
 
 
@@ -81,6 +82,7 @@ class OOIFilterView(ConnectorFormMixin, OctopoesView):
 class BaseOOIListView(OOIFilterView, ListView):
     paginate_by = 150
     context_object_name = "ooi_list"
+    paginator = RockyPaginator
 
     def get_queryset(self) -> OOIList:
         return OOIList(
