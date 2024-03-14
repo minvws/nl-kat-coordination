@@ -43,6 +43,7 @@ class OctopoesAPIConnector:
     @staticmethod
     def _verify_response(response: Response) -> None:
         try:
+            response.read()  # read the response body before raising an exception
             response.raise_for_status()
         except HTTPError as error:
             if response.status_code == 404:
