@@ -3,7 +3,9 @@ import logging
 import time
 from functools import partial, wraps
 
+import pydantic
 import sqlalchemy
+from sqlalchemy.ext.declarative import declarative_base
 
 from scheduler.config import settings
 

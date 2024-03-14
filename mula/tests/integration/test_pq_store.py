@@ -37,11 +37,15 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
 
     def test_push(self):
         task = functions.create_task()
-        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+        p_item = functions.create_p_item(scheduler_id=uuid.uuid4().hex, priority=1, task=task)
+        self.mock_ctx.datastores.pq_store.push(p_item.scheduler_id, p_item)
 
-        p_item = functions.create_p_item(scheduler_id=uuid.uuid4().hex, priority=1, task=created_task)
-        created_p_item = self.mock_ctx.datastores.pq_store.push(p_item.scheduler_id, p_item)
+        created_p_item = self.mock_ctx.datastores.pq_store.get(scheduler_id=p_item.scheduler_id, item_id=p_item.id)
+        created_task = self.mock_ctx.datastores.task_store.get(task.id)
+
         self.assertIsNotNone(created_p_item)
+        self.assertIsNotNone(created_task)
+        self.assertEqual(created_p_item.task_id, created_task.id)
 
     def test_pop(self):
         task = functions.create_task()

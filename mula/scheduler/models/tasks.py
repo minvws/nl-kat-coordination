@@ -11,14 +11,14 @@ from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
 
-from scheduler.utils import GUID
+from scheduler.utils import GUID, cron
 
 from .base import Base
 from .boefje import Boefje
+from .errors import ValidationError
 from .normalizer import Normalizer
 from .raw_data import RawData
 from .task_run import TaskRun
-from .task_status import TaskStatus
 
 
 class Task(BaseModel):
@@ -28,10 +28,22 @@ class Task(BaseModel):
     hash: str | None = Field(None, max_length=32)
     data: dict = Field(default_factory=dict)
 
+    schedule: str | None = None
+
     task_runs: list[TaskRun] = []
 
+    deadline_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    # TODO: pydantic validator?
+    def validate_schedule(self):
+        """Validate the schedule cron expression."""
+        if self.cron_expression is not None:
+            try:
+                cron.next_run(self.cron_expression)
+            except Exception as exc:
+                raise ValidationError(f"Invalid cron expression: {self.cron_expression}") from exc
 
 
 class TaskDB(Base):
@@ -45,8 +57,18 @@ class TaskDB(Base):
     task_runs = relationship("TaskRunDB", back_populates="task")
     p_item = relationship("PrioritizedItemDB", uselist=False, back_populates="task")
 
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    modified_at = Column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
 
 
 class NormalizerTask(BaseModel):

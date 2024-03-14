@@ -56,12 +56,12 @@ def create_p_item(scheduler_id: str, priority: int, task: models.Task | None = N
         scheduler_id=scheduler_id,
         priority=priority,
         task_id=task.id,
+        task=task,
     )
 
 
 def create_task() -> models.Task:
     return models.Task(
-        id=uuid.uuid4(),
         hash=uuid.uuid4().hex,
         data=TestModel(
             id=uuid.uuid4().hex,

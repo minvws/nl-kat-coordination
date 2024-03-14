@@ -10,7 +10,7 @@ from sqlalchemy.sql import func
 from scheduler.utils import GUID
 
 from .base import Base
-from .tasks import Task
+from .tasks import Task, TaskDB
 
 
 class PrioritizedItem(BaseModel):
@@ -31,7 +31,7 @@ class PrioritizedItem(BaseModel):
     priority: int | None = 0
 
     task_id: uuid.UUID
-    task: Task | None = None
+    task: Task
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -65,6 +65,12 @@ class PrioritizedItemDB(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    def __init__(self, **kwargs):
+        # NOTE: Fix for pydantic models (with nested objects) to sqlalchemy models.
+        self.task = TaskDB(**kwargs.pop("task"))
+
+        super().__init__(**kwargs)
 
 
 class Queue(BaseModel):
