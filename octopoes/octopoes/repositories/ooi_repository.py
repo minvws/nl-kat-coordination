@@ -444,13 +444,6 @@ class XTDBOOIRepository(OOIRepository):
         return reference_nodes
 
     @classmethod
-    def encode_segment(cls, segment: Segment) -> str:
-        if segment.direction == Direction.OUTGOING:
-            return f"{segment.source_type.get_object_type()}/{segment.property_name}"
-        else:
-            return f"{segment.target_type.get_object_type()}/_{segment.property_name}"
-
-    @classmethod
     def decode_segment(cls, encoded_segment: str) -> Segment:
         source_type_name, property_name = encoded_segment.split("/")
         relation_owner_type = type_by_name(source_type_name)
@@ -470,7 +463,7 @@ class XTDBOOIRepository(OOIRepository):
         if paths is None:
             paths = get_paths_to_neighours(reference.class_type)
 
-        encoded_segments = [cls.encode_segment(path.segments[0]) for path in sorted(paths)]
+        encoded_segments = [path.segments[0].encode() for path in sorted(paths)]
         segment_query_sections = [f"{{:{s} [*]}}" for s in encoded_segments]
 
         query = """{{
@@ -493,7 +486,7 @@ class XTDBOOIRepository(OOIRepository):
 
     @classmethod
     def construct_neighbour_query_multi(cls, references: set[Reference], paths: set[Path]) -> str:
-        encoded_segments = [cls.encode_segment(path.segments[0]) for path in sorted(paths)]
+        encoded_segments = [path.segments[0].encode() for path in sorted(paths)]
         segment_query_sections = [f"{{:{s} [*]}}" for s in encoded_segments]
 
         query = """{{

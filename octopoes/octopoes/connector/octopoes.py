@@ -305,4 +305,4 @@ class OctopoesAPIConnector:
 
         result = self.session.get(f"/{self.client}/query-many", params=params).json()
 
-        return TypeAdapter(list[tuple[str, OOIType]]).validate_python(result)
+        return TypeAdapter(list[tuple[str, OOIType | str]]).validate_python(result)

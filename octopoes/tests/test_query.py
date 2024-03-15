@@ -372,3 +372,7 @@ def test_build_parth_query_with_multiple_sources_for_abstract_type(mocker):
         ' (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )'
         ' [ Network :object_type "Network" ]]}}'
     )
+
+
+def test_parse_path_concrete_fields_or_abstract_types():
+    assert len(Path.parse("URL.web_url.netloc.name").segments) == 3
