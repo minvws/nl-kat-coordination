@@ -276,7 +276,7 @@ class NormalizerScheduler(Scheduler):
                 self.organisation.id,
                 mime_type,
             )
-        except httpx.ConnectError:
+        except httpx.HTTPError:
             self.logger.warning(
                 "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,

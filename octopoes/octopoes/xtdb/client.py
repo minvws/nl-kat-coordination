@@ -6,7 +6,7 @@ from enum import Enum
 from typing import Any
 
 import httpx
-from httpx import HTTPStatusError, Response, codes
+from httpx import HTTPError, HTTPStatusError, Response, codes
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from octopoes.models.transaction import TransactionRecord
@@ -145,7 +145,7 @@ class XTDBHTTPClient:
         try:
             res = self._session.post("/create-node", json={"node": self._client})
             self._verify_response(res)
-        except HTTPStatusError as e:
+        except HTTPError as e:
             logger.exception("Failed creating node")
             raise XTDBException("Could not create node") from e
 
@@ -153,8 +153,8 @@ class XTDBHTTPClient:
         try:
             res = self._session.post("/delete-node", json={"node": self._client})
             self._verify_response(res)
-        except HTTPStatusError as e:
-            if e.response.status_code == codes.NOT_FOUND:
+        except HTTPError as e:
+            if isinstance(e, HTTPStatusError) and e.response.status_code == codes.NOT_FOUND:
                 raise NodeNotFound from e
 
             logger.exception("Failed deleting node")
