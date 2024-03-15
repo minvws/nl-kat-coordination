@@ -436,6 +436,9 @@ def test_query_subclass_fields_and_returning_only_fields(
     result = xtdb_session.client.query(query, valid_time)
     assert result == [["URL|test|https://test.com/security", "example.com"]]
 
+    result = octopoes_api_connector.query("Network.name", valid_time, "Network|test")
+    assert result == ["test"]
+
     result = octopoes_api_connector.query_many(
         "URL.web_url.netloc.name", valid_time, ["URL|test|https://test.com/security", "URL|test|https://test.com/test"]
     )

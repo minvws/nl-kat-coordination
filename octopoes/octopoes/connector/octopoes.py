@@ -284,7 +284,7 @@ class OctopoesAPIConnector:
             "limit": limit,
         }
         return [
-            TypeAdapter(OOIType).validate_python(ooi)
+            TypeAdapter(OOIType | str).validate_python(ooi)
             for ooi in self.session.get(f"/{self.client}/query", params=params).json()
         ]
 

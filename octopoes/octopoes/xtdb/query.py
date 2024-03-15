@@ -107,14 +107,11 @@ class Query:
         ooi_type = (
             path.segments[-1].target_type
             if path.segments[-1].target_type is not None
-            else path.segments[-2].target_type
+            else path.segments[-1].source_type
         )
 
-        if ooi_type is None:
-            raise InvalidPath("Second to last segment had no valid target type")
-
         query = cls(ooi_type)
-        target_ref: Ref
+        target_ref: Ref = path.segments[0].source_type
         alias_map: dict[str, Ref] = {}
 
         if not path.segments:
@@ -128,8 +125,8 @@ class Query:
 
             if segment.target_type is None:
                 # The last segment is a regular field, so we query for that field value
-                field_alias = Aliased(ooi_type, field=path.segments[-1].property_name)
-                query = query.where(source_ref, **{path.segments[-1].property_name: field_alias}).find(field_alias)
+                field_alias = Aliased(ooi_type, field=segment.property_name)
+                query = query.where(source_ref, **{segment.property_name: field_alias}).find(field_alias)
                 break
 
             if segment.target_type.get_object_type() not in alias_map:
