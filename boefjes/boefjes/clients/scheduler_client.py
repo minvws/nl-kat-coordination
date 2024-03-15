@@ -3,8 +3,7 @@ import logging
 import uuid
 from enum import Enum
 
-import requests
-from httpx import Client, HTTPTransport
+from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
@@ -72,7 +71,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
 
     @staticmethod
-    def _verify_response(response: requests.Response) -> None:
+    def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
     def get_queues(self) -> list[Queue]:

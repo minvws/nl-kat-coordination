@@ -5,8 +5,7 @@ from functools import wraps
 from typing import Any
 from uuid import UUID
 
-import requests
-from httpx import Client, HTTPError, HTTPStatusError, HTTPTransport
+from httpx import Client, HTTPError, HTTPStatusError, HTTPTransport, Response
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
@@ -49,7 +48,7 @@ class BytesAPIClient:
         self.headers = self._get_authentication_headers()
 
     @staticmethod
-    def _verify_response(response: requests.Response) -> None:
+    def _verify_response(response: Response) -> None:
         try:
             response.raise_for_status()
         except HTTPError as error:
