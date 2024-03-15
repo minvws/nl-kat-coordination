@@ -13,8 +13,8 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     ip_address = input_["ip_service"]["ip_port"]["address"]["address"]
     port = input_["ip_service"]["ip_port"]["port"]
 
-    if scheme != "https":
-        return [(set(), "")]
+    if scheme == "http":
+        return [({"info/boefje"}, "Skipping check due to non-TLS scheme")]
 
     try:
         output = client.containers.run(
