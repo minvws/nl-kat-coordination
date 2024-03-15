@@ -6,7 +6,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from requests import HTTPError, RequestException
+from httpx import HTTPError, HTTPStatusError
 from rest_framework.status import HTTP_404_NOT_FOUND
 from tools.view_helpers import schedule_task
 
@@ -34,17 +34,15 @@ class SinglePluginView(OrganizationView):
         try:
             self.plugin = self.katalogus_client.get_plugin(plugin_id)
             self.plugin_schema = self.katalogus_client.get_plugin_schema(plugin_id)
-        except HTTPError as e:
-            if e.response.status_code == HTTP_404_NOT_FOUND:
+        except HTTPError as exc:
+            if isinstance(exc, HTTPStatusError) and exc.response.status_code == HTTP_404_NOT_FOUND:
                 raise Http404(f"Plugin {plugin_id} not found.")
-
-            raise
-        except RequestException:
             messages.add_message(
                 self.request,
                 messages.ERROR,
                 _("Getting information for plugin {} failed. Please check the KATalogus logs.").format(plugin_id),
             )
+            raise
 
     def dispatch(self, request, *args, **kwargs):
         if not self.plugin:

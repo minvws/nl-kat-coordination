@@ -6,7 +6,6 @@ from unittest.mock import Mock
 
 import pytest
 from bits.runner import BitRunner
-from requests.adapters import HTTPAdapter, Retry
 
 from octopoes.config.settings import Settings
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -217,7 +216,6 @@ def bit_runner(mocker) -> BitRunner:
 def xtdb_http_client(request, app_settings: Settings) -> XTDBHTTPClient:
     test_node = f"test-{request.node.originalname}"
     client = get_xtdb_client(str(app_settings.xtdb_uri), test_node)
-    client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return client
 
@@ -234,7 +232,6 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
 @pytest.fixture
 def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
     connector = OctopoesAPIConnector("http://ci_octopoes:80", xtdb_session.client._client)
-    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return connector
 
