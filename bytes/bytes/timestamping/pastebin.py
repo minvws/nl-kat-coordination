@@ -1,4 +1,4 @@
-import requests
+import httpx
 
 from bytes.models import RetrievalLink, SecureHash
 from bytes.repositories.hash_repository import HashRepository
@@ -7,11 +7,11 @@ from bytes.repositories.hash_repository import HashRepository
 class PastebinHashRepository(HashRepository):
     def __init__(self, api_dev_key: str):
         self.api_dev_key = api_dev_key
-        self.session = requests.Session()
+        self.client = httpx.Client()
         self.url = "https://pastebin.com"
 
     def store(self, secure_hash: SecureHash) -> RetrievalLink:
-        response = self.session.post(
+        response = self.client.post(
             url=f"{self.url}/api/api_post.php",
             data={
                 "api_paste_code": secure_hash,
@@ -38,7 +38,7 @@ class PastebinHashRepository(HashRepository):
         paste_id = link.split("/").pop()
         assert len(paste_id) > 0
 
-        response = self.session.get(f"{self.url}/raw/{paste_id}")
+        response = self.client.get(f"{self.url}/raw/{paste_id}")
         if response.status_code != 200:
             raise ValueError(
                 f"Error retrieving pastebin data for {link=}, {response.status_code=},"
