@@ -234,7 +234,6 @@ direction RL
     OOIFindingListView <|-- BaseOOIDetailView
     MuteFindingView <|-- BaseOOIDetailView
     BaseReportView <|-- BaseOOIDetailView
-    DnsReportView <|-- BaseReportView
 
     OOIReportView <|-- BaseOOIDetailView
     OOITreeView <|-- BaseOOIDetailView

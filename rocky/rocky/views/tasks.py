@@ -12,6 +12,7 @@ from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 from requests import HTTPError
 from tools.view_helpers import reschedule_task
 
+from rocky.paginator import RockyPaginator
 from rocky.scheduler import SchedulerError, TaskNotFoundError, client
 
 
@@ -35,6 +36,7 @@ class DownloadTaskDetail(OrganizationView):
 
 class TaskListView(OrganizationView, ListView):
     paginate_by = 20
+    paginator_class = RockyPaginator
 
     def get_queryset(self):
         scheduler_id = self.plugin_type + "-" + self.organization.code
