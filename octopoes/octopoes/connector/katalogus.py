@@ -1,4 +1,4 @@
-import requests
+import httpx
 
 
 class KATalogusClientV1:
@@ -6,7 +6,7 @@ class KATalogusClientV1:
         self.base_uri = f"{base_uri.rstrip('/')}/v1"
 
     def get_organisations(self) -> list[str]:
-        response = requests.get(f"{self.base_uri}/organisations", timeout=30)
+        response = httpx.get(f"{self.base_uri}/organisations", timeout=30)
         response.raise_for_status()
 
         return response.json().keys()

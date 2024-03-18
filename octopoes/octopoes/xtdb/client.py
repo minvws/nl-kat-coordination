@@ -1,14 +1,13 @@
+import functools
 import logging
 from collections.abc import Callable
 from datetime import datetime, timezone
 from enum import Enum
-from functools import lru_cache
-from http import HTTPStatus
 from typing import Any
 
-import requests
+import httpx
+from httpx import HTTPError, HTTPStatusError, Response, codes
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
-from requests import HTTPError, Response
 
 from octopoes.models.transaction import TransactionRecord
 from octopoes.xtdb.exceptions import NodeNotFound, XTDBException
@@ -33,17 +32,6 @@ class Transaction(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class XTDBHTTPSession(requests.Session):
-    def __init__(self, base_url: str):
-        super().__init__()
-
-        self._base_url = base_url
-        self.headers["Accept"] = "application/json"
-
-    def request(self, method: str | bytes, url: str | bytes, *args, **kwargs) -> requests.Response:
-        return super().request(method, self._base_url + str(url), *args, **kwargs)
-
-
 class XTDBStatus(BaseModel):
     version: str | None = None
     revision: str | None = None
@@ -54,24 +42,26 @@ class XTDBStatus(BaseModel):
     size: int | None = None
 
 
-@lru_cache(maxsize=1)
-def get_xtdb_http_session(base_url):
-    return XTDBHTTPSession(base_url)
+@functools.cache
+def _get_xtdb_http_session(base_url: str) -> httpx.Client:
+    return httpx.Client(
+        base_url=base_url, headers={"Accept": "application/json"}, transport=(httpx.HTTPTransport(retries=3))
+    )
 
 
 class XTDBHTTPClient:
     def __init__(self, base_url, client: str):
         self._client = client
-        self._session = get_xtdb_http_session(base_url.rstrip("/"))
+        self._session = _get_xtdb_http_session(base_url)
 
     @staticmethod
     def _verify_response(response: Response) -> None:
         try:
             response.raise_for_status()
-        except HTTPError as e:
-            if e.response.status_code != HTTPStatus.NOT_FOUND:
+        except HTTPStatusError as e:
+            if e.response.status_code != codes.NOT_FOUND:
                 logger.error(response.request.url)
-                logger.error(response.request.body)
+                logger.error(response.request.content)
                 logger.error(response.text)
             raise e
 
@@ -131,7 +121,7 @@ class XTDBHTTPClient:
         res = self._session.post(
             f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
-            data=str(query).encode(),
+            content=str(query),
             headers={"Content-Type": "application/edn"},
         )
         self._verify_response(res)
@@ -144,7 +134,7 @@ class XTDBHTTPClient:
     def submit_transaction(self, operations: list[Operation]) -> None:
         res = self._session.post(
             f"{self.client_url()}/submit-tx",
-            data=Transaction(operations=operations).json(by_alias=True).encode(),
+            content=Transaction(operations=operations).json(by_alias=True),
             headers={"Content-Type": "application/json"},
         )
 
@@ -164,7 +154,7 @@ class XTDBHTTPClient:
             res = self._session.post("/delete-node", json={"node": self._client})
             self._verify_response(res)
         except HTTPError as e:
-            if e.response.status_code == HTTPStatus.NOT_FOUND:
+            if isinstance(e, HTTPStatusError) and e.response.status_code == codes.NOT_FOUND:
                 raise NodeNotFound from e
 
             logger.exception("Failed deleting node")

@@ -2,7 +2,7 @@ from collections.abc import Callable
 from concurrent import futures
 from types import SimpleNamespace
 
-import requests
+import httpx
 import structlog
 from opentelemetry import trace
 
@@ -276,7 +276,7 @@ class NormalizerScheduler(Scheduler):
                 self.organisation.id,
                 mime_type,
             )
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+        except httpx.HTTPError:
             self.logger.warning(
                 "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,

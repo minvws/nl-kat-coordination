@@ -36,3 +36,17 @@ class OnboardingSetClearanceLevelForm(forms.Form):
             },
         ),
     )
+
+
+class OnboardingCreateObjectURLForm(forms.Form):
+    """
+    Custom URL field form especially for onboarding. No need of web_url and network object.
+    """
+
+    url = forms.URLField(
+        label="URL",
+        label_suffix="",
+        required=True,
+        help_text=_("Please enter a valid URL starting with 'http://' or 'https://'."),
+        widget=forms.URLInput({"placeholder": "Enter URL here (e.g., https://www.example.com)"}),
+    )

@@ -2,9 +2,9 @@ import urllib.parse
 from collections.abc import MutableMapping
 from typing import Any
 
-import requests
+import httpx
 import structlog
-from requests.adapters import HTTPAdapter, Retry
+from httpx import HTTPError, HTTPTransport, Limits
 
 from ..connector import Connector  # noqa: TID252
 
@@ -17,7 +17,7 @@ class HTTPService(Connector):
         logger:
             The logger for the class.
         session:
-            A requests.Session object.
+            A httpx.Client object.
         name:
             A string describing the name of the service. This is used args
             an identifier.
@@ -68,23 +68,13 @@ class HTTPService(Connector):
         super().__init__()
 
         self.logger: structlog.BoundLogger = structlog.getLogger(self.__class__.__name__)
-        self.session: requests.Session = requests.Session()
         self.host: str = host
         self.timeout: int = timeout
         self.retries: int = retries
         self.pool_connections: int = pool_connections
+        transport = HTTPTransport(retries=self.retries, limits=Limits(max_connections=self.pool_connections))
+        self.session = httpx.Client(transport=transport, timeout=self.timeout)
         self.source: str = source
-
-        max_retries = Retry(
-            total=self.retries,
-            backoff_factor=0.1,
-            status_forcelist=[500, 502, 503, 504],
-        )
-
-        # Mount the HTTPAdapter to the session
-        http_adapter = HTTPAdapter(max_retries=max_retries, pool_connections=self.pool_connections)
-        self.session.mount("http://", http_adapter)
-        self.session.mount("https://", http_adapter)
 
         if self.source:
             self.headers["User-Agent"] = self.source
@@ -94,14 +84,13 @@ class HTTPService(Connector):
     def get(
         self,
         url: str,
-        payload: dict[str, Any] | None = None,
         params: dict[str, Any] | None = None,
-    ) -> requests.Response:
+    ) -> httpx.Response:
         """Execute a HTTP GET request
 
         Args:
-            headers:
-                A dict to set additional headers for the request.
+            url:
+                A string url formatted reference to the host of the service
             params:
                 A dict to set the query parameters for the request
 
@@ -112,7 +101,6 @@ class HTTPService(Connector):
             url,
             headers=self.headers,
             params=params,
-            data=payload,
             timeout=self.timeout,
         )
         self.logger.debug(
@@ -129,7 +117,7 @@ class HTTPService(Connector):
         url: str,
         payload: dict[str, Any],
         params: dict[str, Any] | None = None,
-    ) -> requests.Response:
+    ) -> httpx.Response:
         """Execute a HTTP POST request
 
         Args:
@@ -209,7 +197,7 @@ class HTTPService(Connector):
 
         return self.is_host_healthy(self.host, self.health_endpoint)
 
-    def _verify_response(self, response: requests.Response) -> None:
+    def _verify_response(self, response: httpx.Response) -> None:
         """Verify the received response from a request.
 
         Raises:
@@ -217,7 +205,7 @@ class HTTPService(Connector):
         """
         try:
             response.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except HTTPError as e:
             self.logger.error(
                 "Received bad response from %s.",
                 response.url,

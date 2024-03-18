@@ -1,7 +1,7 @@
 from django.urls import reverse
+from httpx import HTTPStatusError, Response, codes
 from katalogus.views.plugin_settings_delete import PluginSettingsDeleteView
 from pytest_django.asserts import assertContains
-from requests import RequestException
 
 from tests.conftest import setup_request
 
@@ -70,7 +70,9 @@ def test_plugin_settings_delete_failed(
     mock_katalogus = mock_mixins_katalogus()
     mock_katalogus.get_plugin.return_value = plugin_details
     mock_katalogus.get_plugin_schema.return_value = plugin_schema
-    mock_katalogus.delete_plugin_settings.side_effect = RequestException(response=mocker.MagicMock(status_code=500))
+    mock_katalogus.delete_plugin_settings.side_effect = HTTPStatusError(
+        "Internal Server Error", request=None, response=Response(codes.INTERNAL_SERVER_ERROR)
+    )
 
     request = setup_request(rf.post("plugin_settings_delete"), superuser_member.user)
     response = PluginSettingsDeleteView.as_view()(
@@ -105,8 +107,9 @@ def test_plugin_settings_delete_no_settings_present(
     mock_katalogus = mock_mixins_katalogus()
     mock_katalogus.get_plugin.return_value = plugin_details
     mock_katalogus.get_plugin_schema.return_value = plugin_schema
-    mock_katalogus.delete_plugin_settings.side_effect = RequestException(response=mocker.MagicMock(status_code=404))
-
+    mock_katalogus.delete_plugin_settings.side_effect = HTTPStatusError(
+        "Not Found", request=None, response=Response(codes.NOT_FOUND)
+    )
     request = setup_request(rf.post("plugin_settings_delete"), superuser_member.user)
     response = PluginSettingsDeleteView.as_view()(
         request,

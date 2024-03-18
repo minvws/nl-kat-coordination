@@ -2,8 +2,8 @@ from unittest.mock import call
 
 import pytest
 from django.http import Http404
+from httpx import HTTPError
 from pytest_django.asserts import assertContains
-from requests import HTTPError
 
 from rocky.scheduler import TooManyRequestsError
 from rocky.views.bytes_raw import BytesRawView
@@ -61,7 +61,7 @@ def test_tasks_view_simple(rf, client_member, mocker, lazy_task_list_with_boefje
 def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje):
     mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
     mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
-    mock_scheduler_client.get_lazy_task_list.side_effect = HTTPError
+    mock_scheduler_client.get_lazy_task_list.side_effect = HTTPError("error")
 
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
