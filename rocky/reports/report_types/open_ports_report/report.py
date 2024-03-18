@@ -20,7 +20,7 @@ class OpenPortsReport(Report):
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "open_ports_report/report.html"
 
-    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[Any, Any]]:
         ips_by_input_ooi = self.to_ips(input_oois, valid_time)
         all_ips = list({ip for key, ips in ips_by_input_ooi.items() for ip in ips})
         ports_by_source = self.group_by_source(
