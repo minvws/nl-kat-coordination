@@ -13,7 +13,6 @@ from sqlalchemy.sql.expression import text
 from scheduler.utils import GUID
 
 from .base import Base
-from .task_status import TaskStatus
 
 
 class TaskStatus(str, enum.Enum):

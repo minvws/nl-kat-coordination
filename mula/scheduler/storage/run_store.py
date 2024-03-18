@@ -15,7 +15,7 @@ class RunStore:
         self.dbconn = dbconn
 
     @retry()
-    def get_tasks(
+    def get_runs(
         self,
         scheduler_id: str | None = None,
         task_type: str | None = None,
@@ -58,7 +58,7 @@ class RunStore:
             return tasks, count
 
     @retry()
-    def get_task_by_id(self, task_id: str) -> models.TaskRun | None:
+    def get_runs_by_id(self, task_id: str) -> models.TaskRun | None:
         with self.dbconn.session.begin() as session:
             task_orm = session.query(models.TaskRunDB).filter(models.TaskRunDB.id == task_id).first()
             if task_orm is None:
@@ -69,7 +69,7 @@ class RunStore:
             return task
 
     @retry()
-    def get_tasks_by_hash(self, task_hash: str) -> list[models.TaskRun] | None:
+    def get_runs_by_hash(self, task_hash: str) -> list[models.TaskRun] | None:
         with self.dbconn.session.begin() as session:
             tasks_orm = (
                 session.query(models.TaskRunDB)
@@ -86,7 +86,7 @@ class RunStore:
             return tasks
 
     @retry()
-    def get_latest_task_by_hash(self, task_hash: str) -> models.TaskRun | None:
+    def get_latest_run_by_hash(self, task_hash: str) -> models.TaskRun | None:
         with self.dbconn.session.begin() as session:
             task_orm = (
                 session.query(models.TaskRunDB)
@@ -103,7 +103,7 @@ class RunStore:
             return task
 
     @retry()
-    def create_task(self, task: models.TaskRun) -> models.TaskRun | None:
+    def create_run(self, task: models.TaskRun) -> models.TaskRun | None:
         with self.dbconn.session.begin() as session:
             task_orm = models.TaskRunDB(**task.model_dump())
             session.add(task_orm)
@@ -113,12 +113,12 @@ class RunStore:
             return created_task
 
     @retry()
-    def update_task(self, task: models.TaskRun) -> None:
+    def update_run(self, task: models.TaskRun) -> None:
         with self.dbconn.session.begin() as session:
             (session.query(models.TaskRunDB).filter(models.TaskRunDB.id == task.id).update(task.model_dump()))
 
     @retry()
-    def cancel_tasks(self, scheduler_id: str, task_ids: list[str]) -> None:
+    def cancel_runs(self, scheduler_id: str, task_ids: list[str]) -> None:
         with self.dbconn.session.begin() as session:
             session.query(models.TaskRunDB).filter(
                 models.TaskRunDB.scheduler_id == scheduler_id, models.TaskRunDB.id.in_(task_ids)

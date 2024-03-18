@@ -43,6 +43,17 @@ class TaskStore:
 
             return tasks, count
 
+    @retry()
+    def get_task(self, task_id: str) -> models.Task:
+        with self.dbconn.session.begin() as session:
+            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).one_or_none()
+
+            if task_orm is None:
+                raise ValueError(f"Task not found: {task_id}")
+
+            return models.Task.model_validate(task_orm)
+
+    @retry()
     def create_task(self, task: models.Task) -> models.Task:
         with self.dbconn.session.begin() as session:
             task_orm = models.TaskDB(**task.model_dump())
@@ -51,3 +62,19 @@ class TaskStore:
             created_task = models.Task.model_validate(task_orm)
 
             return created_task
+
+    @retry()
+    def update_task(self, task: models.Task) -> models.Task:
+        with self.dbconn.session.begin() as session:
+            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task.id).one_or_none()
+
+            if task_orm is None:
+                raise ValueError(f"Task not found: {task.id}")
+
+            task_orm.update(task.model_dump())
+            session.add(task_orm)
+
+            # TODO: validate cron expression
+            updated_task = models.Task.model_validate(task_orm)
+
+            return updated_task

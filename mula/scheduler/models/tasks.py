@@ -28,6 +28,7 @@ class Task(BaseModel):
     hash: str | None = Field(None, max_length=32)
     data: dict = Field(default_factory=dict)
 
+    # TODO: add enabled boolean
     schedule: str | None = None
 
     task_runs: list[TaskRun] = []
@@ -53,9 +54,16 @@ class TaskDB(Base):
     hash = Column(String(32), nullable=True)  # TODO: unique=True
     data = Column(JSONB, nullable=False)
 
+    schedule = Column(String, nullable=True)
+
     # TODO: cascade
     task_runs = relationship("TaskRunDB", back_populates="task")
     p_item = relationship("PrioritizedItemDB", uselist=False, back_populates="task")
+
+    deadline_at = Column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
 
     created_at = Column(
         DateTime(timezone=True),
