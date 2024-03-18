@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 from itertools import product
 
-import requests
+import httpx
 from bs4 import BeautifulSoup
 
 SEPARATOR = "|"
@@ -29,9 +29,9 @@ class _PortInfo:
 def iana_service_table(search_query: str) -> list[_Service]:
     services = []
 
-    response = requests.get(
-        "https://www.iana.org/assignments/service-names-port-numbers/"
-        "service-names-port-numbers.xhtml?search=" + search_query,
+    response = httpx.get(
+        "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml",
+        params={"search": search_query},
         timeout=30,
     )
     soup = BeautifulSoup(response.text, "html.parser")
@@ -145,7 +145,7 @@ def _map_usage_value(value: str) -> bool:
 
 
 def wiki_port_tables() -> list[_PortInfo]:
-    response = requests.get("https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers", timeout=30)
+    response = httpx.get("https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers", timeout=30)
     soup = BeautifulSoup(response.text, "html.parser")
 
     rows = []

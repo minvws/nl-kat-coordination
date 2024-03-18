@@ -210,6 +210,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
                         reverse(
                             "change_clearance_level",
                             kwargs={
+                                "plugin_type": "boefje",
                                 "organization_code": self.organization.code,
                                 "plugin_id": plugin_id,
                                 "scan_level": self.plugin.scan_level.value,

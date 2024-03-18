@@ -6,8 +6,8 @@ from enum import Enum
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, Response
+from httpx import HTTPError, HTTPStatusError
 from pydantic import BaseModel, ConfigDict, Field
-from requests import HTTPError
 from uvicorn import Config, Server
 
 from boefjes.clients.bytes_client import BytesAPIClient
@@ -140,7 +140,7 @@ def get_task(task_id, scheduler_client):
     try:
         task = scheduler_client.get_task(task_id)
     except HTTPError as e:
-        if e.response.status_code == 404:
+        if isinstance(e, HTTPStatusError) and e.response.status_code == 404:
             raise HTTPException(status_code=404, detail="Task not found")
         else:
             logger.exception("Failed to get task from scheduler")
