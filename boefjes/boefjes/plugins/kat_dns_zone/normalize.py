@@ -1,4 +1,4 @@
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 from dns.message import Message, from_text
 from dns.rdata import Rdata
@@ -6,14 +6,12 @@ from dns.rdtypes.ANY.SOA import SOA
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI
-from octopoes.models.ooi.dns.records import (
-    DNSSOARecord,
-)
+from octopoes.models.ooi.dns.records import DNSSOARecord
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.network import Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     internet = Network(name="internet")
 
     # parse raw data into dns.message.Message

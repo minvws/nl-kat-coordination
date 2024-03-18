@@ -3,7 +3,7 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-import requests
+import httpx
 from scheduler import config, models, schedulers, storage
 from structlog.testing import capture_logs
 
@@ -151,8 +151,8 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def test_get_normalizers_for_mime_type_request_exception(self, mock_get_normalizers_by_org_id_and_type):
         # Mocks
         mock_get_normalizers_by_org_id_and_type.side_effect = [
-            requests.exceptions.RetryError(),
-            requests.exceptions.ConnectionError(),
+            httpx.ConnectError("Connection error"),
+            httpx.ConnectError("Connection error"),
         ]
 
         # Act

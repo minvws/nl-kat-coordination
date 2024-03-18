@@ -2,18 +2,17 @@ import json
 from collections import defaultdict
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Optional
 
 from django.contrib import messages
 from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
+from httpx import HTTPError
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from requests.exceptions import RequestException
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification
@@ -23,16 +22,21 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
-from rocky.views.scheduler import get_list_of_tasks, reschedule_task
 
 
 class PageActions(Enum):
     START_SCAN = "start_scan"
     SUBMIT_ANSWER = "submit_answer"
     RESCHEDULE_TASK = "reschedule_task"
+    CHANGE_CLEARANCE_LEVEL = "change_clearance_level"
 
 
-class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, BaseOOIDetailView):
+class OOIDetailView(
+    BoefjeMixin,
+    OOIRelatedObjectAddView,
+    OOIFindingManager,
+    BaseOOIDetailView,
+):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
     task_history_limit = 10
@@ -54,9 +58,15 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
 
     def handle_page_action(self, action: str) -> bool:
         try:
+            if action == PageActions.CHANGE_CLEARANCE_LEVEL.value:
+                clearance_level = int(self.request.POST.get("level"))
+                if not self.can_raise_clearance_level(self.ooi, clearance_level):
+                    return redirect("account_detail", organization_code=self.organization.code)
+                return self.get(self.request, *self.args, **self.kwargs)
+
             if action == PageActions.RESCHEDULE_TASK.value:
-                task_id = self.request.POST.get("task_id")
-                reschedule_task(self.request, self.organization.code, task_id)
+                task_id = self.request.POST.get("task_id", "")
+                self.reschedule_task(task_id)
 
             if action == PageActions.START_SCAN.value:
                 boefje_id = self.request.POST.get("boefje_id")
@@ -87,13 +97,13 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 
             return self.get(self.request, status_code=404, *self.args, **self.kwargs)
-        except RequestException as exception:
+        except HTTPError as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
             return self.get(self.request, status_code=500, *self.args, **self.kwargs)
 
-    def get_current_ooi(self) -> Optional[OOI]:
+    def get_current_ooi(self) -> OOI | None:
         # self.ooi is already the current state of the OOI
-        if self.get_observed_at().date() == datetime.utcnow().date():
+        if self.observed_at.date() == datetime.utcnow().date():
             return self.ooi
         try:
             return self.get_ooi(pk=self.get_ooi_id(), observed_at=datetime.now(timezone.utc))
@@ -103,39 +113,18 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
     def get_organization_indemnification(self):
         return Indemnification.objects.filter(organization=self.organization).exists()
 
+    def get_task_filters(self) -> dict[str, str | datetime | None]:
+        filters = super().get_task_filters()
+        filters["task_type"] = "boefje"
+        filters["input_ooi"] = self.get_ooi_id()
+        return filters
+
     def get_task_history(self) -> Page:
-        scheduler_id = f"boefje-{self.organization.code}"
-
-        # FIXME: in context of ooi detail is doesn't make sense to search
-        # for an object name, so we search on plugin id
-        plugin_id = self.request.GET.get("task_history_search") or None
-
         page = int(self.request.GET.get("task_history_page", 1))
 
-        status = self.request.GET.get("task_history_status")
+        task_list = self.get_task_list()
 
-        if self.request.GET.get("task_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("task_history_from"), "%Y-%m-%d")
-        else:
-            min_created_at = None
-
-        if self.request.GET.get("task_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("task_history_to"), "%Y-%m-%d")
-        else:
-            max_created_at = None
-
-        task_history = get_list_of_tasks(
-            self.request,
-            self.organization.code,
-            scheduler_id=scheduler_id,
-            status=status,
-            min_created_at=min_created_at,
-            max_created_at=max_created_at,
-            task_type="boefje",
-            input_ooi=self.get_ooi_id(),
-            plugin_id=plugin_id,
-        )
-        return Paginator(task_history, self.task_history_limit).page(page)
+        return Paginator(task_list, self.task_history_limit).page(page)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -157,30 +146,31 @@ class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, Bas
         context["boefjes"] = [boefje for boefje in boefjes if boefje.scan_level.value <= max_level]
         context["ooi"] = self.ooi
 
-        declarations, observations, inferences = self.get_origins(
-            self.ooi.reference, self.get_observed_at(), self.organization
-        )
+        declarations, observations, inferences = self.get_origins(self.ooi.reference, self.organization)
 
         inference_params = self.octopoes_api_connector.list_origin_parameters(
-            {inference.origin.id for inference in inferences}
+            {inference.origin.id for inference in inferences},
+            self.observed_at,
         )
         inference_params_per_inference = defaultdict(list)
         for inference_param in inference_params:
             inference_params_per_inference[inference_param.origin_id].append(inference_param)
 
+        inference_origin_params: list[tuple] = []
         for inference in inferences:
-            inference.params = inference_params_per_inference.get(inference.origin.id, [])
+            inference_origin_params.append((inference, inference_params_per_inference[inference.origin.id]))
 
         context["declarations"] = declarations
         context["observations"] = observations
         context["inferences"] = inferences
+        context["inference_origin_params"] = inference_origin_params
         context["member"] = self.organization_member
 
         # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
         context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = self.get_observed_at()
+        context["observed_at"] = self.observed_at
         context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects(context["observed_at"])

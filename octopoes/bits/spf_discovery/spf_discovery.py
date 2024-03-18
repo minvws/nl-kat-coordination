@@ -1,4 +1,4 @@
-from typing import Dict, Iterator
+from collections.abc import Iterator
 
 from bits.spf_discovery.internetnl_spf_parser import parse
 from octopoes.models import OOI
@@ -9,7 +9,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
-def run(input_ooi: DNSTXTRecord, additional_oois, config: Dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: DNSTXTRecord, additional_oois, config: dict[str, str]) -> Iterator[OOI]:
     if input_ooi.value.startswith("v=spf1"):
         spf_value = input_ooi.value.replace("%(d)", input_ooi.hostname.tokenized.name)
         parsed = parse(spf_value)
@@ -47,7 +47,7 @@ def run(input_ooi: DNSTXTRecord, additional_oois, config: Dict[str, str]) -> Ite
             yield Finding(finding_type=ft.reference, ooi=input_ooi.reference, description="This SPF record is invalid")
 
 
-def parse_ip_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[str]:
+def parse_ip_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[OOI]:
     # split mechanism into qualifier and ip
     qualifier, ip = mechanism.split(":", 1)
     ip = mechanism[4:]
@@ -72,7 +72,7 @@ def parse_ip_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNS
             )
 
 
-def parse_a_mx_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[str]:
+def parse_a_mx_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[OOI]:
     if mechanism == "a" or mechanism == "mx":
         yield DNSSPFMechanismHostname(spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism=mechanism)
     else:
@@ -86,7 +86,7 @@ def parse_a_mx_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: D
             spf_record=spf_record.reference, hostname=hostname.reference, mechanism=mechanism_type
         )
     if mechanism.startswith("a/") or mechanism.startswith("mx/"):
-        mechanism_type, domain = mechanism.split("/", 1)[1]
+        mechanism_type, domain = mechanism.split("/", 1)
         # TODO: fix prefix lengths
         domain = domain.split("/")[0]
         hostname = Hostname(name=domain, network=Network(name=input_ooi.hostname.tokenized.network.name).reference)
@@ -98,7 +98,7 @@ def parse_a_mx_qualifiers(mechanism: str, input_ooi: DNSTXTRecord, spf_record: D
 
 def parse_ptr_exists_include_mechanism(
     mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord
-) -> Iterator[str]:
+) -> Iterator[OOI]:
     if mechanism == "ptr":
         yield DNSSPFMechanismHostname(spf_record=spf_record.reference, hostname=input_ooi.hostname, mechanism="ptr")
     else:
@@ -113,7 +113,7 @@ def parse_ptr_exists_include_mechanism(
         )
 
 
-def parse_redirect_mechanism(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[str]:
+def parse_redirect_mechanism(mechanism: str, input_ooi: DNSTXTRecord, spf_record: DNSSPFRecord) -> Iterator[OOI]:
     mechanism_type, domain = mechanism.split("=", 1)
     # currently, the model only supports hostnames and not domains
     if domain.startswith("_"):

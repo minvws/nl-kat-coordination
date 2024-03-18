@@ -1,25 +1,36 @@
+from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any, TypedDict
 
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.reports import ReportData
-from reports.report_types.definitions import MultiReport
+from reports.report_types.definitions import MultiReport, ReportPlugins
 
 logger = getLogger(__name__)
+
+
+class OpenPortsDict(TypedDict):
+    total: int
+    ports: dict
+
+
+class SystemSpecificDict(TypedDict):
+    total: int
+    checks: dict
 
 
 class MultiOrganizationReport(MultiReport):
     id = "multi-organization-report"
     name = _("Multi Organization Report")
     description = _("Multi Organization Report")
-    plugins = {"required": [], "optional": []}
+    plugins: ReportPlugins = {"required": [], "optional": []}
     input_ooi_types = {ReportData}
     template_path = "multi_organization_report/report.html"
 
-    def post_process_data(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any]) -> dict[str, Any]:
         """
         The data is of the form:
            {
@@ -28,7 +39,7 @@ class MultiOrganizationReport(MultiReport):
            }
         """
 
-        tags = {}
+        tags: dict[str, list[str]] = {}
         total_critical_vulnerabilities = 0
         basic_securities = []
         total_findings = 0
@@ -36,15 +47,15 @@ class MultiOrganizationReport(MultiReport):
         total_hostnames = 0
         service_counts = {}
         asset_vulnerabilities = []
-        open_ports = {"total": 0, "ports": {}}
-        services = {}
+        open_ports: OpenPortsDict = {"total": 0, "ports": {}}
+        services: dict[str, Any] = {}
         basic_security_summary = {}
         safe_connections_summary = {"number_of_available": 0, "number_of_ips": 0}
-        system_specific = {}
+        system_specific: dict[str, SystemSpecificDict] = {}
         rpki_summary = {}
         ipv6 = {}
         recommendation_counts = {}
-        organization_metrics = {}
+        organization_metrics: dict[str, Any] = {}
 
         for organization, report_data in data.items():
             basic_security = {"compliant": 0, "total": 0}
@@ -205,7 +216,9 @@ class MultiOrganizationReport(MultiReport):
                     system_vulnerabilities[vulnerability][service] += 1
                     system_vulnerability_totals[service] += 1
 
-        system_vulnerabilities = sorted(system_vulnerabilities.items(), key=lambda x: x[1]["cvss"] or 0, reverse=True)
+        system_vulnerabilities = dict(
+            sorted(system_vulnerabilities.items(), key=lambda x: x[1]["cvss"] or 0, reverse=True)
+        )
 
         return {
             "multi_data": data,
@@ -223,7 +236,7 @@ class MultiOrganizationReport(MultiReport):
             "total_hostnames": total_hostnames,
             "service_counts": service_counts,
             "asset_vulnerabilities": asset_vulnerabilities,
-            "system_vulnerabilities": dict(system_vulnerabilities),
+            "system_vulnerabilities": system_vulnerabilities,
             "system_vulnerability_totals": system_vulnerability_totals,
             "open_ports": open_ports,
             "basic_security": {
@@ -242,10 +255,11 @@ class MultiOrganizationReport(MultiReport):
 
 def collect_report_data(
     connector: OctopoesAPIConnector,
-    input_ooi_references: List[str],
+    input_ooi_references: list[str],
+    observed_at: datetime,
 ):
     report_data = {}
     for ooi in [x for x in input_ooi_references if Reference.from_str(x).class_type == ReportData]:
-        report_data[ooi] = connector.get(Reference.from_str(ooi)).dict()
+        report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).dict()
 
     return report_data

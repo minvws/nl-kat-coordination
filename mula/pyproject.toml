@@ -16,20 +16,19 @@ psycopg2 = "^2.9.9"
 pydantic = "^2.6.0"
 pydantic-settings= "^2.1.0"
 python-dotenv = "^1.0.0"
-requests = "^2.31.0"
 retry2 = "^0.9.5"
 sqlalchemy = "^2.0.23"
 structlog = "^23.2.0"
 uvicorn = "^0.26.0"
+httpx = "^0.27.0"
 
 # OpenTelemetry
 opentelemetry-sdk = "^1.19.0"
 opentelemetry-exporter-otlp-proto-grpc = "^1.19.0"
-opentelemetry-instrumentation-fastapi = "^0.41b0"
-opentelemetry-instrumentation-psycopg2 = "^0.41b0"
-opentelemetry-instrumentation-requests = "^0.41b0"
-certifi = "^2023.7.22"
-opentelemetry-instrumentation = "^0.41b0"
+opentelemetry-instrumentation-fastapi = "^0.44b0"
+opentelemetry-instrumentation-psycopg2 = "^0.44b0"
+opentelemetry-instrumentation = "^0.44b0"
+opentelemetry-instrumentation-httpx = "^0.44b0"
 
 [tool.poetry.group.dev.dependencies]
 factory_boy = "^3.2.1"
@@ -37,7 +36,6 @@ click = "^8.0.4"
 psutil = "^5.9.5"
 pytest = "^8.0.0"
 pytest-cov = "^4.0.0"
-httpx = "^0.26.0"
 
 [build-system]
 requires = ["setuptools>=59", "wheel"]

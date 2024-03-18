@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 19:01+0000\n"
+"POT-Creation-Date: 2024-03-05 12:26+0000\n"
 "PO-Revision-Date: 2023-11-18 13:03+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: English (Pirate) <https://hosted.weblate.org/projects/openkat/"
@@ -28,6 +28,7 @@ msgstr ""
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
+#: reports/report_types/dns_report/report.html
 #: reports/report_types/tls_report/report.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/templates/organizations/organization_settings.html
@@ -288,6 +289,10 @@ msgstr ""
 msgid "date joined"
 msgstr ""
 
+#: account/models.py
+msgid "name"
+msgstr ""
+
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
 msgstr ""
@@ -354,8 +359,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                            \"Withdraw acceptance of level L%(acl)s "
-"clearance and responsibility\"\n"
+"                            Withdraw L%(acl)s clearance and responsibility\n"
 "                    "
 msgstr ""
 
@@ -376,8 +380,7 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        \"Accept level L%(tcl)s clearance and "
-"responsibility\"\n"
+"                        Accept level L%(tcl)s clearance and responsibility\n"
 "                    "
 msgstr ""
 
@@ -387,12 +390,12 @@ msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Back"
+msgid "Send"
 msgstr ""
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
-msgid "Send"
+msgid "Back"
 msgstr ""
 
 #: account/templates/password_reset_confirm.html
@@ -466,11 +469,11 @@ msgid "Please contact the system administrator."
 msgstr ""
 
 #: account/templates/recover_email.html
-msgid "Back to Home"
+msgid "Back to login"
 msgstr ""
 
 #: account/templates/recover_email.html
-msgid "Back to login"
+msgid "Back to Home"
 msgstr ""
 
 #: account/templates/registration_email.html
@@ -547,659 +550,6 @@ msgid ""
 "more details."
 msgstr ""
 
-#: fmea/forms.py
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Failure mode"
-msgstr ""
-
-#: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/boefje_detail.html
-#: katalogus/templates/normalizer_detail.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
-#: rocky/templates/oois/ooi_detail.html
-#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
-msgid "Description"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Frequency Level"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Detectability Level"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Effect(s)"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Describe in one sentence what type of failure mode you are creating."
-msgstr ""
-
-#: fmea/forms.py
-msgid "Describe the failure mode in details."
-msgstr ""
-
-#: fmea/forms.py
-msgid ""
-"From 1 to 5, how often does this failure mode occurs. 1: Almost unthinkable "
-"and 5: occurs daily."
-msgstr ""
-
-#: fmea/forms.py
-msgid ""
-"Is this failure mode easy detectable? Give it a score from 1 to 5. 1: always "
-"detectable and 5: almost undetectable."
-msgstr ""
-
-#: fmea/forms.py
-msgid "Describe the type of failure mode"
-msgstr ""
-
-#: fmea/forms.py
-msgid "explanation-failure-mode"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Describe in more detail what the failure mode is about."
-msgstr ""
-
-#: fmea/forms.py
-msgid "explanation-description"
-msgstr ""
-
-#: fmea/forms.py
-msgid "explanation-frequency-level"
-msgstr ""
-
-#: fmea/forms.py
-msgid "explanation-detectability_level"
-msgstr ""
-
-#: fmea/forms.py
-msgid "You must at least set a failure mode."
-msgstr ""
-
-#: fmea/forms.py
-msgid "Choose a frequency level."
-msgstr ""
-
-#: fmea/forms.py
-msgid "Choose a detectability level."
-msgstr ""
-
-#: fmea/forms.py
-msgid "Choose at least one effect."
-msgstr ""
-
-#: fmea/forms.py
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Affected Department"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Affected Objects"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Choose a failure mode which applies to "
-msgstr ""
-
-#: fmea/forms.py
-msgid "When this failure mode occurs, which department is affected?"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Which objects does this failure mode affect when it occurs?"
-msgstr ""
-
-#: fmea/forms.py
-msgid "explanation-affected-ooi-type"
-msgstr ""
-
-#: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Effect"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Severity Level"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Name a possible effect of any type of failure mode that can occur."
-msgstr ""
-
-#: fmea/forms.py
-msgid ""
-"Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
-msgstr ""
-
-#: fmea/forms.py
-msgid "Describe a possible effect for FMEA"
-msgstr ""
-
-#: fmea/forms.py
-msgid "explanation-effect"
-msgstr ""
-
-#: fmea/forms.py
-msgid "explanation-severity-level"
-msgstr ""
-
-#: fmea/forms.py
-msgid "The effect is required."
-msgstr ""
-
-#: fmea/forms.py
-msgid "This effect already exists."
-msgstr ""
-
-#: fmea/forms.py
-msgid "Choose a severity level."
-msgstr ""
-
-#: fmea/models.py
-msgid "Finances"
-msgstr ""
-
-#: fmea/models.py
-msgid "Marketing"
-msgstr ""
-
-#: fmea/models.py
-msgid "Human Resources"
-msgstr ""
-
-#: fmea/models.py
-msgid "Research & Development"
-msgstr ""
-
-#: fmea/models.py
-msgid "Administration"
-msgstr ""
-
-#: fmea/models.py
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/service_health.html rocky/templates/footer.html
-#: rocky/templates/health.html
-msgid "Service"
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 1: Not Severe"
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 2: Harmful"
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 3: Severe"
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 4: Very Harmful"
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 5: Catastrophic"
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 3: Occurs. Incidents occur several times a year."
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 4: Regularly. Incidents occur weekly."
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 5: Frequent. Incidents occur daily."
-msgstr ""
-
-#: fmea/models.py
-msgid ""
-"Level 1: Always Detectable. Incident (almost) never occurs, almost "
-"unthinkable."
-msgstr ""
-
-#: fmea/models.py
-msgid ""
-"Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 3: Detectable. Failure mode is detectable with effort."
-msgstr ""
-
-#: fmea/models.py
-msgid "Level 4: Poorly Detectable. Detecting the failure mode is difficult."
-msgstr ""
-
-#: fmea/models.py
-msgid ""
-"Level 5: Almost Undetectable. Failure mode detection is very difficult or "
-"nearly impossible."
-msgstr ""
-
-#: fmea/models.py fmea/templates/fmea/fmea_failure_mode_list.html
-#: fmea/views/view_helpers.py
-msgid "Failure modes"
-msgstr ""
-
-#: fmea/models.py fmea/views/view_helpers.py
-msgid "Failure Mode Affected Objects"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_department_heatmap.html
-msgid "FMEA Departments Heatmap:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_department_heatmap.html
-msgid "No data to build heatmap"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-msgid "Failure mode affected object table:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Affected Object"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-#: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
-#: fmea/views/fmea_failure_mode_effect.py
-#: katalogus/templates/plugin_settings_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
-#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
-msgid "Edit"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-msgid "Failure mode affected objects cannot be found."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "Define which objects are affected for a failure mode"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "Failure mode affected objects"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "Save"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-#: rocky/templates/forms/json_schema_form.html
-#: rocky/templates/organizations/organization_add.html
-#: rocky/templates/organizations/organization_member_add.html
-#: rocky/templates/organizations/organization_member_add_account_type.html
-#: rocky/templates/partials/elements/ooi_detail_settings.html
-#: rocky/templates/partials/elements/ooi_report_settings.html
-#: rocky/templates/partials/form/indemnification_add_form.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/two_factor/_wizard_actions.html
-msgid "Submit"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "No failure mode yet defined."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "To add affected objects to a failure mode, first create one."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Create failure mode"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Failure mode affected objects table:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "No failure mode affected objects yet defined."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Create failure mode Affected Objects"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Departments failure modes"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Failure modes and affected departments table:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Failure Mode"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Affected Departments"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Nothing found."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Failure mode properties"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Properties"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Risk class"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Frequency level"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Detectability level"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid ""
-"\n"
-"                        Effect and severity level\n"
-"                        "
-msgid_plural ""
-"\n"
-"                        Effects and severity levels\n"
-"                      "
-msgstr[0] ""
-msgstr[1] ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Failure mode effect"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Failure mode effect properties"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Severity"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-msgid "FMEA effect and severity"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-msgid "FMEA effect"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Failure mode effects table:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Severity level"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "No failure mode effect yet defined."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Create a failure mode effect"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create a new failure mode"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "Failure mode and effects"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "No failure mode effects created."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid ""
-"First create failure mode effects which can be added later to a failure mode."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create failure mode effects"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Failure mode table:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Risk Class"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Details"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Sluit details"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Description:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Frequency level:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Detectability level:"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffect and severity level\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgid_plural ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffects and severity levels\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgstr[0] ""
-msgstr[1] ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Failure mode report"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/aggregate_organisation_report/summary.html
-#: reports/report_types/multi_organization_report/summary.html
-#: reports/templates/summary/report_summary.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
-#: rocky/views/ooi_tree.py
-msgid "Summary"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Failure mode: "
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Severity: "
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Detectability: "
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Frequency: "
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Effect: "
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Description: "
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Affected Departments: "
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Affected OOI's: "
-msgstr ""
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Report cannot be viewed, failure mode not found."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "FMEA introduction"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_index.html
-msgid ""
-"FMEA (failure mode and effective analysis) is a step-by-step approach for "
-"collecting knowledge about possible points of failure in a design, "
-"manufacturing process, product or service."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_index.html
-msgid ""
-"Failure mode (FM) refers to the way in which something might break down and "
-"includes potential errors that may occur, especially errors that may affect "
-"a system. Effective analysis (EA) involves deciphering the consequences of "
-"those break downs by making sure that all failures can be detected, "
-"determining how frequently a failure might occur and identifying which "
-"potential failures should be prioritized."
-msgstr ""
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create affected objects of a failure mode"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all failure modes"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all failure mode effects"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all affected objects for a failure modes"
-msgstr ""
-
-#: fmea/templates/fmea/fmea_index.html fmea/views/fmea_analytics.py
-msgid "Heatmap"
-msgstr ""
-
-#: fmea/tools.py
-msgid "--- Select an option ----"
-msgstr ""
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Failure mode affected objects successfully created."
-msgstr ""
-
-#: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
-#: fmea/views/fmea_failure_mode_effect.py
-msgid "Create"
-msgstr ""
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Treeobjects successfully added."
-msgstr ""
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Please select a department or ooi."
-msgstr ""
-
-#: fmea/views/fmea_analytics.py onboarding/templates/step_4_report.html
-msgid "Report"
-msgstr ""
-
-#: fmea/views/fmea_failure_mode.py
-msgid "Failure mode successfully created."
-msgstr ""
-
-#: fmea/views/fmea_failure_mode_effect.py
-msgid "Failure mode effect successfully created."
-msgstr ""
-
-#: fmea/views/view_helpers.py rocky/templates/dashboard_redteam.html
-msgid "FMEA"
-msgstr ""
-
-#: fmea/views/view_helpers.py
-msgid "Failure mode effects"
-msgstr ""
-
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
 msgstr ""
@@ -1265,6 +615,18 @@ msgstr ""
 
 #: katalogus/templates/boefje_detail.html
 msgid "Scan level"
+msgstr ""
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
+#: rocky/templates/oois/ooi_detail.html
+#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
+msgid "Description"
 msgstr ""
 
 #: katalogus/templates/boefje_detail.html
@@ -1429,7 +791,6 @@ msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
-#: reports/report_types/dns_report/report.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
 msgstr ""
@@ -1637,11 +998,11 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting\n"
+"                  Add setting and enable boefje\n"
 "                "
 msgid_plural ""
 "\n"
-"                  Add settings\n"
+"                  Add settings and enable boefje\n"
 "                "
 msgstr[0] ""
 msgstr[1] ""
@@ -1649,12 +1010,12 @@ msgstr[1] ""
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
 "\n"
-"                  Add setting and enable boefje\n"
-"                "
+"                Add setting\n"
+"              "
 msgid_plural ""
 "\n"
-"                  Add settings and enable boefje\n"
-"                "
+"                Add settings\n"
+"              "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1703,6 +1064,13 @@ msgstr ""
 #: katalogus/templates/plugin_settings_list.html
 #: reports/report_types/dns_report/report.html
 msgid "No"
+msgstr ""
+
+#: katalogus/templates/plugin_settings_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
+msgid "Edit"
 msgstr ""
 
 #: katalogus/views/change_clearance_level.py
@@ -1905,6 +1273,22 @@ msgstr ""
 msgid "Organization details"
 msgstr ""
 
+#: onboarding/templates/account/step_2a_organization_setup.html
+#: onboarding/templates/account/step_4_account_setup_admin.html
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html
+#: onboarding/templates/account/step_6_account_setup_client.html
+#: rocky/templates/forms/json_schema_form.html
+#: rocky/templates/organizations/organization_add.html
+#: rocky/templates/organizations/organization_member_add.html
+#: rocky/templates/organizations/organization_member_add_account_type.html
+#: rocky/templates/partials/elements/ooi_detail_settings.html
+#: rocky/templates/partials/elements/ooi_report_settings.html
+#: rocky/templates/partials/form/indemnification_add_form.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/two_factor/_wizard_actions.html
+msgid "Submit"
+msgstr ""
+
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 msgid ""
@@ -2035,13 +1419,13 @@ msgstr ""
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-msgid "Go back to previous step"
+msgid "Skip this step"
 msgstr ""
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
-msgid "Skip this step"
+#: onboarding/templates/account/step_6_account_setup_client.html
+msgid "Go back to previous step"
 msgstr ""
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
@@ -2168,6 +1552,7 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_2a_choose_report_info.html
+#: reports/report_types/dns_report/report.html
 msgid "Data"
 msgstr ""
 
@@ -2348,6 +1733,7 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -2596,6 +1982,10 @@ msgid "Suggested plugins"
 msgstr ""
 
 #: onboarding/templates/step_4_report.html
+msgid "Report"
+msgstr ""
+
+#: onboarding/templates/step_4_report.html
 msgid "Boefjes are scanning"
 msgstr ""
 
@@ -2708,6 +2098,10 @@ msgid "Selected objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Currently filtered on"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_summary.html
 msgid "Selected Report Types"
@@ -2736,6 +2130,12 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
+msgid "Service"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2851,6 +2251,11 @@ msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: rocky/templates/partials/ooi_list_toolbar.html
+msgid "Export"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: rocky/templates/oois/ooi_report.html
 #: rocky/templates/partials/findings_list_toolbar.html
 msgid "Download PDF"
@@ -2865,10 +2270,14 @@ msgid "This is the OpenKAT report for organization"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/templates/partials/report_header.html
+msgid "Created with data from"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Observed at:"
+msgid "Created on"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -2983,6 +2392,19 @@ msgid "Terms in report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
+msgid "Observed at:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/aggregate_organisation_report/summary.html
+#: reports/report_types/multi_organization_report/summary.html
+#: reports/templates/summary/report_summary.html
+#: rocky/templates/partials/ooi_report_severity_totals.html
+#: rocky/views/ooi_tree.py
+msgid "Summary"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/vulnerability_report/report.html
 msgid "vulnerabilities on this system"
 msgstr ""
@@ -3046,12 +2468,14 @@ msgid "Compliance issue"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/findings_report/report.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Risk level"
@@ -3131,31 +2555,27 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "IP address lookup"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "warning"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
-#: rocky/templates/dashboard_redteam.html
-#: rocky/templates/partials/notifications_block.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
+msgid "Records found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid ""
-"You have less than one webserver that is reachable over IPv6, which is "
-"<strong>not</strong> in compliance to internet.nl standards."
+"The table below gives an overview of the DNS records that were found for the "
+"abovementioned DNSZone."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Other records found"
+msgid ""
+"\n"
+"                    <strong>Disclaimer:</strong>\n"
+"                    Not all DNSRecords are parsed in OpenKAT.\n"
+"                    DNS record types that are parsed and could be displayed "
+"in the table are:\n"
+"                "
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "All existing DNS record types can be found here"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3163,17 +2583,145 @@ msgid "Record"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Found by"
+msgid "TTL"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "minutes"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Security measures"
 msgstr ""
 
+#: reports/report_types/dns_report/report.html
+msgid "Other findings found"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+msgid "Other findings found:"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Severity"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: rocky/templates/findings/finding_add.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Details"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Close details"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Open details"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Findings information"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrences"
+msgstr ""
+
 #: reports/report_types/dns_report/report.py
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "FindingType"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "Impact"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Recommendation"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.py
+msgid "First seen"
+msgstr ""
+
+#: reports/report_types/findings_report/report.html
+msgid "No findings have been found."
+msgstr ""
+
+#: reports/report_types/findings_report/report.py
+msgid "Findings Report"
+msgstr ""
+
+#: reports/report_types/findings_report/report.py
+msgid "Shows all the finding types and their occurrences."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -3275,6 +2823,10 @@ msgid "This is the OpenKAT Sector rapport."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
+msgid "Created with date from"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/introduction.html
 msgid "This sector contains"
 msgstr ""
 
@@ -3351,16 +2903,20 @@ msgid "Overview of recommendations"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/recommendations.html
-msgid "Recommendation"
-msgstr ""
-
-#: reports/report_types/multi_organization_report/recommendations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Occurrence"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/report.py
 msgid "Multi Organization Report"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Best scoring security check"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/summary.html
+msgid "Worst scoring security check"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
@@ -3540,20 +3096,6 @@ msgstr ""
 msgid "No ciphers found for this IPService"
 msgstr ""
 
-#: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr ""
-
 #: reports/report_types/tls_report/report.py
 msgid "TLS Report"
 msgstr ""
@@ -3569,35 +3111,11 @@ msgid "Vulnerabilities:"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrences"
-msgstr ""
-
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Close details"
-msgstr ""
-
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Open details"
-msgstr ""
-
-#: reports/report_types/vulnerability_report/report.html
 msgid "Advice"
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "No findings have been found on this system."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
@@ -3613,10 +3131,6 @@ msgstr ""
 #: rocky/templates/oois/ooi_detail_origins_observations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Source"
-msgstr ""
-
-#: reports/report_types/vulnerability_report/report.py
-msgid "First seen"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
@@ -3752,16 +3266,37 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+msgid "explanation select all"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Explanation 'Continue with all OOIs'"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#, python-format
+msgid ""
+"This option will select all OOIs (+ current filters) for %(organization)s "
+"organization."
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+msgid "Continue with all OOIs"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 msgid "Objects:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: reports/templates/summary/ooi_selection.html
 msgid "Clearance type"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Setup report"
+#: reports/templates/partials/report_types_selection.html
+msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3811,8 +3346,20 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 #: reports/views/generate_report.py
-#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate report"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals.html
+msgid "Findings overview"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "FindingTypes"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
@@ -3853,6 +3400,10 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
+msgid "You have selected all objects in previous step."
+msgstr ""
+
+#: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
 msgstr ""
 
@@ -3862,10 +3413,6 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
-msgstr ""
-
-#: reports/templates/partials/report_types_selection.html
-msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/summary/report_summary.html
@@ -3904,6 +3451,17 @@ msgstr ""
 msgid "Select at least one report type to proceed."
 msgstr ""
 
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid ""
+"No data could be found for %(report_types). Object(s) did not exist on "
+"%(date)s."
+msgstr ""
+
+#: reports/views/base.py
+#, python-format
+msgid "Report type '%s' does not exist."
+msgstr ""
+
 #: reports/views/generate_report.py
 msgid "This report may not show all the data as some plugins are not enabled."
 msgstr ""
@@ -3918,6 +3476,10 @@ msgstr ""
 
 #: tools/forms/base.py
 msgid "Date"
+msgstr ""
+
+#: tools/forms/base.py
+msgid "The selected date is in the future. Please select a different date."
 msgstr ""
 
 #: tools/forms/boefje.py
@@ -4179,7 +3741,7 @@ msgstr ""
 msgid "Only CSV file supported"
 msgstr ""
 
-#: tools/forms/upload_csv.py tools/forms/upload_raw.py
+#: tools/forms/upload_csv.py
 msgid "File could not be decoded"
 msgstr ""
 
@@ -4217,10 +3779,6 @@ msgstr ""
 
 #: tools/forms/upload_oois.py
 msgid "Choose a type of which objects are added."
-msgstr ""
-
-#: tools/forms/upload_raw.py
-msgid "Organization code(s) for raw does not exist in our database"
 msgstr ""
 
 #: tools/forms/upload_raw.py
@@ -4597,6 +4155,18 @@ msgid "User overview:"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "warning"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/partials/notifications_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Warning"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
 msgid "Organization code missing"
 msgstr ""
 
@@ -4615,13 +4185,6 @@ msgstr ""
 #: rocky/templates/oois/ooi_findings.html
 #: rocky/templates/partials/findings_list_toolbar.html
 msgid "Add finding"
-msgstr ""
-
-#: rocky/templates/findings/finding_add.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -5615,6 +5178,10 @@ msgid "Use the button below to add a related object. "
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate findings report"
+msgstr ""
+
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute Finding"
 msgstr ""
 
@@ -5644,11 +5211,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_list_toolbar.html
 #: rocky/templates/upload_csv.html rocky/views/upload_csv.py
 msgid "Upload CSV"
-msgstr ""
-
-#: rocky/templates/partials/ooi_list_toolbar.html
-#: reports/report_types/aggregate_organisation_report/introduction.html
-msgid "Export"
 msgstr ""
 
 #: rocky/templates/partials/ooi_list_toolbar.html
@@ -5687,10 +5249,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total occurrences"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total per severity overview:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
@@ -6034,12 +5592,12 @@ msgid "You don't have any backup codes yet."
 msgstr ""
 
 #: rocky/templates/two_factor/core/backup_tokens.html
-#: rocky/templates/two_factor/core/setup_complete.html
-msgid "Back to Account Security"
+msgid "Generate Tokens"
 msgstr ""
 
 #: rocky/templates/two_factor/core/backup_tokens.html
-msgid "Generate Tokens"
+#: rocky/templates/two_factor/core/setup_complete.html
+msgid "Back to Account Security"
 msgstr ""
 
 #: rocky/templates/two_factor/core/login.html
@@ -6261,6 +5819,10 @@ msgstr ""
 
 #: rocky/views/indemnification_add.py
 msgid "Indemnification successfully set."
+msgstr ""
+
+#: rocky/views/mixins.py
+msgid "The selected date is in the future."
 msgstr ""
 
 #: rocky/views/mixins.py
@@ -6562,6 +6124,13 @@ msgstr ""
 msgid ""
 "For IPAddressV4 and IPAddressV6 object types, a column of 'address' is "
 "required, optionally a second column 'network' is supported "
+msgstr ""
+
+#: rocky/views/upload_csv.py
+msgid ""
+"Clearance levels can be controlled by a column 'clearance' taking numerical "
+"values 0, 1, 2, 3, and 4 for the corresponding clearance level (other values "
+"are ignored) "
 msgstr ""
 
 #: rocky/views/upload_csv.py

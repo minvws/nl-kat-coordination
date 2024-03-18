@@ -1,9 +1,9 @@
 import logging
 import uuid
+from collections.abc import Set
 from datetime import datetime, timezone
-from typing import Dict, List, Optional, Set
 
-import requests
+import httpx
 from django.conf import settings
 from django.http import Http404
 
@@ -16,31 +16,29 @@ logger = logging.getLogger(__name__)
 
 class BytesClient:
     def __init__(self, base_url: str, username: str, password: str, organization: str):
-        self.base_url = base_url
         self.credentials = {
             "username": username,
             "password": password,
         }
-        self.session = requests.session()
+        self.session = httpx.Client(base_url=base_url)
         self.organization = organization
 
     def health(self) -> ServiceHealth:
-        response = self.session.get(f"{self.base_url}/health")
+        response = self.session.get("/health")
         response.raise_for_status()
 
         return ServiceHealth.parse_obj(response.json())
 
     @staticmethod
-    def raw_from_declarations(declarations: List[Declaration]):
+    def raw_from_declarations(declarations: list[Declaration]):
         json_string = f"[{','.join([declaration.json() for declaration in declarations])}]"
 
         return json_string.encode("utf-8")
 
-    def add_manual_proof(self, normalizer_id: uuid.UUID, raw: bytes, manual_mime_types: Optional[Set[str]] = None):
+    def add_manual_proof(
+        self, normalizer_id: uuid.UUID, raw: bytes, manual_mime_types: Set[str] = frozenset({"manual/ooi"})
+    ):
         """Per convention for a generic normalizer, we add a raw list of declarations, not a single declaration"""
-
-        if manual_mime_types is None:
-            manual_mime_types = {"manual/ooi"}
 
         self.login()
 
@@ -60,9 +58,9 @@ class BytesClient:
 
         self._save_normalizer_meta(
             NormalizerMeta(
-                id=str(normalizer_id),
+                id=normalizer_id,
                 raw_data=RawData(
-                    id=raw_id,
+                    id=uuid.UUID(raw_id),
                     boefje_meta=boefje_meta,
                     mime_types=[{"value": mime_type} for mime_type in all_mime_types],
                 ),
@@ -72,11 +70,11 @@ class BytesClient:
             ),
         )
 
-    def upload_raw(self, raw: bytes, manual_mime_types: Set[str], input_ooi: Optional[str] = None):
+    def upload_raw(self, raw: bytes, manual_mime_types: set[str], input_ooi: str | None = None):
         self.login()
 
         boefje_meta = BoefjeMeta(
-            id=str(uuid.uuid4()),
+            id=uuid.uuid4(),
             boefje=Boefje(id="manual"),
             input_ooi=input_ooi,
             arguments={},
@@ -89,26 +87,26 @@ class BytesClient:
         self._save_raw(boefje_meta.id, raw, {"boefje/manual"}.union(manual_mime_types))
 
     def _save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        response = self.session.post(f"{self.base_url}/bytes/boefje_meta", data=boefje_meta.json())
+        response = self.session.post(
+            "/bytes/boefje_meta", content=boefje_meta.model_dump_json(), headers={"content-type": "application/json"}
+        )
         response.raise_for_status()
 
     def _save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self.session.post(f"{self.base_url}/bytes/normalizer_meta", data=normalizer_meta.json())
+        response = self.session.post(
+            "/bytes/normalizer_meta",
+            content=normalizer_meta.model_dump_json(),
+            headers={"content-type": "application/json"},
+        )
 
         response.raise_for_status()
 
-    def _save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: Set[str] = None) -> str:
-        if not mime_types:
-            mime_types = set()
-
-        headers = {"content-type": "application/octet-stream"}
-        headers.update(self.session.headers)
-
+    def _save_raw(self, boefje_meta_id: uuid.UUID, raw: bytes, mime_types: Set[str] = frozenset()) -> str:
         response = self.session.post(
-            f"{self.base_url}/bytes/raw",
-            raw,
-            headers=headers,
-            params={"mime_types": mime_types, "boefje_meta_id": boefje_meta_id},
+            "/bytes/raw",
+            content=raw,
+            headers={"content-type": "application/octet-stream"},
+            params={"mime_types": mime_types, "boefje_meta_id": str(boefje_meta_id)},
         )
 
         response.raise_for_status()
@@ -117,17 +115,21 @@ class BytesClient:
     def get_raw(self, raw_id: str) -> bytes:
         # Note: we assume organization permissions are handled before requesting raw data.
 
-        response = self.session.get(f"{self.base_url}/bytes/raw/{raw_id}")
+        response = self.session.get(f"/bytes/raw/{raw_id}")
         response.raise_for_status()
 
         return response.content
 
-    def get_raw_metas(self, boefje_meta_id: str, organization_code: str) -> List:
+    def get_raw_metas(self, boefje_meta_id: uuid.UUID, organization_code: str) -> list:
         # More than 100 raw files per Boefje run is very unlikely at this stage, but eventually we can start paginating
         raw_files_limit = 100
-        params = {"boefje_meta_id": boefje_meta_id, "limit": raw_files_limit, "organization": self.organization}
+        params: dict[str, str | int] = {
+            "boefje_meta_id": str(boefje_meta_id),
+            "limit": raw_files_limit,
+            "organization": str(self.organization),
+        }
 
-        response = self.session.get(f"{self.base_url}/bytes/raw", params=params)
+        response = self.session.get("/bytes/raw", params=params)
         response.raise_for_status()
 
         metas = response.json()
@@ -139,10 +141,10 @@ class BytesClient:
 
         return metas
 
-    def get_normalizer_meta(self, normalizer_meta_id: str) -> Dict:
+    def get_normalizer_meta(self, normalizer_meta_id: uuid.UUID) -> dict:
         # Note: we assume organization permissions are handled before requesting raw data.
 
-        response = self.session.get(f"{self.base_url}/bytes/normalizer_meta/{normalizer_meta_id}")
+        response = self.session.get(f"/bytes/normalizer_meta/{normalizer_meta_id}")
         response.raise_for_status()
 
         return response.json()
@@ -150,12 +152,12 @@ class BytesClient:
     def login(self):
         self.session.headers.update(self._authorization_header())
 
-    def _authorization_header(self) -> Dict[str, str]:
+    def _authorization_header(self) -> dict[str, str]:
         return {"Authorization": f"bearer {self._get_token()}"}
 
     def _get_token(self) -> str:
         response = self.session.post(
-            f"{self.base_url}/token",
+            "/token",
             data=self.credentials,
             headers={"content-type": "application/x-www-form-urlencoded"},
         )

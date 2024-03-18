@@ -1,11 +1,10 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.core.exceptions import BadRequest
-from django.core.paginator import Page, Paginator
 from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
@@ -13,11 +12,11 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
+from katalogus.client import Boefje as KATalogusBoefje
 from katalogus.client import get_katalogus
 from katalogus.views.mixins import BoefjeMixin
 from katalogus.views.plugin_settings_list import PluginSettingsListView
-from rocky.views.ooi_detail import PageActions
-from rocky.views.scheduler import get_list_of_tasks, reschedule_task
+from rocky.views.tasks import TaskListView
 
 logger = getLogger(__name__)
 
@@ -31,60 +30,14 @@ class PluginCoverImgView(OrganizationView):
         return file
 
 
-class PluginDetailView(PluginSettingsListView, TemplateView):
-    task_history_limit = 10
-
-    def get_task_history(self) -> Page:
-        scheduler_id = f"{self.plugin.type}-{self.organization.code}"
-        plugin_type = self.plugin.type
-        plugin_id = self.plugin.id
-        input_ooi = self.request.GET.get("task_history_search")
-        status = self.request.GET.get("task_history_status")
-
-        if self.request.GET.get("task_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("task_history_from"), "%Y-%m-%d")
-        else:
-            min_created_at = None
-
-        if self.request.GET.get("task_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("task_history_to"), "%Y-%m-%d")
-        else:
-            max_created_at = None
-
-        page = int(self.request.GET.get("task_history_page", 1))
-
-        task_history = get_list_of_tasks(
-            self.request,
-            self.organization.code,
-            scheduler_id=scheduler_id,
-            task_type=plugin_type,
-            plugin_id=plugin_id,
-            input_ooi=input_ooi,
-            status=status,
-            min_created_at=min_created_at,
-            max_created_at=max_created_at,
-        )
-        return Paginator(task_history, self.task_history_limit).page(page)
-
-    def post(self, request, *args, **kwargs):
-        action = request.POST["action"]
-
-        if action:
-            self.handle_page_action(action)
-            return redirect(request.path)
-        else:
-            return self.get(request, *args, **kwargs)
-
-    def handle_page_action(self, action: str) -> None:
-        if action == PageActions.RESCHEDULE_TASK.value:
-            task_id = self.request.POST.get("task_id")
-            reschedule_task(self.request, self.organization.code, task_id)
+class PluginDetailView(TaskListView, PluginSettingsListView, TemplateView):
+    paginate_by = 10
+    context_object_name = "task_history"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["plugin"] = self.plugin.model_dump()
-        context["task_history"] = self.get_task_history()
         context["task_history_form_fields"] = [
             "task_history_from",
             "task_history_to",
@@ -126,6 +79,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
 
     template_name = "boefje_detail.html"
     limit_ooi_list = 9999
+    plugin: KATalogusBoefje
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -198,6 +152,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
                         reverse(
                             "change_clearance_level",
                             kwargs={
+                                "plugin_type": "boefje",
                                 "organization_code": self.organization.code,
                                 "plugin_id": plugin_id,
                                 "scan_level": self.plugin.scan_level.value,
@@ -211,19 +166,21 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
 
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
-        return self.octopoes_api_connector.list(self.plugin.consumes, limit=self.limit_ooi_list).items
+        return self.octopoes_api_connector.list_objects(
+            self.plugin.consumes, valid_time=datetime.now(timezone.utc), limit=self.limit_ooi_list
+        ).items
 
     def get_form_filtered_consumable_oois(self):
         """Return a list of oois that is filtered for oois that meets clearance level."""
         oois = self.get_form_consumable_oois()
         return [ooi for ooi in oois if ooi.scan_profile.level >= self.plugin.scan_level.value]
 
-    def get_oois(self, selected_oois: List[str]) -> Dict[str, Any]:
+    def get_oois(self, selected_oois: list[str]) -> dict[str, Any]:
         oois_with_clearance = []
         oois_without_clearance = []
         for ooi in selected_oois:
             ooi_object = self.get_single_ooi(pk=ooi)
-            if ooi_object.scan_profile.level >= self.plugin.scan_level.value:
+            if ooi_object.scan_profile and ooi_object.scan_profile.level >= self.plugin.scan_level.value:
                 oois_with_clearance.append(ooi_object)
             else:
                 oois_without_clearance.append(ooi_object.primary_key)

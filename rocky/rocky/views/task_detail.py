@@ -5,15 +5,15 @@ from django.views.generic import TemplateView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 
 from rocky.views.mixins import OctopoesView
-from rocky.views.scheduler import get_details_of_task
+from rocky.views.scheduler import SchedulerView
 
 
-class TaskDetailView(OctopoesView, TemplateView):
+class TaskDetailView(OctopoesView, SchedulerView, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["task_id"] = kwargs["task_id"]
-        context["task"] = get_details_of_task(self.request, context["task_id"])
+        context["task"] = self.get_task_details(context["task_id"])
         return context
 
 
@@ -54,11 +54,13 @@ class NormalizerTaskJSONView(NormalizerMixin, TaskDetailView):
 
     def get(self, request, *args, **kwargs):
         task_id = kwargs["task_id"]
-        task = get_details_of_task(request, task_id)
-        return JsonResponse(
-            {
-                "oois": self.get_output_oois(task),
-                "valid_time": task.p_item.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            },
-            safe=False,
-        )
+        task = self.get_task_details(task_id)
+        if task:
+            return JsonResponse(
+                {
+                    "oois": self.get_output_oois(task),
+                    "valid_time": task.p_item.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                },
+                safe=False,
+            )
+        return super().get(request, *args, **kwargs)

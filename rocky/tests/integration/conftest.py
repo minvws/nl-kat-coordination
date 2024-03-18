@@ -4,15 +4,13 @@ from ipaddress import ip_address
 
 import pytest
 from django.conf import settings
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import DeclaredScanProfile, Reference
+from octopoes.models import OOI, DeclaredScanProfile, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.findings import CVEFindingType, KATFindingType, RetireJSFindingType, RiskLevelSeverity
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RetireJSFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -29,7 +27,6 @@ def octopoes_api_connector(request) -> OctopoesAPIConnector:
     test_node = f"test-{request.node.originalname}"
 
     connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
-    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     connector.create_node()
     yield connector
@@ -41,7 +38,6 @@ def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
     test_node = f"test-{request.node.originalname}-2"
 
     connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
-    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     connector.create_node()
     yield connector
@@ -53,7 +49,8 @@ def seed_system(
     valid_time: datetime,
     test_hostname: str = "example.com",
     test_ip: str = "192.0.2.3",
-):
+    test_ipv6: str = "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
+) -> dict[str, list[OOI]]:
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
@@ -69,7 +66,7 @@ def seed_system(
 
     addresses = [
         IPAddressV4(network=network.reference, address=ip_address(test_ip)),
-        IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230")),
+        IPAddressV6(network=network.reference, address=ip_address(test_ipv6)),
     ]
     ports = [
         IPPort(address=addresses[0].reference, protocol="tcp", port=25),
@@ -146,6 +143,12 @@ def seed_system(
         ),
     ]
 
+    findings = [
+        Finding(finding_type=finding_types[-3].reference, ooi=instances[1].reference),
+        Finding(finding_type=finding_types[-2].reference, ooi=instances[1].reference),
+        Finding(finding_type=finding_types[-1].reference, ooi=instances[1].reference),
+    ]
+
     oois = (
         hostnames
         + addresses
@@ -160,6 +163,7 @@ def seed_system(
         + resources
         + headers
         + finding_types
+        + findings
         + urls
         + security_txts
         + certificates

@@ -1,13 +1,14 @@
 import uuid
 from datetime import date, datetime, timezone
-from typing import List, TypedDict
+from typing import TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
-from account.mixins import OrganizationView
+from django.http import HttpRequest
 from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models.types import OOI_TYPES
+from tools.models import Organization
 
 
 def convert_date_to_datetime(d: date) -> datetime:
@@ -15,7 +16,7 @@ def convert_date_to_datetime(d: date) -> datetime:
     return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
 
 
-def get_mandatory_fields(request, params: List[str] = None):
+def get_mandatory_fields(request, params: list[str] | None = None):
     mandatory_fields = []
 
     if not params:
@@ -78,13 +79,14 @@ class Breadcrumb(TypedDict):
 
 
 class BreadcrumbsMixin:
-    breadcrumbs: List[Breadcrumb] = []
+    breadcrumbs: list[Breadcrumb] = []
 
-    def build_breadcrumbs(self) -> List[Breadcrumb]:
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         return self.breadcrumbs.copy()
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Mypy doesn't understand the way mixins are used
+        context = super().get_context_data(**kwargs)  # type: ignore[misc]
         context["breadcrumbs"] = self.build_breadcrumbs()
         return context
 
@@ -95,8 +97,9 @@ class Step(TypedDict):
 
 
 class StepsMixin:
-    steps: List[Step] = []
-    current_step: int = None
+    request: HttpRequest
+    steps: list[Step] = []
+    current_step: int | None = None
 
     def get_current_step(self):
         if self.current_step is None:
@@ -106,11 +109,12 @@ class StepsMixin:
     def set_current_stepper_url(self, url):
         self.steps[self.get_current_step() - 1]["url"] = url
 
-    def build_steps(self) -> List[Step]:
+    def build_steps(self) -> list[Step]:
         return self.steps.copy()
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        # Mypy doesn't understand the way mixins are used
+        context = super().get_context_data(**kwargs)  # type: ignore[misc]
         context["steps"] = self.build_steps()
         context["current_step"] = self.get_current_step()
 
@@ -121,7 +125,9 @@ class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
     breadcrumbs = [{"url": reverse_lazy("organization_list"), "text": _("Organizations")}]
 
 
-class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
+class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin):
+    organization: Organization
+
     def build_breadcrumbs(self):
         breadcrumbs = [
             {
@@ -133,7 +139,9 @@ class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         return breadcrumbs
 
 
-class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
+class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
+    organization: Organization
+
     def build_breadcrumbs(self):
         breadcrumbs = [
             {
@@ -145,7 +153,9 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
         return breadcrumbs
 
 
-class ObjectsBreadcrumbsMixin(BreadcrumbsMixin, OrganizationView):
+class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
+    organization: Organization
+
     def build_breadcrumbs(self):
         return [
             {

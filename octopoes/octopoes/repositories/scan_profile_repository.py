@@ -1,18 +1,14 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
+from httpx import HTTPStatusError
 from pydantic import parse_obj_as
-from requests import HTTPError
 
 from octopoes.events.events import OperationType, ScanProfileDBEvent
 from octopoes.events.manager import EventManager
-from octopoes.models import (
-    Reference,
-    ScanProfile,
-    ScanProfileBase,
-)
+from octopoes.models import Reference, ScanProfile, ScanProfileBase
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.repositories.repository import Repository
 from octopoes.xtdb import FieldSet
@@ -31,17 +27,17 @@ class ScanProfileRepository(Repository):
         raise NotImplementedError
 
     def save(
-        self, old_scan_profile: Optional[ScanProfileBase], new_scan_profile: ScanProfileBase, valid_time: datetime
+        self, old_scan_profile: ScanProfileBase | None, new_scan_profile: ScanProfileBase, valid_time: datetime
     ) -> None:
         raise NotImplementedError
 
-    def list(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
+    def list_scan_profiles(self, scan_profile_type: str | None, valid_time: datetime) -> list[ScanProfileBase]:
         raise NotImplementedError
 
     def delete(self, scan_profile: ScanProfileBase, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def get_bulk(self, references: Set[Reference], valid_time: datetime) -> List[ScanProfileBase]:
+    def get_bulk(self, references: set[Reference], valid_time: datetime) -> list[ScanProfileBase]:
         raise NotImplementedError
 
 
@@ -61,17 +57,17 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         return f"{cls.object_type}|{ooi_reference}"
 
     @classmethod
-    def serialize(cls, scan_profile: ScanProfile) -> Dict[str, Any]:
+    def serialize(cls, scan_profile: ScanProfile) -> dict[str, Any]:
         data = scan_profile.dict()
         data[cls.pk_prefix] = cls.format_id(scan_profile.reference)
         data["type"] = cls.object_type
         return data
 
     @classmethod
-    def deserialize(cls, data: Dict[str, Any]) -> ScanProfileBase:
+    def deserialize(cls, data: dict[str, Any]) -> ScanProfileBase:
         return parse_obj_as(ScanProfile, data)
 
-    def list(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
+    def list_scan_profiles(self, scan_profile_type: str | None, valid_time: datetime) -> list[ScanProfileBase]:
         where = {"type": self.object_type}
         if scan_profile_type is not None:
             where["scan_profile_type"] = scan_profile_type
@@ -86,14 +82,14 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         id_ = self.format_id(ooi_reference)
         try:
             return self.deserialize(self.session.client.get_entity(id_, valid_time))
-        except HTTPError as e:
+        except HTTPStatusError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(id_)
             else:
                 raise e
 
     def save(
-        self, old_scan_profile: Optional[ScanProfileBase], new_scan_profile: ScanProfileBase, valid_time: datetime
+        self, old_scan_profile: ScanProfileBase | None, new_scan_profile: ScanProfileBase, valid_time: datetime
     ) -> None:
         if old_scan_profile == new_scan_profile:
             return
@@ -105,6 +101,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
             reference=new_scan_profile.reference,
             old_data=old_scan_profile,
             new_data=new_scan_profile,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -116,10 +113,11 @@ class XTDBScanProfileRepository(ScanProfileRepository):
             reference=scan_profile.reference,
             valid_time=valid_time,
             old_data=scan_profile,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
-    def get_bulk(self, references: Set[Reference], valid_time: datetime) -> List[ScanProfileBase]:
+    def get_bulk(self, references: set[Reference], valid_time: datetime) -> list[ScanProfileBase]:
         ids = list(map(str, references))
         query = generate_pull_query(FieldSet.ALL_FIELDS, {"type": self.object_type, "reference": ids})
         res = self.session.client.query(query, valid_time)
