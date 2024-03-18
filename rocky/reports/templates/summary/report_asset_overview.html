@@ -38,22 +38,32 @@
                 </tr>
             </thead>
             <tbody>
-                {% for option, plugins in plugins.items %}
-                    {% for plugin in plugins %}
-                        <tr>
-                            <td>{{ option }}</td>
-                            <td>{{ plugin.name }}</td>
-                            <td>
-                                {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}
+                {% if plugins.required or plugins.optional %}
+                    {% for option, plugins in plugins.items %}
+                        {% for plugin in plugins %}
+                            <tr>
+                                <td>{{ option }}</td>
+                                <td>{{ plugin.name }}</td>
+                                <td>
+                                    {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}
 
-                            </td>
-                            <td>
-                                <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
-                            </td>
-                            <td>{{ plugin.description }}</td>
-                        </tr>
+                                </td>
+                                <td>
+                                    <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
+                                </td>
+                                <td>{{ plugin.description }}</td>
+                            </tr>
+                        {% endfor %}
                     {% endfor %}
-                {% endfor %}
+                {% else %}
+                    <tr>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>

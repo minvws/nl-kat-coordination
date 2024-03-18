@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-13 17:02+0000\n"
+"POT-Creation-Date: 2024-03-18 15:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1731,7 +1731,6 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -2619,6 +2618,7 @@ msgid "Severity"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -2695,6 +2695,7 @@ msgstr ""
 #: reports/report_types/tls_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -2704,10 +2705,6 @@ msgstr ""
 #: rocky/views/finding_list.py rocky/views/finding_type_add.py
 #: rocky/views/ooi_view.py
 msgid "Findings"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid "FindingType"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
@@ -3410,16 +3407,13 @@ msgid "Generate report"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
+#: reports/templates/partials/report_severity_totals_table.html
 msgid "Findings overview"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total per severity overview:"
-msgstr ""
-
-#: reports/templates/partials/report_severity_totals_table.html
-msgid "FindingTypes"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
