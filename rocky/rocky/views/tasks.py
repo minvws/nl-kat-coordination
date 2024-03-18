@@ -8,8 +8,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
+from httpx import HTTPError
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
-from requests import HTTPError
 from tools.view_helpers import reschedule_task
 
 from rocky.paginator import RockyPaginator

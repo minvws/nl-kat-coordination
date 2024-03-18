@@ -13,11 +13,11 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
+from httpx import HTTPError
 from katalogus.client import Plugin, get_katalogus
 from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import get_selection
-from requests import HTTPError
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb
