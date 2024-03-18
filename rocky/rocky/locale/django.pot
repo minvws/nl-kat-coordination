@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-18 15:27+0000\n"
+"POT-Creation-Date: 2024-03-18 16:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2317,7 +2317,6 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
-#: reports/report_types/safe_connections_report/report.html
 msgid ""
 "In this chapter we check if the connections of all the IP ports of the "
 "system are safe. Safe connections are important to prevent unauthorised "
@@ -2560,8 +2559,9 @@ msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid ""
-"The table below gives an overview of the DNS records that were found for the "
-"abovementioned DNSZone."
+"The DNS report gives an overview of the DNS records that were found for the "
+"DNSZone. Additionally the security measures table shows whether or not DNS "
+"relating security measures are enabled."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -2596,6 +2596,12 @@ msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Security measures"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid ""
+"The security measures table below shows which DNS relating security measures "
+"are enabled based on the contents of the DNS records."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -2686,9 +2692,11 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid ""
-"This report shows the findings found on the system. The overview provides a "
-"summary, followed by a more detailed description of the findings in the next "
-"section."
+"The findings report provides an overview of the identified findings on the "
+"scanned systems. For each finding it shows the risk level and the number of "
+"occurrences of the finding. Under the 'Details' section a description, "
+"impact, recommendation and location of the finding can be found. The risk "
+"level may be different for your specific environment."
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
@@ -2734,11 +2742,11 @@ msgid "Shows all the finding types and their occurrences."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
-#: reports/report_types/multi_organization_report/ipv6.html
 msgid ""
-"IPv6 includes improvements in security features compared to IPv4. While IPv4 "
-"can implement security measures, IPv6 was designed with security in mind, "
-"and its adoption can contribute to a more secure internet."
+"The IPv6 report provides an overview of the current IPv6 status of the "
+"identified system. The table below shows whether the domain is reachable "
+"over IPv6 or not. A green compliance check is shown if this is the case. A "
+"red compliance cross is shown if no IPv6 address was detected."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -2760,7 +2768,12 @@ msgstr ""
 
 #: reports/report_types/mail_report/report.html
 msgid ""
-"The mail report shows the possible compliance issues related to mail servers."
+"The mail report provides an overview of the compliance checks associated "
+"with e-mail servers. The current compliance check the presence of SPF, DKIM "
+"and DMARC records. The table below shows for each of these checks how many "
+"of the identified mail servers are compliant, and if applicable a compliance "
+"issue description and risk level. The risk level may be different for your "
+"specific environment."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
@@ -2873,6 +2886,13 @@ msgid "IPv6"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/ipv6.html
+msgid ""
+"IPv6 includes improvements in security features compared to IPv4. While IPv4 "
+"can implement security measures, IPv6 was designed with security in mind, "
+"and its adoption can contribute to a more secure internet."
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
 msgid "In total "
 msgstr ""
 
@@ -2948,7 +2968,15 @@ msgid "total"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
-msgid "Text about name server report???"
+msgid ""
+"The name server report provides an overview of the compliance checks that "
+"were performed against the identified Domain Name Servers (DNS). The "
+"compliance checks verify the presence and validity of DNSSEC and whether no "
+"unnecessary ports were identified to be open. The table below gives an "
+"overview of the available checks including whether the system passed the "
+"performed checks. The risk level and reasoning as to why an issue was "
+"identified are shown too. The risk level may be different for your specific "
+"environment."
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
@@ -2982,10 +3010,11 @@ msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
 msgid ""
-"See an overview of open ports found. <strong>Bold</strong> open ports are "
-"found through direct scans that the organization performs via OpenKAT. Other "
-"open ports were found outside by OpenKAT itself. Scans with the same "
-"hostnames, ports and IPs are merged."
+"The open ports report provides an overview of the open ports identified on a "
+"system. The ports that are marked as <b>Bold</b> were identified by direct "
+"scans performed by OpenKAT (such as nmap). Ports that are not marked in bold "
+"were identified through external services and/or scans (such as Shodan). "
+"Scans with the same hostnames, ports and IPs are merged."
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
@@ -3011,6 +3040,12 @@ msgstr ""
 
 #: reports/report_types/open_ports_report/report.py
 msgid "Find open ports of IP addresses"
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid ""
+"The RPKI report shows if an RPKI route announcement was available for the "
+"system and if this announcement is not expired."
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
@@ -3053,6 +3088,16 @@ msgid "Safe Connections"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
+msgid ""
+"The secure connections report provides an overview of the performed checks "
+"with regard to encrypted communication channels such as HTTPS. The table "
+"below gives an overview of the available checks including whether the system "
+"passed the performed checks. The risk level and reasoning as to why an issue "
+"was identified are shown too. The risk level may be different for your "
+"specific environment."
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
 msgid "Safe connections compliance:"
 msgstr ""
 
@@ -3065,7 +3110,13 @@ msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
-msgid "The system report shows which system types are connected to the system."
+msgid ""
+"The system report provides an overview of the system types (types of similar "
+"services) that were identified for each system. The following system types "
+"can be identified: DNS servers, Web servers, Mail servers and those "
+"classified as 'Other' servers. Each hostname and/or IP address is given one "
+"or more system types depending on the identified ports and services. The "
+"table below gives an overview of these results."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
@@ -3143,8 +3194,10 @@ msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
 msgid ""
-"The table below shows the vulnerabilities that have been found on this "
-"system."
+"The vulnerability report provides an overview of all identified CVE "
+"vulnerabilities that were identified on the selected systems. For each CVE "
+"the table shows the CVE scoring, the number of occurrences, and the CVE "
+"details."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
@@ -3183,7 +3236,13 @@ msgid "Evidence"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
-msgid "Text about web system report???"
+msgid ""
+"The web system report provides an overview of various web server checks that "
+"were performed against the scanned system(s). For each performed check the "
+"table below shows whether or not the server is compliant with the checks. A "
+"description of why this compliant check failed is also shown, including an "
+"general risk level. The risk level may be different for your specific "
+"environment."
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3261,13 +3320,10 @@ msgstr ""
 
 #: reports/templates/partials/report_introduction.html
 msgid ""
-"Through a systematic examination of the network's infrastructure, the scan "
-"has identified potential security weaknesses and points of exposure. "
-"Additionally, the report offers actionable recommendations and prioritizes "
-"remediation steps to fortify the network's defenses against potential "
-"threats. This invaluable assessment serves as a roadmap for enhancing "
-"network security, ensuring the confidentiality, integrity, and availability "
-"of critical data and resources."
+"This report gives an overview of the current state of security for your "
+"organisation for the selected date. The summary section provides an overview "
+"of the selected systems (objects), plugins and reports. This is followed "
+"with the findings for each report."
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
@@ -3472,7 +3528,28 @@ msgid ""
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html
+msgid ""
+"The objects listed in the table below were used to generate this report. For "
+"each object in the table it additionally shows the clearance level and "
+"whether or not the object was added by a user ('Declared') or indirectly "
+"identified through another service or system ('Inherited')."
+msgstr ""
+
+#: reports/templates/summary/report_asset_overview.html
+msgid ""
+"The table below shows which reports were chosen to generate this report, "
+"including a report description."
+msgstr ""
+
+#: reports/templates/summary/report_asset_overview.html
 msgid "Selected Plugins for scans"
+msgstr ""
+
+#: reports/templates/summary/report_asset_overview.html
+msgid ""
+"The table below shows which plugins were enabled, required or optional for "
+"the selected reports. It also shows the required clearance level and "
+"description of the plugin."
 msgstr ""
 
 #: reports/templates/summary/service_health.html

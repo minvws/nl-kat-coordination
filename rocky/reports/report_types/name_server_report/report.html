@@ -3,7 +3,13 @@
 {% if show_introduction %}
     <p>
         {% blocktranslate trimmed %}
-            Text about name server report???
+            The name server report provides an overview of the compliance checks that
+            were performed against the identified Domain Name Servers (DNS). The compliance
+            checks verify the presence and validity of DNSSEC and whether no unnecessary
+            ports were identified to be open. The table below gives an overview of the
+            available checks including whether the system passed the performed checks.
+            The risk level and reasoning as to why an issue was identified are shown too.
+            The risk level may be different for your specific environment.
         {% endblocktranslate %}
     </p>
 {% endif %}

@@ -3,11 +3,24 @@
 <section id="asset-overview">
     <div>
         <h2>{% translate "Asset overview" %}</h2>
-        <p>{% translate "An overview of the selected objects, reports and plugins to generate this report." %}</p>
+        <!-- <p>{% translate "An overview of the selected objects, reports and plugins to generate this report." %}</p> -->
         <h3>{% translate "Selected objects" %}</h3>
+        <p>
+            {% blocktranslate trimmed %}
+                The objects listed in the table below were used to generate this report.
+                For each object in the table it additionally shows the clearance level and whether or not the object was
+                added by a user ('Declared') or indirectly identified through another service or system ('Inherited').
+            {% endblocktranslate %}
+        </p>
         {% include "summary/ooi_selection.html" %}
 
         <h3>{% translate "Selected Report Types" %}</h3>
+        <p>
+            {% blocktranslate trimmed %}
+                The table below shows which reports were chosen to generate this report,
+                including a report description.
+            {% endblocktranslate %}
+        </p>
         <table>
             <caption class="visually-hidden">{% translate "Selected Report Types" %}</caption>
             <thead>
@@ -26,6 +39,12 @@
             </tbody>
         </table>
         <h3>{% translate "Selected Plugins for scans" %}</h3>
+        <p>
+            {% blocktranslate trimmed %}
+                The table below shows which plugins were enabled, required or optional for the selected reports.
+                It also shows the required clearance level and description of the plugin.
+            {% endblocktranslate %}
+        </p>
         <table>
             <caption class="visually-hidden">{% translate "Selected Plugins for scans" %}</caption>
             <thead>
