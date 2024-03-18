@@ -30,7 +30,7 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) ->
 
     if "unsafe-inline" in header.value or "unsafe-eval" in header.value or "unsafe-hashes" in header.value:
         findings.append(
-            "unsafe-inline, unsafe-eval and unsafe-hashes should not be used in the CSP settings of an HTTP Header."
+            "unsafe-inline, unsafe-eval and unsafe-hashes should not be used in the CSP settings of a HTTP Header."
         )
 
     if "frame-src" not in header.value and "default-src" not in header.value and "child-src" not in header.value:
@@ -65,6 +65,11 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) ->
         if (policy[0] == "default-src" or policy[0] == "object-src" or policy[0] == "script-src") and "data:" in policy:
             findings.append(
                 "'data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
+            )
+
+        if policy[0] == "script-src" and "'self'" in policy:
+            findings.append(
+                "'self' for `script-src` can be problematic if you host JSONP, Angular or user uploaded files."
             )
 
         if policy[0].endswith("-uri") and (
