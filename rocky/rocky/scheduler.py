@@ -11,7 +11,7 @@ from typing import Any
 import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPError, HTTPStatusError, RequestError, codes
+from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 
 from rocky.health import ServiceHealth
@@ -158,15 +158,17 @@ class SchedulerTaskList:
             limit = 1
         else:
             raise TypeError("Invalid slice argument type.")
+        try:
+            res = self.scheduler_client.list_tasks(
+                limit=limit,
+                offset=offset,
+                **self.kwargs,
+            )
 
-        res = self.scheduler_client.list_tasks(
-            limit=limit,
-            offset=offset,
-            **self.kwargs,
-        )
-
-        self._count = res.count
-        return res.results
+            self._count = res.count
+            return res.results
+        except ConnectError:
+            raise SchedulerError()
 
 
 class SchedulerError(Exception):
@@ -201,9 +203,12 @@ class SchedulerClient:
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
-        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
-        res = self._client.get("/tasks", params=kwargs)
-        return PaginatedTasksResponse.model_validate_json(res.content)
+        try:
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+            res = self._client.get("/tasks", params=kwargs)
+            return PaginatedTasksResponse.model_validate_json(res.content)
+        except ConnectError:
+            raise SchedulerError()
 
     def get_task_details(self, task_id: str) -> Task:
         res = self._client.get(f"/tasks/{task_id}")
@@ -257,5 +262,5 @@ class SchedulerClient:
         return task_stats
 
 
-def get_scheduler(organization_code: str) -> SchedulerClient:
+def scheduler_client(organization_code: str) -> SchedulerClient:
     return SchedulerClient(settings.SCHEDULER_API, organization_code)

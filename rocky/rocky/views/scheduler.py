@@ -5,7 +5,7 @@ from account.mixins import OrganizationView
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 
-from rocky.scheduler import PrioritizedItem, SchedulerError, SchedulerTaskList, Task, get_scheduler
+from rocky.scheduler import PrioritizedItem, SchedulerError, SchedulerTaskList, Task, scheduler_client
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ class SchedulerView(OrganizationView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.scheduler_client = get_scheduler(self.organization.code)
+        self.scheduler_client = scheduler_client(self.organization.code)
         self.scheduler_id = f"{self.task_type}-{self.organization.code}"
         self.task_type = self.request.GET.get("type", self.task_type)
         self.status = self.request.GET.get("scan_history_status", None)
@@ -43,15 +43,13 @@ class SchedulerView(OrganizationView):
         try:
             return SchedulerTaskList(self.scheduler_client, **self.get_task_filters())
         except SchedulerError as error:
-            messages.error(self.request, error.message)
-        return None
+            return messages.error(self.request, error.message)
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:
             return self.scheduler_client.get_task_details(task_id)
         except SchedulerError as error:
-            messages.error(self.request, error.message)
-        return None
+            return messages.error(self.request, error.message)
 
     def schedule_task(self, p_item: PrioritizedItem) -> None:
         try:
