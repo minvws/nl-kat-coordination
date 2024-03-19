@@ -158,17 +158,15 @@ class SchedulerTaskList:
             limit = 1
         else:
             raise TypeError("Invalid slice argument type.")
-        try:
-            res = self.scheduler_client.list_tasks(
-                limit=limit,
-                offset=offset,
-                **self.kwargs,
-            )
 
-            self._count = res.count
-            return res.results
-        except ConnectError:
-            raise SchedulerError()
+        res = self.scheduler_client.list_tasks(
+            limit=limit,
+            offset=offset,
+            **self.kwargs,
+        )
+
+        self._count = res.count
+        return res.results
 
 
 class SchedulerError(Exception):
