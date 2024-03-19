@@ -41,12 +41,10 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             logging.warning("Returned IP different from input OOI.")
             logging.debug("Result IP: %s, Input IP: %s)", result["ip"], input_ooi_str)
         for hostname in result["hostnames"]:
+            hostname_ooi = Hostname(name=hostname, network=Network(name=input_["network"]["name"]).reference)
+            yield hostname_ooi
             if hostname.endswith(DNS_PTR_STR):
-                # Some parsing necessary to find the normal IP, could enrich DNSPTRRecord.
-                # reverse_ip = hostname.replace(DNS_PTR_STR, "") # noqa: ERA001
-                yield DNSPTRRecord(hostname=hostname, value=hostname, address=None)
-            else:
-                yield Hostname(name=hostname, network=Network(name=input_["network"]["name"]).reference)
+                yield DNSPTRRecord(hostname=hostname_ooi.reference, value=hostname, address=input_ooi_reference)
 
         for port in result["ports"]:
             yield IPPort(address=input_ooi_reference, port=int(port), state=PortState("open"))
