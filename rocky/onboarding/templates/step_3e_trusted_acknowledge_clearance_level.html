@@ -63,7 +63,7 @@
                             {% endblocktranslate %}
                         </p>
                         <div class="button-container">
-                            <a href="{% url "step_set_clearance_level" organization.code %}?ooi_id={{ ooi }}"
+                            <a href="{% url "step_set_clearance_level" organization.code %}?{{ request.GET.urlencode }}"
                                class="button">{% translate "Set clearance level" %}</a>
                             <a href="{% url "complete_onboarding" organization.code %}"
                                class="button ghost">{% translate "Skip onboarding" %}</a>

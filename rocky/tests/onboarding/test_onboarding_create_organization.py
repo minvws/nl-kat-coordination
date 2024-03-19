@@ -1,7 +1,7 @@
 from django.urls import reverse
+from httpx import HTTPError
 from onboarding.views import OnboardingOrganizationSetupView
 from pytest_django.asserts import assertContains
-from requests import HTTPError
 
 from tests.conftest import setup_request
 
@@ -25,7 +25,7 @@ def test_onboarding_create_organization_already_exist_katalogus(
     )
 
     mock_models_katalogus().organization_exists.return_value = True
-    mock_models_katalogus().create_organization.side_effect = HTTPError()
+    mock_models_katalogus().create_organization.side_effect = HTTPError("")
 
     response = OnboardingOrganizationSetupView.as_view()(request)
     assert response.status_code == 302

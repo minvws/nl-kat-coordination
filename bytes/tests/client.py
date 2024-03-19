@@ -4,27 +4,13 @@ from functools import wraps
 from typing import Any
 from uuid import UUID
 
-import requests
-from requests.exceptions import HTTPError
+import httpx
+from httpx import HTTPError
 
 from bytes.models import BoefjeMeta, NormalizerMeta
 from bytes.repositories.meta_repository import BoefjeMetaFilter, NormalizerMetaFilter, RawDataFilter
 
 BYTES_API_CLIENT_VERSION = "0.2"
-
-
-class BytesAPISession(requests.Session):
-    def __init__(self, base_url: str):
-        super().__init__()
-
-        self._base_url = base_url
-        self.headers["User-Agent"] = f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"
-
-    def request(self, method: str, url: str | bytes, **kwargs) -> requests.Response:  # type: ignore
-        url = self._base_url + str(url)
-
-        return super().request(method, url, **kwargs)
-
 
 ClientSessionMethod = Callable[..., Any]
 
@@ -46,27 +32,28 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
 
 class BytesAPIClient:
     def __init__(self, base_url: str, username: str, password: str):
-        self._session = BytesAPISession(base_url)
-        self.credentials = {
+        self.client = httpx.Client(
+            base_url=base_url, headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"}
+        )
+        self._credentials = {
             "username": username,
             "password": password,
         }
-        self.headers: dict[str, str] = {}
 
     def login(self) -> None:
-        self.headers = self._get_authentication_headers()
+        self.client.headers.update(self._get_authentication_headers())
 
     @staticmethod
-    def _verify_response(response: requests.Response) -> None:
+    def _verify_response(response: httpx.Response) -> None:
         response.raise_for_status()
 
     def _get_authentication_headers(self) -> dict[str, str]:
         return {"Authorization": f"bearer {self._get_token()}"}
 
     def _get_token(self) -> str:
-        response = self._session.post(
+        response = self.client.post(
             "/token",
-            data=self.credentials,
+            data=self._credentials,
             headers={"content-type": "application/x-www-form-urlencoded"},
         )
 
@@ -74,7 +61,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_metrics(self) -> bytes:
-        response = self._session.get("/metrics", headers=self.headers)
+        response = self.client.get("/metrics")
 
         self._verify_response(response)
 
@@ -82,23 +69,23 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_mime_type_count(self, query_filter: RawDataFilter) -> dict[str, str]:
-        params = query_filter.dict()
+        params = query_filter.model_dump(exclude_none=True)
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
-        response = self._session.get("/bytes/mime_types", headers=self.headers, params=params)
+        response = self.client.get("/bytes/mime_types", params=params)
         self._verify_response(response)
 
         return response.json()  # type: ignore
 
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        response = self._session.post("/bytes/boefje_meta", data=boefje_meta.json(), headers=self.headers)
+        response = self.client.post("/bytes/boefje_meta", content=boefje_meta.model_dump_json())
 
         self._verify_response(response)
 
     @retry_with_login
     def get_boefje_meta_by_id(self, boefje_meta_id: UUID) -> BoefjeMeta:
-        response = self._session.get(f"/bytes/boefje_meta/{boefje_meta_id}", headers=self.headers)
+        response = self.client.get(f"/bytes/boefje_meta/{boefje_meta_id}")
         self._verify_response(response)
 
         boefje_meta_json = response.json()
@@ -106,7 +93,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_boefje_meta(self, query_filter: BoefjeMetaFilter) -> list[BoefjeMeta]:
-        response = self._session.get("/bytes/boefje_meta", headers=self.headers, params=query_filter.dict())
+        response = self.client.get("/bytes/boefje_meta", params=query_filter.model_dump(exclude_none=True))
         self._verify_response(response)
 
         boefje_meta_json = response.json()
@@ -114,13 +101,13 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self._session.post("/bytes/normalizer_meta", data=normalizer_meta.json(), headers=self.headers)
+        response = self.client.post("/bytes/normalizer_meta", content=normalizer_meta.model_dump_json())
 
         self._verify_response(response)
 
     @retry_with_login
     def get_normalizer_meta_by_id(self, normalizer_meta_id: UUID) -> NormalizerMeta:
-        response = self._session.get(f"/bytes/normalizer_meta/{normalizer_meta_id}", headers=self.headers)
+        response = self.client.get(f"/bytes/normalizer_meta/{normalizer_meta_id}")
         self._verify_response(response)
 
         normalizer_meta_json = response.json()
@@ -128,7 +115,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_normalizer_meta(self, query_filter: NormalizerMetaFilter) -> list[NormalizerMeta]:
-        response = self._session.get("/bytes/normalizer_meta", headers=self.headers, params=query_filter.dict())
+        response = self.client.get("/bytes/normalizer_meta", params=query_filter.model_dump(exclude_none=True))
         self._verify_response(response)
 
         normalizer_meta_json = response.json()
@@ -140,10 +127,12 @@ class BytesAPIClient:
             mime_types = []
 
         headers = {"content-type": "application/octet-stream"}
-        headers.update(self.headers)
 
-        response = self._session.post(
-            "/bytes/raw", raw, headers=headers, params={"mime_types": mime_types, "boefje_meta_id": str(boefje_meta_id)}
+        response = self.client.post(
+            "/bytes/raw",
+            content=raw,
+            headers=headers,
+            params={"mime_types": mime_types, "boefje_meta_id": str(boefje_meta_id)},
         )
 
         self._verify_response(response)
@@ -153,17 +142,17 @@ class BytesAPIClient:
 
     @retry_with_login
     def get_raw(self, raw_id: UUID) -> bytes:
-        response = self._session.get(f"/bytes/raw/{raw_id}", headers=self.headers, stream=True)
+        response = self.client.get(f"/bytes/raw/{raw_id}")
         self._verify_response(response)
 
         return response.content
 
     @retry_with_login
     def get_raws(self, query_filter: RawDataFilter) -> dict[str, str]:
-        params = query_filter.dict()
+        params = query_filter.model_dump(exclude_none=True)
         params["mime_types"] = [m.value for m in query_filter.mime_types]
 
-        response = self._session.get("/bytes/raw", headers=self.headers, stream=True, params=params)
+        response = self.client.get("/bytes/raw", params=params)
         self._verify_response(response)
 
         return response.json()  # type: ignore

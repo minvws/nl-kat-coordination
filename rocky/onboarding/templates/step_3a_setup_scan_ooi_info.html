@@ -43,7 +43,7 @@
                 </p>
                 {% if organization %}
                     <div class="button-container">
-                        <a href="{% url "step_setup_scan_ooi_add" ooi_type="URL" organization_code=organization.code %}"
+                        <a href="{% url "step_setup_scan_ooi_add" ooi_type="URL" organization_code=organization.code %}?{{ request.GET.urlencode }}"
                            class="button">{% translate "Add URL" %}</a>
                         <a href="{% url "complete_onboarding" organization.code %}"
                            class="button ghost">{% translate "Skip onboarding" %}</a>

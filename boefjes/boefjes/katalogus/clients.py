@@ -1,5 +1,5 @@
+from httpx import Client
 from pydantic import TypeAdapter
-from requests import Session
 
 from boefjes.katalogus.models import PluginType, Repository
 
@@ -25,10 +25,10 @@ class MockPluginRepositoryClient(PluginRepositoryClientInterface):
 
 class PluginRepositoryClient(PluginRepositoryClientInterface):
     def __init__(self):
-        self._session = Session()
+        self._client = Client()
 
     def get_plugins(self, repository: Repository, plugin_type: PluginType | None = None) -> dict[str, PluginType]:
-        res = self._session.get(f"{repository.base_url}/plugins", params={"plugin_type": plugin_type})
+        res = self._client.get(f"{repository.base_url}/plugins", params={"plugin_type": plugin_type})
         res.raise_for_status()
 
         plugins = TypeAdapter(dict[str, PluginType]).validate_json(res.content)
@@ -39,7 +39,7 @@ class PluginRepositoryClient(PluginRepositoryClientInterface):
         return plugins
 
     def get_plugin(self, repository: Repository, plugin_id: str) -> PluginType:
-        res = self._session.get(f"{repository.base_url}/plugins/{plugin_id}")
+        res = self._client.get(f"{repository.base_url}/plugins/{plugin_id}")
         res.raise_for_status()
 
         return PluginType.model_validate_json(res.content)  # type: ignore

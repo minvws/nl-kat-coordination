@@ -6,8 +6,8 @@ import sys
 import time
 from queue import Queue
 
+from httpx import HTTPError
 from pydantic import ValidationError
-from requests import HTTPError
 
 from boefjes.clients.scheduler_client import (
     QueuePrioritizedItem,

@@ -60,11 +60,6 @@ urlpatterns = [
         name="step_report",
     ),
     path(
-        "<organization_code>/step/report/dns-report/",
-        views.DnsReportView.as_view(),
-        name="dns_report",
-    ),
-    path(
         "step/introduction/registration/",
         views.OnboardingIntroductionRegistrationView.as_view(),
         name="step_introduction_registration",
