@@ -5,7 +5,7 @@ import docker
 from boefjes.job_models import BoefjeMeta
 
 # FIXME: We should build a multi-platform image
-if platform.processor() == "arm":
+if platform.machine() in ["arm64", "aarch64"]:
     WAPPALYZER_IMAGE = "noamblitz/wappalyzer:MacM1"
 else:
     WAPPALYZER_IMAGE = "noamblitz/wappalyzer:latest"
