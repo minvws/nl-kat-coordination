@@ -21,10 +21,6 @@ table {
     border-color: #a89cdd;
   }
 
-  td {
-    border-width: 0 0 1px;
-  }
-
   tr {
     /* Zebra striping with opacity to keep background color. e.g for warnings or errors */
     &:first-of-type td {
@@ -34,61 +30,48 @@ table {
     &:last-of-type td {
       border-width: 0 0 1px;
     }
-  }
-}
 
-main div,
-main section,
-main section > div,
-main article,
-main article > div {
-  form fieldset dl,
-  form dl,
-  dl {
-    > div {
-      display: block;
-    }
-  }
-}
-
-tr {
-  border: 1px dashed red;
-}
-
-tr.expanded-row {
-  border: 1px dashed blue;
-}
-
-tr:nth-child(even) td {
-  background-color: white;
-}
-
-tr.expanded-row td {
-  background-color: #eeecf8;
-}
-
-// .expando-button {
-//   display: none;
-// }
-
-table ul.accordion {
-  border: 1px dashed green;
-  width: 100%;
-  display: block;
-
-  &::before {
-    display: none;
-  }
-
-  li {
-    border: 1px dashed purple;
-
-    button {
-      display: inline;
+    &:nth-child(even) td {
+      background-color: white;
     }
 
-    > div {
-      display: block;
+    td {
+      border-width: 0 0 1px;
+
+      span.icon::before {
+        font-size: 1rem;
+      }
+
+      &.actions > button {
+        display: none;
+      }
+    }
+
+    &.expanded-row {
+      td,
+      &:first-of-type td,
+      &:nth-child(even) td {
+        background-color: #eeecf8;
+      }
+    }
+  }
+
+  ul.accordion {
+    width: 100%;
+    display: block;
+
+    &::before {
+      display: none;
+    }
+
+    li {
+      button {
+        display: inline;
+      }
+
+      > div {
+        display: block;
+      }
     }
   }
 }
