@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-12 13:07+0000\n"
+"POT-Creation-Date: 2024-03-14 15:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3861,6 +3861,18 @@ msgid ""
 "Edit this member and change the clearance level if necessary."
 msgstr ""
 
+#: rocky/paginator.py
+msgid "That page number is not an integer"
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page number is less than 1"
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page contains no results"
+msgstr ""
+
 #: rocky/scheduler.py
 msgid "Connectivity issues with Mula."
 msgstr ""
@@ -6141,7 +6153,12 @@ msgstr ""
 
 #: rocky/views/upload_raw.py
 #, python-format
-msgid "Raw file could not be uploaded to Bytes: status code %s"
+msgid "Raw file could not be uploaded to Bytes: status code %d"
+msgstr ""
+
+#: rocky/views/upload_raw.py
+#, python-format
+msgid "Raw file could not be uploaded to Bytes: %s"
 msgstr ""
 
 #: rocky/views/upload_raw.py

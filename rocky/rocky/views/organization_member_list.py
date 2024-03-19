@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
-from requests.exceptions import RequestException
+from httpx import RequestError
 from tools.models import OrganizationMember
 from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
@@ -87,7 +87,7 @@ class OrganizationMemberListView(
             else:
                 raise Exception(f"Unhandled allowed action: {action}")
             organizationmember.save()
-        except RequestException as exception:
+        except RequestError as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
 
     def get_filters_active(self):
