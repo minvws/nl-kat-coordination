@@ -11,5 +11,5 @@ mispo.es
 
 ```
 $ docker build -t mula-load .
-$ docker run --network="host" --orgs [number-of-orgs]
+$ docker run --network="host" mula-load --orgs [number-of-orgs]
 ```
