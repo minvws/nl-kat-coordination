@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, TemplateView
-from requests import RequestException
+from httpx import HTTPError
 from tools.models import Organization
 
 from katalogus.client import get_katalogus
@@ -83,7 +83,7 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
         for boefje in katalogus_client.get_boefjes():
             try:
                 plugin_setting = katalogus_client.get_plugin_settings(boefje.id)
-            except RequestException:
+            except HTTPError:
                 messages.add_message(
                     self.request,
                     messages.ERROR,

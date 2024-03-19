@@ -1,5 +1,4 @@
 import binascii
-import io
 import json
 import logging
 from datetime import datetime, timezone
@@ -17,8 +16,8 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
+from httpx import Response
 from katalogus.client import parse_plugin
-from requests import Response
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
@@ -437,6 +436,19 @@ def network() -> Network:
 
 
 @pytest.fixture
+def url(network) -> URL:
+    return URL(
+        scan_profile=DeclaredScanProfile(
+            scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
+        ),
+        primary_key="URL|testnetwork|http://example.com/",
+        network=network.reference,
+        raw="http://example.com",
+        web_url=Reference("HostnameHTTPURL|http|testnetwork|example.com|80|/"),
+    )
+
+
+@pytest.fixture
 def ipaddressv4(network) -> IPAddressV4:
     return IPAddressV4(network=network.reference, address=IPv4Address("192.0.2.1"))
 
@@ -454,11 +466,6 @@ def ip_port(ipaddressv4) -> IPPort:
 @pytest.fixture
 def hostname(network) -> Hostname:
     return Hostname(name="example.com", network=network.reference)
-
-
-@pytest.fixture
-def url(network):
-    return URL(raw="https://example.com/", network=network.reference)
 
 
 @pytest.fixture
@@ -1076,41 +1083,43 @@ def mock_mixins_katalogus(mocker):
 
 @pytest.fixture
 def mock_scheduler_client_task_list(mocker):
-    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client.session")
-    response = Response()
-    response.raw = io.BytesIO(
-        json.dumps(
-            {
-                "count": 1,
-                "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
-                "previous": None,
-                "results": [
-                    {
-                        "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
-                        "scheduler_id": "boefje-test",
-                        "type": "boefje",
-                        "p_item": {
+    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client._client")
+    response = Response(
+        200,
+        content=(
+            json.dumps(
+                {
+                    "count": 1,
+                    "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
+                    "previous": None,
+                    "results": [
+                        {
                             "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
                             "scheduler_id": "boefje-test",
-                            "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
-                            "priority": 631,
-                            "data": {
-                                "id": "2e757dd366c746b899877cd18252cc6d",
-                                "boefje": {"id": "test-plugin", "version": None},
-                                "input_ooi": "Hostname|internet|example.com",
-                                "organization": "test",
-                                "dispatches": [],
+                            "type": "boefje",
+                            "p_item": {
+                                "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                                "scheduler_id": "boefje-test",
+                                "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
+                                "priority": 631,
+                                "data": {
+                                    "id": "2e757dd366c746b899877cd18252cc6d",
+                                    "boefje": {"id": "test-plugin", "version": None},
+                                    "input_ooi": "Hostname|internet|example.com",
+                                    "organization": "test",
+                                    "dispatches": [],
+                                },
+                                "created_at": "2023-05-09T09:37:20.899668+00:00",
+                                "modified_at": "2023-05-09T09:37:20.899675+00:00",
                             },
-                            "created_at": "2023-05-09T09:37:20.899668+00:00",
-                            "modified_at": "2023-05-09T09:37:20.899675+00:00",
-                        },
-                        "status": "completed",
-                        "created_at": "2023-05-09T09:37:20.909069+00:00",
-                        "modified_at": "2023-05-09T09:37:20.909071+00:00",
-                    }
-                ],
-            }
-        ).encode()
+                            "status": "completed",
+                            "created_at": "2023-05-09T09:37:20.909069+00:00",
+                            "modified_at": "2023-05-09T09:37:20.909071+00:00",
+                        }
+                    ],
+                }
+            ).encode()
+        ),
     )
 
     mock_scheduler_client_session.get.return_value = response
