@@ -9,8 +9,8 @@ from fastapi import status
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -57,7 +57,7 @@ class Server:
 
             FastAPIInstrumentor.instrument_app(self.api)
             Psycopg2Instrumentor().instrument()
-            RequestsInstrumentor().instrument()
+            HTTPXClientInstrumentor().instrument()
 
             resource = Resource(attributes={SERVICE_NAME: "mula"})
             provider = TracerProvider(resource=resource)

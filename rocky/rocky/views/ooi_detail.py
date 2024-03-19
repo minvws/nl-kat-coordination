@@ -8,11 +8,11 @@ from django.core.paginator import Page, Paginator
 from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
+from httpx import HTTPError
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from katalogus.views.mixins import BoefjeMixin
-from requests.exceptions import RequestException
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification
@@ -30,6 +30,7 @@ class PageActions(Enum):
     START_SCAN = "start_scan"
     SUBMIT_ANSWER = "submit_answer"
     RESCHEDULE_TASK = "reschedule_task"
+    CHANGE_CLEARANCE_LEVEL = "change_clearance_level"
 
 
 class OOIDetailView(
@@ -59,6 +60,12 @@ class OOIDetailView(
 
     def handle_page_action(self, action: str) -> bool:
         try:
+            if action == PageActions.CHANGE_CLEARANCE_LEVEL.value:
+                clearance_level = int(self.request.POST.get("level"))
+                if not self.can_raise_clearance_level(self.ooi, clearance_level):
+                    return redirect("account_detail", organization_code=self.organization.code)
+                return self.get(self.request, *self.args, **self.kwargs)
+
             if action == PageActions.RESCHEDULE_TASK.value:
                 task_id = self.request.POST.get("task_id")
                 reschedule_task(self.request, self.organization.code, task_id)
@@ -92,7 +99,7 @@ class OOIDetailView(
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 
             return self.get(self.request, status_code=404, *self.args, **self.kwargs)
-        except RequestException as exception:
+        except HTTPError as exception:
             messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
             return self.get(self.request, status_code=500, *self.args, **self.kwargs)
 
