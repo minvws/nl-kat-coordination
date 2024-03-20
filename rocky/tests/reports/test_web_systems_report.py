@@ -22,9 +22,6 @@ def test_web_report_no_findings(mock_octopoes_api_connector, valid_time, hostnam
         "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
             hostname.reference: [],
         },
-        "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
-            hostname.reference: [],
-        },
         "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type": {
             hostname.reference: [],
         },
@@ -58,9 +55,6 @@ def test_web_report_all_findings(
             hostname.reference: web_report_finding_types,
         },
         "Hostname.<netloc[is HostnameHTTPURL].<ooi[is Finding].finding_type": {
-            hostname.reference: web_report_finding_types,
-        },
-        "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
             hostname.reference: web_report_finding_types,
         },
         "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
