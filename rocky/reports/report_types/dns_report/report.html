@@ -139,7 +139,7 @@
                 {% for info in data.finding_types %}
                     <tr>
                         <td>
-                            <span class="{{ info.finding_type.risk_severity }}">{{ info.finding_type.risk_severity }}</span>
+                            <span class="{{ info.finding_type.risk_severity }}">{{ info.finding_type.risk_severity|capfirst }}</span>
                         </td>
                         <td>{{ info.finding_type }}</td>
                         <td class="actions">
