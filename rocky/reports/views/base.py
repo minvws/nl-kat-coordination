@@ -130,22 +130,22 @@ class BaseReportView(OOIFilterView):
     def get_required_optional_plugins(
         self, plugin_ids_dict: dict[str, set[str]]
     ) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
-        plugins = {}
-        for plugin, plugin_ids in plugin_ids_dict.items():
-            plugins[plugin] = [get_katalogus(self.organization.code).get_plugin(plugin_id) for plugin_id in plugin_ids]
+        all_plugins = {}
+        all_plugins_enabled = {}
 
-        all_plugins_enabled = {
-            plugin_type: all(plugin.enabled for plugin in plugin_list) for plugin_type, plugin_list in plugins.items()
-        }
+        for required_optional, plugin_ids in plugin_ids_dict.items():
+            plugins = []
+            are_plugins_enabled = []
 
-        return plugins, all_plugins_enabled
+            for plugin_id in plugin_ids:
+                plugin = get_katalogus(self.organization.code).get_plugin(plugin_id)
+                plugins.append(plugin)
+                are_plugins_enabled.append(plugin.enabled)
 
-    def are_plugins_enabled(self, plugins_dict: dict[str, list[Plugin]]) -> bool:
-        for k, plugins in plugins_dict.items():
-            for plugin in plugins:
-                if not plugin.enabled:
-                    return False
-        return True
+            all_plugins[required_optional] = sorted(plugins, key=lambda x: x.name)
+            all_plugins_enabled[required_optional] = all(are_plugins_enabled)
+
+        return all_plugins, all_plugins_enabled
 
     def get_report_types_from_choice(self) -> list[type[Report] | type[MultiReport]]:
         report_types = []
