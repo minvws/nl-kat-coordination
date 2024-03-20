@@ -8,33 +8,6 @@
 
     <main id="main-content" tabindex="-1" class="choose-report">
         {% include "partials/main_navigation.html" %}
-
-        <section>
-            <div>
-                <div class="stepper">
-                    <ul>
-                        <li>
-                            <a aria-current="true" href="{{ step.url }}">1: Label</a>
-                        </li>
-                        <li aria-label="step">
-                            <a href="{{ step.url }}">2: Label</a>
-                        </li>
-                        <li aria-label="current-step">
-                            <a href="{{ step.url }}">3: Label</a>
-                        </li>
-                        <li aria-label="step">
-                            <a href="{{ step.url }}">4: Label</a>
-                        </li>
-                        <li aria-label="step">
-                            <a href="{{ step.url }}">5: Label</a>
-                        </li>
-                        <li aria-label="step">
-                            <a href="{{ step.url }}">6: Label</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </section>
         {% include "partials/report_ooi_list.html" %}
 
     </main>

@@ -45,7 +45,7 @@ Steps within a flow can be displayed using this partial.
       padding: 0;
 
       > li {
-        margin-top: -1px;
+        padding-top: 2rem;
 
         &::before {
           content: "\ea61";
@@ -53,7 +53,7 @@ Steps within a flow can be displayed using this partial.
           font-family: tabler-icons;
           font-size: 1rem;
           font-weight: 400;
-          margin: 0 2rem 0 1rem;
+          margin: 0 1rem;
         }
 
         &:first-child {
@@ -68,19 +68,36 @@ Steps within a flow can be displayed using this partial.
         font-weight: 700;
         opacity: 1;
         border-top: 2px solid var(--colors-purrple-8);
+        margin-top: -2px; /* Compensating for the active top border */
       }
 
       > li[aria-label="current-step"] {
         position: relative;
 
+        a {
+          padding-top: 1px;
+        }
+
         &::after {
-          border: 1px dashed red;
-          content: "test";
-          height: 1rem;
+          content: "\f287";
+          font-family: tabler-icons;
           display: block;
+          font-weight: 400;
+          color: var(--colors-purrple-8);
+
+          /* Positioning */
           position: absolute;
-          top: -1rem;
-          right: 0;
+          top: -0.875rem; /* Half the size of the icon */
+
+          /* Small adjustment to prevent the active line to cross the fish head */
+          right: -0.75rem;
+          padding: 0;
+          z-index: 0;
+
+          /* Size */
+          font-size: 1.75rem;
+          height: 1.75rem;
+          line-height: 1.75rem;
         }
       }
     }
