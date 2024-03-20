@@ -27,13 +27,7 @@
                             <td>{{ hostname }}</td>
                             <td>
                                 {% if info.systems %}
-                                    {% for system in info.systems %}
-                                        {% if not forloop.last %}
-                                            {{ system }},
-                                        {% else %}
-                                            {{ system }}
-                                        {% endif %}
-                                    {% endfor %}
+                                    {{ info.systems|join:", " }}
                                 {% else %}
                                     -
                                 {% endif %}

@@ -29,26 +29,14 @@
                         <td>{{ ip.tokenized.address }}</td>
                         <td>
                             {% if ip_services.hostnames %}
-                                {% for hostname in ip_services.hostnames %}
-                                    {% if not forloop.last %}
-                                        {{ hostname.tokenized.name }},
-                                    {% else %}
-                                        {{ hostname.tokenized.name }}
-                                    {% endif %}
-                                {% endfor %}
+                                {{ ip_services.hostnames|join:", " }}
                             {% else %}
                                 -
                             {% endif %}
                         </td>
                         <td>
                             {% if ip_services.services %}
-                                {% for service in ip_services.services %}
-                                    {% if not forloop.last %}
-                                        {{ service }},
-                                    {% else %}
-                                        {{ service }}
-                                    {% endif %}
-                                {% endfor %}
+                                {{ ip_services.services|join:", " }}
                             {% else %}
                                 -
                             {% endif %}
