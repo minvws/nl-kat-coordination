@@ -6,7 +6,6 @@ from katalogus.views.katalogus import AboutPluginsView, BoefjeListView, KATalogu
 from katalogus.views.katalogus_settings import ConfirmCloneSettingsView, KATalogusSettingsView
 from katalogus.views.plugin_enable_disable import PluginEnableDisableView
 from pytest_django.asserts import assertContains, assertNotContains
-from requests import Response
 
 from rocky.health import ServiceHealth
 from tests.conftest import create_member, get_boefjes_data, get_normalizers_data, get_plugins_data, setup_request
@@ -15,7 +14,7 @@ from tests.conftest import create_member, get_boefjes_data, get_normalizers_data
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
 def katalogus_plugin_listing(request, rf, member, mocker):
     plugins = get_plugins_data()
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
     mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = plugins
@@ -57,7 +56,7 @@ def katalogus_plugin_listing(request, rf, member, mocker):
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
 def katalogus_plugin_listing_boefjes(request, rf, member, mocker):
     boefjes = get_boefjes_data()
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
     mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = boefjes
@@ -80,7 +79,7 @@ def katalogus_plugin_listing_boefjes(request, rf, member, mocker):
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
 def katalogus_plugin_listing_normalizers(request, rf, member, mocker):
     normalizers = get_normalizers_data()
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
     mock_requests.Session().get.return_value = mock_response
     mock_response.json.return_value = normalizers
@@ -114,9 +113,9 @@ def katalogus_about_plugins(request, rf, member):
 
 
 def test_katalogus_plugin_listing_no_enable_disable_perm(rf, client_member, mocker):
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
+    mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = get_plugins_data()
 
     request = rf.get("/en/test/kat-alogus/")
@@ -228,8 +227,8 @@ def test_katalogus_clone_settings_not_accessible_without_perms(
 
 
 def test_katalogus_client_organization_not_exists(mocker):
-    mock_requests = mocker.patch("katalogus.client.requests")
-    mock_requests.Session().get().status_code = 404
+    mock_requests = mocker.patch("katalogus.client.httpx")
+    mock_requests.Client().get().status_code = 404
 
     client = KATalogusClientV1("test", "test")
 
@@ -237,24 +236,18 @@ def test_katalogus_client_organization_not_exists(mocker):
 
 
 def test_katalogus_client_organization_exists(mocker):
-    mock_requests = mocker.patch("katalogus.client.requests")
-    mock_requests.Session().get().status_code = 200
+    mock_requests = mocker.patch("katalogus.client.httpx")
+    mock_requests.Client().get().status_code = 200
 
     client = KATalogusClientV1("test", "test")
 
     assert client.organization_exists() is True
 
 
-def test_katalogus_client(mocker):
-    mock_requests = mocker.patch("katalogus.client.requests")
+def test_katalogus_client(httpx_mock):
+    httpx_mock.add_response(json={"service": "test", "healthy": False, "version": None, "additional": 2, "results": []})
 
-    mock_response = Response()
-    mock_response.status_code = 200
-    mock_response._content = b"""{"service": "test", "healthy": false, "version": null, "additional": 2,
-    "results": []}"""
-    mock_requests.Session().get.return_value = mock_response
-
-    client = KATalogusClientV1("test", "test")
+    client = KATalogusClientV1("http://test", "test")
 
     assert isinstance(client.health(), ServiceHealth)
     assert client.health().service == "test"
@@ -269,9 +262,9 @@ def test_enable_disable_plugin_no_clearance(rf, redteam_member, mocker):
     redteam_member.save()
 
     plugin = get_boefjes_data()[0]
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
+    mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
     request = setup_request(
@@ -310,9 +303,9 @@ def test_enable_disable_plugin_no_clearance_other_text(rf, redteam_member, mocke
     redteam_member.save()
 
     plugin = get_boefjes_data()[0]
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
+    mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
     request = setup_request(
@@ -347,9 +340,9 @@ def test_enable_disable_plugin_no_clearance_other_text(rf, redteam_member, mocke
 
 def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
     plugin = get_boefjes_data()[0]
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
+    mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
     request = setup_request(
@@ -375,9 +368,9 @@ def test_enable_disable_plugin_has_clearance(rf, redteam_member, mocker):
 
 def test_enable_disable_normalizer(rf, redteam_member, mocker):
     plugin = get_normalizers_data()[0]
-    mock_requests = mocker.patch("katalogus.client.requests")
+    mock_requests = mocker.patch("katalogus.client.httpx")
     mock_response = mocker.MagicMock()
-    mock_requests.Session().get.return_value = mock_response
+    mock_requests.Client().get.return_value = mock_response
     mock_response.json.return_value = plugin
 
     request = setup_request(

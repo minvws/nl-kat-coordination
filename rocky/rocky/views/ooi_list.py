@@ -8,7 +8,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from requests import RequestException
+from httpx import HTTPError
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
 from tools.forms.ooi_form import OOITypeMultiCheckboxForm
@@ -133,7 +133,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
             )
             return redirect(reverse("account_detail", kwargs={"organization_code": self.organization.code}))
 
-        except (RequestException, RemoteException, ConnectionError):
+        except (HTTPError, RemoteException, ConnectionError):
             messages.add_message(request, messages.ERROR, _("An error occurred while saving clearance levels."))
 
             return self.get(request, status=500, *args, **kwargs)
@@ -159,7 +159,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
         try:
             self.octopoes_api_connector.save_many_scan_profiles(scan_profiles, valid_time=datetime.now(timezone.utc))
-        except (RequestException, RemoteException, ConnectionError):
+        except (HTTPError, RemoteException, ConnectionError):
             messages.add_message(
                 request,
                 messages.ERROR,
@@ -187,7 +187,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
         try:
             connector.delete_many(selected_oois, valid_time)
-        except (RequestException, RemoteException, ConnectionError):
+        except (HTTPError, RemoteException, ConnectionError):
             messages.add_message(request, messages.ERROR, _("An error occurred while deleting oois."))
             return self.get(request, status=500, *args, **kwargs)
         except ObjectNotFoundException:
