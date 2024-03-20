@@ -2744,6 +2744,7 @@ msgid "First seen"
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
 msgid "No findings have been found."
 msgstr ""
 
@@ -3241,7 +3242,6 @@ msgstr ""
 msgid "No vulnerabilities have been found on this system."
 msgstr ""
 
-#: reports/report_types/vulnerability_report/report.py
 msgid "Vulnerability Report"
 msgstr ""
 
