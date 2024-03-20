@@ -3,7 +3,17 @@
 {% if show_heading %}
     <h2>{% translate "Resource Public Key Infrastructure" %}</h2>
 {% endif %}
-{% if show_heading or show_introduction %}
+{% if type %}
+    <h4 id="rpki-{{ type }}">{{ type }} {% translate "server" %}</h4>
+    <p>
+        {% blocktranslate trimmed %}
+            This table shows which checks were performed. Following that, the compliance
+            issues, if any, are shown for each {{ type }} Server.
+        {% endblocktranslate %}
+    </p>
+{% endif %}
+{% if data.rpki_ips %}
+    {% if show_heading or show_introduction %}
     <p>
         {% blocktranslate trimmed %}
             This section contains basic security information about resource public key
@@ -19,17 +29,7 @@
             the system and if this announcement is not expired.
         {% endblocktranslate %}
     </p>
-{% endif %}
-{% if type %}
-    <h4 id="rpki-{{ type }}">{{ type }} {% translate "server" %}</h4>
-    <p>
-        {% blocktranslate trimmed %}
-            This table shows which checks were performed. Following that, the compliance
-            issues, if any, are shown for each {{ type }} Server.
-        {% endblocktranslate %}
-    </p>
-{% endif %}
-{% if data.rpki_ips %}
+    {% endif %}
     <div class="horizontal-scroll">
         <table>
             <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
