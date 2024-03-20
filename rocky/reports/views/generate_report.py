@@ -14,6 +14,7 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
+    REPORTS,
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
     get_report_types_for_oois,
@@ -158,7 +159,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
             by_type[ooi_type].append(ooi)
 
-        for report_type in self.report_types:
+        sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
+        for report_type in sorted_report_types:
             oois = {
                 ooi for ooi_type in report_type.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
             }
