@@ -4,8 +4,6 @@ from ipaddress import ip_address
 
 import pytest
 from django.conf import settings
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -29,7 +27,6 @@ def octopoes_api_connector(request) -> OctopoesAPIConnector:
     test_node = f"test-{request.node.originalname}"
 
     connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
-    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     connector.create_node()
     yield connector
@@ -41,7 +38,6 @@ def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
     test_node = f"test-{request.node.originalname}-2"
 
     connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
-    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     connector.create_node()
     yield connector

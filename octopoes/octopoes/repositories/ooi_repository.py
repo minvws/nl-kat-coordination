@@ -4,12 +4,11 @@ import json
 import logging
 from collections import Counter
 from datetime import datetime
-from http import HTTPStatus
 from typing import Any, cast
 
 from bits.definitions import BitDefinition
+from httpx import HTTPStatusError, codes
 from pydantic import RootModel, TypeAdapter
-from requests import HTTPError
 
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
@@ -225,8 +224,8 @@ class XTDBOOIRepository(OOIRepository):
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
-        except HTTPError as e:
-            if e.response.status_code == HTTPStatus.NOT_FOUND:
+        except HTTPStatusError as e:
+            if e.response.status_code == codes.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
             raise
@@ -254,8 +253,8 @@ class XTDBOOIRepository(OOIRepository):
                 limit=limit,
                 indices=indices,
             )
-        except HTTPError as e:
-            if e.response.status_code == HTTPStatus.NOT_FOUND:
+        except HTTPStatusError as e:
+            if e.response.status_code == codes.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
             raise
