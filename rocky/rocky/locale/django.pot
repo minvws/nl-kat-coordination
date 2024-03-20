@@ -5038,7 +5038,7 @@ msgid "graph"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
-msgid "Clearance level inheritance"
+msgid "Clearance level inheritance:"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
