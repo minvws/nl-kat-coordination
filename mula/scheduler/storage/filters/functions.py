@@ -1,4 +1,5 @@
 import sqlalchemy
+from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.orm.query import Query
 from sqlalchemy.sql.elements import BinaryExpression
 
@@ -26,25 +27,38 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
     for operator in filter_request.filters:
         expressions = []
         for filter_ in filter_request.filters[operator]:
+            # We allow the filter field not to be set. When it isn't present
+            # we assume that we filter on the column name.
             filter_field = filter_.field if filter_.field else filter_.column
 
             # Return the selected attribute of the model, e.g. Model.selected_attr
             entity_attr = getattr(entity, filter_.column)
 
+            breakpoint()
+
+            # TODO: check if the field
+
+            # If a nested field is being selected we need to traverse the nested
+            # fields and return the correct expression.
+            #
             # When selecting a nested field sqlalchemy uses index operators,
             # e.g. Model.selected_attr["nested_field"] this will return a
             # sqlalchemy.sql.elements.BinaryExpression whose type defaults to
             # JSON.
-
-            # If a nested field is being selected we need to traverse the nested
-            # fields and return the correct expression.
             if len(filter_field.split("__")) > 1:
                 for nested_field in filter_field.split("__"):
-                    entity_attr = entity_attr[nested_field]
 
+                    # TODO: check if the field is a relationship or nested
+                    if isinstance(entity_attr, RelationshipProperty):
+                        entity_attr = entity_attr.entity.class_
+                    elif isinstance(entity_attr, BinaryExpression):
+                        entity_attr = entity_attr.type
+                    else:
+                        entity_attr = entity_attr[nested_field]
             # If the filter field is the same as the column name, return the
             # expression as is.
             else:
+                breakpoint()
                 entity_attr = entity_attr if filter_field == filter_.column else entity_attr[filter_field]
 
             # Cast the expression to the correct type based on the filter value

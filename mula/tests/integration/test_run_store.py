@@ -26,6 +26,7 @@ class RunStoreTestCase(unittest.TestCase):
             **{
                 storage.RunStore.name: storage.RunStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.TaskStore.name: storage.TaskStore(self.dbconn),
             }
         )
 
@@ -143,11 +144,32 @@ class RunStoreTestCase(unittest.TestCase):
         self.assertEqual(results.get(keys[1]).get("total"), 2)
         self.assertEqual(results.get(keys[2]).get("queued"), 2)
 
+    def test_get_tasks_filter_related_and_nested(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        task_run = functions.create_run(task)
+        created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
+
+        f_req = filters.FilterRequest(
+            filters={
+                "and": [
+                    filters.Filter(column="task", field="id", operator="eq", value=created_task.id.hex),
+                ]
+            }
+        )
+
+        task_runs, count = self.mock_ctx.datastores.run_store.get_runs(filters=f_req)
+        breakpoint()
+
     def test_get_tasks_filter_multiple_and(self):
         # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        task_run = functions.create_run(task)
+        created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
 
         f_req = filters.FilterRequest(
             filters={

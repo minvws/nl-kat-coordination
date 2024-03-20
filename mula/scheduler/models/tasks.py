@@ -4,7 +4,7 @@ from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
@@ -25,10 +25,12 @@ class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    scheduler_id: str
+    # type: str
     hash: str | None = Field(None, max_length=32)
     data: dict = Field(default_factory=dict)
 
-    # TODO: add enabled boolean
+    enabled: bool = True
     schedule: str | None = None
 
     task_runs: list[TaskRun] = []
@@ -51,9 +53,12 @@ class TaskDB(Base):
     __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)
+    scheduler_id = Column(String, nullable=False)
+    # type = Column(String, nullable=False)
     hash = Column(String(32), nullable=True)  # TODO: unique=True
     data = Column(JSONB, nullable=False)
 
+    enabled = Column(Boolean, nullable=False, default=True)
     schedule = Column(String, nullable=True)
 
     # TODO: cascade

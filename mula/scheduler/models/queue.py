@@ -69,7 +69,6 @@ class PrioritizedItemDB(Base):
     def __init__(self, **kwargs):
         # NOTE: Fix for pydantic models (with nested objects) to sqlalchemy models.
         self.task = TaskDB(**kwargs.pop("task"))
-
         super().__init__(**kwargs)
 
 

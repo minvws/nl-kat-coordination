@@ -42,34 +42,18 @@ class TaskStatus(str, enum.Enum):
 class TaskRun(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID
-
-    scheduler_id: str
-
-    type: str
-
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     task_id: uuid.UUID
-
-    status: TaskStatus
+    status: TaskStatus = TaskStatus.PENDING
 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    def __repr__(self):
-        return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
 
 class TaskRunDB(Base):
     __tablename__ = "task_runs"
 
     id = Column(GUID, primary_key=True)
-
-    scheduler_id = Column(String)
-
-    type = Column(String)
-
-    # FIXME: ondelete
     task_id = Column(GUID, ForeignKey("tasks.id", ondelete="SET NULL"), nullable=False)
     task = relationship("TaskDB", back_populates="task_runs")
 

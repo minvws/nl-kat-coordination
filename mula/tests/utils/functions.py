@@ -50,34 +50,34 @@ def create_p_item_request(priority: int, data: TestModel | None = None) -> model
 
 def create_p_item(scheduler_id: str, priority: int, task: models.Task | None = None) -> models.PrioritizedItem:
     if task is None:
-        task = create_task()
+        task = create_task(scheduler_id)
 
     return models.PrioritizedItem(
-        scheduler_id=scheduler_id,
+        scheduler_id=task.scheduler_id,
         priority=priority,
         task_id=task.id,
         task=task,
     )
 
 
-def create_task() -> models.Task:
+def create_task(scheduler_id: str) -> models.Task:
+    data = TestModel(
+        id=uuid.uuid4().hex,
+        name=uuid.uuid4().hex,
+    )
+
     return models.Task(
-        hash=uuid.uuid4().hex,
-        data=TestModel(
-            id=uuid.uuid4().hex,
-            name=uuid.uuid4().hex,
-        ).model_dump(),
+        scheduler_id=scheduler_id,
+        hash=data.hash,
+        data=data.model_dump(),
     )
 
 
-def create_run(p_item: models.PrioritizedItem) -> models.TaskRun:
+def create_run(task: models.Task) -> models.TaskRun:
     return models.TaskRun(
-        id=p_item.id,
-        hash=p_item.hash,
-        type=TestModel.type,
-        scheduler_id=p_item.scheduler_id,
-        p_item=p_item,
-        status=models.TaskStatus.QUEUED,
+        scheduler_id=task.scheduler_id,
+        task_id=task.id,
+        task=task,
     )
 
 
