@@ -63,8 +63,4 @@ class FilterRequest(BaseModel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if isinstance(self.filters, list):
-            expressions = []
-            for expression in self.filters:
-                expressions.append(expression)
-
-            self.filters = {"and": expressions}
+            self.filters = {"and": self.filters}
