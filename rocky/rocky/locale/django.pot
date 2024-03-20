@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-18 16:39+0000\n"
+"POT-Creation-Date: 2024-03-20 13:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3150,7 +3150,15 @@ msgid "Combine IP addresses, hostnames and services into systems."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
-msgid "Text about TLS report."
+msgid ""
+"The TLS report shows which TLS protocols and ciphers were identified on the "
+"host for the provided port."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid ""
+"The table below provides an overview of the identified TLS protocols and "
+"ciphers, including a status suggestion."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3194,6 +3202,13 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 msgid "No ciphers found for this IPService."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid ""
+"The list below gives an overview of the findings based on the identified TLS "
+"protocols and ciphers. This includes the reasoning why the cipher or "
+"protocol is marked as a finding."
 msgstr ""
 
 #: reports/report_types/tls_report/report.py
