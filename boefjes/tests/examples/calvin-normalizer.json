@@ -11,8 +11,11 @@
       "input_ooi": null,
       "arguments": {}
     },
-    "mime_types": [{"value": "boefje/calvin"}]
-
+    "mime_types": [
+      {
+        "value": "boefje/calvin"
+      }
+    ]
   },
   "normalizer": {
     "id": "calvin-normalize"

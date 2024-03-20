@@ -1,10 +1,10 @@
 {
-    "id": "kat_nuclei_cve_normalize",
-    "consumes": [
-        "boefje/nuclei-cve"
-    ],
-    "produces": [
-        "Findings",
-        "CVEFindingType"
-    ]
+  "id": "kat_nuclei_cve_normalize",
+  "consumes": [
+    "boefje/nuclei-cve"
+  ],
+  "produces": [
+    "Findings",
+    "CVEFindingType"
+  ]
 }
