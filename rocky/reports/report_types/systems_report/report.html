@@ -1,19 +1,19 @@
 {% load i18n %}
 
 {% if data.services %}
-<div class="horizontal-scroll">
-    {% if show_introduction %}
-        <p>
-            {% blocktranslate trimmed %}
-                The system report provides an overview of the system types (types of
-                similar services) that were identified for each system. The following
-                system types can be identified: DNS servers, Web servers, Mail servers
-                and those classified as 'Other' servers. Each hostname and/or IP
-                address is given one or more system types depending on the identified
-                ports and services. The table below gives an overview of these results.
-            {% endblocktranslate %}
-        </p>
-    {% endif %}
+    <div class="horizontal-scroll">
+        {% if show_introduction %}
+            <p>
+                {% blocktranslate trimmed %}
+                    The system report provides an overview of the system types (types of
+                    similar services) that were identified for each system. The following
+                    system types can be identified: DNS servers, Web servers, Mail servers
+                    and those classified as 'Other' servers. Each hostname and/or IP
+                    address is given one or more system types depending on the identified
+                    ports and services. The table below gives an overview of these results.
+                {% endblocktranslate %}
+            </p>
+        {% endif %}
         <table>
             <caption class="visually-hidden">{% translate "Selected assets:" %}</caption>
             <thead>
