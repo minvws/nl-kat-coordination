@@ -30,7 +30,7 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) ->
 
     if "unsafe-inline" in header.value or "unsafe-eval" in header.value or "unsafe-hashes" in header.value:
         findings.append(
-            "unsafe-inline, unsafe-eval and unsafe-hashes should not be used in the CSP settings of a HTTP Header."
+            "unsafe-inline, unsafe-eval and unsafe-hashes should not be used in the CSP settings of an HTTP Header."
         )
 
     if "frame-src" not in header.value and "default-src" not in header.value and "child-src" not in header.value:
