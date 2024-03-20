@@ -15,7 +15,7 @@ def is_url(input_str):
     return bool(result.scheme)
 
 
-def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: list, config: dict) -> Iterator[OOI]:
     network = Network(name="internet")
 
     if input_ooi.key.lower() == "location":

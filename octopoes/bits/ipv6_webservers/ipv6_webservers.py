@@ -7,7 +7,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def run(
-    hostname: Hostname, additional_oois: list[DNSAAAARecord | DNSARecord | DNSNSRecord], config: dict[str, str]
+    hostname: Hostname, additional_oois: list[DNSAAAARecord | DNSARecord | DNSNSRecord], config: dict
 ) -> Iterator[OOI]:
     dns_a_records = [dns_a_record for dns_a_record in additional_oois if isinstance(dns_a_record, DNSARecord)]
     dns_aaaa_records = [

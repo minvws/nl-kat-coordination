@@ -24,7 +24,7 @@ def hostname_in_qualifiers(hostname: str, qualifiers: list[str]) -> bool:
 def run(
     input_ooi: X509Certificate,
     additional_oois: list[Website | SubjectAlternativeNameHostname],
-    config: dict[str, str],
+    config: dict,
 ) -> Iterator[OOI]:
     websites = [website for website in additional_oois if isinstance(website, Website)]
     subject_alternative_name_hostnames = [

@@ -851,6 +851,16 @@ yaml = ["PyYAML (>=3.10)"]
 zookeeper = ["kazoo (>=2.8.0)"]
 
 [[package]]
+name = "link-shorteners"
+version = "1.10.0"
+description = "List of all URL shorteners, such as bitly, tinyurl, shorturl, and many others."
+optional = false
+python-versions = "*"
+files = [
+    {file = "link-shorteners-1.10.0.tar.gz", hash = "sha256:e13c16c1153b5e40be9e3ed6653b8e196041c3f531bfc9cff7f0fcd1b5a77b0a"},
+]
+
+[[package]]
 name = "opentelemetry-api"
 version = "1.23.0"
 description = "OpenTelemetry Python API"
@@ -2081,4 +2091,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "43ed837068ec152f98518aaa8d1e639c6c6cbdf34950310b5165fd69d9ba333c"
+content-hash = "37b78776591ad6950d689b7416cb634d25ab8d8f1646ac95948b1136372736a4"

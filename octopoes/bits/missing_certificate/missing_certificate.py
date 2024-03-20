@@ -5,7 +5,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import Website
 
 
-def run(input_ooi: Website, additional_oois, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: Website, additional_oois, config: dict) -> Iterator[OOI]:
     if input_ooi.ip_service.tokenized.service.name.lower() != "https":
         return
 

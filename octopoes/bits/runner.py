@@ -36,7 +36,7 @@ class BitRunner:
         return f"BitRunner {self.module}"
 
 
-def _bit_run_signature(input_ooi: OOI, additional_oois: list[OOI], config: dict[str, str]) -> Iterator[OOI]:
+def _bit_run_signature(input_ooi: OOI, additional_oois: list[OOI], config: dict) -> Iterator[OOI]:
     yield input_ooi
 
 

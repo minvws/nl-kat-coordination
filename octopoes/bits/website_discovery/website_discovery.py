@@ -7,9 +7,7 @@ from octopoes.models.ooi.service import IPService
 from octopoes.models.ooi.web import Website
 
 
-def run(
-    ip_address: IPAddressV4, additional_oois: list[IPService | ResolvedHostname], config: dict[str, str]
-) -> Iterator[OOI]:
+def run(ip_address: IPAddressV4, additional_oois: list[IPService | ResolvedHostname], config: dict) -> Iterator[OOI]:
     def is_service_http(ip_service: IPService) -> bool:
         return "http" in ip_service.service.tokenized.name.lower().strip()
 

@@ -349,6 +349,8 @@ jsonschema==4.21.1 ; python_version >= "3.10" and python_version < "4.0" \
 kombu==5.3.5 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:0eac1bbb464afe6fb0924b21bf79460416d25d8abc52546d4f16cad94f789488 \
     --hash=sha256:30e470f1a6b49c70dc6f6d13c3e4cc4e178aa6c469ceb6bcd55645385fc84b93
+link-shorteners==1.10.0 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:e13c16c1153b5e40be9e3ed6653b8e196041c3f531bfc9cff7f0fcd1b5a77b0a
 opentelemetry-api==1.23.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:14a766548c8dd2eb4dfc349739eb4c3893712a0daa996e5dbf945f9da665da9d \
     --hash=sha256:cc03ea4025353048aadb9c64919099663664672ea1c6be6ddd8fee8e4cd5e774

@@ -5,7 +5,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HostnameHTTPURL, HTTPHeader
 
 
-def run(input_ooi: HostnameHTTPURL, additional_oois: list[HTTPHeader], config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: HostnameHTTPURL, additional_oois: list[HTTPHeader], config: dict) -> Iterator[OOI]:
     header_keys = [header.key.lower() for header in additional_oois if isinstance(header, HTTPHeader)]
 
     # only check for http urls

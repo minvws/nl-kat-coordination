@@ -9,7 +9,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
-def run(input_ooi: DNSTXTRecord, additional_oois, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: DNSTXTRecord, additional_oois, config: dict) -> Iterator[OOI]:
     if input_ooi.value.startswith("v=spf1"):
         spf_value = input_ooi.value.replace("%(d)", input_ooi.hostname.tokenized.name)
         parsed = parse(spf_value)

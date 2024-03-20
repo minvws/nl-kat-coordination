@@ -6,7 +6,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import NXDOMAIN
 
 
-def run(input_ooi: Hostname, additional_oois: list[NXDOMAIN], config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: list[NXDOMAIN], config: dict) -> Iterator[OOI]:
     if additional_oois:
         nxdomain = KATFindingType(id="KAT-NXDOMAIN")
         yield nxdomain
