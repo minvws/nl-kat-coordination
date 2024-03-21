@@ -21,7 +21,8 @@ repos:
     exclude: |
       (?x)(
       \.svcg$ |
-      ^boefjes/tests/examples/rdns-nxdomain.txt$
+      ^boefjes/tests/examples/rdns-nxdomain.txt$ |
+      ^boefjes/tests/examples/raw/
       )
   - id: fix-byte-order-marker
   - id: pretty-format-json
