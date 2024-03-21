@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -39,11 +40,14 @@ class SchedulerView(OrganizationView):
             "input_ooi": self.input_ooi,
         }
 
-    def get_task_list(self) -> SchedulerTaskList | None:
+    def get_task_list(self) -> SchedulerTaskList | list[Any]:
         try:
+            if not self.scheduler_client.health().healthy:
+                raise SchedulerError()
             return SchedulerTaskList(self.scheduler_client, **self.get_task_filters())
         except SchedulerError as error:
-            return messages.error(self.request, error.message)
+            messages.error(self.request, error.message)
+        return []  # must return empty list for object_list to be subscriptable
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:

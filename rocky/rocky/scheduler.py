@@ -246,9 +246,12 @@ class SchedulerClient:
             raise SchedulerError()
 
     def health(self) -> ServiceHealth:
-        health_endpoint = self._client.get("/health")
-        health_endpoint.raise_for_status()
-        return ServiceHealth.model_validate_json(health_endpoint.content)
+        try:
+            health_endpoint = self._client.get("/health")
+            health_endpoint.raise_for_status()
+            return ServiceHealth.model_validate_json(health_endpoint.content)
+        except ConnectError:
+            raise SchedulerError()
 
     def get_task_stats(self, organization_code: str, task_type: str) -> dict:
         try:
