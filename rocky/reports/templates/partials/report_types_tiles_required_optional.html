@@ -1,5 +1,5 @@
 {% for option, report_types in report_types.items %}
-    {% for report_type in report_types %}
+    {% for report_type in report_types|dictsort:"name" %}
         <div class="tile-container">
             <p class="tile-title">
                 {{ report_type.name }}

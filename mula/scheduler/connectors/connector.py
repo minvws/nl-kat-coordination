@@ -2,7 +2,7 @@ import socket
 import time
 from collections.abc import Callable
 
-import requests
+import httpx
 import structlog
 
 
@@ -40,10 +40,10 @@ class Connector:
         """
         try:
             url = f"{host}/{health_endpoint}"
-            response = requests.get(url, timeout=5)
+            response = httpx.get(url, timeout=5)
             healthy = response.json().get("healthy")
             return healthy
-        except requests.exceptions.RequestException as exc:
+        except httpx.HTTPError as exc:
             self.logger.warning("Exception: %s", exc)
             return False
 
