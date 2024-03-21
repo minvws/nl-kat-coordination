@@ -155,6 +155,30 @@ class RunStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters={
                 "and": [
+                    filters.Filter(
+                        column="task",
+                        field="data__id",
+                        operator="eq",
+                        value=created_task.data.get("id"),
+                    ),
+                ]
+            }
+        )
+
+        task_runs, count = self.mock_ctx.datastores.run_store.get_runs(filters=f_req)
+        breakpoint()
+
+    def test_get_tasks_filter_related(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        task_run = functions.create_run(task)
+        created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
+
+        f_req = filters.FilterRequest(
+            filters={
+                "and": [
                     filters.Filter(column="task", field="id", operator="eq", value=created_task.id.hex),
                 ]
             }

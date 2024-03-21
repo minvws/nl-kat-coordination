@@ -27,16 +27,25 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
     for operator in filter_request.filters:
         expressions = []
         for filter_ in filter_request.filters[operator]:
-            # We allow the filter field not to be set. When it isn't present
-            # we assume that we filter on the column name.
+            if not hasattr(entity, filter_.column):
+                raise FilterError(f"Invalid filter field: {filter_.column} (error: not found)")
+
+            # If the filter field is not specified we will use the column name
+            # as the filter_field
             filter_field = filter_.field if filter_.field else filter_.column
 
             # Return the selected attribute of the model, e.g. Model.selected_attr
             entity_attr = getattr(entity, filter_.column)
 
-            breakpoint()
+            # Check if the column we are filtering on is a relationship
+            relationship = getattr(entity, filter_.column).property
+            if isinstance(relationship, RelationshipProperty):
+                related_entity = relationship.entity.class_
+                # related_attr = getattr(related_entity, filter_.column)
+                # entity_attr = related_attr
+                query = query.join(related_entity)
 
-            # TODO: check if the field
+            breakpoint()
 
             # If a nested field is being selected we need to traverse the nested
             # fields and return the correct expression.
@@ -47,19 +56,14 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
             # JSON.
             if len(filter_field.split("__")) > 1:
                 for nested_field in filter_field.split("__"):
-
-                    # TODO: check if the field is a relationship or nested
-                    if isinstance(entity_attr, RelationshipProperty):
-                        entity_attr = entity_attr.entity.class_
-                    elif isinstance(entity_attr, BinaryExpression):
-                        entity_attr = entity_attr.type
+                    if hasattr(entity_attr, "property") and isinstance(entity_attr.property, RelationshipProperty):
+                        related_entity = entity_attr.property.entity.class_
+                        related_attr = getattr(related_entity, nested_field)
+                        entity_attr = related_attr
                     else:
                         entity_attr = entity_attr[nested_field]
-            # If the filter field is the same as the column name, return the
-            # expression as is.
-            else:
-                breakpoint()
-                entity_attr = entity_attr if filter_field == filter_.column else entity_attr[filter_field]
+            # else:
+            #     entity_attr = entity_attr if filter_field == filter_.column else entity_attr[filter_field]
 
             # Cast the expression to the correct type based on the filter value
             if isinstance(entity_attr, BinaryExpression):
