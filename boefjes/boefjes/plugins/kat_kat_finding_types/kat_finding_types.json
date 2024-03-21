@@ -427,39 +427,39 @@
         "recommendation": "Ideally to minimize the attack surface as much as possible these panels should not be directly exposed to the internet."
     },
     "KAT-CRITICAL-BAD-CIPHER": {
-          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
-          "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
-          "risk": "critical",
-          "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
-          "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
+        "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
+        "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
+        "risk": "critical",
+        "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
+        "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
     },
     "KAT-MEDIUM-BAD-CIPHER": {
-          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
-          "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
-          "risk": "medium",
-          "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
-          "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
+        "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
+        "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
+        "risk": "medium",
+        "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
+        "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
     },
     "KAT-RECOMMENDATION-BAD-CIPHER": {
-          "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
-          "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
-          "risk": "recommendation",
-          "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
-          "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
+        "description": "Ciphers are used that are labeled as bad. These should not be used anymore",
+        "source": "https://wiki.mozilla.org/Security/Server_Side_TLS",
+        "risk": "recommendation",
+        "impact": "Weak or insecure ciphers may result in loss of confidentiality and integrity of data through decryption.",
+        "recommendation": "It is recommended to only use ciphers labelled as 'good'. Check https://cipherlist.eu/ for safe ciphers."
     },
     "KAT-NO-RPKI": {
-            "description": "The IP address does not have a route announcement that is matched by the published Route Policy and Authorization (RPKI)",
-            "source": "https://blog.cloudflare.com/rpki/",
-            "risk": "low",
-            "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
-            "recommendation": "Work on implementing RPKI for your IP addresses. This may involve creating Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses."
+        "description": "The IP address does not have a route announcement that is matched by the published Route Policy and Authorization (RPKI)",
+        "source": "https://blog.cloudflare.com/rpki/",
+        "risk": "low",
+        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+        "recommendation": "Work on implementing RPKI for your IP addresses. This may involve creating Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses."
     },
     "KAT-EXPIRED-RPKI": {
-            "description": "The route announcement that is matched by the published Route Policy and Authorization (RPKI) is expired",
-            "source": "https://blog.cloudflare.com/rpki/",
-            "risk": "low",
-            "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
-            "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
+        "description": "The route announcement that is matched by the published Route Policy and Authorization (RPKI) is expired",
+        "source": "https://blog.cloudflare.com/rpki/",
+        "risk": "low",
+        "impact": "Without RPKI validation, your servers might be more vulnerable to unintended or malicious routing configuration errors, potentially leading to inaccessibility of your servers or interception of internet traffic directed to them.",
+        "recommendation": "Make sure that the Route Origin Authorizations (ROAs) that specify which Autonomous Systems (AS) are authorized to announce your IP addresses are valid and not expired."
     },
     "KAT-NO-CAA": {
         "description": "This zone does not carry at least one CAA record.",
@@ -467,5 +467,12 @@
         "risk": "low",
         "impact": "All Certificate Authorities may issue certificates for you domain.",
         "recommendation": "Set a CAA record to limit which CA's are allowed to issue certs."
+    },
+    "KAT-LEGACY-SECURITY-LOCATION": {
+        "description": "This website only has a legacy location security.txt file.",
+        "source": "https://www.rfc-editor.org/rfc/rfc9116#section-3-1",
+        "risk": "info",
+        "impact": "Only providing the legacy url will mean, as time goes on, more and more tools and researchers will not find your Security disclosure policy possibly leading to less than ideal disclosure.",
+        "recommendation": "Add a security.txt file location in the /.well-known folder."
     }
 }

@@ -27,9 +27,8 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             session.mount(uri, ForcedIPHTTPSAdapter(dest_ip=ip))
         else:
             addr = ipaddress.ip_address(ip)
-            netloc = f"[{ip}]" if addr.version == 6 else ip
-
-            uri = f"{scheme}://{netloc}/{path}"
+            iploc = f"[{ip}]" if addr.version == 6 else ip
+            uri = f"{scheme}://{iploc}/{path}"
 
         response = do_request(netloc, session, uri, useragent)
 
@@ -37,7 +36,8 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         if response.status_code == 200:
             results[path] = {"content": response.content.decode(), "url": response.url, "ip": ip, "status": 200}
         # if the response is 301, we need to follow the location header to the correct security txt,
-        # we can not force the ip anymore
+        # we can not force the ip anymore because we dont know it yet.
+        # TODO return a redirected URL and have OpenKAT figure out if we want to follow this.
         elif response.status_code in [301, 302, 307, 308]:
             uri = response.headers["Location"]
             response = requests.get(uri, stream=True, timeout=30, verify=False)  # noqa: S501

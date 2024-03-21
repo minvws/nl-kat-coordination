@@ -5,5 +5,8 @@
     "consumes": [
         "Website"
     ],
+    "environment_keys": [
+        "USERAGENT"
+    ],
     "scan_level": 2
 }
