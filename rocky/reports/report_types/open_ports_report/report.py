@@ -54,7 +54,8 @@ class OpenPortsReport(Report):
                     port_numbers[port.port] = found_by_openkat
                     services[port.port] = [service.name for service in services_by_port.get(port.reference, [])]
 
-                by_ip[ip] = {"ports": port_numbers, "hostnames": hostnames, "services": services}
+                sorted_port_numbers = dict(sorted(port_numbers.items()))
+                by_ip[ip] = {"ports": sorted_port_numbers, "hostnames": hostnames, "services": services}
 
             result[input_ooi] = by_ip
         return result
