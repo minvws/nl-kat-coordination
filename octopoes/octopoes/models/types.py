@@ -205,7 +205,7 @@ def to_concrete(object_types: set[type[OOI]]) -> set[type[OOI]]:
     return concrete_types
 
 
-class TypeNotFound(Exception):
+class TypeNotFound(ValueError):
     pass
 
 
