@@ -1,11 +1,13 @@
 {
-    "id": "binaryedge",
-    "name": "BinaryEdge",
-    "description": "Use BinaryEdge to find open ports with vulnerabilities that are found on that port",
-    "consumes": [
-        "IPAddressV4",
-        "IPAddressV6"
-    ],
-    "environment_keys": ["BINARYEDGE_API"],
-    "scan_level": 2
+  "id": "binaryedge",
+  "name": "BinaryEdge",
+  "description": "Use BinaryEdge to find open ports with vulnerabilities that are found on that port",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "environment_keys": [
+    "BINARYEDGE_API"
+  ],
+  "scan_level": 2
 }
