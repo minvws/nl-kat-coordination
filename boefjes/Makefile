@@ -6,7 +6,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 # Makefile Reference: https://tech.davis-hansson.com/p/make/
 
-.PHONY: help sql migrate migrations debian ubuntu clean
+.PHONY: help sql migrate migrations debian ubuntu clean images
 
 # use HIDE to run commands invisibly, unless VERBOSE defined
 HIDE:=$(if $(VERBOSE),,@)
@@ -15,6 +15,7 @@ export m		# Message for alembic migration
 export revid	# Revision id to generate raw sql for
 export rev1		# Previous revision id for generating migrations
 export rev2		# New revision id for the new migration file
+export DOCKER_DEFAULT_PLATFORM=$(shell docker system info --format '{{.OSType}}/{{.Architecture}}')
 
 ##
 ##|------------------------------------------------------------------------|
@@ -28,10 +29,16 @@ help: ## Show this help.
 ##|------------------------------------------------------------------------|
 ##			Development
 ##|------------------------------------------------------------------------|
-build: seed
+
+build: seed images
 
 seed:  # Seed the katalogus database
 	-docker compose run --rm katalogus python -m boefjes.seed
+
+images:  # Build the images for the containerized boefjes
+	docker build -f images/base.Dockerfile -t openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
+	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-sec --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dnssec .
+
 
 ##
 ##|------------------------------------------------------------------------|

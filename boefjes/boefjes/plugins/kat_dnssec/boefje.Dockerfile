@@ -1,6 +1,6 @@
 FROM noamblitz/drill:latest
 
-RUN apk add --update --no-cache python3 && ln -sf python3 /usr/bin/python && python3 -m ensurepip
+RUN apk add --update --no-cache python3 curl && ln -sf python3 /usr/bin/python && python3 -m ensurepip
 
 ARG BOEFJE_PATH
 ENV PYTHONPATH=/app:$BOEFJE_PATH
