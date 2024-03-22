@@ -2,12 +2,12 @@ import sys
 import json
 from base64 import b64encode
 
-from main import run, BoefjeMeta
+from main import run
 
 
 def main():
     boefje_input = json.load(sys.stdin)
-    raws = run(BoefjeMeta.model_validate(boefje_input["boefje_meta"]))
+    raws = run(boefje_input["boefje_meta"])
     out = {
         "status": "COMPLETED",
         "files": [{

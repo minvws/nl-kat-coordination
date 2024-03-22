@@ -8,8 +8,6 @@ import dns.resolver
 from dns.name import Name
 from dns.resolver import Answer
 
-from boefjes.job_models import BoefjeMeta
-
 logger = logging.getLogger(__name__)
 DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME", "SOA"}
 
@@ -26,8 +24,8 @@ def get_record_types() -> list[str]:
     return list(set(requested_record_types).intersection(DEFAULT_RECORD_TYPES))
 
 
-def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
-    hostname = boefje_meta.arguments["input"]["name"]
+def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
+    hostname = boefje_meta["arguments"]["input"]["name"]
 
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
