@@ -1,0 +1,9 @@
+{
+    "id": "kat_webpage_analysis_wappalyzer_normalize",
+    "consumes": [
+        "openkat-http/full"
+    ],
+    "produces": [
+        "HTTPHeader"
+    ]
+}

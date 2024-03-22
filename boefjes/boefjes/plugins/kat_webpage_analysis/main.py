@@ -66,9 +66,10 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         if content_type[0] in ALLOWED_CONTENT_TYPES:
             body_mimetypes.add(content_type[0])
 
+    header_dump = json.dumps(dict(response.headers))
     return [
-        ({"openkat-http/full"}, f"{response.headers}\n\n{response.content}"),
-        ({"openkat-http/headers"}, json.dumps(dict(response.headers))),
+        ({"openkat-http/full"}, f"{header_dump}\r\n\r\n{response.content}"),
+        ({"openkat-http/headers"}, header_dump),
         (body_mimetypes, response.content),
     ]
 
