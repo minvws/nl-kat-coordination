@@ -1,7 +1,7 @@
 import json
 import os
-import subprocess
 import re
+import subprocess
 
 
 def run(boefje_meta):
