@@ -1,13 +1,13 @@
 {
-    "id": "kat_dicom_normalize",
-    "consumes": [
-        "boefje/dicom"
-    ],
-    "produces": [
-        "KATFindingType",
-        "SoftwareInstance",
-        "IPPort",
-        "Finding",
-        "Software"
-    ]
+  "id": "kat_dicom_normalize",
+  "consumes": [
+    "boefje/dicom"
+  ],
+  "produces": [
+    "KATFindingType",
+    "SoftwareInstance",
+    "IPPort",
+    "Finding",
+    "Software"
+  ]
 }

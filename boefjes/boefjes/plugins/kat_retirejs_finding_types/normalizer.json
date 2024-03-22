@@ -1,10 +1,10 @@
 {
-    "id": "kat_retirejs_finding_types_normalize",
-    "consumes": [
-        "boefje/retirejs-finding-types"
-    ],
-    "produces": [
-        "RetireJSFindingType"
-    ],
-    "enabled": true
+  "id": "kat_retirejs_finding_types_normalize",
+  "consumes": [
+    "boefje/retirejs-finding-types"
+  ],
+  "produces": [
+    "RetireJSFindingType"
+  ],
+  "enabled": true
 }

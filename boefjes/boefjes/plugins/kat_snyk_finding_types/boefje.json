@@ -1,10 +1,10 @@
 {
-    "id": "snyk-finding-types",
-    "name": "SNYK Finding Types",
-    "description": "Hydrate information of SNYK finding types",
-    "consumes": [
-        "SnykFindingType"
-    ],
-    "scan_level": 0,
-    "enabled": true
+  "id": "snyk-finding-types",
+  "name": "SNYK Finding Types",
+  "description": "Hydrate information of SNYK finding types",
+  "consumes": [
+    "SnykFindingType"
+  ],
+  "scan_level": 0,
+  "enabled": true
 }
