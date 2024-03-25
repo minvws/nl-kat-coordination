@@ -502,6 +502,19 @@ def software() -> Software:
 
 
 @pytest.fixture
+def cve_finding_type_2023_38408() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-2023-38408",
+        description="The PKCS#11 feature in ssh-agent in OpenSSH before 9.3p2 has an insufficiently "
+        "trustworthy search path, leading to remote code execution if an agent is forwarded to an "
+        "attacker-controlled system. ",
+        source="https://cve.circl.lu/cve/CVE-2023-38408",
+        risk_score=9.8,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
 def cve_finding_type_2019_8331() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-2019-8331",
@@ -524,6 +537,19 @@ def cve_finding_type_2019_2019() -> CVEFindingType:
         source="https://cve.circl.lu/cve/CVE-2019-2019",
         risk_score=6.5,
         risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def cve_finding_2023_38408() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2023-38408"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2023-38408"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2023-38408 detected",
+        reproduce=None,
     )
 
 
@@ -557,7 +583,7 @@ def cve_finding_2019_2019() -> Finding:
 def cve_finding_type_no_score() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-0000-0001",
-        description="CVE Finding without scopre",
+        description="CVE Finding without score",
         source="https://cve.circl.lu/cve/CVE-0000-0001",
         risk_severity=RiskLevelSeverity.UNKNOWN,
     )
