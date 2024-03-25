@@ -1,10 +1,10 @@
 {
-    "id": "kat_snyk_finding_types_normalize",
-    "consumes": [
-        "boefje/snyk-finding-types"
-    ],
-    "produces": [
-        "SNYKFindingType"
-    ],
-    "enabled": true
+  "id": "kat_snyk_finding_types_normalize",
+  "consumes": [
+    "boefje/snyk-finding-types"
+  ],
+  "produces": [
+    "SNYKFindingType"
+  ],
+  "enabled": true
 }

@@ -1,10 +1,10 @@
-    {
-        "id": "nuclei-cve",
-        "name": "Nuclei CVE scan",
-        "description": "Nuclei is used to send requests across targets based on a template, providing fast scanning. (CVE scanning)",
-        "consumes": [
-            "Hostname",
-            "HostnameHTTPURL"
-        ],
-        "scan_level": 3
-    }
+{
+  "id": "nuclei-cve",
+  "name": "Nuclei CVE scan",
+  "description": "Nuclei is used to send requests across targets based on a template, providing fast scanning. (CVE scanning)",
+  "consumes": [
+    "Hostname",
+    "HostnameHTTPURL"
+  ],
+  "scan_level": 3
+}

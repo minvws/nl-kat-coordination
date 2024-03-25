@@ -1,10 +1,10 @@
 {
-    "id": "kat_rpki_normalize",
-    "consumes": [
-        "boefje/rpki"
-    ],
-    "produces": [
-        "Finding",
-        "KATFindingType"
-    ]
+  "id": "kat_rpki_normalize",
+  "consumes": [
+    "boefje/rpki"
+  ],
+  "produces": [
+    "Finding",
+    "KATFindingType"
+  ]
 }

@@ -1,7 +1,10 @@
 {
   "organization_code": "test",
   "organization_name": "Test",
-  "organization_tags": ["tag1", "tag2"],
+  "organization_tags": [
+    "tag1",
+    "tag2"
+  ],
   "data": {
     "report_data": {
       "IPAddressV4|internet|192.0.2.0": {
