@@ -151,6 +151,7 @@ class RunStoreTestCase(unittest.TestCase):
 
         task_run = functions.create_run(task)
         created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
+        breakpoint()
 
         f_req = filters.FilterRequest(
             filters={
@@ -168,7 +169,7 @@ class RunStoreTestCase(unittest.TestCase):
         task_runs, count = self.mock_ctx.datastores.run_store.get_runs(filters=f_req)
         breakpoint()
 
-    def test_get_tasks_filter_related(self):
+    def test_get_tasks_filter_related__(self):
         # Arrange
         task = functions.create_task(scheduler_id=self.organisation.id)
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
