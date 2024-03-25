@@ -62,4 +62,4 @@ OpenKAT was created during the pandemic. Publishing the source code is one way t
 
 Since the source code was published, 'OpenKAT days' have been organized regularly, the community around OpenKAT has grown, and developers from various other organizations are working on modules for the system. It is the first government project to be developed in this way. If you also want to help, contact the team at meedoen@openkat.nl.
 
-The long-term goal is for OpenKAT to play a permanent role in information security in healthcare and in the Netherlands as a whole. The system itself provides a good basis for this and its modular structure makes it easily adaptable to a specific context. Thanks to the EU PL 1.2 license, such contributions will be made available to all users as much as possible.
+The long-term goal is for OpenKAT to play a permanent role in information security in healthcare and in the Netherlands as a whole. The system itself provides a good basis for this and its modular structure makes it easily adaptable to a specific context. Thanks to the EUPL 1.2 license, such contributions will be made available to all users as much as possible.
