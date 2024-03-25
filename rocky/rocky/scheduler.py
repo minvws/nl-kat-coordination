@@ -209,19 +209,22 @@ class SchedulerClient:
             raise SchedulerError()
 
     def get_task_details(self, task_id: str) -> Task:
-        res = self._client.get(f"/tasks/{task_id}")
-        res.raise_for_status()
-        task_details = Task.model_validate_json(res.content)
+        try:
+            res = self._client.get(f"/tasks/{task_id}")
+            res.raise_for_status()
+            task_details = Task.model_validate_json(res.content)
 
-        if task_details.type == "normalizer":
-            organization = task_details.p_item.data.raw_data.boefje_meta.organization
-        else:
-            organization = task_details.p_item.data.organization
+            if task_details.type == "normalizer":
+                organization = task_details.p_item.data.raw_data.boefje_meta.organization
+            else:
+                organization = task_details.p_item.data.organization
 
-        if organization != self.organization_code:
-            raise TaskNotFoundError()
+            if organization != self.organization_code:
+                raise TaskNotFoundError()
 
-        return task_details
+            return task_details
+        except ConnectError:
+            raise SchedulerError()
 
     def push_task(self, prioritized_item: PrioritizedItem) -> None:
         try:

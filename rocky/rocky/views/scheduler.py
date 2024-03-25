@@ -47,7 +47,7 @@ class SchedulerView(OrganizationView):
             return SchedulerTaskList(self.scheduler_client, **self.get_task_filters())
         except SchedulerError as error:
             messages.error(self.request, error.message)
-        return []  # must return empty list for object_list to be subscriptable
+        return []
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:

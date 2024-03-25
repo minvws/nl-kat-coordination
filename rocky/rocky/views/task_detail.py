@@ -1,9 +1,11 @@
+from django.contrib import messages
 from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 
+from rocky.scheduler import SchedulerError
 from rocky.views.mixins import OctopoesView
 from rocky.views.scheduler import SchedulerView
 
@@ -13,7 +15,10 @@ class TaskDetailView(OctopoesView, SchedulerView, TemplateView):
         context = super().get_context_data(**kwargs)
 
         context["task_id"] = kwargs["task_id"]
-        context["task"] = self.get_task_details(context["task_id"])
+        try:
+            context["task"] = self.get_task_details(context["task_id"])
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
         return context
 
 

@@ -67,7 +67,3 @@ class BoefjesTaskListView(BoefjeMixin, TaskListView):
 class NormalizersTaskListView(NormalizerMixin, TaskListView):
     template_name = "tasks/normalizers.html"
     task_type = "normalizer"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
