@@ -22,26 +22,26 @@
       "address": "1.1.1.1"
     },
     {
-        "object_type": "IPPort",
-        "address": "IPAddressV4|internet|1.1.1.1",
-        "protocol": "tcp",
-        "port": 80,
-        "state": "open"
+      "object_type": "IPPort",
+      "address": "IPAddressV4|internet|1.1.1.1",
+      "protocol": "tcp",
+      "port": 80,
+      "state": "open"
     },
     {
-        "object_type": "Service",
-        "name": "http"
+      "object_type": "Service",
+      "name": "http"
     },
     {
-        "object_type": "IPService",
-        "ip_port": "IPPort|internet|1.1.1.1|tcp|80",
-        "service": "Service|http"
+      "object_type": "IPService",
+      "ip_port": "IPPort|internet|1.1.1.1|tcp|80",
+      "service": "Service|http"
     },
     {
-        "object_type": "HTTPHeader",
-        "resource": "HTTPResource|internet|1.1.1.1|tcp|80|http|internet|example.com|http|internet|example.com|80|/",
-        "key": "strict-transport-security",
-        "value": "max-age=31536000; includeSubDomains"
+      "object_type": "HTTPHeader",
+      "resource": "HTTPResource|internet|1.1.1.1|tcp|80|http|internet|example.com|http|internet|example.com|80|/",
+      "key": "strict-transport-security",
+      "value": "max-age=31536000; includeSubDomains"
     }
   ],
   "valid_time": "2019-01-01T00:00:00+00:00",

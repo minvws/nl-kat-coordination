@@ -5,8 +5,8 @@
   "arguments": {
     "domain": "www.example.nl",
     "input": {
-        "id": "www.example.nl"
-      }
+      "id": "www.example.nl"
+    }
   },
   "dispatches": {
     "normalizers": [

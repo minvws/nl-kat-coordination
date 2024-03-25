@@ -5,8 +5,7 @@
     "domain": "Hostname|internet|rijksoverheid.nl"
   },
   "dispatches": {
-    "normalizers": [
-    ],
+    "normalizers": [],
     "boefjes": []
   }
 }
