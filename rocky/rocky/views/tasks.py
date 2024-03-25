@@ -1,11 +1,11 @@
 from enum import Enum
+from typing import Any
 
-from django.http import FileResponse, HttpResponse
-from django.shortcuts import redirect
+from django.contrib import messages
+from django.http import HttpRequest, HttpResponse
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
-from katalogus.views.mixins import BoefjeMixin, NormalizerMixin
 
 from rocky.paginator import RockyPaginator
 from rocky.scheduler import SchedulerError
@@ -16,22 +16,16 @@ class PageActions(Enum):
     RESCHEDULE_TASK = "reschedule_task"
 
 
-class DownloadTaskDetail(SchedulerView):
-    def get(self, request, *args, **kwargs):
-        task_id = kwargs["task_id"]
-        filename = "task_" + task_id + ".json"
-        task_details = self.get_task_details(task_id)
-        if task_details is not None:
-            response = HttpResponse(FileResponse(task_details.json()), content_type="application/json")
-            response["Content-Disposition"] = "attachment; filename=" + filename
-            return response
-
-        return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
-
-
 class TaskListView(SchedulerView, ListView):
-    paginate_by = 20
     paginator_class = RockyPaginator
+    paginate_by = 20
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        try:
+            super().get(request, *args, **kwargs)
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
+        return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
         return self.get_task_list()
@@ -47,23 +41,22 @@ class TaskListView(SchedulerView, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["breadcrumbs"] = [
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
+        ]
         try:
             context["stats"] = self.scheduler_client.get_task_stats(self.task_type, self.task_type)
         except SchedulerError:
             context["stats_error"] = True
         else:
             context["stats_error"] = False
-        context["breadcrumbs"] = [
-            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
-        ]
-
         return context
 
 
-class BoefjesTaskListView(BoefjeMixin, TaskListView):
+class BoefjesTaskListView(TaskListView):
     template_name = "tasks/boefjes.html"
 
 
-class NormalizersTaskListView(NormalizerMixin, TaskListView):
+class NormalizersTaskListView(TaskListView):
     template_name = "tasks/normalizers.html"
     task_type = "normalizer"

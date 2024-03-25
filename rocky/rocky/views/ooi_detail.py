@@ -12,7 +12,6 @@ from httpx import HTTPError
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
-from katalogus.views.mixins import BoefjeMixin
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification
@@ -22,6 +21,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
+from rocky.views.scheduler import SchedulerView
 
 
 class PageActions(Enum):
@@ -32,7 +32,7 @@ class PageActions(Enum):
 
 
 class OOIDetailView(
-    BoefjeMixin,
+    SchedulerView,
     OOIRelatedObjectAddView,
     OOIFindingManager,
     BaseOOIDetailView,

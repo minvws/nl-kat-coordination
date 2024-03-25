@@ -12,9 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
-from katalogus.client import Boefje as KATalogusBoefje
-from katalogus.client import get_katalogus
-from katalogus.views.mixins import BoefjeMixin
+from katalogus.client import Boefje, get_katalogus
 from katalogus.views.plugin_settings_list import PluginSettingsListView
 from rocky.views.tasks import TaskListView
 
@@ -74,12 +72,12 @@ class NormalizerDetailView(PluginDetailView):
         return context
 
 
-class BoefjeDetailView(BoefjeMixin, PluginDetailView):
+class BoefjeDetailView(PluginDetailView):
     """Detail view for a specific boefje. Shows boefje settings and consumable oois for scanning."""
 
     template_name = "boefje_detail.html"
     limit_ooi_list = 9999
-    plugin: KATalogusBoefje
+    plugin: Boefje
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

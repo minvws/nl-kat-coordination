@@ -12,10 +12,6 @@ from rest_framework.status import HTTP_404_NOT_FOUND
 from katalogus.client import Boefje as KATalogusBoefje
 from katalogus.client import KATalogusClientV1, get_katalogus
 from katalogus.client import Normalizer as KATalogusNormalizer
-from octopoes.models import OOI
-from rocky.scheduler import Boefje, BoefjeTask, Normalizer, NormalizerTask, PrioritizedItem, RawData
-from rocky.views.mixins import OctopoesView
-from rocky.views.scheduler import SchedulerView
 
 logger = getLogger(__name__)
 
@@ -57,47 +53,3 @@ class SinglePluginView(OrganizationView):
     def is_secret_field(self, field: str) -> bool:
         """Check whether this field should be secret, defaults to False."""
         return bool(self.plugin_schema and field in self.plugin_schema.get("secret", []))
-
-
-class NormalizerMixin(OctopoesView, SchedulerView):
-    """
-    When a user wants to run a normalizer on a given set of raw data,
-    this mixin provides the method to construct the normalizer task for that data and run it.
-    """
-
-    def run_normalizer(self, normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
-        normalizer_task = NormalizerTask(normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data)
-
-        p_item = PrioritizedItem(priority=1, data=normalizer_task)
-
-        self.schedule_task(p_item)
-
-
-class BoefjeMixin(OctopoesView, SchedulerView):
-    """
-    When a user wants to scan one or multiple OOI's,
-    this mixin provides the methods to construct the boefjes for the OOI's and run them.
-    """
-
-    def run_boefje(self, katalogus_boefje: KATalogusBoefje, ooi: OOI | None) -> None:
-        boefje_task = BoefjeTask(
-            boefje=Boefje.model_validate(katalogus_boefje.model_dump()),
-            input_ooi=ooi.reference if ooi else None,
-            organization=self.organization.code,
-        )
-
-        p_item = PrioritizedItem(priority=1, data=boefje_task)
-        self.schedule_task(p_item)
-
-    def run_boefje_for_oois(
-        self,
-        boefje: KATalogusBoefje,
-        oois: list[OOI],
-    ) -> None:
-        if not oois and not boefje.consumes:
-            self.run_boefje(boefje, None)
-
-        for ooi in oois:
-            if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level:
-                self.can_raise_clearance_level(ooi, boefje.scan_level)
-            self.run_boefje(boefje, ooi)

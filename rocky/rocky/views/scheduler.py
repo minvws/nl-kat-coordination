@@ -1,14 +1,22 @@
-import logging
 from datetime import datetime
-from typing import Any
 
-from account.mixins import OrganizationView
 from django.contrib import messages
+from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
+from katalogus.client import Boefje, Normalizer
 
-from rocky.scheduler import PrioritizedItem, SchedulerError, SchedulerTaskList, Task, scheduler_client
-
-logger = logging.getLogger(__name__)
+from octopoes.models import OOI
+from rocky.scheduler import (
+    BoefjeTask,
+    NormalizerTask,
+    PrioritizedItem,
+    RawData,
+    SchedulerError,
+    SchedulerTaskList,
+    Task,
+    scheduler_client,
+)
+from rocky.views.mixins import OctopoesView
 
 
 def get_date_time(date: str | None) -> datetime | None:
@@ -17,7 +25,7 @@ def get_date_time(date: str | None) -> datetime | None:
     return None
 
 
-class SchedulerView(OrganizationView):
+class SchedulerView(OctopoesView):
     task_type: str = "boefje"  # default task type
 
     def setup(self, request, *args, **kwargs):
@@ -40,20 +48,37 @@ class SchedulerView(OrganizationView):
             "input_ooi": self.input_ooi,
         }
 
-    def get_task_list(self) -> SchedulerTaskList | list[Any]:
+    def get_task_list(self) -> SchedulerTaskList | None:
         try:
-            if not self.scheduler_client.health().healthy:
-                raise SchedulerError()
             return SchedulerTaskList(self.scheduler_client, **self.get_task_filters())
         except SchedulerError as error:
-            messages.error(self.request, error.message)
-        return []
+            return messages.error(self.request, error.message)
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:
             return self.scheduler_client.get_task_details(task_id)
         except SchedulerError as error:
             return messages.error(self.request, error.message)
+
+    def get_output_oois(self, task):
+        try:
+            return self.octopoes_api_connector.list_origins(
+                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at, task_id=task.id
+            )[0].result
+        except IndexError:
+            return []
+
+    def get_json_task_details(self) -> JsonResponse | None:
+        task = self.get_task_details(self.kwargs["task_id"])
+        if task:
+            return JsonResponse(
+                {
+                    "oois": self.get_output_oois(task),
+                    "valid_time": task.p_item.data.raw_data.boefje_meta.ended_at.strftime("%Y-%m-%dT%H:%M:%S"),
+                },
+                safe=False,
+            )
+        return task
 
     def schedule_task(self, p_item: PrioritizedItem) -> None:
         try:
@@ -96,3 +121,33 @@ class SchedulerView(OrganizationView):
             self.schedule_task(new_p_item)
         except SchedulerError as error:
             messages.error(self.request, error.message)
+
+    def run_normalizer(self, normalizer: Normalizer, raw_data: RawData) -> None:
+        normalizer_task = NormalizerTask(normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data)
+
+        p_item = PrioritizedItem(priority=1, data=normalizer_task)
+
+        self.schedule_task(p_item)
+
+    def run_boefje(self, boefje: Boefje, ooi: OOI | None) -> None:
+        boefje_task = BoefjeTask(
+            boefje=Boefje.model_validate(boefje.model_dump()),
+            input_ooi=ooi.reference if ooi else None,
+            organization=self.organization.code,
+        )
+
+        p_item = PrioritizedItem(priority=1, data=boefje_task)
+        self.schedule_task(p_item)
+
+    def run_boefje_for_oois(
+        self,
+        boefje: Boefje,
+        oois: list[OOI],
+    ) -> None:
+        if not oois and not boefje.consumes:
+            self.run_boefje(boefje, None)
+
+        for ooi in oois:
+            if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level:
+                self.can_raise_clearance_level(ooi, boefje.scan_level)
+            self.run_boefje(boefje, ooi)
