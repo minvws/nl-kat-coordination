@@ -32,7 +32,7 @@ GROUP_CLIENT = "clients"
 
 logger = logging.getLogger(__name__)
 
-ORGANIZATION_CODE_LENGTH = 32
+ORGANIZATION_CODE_LENGTH = 36
 DENY_ORGANIZATION_CODES = [
     "admin",
     "api",

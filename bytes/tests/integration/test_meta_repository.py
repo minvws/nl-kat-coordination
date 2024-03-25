@@ -87,7 +87,7 @@ def test_data_error_is_raised_when_organization_id_is_too_long(meta_repository: 
 
     with pytest.raises(DataError), meta_repository:
         boefje_meta.id = str(uuid.uuid4())
-        boefje_meta.organization = 33 * "t"
+        boefje_meta.organization = 37 * "t"
         meta_repository.save_boefje_meta(boefje_meta)
 
     meta_repository.session.rollback()  # make sure to roll back the session, so we can clean up the db
