@@ -506,7 +506,8 @@ def cve_finding_type_2023_38408() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-2023-38408",
         description="The PKCS#11 feature in ssh-agent in OpenSSH before 9.3p2 has an insufficiently "
-        "trustworthy search path, leading to remote code execution if an agent is forwarded to an attacker-controlled system. ",
+        "trustworthy search path, leading to remote code execution if an agent is forwarded to an "
+        "attacker-controlled system. ",
         source="https://cve.circl.lu/cve/CVE-2023-38408",
         risk_score=9.8,
         risk_severity=RiskLevelSeverity.CRITICAL,
