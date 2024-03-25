@@ -176,10 +176,10 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
             for ooi, data in results.items():
                 ooi_human_readable = Reference.from_str(ooi).human_readable
-                if ooi not in report_data:
-                    report_data[ooi] = {}
+                if report_type.name not in report_data:
+                    report_data[report_type.name] = {}
 
-                report_data[ooi][report_type.name] = {
+                report_data[report_type.name][ooi] = {
                     "data": data,
                     "template": report_type.template_path,
                     "ooi_human_readable": ooi_human_readable,

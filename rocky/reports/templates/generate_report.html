@@ -16,8 +16,8 @@
             <div class="chapter-numbers report-content">
                 {% include "summary/report_asset_overview.html" %}
 
-                {% for ooi, report in report_data.items %}
-                    {% for report_type,data in report.items %}
+                {% for report_type, report in report_data.items %}
+                    {% for ooi,data in report.items %}
                         {% if data.data %}
                             <section id="{{ report_type }}-{{ ooi }}">
                                 <div>

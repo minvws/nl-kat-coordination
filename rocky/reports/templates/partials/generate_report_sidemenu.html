@@ -9,8 +9,8 @@
             <li>
                 <a href="#asset-overview">{% translate "Asset overview" %}</a>
             </li>
-            {% for ooi, report in report_data.items %}
-                {% for report_type,data in report.items %}
+            {% for report_type, report in report_data.items %}
+                {% for ooi,data in report.items %}
                     {% if data.data %}
                         <li>
                             <a href="#{{ report_type }}-{{ ooi }}">{{ report_type }} {% translate "for" %} {{ data.ooi_human_readable }}</a>
