@@ -6,6 +6,7 @@
         <tr>
             <th>{% translate "Object" %}</th>
             <th>{% translate "Type" %}</th>
+            <th>{% translate "Network" %}</th>
             <th>{% translate "Clearance level" %}</th>
             <th>{% translate "Clearance type" %}</th>
         </tr>
@@ -13,8 +14,9 @@
     <tbody>
         {% for ooi in oois %}
             <tr>
-                <td>{{ ooi.primary_key }}</td>
+                <td>{{ ooi.human_readable }}</td>
                 <td>{{ ooi.object_type }}</td>
+                <td>{{ ooi.network.tokenized.name }}</td>
                 <td>
                     {% include "partials/scan_level_indicator.html" with value=ooi.scan_profile.level.value custom_class="left" %}
 
