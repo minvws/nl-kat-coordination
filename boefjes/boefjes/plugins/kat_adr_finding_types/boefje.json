@@ -1,10 +1,10 @@
 {
-    "id": "adr-finding-types",
-    "name": "ADR Finding Types",
-    "description": "Hydrate information of ADR finding types",
-    "consumes": [
-        "ADRFindingType"
-    ],
-    "scan_level": 0,
-    "enabled": true
+  "id": "adr-finding-types",
+  "name": "ADR Finding Types",
+  "description": "Hydrate information of ADR finding types",
+  "consumes": [
+    "ADRFindingType"
+  ],
+  "scan_level": 0,
+  "enabled": true
 }

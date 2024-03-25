@@ -21,7 +21,7 @@
     ]
   },
   "normalizer": {
-  "id": "kat_ipv6_nameservers.normalize",
-  "version": null
+    "id": "kat_ipv6_nameservers.normalize",
+    "version": null
   }
 }
