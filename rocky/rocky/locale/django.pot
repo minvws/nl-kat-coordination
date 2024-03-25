@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-20 13:53+0000\n"
+"POT-Creation-Date: 2024-03-25 11:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3197,7 +3197,8 @@ msgid "Good"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
-msgid "No ciphers found for this IPService."
+msgid ""
+"No ciphers were found for this combination of IP address, port and service."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
