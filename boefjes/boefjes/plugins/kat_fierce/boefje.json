@@ -1,9 +1,9 @@
 {
-    "id": "fierce",
-    "name": "Fierce",
-    "description": "Use a Fierce scan to find subdomains (with their ip)",
-    "consumes": [
-        "Hostname"
-    ],
-    "scan_level": 3
+  "id": "fierce",
+  "name": "Fierce",
+  "description": "Use a Fierce scan to find subdomains (with their ip)",
+  "consumes": [
+    "Hostname"
+  ],
+  "scan_level": 3
 }

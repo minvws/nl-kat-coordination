@@ -1,10 +1,10 @@
-    {
-        "id": "many-ports-open",
-        "name": "Many new ports open",
-        "description": "Check if there are many ports open that were not before",
-        "consumes": [
-            "IPAddressV4",
-            "IPAddressV6"
-        ],
-        "scan_level": 1
-    }
+{
+  "id": "many-ports-open",
+  "name": "Many new ports open",
+  "description": "Check if there are many ports open that were not before",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "scan_level": 1
+}

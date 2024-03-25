@@ -1,10 +1,10 @@
 {
-    "id": "cwe-finding-types",
-    "name": "CWE Finding Types",
-    "description": "Hydrate information of CWE finding types",
-    "consumes": [
-        "CWEFindingType"
-    ],
-    "scan_level": 0,
-    "enabled": true
+  "id": "cwe-finding-types",
+  "name": "CWE Finding Types",
+  "description": "Hydrate information of CWE finding types",
+  "consumes": [
+    "CWEFindingType"
+  ],
+  "scan_level": 0,
+  "enabled": true
 }

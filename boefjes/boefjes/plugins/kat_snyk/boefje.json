@@ -1,9 +1,9 @@
-    {
-        "id": "snyk",
-        "name": "Snyk.io-vulnerabilities",
-        "description": "Get Snyk.io vulnerabilities based on Software",
-        "consumes": [
-            "SoftwareInstance"
-        ],
-        "scan_level": 1
-    }
+{
+  "id": "snyk",
+  "name": "Snyk.io-vulnerabilities",
+  "description": "Get Snyk.io vulnerabilities based on Software",
+  "consumes": [
+    "SoftwareInstance"
+  ],
+  "scan_level": 1
+}

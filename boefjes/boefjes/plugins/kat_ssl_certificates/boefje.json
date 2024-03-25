@@ -1,9 +1,9 @@
-    {
-        "id": "ssl-certificates",
-        "name": "SSLCertificates",
-        "description": "Scan SSL certificates of websites",
-        "consumes": [
-            "Website"
-        ],
-        "scan_level": 1
-    }
+{
+  "id": "ssl-certificates",
+  "name": "SSLCertificates",
+  "description": "Scan SSL certificates of websites",
+  "consumes": [
+    "Website"
+  ],
+  "scan_level": 1
+}
