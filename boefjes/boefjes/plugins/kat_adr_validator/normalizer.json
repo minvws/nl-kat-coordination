@@ -1,12 +1,12 @@
 {
-    "id": "adr-validator",
-    "consumes": [
-        "boefje/adr-validator"
-    ],
-    "produces": [
-        "APIDesignRule",
-        "APIDesignRuleResult",
-        "ADRFindingType",
-        "Finding"
-    ]
+  "id": "adr-validator",
+  "consumes": [
+    "boefje/adr-validator"
+  ],
+  "produces": [
+    "APIDesignRule",
+    "APIDesignRuleResult",
+    "ADRFindingType",
+    "Finding"
+  ]
 }
