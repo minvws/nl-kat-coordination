@@ -48,9 +48,9 @@
     </div>
     {% for ip, findings in data.sc_ips.items %}
         {% if findings %}
-            <h5>{{ ip }}</h5>
+            <h5>{% translate "Host: " %}{{ ip.tokenized.address }}</h5>
             <table>
-                <caption class="visually-hidden">{% translate "Safe connections compliance:" %}</caption>
+                <caption class="visually-hidden">{% translate "Safe connections compliance" %}</caption>
                 <thead>
                     <tr>
                         <th scope="col">{% translate "Compliance issue" %}</th>

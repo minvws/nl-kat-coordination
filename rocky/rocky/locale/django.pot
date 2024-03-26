@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-25 11:11+0000\n"
+"POT-Creation-Date: 2024-03-26 10:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3111,6 +3111,15 @@ msgstr ""
 msgid "Safe connections compliance:"
 msgstr ""
 
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+msgid "Host: "
+msgstr ""
+
+#: reports/report_types/safe_connections_report/report.html
+msgid "Safe connections compliance"
+msgstr ""
+
 #: reports/report_types/safe_connections_report/report.py
 msgid "Safe Connections Report"
 msgstr ""
@@ -3549,12 +3558,6 @@ msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Toggle all report types"
-msgstr ""
-
-#: reports/templates/summary/report_asset_overview.html
-msgid ""
-"An overview of the selected objects, reports and plugins to generate this "
-"report."
 msgstr ""
 
 #: reports/templates/summary/report_asset_overview.html

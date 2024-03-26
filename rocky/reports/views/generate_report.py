@@ -175,7 +175,20 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                 continue
 
             for ooi, data in results.items():
-                ooi_human_readable = Reference.from_str(ooi).human_readable
+                tokenized_ooi = Reference.from_str(ooi).tokenized
+                if "ip_port" in tokenized_ooi.root:
+                    ooi_human_readable = (
+                        tokenized_ooi.service.name
+                        + "://"
+                        + tokenized_ooi.ip_port.address.address
+                        + " at port: "
+                        + tokenized_ooi.ip_port.port
+                        + "/"
+                        + tokenized_ooi.ip_port.protocol
+                    )
+                else:
+                    ooi_human_readable = Reference.from_str(ooi).human_readable
+
                 if report_type.name not in report_data:
                     report_data[report_type.name] = {}
 
