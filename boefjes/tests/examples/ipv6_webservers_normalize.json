@@ -20,7 +20,7 @@
     ]
   },
   "normalizer": {
-  "id": "kat_ipv6_webservers.normalize",
-  "version": null
+    "id": "kat_ipv6_webservers.normalize",
+    "version": null
   }
 }

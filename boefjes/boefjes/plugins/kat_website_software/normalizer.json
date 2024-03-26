@@ -1,10 +1,10 @@
 {
-    "id": "kat_website_software_normalize",
-    "consumes": [
-        "boefje/website-software"
-    ],
-    "produces": [
-        "Software",
-        "SoftwareInstance"
-    ]
+  "id": "kat_website_software_normalize",
+  "consumes": [
+    "boefje/website-software"
+  ],
+  "produces": [
+    "Software",
+    "SoftwareInstance"
+  ]
 }
