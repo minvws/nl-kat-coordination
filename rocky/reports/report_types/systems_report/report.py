@@ -102,7 +102,7 @@ class SystemReport(Report):
 
             for ip in ips:
                 ip_services[ip] = {
-                    "hostnames": [hostname.reference for hostname in hostnames_by_source.get(ip, [])],
+                    "hostnames": [hostname.reference.tokenized.name for hostname in hostnames_by_source.get(ip, [])],
                     "services": list(set(services_by_source.get(ip, [])).union(set(software_by_source.get(ip, [])))),
                 }
 

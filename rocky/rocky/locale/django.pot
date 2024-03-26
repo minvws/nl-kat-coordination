@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-26 11:10+0000\n"
+"POT-Creation-Date: 2024-03-26 15:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2760,7 +2760,7 @@ msgid ""
 "The IPv6 report provides an overview of the current IPv6 status of the "
 "identified system. The table below shows whether the domain is reachable "
 "over IPv6 or not. A green compliance check is shown if this is the case. A "
-"red compliance cross is shown if no IPv6 address was detected."
+"grey compliance cross is shown if no IPv6 address was detected."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -2796,6 +2796,10 @@ msgstr ""
 
 #: reports/report_types/mail_report/report.html
 msgid "mailservers compliant"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid "No mailservers have been found on this system."
 msgstr ""
 
 #: reports/report_types/mail_report/report.py
@@ -3014,8 +3018,12 @@ msgstr ""
 msgid "No unnecessary ports open"
 msgstr ""
 
+#: reports/report_types/name_server_report/report.html
+msgid "No nameservers have been found on this system."
+msgstr ""
+
 #: reports/report_types/name_server_report/report.py
-msgid "Name server Report"
+msgid "Name Server Report"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.py
@@ -3025,7 +3033,7 @@ msgstr ""
 #: reports/report_types/open_ports_report/report.html
 msgid ""
 "The open ports report provides an overview of the open ports identified on a "
-"system. The ports that are marked as <b>Bold</b> were identified by direct "
+"system. The ports that are marked as <b>bold</b> were identified by direct "
 "scans performed by OpenKAT (such as nmap). Ports that are not marked in bold "
 "were identified through external services and/or scans (such as Shodan). "
 "Scans with the same hostnames, ports and IPs are merged."
@@ -3318,6 +3326,10 @@ msgstr ""
 
 #: reports/report_types/web_system_report/report.html
 msgid "Certificate is not expiring soon"
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "No webservers have been found on this system."
 msgstr ""
 
 #: reports/report_types/web_system_report/report.py

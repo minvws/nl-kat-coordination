@@ -95,7 +95,7 @@ class AggregateOrganisationReport(AggregateReport):
                         ipv6[hostname] = {"enabled": info["enabled"], "systems": []}
 
                         for ip, system in systems["services"].items():
-                            if hostname in [x.tokenized.name for x in system["hostnames"]]:
+                            if hostname in [x for x in system["hostnames"]]:
                                 ipv6[hostname]["systems"] = sorted(
                                     set(ipv6[hostname]["systems"]).union(set(system["services"]))
                                 )
