@@ -260,7 +260,7 @@ class SchedulerClient:
         try:
             res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
             res.raise_for_status()
-        except HTTPError:
+        except (ConnectError, HTTPError):
             raise SchedulerError()
         task_stats = json.loads(res.content)
         return task_stats

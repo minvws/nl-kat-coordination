@@ -1,8 +1,11 @@
 from datetime import datetime
+from typing import Any
 
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 from katalogus.client import Boefje, Normalizer
 
 from octopoes.models import OOI
@@ -25,7 +28,7 @@ def get_date_time(date: str | None) -> datetime | None:
     return None
 
 
-class SchedulerView(OctopoesView):
+class SchedulerView(OctopoesView, TemplateView):
     task_type: str = "boefje"  # default task type
 
     def setup(self, request, *args, **kwargs):
@@ -38,6 +41,13 @@ class SchedulerView(OctopoesView):
         self.max_created_at = get_date_time(self.request.GET.get("scan_history_to", None))
         self.input_ooi = self.request.GET.get("scan_history_search", None)
 
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        try:
+            super().get(request, *args, **kwargs)
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
+        return redirect("health_beautified", organization_code=self.organization.code)
+
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         return {
             "scheduler_id": self.scheduler_id,
@@ -48,11 +58,12 @@ class SchedulerView(OctopoesView):
             "input_ooi": self.input_ooi,
         }
 
-    def get_task_list(self) -> SchedulerTaskList | None:
+    def get_task_list(self) -> SchedulerTaskList | list[Any]:
         try:
             return SchedulerTaskList(self.scheduler_client, **self.get_task_filters())
         except SchedulerError as error:
-            return messages.error(self.request, error.message)
+            messages.error(self.request, error.message)
+        return []
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:

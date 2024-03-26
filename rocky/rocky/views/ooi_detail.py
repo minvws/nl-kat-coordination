@@ -115,7 +115,6 @@ class OOIDetailView(
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
-        filters["task_type"] = "boefje"
         filters["input_ooi"] = self.get_ooi_id()
         return filters
 
