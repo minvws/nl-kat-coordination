@@ -39,7 +39,8 @@ seed:  # Seed the katalogus database
 	-docker compose run --rm katalogus python -m boefjes.seed
 
 images:  # Build the images for the containerized boefjes
-	docker build -f images/base.Dockerfile -t openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
+  # Dns-records is disabled for now, see the discussion in https://github.com/minvws/nl-kat-coordination/pull/2709
+	# docker build -f images/base.Dockerfile -t openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
 	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-sec --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dnssec .
 
 
