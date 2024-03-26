@@ -1,24 +1,36 @@
 {% load i18n %}
-{% load static %}
-{% load tz %}
 
-{% get_current_timezone as TIME_ZONE %}
-<section class="centered">
-    <div class="centered">
-        {# Weasyprint ignores presentational hints so we also need to specify width using CSS. #}
-        <img width="320"
-             style="width: 320px"
-             src="{% static 'img/kat_logo.png' %}"
-             alt="{% translate "OpenKAT" %}" />
-        <h1>{% translate "Report for organization" %} {{ organization.name }}</h1>
-        <p class="emphasized">
-            <strong>{% translate "Created with data from" %}</strong>: {{ observed_at }} {{ TIME_ZONE }}
-        </p>
-        <p>
-            <strong>{% translate "Created on" %}</strong>: {{ created_at }}
-        </p>
-        <p>
-            <strong>{% translate "Created by:" %}</strong> {{ organization_member.user.full_name }}
-        </p>
+<section class="introduction" id="introduction">
+    <div>
+        <div class="horizontal-view toolbar">
+            <h1>{% translate "OpenKAT Report" %}</h1>
+            <div class="dropdown">
+                <button aria-controls="export-add" class="dropdown-button ghost">
+                    {% translate "Export" %}<span aria-hidden="true" class="icon ti-chevron-down"></span>
+                </button>
+                <ul id="export-add" aria-expanded="false" class="dropdown-list">
+                    <li>
+                        <a href="{{ report_download_url }}"
+                           target="_blank"
+                           rel="noopener noreferrer">{% translate "Download report" %}</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <p>
+                {% translate "This is the OpenKAT report for organization" %} {{ organization.name }}.
+                {% translate "All selected report types for the selected objects are displayed one below the other." %}
+            </p>
+            <p>
+                {% translate "Created with data from" %}: <strong>{{ observed_at }} {{ TIME_ZONE }}</strong>
+            </p>
+            <p>
+                {% translate "Created on" %}<strong>: {{ created_at }}</strong>
+            </p>
+            <p>
+                {% translate "Created by:" %} <strong>{{ organization_member.user.full_name }}</strong>
+            </p>
+        </div>
     </div>
 </section>
