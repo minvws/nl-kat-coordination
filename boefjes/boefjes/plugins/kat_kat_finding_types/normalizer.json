@@ -1,10 +1,10 @@
 {
-    "id": "kat_kat_finding_types_normalize",
-    "consumes": [
-        "boefje/kat-finding-types"
-    ],
-    "produces": [
-        "KATFindingType"
-    ],
-    "enabled": true
+  "id": "kat_kat_finding_types_normalize",
+  "consumes": [
+    "boefje/kat-finding-types"
+  ],
+  "produces": [
+    "KATFindingType"
+  ],
+  "enabled": true
 }
