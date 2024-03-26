@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-26 10:53+0000\n"
+"POT-Creation-Date: 2024-03-26 11:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2605,7 +2605,7 @@ msgid "minutes"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "No records have been found  on this system."
+msgid "No records have been found."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
