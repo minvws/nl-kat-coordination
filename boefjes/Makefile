@@ -15,6 +15,9 @@ export m		# Message for alembic migration
 export revid	# Revision id to generate raw sql for
 export rev1		# Previous revision id for generating migrations
 export rev2		# New revision id for the new migration file
+
+# We set this to build images with the right target platform in the `images` target. This prevents arm systems such as
+# systems with an Apple silicon chip to build images they cannot use.
 export DOCKER_DEFAULT_PLATFORM=$(shell docker system info --format '{{.OSType}}/{{.Architecture}}')
 
 ##

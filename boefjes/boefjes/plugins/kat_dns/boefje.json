@@ -9,6 +9,5 @@
         "RECORD_TYPES",
         "REMOTE_NS"
     ],
-    "scan_level": 1,
-    "oci_image": "openkat/dns-records"
+    "scan_level": 1
 }

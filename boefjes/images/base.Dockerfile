@@ -21,3 +21,5 @@ RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip  && (pip in
 
 COPY ./images/docker_adapter.py .
 COPY $BOEFJE_PATH $BOEFJE_PATH
+
+USER nonroot
