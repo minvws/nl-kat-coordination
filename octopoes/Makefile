@@ -46,14 +46,12 @@ test:
 	pytest
 
 rtest:
-	docker compose --project-directory . -f .ci/docker-compose.yml kill
 	docker compose --project-directory . -f .ci/docker-compose.yml down --remove-orphans
 	docker compose --project-directory . -f .ci/docker-compose.yml up -d --build ci_octopoes ci_octopoes_api_worker
 	sleep 2
 	robot -d reports tests/robot
 
 itest:
-	docker compose --project-directory . -f .ci/docker-compose.yml kill
+	docker compose --project-directory . -f .ci/docker-compose.yml down --remove-orphans
 	docker compose --project-directory . -f .ci/docker-compose.yml build $(build_args)
-	docker compose --project-directory . -f .ci/docker-compose.yml down
 	docker compose --project-directory . -f .ci/docker-compose.yml run --rm octopoes_integration
