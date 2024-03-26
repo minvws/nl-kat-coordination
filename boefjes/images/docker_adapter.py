@@ -1,6 +1,5 @@
-import traceback
-
 import sys
+import traceback
 from base64 import b64encode
 
 import httpx
@@ -27,12 +26,8 @@ def main():
         out = {
             "status": "FAILED",
             "files": [
-                {
-                    "name": None,
-                    "content": b64encode(traceback.format_exc().encode()).decode(),
-                    "tags": ["error/boefje"]
-                }
-            ]
+                {"name": None, "content": b64encode(traceback.format_exc().encode()).decode(), "tags": ["error/boefje"]}
+            ],
         }
 
     httpx.post(boefje_input["output_url"], json=out)
