@@ -1,14 +1,14 @@
 {
-    "id": "censys",
-    "name": "Censys",
-    "description": "Use Censys to discover open ports, services and certificates",
-    "consumes": [
-        "IPAddressV4",
-        "IPAddressV6"
-    ],
-    "environment_keys": [
-        "CENSYS_API_ID",
-        "CENSYS_API_SECRET"
-    ],
-    "scan_level": 1
+  "id": "censys",
+  "name": "Censys",
+  "description": "Use Censys to discover open ports, services and certificates",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "environment_keys": [
+    "CENSYS_API_ID",
+    "CENSYS_API_SECRET"
+  ],
+  "scan_level": 1
 }

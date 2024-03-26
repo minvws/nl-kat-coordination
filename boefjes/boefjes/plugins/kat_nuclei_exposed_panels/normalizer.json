@@ -1,10 +1,10 @@
 {
-    "id": "kat_nuclei_exposed_panels_normalize",
-    "consumes": [
-        "boefje/nuclei-exposed-panels"
-    ],
-    "produces": [
-        "Findings",
-        "KATFindingType"
-    ]
+  "id": "kat_nuclei_exposed_panels_normalize",
+  "consumes": [
+    "boefje/nuclei-exposed-panels"
+  ],
+  "produces": [
+    "Findings",
+    "KATFindingType"
+  ]
 }

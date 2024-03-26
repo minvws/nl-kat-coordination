@@ -1,13 +1,13 @@
 {
-    "id": "kat_censys_normalize",
-    "consumes": [
-        "boefje/censys"
-    ],
-    "produces": [
-        "IPPort",
-        "X509Certificate",
-        "SoftwareInstance",
-        "ResolvedHostname",
-        "HTTPHeader"
-    ]
+  "id": "kat_censys_normalize",
+  "consumes": [
+    "boefje/censys"
+  ],
+  "produces": [
+    "IPPort",
+    "X509Certificate",
+    "SoftwareInstance",
+    "ResolvedHostname",
+    "HTTPHeader"
+  ]
 }
