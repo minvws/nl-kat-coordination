@@ -1,25 +1,18 @@
-ARG PYTHON_VERSION=3.11
-FROM python:$PYTHON_VERSION
+FROM python:3.11-alpine
 
-ARG USER_UID=1000
-ARG USER_GID=1000
 ARG BOEFJE_PATH
-ENV PATH=/home/nonroot/.local/bin:${PATH}
-
-WORKDIR /app
-RUN groupadd --gid $USER_GID nonroot && adduser --disabled-password --gecos '' --uid $USER_UID --gid $USER_GID nonroot
-
-COPY ./images/boefje_entrypoint.sh .
-ENTRYPOINT ["/app/boefje_entrypoint.sh"]
-
 ENV PYTHONPATH=/app:$BOEFJE_PATH
 
-# requirements.txt file is optional this way
+WORKDIR /app
+RUN adduser --disabled-password --gecos '' nonroot
+
 COPY $BOEFJE_PATH/requirements.txt* .
 
-RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip  && (pip install -r requirements.txt || true)
+RUN --mount=type=cache,target=/root/.cache pip install --upgrade pip && pip install httpx
+RUN if test -f requirements.txt; then pip install -r requirements.txt; fi
 
 COPY ./images/docker_adapter.py .
 COPY $BOEFJE_PATH $BOEFJE_PATH
 
+ENTRYPOINT ["/usr/local/bin/python", "-m", "docker_adapter"]
 USER nonroot

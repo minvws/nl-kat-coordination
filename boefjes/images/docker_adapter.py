@@ -1,12 +1,14 @@
-import json
 import sys
 from base64 import b64encode
 
+import httpx
 from main import run
 
 
 def main():
-    boefje_input = json.load(sys.stdin)
+    input_url = sys.argv[-1]
+    boefje_input = httpx.get(input_url).json()
+
     raws = run(boefje_input["boefje_meta"])
     out = {
         "status": "COMPLETED",
@@ -19,8 +21,7 @@ def main():
             for x in raws
         ],
     }
-
-    json.dump(out, sys.stdout)
+    httpx.post(boefje_input["output_url"], data=out)
 
 
 if __name__ == "__main__":

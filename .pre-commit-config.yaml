@@ -61,10 +61,6 @@ repos:
   hooks:
   - id: pyupgrade
     args: [--py310-plus]
-    exclude: |
-      (?x)(
-      ^boefjes/boefjes/plugins
-      )
 
 - repo: https://github.com/adamchainz/django-upgrade
   rev: 1.16.0
