@@ -142,7 +142,7 @@ class BaseReportView(OOIFilterView):
                 plugins.append(plugin)
                 are_plugins_enabled.append(plugin.enabled)
 
-            all_plugins[required_optional] = sorted(plugins, key=lambda x: x.name)
+            all_plugins[required_optional] = sorted(plugins, key=attrgetter("name"))
             all_plugins_enabled[required_optional] = all(are_plugins_enabled)
 
         return all_plugins, all_plugins_enabled
