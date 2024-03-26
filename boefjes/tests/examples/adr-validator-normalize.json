@@ -1,40 +1,40 @@
 {
-    "id": "76c2d73e-6157-41b1-be43-75656f9160f9",
-    "raw_data": {
-        "id": "66451567-2381-4248-b5a1-d0d0985e065f",
-        "boefje_meta": {
-            "id": "f29f76c5-f7b1-4662-89c6-6dc313a9f93f",
-            "boefje": {
-                "id": "adr-validator"
-            },
-            "input_ooi": "RESTAPI|https|Internet|example.com|443|/api",
-            "arguments": {
-                "input": {
-                    "object_type": "RESTAPI",
-                    "scan_profile": "scan_profile_type='declared' reference=Reference('RESTAPI|https|Internet|example.com|443|/api/v1') level=<ScanLevel.L1: 1>",
-                    "primary_key": "RESTAPI|https|Internet|ple.com|443|/api/v1",
-                    "api_url": {
-                        "scheme": "https",
-                        "netloc": {
-                            "network": {
-                                "name": "Internet"
-                            },
-                            "name": "example.com"
-                        },
-                        "port": "443",
-                        "path": "/api/v1"
-                    }
-                }
-            },
-            "organization": "st"
-        },
-        "mime_types": [
-            {
-                "value": "boefje/adr-validator"
-            }
-        ]
-    },
-    "normalizer": {
+  "id": "76c2d73e-6157-41b1-be43-75656f9160f9",
+  "raw_data": {
+    "id": "66451567-2381-4248-b5a1-d0d0985e065f",
+    "boefje_meta": {
+      "id": "f29f76c5-f7b1-4662-89c6-6dc313a9f93f",
+      "boefje": {
         "id": "adr-validator"
-    }
+      },
+      "input_ooi": "RESTAPI|https|Internet|example.com|443|/api",
+      "arguments": {
+        "input": {
+          "object_type": "RESTAPI",
+          "scan_profile": "scan_profile_type='declared' reference=Reference('RESTAPI|https|Internet|example.com|443|/api/v1') level=<ScanLevel.L1: 1>",
+          "primary_key": "RESTAPI|https|Internet|ple.com|443|/api/v1",
+          "api_url": {
+            "scheme": "https",
+            "netloc": {
+              "network": {
+                "name": "Internet"
+              },
+              "name": "example.com"
+            },
+            "port": "443",
+            "path": "/api/v1"
+          }
+        }
+      },
+      "organization": "st"
+    },
+    "mime_types": [
+      {
+        "value": "boefje/adr-validator"
+      }
+    ]
+  },
+  "normalizer": {
+    "id": "adr-validator"
+  }
 }

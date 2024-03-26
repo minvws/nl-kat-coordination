@@ -1,6 +1,7 @@
 from collections.abc import Iterable, Sequence
 from datetime import datetime
 from logging import getLogger
+from operator import attrgetter
 from typing import Any
 
 from account.mixins import OrganizationView
@@ -142,7 +143,7 @@ class BaseReportView(OOIFilterView):
                 plugins.append(plugin)
                 are_plugins_enabled.append(plugin.enabled)
 
-            all_plugins[required_optional] = sorted(plugins, key=lambda x: x.name)
+            all_plugins[required_optional] = sorted(plugins, key=attrgetter("name"))
             plugins_enabled[required_optional] = all(are_plugins_enabled)
 
         return all_plugins, plugins_enabled

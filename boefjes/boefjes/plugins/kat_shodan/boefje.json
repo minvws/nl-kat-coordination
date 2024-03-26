@@ -1,11 +1,13 @@
-    {
-        "id": "shodan",
-        "name": "Shodan",
-        "description": "Use Shodan to find open ports with vulnerabilities that are found on that port",
-        "consumes": [
-            "IPAddressV4",
-            "IPAddressV6"
-        ],
-        "environment_keys": ["SHODAN_API"],
-        "scan_level": 1
-    }
+{
+  "id": "shodan",
+  "name": "Shodan",
+  "description": "Use Shodan to find open ports with vulnerabilities that are found on that port",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "environment_keys": [
+    "SHODAN_API"
+  ],
+  "scan_level": 1
+}

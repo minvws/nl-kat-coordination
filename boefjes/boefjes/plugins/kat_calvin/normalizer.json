@@ -1,10 +1,10 @@
 {
-    "id": "calvin-normalize",
-    "consumes": [
-        "boefje/calvin"
-    ],
-    "produces": [
-        "Application",
-        "Incident"
-    ]
+  "id": "calvin-normalize",
+  "consumes": [
+    "boefje/calvin"
+  ],
+  "produces": [
+    "Application",
+    "Incident"
+  ]
 }

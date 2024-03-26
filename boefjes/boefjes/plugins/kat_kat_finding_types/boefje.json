@@ -1,10 +1,10 @@
 {
-    "id": "kat-finding-types",
-    "name": "KAT Finding Types",
-    "description": "Hydrate information of KAT finding types",
-    "consumes": [
-        "KATFindingType"
-    ],
-    "scan_level": 0,
-    "enabled": true
+  "id": "kat-finding-types",
+  "name": "KAT Finding Types",
+  "description": "Hydrate information of KAT finding types",
+  "consumes": [
+    "KATFindingType"
+  ],
+  "scan_level": 0,
+  "enabled": true
 }
