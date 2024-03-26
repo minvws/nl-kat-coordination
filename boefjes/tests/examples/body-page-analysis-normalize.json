@@ -54,12 +54,12 @@
     },
     "mime_types": [
       {
-        "value": "openkat-http/full"
+        "value": "openkat-http/response"
       }
     ]
   },
   "normalizer": {
-    "id": "kat_webpage_analysis_analyze_page_normalize",
+    "id": "kat_webpage_analysis_wappalyzer_normalize",
     "version": null
   }
 }

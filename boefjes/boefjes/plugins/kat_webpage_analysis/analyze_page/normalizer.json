@@ -1,9 +1,10 @@
 {
     "id": "kat_webpage_analysis_wappalyzer_normalize",
     "consumes": [
-        "openkat-http/full"
+        "openkat-http/response"
     ],
     "produces": [
-        "HTTPHeader"
+        "Software",
+        "SoftwareInstance"
     ]
 }

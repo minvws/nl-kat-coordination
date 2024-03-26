@@ -1,13 +1,31 @@
 {
-  "Server": "nginx/1.18.0",
-  "Date": "Tue, 03 Jan 2023 10:16:45 GMT",
-  "Content-Type": "text/html",
-  "Last-Modified": "Fri, 18 Feb 2022 09:21:01 GMT",
-  "Transfer-Encoding": "chunked",
-  "Connection": "keep-alive",
-  "ETag": "W/\"620f64fd-72f\"",
-  "Content-Security-Policy": "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';",
-  "Content-Encoding": "gzip"
+    "response": {
+        "url": "https://mispo.es/",
+        "status_code": 200,
+        "headers": {
+            "Server": "nginx/1.18.0",
+            "Date": "Tue, 26 Mar 2024 13:59:01 GMT",
+            "Content-Type": "text/html",
+            "Last-Modified": "Fri, 18 Feb 2022 09:21:01 GMT",
+            "Transfer-Encoding": "chunked",
+            "Connection": "keep-alive",
+            "ETag": "W/\"620f64fd-72f\"",
+            "Content-Security-Policy": "default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';",
+            "Content-Encoding": "gzip"
+        },
+        "cookies": {},
+        "is_redirect": false
+    },
+    "request": {
+        "url": "https://mispo.es/",
+        "method": "GET",
+        "headers": {
+            "User-Agent": "OpenKAT",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept": "*/*",
+            "Connection": "keep-alive"
+        }
+    }
 }
 
 <!DOCTYPE html>

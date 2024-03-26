@@ -66,12 +66,34 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         if content_type[0] in ALLOWED_CONTENT_TYPES:
             body_mimetypes.add(content_type[0])
 
-    header_dump = json.dumps(dict(response.headers))
+    # todo: openkat-http/full -> openkat-http/response with the format (<JSON meta> \r\n\r\n <response content>)
+    # todo: JSON meta is an object with the properties url, request, (history), response
+    # todo: request (only headers), response (headers, status code, cookies), history (a list of requests)
+
+    response_dump = json.dumps(create_response_object(response))
     return [
-        ({"openkat-http/full"}, f"{header_dump}\r\n\r\n{response.content}"),
-        ({"openkat-http/headers"}, header_dump),
+        ({"openkat-http/response"}, f"{response_dump}\r\n\r\n{response.content}"),
+        ({"openkat-http/headers"}, response_dump),
         (body_mimetypes, response.content),
     ]
+
+
+# todo: perhaps also implement response.history?
+def create_response_object(response: requests.Response) -> dict:
+    return {
+        "response": {
+            "url": response.url,
+            "status_code": response.status_code,
+            "headers": dict(response.headers),
+            "cookies": dict(response.cookies),
+            "is_redirect": response.is_redirect,
+        },
+        "request": {
+            "url": response.request.url,
+            "method": response.request.method,
+            "headers": dict(response.request.headers),
+        },
+    }
 
 
 def do_request(hostname: str, session: Session, uri: str, useragent: str):

@@ -9,12 +9,11 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    # fetch a reference to the original resource where these headers where downloaded from
-    web_url = normalizer_meta.raw_data.boefje_meta.arguments["input"]["web_url"]
-    url = f"{web_url['scheme']}://{web_url['netloc']['name']}:{web_url['port']}{web_url['path']}"
-    raw_headers, body = raw.decode().split("\n\n", 1)
+    raw_respsone, body = raw.decode().split("\n\n", 1)
+    response_object = json.loads(raw_respsone)
+    url = response_object["response"]["url"]
 
-    headers = json.loads(raw_headers)
+    headers = json.loads(raw_respsone)
 
     wappalyzer = Wappalyzer.latest()
     web_page = WebPage(url, body, headers)
