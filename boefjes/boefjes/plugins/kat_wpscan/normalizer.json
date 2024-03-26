@@ -1,10 +1,10 @@
 {
-    "id": "kat_wpscan_normalize",
-    "consumes": [
-        "boefje/wp-scan"
-    ],
-    "produces": [
-        "Finding",
-        "CVEFindingType"
-    ]
+  "id": "kat_wpscan_normalize",
+  "consumes": [
+    "boefje/wp-scan"
+  ],
+  "produces": [
+    "Finding",
+    "CVEFindingType"
+  ]
 }

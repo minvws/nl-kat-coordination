@@ -1,10 +1,10 @@
 {
-    "id": "kat_webpage_analysis_wappalyzer_normalize",
-    "consumes": [
-        "openkat-http/response"
-    ],
-    "produces": [
-        "Software",
-        "SoftwareInstance"
-    ]
+  "id": "kat_webpage_analysis_wappalyzer_normalize",
+  "consumes": [
+    "openkat-http/response"
+  ],
+  "produces": [
+    "Software",
+    "SoftwareInstance"
+  ]
 }
