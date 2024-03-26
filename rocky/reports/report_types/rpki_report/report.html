@@ -2,15 +2,6 @@
 
 {% if show_heading %}
     <h2>{% translate "Resource Public Key Infrastructure" %}</h2>
-    <p>
-        {% blocktranslate trimmed %}
-            This section contains basic security information about resource public key
-            infrastructure. If your web server employs RPKI for its IP addresses and
-            associated nameservers, then it enhances visitor protection against
-            misconfigurations and malicious route intercepts through verified route
-            announcements, ensuring reliable server access and secure internet traffic.
-        {% endblocktranslate %}
-    </p>
 {% endif %}
 {% if type %}
     <h4 id="rpki-{{ type }}">{{ type }} {% translate "server" %}</h4>
@@ -22,6 +13,23 @@
     </p>
 {% endif %}
 {% if data.rpki_ips %}
+    {% if show_heading or show_introduction %}
+        <p>
+            {% blocktranslate trimmed %}
+                This section contains basic security information about resource public key
+                infrastructure. If your web server employs RPKI for its IP addresses and
+                associated nameservers, then it enhances visitor protection against
+                misconfigurations and malicious route intercepts through verified route
+                announcements, ensuring reliable server access and secure internet traffic.
+            {% endblocktranslate %}
+        </p>
+        <p>
+            {% blocktranslate trimmed %}
+                The RPKI report shows if an RPKI route announcement was available for
+                the system and if this announcement is not expired.
+            {% endblocktranslate %}
+        </p>
+    {% endif %}
     <div class="horizontal-scroll">
         <table>
             <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
@@ -89,4 +97,6 @@
             </table>
         {% endif %}
     {% endfor %}
+{% else %}
+    <p>{% translate "No IPs have been found on this system." %}</p>
 {% endif %}
