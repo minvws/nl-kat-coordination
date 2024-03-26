@@ -1,9 +1,9 @@
 {
-    "id": "kat_ssl_test_ciphers_normalize",
-    "consumes": [
-        "boefje/testssl-sh-ciphers"
-    ],
-    "produces": [
-        "TLSCipher"
-    ]
+  "id": "kat_ssl_test_ciphers_normalize",
+  "consumes": [
+    "boefje/testssl-sh-ciphers"
+  ],
+  "produces": [
+    "TLSCipher"
+  ]
 }

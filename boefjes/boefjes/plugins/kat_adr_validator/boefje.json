@@ -1,9 +1,9 @@
 {
-    "id": "adr-validator",
-    "name": "API Design Rules validator",
-    "description": "Validate if an API conforms to the API Design Rules",
-    "consumes": [
-        "RESTAPI"
-    ],
-    "scan_level": 1
+  "id": "adr-validator",
+  "name": "API Design Rules validator",
+  "description": "Validate if an API conforms to the API Design Rules",
+  "consumes": [
+    "RESTAPI"
+  ],
+  "scan_level": 1
 }
