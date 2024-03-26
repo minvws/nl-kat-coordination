@@ -144,32 +144,7 @@ class RunStoreTestCase(unittest.TestCase):
         self.assertEqual(results.get(keys[1]).get("total"), 2)
         self.assertEqual(results.get(keys[2]).get("queued"), 2)
 
-    def test_get_tasks_filter_related_and_nested(self):
-        # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
-        created_task = self.mock_ctx.datastores.task_store.create_task(task)
-
-        task_run = functions.create_run(task)
-        created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
-        breakpoint()
-
-        f_req = filters.FilterRequest(
-            filters={
-                "and": [
-                    filters.Filter(
-                        column="task",
-                        field="data__id",
-                        operator="eq",
-                        value=created_task.data.get("id"),
-                    ),
-                ]
-            }
-        )
-
-        task_runs, count = self.mock_ctx.datastores.run_store.get_runs(filters=f_req)
-        breakpoint()
-
-    def test_get_tasks_filter_related__(self):
+    def test_get_tasks_filter_related(self):
         # Arrange
         task = functions.create_task(scheduler_id=self.organisation.id)
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
@@ -186,7 +161,35 @@ class RunStoreTestCase(unittest.TestCase):
         )
 
         task_runs, count = self.mock_ctx.datastores.run_store.get_runs(filters=f_req)
-        breakpoint()
+        self.assertEqual(count, 1)
+        self.assertEqual(len(task_runs), 1)
+        self.assertEqual(task_runs[0].task_id, created_task.id)
+
+    def test_get_tasks_filter_related_and_nested(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        task_run = functions.create_run(task)
+        created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
+
+        f_req = filters.FilterRequest(
+            filters={
+                "and": [
+                    filters.Filter(
+                        column="task",
+                        field="data__id",
+                        operator="eq",
+                        value=created_task.data.get("id"),
+                    ),
+                ]
+            }
+        )
+
+        task_runs, count = self.mock_ctx.datastores.run_store.get_runs(filters=f_req)
+        self.assertEqual(count, 1)
+        self.assertEqual(len(task_runs), 1)
+        self.assertEqual(task_runs[0].task_id, created_task.id)
 
     def test_get_tasks_filter_multiple_and(self):
         # Arrange
