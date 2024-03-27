@@ -1,13 +1,13 @@
 {
-    "id": "kat_fierce_normalize",
-    "consumes": [
-        "boefje/fierce"
-    ],
-    "produces": [
-        "IPAddressV6",
-        "DNSARecord",
-        "Hostname",
-        "DNSAAAARecord",
-        "IPAddressV4"
-    ]
+  "id": "kat_fierce_normalize",
+  "consumes": [
+    "boefje/fierce"
+  ],
+  "produces": [
+    "IPAddressV6",
+    "DNSARecord",
+    "Hostname",
+    "DNSAAAARecord",
+    "IPAddressV4"
+  ]
 }

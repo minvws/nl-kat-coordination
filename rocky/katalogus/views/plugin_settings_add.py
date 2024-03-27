@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-from requests import RequestException
+from httpx import HTTPError
 
 from katalogus.forms import PluginSchemaForm
 from katalogus.views.mixins import SinglePluginView
@@ -52,14 +52,14 @@ class PluginSettingsAddView(OrganizationPermissionRequiredMixin, SinglePluginVie
         try:
             self.katalogus_client.upsert_plugin_settings(self.plugin.id, form.cleaned_data)
             messages.add_message(self.request, messages.SUCCESS, _("Added settings for '{}'").format(self.plugin.name))
-        except RequestException:
+        except HTTPError:
             messages.add_message(self.request, messages.ERROR, _("Failed adding settings"))
             return redirect(self.get_success_url())
 
         if "add-enable" in self.request.POST:
             try:
                 self.katalogus_client.enable_boefje(self.plugin)
-            except RequestException:
+            except HTTPError:
                 messages.add_message(self.request, messages.ERROR, _("Enabling {} failed").format(self.plugin.name))
                 return redirect(self.get_success_url())
 

@@ -4,15 +4,14 @@ import datetime
 import json
 import uuid
 from enum import Enum
-from http import HTTPStatus
 from logging import getLogger
 from typing import Any
 
-import requests
+import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from httpx import HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
-from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
 
@@ -190,14 +189,14 @@ class TaskNotFoundError(SchedulerError):
 
 class SchedulerClient:
     def __init__(self, base_uri: str):
-        self.session = requests.Session()
-        self._base_uri = base_uri
+        self._client = httpx.Client(base_url=base_uri)
 
     def list_tasks(
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
-        res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+        res = self._client.get("/tasks", params=kwargs)
         return PaginatedTasksResponse.model_validate_json(res.content)
 
     def get_lazy_task_list(
@@ -224,7 +223,7 @@ class SchedulerClient:
         )
 
     def get_task_details(self, organization_code: str, task_id: str) -> Task:
-        res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
+        res = self._client.get(f"/tasks/{task_id}")
         res.raise_for_status()
         task_details = Task.model_validate_json(res.content)
 
@@ -239,27 +238,33 @@ class SchedulerClient:
 
     def push_task(self, queue_name: str, prioritized_item: PrioritizedItem) -> None:
         try:
-            res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
+            res = self._client.post(
+                f"/queues/{queue_name}/push",
+                content=prioritized_item.json(),
+                headers={"Content-Type": "application/json"},
+            )
             res.raise_for_status()
-        except HTTPError as http_error:
+        except HTTPStatusError as http_error:
             code = http_error.response.status_code
-            if code == HTTPStatus.TOO_MANY_REQUESTS:
+            if code == codes.TOO_MANY_REQUESTS:
                 raise TooManyRequestsError()
-            elif code == HTTPStatus.BAD_REQUEST:
+            elif code == codes.BAD_REQUEST:
                 raise BadRequestError()
-            elif code == HTTPStatus.CONFLICT:
+            elif code == codes.CONFLICT:
                 raise ConflictError()
             else:
                 raise SchedulerError()
+        except RequestError:
+            raise SchedulerError()
 
     def health(self) -> ServiceHealth:
-        health_endpoint = self.session.get(f"{self._base_uri}/health")
+        health_endpoint = self._client.get("/health")
         health_endpoint.raise_for_status()
         return ServiceHealth.model_validate_json(health_endpoint.content)
 
     def get_task_stats(self, organization_code: str, task_type: str) -> dict:
         try:
-            res = self.session.get(f"{self._base_uri}/tasks/stats/{task_type}-{organization_code}")
+            res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
             res.raise_for_status()
         except HTTPError:
             raise SchedulerError()

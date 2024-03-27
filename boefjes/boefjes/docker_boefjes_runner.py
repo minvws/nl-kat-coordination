@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 import docker
 from docker.errors import APIError, ContainerError, ImageNotFound
-from requests import HTTPError
+from httpx import HTTPError
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus

@@ -1,10 +1,10 @@
 {
-    "id": "kat_ssl_scan_normalize",
-    "consumes": [
-        "boefje/ssl-version"
-    ],
-    "produces": [
-        "KATFindingType",
-        "Finding"
-    ]
+  "id": "kat_ssl_scan_normalize",
+  "consumes": [
+    "boefje/ssl-version"
+  ],
+  "produces": [
+    "KATFindingType",
+    "Finding"
+  ]
 }
