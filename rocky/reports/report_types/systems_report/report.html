@@ -29,7 +29,10 @@
                         <td>{{ ip.tokenized.address }}</td>
                         <td>
                             {% if ip_services.hostnames %}
-                                {{ ip_services.hostnames|join:", " }}
+                                {% for hostname in ip_services.hostnames %}
+                                    {{ hostname.human_readable }}
+                                    {% if not forloop.last %},{% endif %}
+                                {% endfor %}
                             {% else %}
                                 -
                             {% endif %}

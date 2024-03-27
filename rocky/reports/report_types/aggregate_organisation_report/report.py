@@ -80,9 +80,9 @@ class AggregateOrganisationReport(AggregateReport):
 
                         for service in system["services"]:
                             if service not in services:
-                                services[service] = {str(ip): systems["services"][ip]}
+                                services[service] = {ip: systems["services"][ip]}
                             else:
-                                services[service][str(ip)] = systems["services"][ip]
+                                services[service][ip] = systems["services"][ip]
                         unique_hostnames.update(systems["services"][ip]["hostnames"])
                     total_systems += report_specific_data["summary"]["total_systems"]
 
@@ -423,14 +423,14 @@ class AggregateOrganisationReport(AggregateReport):
             for ip, system_for_service in systems_for_service.items():
                 # Assumes relevant hostnames have an ip address for now
                 if str(ip) not in report_data:
-                    report_data[str(ip)] = []
+                    report_data[ip] = []
 
                 if str(ip) in data and report_id in data[str(ip)] and system_type == service:
-                    report_data[str(ip)].append(data[str(ip)][report_id])
+                    report_data[ip].append(data[str(ip)][report_id])
 
                 for hostname in system_for_service["hostnames"]:
                     if str(hostname) in data and report_id in data[str(hostname)] and system_type == service:
-                        report_data[str(ip)].append(data[str(hostname)][report_id])
+                        report_data[ip].append(data[str(hostname)][report_id])
 
         report_data = {key: value for key, value in report_data.items() if value}
 
