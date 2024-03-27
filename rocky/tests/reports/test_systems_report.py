@@ -49,7 +49,7 @@ def test_systems_simple_web_system(mock_octopoes_api_connector, valid_time, host
 
     assert len(data["services"]) == 1
     assert len(data["services"][ipaddressv4.reference]["services"]) == 1
-    assert data["services"][ipaddressv4.reference]["hostnames"] == [hostname.name]
+    assert data["services"][ipaddressv4.reference]["hostnames"] == [hostname.reference]
     assert data["services"][ipaddressv4.reference]["services"] == [SystemType.DNS]
     assert data["summary"]["total_systems"] == 1
     assert data["summary"]["total_domains"] == 1
@@ -84,7 +84,7 @@ def test_systems_complex_system(mock_octopoes_api_connector, valid_time, hostnam
 
     assert len(data["services"]) == 1
     assert len(data["services"][ipaddressv4.reference]["services"]) == 2
-    assert data["services"][ipaddressv4.reference]["hostnames"] == [hostname.name]
+    assert data["services"][ipaddressv4.reference]["hostnames"] == [hostname.reference]
     assert data["services"][ipaddressv4.reference]["services"] == [SystemType.DNS, SystemType.DICOM]
     assert data["summary"]["total_systems"] == 1
     assert data["summary"]["total_domains"] == 1
