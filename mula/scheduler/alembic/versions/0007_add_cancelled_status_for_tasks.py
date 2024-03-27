@@ -5,6 +5,7 @@ Revises: 0006_add_jsonb_fields
 Create Date: 2023-05-30 12:22:42.329666
 
 """
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
