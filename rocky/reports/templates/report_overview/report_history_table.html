@@ -16,14 +16,14 @@
             <table>
                 <caption class="visually-hidden">{% translate "Reports:" %}</caption>
                 <thead>
-                    <th>
+                    <th scope="col">
                         <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
                     </th>
-                    <th>{% translate "Name" %}</th>
-                    <th>{% translate "Report type" %}</th>
-                    <th>{% translate "Objects" %}</th>
-                    <th>{% translate "Reference date" %}</th>
-                    <th>{% translate "Creation date" %}</th>
+                    <th scope="col">{% translate "Name" %}</th>
+                    <th scope="col">{% translate "Report type" %}</th>
+                    <th scope="col">{% translate "Objects" %}</th>
+                    <th scope="col">{% translate "Reference date" %}</th>
+                    <th scope="col">{% translate "Creation date" %}</th>
                 </thead>
                 <tbody>
                     <tr>
@@ -35,6 +35,37 @@
                         <td>2</td>
                         <td>22 jan. 2024</td>
                         <td>22 jan. 2024</td>
+                        <td class="actions">
+                            <button class="expando-button"
+                                    type="button"
+                                    data-icon-open-class="icon ti-chevron-down"
+                                    data-icon-close-class="icon ti-chevron-up"
+                                    data-close-label="{% translate "Close details" %}">
+                                {% translate "Open details" %}
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="expando-row">
+                        <td colspan="5">
+                            <h3 class="heading-normal">{% translate "Objects in this report" %}</h3>
+                            <table>
+                                <caption class="visually-hidden">{% translate "Reports:" %}</caption>
+                                <thead>
+                                    <th scope="col">{% translate "Object name" %}</th>
+                                    <th scope="col">{% translate "Object type" %}</th>
+                                    <th scope="col">{% translate "Clearance level" %}</th>
+                                    <th scope="col">{% translate "Tags" %}</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>mispo.es</td>
+                                        <td>IP-port</td>
+                                        <td>L2</td>
+                                        <td>Tag-example</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
                     </tr>
                 </tbody>
             </table>
