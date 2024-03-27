@@ -8,6 +8,6 @@ from .organisation import Organisation
 from .plugin import Plugin
 from .queue import PrioritizedItem, PrioritizedItemDB, Queue
 from .request import PrioritizedItemRequest, ScheduleRequest
-from .schedule import Schedule, ScheduleDB
 from .scheduler import Scheduler
-from .tasks import BoefjeTask, NormalizerTask, TaskRun, TaskRunDB, TaskStatus
+from .schema import BoefjeTask, NormalizerTask, TaskSchema, TaskSchemaDB
+from .task import Task, TaskDB, TaskStatus

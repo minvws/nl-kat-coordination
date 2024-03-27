@@ -1,92 +1,70 @@
-import enum
 import uuid
 from datetime import datetime, timezone
 from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, String
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
 from sqlalchemy.sql.expression import text
 
-from scheduler.utils import GUID
+from scheduler.utils import GUID, cron
 
 from .base import Base
 from .boefje import Boefje
+from .errors import ValidationError
 from .normalizer import Normalizer
-from .queue import PrioritizedItem
 from .raw_data import RawData
+from .task import Task
 
 
-class TaskStatus(str, enum.Enum):
-    # Task has been created but not yet queued
-    PENDING = "pending"
-
-    # Task has been pushed onto queue and is ready to be picked up
-    QUEUED = "queued"
-
-    # Task has been picked up by a worker
-    DISPATCHED = "dispatched"
-
-    # Task has been picked up by a worker, and the worker indicates that it is
-    # running.
-    RUNNING = "running"
-
-    # Task has been completed
-    COMPLETED = "completed"
-
-    # Task has failed
-    FAILED = "failed"
-
-    # Task has been cancelled
-    CANCELLED = "cancelled"
-
-
-class TaskRun(BaseModel):
+class TaskSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: uuid.UUID
-
+    id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scheduler_id: str
+    hash: str | None = Field(None, max_length=32)
+    data: dict = Field(default_factory=dict)
 
-    type: str
+    enabled: bool = True
+    schedule: str | None = None
 
-    # Item that was pushed onto the queue
-    p_item: PrioritizedItem
+    tasks: list[Task] = []
 
-    status: TaskStatus
-
-    schedule_id: uuid.UUID | None = None
-
+    deadline_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    def __repr__(self):
-        return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
+    # TODO: pydantic validator?
+    def validate_schedule(self):
+        """Validate the schedule cron expression."""
+        if self.cron_expression is not None:
+            try:
+                cron.next_run(self.cron_expression)
+            except Exception as exc:
+                raise ValidationError(f"Invalid cron expression: {self.cron_expression}") from exc
 
 
-class TaskRunDB(Base):
-    __tablename__ = "task_runs"
+class TaskSchemaDB(Base):
+    __tablename__ = "schemas"
 
     id = Column(GUID, primary_key=True)
+    scheduler_id = Column(String, nullable=False)
+    hash = Column(String(32), nullable=True)  # TODO: unique=True
+    data = Column(JSONB, nullable=False)
 
-    scheduler_id = Column(String)
+    enabled = Column(Boolean, nullable=False, default=True)
+    schedule = Column(String, nullable=True)
 
-    type = Column(String)
+    # TODO: cascade
+    tasks = relationship("TaskDB", back_populates="schema")
 
-    p_item = Column(JSONB, nullable=False)
-
-    schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
-    schedule = relationship("ScheduleDB", back_populates="tasks")
-
-    status = Column(
-        Enum(TaskStatus),
-        nullable=False,
-        default=TaskStatus.PENDING,
+    deadline_at = Column(
+        DateTime(timezone=True),
+        nullable=True,
     )
 
     created_at = Column(
@@ -100,14 +78,6 @@ class TaskRunDB(Base):
         nullable=False,
         server_default=func.now(),
         onupdate=func.now(),
-    )
-
-    __table_args__ = (
-        Index(
-            "ix_p_item_hash",
-            text("(p_item->>'hash')"),
-            created_at.desc(),
-        ),
     )
 
 

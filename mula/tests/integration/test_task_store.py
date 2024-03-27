@@ -7,7 +7,6 @@ from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
-
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 
@@ -25,8 +24,9 @@ class TaskStoreTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.TaskStore.name: storage.TaskStore(self.dbconn),
+                storage.SchemaStore.name: storage.SchemaStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
+                storage.TaskStore.name: storage.TaskStore(self.dbconn),
             }
         )
 
@@ -36,6 +36,30 @@ class TaskStoreTestCase(unittest.TestCase):
     def tearDown(self):
         models.Base.metadata.drop_all(self.dbconn.engine)
         self.dbconn.engine.dispose()
+
+    def test_get_tasks(self):
+        pass
+
+    def test_get_tasks_filter(self):
+        pass
+
+    def test_get_task(self):
+        pass
+
+    def test_get_tasks_by_hash(self):
+        pass
+
+    def test_get_latest_task_by_hash(self):
+        pass
+
+    def test_create_task(self):
+        pass
+
+    def test_update_task(self):
+        pass
+
+    def test_cancel_tasks(self):
+        pass
 
     def test_get_status_counts(self):
         # Arrange
@@ -69,7 +93,7 @@ class TaskStoreTestCase(unittest.TestCase):
         ):
             for _ in r:
                 p_item = functions.create_p_item(self.organisation.id, 1)
-                task = models.TaskRun(
+                task = models.Task(
                     id=p_item.id,
                     hash=p_item.hash,
                     type=functions.TestModel.type,
@@ -121,7 +145,7 @@ class TaskStoreTestCase(unittest.TestCase):
         ):
             for _ in r:
                 p_item = functions.create_p_item(self.organisation.id, 1)
-                task = models.TaskRun(
+                task = models.Task(
                     id=p_item.id,
                     hash=p_item.hash,
                     type=functions.TestModel.type,
@@ -144,11 +168,67 @@ class TaskStoreTestCase(unittest.TestCase):
         self.assertEqual(results.get(keys[1]).get("total"), 2)
         self.assertEqual(results.get(keys[2]).get("queued"), 2)
 
+    # NOTE: this is correct and works
+    def test_get_tasks_filter_related(self):
+        # Arrange
+        schema = functions.create_schema(scheduler_id=self.organisation.id)
+        created_schema = self.mock_ctx.datastores.schema_store.create_schema(schema)
+
+        task = functions.create_task(schema)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        f_req = filters.FilterRequest(
+            filters={
+                "and": [
+                    filters.Filter(
+                        column="schema",
+                        field="id",
+                        operator="eq",
+                        value=created_schema.id.hex,
+                    ),
+                ]
+            }
+        )
+
+        tasks, count = self.mock_ctx.datastores.task_store.get_tasks(filters=f_req)
+        self.assertEqual(count, 1)
+        self.assertEqual(len(tasks), 1)
+        self.assertEqual(tasks[0].schema_id, created_schema.id)
+
+    # NOTE: this is correct and works
+    def test_get_tasks_filter_related_and_nested(self):
+        # Arrange
+        schema = functions.create_schema(scheduler_id=self.organisation.id)
+        created_schema = self.mock_ctx.datastores.schema_store.create_schema(schema)
+
+        task = functions.create_task(schema)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        f_req = filters.FilterRequest(
+            filters={
+                "and": [
+                    filters.Filter(
+                        column="schema",
+                        field="data__id",
+                        operator="eq",
+                        value=created_schema.data.get("id"),
+                    ),
+                ]
+            }
+        )
+
+        tasks, count = self.mock_ctx.datastores.task_store.get_tasks(filters=f_req)
+        self.assertEqual(count, 1)
+        self.assertEqual(len(tasks), 1)
+        self.assertEqual(tasks[0].schema_id, created_schema.id)
+
     def test_get_tasks_filter_multiple_and(self):
         # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.task_store.create_task(first_task)
+        schema = functions.create_schema(scheduler_id=self.organisation.id)
+        created_schema = self.mock_ctx.datastores.schema_store.create_schema(schema)
+
+        task = functions.create_task(schema)
+        created_task = self.mock_ctx.datastores.task_store.create_task(schema)
 
         f_req = filters.FilterRequest(
             filters={

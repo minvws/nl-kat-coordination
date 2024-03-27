@@ -263,9 +263,8 @@ class Scheduler(abc.ABC):
         schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(p_item.hash)
         if schedule_db is None:
             schedule_db = self.ctx.datastores.schedule_store.create_schedule(
-                models.Schedule(
+                models.TaskSchema(
                     scheduler_id=self.scheduler_id,
-                    p_item=p_item,
                     deadline_at=datetime.now(timezone.utc) + timedelta(seconds=self.ctx.config.pq_grace_period),
                     created_at=datetime.now(timezone.utc),
                     modified_at=datetime.now(timezone.utc),
@@ -276,7 +275,7 @@ class Scheduler(abc.ABC):
         #
         # NOTE: we set the id of the task the same as the p_item, for easier
         # lookup.
-        task = models.TaskRun(
+        task = models.Task(
             id=p_item.id,
             scheduler_id=self.scheduler_id,
             type=self.queue.item_type.type,
@@ -362,12 +361,12 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
-    def signal_handler_task(self, task: models.TaskRun) -> None:
+    def signal_handler_task(self, task: models.Task) -> None:
         """Handle a task that has been completed or failed."""
         if task.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
             return
 
-        def _calculate_deadline(task: models.TaskRun):
+        def _calculate_deadline(task: models.Task):
             schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(task.p_item.hash)
 
             try:
