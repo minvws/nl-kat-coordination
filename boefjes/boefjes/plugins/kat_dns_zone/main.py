@@ -1,4 +1,5 @@
 """Boefje script for getting dns records"""
+
 import logging
 
 import dns.resolver

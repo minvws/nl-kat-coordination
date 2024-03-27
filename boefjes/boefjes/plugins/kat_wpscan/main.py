@@ -1,4 +1,5 @@
 """Boefje script for scanning wordpress sites using wpscan"""
+
 from os import getenv
 
 import docker
