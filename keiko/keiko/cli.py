@@ -1,4 +1,5 @@
 """Keiko CLI module."""
+
 import uuid
 from typing import TextIO
 
