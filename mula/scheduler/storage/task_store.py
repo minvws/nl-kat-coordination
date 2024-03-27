@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta, timezone
+
 from sqlalchemy import exc, func
 
 from scheduler import models
@@ -15,8 +17,11 @@ class TaskStore:
     @retry()
     def get_tasks(
         self,
-        task_id: str | None = None,
-        task_hash: str | None = None,
+        scheduler_id: str | None = None,
+        task_type: str | None = None,
+        status: str | None = None,
+        min_created_at: datetime | None = None,
+        max_created_at: datetime | None = None,
         filters: FilterRequest | None = None,
         offset: int = 0,
         limit: int = 100,
@@ -24,11 +29,20 @@ class TaskStore:
         with self.dbconn.session.begin() as session:
             query = session.query(models.TaskDB)
 
-            if task_id is not None:
-                query = query.filter(models.TaskDB.id == task_id)
+            if scheduler_id is not None:
+                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
 
-            if task_hash is not None:
-                query = query.filter(models.TaskDB.hash == task_hash)
+            if task_type is not None:
+                query = query.filter(models.TaskDB.type == task_type)
+
+            if status is not None:
+                query = query.filter(models.TaskDB.status == models.TaskStatus(status).name)
+
+            if min_created_at is not None:
+                query = query.filter(models.TaskDB.created_at >= min_created_at)
+
+            if max_created_at is not None:
+                query = query.filter(models.TaskDB.created_at <= max_created_at)
 
             if filters is not None:
                 query = apply_filter(models.TaskDB, query, filters)
@@ -44,17 +58,52 @@ class TaskStore:
             return tasks, count
 
     @retry()
-    def get_task(self, task_id: str) -> models.Task:
+    def get_task(self, task_id: str) -> models.Task | None:
         with self.dbconn.session.begin() as session:
-            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).one_or_none()
-
+            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
             if task_orm is None:
-                raise ValueError(f"Task not found: {task_id}")
+                return None
 
-            return models.Task.model_validate(task_orm)
+            task = models.Task.model_validate(task_orm)
+
+            return task
 
     @retry()
-    def create_task(self, task: models.Task) -> models.Task:
+    def get_tasks_by_hash(self, task_hash: str) -> list[models.Task] | None:
+        with self.dbconn.session.begin() as session:
+            tasks_orm = (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
+                .order_by(models.TaskDB.created_at.desc())
+                .all()
+            )
+
+            if tasks_orm is None:
+                return None
+
+            tasks = [models.Task.model_validate(task_orm) for task_orm in tasks_orm]
+
+            return tasks
+
+    @retry()
+    def get_latest_task_by_hash(self, task_hash: str) -> models.Task | None:
+        with self.dbconn.session.begin() as session:
+            task_orm = (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
+                .order_by(models.TaskDB.created_at.desc())
+                .first()
+            )
+
+            if task_orm is None:
+                return None
+
+            task = models.Task.model_validate(task_orm)
+
+            return task
+
+    @retry()
+    def create_task(self, task: models.Task) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             task_orm = models.TaskDB(**task.model_dump())
             session.add(task_orm)
@@ -64,17 +113,68 @@ class TaskStore:
             return created_task
 
     @retry()
-    def update_task(self, task: models.Task) -> models.Task:
+    def update_task(self, task: models.Task) -> None:
         with self.dbconn.session.begin() as session:
-            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task.id).one_or_none()
+            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump()))
 
-            if task_orm is None:
-                raise ValueError(f"Task not found: {task.id}")
+    @retry()
+    def cancel_tasks(self, scheduler_id: str, task_ids: list[str]) -> None:
+        with self.dbconn.session.begin() as session:
+            session.query(models.TaskDB).filter(
+                models.TaskDB.scheduler_id == scheduler_id, models.TaskDB.id.in_(task_ids)
+            ).update({"status": models.TaskStatus.CANCELLED.name})
 
-            task_orm.update(task.model_dump())
-            session.add(task_orm)
+    @retry()
+    def get_status_count_per_hour(
+        self,
+        scheduler_id: str | None = None,
+    ) -> dict[str, dict[str, int]] | None:
+        with self.dbconn.session.begin() as session:
+            query = (
+                session.query(
+                    func.DATE_TRUNC("hour", models.TaskDB.modified_at).label("hour"),
+                    models.TaskDB.status,
+                    func.count(models.TaskDB.id).label("count"),
+                )
+                .filter(
+                    models.TaskDB.modified_at >= datetime.now(timezone.utc) - timedelta(hours=24),
+                )
+                .group_by("hour", models.TaskDB.status)
+                .order_by("hour", models.TaskDB.status)
+            )
 
-            # TODO: validate cron expression
-            updated_task = models.Task.model_validate(task_orm)
+            if scheduler_id is not None:
+                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
 
-            return updated_task
+            results = query.all()
+
+            response: dict[str, dict[str, int]] = {}
+            for row in results:
+                date, status, task_count = row
+                response.setdefault(date.isoformat(), {k.value: 0 for k in models.TaskStatus}).update(
+                    {status.value: task_count}
+                )
+                response[date.isoformat()].update({"total": response[date.isoformat()].get("total", 0) + task_count})
+
+            return response
+
+    @retry()
+    def get_status_counts(self, scheduler_id: str | None = None) -> dict[str, int] | None:
+        with self.dbconn.session.begin() as session:
+            query = (
+                session.query(models.TaskDB.status, func.count(models.TaskDB.id).label("count"))
+                .group_by(models.TaskDB.status)
+                .order_by(models.TaskDB.status)
+            )
+
+            if scheduler_id is not None:
+                query = query.filter(models.TaskDB.scheduler_id == scheduler_id)
+
+            results = query.all()
+
+            response = {k.value: 0 for k in models.TaskStatus}
+            for row in results:
+                status, task_count = row
+                response[status.value] = task_count
+
+            return response

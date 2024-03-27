@@ -60,24 +60,24 @@ def create_p_item(scheduler_id: str, priority: int, task: models.Task | None = N
     )
 
 
-def create_task(scheduler_id: str) -> models.Task:
+def create_schema(scheduler_id: str) -> models.TaskSchema:
     data = TestModel(
         id=uuid.uuid4().hex,
         name=uuid.uuid4().hex,
     )
 
-    return models.Task(
+    return models.TaskSchema(
         scheduler_id=scheduler_id,
         hash=data.hash,
         data=data.model_dump(),
     )
 
 
-def create_run(task: models.Task) -> models.TaskRun:
-    return models.TaskRun(
-        scheduler_id=task.scheduler_id,
-        task_id=task.id,
-        task=task,
+def create_task(schema: models.TaskSchema) -> models.Task:
+    return models.Task(
+        scheduler_id=schema.scheduler_id,
+        schema_id=schema.id,
+        schema=schema,
     )
 
 

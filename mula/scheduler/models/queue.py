@@ -10,7 +10,7 @@ from sqlalchemy.sql import func
 from scheduler.utils import GUID
 
 from .base import Base
-from .tasks import Task, TaskDB
+from .task import Task, TaskDB
 
 
 class PrioritizedItem(BaseModel):

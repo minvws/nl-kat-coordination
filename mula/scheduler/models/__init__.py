@@ -9,5 +9,5 @@ from .plugin import Plugin
 from .queue import PrioritizedItem, PrioritizedItemDB, Queue
 from .request import PrioritizedItemRequest, ScheduleRequest
 from .scheduler import Scheduler
-from .task_run import TaskRun, TaskRunDB, TaskStatus
-from .tasks import BoefjeTask, NormalizerTask, Task, TaskDB
+from .schema import BoefjeTask, NormalizerTask, TaskSchema, TaskSchemaDB
+from .task import Task, TaskDB, TaskStatus
