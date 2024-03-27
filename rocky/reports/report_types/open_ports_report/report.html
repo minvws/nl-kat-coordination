@@ -7,10 +7,11 @@
         {% endif %}
         <p>
             {% blocktranslate trimmed %}
-                See an overview of open ports found. <strong>Bold</strong> open ports are found through
-                direct scans that the organization performs via OpenKAT.
-                Other open ports were found outside by OpenKAT itself. Scans with the same hostnames,
-                ports and IPs are merged.
+                The open ports report provides an overview of the open ports identified on
+                a system. The ports that are marked as <b>Bold</b> were identified by direct
+                scans performed by OpenKAT (such as nmap). Ports that are not marked in bold
+                were identified through external services and/or scans (such as Shodan). Scans
+                with the same hostnames, ports and IPs are merged.
             {% endblocktranslate %}
         </p>
         <table>
@@ -29,19 +30,25 @@
                         {# djLint formatting adds spaces before the comma. #}
                         {# djlint:off #}
                         <td>
-                            {% for port, found_by_openkat in detailed_data.ports.items %}
-                                {% if found_by_openkat %}
-                                    <strong><span class="visually-hidden">({% translate "Direct scan" %})</span>{{ port }}</strong>{% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
-                                {% else %}
-                                    {{ port }}{% if detailed_data.ports|length > 1 and not forloop.last %},{% endif %}
-                                {% endif %}
-                            {% endfor %}
+                            {% if detailed_data.ports %}
+                                {% for port, found_by_openkat in detailed_data.ports.items %}
+                                    {% if found_by_openkat %}
+                                        <strong><span class="visually-hidden">({% translate "Direct scan" %})</span>{{ port }}</strong>{% if not forloop.last %},{% endif %}
+                                    {% else %}
+                                        {{ port }}{% if not forloop.last %},{% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                -
+                            {% endif %}
 
                         </td>
                         <td>
-                            {% for hostnames in detailed_data.hostnames %}
-                                {{ hostnames }}{% if detailed_data.hostnames|length > 1 and not forloop.last %},{% endif %}
-                            {% endfor %}
+                            {% if detailed_data.hostnames %}
+                                {{ detailed_data.hostnames|join:", " }}
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
                         {# djlint:on #}
                     </tr>

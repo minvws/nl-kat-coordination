@@ -1,4 +1,5 @@
 """Packaging script for keiko."""
+
 from setuptools import find_packages, setup
 
 from keiko.version import __version__

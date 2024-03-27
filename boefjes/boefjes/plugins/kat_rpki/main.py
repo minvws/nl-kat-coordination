@@ -1,4 +1,5 @@
 """Boefje script for validating vrps records based on code from @trideeindhoven"""
+
 import hashlib
 import json
 import os
