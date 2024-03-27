@@ -72,21 +72,21 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
     assert data["services"] == {
         "IPAddressV4|test|192.0.2.3": {
             "hostnames": [
-                "a.example.com",
-                "b.example.com",
-                "c.example.com",
-                "d.example.com",
-                "e.example.com",
-                "example.com",
+                "Hostname|test|a.example.com",
+                "Hostname|test|b.example.com",
+                "Hostname|test|c.example.com",
+                "Hostname|test|d.example.com",
+                "Hostname|test|e.example.com",
+                "Hostname|test|example.com",
             ],
             "services": [SystemType.DICOM, SystemType.MAIL, SystemType.OTHER, SystemType.WEB],
         },
         "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
             "hostnames": [
-                "c.example.com",
-                "d.example.com",
-                "example.com",
-                "f.example.com",
+                "Hostname|test|c.example.com",
+                "Hostname|test|d.example.com",
+                "Hostname|test|example.com",
+                "Hostname|test|f.example.com",
             ],
             "services": [SystemType.WEB],
         },
@@ -103,12 +103,12 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
 
     v4_test_hostnames = [
-        "a.example.com",
-        "b.example.com",
-        "c.example.com",
-        "d.example.com",
-        "e.example.com",
-        "example.com",
+        "Hostname|test|a.example.com",
+        "Hostname|test|b.example.com",
+        "Hostname|test|c.example.com",
+        "Hostname|test|d.example.com",
+        "Hostname|test|e.example.com",
+        "Hostname|test|example.com",
     ]
 
     assert data["systems"]["services"] == {
@@ -118,10 +118,10 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         },
         "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
             "hostnames": [
-                "c.example.com",
-                "d.example.com",
-                "example.com",
-                "f.example.com",
+                "Hostname|test|c.example.com",
+                "Hostname|test|d.example.com",
+                "Hostname|test|example.com",
+                "Hostname|test|f.example.com",
             ],
             "services": [SystemType.WEB],
         },
@@ -141,7 +141,7 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         "IPAddressV4|test|192.0.2.3": {
             "ports": {22: False, 25: False, 443: False},
             "services": {22: ["ssh"], 25: ["smtp"], 443: ["https"]},
-            "hostnames": [x for x in v4_test_hostnames],
+            "hostnames": [x.replace("Hostname|test|", "") for x in v4_test_hostnames],
         },
         "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
             "ports": {80: False},
