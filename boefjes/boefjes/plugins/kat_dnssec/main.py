@@ -1,4 +1,5 @@
 """Boefje script checking if dnssec has been correctly configured and is valid for given hostname"""
+
 import json
 import re
 
