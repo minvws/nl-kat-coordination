@@ -35,6 +35,8 @@
                 Boefje is run manually for this object again. Objects with a clearance level higher than "L0" will be scanned automatically by Boefjes with
                 corresponding scan levels.
             {% endblocktranslate %}
+                        {% include "partials/explanations.html" %}
+
                     </p>
                 {% elif ooi.scan_profile.scan_profile_type == "inherited" %}
                     {% include "partials/explanations.html" %}
