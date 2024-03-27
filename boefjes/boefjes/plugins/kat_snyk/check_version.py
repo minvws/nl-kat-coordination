@@ -170,4 +170,4 @@ def check_version_in(version: str, versions: str):
     in_range = False
     while not in_range and all_versions:
         in_range, all_versions = check_version_agains_versionlist(version, all_versions)
-    return in_range
+    return in_range if version else False
