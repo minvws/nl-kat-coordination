@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if data.web_checks|length > 0 %}
-    {% if show_introduction %}
+    {% if generate_report %}
         <p>
             {% blocktranslate trimmed %}
                 The web system report provides an overview of various web server checks

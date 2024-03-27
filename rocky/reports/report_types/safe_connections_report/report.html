@@ -10,7 +10,7 @@
     </p>
 {% endif %}
 {% if data.sc_ips %}
-    {% if show_introduction %}
+    {% if generate_report %}
         <p>
             {% blocktranslate trimmed %}
                 The secure connections report provides an overview of the performed
@@ -48,7 +48,11 @@
     </div>
     {% for ip, findings in data.sc_ips.items %}
         {% if findings %}
-            <h5>{% translate "Host" %}: {{ ip.tokenized.address }}</h5>
+            {% if generate_report %}
+                <h5>{% translate "Host" %}: {{ ip.tokenized.address }}</h5>
+            {% else %}
+                <h5>{% translate "Host" %}: {{ ip }}</h5>
+            {% endif %}
             <table>
                 <caption class="visually-hidden">{% translate "Safe connections compliance" %}</caption>
                 <thead>
