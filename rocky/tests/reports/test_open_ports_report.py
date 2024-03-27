@@ -73,7 +73,7 @@ def test_open_ports_report_ip_multiple_ports_sorting(
 
     data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
-    assert data[ipaddressv4.reference] == {
+    assert data[str(ipaddressv4.address)] == {
         "ports": {80: False, 443: False},
         "hostnames": [hostname.name],
         "services": {80: [service.name], 443: [service.name]},
