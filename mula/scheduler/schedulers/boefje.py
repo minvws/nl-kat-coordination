@@ -16,8 +16,8 @@ from scheduler.models import (
     MutationOperationType,
     Organisation,
     Plugin,
-    PrioritizedItem,
     ScanProfileMutation,
+    Task,
     TaskStatus,
 )
 from scheduler.storage import filters
@@ -791,22 +791,17 @@ class BoefjeScheduler(Scheduler):
             )
         )
 
-        # We need to create a PrioritizedItem for this task, to push
-        # it to the priority queue.
-        task = models.Task(
-            hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
-        )
-
-        p_item = PrioritizedItem(
+        # TODO: check the correct attributes, schema
+        task = Task(
             scheduler_id=self.scheduler_id,
             priority=score,
-            task_id=task.id,
-            task=task,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
+            # schema_id=
         )
 
         try:
-            self.push_item_to_queue_with_timeout(p_item, self.max_tries)
+            self.push_task_to_queue_with_timeout(task, self.max_tries)
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
@@ -822,9 +817,8 @@ class BoefjeScheduler(Scheduler):
 
         self.logger.info(
             "Created boefje task",
-            p_item_id=p_item.id,
-            task_id=p_item.task.id,
-            task_hash=p_item.task.hash,
+            task_id=task.id,
+            task_hash=task.hash,
             boefje_id=boefje.id,
             organisation_id=self.organisation.id,
             scheduler_id=self.scheduler_id,

@@ -61,7 +61,7 @@ class PriorityQueue(abc.ABC):
         pq_id: str,
         maxsize: int,
         item_type: Any,
-        pq_store: storage.PriorityQueueStore,
+        task_store: storage.TaskStore,
         allow_replace: bool = False,
         allow_updates: bool = False,
         allow_priority_updates: bool = False,
@@ -97,10 +97,10 @@ class PriorityQueue(abc.ABC):
         self.allow_replace: bool = allow_replace
         self.allow_updates: bool = allow_updates
         self.allow_priority_updates: bool = allow_priority_updates
-        self.pq_store: storage.PriorityQueueStore = pq_store
+        self.task_store: storage.TaskStore = task_store
         self.lock: threading.Lock = threading.Lock()
 
-    def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.PrioritizedItem | None:
+    def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
 
@@ -116,7 +116,7 @@ class PriorityQueue(abc.ABC):
         if self.empty():
             raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
 
-        item = self.pq_store.pop(self.pq_id, filters)
+        item = self.task_store.pop(self.pq_id, filters)
         if item is None:
             return None
 
@@ -124,7 +124,7 @@ class PriorityQueue(abc.ABC):
 
         return item
 
-    def push(self, p_item: models.PrioritizedItem) -> models.PrioritizedItem | None:
+    def push(self, task: models.Task) -> models.Task | None:
         """Push an item onto the queue.
 
         Args:
@@ -142,23 +142,20 @@ class PriorityQueue(abc.ABC):
 
             PrioritizedItemNotFoundError: If the item is not found on the queue.
         """
-        if not isinstance(p_item, models.PrioritizedItem):
-            raise InvalidPrioritizedItemError("The item is not a PrioritizedItem")
-
-        if not self._is_valid_item(p_item.task.data):
+        if not self._is_valid_item(task.data):
             raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
 
-        if not p_item.priority:
+        if not task.priority:
             raise InvalidPrioritizedItemError("PrioritizedItem must have a priority")
 
-        if self.full() and p_item.priority > 1:
+        if self.full() and task.priority > 1:
             raise QueueFullError(f"Queue {self.pq_id} is full.")
 
         # We try to get the item from the queue by a specified identifier of
         # that item by the implementation of the queue. We don't do this by
         # the item itself or its hash because this might have been changed
         # and we might need to update that.
-        item_on_queue = self.get_p_item_by_identifier(p_item)
+        item_on_queue = self.is_item_on_queue(task)
 
         # Item on queue and data changed
         item_changed = item_on_queue and p_item.data != item_on_queue.data
@@ -335,7 +332,7 @@ class PriorityQueue(abc.ABC):
         return response
 
     @abc.abstractmethod
-    def create_hash(self, p_item: models.PrioritizedItem) -> str:
+    def create_hash(self, schema: models.TaskSchema) -> str:
         """Create a hash for the given item. This hash is used to determine if
         the item is already in the queue.
 

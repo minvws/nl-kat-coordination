@@ -13,9 +13,9 @@ from scheduler.models import (
     NormalizerTask,
     Organisation,
     Plugin,
-    PrioritizedItem,
     RawData,
     RawDataReceivedEvent,
+    Task,
     TaskStatus,
 )
 
@@ -168,7 +168,7 @@ class NormalizerScheduler(Scheduler):
             raw_data: The raw data to create a task for.
             caller: The name of the function that called this function, used for logging.
         """
-        task = NormalizerTask(
+        normalizer_task = NormalizerTask(
             normalizer=Normalizer(id=normalizer.id),
             raw_data=raw_data,
         )
@@ -176,8 +176,8 @@ class NormalizerScheduler(Scheduler):
         if not self.is_task_allowed_to_run(normalizer):
             self.logger.debug(
                 "Task is not allowed to run: %s",
-                task.id,
-                task_id=task.id,
+                normalizer_task.id,
+                task_id=normalizer_task.id,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
@@ -185,11 +185,11 @@ class NormalizerScheduler(Scheduler):
             return
 
         try:
-            if self.is_task_running(task):
+            if self.is_task_running(normalizer_task):
                 self.logger.debug(
                     "Task is still running: %s",
-                    task.id,
-                    task_id=task.id,
+                    normalizer_task.id,
+                    task_id=normalizer_task.id,
                     organisation_id=self.organisation.id,
                     scheduler_id=self.scheduler_id,
                     caller=caller,
@@ -198,8 +198,8 @@ class NormalizerScheduler(Scheduler):
         except Exception:
             self.logger.warning(
                 "Could not check if task is running: %s",
-                task.id,
-                task_id=task.id,
+                normalizer_task.id,
+                task_id=normalizer_task.id,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
@@ -207,11 +207,11 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        if self.is_item_on_queue_by_hash(task.hash):
+        if self.is_item_on_queue_by_hash(normalizer_task.hash):
             self.logger.debug(
                 "Task is already on queue: %s",
-                task.id,
-                task_id=task.id,
+                normalizer_task.id,
+                task_id=normalizer_task.id,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
@@ -221,22 +221,21 @@ class NormalizerScheduler(Scheduler):
         score = self.ranker.rank(
             SimpleNamespace(
                 raw_data=raw_data,
-                task=task,
+                task=normalizer_task,
             ),
         )
 
-        # We need to create a PrioritizedItem for this task, to
-        # push it to the priority queue.
-        p_item = PrioritizedItem(
-            id=task.id,
+        # TODO: check the correct attributes, schema
+        task = Task(
             scheduler_id=self.scheduler_id,
             priority=score,
-            data=task.model_dump(),
-            hash=task.hash,
+            hash=normalizer_task.hash,
+            data=normalizer_task.model_dump(),
+            # schema_id=
         )
 
         try:
-            self.push_item_to_queue_with_timeout(p_item, self.max_tries)
+            self.push_task_to_queue_with_timeout(task, self.max_tries)
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",

@@ -18,22 +18,21 @@ from .boefje import Boefje
 from .errors import ValidationError
 from .normalizer import Normalizer
 from .raw_data import RawData
-from .task_run import TaskRun
+from .task import Task
 
 
-class Task(BaseModel):
+# TODO: determine naming Schema, Definition, Manifest, Specification, Schedule, Config
+class TaskSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
     scheduler_id: str
-    # type: str
     hash: str | None = Field(None, max_length=32)
     data: dict = Field(default_factory=dict)
-
     enabled: bool = True
     schedule: str | None = None
 
-    task_runs: list[TaskRun] = []
+    tasks: list[Task] = []
 
     deadline_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -49,12 +48,11 @@ class Task(BaseModel):
                 raise ValidationError(f"Invalid cron expression: {self.cron_expression}") from exc
 
 
-class TaskDB(Base):
-    __tablename__ = "tasks"
+class TaskSchemaDB(Base):
+    __tablename__ = "schemas"
 
     id = Column(GUID, primary_key=True)
     scheduler_id = Column(String, nullable=False)
-    # type = Column(String, nullable=False)
     hash = Column(String(32), nullable=True)  # TODO: unique=True
     data = Column(JSONB, nullable=False)
 
@@ -62,8 +60,7 @@ class TaskDB(Base):
     schedule = Column(String, nullable=True)
 
     # TODO: cascade
-    task_runs = relationship("TaskRunDB", back_populates="task")
-    p_item = relationship("PrioritizedItemDB", uselist=False, back_populates="task")
+    task_runs = relationship("TaskDB", back_populates="schema")
 
     deadline_at = Column(
         DateTime(timezone=True),

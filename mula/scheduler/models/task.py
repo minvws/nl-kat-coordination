@@ -39,7 +39,7 @@ class TaskStatus(str, enum.Enum):
     CANCELLED = "cancelled"
 
 
-class TaskRun(BaseModel):
+class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -50,12 +50,12 @@ class TaskRun(BaseModel):
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
-class TaskRunDB(Base):
-    __tablename__ = "task_runs"
+class TaskDB(Base):
+    __tablename__ = "tasks"
 
     id = Column(GUID, primary_key=True)
-    task_id = Column(GUID, ForeignKey("tasks.id", ondelete="SET NULL"), nullable=False)
-    task = relationship("TaskDB", back_populates="task_runs")
+    schema_id = Column(GUID, ForeignKey("schemas.id", ondelete="SET NULL"), nullable=False)
+    schema = relationship("TaskSchemaDB", back_populates="tasks")
 
     status = Column(
         Enum(TaskStatus),
