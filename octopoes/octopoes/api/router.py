@@ -177,13 +177,14 @@ def query_many(
     q = XTDBQuery.from_path(object_path)
     source_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
 
-    return octopoes.ooi_repository.query(
-        q.find(source_alias)
-        .pull(q.result_type)
-        .where(object_path.segments[0].source_type, primary_key=source_alias)
-        .where_in(object_path.segments[0].source_type, primary_key=sources),
-        valid_time,
+    q = q.where(object_path.segments[0].source_type, primary_key=source_alias).where_in(
+        object_path.segments[0].source_type, primary_key=sources
     )
+
+    if q._find_clauses:  # Path contained a target field, so no need to pull the result type
+        return octopoes.ooi_repository.query(q.find(source_alias, index=0), valid_time)
+
+    return octopoes.ooi_repository.query(q.find(source_alias, index=0).pull(q.result_type), valid_time)
 
 
 @router.post("/objects/load_bulk", tags=["Objects"])
