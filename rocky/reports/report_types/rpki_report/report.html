@@ -13,7 +13,7 @@
     </p>
 {% endif %}
 {% if data.rpki_ips %}
-    {% if show_heading or show_introduction %}
+    {% if show_heading or generate_report %}
         <p>
             {% blocktranslate trimmed %}
                 This section contains basic security information about resource public key

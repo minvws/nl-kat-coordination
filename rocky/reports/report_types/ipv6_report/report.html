@@ -8,7 +8,7 @@
                 The IPv6 report provides an overview of the current IPv6 status of the
                 identified system. The table below shows whether the domain is reachable
                 over IPv6 or not. A green compliance check is shown if this is the case.
-                A red compliance cross is shown if no IPv6 address was detected.
+                A grey compliance cross is shown if no IPv6 address was detected.
             {% endblocktranslate %}
         </p>
         <div class="horizontal-scroll">
@@ -17,7 +17,9 @@
                 <thead>
                     <tr>
                         <th scope="col">{% translate "Domain" %}</th>
-                        <th scope="col">{% translate "System type" %}</th>
+                        {% if show_heading %}
+                            <th scope="col">{% translate "System type" %}</th>
+                        {% endif %}
                         <th scope="col">IPv6</th>
                     </tr>
                 </thead>
@@ -25,13 +27,15 @@
                     {% for hostname, info in data.items %}
                         <tr>
                             <td>{{ hostname }}</td>
-                            <td>
-                                {% if info.systems %}
-                                    {{ info.systems|join:", " }}
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </td>
+                            {% if show_heading %}
+                                <td>
+                                    {% if info.systems %}
+                                        {{ info.systems|join:", " }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            {% endif %}
                             <td>
                                 {% if info.enabled %}
                                     <span class="icon positive"></span>

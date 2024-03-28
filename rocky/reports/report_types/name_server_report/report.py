@@ -52,7 +52,7 @@ class NameServerChecks:
 
 class NameServerSystemReport(Report):
     id = "name-server-report"
-    name = _("Name server Report")
+    name = _("Name Server Report")
     description = _("Name server report checks name servers on basic security standards.")
     plugins = {
         "required": [
