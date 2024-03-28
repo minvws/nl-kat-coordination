@@ -257,12 +257,12 @@ class Scheduler(abc.ABC):
         # Set last activity of scheduler
         self.last_activity = datetime.now(timezone.utc)
 
-        # Create TaskSchedule
+        # Create TaskSchema
         #
-        # Do we have a schedule for this task?
-        schedule_db = self.ctx.datastores.schedule_store.get_schedule_by_hash(p_item.hash)
+        # Do we have a schema for this task?
+        schedule_db = self.ctx.datastores.schema_store.get_schema_by_hash(p_item.hash)  # FIXME
         if schedule_db is None:
-            schedule_db = self.ctx.datastores.schedule_store.create_schedule(
+            schedule_db = self.ctx.datastores.schema_store.create_schema(
                 models.TaskSchema(
                     scheduler_id=self.scheduler_id,
                     deadline_at=datetime.now(timezone.utc) + timedelta(seconds=self.ctx.config.pq_grace_period),
@@ -271,27 +271,11 @@ class Scheduler(abc.ABC):
                 )
             )
 
-        # Create Task
-        #
-        # NOTE: we set the id of the task the same as the p_item, for easier
-        # lookup.
-        task = models.Task(
-            id=p_item.id,
-            scheduler_id=self.scheduler_id,
-            type=self.queue.item_type.type,
-            p_item=p_item,
-            status=models.TaskStatus.QUEUED,
-            schedule_id=schedule_db.id,
-            created_at=datetime.now(timezone.utc),
-            modified_at=datetime.now(timezone.utc),
-        )
-
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
-            self.ctx.datastores.task_store.update_task(task)
+            task_db.status = models.TaskStatus.QUEUED
+            self.ctx.datastores.task_store.update_task(task_db)
             return
-
-        self.ctx.datastores.task_store.create_task(task)
 
     def pop_item_from_queue(
         self, filters: storage.filters.FilterRequest | None = None

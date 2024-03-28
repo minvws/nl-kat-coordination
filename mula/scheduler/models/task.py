@@ -43,7 +43,9 @@ class Task(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
+    scheduler_id: uuid.UUID
     schema_id: uuid.UUID
+    data: dict = Field(default_factory=dict)
 
     status: TaskStatus = TaskStatus.PENDING
 
@@ -56,9 +58,11 @@ class TaskDB(Base):
 
     id = Column(GUID, primary_key=True)
 
-    schema_id = Column(GUID, ForeignKey("schemas.id", ondelete="SET NULL"), nullable=False)
-    schema = relationship("TaskSchemaDB", back_populates="tasks")
+    scheduler_id = Column(String, nullable=False)
+    schema_id = Column(GUID, ForeignKey("schemas.id", ondelete="SET NULL"), nullable=True)
+    data: dict = Field(default_factory=dict)
 
+    schema = relationship("TaskSchemaDB", back_populates="tasks")
     p_item = relationship("PrioritizedItemDB", uselist=False, back_populates="task")
 
     status = Column(

@@ -50,10 +50,11 @@ def create_p_item_request(priority: int, data: TestModel | None = None) -> model
 
 def create_p_item(scheduler_id: str, priority: int, task: models.Task | None = None) -> models.PrioritizedItem:
     if task is None:
-        task = create_task(scheduler_id)
+        schema = create_schema(scheduler_id)
+        task = create_task(schema)
 
     return models.PrioritizedItem(
-        scheduler_id=task.scheduler_id,
+        scheduler_id=scheduler_id,
         priority=priority,
         task_id=task.id,
         task=task,

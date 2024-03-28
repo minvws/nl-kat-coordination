@@ -25,7 +25,7 @@ class TaskSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
-    scheduler_id: str
+    scheduler_id: uuid.UUID
     hash: str | None = Field(None, max_length=32)
     data: dict = Field(default_factory=dict)
 
