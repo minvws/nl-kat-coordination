@@ -37,52 +37,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <h3>{% translate "Selected Plugins for scans" %}</h3>
-        <p>
-            {% blocktranslate trimmed %}
-                The table below shows which plugins were enabled, required or optional for the selected reports.
-                It also shows the required clearance level and description of the plugin.
-            {% endblocktranslate %}
-        </p>
-        <table>
-            <caption class="visually-hidden">{% translate "Selected Plugins for scans" %}</caption>
-            <thead>
-                <tr>
-                    <th>{% translate "Plugin options" %}</th>
-                    <th>{% translate "Plugin name" %}</th>
-                    <th>{% translate "Plugin scan level" %}</th>
-                    <th>{% translate "Plugin type" %}</th>
-                    <th>{% translate "Plugin description" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if plugins.required or plugins.optional %}
-                    {% for option, plugins in plugins.items %}
-                        {% for plugin in plugins %}
-                            <tr>
-                                <td>{{ option }}</td>
-                                <td>{{ plugin.name }}</td>
-                                <td>
-                                    {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}
+        {% include "summary/selected_plugins.html" %}
 
-                                </td>
-                                <td>
-                                    <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
-                                </td>
-                                <td>{{ plugin.description }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
     </div>
 </section>
