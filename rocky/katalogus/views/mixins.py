@@ -2,7 +2,7 @@ from logging import getLogger
 
 from account.mixins import OrganizationView
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -93,11 +93,14 @@ class BoefjeMixin(OctopoesView):
         self,
         boefje: KATalogusBoefje,
         oois: list[OOI],
-    ) -> None:
+    ) -> HttpResponseRedirect | HttpResponsePermanentRedirect | None:
         if not oois and not boefje.consumes:
             self.run_boefje(boefje, None)
 
         for ooi in oois:
-            if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level:
-                self.can_raise_clearance_level(ooi, boefje.scan_level)
-            self.run_boefje(boefje, ooi)
+            has_clearance, response = self.can_raise_clearance_level(ooi, boefje.scan_level)
+            if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level and has_clearance:
+                self.run_boefje(boefje, ooi)
+            else:
+                return response
+        return None
