@@ -9,7 +9,8 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    raw_respsone, body = raw.decode().split("\n\n", 1)
+    raw_respsone, body = raw.decode().split("\r\n\r\n", 1)
+    body = body.decode()
     response_object = json.loads(raw_respsone)
     url = response_object["response"]["url"]
 
