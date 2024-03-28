@@ -22,12 +22,7 @@ override_dh_fixperms:
 	chmod 755 $(DESTDIR)/usr/bin/update-katalogus-db
 
 override_dh_virtualenv:
-# This works around https://github.com/pypa/pip/issues/6469 by installing the git
-# requirements separately
-  grep -v git+https:// requirements.txt > /tmp/requirements-nogit.txt
-	grep git+https:// requirements.txt > /tmp/requirements-git.txt
-	dh_virtualenv --requirements=/tmp/requirements-nogit.txt $(DH_VENV_ARGS)
-	$(DH_VENV_DIR)/bin/python -m pip install -r /tmp/requirements-git.txt
+	dh_virtualenv $(DH_VENV_ARGS)
 
 	$(DH_VENV_DIR)/bin/python -m pip install gunicorn==20.1.0
 	cd /octopoes && /usr/bin/python3 setup.py bdist_wheel
