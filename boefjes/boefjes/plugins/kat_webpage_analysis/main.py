@@ -1,3 +1,4 @@
+import binascii
 import ipaddress
 import json
 import mimetypes
@@ -66,13 +67,12 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         if content_type[0] in ALLOWED_CONTENT_TYPES:
             body_mimetypes.add(content_type[0])
 
-    # todo: openkat-http/full -> openkat-http/response with the format (<JSON meta> \r\n\r\n <response content>)
-    # todo: JSON meta is an object with the properties url, request, (history), response
-    # todo: request (only headers), response (headers, status code, cookies), history (a list of requests)
-
+    # in case of a full response object, we hexdump to avoid issues with binary data or different encoding
     response_dump = json.dumps(create_response_object(response))
+    content = binascii.hexlify(response.content).decode()
+
     return [
-        ({"openkat-http/response"}, f"{response_dump}\r\n\r\n{response.content}"),
+        ({"openkat-http/response"}, f"{response_dump}\r\n\r\n{content}"),
         ({"openkat-http/headers"}, response_dump),
         (body_mimetypes, response.content),
     ]
@@ -87,6 +87,7 @@ def create_response_object(response: requests.Response) -> dict:
             "headers": dict(response.headers),
             "cookies": dict(response.cookies),
             "is_redirect": response.is_redirect,
+            "encoding": response.encoding,
         },
         "request": {
             "url": response.request.url,

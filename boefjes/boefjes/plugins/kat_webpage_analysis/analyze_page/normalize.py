@@ -1,3 +1,4 @@
+import binascii
 import json
 from collections.abc import Iterable
 
@@ -13,8 +14,9 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     response_object = json.loads(raw_respsone)
     url = response_object["response"]["url"]
 
-    headers = json.loads(raw_respsone)
-    body = body.decode()
+    headers = response_object["response"]["headers"]
+    body = binascii.unhexlify(body.strip())
+    body = body.decode(response_object.get("encoding") or "utf-8", "replace")
 
     wappalyzer = Wappalyzer.latest()
     web_page = WebPage(url, body, headers)
