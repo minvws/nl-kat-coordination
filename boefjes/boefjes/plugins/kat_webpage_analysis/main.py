@@ -72,7 +72,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     content = binascii.hexlify(response.content).decode()
 
     return [
-        ({"openkat-http/response"}, f"{response_dump}\r\n\r\n{content}"),
+        ({"openkat-http/response"}, f"{response_dump}\n\n{content}"),
         ({"openkat-http/headers"}, response_dump),
         (body_mimetypes, response.content),
     ]
