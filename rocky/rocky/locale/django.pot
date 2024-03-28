@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-26 15:14+0000\n"
+"POT-Creation-Date: 2024-03-28 08:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2465,6 +2465,12 @@ msgid "IPs are compliant"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+msgid "Host"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/web_system_report/report.html
@@ -3117,11 +3123,6 @@ msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
 msgid "Safe connections compliance:"
-msgstr ""
-
-#: reports/report_types/safe_connections_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-msgid "Host"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
