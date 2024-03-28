@@ -33,4 +33,3 @@ sql_migrations
 .dockerignore
 export_migrations
 docs
-base.yml

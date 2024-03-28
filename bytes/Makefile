@@ -60,7 +60,7 @@ migrate: ## Run alembic migrations
 ##|------------------------------------------------------------------------|
 
 test: utest itest ## Run all tests.
-ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker compose --project-directory . -f .ci/docker-compose.yml
 
 
 utest: ## Run the unit tests.
