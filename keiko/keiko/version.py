@@ -1,4 +1,5 @@
 """Version information for keiko."""
+
 from importlib.metadata import PackageNotFoundError, version
 
 try:

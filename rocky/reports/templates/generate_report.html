@@ -6,31 +6,34 @@
 {% block content %}
     {% include "header.html" %}
 
-    <main id="main-content" tabindex="-1" class="choose-report">
-        <section class="centered">
-            <div class="centered">
-                <a href="{{ report_download_url }}"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="button ghost">{% translate "Download report" %}</a>
+    <main id="main-content" tabindex="-1" class="sidemenu choose-report report">
+        {% include "partials/generate_report_sidemenu.html" %}
+
+        <article>
+            {% include "partials/report_header.html" %}
+            {% include "partials/report_introduction.html" %}
+
+            <div class="chapter-numbers report-content">
+                {% include "summary/report_asset_overview.html" %}
+
+                {% for report_type, report in report_data.items %}
+                    {% for ooi,data in report.items %}
+                        {% if data.data %}
+                            <section id="{{ report_type }}-{{ ooi }}">
+                                <div>
+                                    <h2>{{ report_type }} {% translate "for" %} {{ data.ooi_human_readable }}</h2>
+                                    {% include data.template with data=data.data show_introduction="yes" %}
+
+                                </div>
+                            </section>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
             </div>
-        </section>
-        {% include "partials/report_header.html" %}
-        {% include "partials/report_introduction.html" %}
-        {% include "summary/report_summary.html" %}
-
-        {% for ooi, report in report_data.items %}
-            {% for report_type,data in report.items %}
-                {% if data.data %}
-                    <section>
-                        <div>
-                            <h2>{{ report_type }} {% translate "for" %} {{ ooi }}</h2>
-                            {% include data.template with data=data.data %}
-
-                        </div>
-                    </section>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
+        </article>
     </main>
 {% endblock content %}
+{% block html_at_end_body %}
+    {{ block.super }}
+    <script src="{% static "js/sidemenuOl.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+{% endblock html_at_end_body %}
