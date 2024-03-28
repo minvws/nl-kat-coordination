@@ -176,7 +176,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
             for ooi, data in results.items():
                 reference = Reference.from_str(ooi)
-                if "ip_port" in reference.tokenized.root:
+                if "IPService" in reference:
                     ooi_human_readable = (
                         reference.tokenized.service.name
                         + "://"
