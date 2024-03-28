@@ -11,7 +11,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     REPORTS,
@@ -141,8 +141,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
-        if not self.are_plugins_enabled(self.plugins):
-            warning_message = _("This report may not show all the data as some plugins are not enabled.")
+        if not self.all_plugins_enabled["required"]:
+            warning_message = _("This report may not show all the data as some required plugins are not enabled.")
             messages.add_message(self.request, messages.WARNING, warning_message)
         return super().get(request, *args, **kwargs)
 
@@ -170,7 +170,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             except ObjectNotFoundException:
                 error_reports.append(report_type.id)
                 continue
-            except StopIteration:
+            except TypeNotFound:
                 error_reports.append(report_type.id)
                 continue
 
