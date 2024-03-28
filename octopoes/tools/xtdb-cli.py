@@ -150,7 +150,9 @@ As instructions the following keywords with arguments are supported:
   recent-queries
   slowest-queries
 
-If no keyword is given in the initial instruction either use a dash "-" to read stdin otherwise all instructions are treated as filenames
+If no keyword is given in the initial instruction either use
+* a dash "-" to read stdin
+* otherwise all instructions are treated as filenames
 
 See https://v1-docs.xtdb.com/clients/http/ for more information.
 
