@@ -42,7 +42,7 @@ class AggregateOrganisationReport(AggregateReport):
     }
     template_path = "aggregate_organisation_report/report.html"
 
-    def post_process_data(self, data: dict[str, Any], valid_time) -> dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any], valid_time, organization_code: str) -> dict[str, Any]:
         systems: dict[str, dict[str, Any]] = {"services": {}}
         services = {}
         open_ports = {}
@@ -393,7 +393,7 @@ class AggregateOrganisationReport(AggregateReport):
 
         config_oois = self.octopoes_api_connector.list_objects(types={Config}, valid_time=valid_time).items
 
-        flattened_health = flatten_health(get_rocky_health(self.octopoes_api_connector))
+        flattened_health = flatten_health(get_rocky_health(organization_code, self.octopoes_api_connector))
 
         return {
             "systems": systems,
@@ -442,6 +442,7 @@ def aggregate_reports(
     input_ooi_references: list[OOI],
     selected_report_types: list[str],
     valid_time: datetime,
+    organization_code: str,
 ) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
     by_type: dict[str, list[str]] = {}
 
@@ -476,6 +477,6 @@ def aggregate_reports(
             report_data[ooi_str][report_type.id] = data
 
     aggregate_report = AggregateOrganisationReport(connector)
-    post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
+    post_processed_data = aggregate_report.post_process_data(report_data, valid_time, organization_code)
 
     return aggregate_report, post_processed_data, report_data, errors

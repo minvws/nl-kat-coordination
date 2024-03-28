@@ -4,13 +4,14 @@ import datetime
 import json
 import uuid
 from enum import Enum
+from functools import cached_property
 from logging import getLogger
 from typing import Any
 
 import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from httpx import HTTPError, HTTPStatusError, RequestError, codes
+from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
 
 from rocky.health import ServiceHealth
@@ -122,7 +123,9 @@ class PaginatedTasksResponse(BaseModel):
     results: list[Task]
 
 
-class LazyTaskList:
+class SchedulerTaskList:
+    HARD_LIMIT = 99_999_999
+
     def __init__(
         self,
         scheduler_client: SchedulerClient,
@@ -132,7 +135,7 @@ class LazyTaskList:
         self.kwargs = kwargs
         self._count: int | None = None
 
-    @property
+    @cached_property
     def count(self) -> int:
         if self._count is None:
             self._count = self.scheduler_client.list_tasks(
@@ -147,7 +150,9 @@ class LazyTaskList:
     def __getitem__(self, key) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
-            limit = key.stop - offset
+            limit = SchedulerTaskList.HARD_LIMIT
+            if key.stop:
+                limit = key.stop - offset
         elif isinstance(key, int):
             offset = key
             limit = 1
@@ -165,7 +170,7 @@ class LazyTaskList:
 
 
 class SchedulerError(Exception):
-    message = _("Connectivity issues with Mula.")
+    message = _("Could not connect to Scheduler. Service is possibly down.")
 
     def __str__(self):
         return str(self.message)
@@ -184,60 +189,46 @@ class ConflictError(SchedulerError):
 
 
 class TaskNotFoundError(SchedulerError):
-    message = _("Task not found.")
+    message = _("Task could not be found.")
 
 
 class SchedulerClient:
-    def __init__(self, base_uri: str):
+    def __init__(self, base_uri: str, organization_code: str):
         self._client = httpx.Client(base_url=base_uri)
+        self.organization_code = organization_code
 
     def list_tasks(
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
-        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
-        res = self._client.get("/tasks", params=kwargs)
-        return PaginatedTasksResponse.model_validate_json(res.content)
-
-    def get_lazy_task_list(
-        self,
-        scheduler_id: str,
-        task_type: str | None = None,
-        status: str | None = None,
-        min_created_at: datetime.datetime | None = None,
-        max_created_at: datetime.datetime | None = None,
-        input_ooi: str | None = None,
-        plugin_id: str | None = None,
-        boefje_name: str | None = None,
-    ) -> LazyTaskList:
-        return LazyTaskList(
-            self,
-            scheduler_id=scheduler_id,
-            type=task_type,
-            status=status,
-            min_created_at=min_created_at,
-            max_created_at=max_created_at,
-            input_ooi=input_ooi,
-            plugin_id=plugin_id,
-            boefje_name=boefje_name,
-        )
-
-    def get_task_details(self, organization_code: str, task_id: str) -> Task:
-        res = self._client.get(f"/tasks/{task_id}")
-        res.raise_for_status()
-        task_details = Task.model_validate_json(res.content)
-
-        if task_details.type == "normalizer":
-            organization = task_details.p_item.data.raw_data.boefje_meta.organization
-        else:
-            organization = task_details.p_item.data.organization
-
-        if organization != organization_code:
-            raise TaskNotFoundError()
-        return task_details
-
-    def push_task(self, queue_name: str, prioritized_item: PrioritizedItem) -> None:
         try:
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+            res = self._client.get("/tasks", params=kwargs)
+            return PaginatedTasksResponse.model_validate_json(res.content)
+        except ConnectError:
+            raise SchedulerError()
+
+    def get_task_details(self, task_id: str) -> Task:
+        try:
+            res = self._client.get(f"/tasks/{task_id}")
+            res.raise_for_status()
+            task_details = Task.model_validate_json(res.content)
+
+            if task_details.type == "normalizer":
+                organization = task_details.p_item.data.raw_data.boefje_meta.organization
+            else:
+                organization = task_details.p_item.data.organization
+
+            if organization != self.organization_code:
+                raise TaskNotFoundError()
+
+            return task_details
+        except ConnectError:
+            raise SchedulerError()
+
+    def push_task(self, prioritized_item: PrioritizedItem) -> None:
+        try:
+            queue_name = f"{prioritized_item.data.type}-{self.organization_code}"
             res = self._client.post(
                 f"/queues/{queue_name}/push",
                 content=prioritized_item.json(),
@@ -258,18 +249,22 @@ class SchedulerClient:
             raise SchedulerError()
 
     def health(self) -> ServiceHealth:
-        health_endpoint = self._client.get("/health")
-        health_endpoint.raise_for_status()
-        return ServiceHealth.model_validate_json(health_endpoint.content)
+        try:
+            health_endpoint = self._client.get("/health")
+            health_endpoint.raise_for_status()
+            return ServiceHealth.model_validate_json(health_endpoint.content)
+        except ConnectError:
+            raise SchedulerError()
 
     def get_task_stats(self, organization_code: str, task_type: str) -> dict:
         try:
             res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
             res.raise_for_status()
-        except HTTPError:
+        except (ConnectError, HTTPError):
             raise SchedulerError()
         task_stats = json.loads(res.content)
         return task_stats
 
 
-client = SchedulerClient(settings.SCHEDULER_API)
+def scheduler_client(organization_code: str) -> SchedulerClient:
+    return SchedulerClient(settings.SCHEDULER_API, organization_code)

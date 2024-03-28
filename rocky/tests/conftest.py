@@ -1088,7 +1088,7 @@ def setup_request(request, user):
 
 @pytest.fixture
 def mock_scheduler(mocker):
-    return mocker.patch("rocky.views.ooi_detail.scheduler.client")
+    return mocker.patch("rocky.views.scheduler.scheduler_client")()
 
 
 def get_stub_path(file_name: str) -> Path:

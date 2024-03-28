@@ -12,18 +12,16 @@ from httpx import HTTPError
 from jsonschema.validators import Draft202012Validator
 from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
-from katalogus.views.mixins import BoefjeMixin
 from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.models import Indemnification
 from tools.ooi_helpers import format_display
-from tools.view_helpers import reschedule_task
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
-from rocky import scheduler
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
+from rocky.views.scheduler import SchedulerView
 
 
 class PageActions(Enum):
@@ -34,7 +32,7 @@ class PageActions(Enum):
 
 
 class OOIDetailView(
-    BoefjeMixin,
+    SchedulerView,
     OOIRelatedObjectAddView,
     OOIFindingManager,
     BaseOOIDetailView,
@@ -67,8 +65,8 @@ class OOIDetailView(
                 return self.get(self.request, *self.args, **self.kwargs)
 
             if action == PageActions.RESCHEDULE_TASK.value:
-                task_id = self.request.POST.get("task_id")
-                reschedule_task(self.request, self.organization.code, task_id)
+                task_id = self.request.POST.get("task_id", "")
+                self.reschedule_task(task_id)
 
             if action == PageActions.START_SCAN.value:
                 boefje_id = self.request.POST.get("boefje_id")
@@ -115,38 +113,17 @@ class OOIDetailView(
     def get_organization_indemnification(self):
         return Indemnification.objects.filter(organization=self.organization).exists()
 
+    def get_task_filters(self) -> dict[str, str | datetime | None]:
+        filters = super().get_task_filters()
+        filters["input_ooi"] = self.get_ooi_id()
+        return filters
+
     def get_task_history(self) -> Page:
-        scheduler_id = f"boefje-{self.organization.code}"
-
-        # FIXME: in context of ooi detail is doesn't make sense to search
-        # for an object name, so we search on plugin id
-        plugin_id = self.request.GET.get("task_history_search") or None
-
         page = int(self.request.GET.get("task_history_page", 1))
 
-        status = self.request.GET.get("task_history_status")
+        task_list = self.get_task_list()
 
-        if self.request.GET.get("task_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("task_history_from"), "%Y-%m-%d")
-        else:
-            min_created_at = None
-
-        if self.request.GET.get("task_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("task_history_to"), "%Y-%m-%d")
-        else:
-            max_created_at = None
-
-        task_history = scheduler.client.get_lazy_task_list(
-            scheduler_id=scheduler_id,
-            status=status,
-            min_created_at=min_created_at,
-            max_created_at=max_created_at,
-            task_type="boefje",
-            input_ooi=self.get_ooi_id(),
-            plugin_id=plugin_id,
-        )
-
-        return Paginator(task_history, self.task_history_limit).page(page)
+        return Paginator(task_list, self.task_history_limit).page(page)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

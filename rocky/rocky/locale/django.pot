@@ -4014,7 +4014,7 @@ msgid "That page contains no results"
 msgstr ""
 
 #: rocky/scheduler.py
-msgid "Connectivity issues with Mula."
+msgid "Could not connect to Scheduler. Service is possibly down."
 msgstr ""
 
 #: rocky/scheduler.py
@@ -4027,6 +4027,10 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "Task already queued."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "Task could not be found."
 msgstr ""
 
 #: rocky/settings.py
@@ -6254,8 +6258,24 @@ msgstr ""
 msgid "Reset"
 msgstr ""
 
-#: rocky/views/tasks.py
-msgid "Fetching tasks failed: no connection with scheduler"
+#: rocky/views/scheduler.py
+msgid "'Plugin not found'"
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid "'OOI not found'"
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid "Scheduling {} {} with input object {} failed. "
+msgstr ""
+
+#: rocky/views/scheduler.py
+msgid ""
+"Task of {} {} with input object {} is scheduled and will soon be started in "
+"the background. Results will be added to the object list when they are in. "
+"It may take some time, a refresh of the page may be needed to show the "
+"results."
 msgstr ""
 
 #: rocky/views/upload_csv.py
