@@ -162,7 +162,7 @@ jobs:
         run: python3.10 -m venv /var/www/html/.venv
 
       - name: Create scheduler release archive
-        run: tar -cvzf ${{ env.PKGDIR }}/scheduler_${{ env.RELEASE_VERSION }}.tar.gz --exclude=./.git* --exclude=Makefile --exclude=Dockerfile --exclude=base.yml --exclude=requirements* --exclude=tests .
+        run: tar -cvzf ${{ env.PKGDIR }}/scheduler_${{ env.RELEASE_VERSION }}.tar.gz --exclude=./.git* --exclude=Makefile --exclude=Dockerfile --exclude=requirements* --exclude=tests .
         working-directory: ./mula
 
       - name: Create virtual env

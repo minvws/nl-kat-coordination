@@ -74,8 +74,9 @@ class PluginEnableDisableView(SinglePluginView):
             )
         else:
             member_clearance_level_text = (
-                "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
-            ).format(self.organization_member.acknowledged_clearance_level)
+                f"Your clearance level is L{self.organization_member.acknowledged_clearance_level}. Contact your "
+                f"administrator to get a higher clearance level."
+            )
 
             if (
                 self.organization_member.trusted_clearance_level < 0

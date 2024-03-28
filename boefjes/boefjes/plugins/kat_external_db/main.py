@@ -1,4 +1,5 @@
 """Boefje script for getting domains and ipaddresses from dadb"""
+
 from os import getenv
 
 import requests

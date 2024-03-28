@@ -950,20 +950,17 @@ msgid "Plugins overview:"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin name"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin type"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin description"
 msgstr ""
 
@@ -2121,21 +2118,6 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/partials/report_sidemenu.html
-msgid "Selected Plugins"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "Plugin options"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "Plugin scan level"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -3500,6 +3482,10 @@ msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All required plugins are enabled."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid "Suggested plugins"
 msgstr ""
 
@@ -3507,6 +3493,10 @@ msgstr ""
 msgid ""
 "This report requires at least one of the following plugins to be enabled to "
 "generate the report:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All suggested plugins are enabled"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3531,6 +3521,11 @@ msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
+msgstr ""
+
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/selected_plugins.html
+msgid "Selected Plugins"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
@@ -3587,15 +3582,22 @@ msgid ""
 "including a report description."
 msgstr ""
 
-#: reports/templates/summary/report_asset_overview.html
-msgid "Selected Plugins for scans"
+#: reports/templates/summary/selected_plugins.html
+msgid ""
+"The table below shows all required or optional plugins for the selected "
+"reports."
 msgstr ""
 
-#: reports/templates/summary/report_asset_overview.html
-msgid ""
-"The table below shows which plugins were enabled, required or optional for "
-"the selected reports. It also shows the required clearance level and "
-"description of the plugin."
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin enabled"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin options"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin scan level"
 msgstr ""
 
 #: reports/templates/summary/service_health.html
@@ -3642,7 +3644,9 @@ msgid "Report type '%s' does not exist."
 msgstr ""
 
 #: reports/views/generate_report.py
-msgid "This report may not show all the data as some plugins are not enabled."
+msgid ""
+"This report may not show all the data as some required plugins are not "
+"enabled."
 msgstr ""
 
 #: reports/views/multi_report.py
