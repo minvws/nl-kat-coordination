@@ -54,14 +54,30 @@ The essential metadata includes:
 
 Because stdin and stdout in container orchestrators are relatively complicated
 and work on a best-effort basis, this is not reliable enough for boefje input
-and output. Instead, we use a simple HTTP API for input and output.
+and output. Kubernetes will for example redirect stdout and stderr to log files
+and will by default rotate the log file when it gets larger than 10 MB. See the
+[Kubernetes logging documentation][kubernetes-logging] for more information
+about this. Tools like [filebeat][filebeat-kubernetes] also work by mounting the
+host `/var/log/containers` in the filebeat container. This is something that can
+be done with a cluster component like filebeat, but must not be done with an
+application like OpenKAT.
 
-This HTTP API will be part of new boefjes runner and will communicate with
-existing parts of KAT such as bytes and mula (the scheduler) to get the boefje
-input and save its output.
+Copying files from the container is also not an option, because for example the
+`kubectl cp` command to copy files from a container actually executes `tar` in
+the container using `kubectl exec`. There is also no guarantee that the
+container will be around when it's done, because after the container exits it is
+usually removed right away.
+
+Because of this we designed a simple HTTP API for input and output. This HTTP
+API will be part of new boefjes runner and will communicate with existing parts
+of KAT such as bytes and mula (the scheduler) to get the boefje input and save
+its output.
 
 The HTTP API will be versioned, so that the API can evolve while staying
 compatible with existing boefjes.
+
+[kubernetes-logging]: https://kubernetes.io/docs/concepts/cluster-administration/logging/#how-nodes-handle-container-logs
+[filebeat-kubernetes]: https://www.elastic.co/guide/en/beats/filebeat/current/running-on-kubernetes.html
 
 ### Input
 
