@@ -1,7 +1,7 @@
 {
-  "id": "kat_website_software_normalize",
+  "id": "kat_webpage_analysis_wappalyzer_normalize",
   "consumes": [
-    "boefje/website-software"
+    "openkat-http/response"
   ],
   "produces": [
     "Software",

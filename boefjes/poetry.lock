@@ -2143,15 +2143,13 @@ files = [
 defusedxml = ["defusedxml (>=0.6.0)"]
 
 [[package]]
-name = "python-wappalyzer"
-version = "0.3.1"
+name = "python-Wappalyzer"
+version = "0.4.0"
 description = "Python implementation of the Wappalyzer web application detection utility"
 optional = false
 python-versions = "*"
-files = [
-    {file = "python-Wappalyzer-0.3.1.tar.gz", hash = "sha256:28fc8d5b8ace221aad7c5729b923976af53c5b7116fd0ddc452a0dcaeaf4b831"},
-    {file = "python_Wappalyzer-0.3.1-py3-none-any.whl", hash = "sha256:0c76e4bbc1e782795f2ccda627add6366153cd53d8f8eb5a5b62431c7c4ecdfe"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 aiohttp = "*"
@@ -2160,6 +2158,16 @@ beautifulsoup4 = "*"
 httpretty = "*"
 lxml = "*"
 requests = "*"
+
+[package.extras]
+dev = ["mypy (>=0.812)", "pytest", "pytest-asyncio", "tox"]
+docs = ["docutils", "pydoctor"]
+
+[package.source]
+type = "git"
+url = "https://github.com/chorsley/python-Wappalyzer.git"
+reference = "0.4.0"
+resolved_reference = "ac651718af77804e52b826944933be831d491387"
 
 [[package]]
 name = "pywin32"
@@ -2833,4 +2841,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ab274a568293914d3aed73f141f4b3e87da9d5d892935fc72dad5a719dc57f91"
+content-hash = "8bea280837f9852dedaa449f17cd846d7690d2b98c9304534cbb3d8e6bce527b"

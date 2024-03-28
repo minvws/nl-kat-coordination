@@ -7,7 +7,7 @@ from boefjes.job_models import Boefje, BoefjeMeta, Normalizer, NormalizerMeta, R
 
 
 def get_dummy_data(filename: str) -> bytes:
-    path = BASE_DIR / ".." / "tests" / "examples" / filename
+    path = BASE_DIR.parent / "tests" / "examples" / filename
     return path.read_bytes()
 
 
