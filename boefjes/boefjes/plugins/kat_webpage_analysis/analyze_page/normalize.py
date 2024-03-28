@@ -9,12 +9,12 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    raw_respsone, body = raw.decode().split("\r\n\r\n", 1)
-    body = body.decode()
+    raw_respsone, body = raw.split(b"\n\n", 1)
     response_object = json.loads(raw_respsone)
     url = response_object["response"]["url"]
 
     headers = json.loads(raw_respsone)
+    body = body.decode()
 
     wappalyzer = Wappalyzer.latest()
     web_page = WebPage(url, body, headers)
