@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from typing import Any
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import ResolvedHostname
@@ -6,7 +7,9 @@ from octopoes.models.ooi.network import IPAddress, IPPort, Network
 from octopoes.models.ooi.web import URL
 
 
-def run(ip_address: IPAddress, additional_oois: list[IPPort | ResolvedHostname], config: dict) -> Iterator[OOI]:
+def run(
+    ip_address: IPAddress, additional_oois: list[IPPort | ResolvedHostname], config: dict[str, Any]
+) -> Iterator[OOI]:
     hostnames = [resolved.hostname for resolved in additional_oois if isinstance(resolved, ResolvedHostname)]
     ip_ports = [ip_port for ip_port in additional_oois if isinstance(ip_port, IPPort)]
 
