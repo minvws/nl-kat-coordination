@@ -18,7 +18,6 @@ COPY boefjes/requirements-dev.txt boefjes/requirements.txt .
 
 RUN --mount=type=cache,target=/root/.cache \
     pip install --upgrade pip \
-    && pip install -r requirements.txt \
     && if [ "$ENVIRONMENT" = "dev" ]; \
     then \
     grep -v git+https:// requirements-dev.txt | pip install -r /dev/stdin ; \
