@@ -166,6 +166,8 @@ def check_version_agains_versionlist(my_version: str, all_versions: list[str]):
 
 
 def check_version_in(version: str, versions: str):
+    if not version:
+        return False
     all_versions = versions.split(",")  # Example: https://snyk.io/vuln/composer%3Awoocommerce%2Fwoocommerce-blocks
     in_range = False
     while not in_range and all_versions:
