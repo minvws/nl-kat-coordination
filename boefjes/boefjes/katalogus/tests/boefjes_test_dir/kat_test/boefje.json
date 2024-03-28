@@ -1,10 +1,10 @@
 {
-    "id": "kat_test",
-    "name": "Kat test name",
-    "description": "Testing KAT",
-    "consumes": [
-        "DNSZone"
-    ],
-    "environment_keys": [],
-    "scan_level": 1
+  "id": "kat_test",
+  "name": "Kat test name",
+  "description": "Testing KAT",
+  "consumes": [
+    "DNSZone"
+  ],
+  "environment_keys": [],
+  "scan_level": 1
 }

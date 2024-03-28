@@ -1,4 +1,5 @@
 """Boefje script for getting dns records"""
+
 import json
 import logging
 import re

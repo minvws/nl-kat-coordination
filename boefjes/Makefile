@@ -68,7 +68,7 @@ check:
 ##			Tests
 ##|------------------------------------------------------------------------|
 
-ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker compose --project-directory . -f .ci/docker-compose.yml
 
 
 test: itest ## Run all tests.

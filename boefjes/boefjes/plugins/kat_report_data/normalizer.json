@@ -1,9 +1,9 @@
 {
-    "id": "kat_report_data",
-    "consumes": [
-        "openkat/report-data"
-    ],
-    "produces": [
-        "ReportData"
-    ]
+  "id": "kat_report_data",
+  "consumes": [
+    "openkat/report-data"
+  ],
+  "produces": [
+    "ReportData"
+  ]
 }

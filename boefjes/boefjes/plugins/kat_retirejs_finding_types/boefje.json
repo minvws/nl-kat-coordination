@@ -1,10 +1,10 @@
 {
-    "id": "retirejs-finding-types",
-    "name": "RetireJS Finding Types",
-    "description": "Hydrate information of RetireJS finding types",
-    "consumes": [
-        "RetireJSFindingType"
-    ],
-    "scan_level": 0,
-    "enabled": true
+  "id": "retirejs-finding-types",
+  "name": "RetireJS Finding Types",
+  "description": "Hydrate information of RetireJS finding types",
+  "consumes": [
+    "RetireJSFindingType"
+  ],
+  "scan_level": 0,
+  "enabled": true
 }
