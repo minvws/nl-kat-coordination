@@ -57,9 +57,38 @@ class Task(BaseModel):
 
     status: TaskStatus
 
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    meta: dict | None = None
 
+    # Status transition timestamps
+    pending_at: datetime | None = Field(default_factory=lambda: datetime.now(timezone.utc))
+    queued_at: datetime | None = None
+    dispatched_at: datetime | None = None
+    running_at: datetime | None = None
+    completed_at: datetime | None = None
+
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    def update_status(self, status: TaskStatus) -> None:
+        """Update and log the status transition."""
+        from_status = self.status
+        to_status = status
+        now_utc = datetime.now(timezone.utc)
+
+        if from_status == TaskStatus.PENDING and to_status in (TaskStatus.QUEUED,):
+            self.queued_at = now_utc
+        elif from_status == TaskStatus.QUEUED and to_status in (TaskStatus.DISPATCHED,):
+            self.dispatched_at = now_utc
+        elif from_status == TaskStatus.DISPATCHED and to_status in (TaskStatus.RUNNING,):
+            self.running_at = now_utc
+        elif from_status == TaskStatus.RUNNING and to_status in (
+            TaskStatus.COMPLETED,
+            TaskStatus.FAILED,
+            TaskStatus.CANCELLED,
+        ):
+            self.completed_at = now_utc
+
+        self.status = to_status
 
     def __repr__(self):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
@@ -81,6 +110,14 @@ class TaskDB(Base):
         nullable=False,
         default=TaskStatus.PENDING,
     )
+
+    meta = Column(JSONB)
+
+    pending_at = Column(DateTime(timezone=True), nullable=True, server_default=func.now())
+    queued_at = Column(DateTime(timezone=True), nullable=True)
+    dispatched_at = Column(DateTime(timezone=True), nullable=True)
+    running_at = Column(DateTime(timezone=True), nullable=True)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
 
     created_at = Column(
         DateTime(timezone=True),
