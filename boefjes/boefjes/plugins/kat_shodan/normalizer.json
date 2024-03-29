@@ -1,11 +1,11 @@
 {
-    "id": "kat_shodan_normalize",
-    "consumes": [
-        "boefje/shodan"
-    ],
-    "produces": [
-        "Finding",
-        "IPPort",
-        "CVEFindingType"
-    ]
+  "id": "kat_shodan_normalize",
+  "consumes": [
+    "boefje/shodan"
+  ],
+  "produces": [
+    "Finding",
+    "IPPort",
+    "CVEFindingType"
+  ]
 }

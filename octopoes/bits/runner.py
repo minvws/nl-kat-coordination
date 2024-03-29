@@ -12,8 +12,7 @@ class ModuleException(Exception):
 
 
 class Runnable(Protocol):
-    def run(self, *args, **kwargs) -> Any:
-        ...
+    def run(self, *args, **kwargs) -> Any: ...
 
 
 class BitRunner:

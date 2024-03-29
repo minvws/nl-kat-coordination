@@ -18,11 +18,11 @@
       "address": "1.1.1.1"
     },
     {
-        "object_type": "IPPort",
-        "address": "IPAddressV4|internet|1.1.1.1",
-        "protocol": "tcp",
-        "port": 80,
-        "state": "open"
+      "object_type": "IPPort",
+      "address": "IPAddressV4|internet|1.1.1.1",
+      "protocol": "tcp",
+      "port": 80,
+      "state": "open"
     }
   ],
   "valid_time": "2019-01-01T00:00:00+00:00",
