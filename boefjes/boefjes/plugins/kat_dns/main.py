@@ -1,4 +1,5 @@
 """Boefje script for getting dns records"""
+
 import json
 import logging
 import re
@@ -8,7 +9,6 @@ import dns.resolver
 from dns.name import Name
 from dns.resolver import Answer
 
-from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
-    nameserver = getenv("REMOTE_NS", str(settings.remote_ns))
+    nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
 
     record_types = get_record_types()

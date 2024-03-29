@@ -16,19 +16,18 @@ from reports.report_types.vulnerability_report.report import VulnerabilityReport
 from reports.report_types.web_system_report.report import WebSystemReport
 
 REPORTS = [
-    DNSReport,
-    TLSReport,
-    SystemReport,
-    RPKIReport,
-    MailReport,
-    WebSystemReport,
-    NameServerSystemReport,
-    SafeConnectionsReport,
+    FindingsReport,
     VulnerabilityReport,
     OpenPortsReport,
+    WebSystemReport,
+    SafeConnectionsReport,
+    TLSReport,
+    SystemReport,
+    DNSReport,
+    MailReport,
+    NameServerSystemReport,
+    RPKIReport,
     IPv6Report,
-    VulnerabilityReport,
-    FindingsReport,
 ]
 AGGREGATE_REPORTS = [AggregateOrganisationReport]
 

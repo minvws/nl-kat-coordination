@@ -73,12 +73,10 @@ class OctopoesService:
         self.scan_profile_repository = scan_profile_repository
 
     @overload
-    def _populate_scan_profiles(self, oois: ValuesView[OOI], valid_time: datetime) -> ValuesView[OOI]:
-        ...
+    def _populate_scan_profiles(self, oois: ValuesView[OOI], valid_time: datetime) -> ValuesView[OOI]: ...
 
     @overload
-    def _populate_scan_profiles(self, oois: list[OOI], valid_time: datetime) -> list[OOI]:
-        ...
+    def _populate_scan_profiles(self, oois: list[OOI], valid_time: datetime) -> list[OOI]: ...
 
     def _populate_scan_profiles(
         self, oois: list[OOI] | ValuesView[OOI], valid_time: datetime
