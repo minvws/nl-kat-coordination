@@ -204,6 +204,7 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
+            breakpoint()
             self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
             self.logger.warning(

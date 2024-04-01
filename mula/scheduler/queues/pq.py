@@ -145,7 +145,7 @@ class PriorityQueue(abc.ABC):
         if not isinstance(p_item, models.PrioritizedItem):
             raise InvalidPrioritizedItemError("The item is not a PrioritizedItem")
 
-        if not self._is_valid_item(p_item.task.data):
+        if not self._is_valid_item(p_item.data):
             raise InvalidPrioritizedItemError(f"PrioritizedItem must be of type {self.item_type}")
 
         if not p_item.priority:

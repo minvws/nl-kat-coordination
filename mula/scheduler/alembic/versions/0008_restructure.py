@@ -2,7 +2,7 @@
 
 Revision ID: 0008
 Revises: 0007
-Create Date: 2024-03-28 16:32:05.660440
+Create Date: 2024-04-01 08:58:17.231504
 
 """
 
@@ -26,6 +26,7 @@ def upgrade():
         sa.Column("id", scheduler.utils.datastore.GUID(), nullable=False),
         sa.Column("scheduler_id", sa.String(), nullable=False),
         sa.Column("hash", sa.String(length=32), nullable=True),
+        sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column("enabled", sa.Boolean(), nullable=False),
         sa.Column("schedule", sa.String(), nullable=True),
         sa.Column("deadline_at", sa.DateTime(timezone=True), nullable=True),
@@ -39,6 +40,7 @@ def upgrade():
         sa.Column("scheduler_id", sa.String(), nullable=True),
         sa.Column("hash", sa.String(length=32), nullable=True),
         sa.Column("priority", sa.Integer(), nullable=True),
+        sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column("task_id", scheduler.utils.datastore.GUID(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("modified_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -51,8 +53,7 @@ def upgrade():
     op.create_index(op.f("ix_p_items_hash"), "p_items", ["hash"], unique=False)
     op.drop_index("ix_items_hash", table_name="items")
     op.drop_table("items")
-    op.add_column("tasks", sa.Column("schema_id", scheduler.utils.datastore.GUID(), nullable=False))
-    op.add_column("tasks", sa.Column("data", postgresql.JSONB(astext_type=sa.Text()), nullable=False))
+    op.add_column("tasks", sa.Column("schema_id", scheduler.utils.datastore.GUID(), nullable=True))
     op.alter_column("tasks", "scheduler_id", existing_type=sa.VARCHAR(), nullable=False)
     op.drop_index("ix_tasks_p_item_hash", table_name="tasks")
     op.create_foreign_key(None, "tasks", "schemas", ["schema_id"], ["id"], ondelete="SET NULL")
@@ -75,7 +76,6 @@ def downgrade():
         unique=False,
     )
     op.alter_column("tasks", "scheduler_id", existing_type=sa.VARCHAR(), nullable=True)
-    op.drop_column("tasks", "data")
     op.drop_column("tasks", "schema_id")
     op.create_table(
         "items",

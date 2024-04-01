@@ -30,6 +30,8 @@ class PrioritizedItem(BaseModel):
 
     priority: int | None = 0
 
+    data: dict | None = {}
+
     task_id: uuid.UUID
     task: Task
 
@@ -49,6 +51,8 @@ class PrioritizedItemDB(Base):
     hash = Column(String(32), index=True)
 
     priority = Column(Integer)
+
+    data = Column(JSONB, nullable=False)
 
     task_id = Column(GUID, ForeignKey("tasks.id"))
     task = relationship("TaskDB", back_populates="p_item")

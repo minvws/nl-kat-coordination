@@ -795,7 +795,6 @@ class BoefjeScheduler(Scheduler):
         # it to the priority queue.
         task = models.Task(
             hash=boefje_task.hash,
-            data=boefje_task.model_dump(),
         )
 
         p_item = PrioritizedItem(
@@ -803,6 +802,7 @@ class BoefjeScheduler(Scheduler):
             priority=score,
             task_id=task.id,
             task=task,
+            data=boefje_task.model_dump(),
         )
 
         try:
