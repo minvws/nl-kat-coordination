@@ -369,6 +369,7 @@ class AggregateOrganisationReport(AggregateReport):
         recommendations = list(set(filter(None, recommendations)))
         total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
+        total_criticals = sum(vulnerability["summary"]["total_criticals"] for vulnerability in vulnerabilities.values())
 
         summary = {
             # _("General recommendations"): "",
