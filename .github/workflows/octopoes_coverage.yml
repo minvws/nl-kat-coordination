@@ -35,7 +35,7 @@ jobs:
         run: unzip coverage.zip
 
       - name: 'Comment on PR'
-        uses: 5monkeys/cobertura-action@4157521550018abbbd29dfdf1b5963e907ea37f0
+        uses: 5monkeys/cobertura-action@ee5787cc56634acddedc51f21c7947985531e6eb
         with:
           path: coverage.xml
           minimum_coverage: 75
