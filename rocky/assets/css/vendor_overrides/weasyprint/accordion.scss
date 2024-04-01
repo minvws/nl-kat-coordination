@@ -23,13 +23,16 @@ ul.accordion {
   display: inline;
 
   /* Accordion item */
-  > div {
+  > div,
+  > li {
     width: 100%;
     background-color: transparent;
+    padding-top: 0;
 
     > button {
-      display: inline;
+      display: block;
       font-weight: bold;
+      width: 100%;
 
       /* Show all accordion content */
       &[aria-expanded="true"] + div,
