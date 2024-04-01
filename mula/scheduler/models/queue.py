@@ -13,6 +13,10 @@ from .base import Base
 from .task import Task
 
 
+class PrioritizedItem(Task):
+    pass
+
+
 class Queue(BaseModel):
     id: str
     size: int
@@ -21,4 +25,4 @@ class Queue(BaseModel):
     allow_replace: bool
     allow_updates: bool
     allow_priority_updates: bool
-    pq: list[Task] | None = None
+    pq: list[PrioritizedItem] | None = None

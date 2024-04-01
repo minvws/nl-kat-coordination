@@ -6,8 +6,8 @@ from .normalizer import Normalizer
 from .ooi import OOI, MutationOperationType, ScanProfile, ScanProfileMutation
 from .organisation import Organisation
 from .plugin import Plugin
-from .queue import Queue
-from .request import ScheduleRequest
+from .queue import PrioritizedItem, Queue
+from .request import PrioritizedItemRequest, ScheduleRequest
 from .scheduler import Scheduler
-from .schema import BoefjeTask, NormalizerTask, TaskSchema, TaskSchemaDB
-from .task import Task, TaskDB, TaskStatus
+from .schema import TaskSchema, TaskSchemaDB
+from .task import BoefjeTask, NormalizerTask, Task, TaskDB, TaskStatus

@@ -153,8 +153,9 @@ class AppContext:
         dbconn = storage.DBConn(str(self.config.db_uri))
         self.datastores: SimpleNamespace = SimpleNamespace(
             **{
-                storage.TaskSchemaStore.name: storage.TaskSchemaStore(dbconn),
+                storage.SchemaStore.name: storage.SchemaStore(dbconn),
                 storage.TaskStore.name: storage.TaskStore(dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(dbconn),
             }
         )
 

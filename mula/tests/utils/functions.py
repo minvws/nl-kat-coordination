@@ -52,11 +52,26 @@ def create_p_item(scheduler_id: str, priority: int, task: models.Task | None = N
     if task is None:
         task = create_task(scheduler_id)
 
-    return models.PrioritizedItem(
-        scheduler_id=task.scheduler_id,
-        priority=priority,
-        task_id=task.id,
-        task=task,
+    p_item = models.PrioritizedItem(
+        **task.dict(),
+    )
+
+    if priority is not None:
+        p_item.priority = priority
+
+    return p_item
+
+
+def create_schema(scheduler_id: str) -> models.TaskSchema:
+    data = TestModel(
+        id=uuid.uuid4().hex,
+        name=uuid.uuid4().hex,
+    )
+
+    return models.TaskSchema(
+        scheduler_id=scheduler_id,
+        hash=data.hash,
+        data=data.model_dump(),
     )
 
 
@@ -70,14 +85,6 @@ def create_task(scheduler_id: str) -> models.Task:
         scheduler_id=scheduler_id,
         hash=data.hash,
         data=data.model_dump(),
-    )
-
-
-def create_run(task: models.Task) -> models.TaskRun:
-    return models.TaskRun(
-        scheduler_id=task.scheduler_id,
-        task_id=task.id,
-        task=task,
     )
 
 

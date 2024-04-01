@@ -14,11 +14,7 @@ from sqlalchemy.sql.expression import text
 from scheduler.utils import GUID, cron
 
 from .base import Base
-from .boefje import Boefje
 from .errors import ValidationError
-from .normalizer import Normalizer
-from .raw_data import RawData
-from .task import Task
 
 
 # TODO: determine naming Schema, Definition, Manifest, Specification, Schedule, Config
@@ -26,13 +22,18 @@ class TaskSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
+
     scheduler_id: str
+
     hash: str | None = Field(None, max_length=32)
-    data: dict = Field(default_factory=dict)
+
+    data: dict | None = {}
+
     enabled: bool = True
+
     schedule: str | None = None
 
-    tasks: list[Task] = []
+    tasks: list["Task"] = []
 
     deadline_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -52,15 +53,19 @@ class TaskSchemaDB(Base):
     __tablename__ = "schemas"
 
     id = Column(GUID, primary_key=True)
+
     scheduler_id = Column(String, nullable=False)
+
     hash = Column(String(32), nullable=True)  # TODO: unique=True
+
     data = Column(JSONB, nullable=False)
 
     enabled = Column(Boolean, nullable=False, default=True)
+
     schedule = Column(String, nullable=True)
 
     # TODO: cascade
-    task_runs = relationship("TaskDB", back_populates="schema")
+    tasks = relationship("TaskDB", back_populates="schema")
 
     deadline_at = Column(
         DateTime(timezone=True),
@@ -79,45 +84,3 @@ class TaskSchemaDB(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
-
-
-class NormalizerTask(BaseModel):
-    """NormalizerTask represent data needed for a Normalizer to run."""
-
-    type: ClassVar[str] = "normalizer"
-
-    id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
-    normalizer: Normalizer
-    raw_data: RawData
-
-    @property
-    def hash(self) -> str:
-        """Make NormalizerTask hashable, so that we can de-duplicate it when
-        used in the PriorityQueue. We hash the combination of the attributes
-        normalizer.id since this combination is unique."""
-        return mmh3.hash_bytes(
-            f"{self.normalizer.id}-{self.raw_data.boefje_meta.id}-{self.raw_data.boefje_meta.organization}"
-        ).hex()
-
-
-class BoefjeTask(BaseModel):
-    """BoefjeTask represent data needed for a Boefje to run."""
-
-    type: ClassVar[str] = "boefje"
-
-    id: uuid.UUID | None = Field(default_factory=uuid.uuid4)
-    boefje: Boefje
-    input_ooi: str | None = None
-    organization: str
-
-    dispatches: list[Normalizer] = Field(default_factory=list)
-
-    @property
-    def hash(self) -> str:
-        """Make BoefjeTask hashable, so that we can de-duplicate it when used
-        in the PriorityQueue. We hash the combination of the attributes
-        input_ooi and boefje.id since this combination is unique."""
-        if self.input_ooi:
-            return mmh3.hash_bytes(f"{self.input_ooi}-{self.boefje.id}-{self.organization}").hex()
-
-        return mmh3.hash_bytes(f"{self.boefje.id}-{self.organization}").hex()

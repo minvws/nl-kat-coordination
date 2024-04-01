@@ -158,7 +158,7 @@ class Server:
             path="/tasks/{task_id}",
             endpoint=self.get_task,
             methods=["GET"],
-            response_model=models.TaskRun,
+            response_model=models.Task,
             status_code=status.HTTP_200_OK,
             description="Get a task",
         )
@@ -167,7 +167,7 @@ class Server:
             path="/tasks/{task_id}",
             endpoint=self.patch_task,
             methods=["PATCH"],
-            response_model=models.TaskRun,
+            response_model=models.Task,
             status_code=status.HTTP_200_OK,
             description="Update a task",
         )
@@ -436,7 +436,7 @@ class Server:
                 detail="task not found",
             )
 
-        return models.TaskRun(**task.model_dump())
+        return models.Task(**task.model_dump())
 
     def patch_task(self, task_id: str, item: dict, background_tasks: BackgroundTasks) -> Any:
         if len(item) == 0:
