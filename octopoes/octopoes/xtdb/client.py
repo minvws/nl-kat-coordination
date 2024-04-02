@@ -10,7 +10,7 @@ from httpx import HTTPError, HTTPStatusError, Response, codes
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from octopoes.models.transaction import TransactionRecord
-from octopoes.xtdb.exceptions import NodeNotFound, ObjectNotFound, XTDBException
+from octopoes.xtdb.exceptions import NodeNotFound, XTDBException
 from octopoes.xtdb.query import Query
 
 logger = logging.getLogger(__name__)
@@ -67,8 +67,10 @@ class XTDBHTTPClient:
             else:
                 if response.json()["error"] == "Node not found":
                     raise NodeNotFound
-                # elif response.json()["error"].endswith("not found"):
-                #     raise ObjectNotFound
+                # """
+                # "elif response.json()["error"].endswith("not found"):
+                # "    raise ObjectNotFound
+                # """
                 else:
                     raise e
 

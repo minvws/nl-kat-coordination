@@ -3,7 +3,6 @@ import os
 from datetime import datetime, timezone
 
 import pytest
-from httpx import HTTPError
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
