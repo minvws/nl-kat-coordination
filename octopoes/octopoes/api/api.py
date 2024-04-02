@@ -25,7 +25,7 @@ from octopoes.core.app import close_rabbit_channel
 from octopoes.events.manager import get_rabbit_channel
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.version import __version__
-from octopoes.xtdb.exceptions import NodeNotFound, ObjectNotFound
+from octopoes.xtdb.exceptions import NodeNotFound
 
 settings = Settings()
 logger = logging.getLogger(__name__)
@@ -77,11 +77,6 @@ def http_exception_handler(request: Request, exc: RequestError) -> JSONResponse:
         },
         status.HTTP_502_BAD_GATEWAY,
     )
-
-
-@app.exception_handler(ObjectNotFound)
-def object_not_found_exception_handler(request: Request, exc: ObjectNotFound) -> JSONResponse:
-    raise ObjectNotFoundException("Object not found")
 
 
 @app.exception_handler(NodeNotFound)

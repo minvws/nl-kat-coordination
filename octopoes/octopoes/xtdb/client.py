@@ -67,10 +67,6 @@ class XTDBHTTPClient:
             else:
                 if response.json()["error"] == "Node not found":
                     raise NodeNotFound
-                # """
-                # "elif response.json()["error"].endswith("not found"):
-                # "    raise ObjectNotFound
-                # """
                 else:
                     raise e
 
