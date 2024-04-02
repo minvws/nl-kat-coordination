@@ -15,3 +15,9 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         f = Finding(finding_type=ft.reference, ooi=ooi)
         yield ft
         yield f
+
+    if not results["valid"]:
+        ft = KATFindingType(id="KAT-INVALID-RPKI")
+        f = Finding(finding_type=ft.reference, ooi=ooi)
+        yield ft
+        yield f
