@@ -96,6 +96,7 @@ task-tags = ["Example", "todo", "TODO", "FIXME"]
 "manage.py" = ["INP"]
 "*/tests/*" = ["T20"]
 "boefjes/boefjes/plugins/*" = ["PTH"]
+"boefjes/images/*" = ["INP001"]
 "scripts/*.py" = ["INP001", "T201"]
 "cveapi/cveapi.py" = ["INP001"]
 

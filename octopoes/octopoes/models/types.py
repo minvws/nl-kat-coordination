@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 from octopoes.models import OOI, Reference
+from octopoes.models.exception import TypeNotFound
 from octopoes.models.ooi.certificate import (
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
@@ -206,7 +207,10 @@ def to_concrete(object_types: set[type[OOI]]) -> set[type[OOI]]:
 
 
 def type_by_name(type_name: str):
-    return next(t for t in ALL_TYPES if t.__name__ == type_name)
+    try:
+        return next(t for t in ALL_TYPES if t.__name__ == type_name)
+    except StopIteration:
+        raise TypeNotFound
 
 
 def related_object_type(field) -> type[OOI]:
