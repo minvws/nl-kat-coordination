@@ -33,6 +33,5 @@ pyproject.toml
 sql_migrations
 .dockerignore
 docs
-base.yml
 assets/dist
 static

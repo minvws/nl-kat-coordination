@@ -99,11 +99,19 @@ class Query:
 
         The last segment in the path is assumed to be the queries OOI Type. Because paths often describe type traversal,
         we assume that every time we get a duplicate type, we have to alias it, except the target type.
+
+        If the last segment is not an OOI Type, the result of the query changes to the value of that specific field
+        instead of returning the complete OOIs for the last type.
         """
 
-        ooi_type = path.segments[-1].target_type
+        ooi_type = (
+            path.segments[-1].target_type
+            if path.segments[-1].target_type is not None
+            else path.segments[-1].source_type
+        )
+
         query = cls(ooi_type)
-        target_ref: Ref
+        target_ref: Ref = path.segments[0].source_type
         alias_map: dict[str, Ref] = {}
 
         if not path.segments:
@@ -114,6 +122,12 @@ class Query:
 
             if segment.source_type.get_object_type() not in alias_map:  # Only happens on the first segment
                 alias_map[segment.source_type.get_object_type()] = source_ref
+
+            if segment.target_type is None:
+                # The last segment is a regular field, so we query for that field value
+                field_alias = Aliased(ooi_type, field=segment.property_name)
+                query = query.where(source_ref, **{segment.property_name: field_alias}).find(field_alias)
+                break
 
             if segment.target_type.get_object_type() not in alias_map:
                 target_ref = segment.target_type
@@ -139,10 +153,13 @@ class Query:
 
         return self
 
-    def find(self, item: Ref) -> "Query":
+    def find(self, item: Ref, *, index: int | None = None) -> "Query":
         """Add a find clause, so we can select specific fields in a query to be returned as well."""
 
-        self._find_clauses.append(self._get_object_alias(item))
+        if index is None:
+            self._find_clauses.append(self._get_object_alias(item))
+        else:
+            self._find_clauses.insert(index, self._get_object_alias(item))
 
         return self
 
@@ -180,11 +197,13 @@ class Query:
             TypeError: issubclass() arg 1 must be a class
         """
         ooi_type = ref.type if isinstance(ref, Aliased) else ref
-
-        if field_name not in ooi_type.model_fields:
-            raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
-
         abstract_types = get_abstract_types()
+
+        if field_name not in ooi_type.model_fields and (
+            ooi_type not in abstract_types
+            or not any(field_name in concrete_type.model_fields for concrete_type in ooi_type.strict_subclasses())
+        ):
+            raise InvalidField(f'"{field_name}" is not a field of {ooi_type.get_object_type()}')
 
         if isinstance(value, str):
             value = value.replace('"', r"\"")

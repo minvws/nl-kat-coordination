@@ -8,7 +8,7 @@ from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
 from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.ooi.network import IPAddress, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
-from octopoes.models.ooi.web import Website
+from octopoes.models.ooi.web import URL, Website, WebURL
 from octopoes.models.path import Path
 from octopoes.xtdb.query import Aliased, InvalidField, Query
 
@@ -372,3 +372,17 @@ def test_build_parth_query_with_multiple_sources_for_abstract_type(mocker):
         ' (or [ IPAddress :object_type "IPAddressV4" ] [ IPAddress :object_type "IPAddressV6" ] )'
         ' [ Network :object_type "Network" ]]}}'
     )
+
+
+def test_parse_path_concrete_fields_or_abstract_types():
+    segments = Path.parse("URL.web_url.netloc.name").segments
+    assert len(segments) == 3
+    assert segments[0].source_type == URL
+    assert segments[0].target_type == WebURL
+
+    assert segments[1].source_type == WebURL
+    assert segments[1].target_type == Hostname
+
+    assert segments[2].source_type == Hostname
+    assert segments[2].target_type is None
+    assert segments[2].property_name == "name"

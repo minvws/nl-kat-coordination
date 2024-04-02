@@ -1,60 +1,110 @@
 /*
 Steps within a flow can be displayed using this partial.
 */
+
+@import "stepper-variables";
+
 .stepper {
-  border-top: 1px solid $grey;
-  width: 100%;
+  border-top: var(--stepper-border-top);
+  width: var(--stepper-width);
 
-  >ul {
-    padding: 1rem 0;
+  > ul {
+    padding: var(--stepper-padding);
+    width: var(--stepper-width);
 
-    >li {
-      font-weight: 400;
-      list-style-type: none;
-      opacity: 0.4;
+    > li {
+      font-weight: var(--stepper-item-font-weight);
+      list-style-type: var(--stepper-item-list-style-type);
+      opacity: var(--stepper-item-opacity);
 
-      >a {
-        color: black;
-        margin: 0;
-        text-decoration: none;
+      > a {
+        color: var(--stepper-item-link-color);
+        margin: var(--stepper-item-link-margin);
+        text-decoration: var(--stepper-item-link-text-decoration);
 
         &:hover {
-          text-decoration: underline;
+          text-decoration: var(--stepper-item-link-hover-text-decoration);
         }
       }
 
       a:visited {
-        color: black;
-        text-decoration: none;
+        color: var(--stepper-item-link-visited-color);
+        text-decoration: var(--stepper-item-link-visited-text-decoration);
       }
     }
 
-    >li:not(li[aria-label="current-step"] ~ li) {
-      font-weight: 700;
-      opacity: 1;
+    /* Selects all steps until the active step */
+    > li:not(li[aria-label="current-step"] ~ li) {
+      font-weight: var(--list-item-completed-font-weight);
+      opacity: var(--list-item-completed-opacity);
     }
   }
 
   @media (width >= 56rem) {
-    >ul {
+    > ul {
       display: flex;
       flex-direction: row;
-      padding: 2rem 0;
+      padding: var(--stepper-above-breakpoint-padding);
 
-      >li {
+      > li {
+        padding-top: var(--stepper-item-above-breakpoint-padding-top);
+
         &::before {
-          content: "\ea61";
+          content: var(--stepper-divider-icon);
           display: inline-flex;
-          font-family: tabler-icons;
-          font-size: 1rem;
-          font-weight: 400;
-          margin: 0 2rem 0 1rem;
+          font-family: var(--stepper-divider-icon-font-family);
+          font-size: var(--stepper-divider-icon-font-size);
+          font-weight: var(--stepper-divider-icon-font-weight);
+          margin: var(--stepper-divider-icon-margin);
         }
 
         &:first-child {
           &::before {
             content: none;
           }
+        }
+
+        &:last-child {
+          flex-grow: var(--stepper-item-above-breakpoint-flex-grow);
+          max-width: var(--stepper-item-above-breakpoint-max-width);
+        }
+      }
+
+      /* Selects all steps until the active step */
+      > li:not(li[aria-label="current-step"] ~ li) {
+        font-weight: var(--list-item-completed-above-breakpoint-font-weight);
+        opacity: var(--list-item-completed-above-breakpoint-opacity);
+        border-top: var(--list-item-completed-above-breakpoint-border-top);
+        margin-top: var(--list-item-completed-above-breakpoint-margin-top);
+      }
+
+      > li[aria-label="current-step"] {
+        position: relative;
+
+        a {
+          padding-top: var(--stepper-item-current-link-padding-top);
+        }
+
+        &::after {
+          content: var(--stepper-item-current-icon);
+          font-family: var(--stepper-item-current-icon-font-family);
+          display: var(--stepper-item-current-icon-display);
+          font-weight: var(--stepepr-item-current-icon-font-weight);
+          color: var(--stepper-item-current-icon-color);
+
+          /* Positioning */
+          position: var(--stepper-item-current-icon-position);
+          top: var(--stepper-item-current-icon-top);
+          bottom: var(--stepper-item-current-icon-bottom);
+          right: var(--stepper-item-current-icon-right);
+          left: var(--stepper-item-current-icon-left);
+          padding: var(--stepper-item-current-icon-padding);
+          z-index: 0;
+
+          /* Size */
+          font-size: var(--stepper-item-current-icon-font-size);
+          height: var(--stepper-item-current-icon-height);
+          line-height: var(--stepper-item-current-icon-line-height);
         }
       }
     }
