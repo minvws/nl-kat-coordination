@@ -92,7 +92,7 @@ def refresh_cache(
     source_url: str, data_path: Path, meta_path: Path, algo: str, file_extension: str = "json"
 ) -> tuple[dict | list, dict]:
     """Refreshes the cache for either RPKI or BGP data. Handles both JSON and JSON Lines formats."""
-    headers = {"User-Agent": "MyScript/1.0 (example@example.com)"}
+    headers = {"User-Agent": getenv("USERAGENT", default="OpenKAT")}
     response = requests.get(source_url, headers=headers, allow_redirects=True, timeout=30)
     response.raise_for_status()
 
