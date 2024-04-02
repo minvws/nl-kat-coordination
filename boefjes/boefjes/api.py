@@ -73,7 +73,7 @@ def get_scheduler_client():
 
 def get_bytes_client():
     return BytesAPIClient(
-        settings.bytes_api,
+        str(settings.bytes_api),
         username=settings.bytes_username,
         password=settings.bytes_password,
     )

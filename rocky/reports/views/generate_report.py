@@ -11,7 +11,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     REPORTS,
@@ -170,7 +170,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             except ObjectNotFoundException:
                 error_reports.append(report_type.id)
                 continue
-            except StopIteration:
+            except TypeNotFound:
                 error_reports.append(report_type.id)
                 continue
 
