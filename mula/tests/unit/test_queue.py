@@ -7,7 +7,6 @@ import uuid
 from unittest import mock
 
 from scheduler import config, models, queues, storage
-
 from tests.mocks import queue as mock_queue
 from tests.utils import functions
 

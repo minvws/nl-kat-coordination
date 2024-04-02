@@ -1,3 +1,4 @@
+import enum
 import uuid
 from datetime import datetime, timezone
 
@@ -10,7 +11,10 @@ from sqlalchemy.sql import func
 from scheduler.utils import GUID
 
 from .base import Base
-from .task import Task
+from .task import Task, TaskStatus
+
+# Make PrioritizedItemStatus an enum of TaskStatus
+PrioritizedItemStatus = enum.Enum("PrioritizedItemStatus", TaskStatus.__members__)
 
 
 class PrioritizedItem(Task):

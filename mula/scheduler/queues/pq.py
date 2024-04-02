@@ -201,6 +201,7 @@ class PriorityQueue(abc.ABC):
         if not item_on_queue:
             identifier = self.create_hash(p_item)
             p_item.hash = identifier
+            p_item.status = models.PrioritizedItemStatus.QUEUED.value
             item_db = self.pq_store.push(self.pq_id, p_item)
         else:
             self.pq_store.update(self.pq_id, p_item)
