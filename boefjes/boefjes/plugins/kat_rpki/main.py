@@ -24,7 +24,6 @@ HASHFUNC = "sha256"
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
-    now = datetime.utcnow()
     hash_algorithm = getenv("HASHFUNC", HASHFUNC)
 
     if not RPKI_PATH.exists() or cache_out_of_date():
@@ -35,17 +34,12 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         with RPKI_META_PATH.open() as json_meta_file:
             rpki_meta = json.load(json_meta_file)
     exists = False
-    notexpired = False
     roas = []
     for roa in rpki_json["roas"]:
         if IPAddress(ip) in IPNetwork(roa["prefix"]):
             exists = True
-            expires = datetime.fromtimestamp(roa["expires"])
-            roas.append({"prefix": roa["prefix"], "expires": expires.strftime("%Y-%m-%dT%H:%M"), "ta": roa["ta"]})
-            if expires > now:
-                notexpired = True
 
-    results = {"vrps_records": roas, "notexpired": notexpired, "exists": exists}
+    results = {"vrps_records": roas, "exists": exists}
 
     return [
         (set(), json.dumps(results)),
