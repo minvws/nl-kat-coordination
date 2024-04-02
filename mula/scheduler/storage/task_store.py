@@ -118,7 +118,7 @@ class TaskStore:
             (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump()))
 
     @retry()
-    def cancel_task(self, scheduler_id: str, task_ids: list[str]) -> None:
+    def cancel_tasks(self, scheduler_id: str, task_ids: list[str]) -> None:
         with self.dbconn.session.begin() as session:
             session.query(models.TaskDB).filter(
                 models.TaskDB.scheduler_id == scheduler_id, models.TaskDB.id.in_(task_ids)

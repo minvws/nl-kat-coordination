@@ -417,7 +417,7 @@ class Server:
 
     def get_task(self, task_id: str) -> Any:
         try:
-            task = self.ctx.datastores.task_store.get_task_by_id(task_id)
+            task = self.ctx.datastores.task_store.get_task(task_id)
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -446,7 +446,7 @@ class Server:
             )
 
         try:
-            task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
+            task_db = self.ctx.datastores.task_store.get_task(task_id)
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,

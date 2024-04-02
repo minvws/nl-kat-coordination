@@ -3,7 +3,6 @@ from types import SimpleNamespace
 from unittest import mock
 
 from scheduler import config, models, storage
-
 from tests.utils import functions
 
 
@@ -192,7 +191,7 @@ class ScheduleStore(unittest.TestCase):
         is_schedule_deleted = self.mock_ctx.datastores.schedule_store.get_schedule_by_id(schedule_db.id)
         self.assertEqual(is_schedule_deleted, None)
 
-        is_task_deleted = self.mock_ctx.datastores.task_store.get_task_by_id(task_db.id)
+        is_task_deleted = self.mock_ctx.datastores.task_store.get_task(task_db.id)
         self.assertIsNotNone(is_task_deleted)
         self.assertIsNone(is_task_deleted.schedule_id)
 

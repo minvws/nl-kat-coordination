@@ -18,7 +18,6 @@ from .base import Base
 from .boefje import Boefje
 from .normalizer import Normalizer
 from .raw_data import RawData
-from .schema import TaskSchema
 
 
 class TaskStatus(str, enum.Enum):

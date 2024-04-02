@@ -15,6 +15,7 @@ from scheduler.utils import GUID, cron
 
 from .base import Base
 from .errors import ValidationError
+from .task import Task
 
 
 # TODO: determine naming Schema, Definition, Manifest, Specification, Schedule, Config
@@ -33,7 +34,7 @@ class TaskSchema(BaseModel):
 
     schedule: str | None = None
 
-    tasks: list["Task"] = []
+    tasks: list[Task] = []
 
     deadline_at: datetime | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

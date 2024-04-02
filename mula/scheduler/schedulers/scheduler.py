@@ -263,7 +263,7 @@ class Scheduler(abc.ABC):
         # Do we have a schedule for this task?
         schema_db = self.ctx.datastores.schema_store.get_schema_by_hash(p_item.hash)
         if schema_db is None:
-            schema_db = self.ctx.datastores.schema_store.create_schedule(
+            schema_db = self.ctx.datastores.schema_store.create_schema(
                 models.TaskSchema(
                     scheduler_id=self.scheduler_id,
                     deadline_at=datetime.now(timezone.utc) + timedelta(seconds=self.ctx.config.pq_grace_period),
@@ -319,7 +319,7 @@ class Scheduler(abc.ABC):
             p_item: The prioritized item from the priority queue.
         """
         # Update task
-        task = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
+        task = self.ctx.datastores.task_store.get_task(str(p_item.id))
         if task is None:
             self.logger.warning(
                 "PrioritizedItem %s popped from %s, task %s not found in datastore, could not update task status",

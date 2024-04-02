@@ -49,7 +49,7 @@ class SchemaStore:
             task_orm = session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.id == task_id).one_or_none()
 
             if task_orm is None:
-                raise ValueError(f"TaskSchema not found: {task_id}")
+                return None
 
             return models.TaskSchema.model_validate(task_orm)
 
@@ -58,7 +58,7 @@ class SchemaStore:
             task_orm = session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.hash == schema_hash).one_or_none()
 
             if task_orm is None:
-                raise ValueError(f"TaskSchema not found: {schema_hash}")
+                return None
 
             return models.TaskSchema.model_validate(task_orm)
 
@@ -78,7 +78,7 @@ class SchemaStore:
             task_orm = session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.id == task.id).one_or_none()
 
             if task_orm is None:
-                raise ValueError(f"TaskSchema not found: {task.id}")
+                return None
 
             task_orm.update(task.model_dump())
             session.add(task_orm)
