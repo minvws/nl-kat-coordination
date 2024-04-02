@@ -269,7 +269,7 @@ class OctopoesAPIConnector:
         params = {k: v for k, v in params.items() if v is not None}  # filter out None values
 
         return [
-            TypeAdapter(OOIType).validate_python(ooi)
+            TypeAdapter(OOIType | str).validate_python(ooi)
             for ooi in self.session.get(f"/{self.client}/query", params=params).json()
         ]
 
@@ -290,4 +290,4 @@ class OctopoesAPIConnector:
 
         result = self.session.get(f"/{self.client}/query-many", params=params).json()
 
-        return TypeAdapter(list[tuple[str, OOIType]]).validate_python(result)
+        return TypeAdapter(list[tuple[str, OOIType | str]]).validate_python(result)
