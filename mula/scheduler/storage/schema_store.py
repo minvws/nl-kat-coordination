@@ -53,6 +53,15 @@ class SchemaStore:
 
             return models.TaskSchema.model_validate(task_orm)
 
+    def get_schema_by_hash(self, schema_hash: str) -> models.TaskSchema:
+        with self.dbconn.session.begin() as session:
+            task_orm = session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.hash == schema_hash).one_or_none()
+
+            if task_orm is None:
+                raise ValueError(f"TaskSchema not found: {schema_hash}")
+
+            return models.TaskSchema.model_validate(task_orm)
+
     @retry()
     def create_schema(self, task: models.TaskSchema) -> models.TaskSchema:
         with self.dbconn.session.begin() as session:
