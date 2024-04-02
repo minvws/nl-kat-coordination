@@ -35,7 +35,7 @@ def test_node_creation_and_deletion(xtdb_http_client: XTDBHTTPClient):
 
     xtdb_http_client.delete_node()
 
-    with pytest.raises(HTTPError):
+    with pytest.raises(NodeNotFound):
         assert xtdb_http_client.status()
 
 
