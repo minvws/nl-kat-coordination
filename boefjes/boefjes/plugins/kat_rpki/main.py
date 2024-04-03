@@ -47,6 +47,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         )
     else:
         bgp_data = load_jsonl(BGP_PATH)
+        bgp_meta = load_json(BGP_META_PATH)
 
     exists = False
     valid = False
@@ -75,6 +76,10 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         (
             {"rpki/cache-meta"},
             json.dumps(rpki_meta),
+        ),
+        (
+            {"rpki/bgp-cache-meta"},
+            json.dumps(bgp_meta),
         ),
     ]
 
