@@ -1,8 +1,10 @@
 import logging
 from ipaddress import ip_address
-from typing import List, Tuple, Union
+from os import getenv
 
 import docker
+from docker.errors import APIError
+from requests.exceptions import RequestException
 
 from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.helpers import get_file_from_container
@@ -10,7 +12,7 @@ from boefjes.plugins.helpers import get_file_from_container
 SSL_TEST_IMAGE = "drwetter/testssl.sh:3.2"
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     ip_port = input_["ip_port"]["port"]
     address = input_["ip_port"]["address"]["address"]
@@ -20,20 +22,29 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     else:
         args = f" --jsonfile tmp/output.json --server-preference {address}:{ip_port}"
 
+    timeout = getenv("TIMEOUT", 30)
+
+    environment_vars = {
+        "OPENSSL_TIMEOUT": timeout,
+        "CONNECT_TIMEOUT": timeout,
+    }
+
     client = docker.from_env()
     container = client.containers.run(
         SSL_TEST_IMAGE,
         args,
         detach=True,
+        environment=environment_vars,
     )
 
-    container.wait()
-
-    output = get_file_from_container(container, "tmp/output.json")
-
     try:
+        container.wait(timeout=300)
+        output = get_file_from_container(container, "tmp/output.json")
+    except (APIError, RequestException) as e:
+        logging.warning("DockerException occurred: %s", e)
+        container.stop()
+        raise Exception("Error occurred (possibly a timeout) while running testssl.sh")
+    finally:
         container.remove()
-    except Exception as e:
-        logging.warning(e)
 
     return [(set(), output)]

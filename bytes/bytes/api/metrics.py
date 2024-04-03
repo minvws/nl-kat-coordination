@@ -1,5 +1,4 @@
 import logging
-from typing import Dict
 
 from cachetools import TTLCache, cached
 from prometheus_client import CollectorRegistry, Gauge
@@ -30,7 +29,7 @@ def ignore_arguments_key(meta_repository: MetaDataRepository):
 
 
 @cached(cache=TTLCache(maxsize=1, ttl=get_settings().metrics_ttl_seconds), key=ignore_arguments_key)
-def cached_counts_per_organization(meta_repository: MetaDataRepository) -> Dict[str, int]:
+def cached_counts_per_organization(meta_repository: MetaDataRepository) -> dict[str, int]:
     logger.debug(
         "Metrics cache miss for cached_counts_per_organization, ttl set to %s seconds",
         get_settings().metrics_ttl_seconds,

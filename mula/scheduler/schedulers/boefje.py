@@ -1,9 +1,9 @@
+from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
-from typing import Callable, List, Optional
 
-import requests
+import httpx
 import structlog
 from opentelemetry import trace
 
@@ -41,8 +41,8 @@ class BoefjeScheduler(Scheduler):
         ctx: context.AppContext,
         scheduler_id: str,
         organisation: Organisation,
-        queue: Optional[queues.PriorityQueue] = None,
-        callback: Optional[Callable[..., None]] = None,
+        queue: queues.PriorityQueue | None = None,
+        callback: Callable[..., None] | None = None,
     ):
         self.logger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
@@ -94,21 +94,21 @@ class BoefjeScheduler(Scheduler):
         self.listeners["scan_profile_mutations"] = listener
 
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-mutations",
+            name=f"BoefjeScheduler-{self.scheduler_id}-mutations",
             target=self.listeners["scan_profile_mutations"].listen,
             loop=False,
         )
 
         # New Boefjes
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-new_boefjes",
+            name=f"BoefjeScheduler-{self.scheduler_id}-new_boefjes",
             target=self.push_tasks_for_new_boefjes,
             interval=60.0,
         )
 
         # Random OOI's from Octopoes
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-random",
+            name=f"BoefjeScheduler-{self.scheduler_id}-random",
             target=self.push_tasks_for_random_objects,
             interval=60.0,
         )
@@ -198,7 +198,9 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        with futures.ThreadPoolExecutor() as executor:
+        with futures.ThreadPoolExecutor(
+            thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
+        ) as executor:
             for boefje in boefjes:
                 executor.submit(
                     self.push_task,
@@ -214,7 +216,7 @@ class BoefjeScheduler(Scheduler):
         new_boefjes = None
         try:
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+        except httpx.HTTPError:
             self.logger.warning(
                 "Failed to get new boefjes for organisation: %s from katalogus",
                 self.organisation.name,
@@ -240,14 +242,14 @@ class BoefjeScheduler(Scheduler):
         )
 
         for boefje in new_boefjes:
-            oois_by_object_type: List[OOI] = []
+            oois_by_object_type: list[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
                     self.organisation.id,
                     boefje.consumes,
                     list(range(boefje.scan_level, 5)),
                 )
-            except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+            except httpx.HTTPError:
                 self.logger.warning(
                     "Could not get oois for organisation: %s from octopoes",
                     self.organisation.name,
@@ -256,7 +258,9 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            with futures.ThreadPoolExecutor() as executor:
+            with futures.ThreadPoolExecutor(
+                thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
+            ) as executor:
                 for ooi in oois_by_object_type:
                     executor.submit(
                         self.push_task,
@@ -283,7 +287,7 @@ class BoefjeScheduler(Scheduler):
                 n=self.ctx.config.pq_max_random_objects,
                 scan_level=[1, 2, 3, 4],
             )
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+        except httpx.HTTPError:
             self.logger.warning(
                 "Could not get random oois for organisation: %s from octopoes",
                 self.organisation.name,
@@ -321,7 +325,9 @@ class BoefjeScheduler(Scheduler):
                 )
                 continue
 
-            with futures.ThreadPoolExecutor() as executor:
+            with futures.ThreadPoolExecutor(
+                thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-random"
+            ) as executor:
                 for boefje in boefjes:
                     executor.submit(
                         self.push_task,
@@ -760,7 +766,7 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
-    def get_boefjes_for_ooi(self, ooi) -> List[Plugin]:
+    def get_boefjes_for_ooi(self, ooi) -> list[Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
 
         Args:
@@ -774,7 +780,7 @@ class BoefjeScheduler(Scheduler):
                 ooi.object_type,
                 self.organisation.id,
             )
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+        except httpx.ConnectError:
             self.logger.warning(
                 "Could not get boefjes for object_type: %s",
                 ooi.object_type,

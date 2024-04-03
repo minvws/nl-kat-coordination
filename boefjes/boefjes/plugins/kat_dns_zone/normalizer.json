@@ -1,11 +1,11 @@
 {
-    "id": "kat_dns_zone_normalize",
-    "consumes": [
-        "boefje/dns-zone"
-    ],
-    "produces": [
-        "Hostname",
-        "DNSZone",
-        "DNSSOARecord"
-    ]
+  "id": "kat_dns_zone_normalize",
+  "consumes": [
+    "boefje/dns-zone"
+  ],
+  "produces": [
+    "Hostname",
+    "DNSZone",
+    "DNSSOARecord"
+  ]
 }

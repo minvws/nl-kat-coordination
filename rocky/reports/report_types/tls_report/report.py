@@ -1,6 +1,6 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
@@ -23,13 +23,13 @@ class TLSReport(Report):
     input_ooi_types = {IPService}
     template_path = "tls_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
-        suites = {}
-        findings = []
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
+        suites: dict = {}
+        findings: list[Finding] = []
         suites_with_findings = []
         ref = Reference.from_str(input_ooi)
         tree = self.octopoes_api_connector.get_tree(
-            ref, depth=TREE_DEPTH, types={TLSCipher, Finding}, valid_time=valid_time
+            ref, valid_time=valid_time, depth=TREE_DEPTH, types={TLSCipher, Finding}
         ).store
         for pk, ooi in tree.items():
             if ooi.ooi_type == "TLSCipher":
@@ -40,7 +40,7 @@ class TLSReport(Report):
         for protocol, cipher_suites in suites.items():
             for suite in cipher_suites:
                 for finding in findings:
-                    if suite["cipher_suite_name"] in finding.description:
+                    if finding.description and suite["cipher_suite_name"] in finding.description:
                         suites_with_findings.append(suite["cipher_suite_name"])
 
         return {

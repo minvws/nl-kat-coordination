@@ -1,4 +1,4 @@
-from typing import List
+from datetime import datetime, timezone
 
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import OOI, Organisation
@@ -16,17 +16,17 @@ class Octopoes(HTTPService):
         self,
         host: str,
         source: str,
-        orgs: List[Organisation],
+        orgs: list[Organisation],
         pool_connections: int,
         timeout: int = 10,
     ):
-        self.orgs: List[Organisation] = orgs
+        self.orgs: list[Organisation] = orgs
         super().__init__(host, source, timeout, pool_connections)
 
     @exception_handler
     def get_objects_by_object_types(
-        self, organisation_id: str, object_types: List[str], scan_level: List[int]
-    ) -> List[OOI]:
+        self, organisation_id: str, object_types: list[str], scan_level: list[int]
+    ) -> list[OOI]:
         """Get all oois from octopoes"""
         if scan_level is None:
             scan_level = []
@@ -35,9 +35,10 @@ class Octopoes(HTTPService):
 
         params = {
             "types": object_types,
-            "scan_level": {s for s in scan_level},
+            "scan_level": [s for s in scan_level],
             "offset": 0,
             "limit": 1,
+            "valid_time": datetime.now(timezone.utc),
         }
 
         # Get the total count of objects
@@ -58,7 +59,7 @@ class Octopoes(HTTPService):
         return oois
 
     @exception_handler
-    def get_random_objects(self, organisation_id: str, n: int, scan_level: List[int]) -> List[OOI]:
+    def get_random_objects(self, organisation_id: str, n: int, scan_level: list[int]) -> list[OOI]:
         """Get `n` random oois from octopoes"""
         if scan_level is None:
             scan_level = []
@@ -67,7 +68,8 @@ class Octopoes(HTTPService):
 
         params = {
             "amount": str(n),
-            "scan_level": {s for s in scan_level},
+            "scan_level": [s for s in scan_level],
+            "valid_time": datetime.now(timezone.utc),
         }
 
         response = self.get(url, params=params)
@@ -78,7 +80,7 @@ class Octopoes(HTTPService):
     def get_object(self, organisation_id: str, reference: str) -> OOI:
         """Get an ooi from octopoes"""
         url = f"{self.host}/{organisation_id}"
-        response = self.get(url, params={"reference": reference})
+        response = self.get(url, params={"reference": reference, "valid_time": datetime.now(timezone.utc)})
         return OOI(**response.json())
 
     def is_healthy(self) -> bool:

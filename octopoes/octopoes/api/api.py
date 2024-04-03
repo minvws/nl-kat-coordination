@@ -8,15 +8,15 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request
 from fastapi.responses import JSONResponse
+from httpx import RequestError
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from pika.adapters.utils.connection_workflow import AMQPConnectionWorkflowFailed
-from requests import RequestException
 
 from octopoes.api.models import ServiceHealth
 from octopoes.api.router import router
@@ -45,7 +45,7 @@ if settings.span_export_grpc_endpoint is not None:
     logger.info("Setting up instrumentation with span exporter endpoint [%s]", settings.span_export_grpc_endpoint)
 
     FastAPIInstrumentor.instrument_app(app)
-    RequestsInstrumentor().instrument()
+    HTTPXClientInstrumentor().instrument()
 
     resource = Resource(attributes={SERVICE_NAME: "octopoes"})
     provider = TracerProvider(resource=resource)
@@ -57,7 +57,7 @@ if settings.span_export_grpc_endpoint is not None:
 
 
 @app.exception_handler(RequestValidationError)
-def http_validation_exception_handler(request: Request, exc: RequestException) -> JSONResponse:
+def http_validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     logger.critical(exc)
     return JSONResponse(
         {
@@ -67,8 +67,8 @@ def http_validation_exception_handler(request: Request, exc: RequestException) -
     )
 
 
-@app.exception_handler(RequestException)
-def http_exception_handler(request: Request, exc: RequestException) -> JSONResponse:
+@app.exception_handler(RequestError)
+def http_exception_handler(request: Request, exc: RequestError) -> JSONResponse:
     logger.critical(exc)
     return JSONResponse(
         {

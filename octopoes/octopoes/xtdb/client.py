@@ -1,13 +1,13 @@
+import functools
 import logging
+from collections.abc import Callable
 from datetime import datetime, timezone
 from enum import Enum
-from functools import lru_cache
-from http import HTTPStatus
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type, Union
+from typing import Any
 
-import requests
+import httpx
+from httpx import HTTPError, HTTPStatusError, Response, codes
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
-from requests import HTTPError, Response
 
 from octopoes.models.transaction import TransactionRecord
 from octopoes.xtdb.exceptions import NodeNotFound, XTDBException
@@ -24,53 +24,44 @@ class OperationType(Enum):
     FN = "fn"
 
 
-Operation = Tuple[OperationType, Union[str, Dict[str, Any]], Optional[datetime]]
+Operation = tuple[OperationType, str | dict[str, Any], datetime | None]
 
 
 class Transaction(BaseModel):
-    operations: List[Operation] = Field(alias="tx-ops")
+    operations: list[Operation] = Field(alias="tx-ops")
     model_config = ConfigDict(populate_by_name=True)
 
 
-class XTDBHTTPSession(requests.Session):
-    def __init__(self, base_url: str):
-        super().__init__()
-
-        self._base_url = base_url
-        self.headers["Accept"] = "application/json"
-
-    def request(self, method: str, url: Union[str, bytes], **kwargs) -> requests.Response:
-        return super().request(method, self._base_url + str(url), **kwargs)
-
-
 class XTDBStatus(BaseModel):
-    version: Optional[str] = None
-    revision: Optional[str] = None
-    indexVersion: Optional[int] = None
-    consumerState: Optional[str] = None
-    kvStore: Optional[str] = None
-    estimateNumKeys: Optional[int] = None
-    size: Optional[int] = None
+    version: str | None = None
+    revision: str | None = None
+    indexVersion: int | None = None
+    consumerState: str | None = None
+    kvStore: str | None = None
+    estimateNumKeys: int | None = None
+    size: int | None = None
 
 
-@lru_cache(maxsize=1)
-def get_xtdb_http_session(base_url):
-    return XTDBHTTPSession(base_url)
+@functools.cache
+def _get_xtdb_http_session(base_url: str) -> httpx.Client:
+    return httpx.Client(
+        base_url=base_url, headers={"Accept": "application/json"}, transport=(httpx.HTTPTransport(retries=3))
+    )
 
 
 class XTDBHTTPClient:
     def __init__(self, base_url, client: str):
         self._client = client
-        self._session = get_xtdb_http_session(base_url.rstrip("/"))
+        self._session = _get_xtdb_http_session(base_url)
 
     @staticmethod
     def _verify_response(response: Response) -> None:
         try:
             response.raise_for_status()
-        except HTTPError as e:
-            if e.response.status_code != HTTPStatus.NOT_FOUND:
+        except HTTPStatusError as e:
+            if e.response.status_code != codes.NOT_FOUND:
                 logger.error(response.request.url)
-                logger.error(response.request.body)
+                logger.error(response.request.content)
                 logger.error(response.text)
             raise e
 
@@ -82,7 +73,7 @@ class XTDBHTTPClient:
         self._verify_response(res)
         return XTDBStatus.model_validate_json(res.content)
 
-    def get_entity(self, entity_id: str, valid_time: Optional[datetime] = None) -> dict:
+    def get_entity(self, entity_id: str, valid_time: datetime | None = None) -> dict:
         if valid_time is None:
             valid_time = datetime.now(timezone.utc)
         res = self._session.get(
@@ -97,11 +88,11 @@ class XTDBHTTPClient:
         *,
         sort_order: str = "asc",  # Or: "desc"
         with_docs: bool = False,
-        has_doc: Optional[bool] = None,
+        has_doc: bool | None = None,
         offset: int = 0,
-        limit: Optional[int] = None,
-        indices: Optional[List[int]] = None,
-    ) -> List[TransactionRecord]:
+        limit: int | None = None,
+        indices: list[int] | None = None,
+    ) -> list[TransactionRecord]:
         params = {
             "eid": entity_id,
             "sort-order": sort_order,
@@ -111,7 +102,7 @@ class XTDBHTTPClient:
 
         res = self._session.get(f"{self.client_url()}/entity", params=params)
         self._verify_response(res)
-        transactions: List[TransactionRecord] = TypeAdapter(List[TransactionRecord]).validate_json(res.content)
+        transactions: list[TransactionRecord] = TypeAdapter(list[TransactionRecord]).validate_json(res.content)
 
         if has_doc is True:  # The doc is None if and only if the hash is  "0000000000000000000000000000000000000000"
             transactions = [transaction for transaction in transactions if transaction.content_hash != 40 * "0"]
@@ -124,13 +115,13 @@ class XTDBHTTPClient:
 
         return transactions[offset:limit]
 
-    def query(self, query: Union[str, Query], valid_time: Optional[datetime] = None) -> List[List[Any]]:
+    def query(self, query: str | Query, valid_time: datetime | None = None) -> list[list[Any]]:
         if valid_time is None:
             valid_time = datetime.now(timezone.utc)
         res = self._session.post(
             f"{self.client_url()}/query",
             params={"valid-time": valid_time.isoformat()},
-            data=str(query),
+            content=str(query),
             headers={"Content-Type": "application/edn"},
         )
         self._verify_response(res)
@@ -140,10 +131,10 @@ class XTDBHTTPClient:
         self._session.get(f"{self.client_url()}/await-tx", params={"txId": transaction_id})
         logger.info("Transaction completed [txId=%s]", transaction_id)
 
-    def submit_transaction(self, operations: List[Operation]) -> None:
+    def submit_transaction(self, operations: list[Operation]) -> None:
         res = self._session.post(
             f"{self.client_url()}/submit-tx",
-            data=Transaction(operations=operations).json(by_alias=True),
+            content=Transaction(operations=operations).json(by_alias=True),
             headers={"Content-Type": "application/json"},
         )
 
@@ -163,14 +154,14 @@ class XTDBHTTPClient:
             res = self._session.post("/delete-node", json={"node": self._client})
             self._verify_response(res)
         except HTTPError as e:
-            if e.response.status_code == HTTPStatus.NOT_FOUND:
+            if isinstance(e, HTTPStatusError) and e.response.status_code == codes.NOT_FOUND:
                 raise NodeNotFound from e
 
             logger.exception("Failed deleting node")
 
             raise XTDBException("Could not delete node") from e
 
-    def sync(self, timeout: Optional[int] = None):
+    def sync(self, timeout: int | None = None):
         params = {}
 
         if timeout is not None:
@@ -186,19 +177,19 @@ class XTDBSession:
     def __init__(self, client: XTDBHTTPClient):
         self.client = client
 
-        self._operations = []
-        self.post_commit_callbacks = []
+        self._operations: list[Operation] = []
+        self.post_commit_callbacks: list[Callable[[], None]] = []
 
     def __enter__(self):
         return self
 
-    def __exit__(self, _exc_type: Type[Exception], _exc_value: str, _exc_traceback: str) -> None:
+    def __exit__(self, _exc_type: type[Exception], _exc_value: str, _exc_traceback: str) -> None:
         self.commit()
 
     def add(self, operation: Operation):
         self._operations.append(operation)
 
-    def put(self, document: Union[str, Dict[str, Any]], valid_time: datetime):
+    def put(self, document: str | dict[str, Any], valid_time: datetime):
         self.add((OperationType.PUT, document, valid_time))
 
     def commit(self) -> None:

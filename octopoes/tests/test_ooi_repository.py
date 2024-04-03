@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from ipaddress import IPv4Address
-from typing import List, Literal, cast
+from typing import Literal, cast
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
@@ -35,7 +35,7 @@ class OOIRepositoryTest(TestCase):
         class TestOOIClass(OOI):
             object_type: Literal["TestOOIClass"] = "TestOOIClass"
             id: str = "test_id"
-            multiple_refs: List[Reference] = ReferenceField(Network)
+            multiple_refs: list[Reference] = ReferenceField(Network)
             _natural_key_attrs = ["id"]
 
         internet = Network(name="internet")
@@ -90,12 +90,12 @@ class OOIRepositoryTest(TestCase):
     @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
     def test_encode_outgoing_segment(self):
         path = Path.parse("MockIPAddressV4.network")
-        self.assertEqual("MockIPAddressV4/network", self.repository.encode_segment(path.segments[0]))
+        self.assertEqual("MockIPAddressV4/network", path.segments[0].encode())
 
     @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
     def test_encode_incoming_segment(self):
         path = Path.parse("MockIPAddressV4.<address [is MockIPPort]")
-        self.assertEqual("MockIPPort/_address", self.repository.encode_segment(path.segments[0]))
+        self.assertEqual("MockIPPort/_address", path.segments[0].encode())
 
     @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
     def test_decode_outgoing_segment(self):

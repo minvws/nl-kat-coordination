@@ -3,9 +3,9 @@ import csv
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import requests
+import httpx
 
 OCTOPOES_API = "http://localhost:8001"
 KATALOGUS_API = "http://localhost:8003"
@@ -14,7 +14,7 @@ SCHEDULER_API = "http://localhost:8004"
 
 def run(org_num: int = 1):
     # Create organisations
-    orgs: List[Dict[str, Any]] = []
+    orgs: list[dict[str, Any]] = []
     for n in range(0, org_num):
         org = {
             "id": f"org-{n}",
@@ -22,7 +22,7 @@ def run(org_num: int = 1):
         }
         orgs.append(org)
 
-        resp_katalogus = requests.post(
+        resp_katalogus = httpx.post(
             url=f"{KATALOGUS_API}/v1/organisations/",
             json=org,
             timeout=30,
@@ -30,7 +30,7 @@ def run(org_num: int = 1):
 
         try:
             resp_katalogus.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except httpx.HTTPError:
             if resp_katalogus.status_code != 404:
                 print("Error creating organisation ", org)
                 raise
@@ -39,11 +39,11 @@ def run(org_num: int = 1):
                 print("Organisation already exists in katalogus", org)
 
         try:
-            requests.post(
+            httpx.post(
                 url=f"{OCTOPOES_API}/{org.get('id')}/node/",
                 timeout=30,
             )
-        except requests.exceptions.HTTPError:
+        except httpx.HTTPError:
             print("Error creating organisation ", org)
             raise
 
@@ -52,7 +52,7 @@ def run(org_num: int = 1):
         # Enable boefjes for organisation
         boefjes = ("dns-records", "dns-sec", "dns-zone")
         for boefje_id in boefjes:
-            resp_enable_boefje = requests.patch(
+            resp_enable_boefje = httpx.patch(
                 url=f"{KATALOGUS_API}/v1/organisations/{org.get('id')}/repositories/LOCAL/plugins/{boefje_id}",
                 json={"enabled": True},
                 timeout=30,
@@ -60,13 +60,13 @@ def run(org_num: int = 1):
 
             try:
                 resp_enable_boefje.raise_for_status()
-            except requests.exceptions.HTTPError:
+            except httpx.HTTPError:
                 print("Error enabling boefje ", boefje_id)
                 raise
 
             print("Enabled boefje ", boefje_id)
 
-    declarations: List[Dict[str, Any]] = []
+    declarations: list[dict[str, Any]] = []
 
     # Check if data file exists
     if not Path("data.csv").exists():
@@ -98,22 +98,22 @@ def run(org_num: int = 1):
 
     for org in orgs:
         for declaration in declarations:
-            resp_octopoes_decl = requests.post(
+            resp_octopoes_decl = httpx.post(
                 f"{OCTOPOES_API}/{org.get('id')}/declarations", json=declaration, timeout=30
             )
 
             try:
                 resp_octopoes_decl.raise_for_status()
-            except requests.exceptions.HTTPError:
+            except httpx.HTTPError:
                 print("Error creating declaration ", declaration)
                 print(resp_octopoes_decl.text)
                 raise
 
             print("Org", org.get("id"), "created declaration ", declaration)
 
-            resp_octopoes_scan_profile = requests.put(
+            resp_octopoes_scan_profile = httpx.put(
                 url=f"{OCTOPOES_API}/{org.get('id')}/scan_profiles",
-                params={"valid_time": datetime.now(timezone.utc)},
+                params={"valid_time": str(datetime.now(timezone.utc))},
                 json={
                     "scan_profile_type": "declared",
                     "reference": declaration.get("ooi").get("scan_profile").get("reference"),
@@ -124,7 +124,7 @@ def run(org_num: int = 1):
 
             try:
                 resp_octopoes_scan_profile.raise_for_status()
-            except requests.exceptions.HTTPError:
+            except httpx.HTTPError:
                 print("Error creating scan profile", declaration.get("ooi").get("scan_profile"))
                 print(resp_octopoes_scan_profile.text)
                 raise

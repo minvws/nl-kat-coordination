@@ -4,15 +4,14 @@ import datetime
 import json
 import uuid
 from enum import Enum
-from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
-import requests
+import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from httpx import HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
-from requests.exceptions import HTTPError
 
 from rocky.health import ServiceHealth
 
@@ -23,8 +22,8 @@ class Boefje(BaseModel):
     """Boefje representation."""
 
     id: str
-    name: Optional[str] = Field(default=None)
-    version: Optional[str] = Field(default=None)
+    name: str | None = Field(default=None)
+    version: str | None = Field(default=None)
 
 
 class BoefjeMeta(BaseModel):
@@ -32,27 +31,27 @@ class BoefjeMeta(BaseModel):
 
     id: uuid.UUID
     boefje: Boefje
-    input_ooi: Optional[str] = None
-    arguments: Dict[str, Any]
+    input_ooi: str | None = None
+    arguments: dict[str, Any]
     organization: str
-    started_at: Optional[datetime.datetime] = None
-    ended_at: Optional[datetime.datetime] = None
+    started_at: datetime.datetime | None = None
+    ended_at: datetime.datetime | None = None
 
 
 class RawData(BaseModel):
     id: uuid.UUID
     boefje_meta: BoefjeMeta
-    mime_types: List[Dict[str, str]]
-    secure_hash: Optional[str] = None
-    hash_retrieval_link: Optional[str] = None
+    mime_types: list[dict[str, str]]
+    secure_hash: str | None = None
+    hash_retrieval_link: str | None = None
 
 
 class Normalizer(BaseModel):
     """Normalizer representation."""
 
-    id: Optional[str] = None
-    name: Optional[str] = None
-    version: Optional[str] = Field(default=None)
+    id: str | None = None
+    name: str | None = None
+    version: str | None = Field(default=None)
 
 
 class NormalizerMeta(BaseModel):
@@ -66,7 +65,7 @@ class NormalizerMeta(BaseModel):
 class NormalizerTask(BaseModel):
     """NormalizerTask represent data needed for a Normalizer to run."""
 
-    id: Optional[uuid.UUID] = None
+    id: uuid.UUID | None = None
     normalizer: Normalizer
     raw_data: RawData
     type: str = "normalizer"
@@ -75,9 +74,9 @@ class NormalizerTask(BaseModel):
 class BoefjeTask(BaseModel):
     """BoefjeTask represent data needed for a Boefje to run."""
 
-    id: Optional[uuid.UUID] = None
+    id: uuid.UUID | None = None
     boefje: Boefje
-    input_ooi: Optional[str] = None
+    input_ooi: str | None = None
     organization: str
     type: str = "boefje"
 
@@ -88,10 +87,10 @@ class PrioritizedItem(BaseModel):
     representation.
     """
 
-    id: Optional[uuid.UUID] = None
-    hash: Optional[str] = None
+    id: uuid.UUID | None = None
+    hash: str | None = None
     priority: int
-    data: SerializeAsAny[Union[BoefjeTask, NormalizerTask]]
+    data: SerializeAsAny[BoefjeTask | NormalizerTask]
 
 
 class TaskStatus(Enum):
@@ -106,7 +105,7 @@ class TaskStatus(Enum):
 
 
 class Task(BaseModel):
-    id: Optional[uuid.UUID] = None
+    id: uuid.UUID | None = None
     scheduler_id: str
     type: str
     p_item: PrioritizedItem
@@ -118,9 +117,9 @@ class Task(BaseModel):
 
 class PaginatedTasksResponse(BaseModel):
     count: int
-    next: Optional[str] = None
-    previous: Optional[str] = None
-    results: List[Task]
+    next: str | None = None
+    previous: str | None = None
+    results: list[Task]
 
 
 class LazyTaskList:
@@ -131,7 +130,7 @@ class LazyTaskList:
     ):
         self.scheduler_client = scheduler_client
         self.kwargs = kwargs
-        self._count = None
+        self._count: int | None = None
 
     @property
     def count(self) -> int:
@@ -145,7 +144,7 @@ class LazyTaskList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key) -> List[Task]:
+    def __getitem__(self, key) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = key.stop - offset
@@ -190,26 +189,26 @@ class TaskNotFoundError(SchedulerError):
 
 class SchedulerClient:
     def __init__(self, base_uri: str):
-        self.session = requests.Session()
-        self._base_uri = base_uri
+        self._client = httpx.Client(base_url=base_uri)
 
     def list_tasks(
         self,
         **kwargs,
     ) -> PaginatedTasksResponse:
-        res = self.session.get(f"{self._base_uri}/tasks", params=kwargs)
+        kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
+        res = self._client.get("/tasks", params=kwargs)
         return PaginatedTasksResponse.model_validate_json(res.content)
 
     def get_lazy_task_list(
         self,
         scheduler_id: str,
-        task_type: Optional[str] = None,
-        status: Optional[str] = None,
-        min_created_at: Optional[datetime.datetime] = None,
-        max_created_at: Optional[datetime.datetime] = None,
-        input_ooi: Optional[str] = None,
-        plugin_id: Optional[str] = None,
-        boefje_name: Optional[str] = None,
+        task_type: str | None = None,
+        status: str | None = None,
+        min_created_at: datetime.datetime | None = None,
+        max_created_at: datetime.datetime | None = None,
+        input_ooi: str | None = None,
+        plugin_id: str | None = None,
+        boefje_name: str | None = None,
     ) -> LazyTaskList:
         return LazyTaskList(
             self,
@@ -223,8 +222,8 @@ class SchedulerClient:
             boefje_name=boefje_name,
         )
 
-    def get_task_details(self, organization_code: str, task_id: str) -> Optional[Task]:
-        res = self.session.get(f"{self._base_uri}/tasks/{task_id}")
+    def get_task_details(self, organization_code: str, task_id: str) -> Task:
+        res = self._client.get(f"/tasks/{task_id}")
         res.raise_for_status()
         task_details = Task.model_validate_json(res.content)
 
@@ -239,27 +238,33 @@ class SchedulerClient:
 
     def push_task(self, queue_name: str, prioritized_item: PrioritizedItem) -> None:
         try:
-            res = self.session.post(f"{self._base_uri}/queues/{queue_name}/push", data=prioritized_item.json())
+            res = self._client.post(
+                f"/queues/{queue_name}/push",
+                content=prioritized_item.json(),
+                headers={"Content-Type": "application/json"},
+            )
             res.raise_for_status()
-        except HTTPError as http_error:
+        except HTTPStatusError as http_error:
             code = http_error.response.status_code
-            if code == HTTPStatus.TOO_MANY_REQUESTS:
+            if code == codes.TOO_MANY_REQUESTS:
                 raise TooManyRequestsError()
-            elif code == HTTPStatus.BAD_REQUEST:
+            elif code == codes.BAD_REQUEST:
                 raise BadRequestError()
-            elif code == HTTPStatus.CONFLICT:
+            elif code == codes.CONFLICT:
                 raise ConflictError()
             else:
                 raise SchedulerError()
+        except RequestError:
+            raise SchedulerError()
 
     def health(self) -> ServiceHealth:
-        health_endpoint = self.session.get(f"{self._base_uri}/health")
+        health_endpoint = self._client.get("/health")
         health_endpoint.raise_for_status()
         return ServiceHealth.model_validate_json(health_endpoint.content)
 
-    def get_task_stats(self, organization_code: str, task_type: str) -> Dict:
+    def get_task_stats(self, organization_code: str, task_type: str) -> dict:
         try:
-            res = self.session.get(f"{self._base_uri}/tasks/stats/{task_type}-{organization_code}")
+            res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
             res.raise_for_status()
         except HTTPError:
             raise SchedulerError()

@@ -1,9 +1,9 @@
 {
-    "id": "certificate-search",
-    "name": "CRT",
-    "description": "Certificate search",
-    "consumes": [
-        "DNSZone"
-    ],
-    "scan_level": 1
+  "id": "certificate-search",
+  "name": "CRT",
+  "description": "Certificate search",
+  "consumes": [
+    "DNSZone"
+  ],
+  "scan_level": 1
 }

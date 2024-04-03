@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -88,7 +88,7 @@ class ReportTypesSelectionMultiReportView(BreadcrumbsMultiReportView, BaseReport
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.get_oois()
-        context["available_report_types"] = self.get_report_types_for_generate_report([MultiOrganizationReport])
+        context["available_report_types"] = self.get_report_types_for_generate_report({MultiOrganizationReport})
         return context
 
 
@@ -105,7 +105,7 @@ class SetupScanMultiReportView(BreadcrumbsMultiReportView, BaseReportView, Templ
             messages.error(self.request, _("Select at least one report type to proceed."))
 
         if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("multi_report_view", kwargs=kwargs) + self.get_selection())
+            return redirect(reverse("multi_report_view", kwargs=kwargs) + get_selection(request))
 
         return super().get(request, *args, **kwargs)
 
@@ -123,10 +123,12 @@ class MultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView):
     template_name = "multi_report.html"
     current_step = 6
 
-    def multi_reports_for_oois(self) -> Dict[str, Dict[str, Any]]:
+    def multi_reports_for_oois(self) -> dict[str, dict[str, Any]]:
         report = MultiOrganizationReport(self.octopoes_api_connector)
 
-        return report.post_process_data(collect_report_data(self.octopoes_api_connector, self.selected_oois))
+        return report.post_process_data(
+            collect_report_data(self.octopoes_api_connector, self.selected_oois, self.observed_at)
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
