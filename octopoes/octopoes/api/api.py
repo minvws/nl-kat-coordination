@@ -23,7 +23,7 @@ from octopoes.api.router import router
 from octopoes.config.settings import Settings
 from octopoes.core.app import close_rabbit_channel
 from octopoes.events.manager import get_rabbit_channel
-from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.version import __version__
 from octopoes.xtdb.exceptions import NodeNotFound
 from octopoes.xtdb.query import InvalidField, InvalidPath
@@ -97,6 +97,17 @@ def invalid_path(request: Request, exc: InvalidPath) -> JSONResponse:
     return JSONResponse(
         {
             "value": str(exc),
+        },
+        status.HTTP_404_NOT_FOUND,
+    )
+
+
+@app.exception_handler(TypeNotFound)
+def type_not_found(request: Request, exc: TypeNotFound) -> JSONResponse:
+    logger.critical(exc)
+    return JSONResponse(
+        {
+            "value": "Type not found",
         },
         status.HTTP_404_NOT_FOUND,
     )
