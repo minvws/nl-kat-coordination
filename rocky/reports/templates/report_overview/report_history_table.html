@@ -16,14 +16,16 @@
             <table>
                 <caption class="visually-hidden">{% translate "Reports:" %}</caption>
                 <thead>
-                    <th scope="col">
-                        <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
-                    </th>
-                    <th scope="col">{% translate "Name" %}</th>
-                    <th scope="col">{% translate "Report type" %}</th>
-                    <th scope="col">{% translate "Objects" %}</th>
-                    <th scope="col">{% translate "Reference date" %}</th>
-                    <th scope="col">{% translate "Creation date" %}</th>
+                    <tr>
+                        <th scope="col">
+                            <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                        </th>
+                        <th scope="col">{% translate "Name" %}</th>
+                        <th scope="col">{% translate "Report type" %}</th>
+                        <th scope="col">{% translate "Objects" %}</th>
+                        <th scope="col">{% translate "Reference date" %}</th>
+                        <th scope="col">{% translate "Creation date" %}</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <tr>
@@ -51,10 +53,12 @@
                             <table>
                                 <caption class="visually-hidden">{% translate "Reports:" %}</caption>
                                 <thead>
-                                    <th scope="col">{% translate "Object name" %}</th>
-                                    <th scope="col">{% translate "Object type" %}</th>
-                                    <th scope="col">{% translate "Clearance level" %}</th>
-                                    <th scope="col">{% translate "Tags" %}</th>
+                                    <tr>
+                                        <th scope="col">{% translate "Object name" %}</th>
+                                        <th scope="col">{% translate "Object type" %}</th>
+                                        <th scope="col">{% translate "Clearance level" %}</th>
+                                        <th scope="col">{% translate "Tags" %}</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
