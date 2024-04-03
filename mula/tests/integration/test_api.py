@@ -38,7 +38,7 @@ class APITemplateTestCase(unittest.TestCase):
         # Organisation
         self.organisation = OrganisationFactory()
 
-        # Queue and Schemar
+        # Queue and Scheduler
         queue = mock_queue.MockPriorityQueue(
             pq_id=self.organisation.id,
             maxsize=10,
@@ -47,7 +47,7 @@ class APITemplateTestCase(unittest.TestCase):
             pq_store=self.mock_ctx.datastores.pq_store,
         )
 
-        self.scheduler = mock_scheduler.MockSchemar(
+        self.scheduler = mock_scheduler.MockScheduler(
             ctx=self.mock_ctx,
             scheduler_id=self.organisation.id,
             queue=queue,
