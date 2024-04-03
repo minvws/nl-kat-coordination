@@ -61,6 +61,3 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
         self.assertIsNotNone(popped_item)
         self.assertEqual(popped_item.id, created_p_item.id)
         self.assertEqual(popped_item.task_id, task.id)
-
-    def test_task_relationship(self):
-        pass

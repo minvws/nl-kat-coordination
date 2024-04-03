@@ -178,29 +178,3 @@ class TaskStore:
                 response[status.value] = task_count
 
             return response
-
-    def pop(self, scheduler_id: str, filters: FilterRequest | None = None) -> models.Task | None:
-        with self.dbconn.session.begin() as session:
-            query = session.query(models.TaskDB).filter(
-                models.TaskDB.scheduler_id == scheduler_id,
-            )
-
-            if filters is not None:
-                query = apply_filter(models.TaskDB, query, filters)
-
-            task_orm = query.order_by(models.TaskDB.priority.desc()).first()
-
-    def push(self, scheduler_id: str, task: models.Task) -> None:
-        pass
-
-    def peek(self, scheduler_id: str, index: int) -> models.Task | None:
-        pass
-
-    def empty(self, scheduler_id: str) -> bool:
-        pass
-
-    def qsize(self, scheduler_id: str) -> int:
-        pass
-
-    def clear(self, scheduler_id: str) -> None:
-        pass
