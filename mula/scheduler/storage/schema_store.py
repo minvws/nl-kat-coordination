@@ -35,55 +35,50 @@ class SchemaStore:
 
             try:
                 count = query.count()
-                tasks_orm = query.order_by(models.TaskSchemaDB.created_at.desc()).offset(offset).limit(limit).all()
+                schemas_orm = query.order_by(models.TaskSchemaDB.created_at.desc()).offset(offset).limit(limit).all()
             except exc.ProgrammingError as e:
                 raise ValueError(f"Invalid filter: {e}") from e
 
-            tasks = [models.TaskSchema.model_validate(task_orm) for task_orm in tasks_orm]
+            schemas = [models.TaskSchema.model_validate(schema_orm) for schema_orm in schemas_orm]
 
-            return tasks, count
+            return schemas, count
 
     @retry()
-    def get_schema(self, task_id: str) -> models.TaskSchema:
+    def get_schema(self, schema_id: str) -> models.TaskSchema:
         with self.dbconn.session.begin() as session:
-            task_orm = session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.id == task_id).one_or_none()
+            schema_orm = session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.id == schema_id).one_or_none()
 
-            if task_orm is None:
+            if schema_orm is None:
                 return None
 
-            return models.TaskSchema.model_validate(task_orm)
+            return models.TaskSchema.model_validate(schema_orm)
 
     def get_schema_by_hash(self, schema_hash: str) -> models.TaskSchema:
         with self.dbconn.session.begin() as session:
-            task_orm = session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.hash == schema_hash).one_or_none()
+            schema_orm = (
+                session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.hash == schema_hash).one_or_none()
+            )
 
-            if task_orm is None:
+            if schema_orm is None:
                 return None
 
-            return models.TaskSchema.model_validate(task_orm)
+            return models.TaskSchema.model_validate(schema_orm)
 
     @retry()
-    def create_schema(self, task: models.TaskSchema) -> models.TaskSchema:
+    def create_schema(self, schema: models.TaskSchema) -> models.TaskSchema:
         with self.dbconn.session.begin() as session:
-            task_orm = models.TaskSchemaDB(**task.model_dump())
-            session.add(task_orm)
+            schema_orm = models.TaskSchemaDB(**schema.model_dump())
+            session.add(schema_orm)
 
-            created_task = models.TaskSchema.model_validate(task_orm)
+            created_schema = models.TaskSchema.model_validate(schema_orm)
 
-            return created_task
+            return created_schema
 
     @retry()
-    def update_schema(self, task: models.TaskSchema) -> models.TaskSchema:
+    def update_schema(self, schema: models.TaskSchema) -> None:
         with self.dbconn.session.begin() as session:
-            task_orm = session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.id == task.id).one_or_none()
-
-            if task_orm is None:
-                return None
-
-            task_orm.update(task.model_dump())
-            session.add(task_orm)
-
-            # TODO: validate cron expression
-            updated_task = models.TaskSchema.model_validate(task_orm)
-
-            return updated_task
+            (
+                session.query(models.TaskSchemaDB)
+                .filter(models.TaskSchemaDB.id == schema.id)
+                .update(schema.model_dump(exclude={"tasks"}))
+            )

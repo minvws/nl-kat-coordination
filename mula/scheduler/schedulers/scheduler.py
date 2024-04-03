@@ -204,7 +204,7 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
-            p_item.status = models.PrioritizedItemStatus.QUEUED.value
+            p_item.status = models.PrioritizedItemStatus.QUEUED
             p_item = self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
             self.logger.warning(
@@ -255,7 +255,6 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The prioritized item from the priority queue.
         """
-        # Set last activity of scheduler
         self.last_activity = datetime.now(timezone.utc)
 
         # Create TaskSchema
@@ -271,6 +270,9 @@ class Scheduler(abc.ABC):
                     modified_at=datetime.now(timezone.utc),
                 )
             )
+
+        p_item.schema_id = schema_db.id
+        self.ctx.datastores.task_store.update_task(p_item)
 
     def pop_item_from_queue(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
         """Pop an item from the queue.
@@ -344,23 +346,23 @@ class Scheduler(abc.ABC):
             return
 
         def _calculate_deadline(task: models.Task):
-            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(task.p_item.hash)
+            schema = self.ctx.datastores.schema_store.get_schema_by_hash(task.hash)
 
             try:
-                schedule.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(schedule))
+                schema.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(schema))
             except Exception:
                 self.logger.error(
                     "Unable to calculate deadline for schedule %s. Disabling schedule",
-                    schedule.id,
-                    schedule_id=schedule.id,
+                    schema.id,
+                    schema_id=schema.id,
                     task_hash=task.p_item.hash,
                     scheduler_id=self.scheduler_id,
                 )
-                schedule.enabled = False
+                schema.enabled = False
 
-            schedule.evaluated_at = datetime.now(timezone.utc)
-            self.ctx.datastores.schedule_store.update_schedule(schedule)
+            self.ctx.datastores.schema_store.update_schema(schema)
 
+        # TODO: explain why we're using executor here
         self.executor.submit(_calculate_deadline, task)
 
     def enable(self) -> None:

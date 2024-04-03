@@ -102,7 +102,12 @@ class PriorityQueueStore:
     @retry()
     def qsize(self, scheduler_id: str) -> int:
         with self.dbconn.session.begin() as session:
-            count = session.query(models.TaskDB).filter(models.TaskDB.scheduler_id == scheduler_id).count()
+            count = (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                .count()
+            )
 
             return count
 

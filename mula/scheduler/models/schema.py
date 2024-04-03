@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import ClassVar
 
 import mmh3
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
@@ -20,7 +20,7 @@ from .task import Task
 
 # TODO: determine naming Schema, Definition, Manifest, Specification, Schedule, Config
 class TaskSchema(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, validate_assignment=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
@@ -40,14 +40,17 @@ class TaskSchema(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-    # TODO: pydantic validator?
-    def validate_schedule(self):
+    @field_validator("schedule")
+    @classmethod
+    def validate_schedule(cls, value: str):
         """Validate the schedule cron expression."""
-        if self.cron_expression is not None:
-            try:
-                cron.next_run(self.cron_expression)
-            except Exception as exc:
-                raise ValidationError(f"Invalid cron expression: {self.cron_expression}") from exc
+        if value is None:
+            return
+
+        try:
+            cron.next_run(value)
+        except Exception as exc:
+            raise ValueError(f"Invalid cron expression: {value}") from exc
 
 
 class TaskSchemaDB(Base):

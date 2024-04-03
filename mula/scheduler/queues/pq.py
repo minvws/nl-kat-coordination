@@ -120,8 +120,6 @@ class PriorityQueue(abc.ABC):
         if item is None:
             return None
 
-        self.remove(item)
-
         return item
 
     def push(self, p_item: models.PrioritizedItem) -> models.PrioritizedItem | None:
