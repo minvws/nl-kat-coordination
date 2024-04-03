@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-26 16:12+0000\n"
+"POT-Creation-Date: 2024-04-03 15:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2116,6 +2116,7 @@ msgid "Selected Report Types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/partials/plugin_overview_table.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr ""
@@ -3144,6 +3145,7 @@ msgid "Ciphers:"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
+#: reports/templates/partials/plugin_overview_table.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
@@ -3316,6 +3318,26 @@ msgstr ""
 msgid "Overview of reports"
 msgstr ""
 
+#: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/partials/report_sidemenu.html
+#: rocky/templates/oois/ooi_page_tabs.html
+msgid "Overview"
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+msgid "Plugin overview table"
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/partials/report_setup_scan.html
+msgid "Required plugins"
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/partials/report_setup_scan.html
+msgid "Suggested plugins"
+msgstr ""
+
 #: reports/templates/partials/report_header.html
 msgid "OpenKAT Report"
 msgstr ""
@@ -3452,19 +3474,11 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Required plugins"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Good job! All required plugins are enabled."
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
-msgid "Suggested plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3490,11 +3504,6 @@ msgstr ""
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total per severity overview:"
-msgstr ""
-
-#: reports/templates/partials/report_sidemenu.html
-#: rocky/templates/oois/ooi_page_tabs.html
-msgid "Overview"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html

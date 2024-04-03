@@ -174,10 +174,29 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                 error_reports.append(report_type.id)
                 continue
 
+            if report_type.name not in report_data:
+                report_data[report_type.name] = {}
+
+            required_plugin_count = sum(
+                1
+                for plugin in self.plugins["required"]
+                if plugin.enabled and plugin.id in report_type.plugins["required"]
+            )
+            optional_plugin_count = sum(
+                1
+                for plugin in self.plugins["optional"]
+                if plugin.enabled and plugin.id in report_type.plugins["optional"]
+            )
+
+            report_data[report_type.name] = {
+                "required_plugin_count": required_plugin_count,
+                "optional_plugin_count": optional_plugin_count,
+                "total_required": len(report_type.plugins["required"]),
+                "total_optional": len(report_type.plugins["optional"]),
+            }
+
             for ooi, data in results.items():
                 ooi_human_readable = Reference.from_str(ooi).human_readable
-                if report_type.name not in report_data:
-                    report_data[report_type.name] = {}
 
                 report_data[report_type.name][ooi] = {
                     "data": data,

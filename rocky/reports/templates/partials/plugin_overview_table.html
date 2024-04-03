@@ -1,0 +1,50 @@
+{% load i18n %}
+
+<section id="asset-overview">
+    <div>
+        <h2>{% translate "Overview" %}</h2>
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">{% translate "Plugin overview table" %}</caption>
+                <thead>
+                    <tr>
+                        <th>{% translate "Report type" %}</th>
+                        <th>{% translate "Status" %}</th>
+                        <th>{% translate "Required plugins" %}</th>
+                        <th>{% translate "Suggested plugins" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report_type, data in report_data.items %}
+                        <tr>
+                            <td>{{ report_type }}</td>
+                            <td>
+                                <span class="icon positive"></span>Ready
+                            </td>
+                            <td>
+                                <span class="icon negative"></span>{{ data.required_plugin_count }}/{{ data.total_required }}
+                            </td>
+                            <td>
+                                <span class="icon negative"></span>{{ data.optional_plugin_count }}/{{ data.total_optional }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tfoot>
+                        <tr>
+                            <td>Total</td>
+                            <td>
+                                <span class="icon positive"></span>Ready
+                            </td>
+                            <td>
+                                <span class="icon negative"></span>0/0
+                            </td>
+                            <td>
+                                <span class="icon negative"></span>0/0
+                            </td>
+                        </tr>
+                    </tfoot>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
