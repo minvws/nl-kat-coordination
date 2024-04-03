@@ -4,7 +4,7 @@
     "boefje/nuclei-cve"
   ],
   "produces": [
-    "Findings",
+    "Finding",
     "CVEFindingType"
   ]
 }
