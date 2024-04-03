@@ -4,7 +4,7 @@
     "boefje/nuclei-exposed-panels"
   ],
   "produces": [
-    "Findings",
+    "Finding",
     "KATFindingType"
   ]
 }
