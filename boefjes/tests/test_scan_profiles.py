@@ -22,8 +22,8 @@ class ScanProfileTest(TestCase):
 
         raw = json.dumps(
             {
-                "ip_addresses": [{"ip_address": "127.0.0.1"}, {"ip_address": "10.0.0.0"}],
-                "domains": [{"domain": "example.com"}],
+                "ip_addresses": [{"address": "127.0.0.1"}, {"address": "10.0.0.0"}],
+                "domains": [{"name": "example.com"}],
             }
         )
         output = runner.run(meta, bytes(raw, "UTF-8"))
