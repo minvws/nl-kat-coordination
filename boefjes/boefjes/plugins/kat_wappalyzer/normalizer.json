@@ -1,5 +1,5 @@
 {
-  "id": "kat_webpage_analysis_wappalyzer_normalize",
+  "id": "kat_wappalyzer_normalize",
   "consumes": [
     "openkat-http/response"
   ],

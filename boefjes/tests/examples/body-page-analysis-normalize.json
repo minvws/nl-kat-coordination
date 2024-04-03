@@ -59,7 +59,7 @@
     ]
   },
   "normalizer": {
-    "id": "kat_webpage_analysis_wappalyzer_normalize",
+    "id": "kat_wappalyzer_normalize",
     "version": null
   }
 }
