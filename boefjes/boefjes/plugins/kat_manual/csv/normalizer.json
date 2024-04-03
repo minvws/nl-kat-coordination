@@ -4,6 +4,6 @@
     "manual/csv"
   ],
   "produces": [
-    "OOIType"
+    "OOI"
   ]
 }
