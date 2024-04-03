@@ -59,7 +59,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             expires = datetime.fromtimestamp(roa["expires"])
             asn = roa["asn"]
             roas.append(
-                {"prefix": roa["prefix"], "expires": expires.strftime("%Y-%m-%dT%H:%M"), "ta": roa["ta"], "asn": asn}
+                {"prefix": roa["prefix"], "expires": expires.strftime("%Y-%m-%dT%H:%M%z"), "ta": roa["ta"], "asn": asn}
             )
             exists = True
 
