@@ -102,6 +102,17 @@ def invalid_path(request: Request, exc: InvalidPath) -> JSONResponse:
     )
 
 
+@app.exception_handler(ValueError)
+def value_error(request: Request, exc: ValueError) -> JSONResponse:
+    logger.critical(exc)
+    return JSONResponse(
+        {
+            "value": str(exc),
+        },
+        status.HTTP_400_BAD_REQUEST,
+    )
+
+
 @app.exception_handler(TypeNotFound)
 def type_not_found(request: Request, exc: TypeNotFound) -> JSONResponse:
     logger.critical(exc)
