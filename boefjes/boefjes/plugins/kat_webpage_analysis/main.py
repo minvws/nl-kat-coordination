@@ -73,7 +73,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     return [
         ({"openkat-http/response"}, f"{response_dump}\n\n{content}"),
-        ({"openkat-http/headers"}, response_dump),
+        ({"openkat-http/headers"}, json.dumps(dict(response.headers))),
         (body_mimetypes, response.content),
     ]
 
