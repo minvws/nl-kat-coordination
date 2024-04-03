@@ -87,7 +87,7 @@ def invalid_field(request: Request, exc: InvalidField) -> JSONResponse:
         {
             "value": str(exc),
         },
-        status.HTTP_404_NOT_FOUND,
+        status.HTTP_400_BAD_REQUEST,
     )
 
 
@@ -98,7 +98,7 @@ def invalid_path(request: Request, exc: InvalidPath) -> JSONResponse:
         {
             "value": str(exc),
         },
-        status.HTTP_404_NOT_FOUND,
+        status.HTTP_400_BAD_REQUEST,
     )
 
 
