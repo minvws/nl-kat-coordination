@@ -26,6 +26,7 @@ from octopoes.events.manager import get_rabbit_channel
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.version import __version__
 from octopoes.xtdb.exceptions import NodeNotFound
+from octopoes.xtdb.query import InvalidField, InvalidPath
 
 settings = Settings()
 logger = logging.getLogger(__name__)
@@ -76,6 +77,28 @@ def http_exception_handler(request: Request, exc: RequestError) -> JSONResponse:
             "value": str(exc),
         },
         status.HTTP_502_BAD_GATEWAY,
+    )
+
+
+@app.exception_handler(InvalidField)
+def invalid_field(request: Request, exc: InvalidField) -> JSONResponse:
+    logger.critical(exc)
+    return JSONResponse(
+        {
+            "value": str(exc),
+        },
+        status.HTTP_404_NOT_FOUND,
+    )
+
+
+@app.exception_handler(InvalidPath)
+def invalid_path(request: Request, exc: InvalidPath) -> JSONResponse:
+    logger.critical(exc)
+    return JSONResponse(
+        {
+            "value": str(exc),
+        },
+        status.HTTP_404_NOT_FOUND,
     )
 
 

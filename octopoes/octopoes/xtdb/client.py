@@ -59,6 +59,7 @@ class XTDBHTTPClient:
         try:
             response.raise_for_status()
         except HTTPStatusError as e:
+            logger.error(e.response.status_code)
             if e.response.status_code != codes.NOT_FOUND:
                 logger.error(response.request.url)
                 logger.error(response.request.content)
