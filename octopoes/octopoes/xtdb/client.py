@@ -67,7 +67,7 @@ class XTDBHTTPClient:
                 raise e
             else:
                 if response.json()["error"] == "Node not found":
-                    raise NodeNotFound
+                    raise NodeNotFound() from e
                 else:
                     raise e
 
