@@ -62,7 +62,7 @@ netaddr = "0.9.0"
 # required by kat_burpsuite, kat_cwe_finding_types and kat_ssl_scan
 defusedxml = "^0.7.1"
 # required by kat_webpage_analysis/check_images normalizer
-pillow = "^10.2.0"
+pillow = "^10.3.0"
 httpx = "^0.27.0"
 
 [tool.poetry.group.dev.dependencies]
