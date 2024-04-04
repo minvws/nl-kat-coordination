@@ -259,7 +259,7 @@ class Scheduler(abc.ABC):
 
         # Create TaskSchema
         #
-        # Do we have a schedule for this task?
+        # Do we have a schema for this task?
         schema_db = self.ctx.datastores.schema_store.get_schema_by_hash(p_item.hash)
         if schema_db is None:
             schema_db = self.ctx.datastores.schema_store.create_schema(

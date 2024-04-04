@@ -195,7 +195,7 @@ class Server:
             path="/queues/{queue_id}/pop",
             endpoint=self.pop_queue,
             methods=["POST"],
-            response_model=models.Task | None,
+            response_model=models.PrioritizedItem | None,
             status_code=status.HTTP_200_OK,
             description="Pop an item from a queue",
         )
@@ -204,7 +204,7 @@ class Server:
             path="/queues/{queue_id}/push",
             endpoint=self.push_queue,
             methods=["POST"],
-            response_model=models.Task | None,
+            response_model=models.PrioritizedItem | None,
             status_code=status.HTTP_201_CREATED,
             description="Push an item to a queue",
         )
@@ -534,9 +534,9 @@ class Server:
                 detail="could not pop item from queue, check your filters",
             )
 
-        return models.Task(**p_item.model_dump())
+        return models.PrioritizedItem(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.Task) -> Any:
+    def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -546,7 +546,7 @@ class Server:
 
         try:
             # Load default values
-            p_item = models.Task()
+            p_item = models.PrioritizedItem()
 
             # Set values
             if p_item.scheduler_id is None:
