@@ -15,17 +15,31 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for report_type, data in report_data.items %}
+                    {% for report_type, data in plugin_data.report_types.items %}
                         <tr>
                             <td>{{ report_type }}</td>
                             <td>
-                                <span class="icon positive"></span>Ready
+                                {% if data.number_of_enabled_required != data.number_of_available_required or data.number_of_enabled_optional != data.number_of_available_optional %}
+                                    <span class="icon warning"></span>{% translate "Action required" %}
+                                {% else %}
+                                    <span class="icon positive"></span>{% translate "Ready" %}
+                                {% endif %}
                             </td>
                             <td>
-                                <span class="icon negative"></span>{{ data.required_plugin_count }}/{{ data.total_required }}
+                                {% if data.number_of_available_required > 0 and data.number_of_enabled_required != data.number_of_available_required %}
+                                    <span class="icon warning"></span>
+                                {% else %}
+                                    <span class="icon positive"></span>
+                                {% endif %}
+                                {{ data.number_of_enabled_required }}/{{ data.number_of_available_required }}
                             </td>
                             <td>
-                                <span class="icon negative"></span>{{ data.optional_plugin_count }}/{{ data.total_optional }}
+                                {% if data.number_of_available_optional > 0 and data.number_of_enabled_optional != data.data.number_of_available_optional %}
+                                    <span class="icon warning"></span>
+                                {% else %}
+                                    <span class="icon positive"></span>
+                                {% endif %}
+                                {{ data.number_of_enabled_optional }}/{{ data.number_of_available_optional }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -33,13 +47,27 @@
                         <tr>
                             <td>Total</td>
                             <td>
-                                <span class="icon positive"></span>Ready
+                                {% if plugin_data.total_enabled_plugins.required != plugin_data.total_available_plugins.required or plugin_data.total_enabled_plugins.optional != plugin_data.total_available_plugins.optional %}
+                                    <span class="icon warning"></span>{% translate "Action required" %}
+                                {% else %}
+                                    <span class="icon positive"></span>{% translate "Ready" %}
+                                {% endif %}
                             </td>
                             <td>
-                                <span class="icon negative"></span>0/0
+                                {% if plugin_data.total_available_plugins.required > 0 and plugin_data.total_enabled_plugins.required != plugin_data.total_available_plugins.required %}
+                                    <span class="icon warning"></span>
+                                {% else %}
+                                    <span class="icon positive"></span>
+                                {% endif %}
+                                {{ plugin_data.total_enabled_plugins.required }}/{{ plugin_data.total_available_plugins.required }}
                             </td>
                             <td>
-                                <span class="icon negative"></span>0/0
+                                {% if plugin_data.total_available_plugins.optional > 0 and plugin_data.total_enabled_plugins.optional != plugin_data.total_available_plugins.optional %}
+                                    <span class="icon warning"></span>
+                                {% else %}
+                                    <span class="icon positive"></span>
+                                {% endif %}
+                                {{ plugin_data.total_enabled_plugins.optional }}/{{ plugin_data.total_available_plugins.optional }}
                             </td>
                         </tr>
                     </tfoot>
