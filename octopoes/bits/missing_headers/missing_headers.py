@@ -1,11 +1,12 @@
 from collections.abc import Iterator
+from typing import Any
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
 
-def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, str]) -> Iterator[OOI]:
+def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, Any]) -> Iterator[OOI]:
     if not additional_oois:
         return
 

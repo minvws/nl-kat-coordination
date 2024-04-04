@@ -43,7 +43,9 @@ class PluginSchemaForm(forms.Form):
 
         # The form assigns "" and in some scenario's null to all unfilled (optional) fields
         cleaned_data = {
-            key: value for key, value in cleaned_data.items() if value is not None and value != ""  # noqa: PLC1901
+            key: value
+            for key, value in cleaned_data.items()
+            if value is not None and value != ""  # noqa: PLC1901
         }
 
         validator = Draft202012Validator(self.plugin_schema)
