@@ -45,9 +45,8 @@ class SchedulerView(OctopoesView):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
             return super().get(request, *args, **kwargs)
-        except SchedulerError as error:
-            messages.error(self.request, error.message)
-        return redirect("health_beautified", organization_code=self.organization.code)
+        except SchedulerError:
+            return redirect("health_beautified", organization_code=self.organization.code)
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         return {
