@@ -11,9 +11,10 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
+    REPORTS,
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
     get_report_types_for_oois,
@@ -140,8 +141,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
-        if not self.are_plugins_enabled(self.plugins):
-            warning_message = _("This report may not show all the data as some plugins are not enabled.")
+        if not self.all_plugins_enabled["required"]:
+            warning_message = _("This report may not show all the data as some required plugins are not enabled.")
             messages.add_message(self.request, messages.WARNING, warning_message)
         return super().get(request, *args, **kwargs)
 
@@ -156,9 +157,10 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             if ooi_type not in by_type:
                 by_type[ooi_type] = []
 
-                by_type[ooi_type].append(ooi)
+            by_type[ooi_type].append(ooi)
 
-        for report_type in self.report_types:
+        sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
+        for report_type in sorted_report_types:
             oois = {
                 ooi for ooi_type in report_type.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
             }
@@ -168,15 +170,20 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             except ObjectNotFoundException:
                 error_reports.append(report_type.id)
                 continue
-            except StopIteration:
+            except TypeNotFound:
                 error_reports.append(report_type.id)
                 continue
 
             for ooi, data in results.items():
-                if ooi not in report_data:
-                    report_data[ooi] = {}
+                ooi_human_readable = Reference.from_str(ooi).human_readable
+                if report_type.name not in report_data:
+                    report_data[report_type.name] = {}
 
-                report_data[ooi][report_type.name] = {"data": data, "template": report_type.template_path}
+                report_data[report_type.name][ooi] = {
+                    "data": data,
+                    "template": report_type.template_path,
+                    "ooi_human_readable": ooi_human_readable,
+                }
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:

@@ -33,7 +33,7 @@ class IPv6Report(Report):
         For ip addresses, check all hostnames that point to them, and check whether they point to ipv6 addresses.
         """
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
-        all_hostnames = [h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames]
+        all_hostnames = list({h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames})
 
         query = "Hostname.<hostname[is ResolvedHostname].address"
         ips = self.group_by_source(self.octopoes_api_connector.query_many(query, valid_time, all_hostnames))

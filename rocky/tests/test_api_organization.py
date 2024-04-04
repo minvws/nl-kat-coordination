@@ -2,6 +2,7 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
+from httpx import HTTPError
 from pytest_assert_utils import assert_model_attrs
 from pytest_common_subject import precondition_fixture
 from pytest_drf import (
@@ -19,7 +20,6 @@ from pytest_drf import (
 )
 from pytest_drf.util import pluralized, url_for
 from pytest_lambda import lambda_fixture, static_fixture
-from requests import HTTPError
 from tools.models import Organization
 
 pytestmark = pytest.mark.django_db

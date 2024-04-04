@@ -49,7 +49,6 @@ class AggregateOrganisationReport(AggregateReport):
         ipv6 = {}
         vulnerabilities = {}
         total_criticals = 0
-        total_findings = 0
         total_systems = 0
         unique_ips = set()
         unique_hostnames = set()
@@ -103,7 +102,6 @@ class AggregateOrganisationReport(AggregateReport):
 
                 if report_id == VulnerabilityReport.id:
                     for ip, vulnerabilities_data in report_specific_data.items():
-                        total_findings += vulnerabilities_data["summary"]["total_findings"]
                         terms.extend(vulnerabilities_data["summary"]["terms"])
                         recommendations.extend(vulnerabilities_data["summary"]["recommendations"])
                         vulnerabilities_data["title"] = ip.split("|")[2]
@@ -371,6 +369,7 @@ class AggregateOrganisationReport(AggregateReport):
         recommendations = list(set(filter(None, recommendations)))
         total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
+        total_criticals = sum(vulnerability["summary"]["total_criticals"] for vulnerability in vulnerabilities.values())
 
         summary = {
             # _("General recommendations"): "",

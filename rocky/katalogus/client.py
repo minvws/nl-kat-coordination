@@ -1,8 +1,7 @@
-import json
 from io import BytesIO
 from logging import getLogger
 
-import requests
+import httpx
 from django.conf import settings
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
@@ -10,6 +9,7 @@ from pydantic import BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
+from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
 
@@ -65,22 +65,21 @@ class Normalizer(Plugin):
 
 class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
-        self.session = requests.Session()
-        self.base_uri = base_uri
+        self.session = httpx.Client(base_url=base_uri)
         self.organization = organization
-        self.organization_uri = f"{base_uri}/v1/organisations/{organization}"
+        self.organization_uri = f"/v1/organisations/{organization}"
 
     def organization_exists(self) -> bool:
-        response = self.session.get(f"{self.organization_uri}")
+        response = self.session.get(self.organization_uri)
 
         return response.status_code != 404
 
     def create_organization(self, name: str):
-        response = self.session.post(f"{self.base_uri}/v1/organisations/", json={"id": self.organization, "name": name})
+        response = self.session.post("/v1/organisations/", json={"id": self.organization, "name": name})
         response.raise_for_status()
 
     def delete_organization(self):
-        response = self.session.delete(f"{self.organization_uri}")
+        response = self.session.delete(self.organization_uri)
         response.raise_for_status()
 
     def get_plugins(self, **params):
@@ -98,6 +97,8 @@ class KATalogusClientV1:
         response.raise_for_status()
 
         schema = response.json()
+        if not schema:
+            return None
 
         try:
             Draft202012Validator.check_schema(schema)
@@ -129,7 +130,7 @@ class KATalogusClientV1:
         return response
 
     def health(self) -> ServiceHealth:
-        response = self.session.get(f"{self.base_uri}/health")
+        response = self.session.get("/health")
         response.raise_for_status()
 
         return ServiceHealth.model_validate_json(response.content)
@@ -156,10 +157,8 @@ class KATalogusClientV1:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
     def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
-        body = {"enabled": enabled}
         response = self.session.patch(
-            f"{self.organization_uri}/repositories/{repository_id}/plugins/{boefje_id}",
-            data=json.dumps(body),
+            f"{self.organization_uri}/repositories/{repository_id}/plugins/{boefje_id}", json={"enabled": enabled}
         )
         response.raise_for_status()
 
@@ -183,7 +182,7 @@ def parse_boefje(boefje: dict) -> Boefje:
     for type_name in boefje.get("consumes", []):
         try:
             consumes.add(type_by_name(type_name))
-        except StopIteration:
+        except TypeNotFound:
             logger.warning("Unknown OOI type %s for boefje consumes %s", type_name, boefje["id"])
 
     return Boefje(
@@ -209,7 +208,7 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
     for type_name in normalizer.get("produces", []):
         try:
             produces.add(type_by_name(type_name))
-        except StopIteration:
+        except TypeNotFound:
             logger.warning("Unknown OOI type %s for normalizer produces %s", type_name, normalizer["id"])
 
     return Normalizer(

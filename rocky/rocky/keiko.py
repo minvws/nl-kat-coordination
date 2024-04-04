@@ -6,11 +6,11 @@ from http import HTTPStatus
 from io import BytesIO
 from typing import Any, BinaryIO
 
-import requests
+import httpx
 from django.conf import settings
 from django.urls import reverse
 from django.utils import translation
-from requests import HTTPError
+from httpx import HTTPError
 from tools.ooi_helpers import get_ooi_dict
 from tools.view_helpers import get_ooi_url, url_with_querystring
 
@@ -34,14 +34,13 @@ class GeneratingReportFailed(ReportException):
 
 class KeikoClient:
     def __init__(self, base_uri: str, timeout: int = 60):
-        self.session = requests.Session()
-        self._base_uri = base_uri
+        self.session = httpx.Client(base_url=base_uri)
         self._timeout = timeout
 
     def generate_report(self, template: str, data: dict, glossary: str) -> str:
         try:
             res = self.session.post(
-                f"{self._base_uri}/reports",
+                "/reports",
                 json={
                     "template": template,
                     "data": data,
@@ -59,7 +58,7 @@ class KeikoClient:
         try:
             for _ in range(self._timeout):
                 time.sleep(1)
-                res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf")
+                res = self.session.get(f"/reports/{report_id}.keiko.pdf")
 
                 if res.status_code == HTTPStatus.NOT_FOUND:
                     continue
@@ -72,7 +71,7 @@ class KeikoClient:
         raise ReportNotFoundException
 
     def health(self) -> ServiceHealth:
-        res = self.session.get(f"{self._base_uri}/health")
+        res = self.session.get("/health")
         res.raise_for_status()
 
         return ServiceHealth.model_validate_json(res.content)

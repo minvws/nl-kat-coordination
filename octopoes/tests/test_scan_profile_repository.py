@@ -8,8 +8,7 @@ from tests.mocks.mock_ooi_types import ALL_OOI_TYPES, MockIPAddressV4, MockNetwo
 
 @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
 class ScanProfileRepositoryTest(TestCase):
-    def setUp(self) -> None:
-        ...
+    def setUp(self) -> None: ...
 
     def test_serialize_declared(self):
         scan_profile = DeclaredScanProfile(

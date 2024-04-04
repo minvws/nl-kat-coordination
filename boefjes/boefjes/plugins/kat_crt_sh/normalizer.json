@@ -1,10 +1,10 @@
 {
-    "id": "kat_crt_sh_normalize",
-    "consumes": [
-        "boefje/certificate-search"
-    ],
-    "produces": [
-        "Hostname",
-        "X509Certificate"
-    ]
+  "id": "kat_crt_sh_normalize",
+  "consumes": [
+    "boefje/certificate-search"
+  ],
+  "produces": [
+    "Hostname",
+    "X509Certificate"
+  ]
 }

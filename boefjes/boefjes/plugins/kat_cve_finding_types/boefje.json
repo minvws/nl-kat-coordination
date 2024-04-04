@@ -1,13 +1,13 @@
 {
-    "id": "cve-finding-types",
-    "name": "CVE Finding Types",
-    "description": "Hydrate information of CVE finding types from the CVE API",
-    "consumes": [
-        "CVEFindingType"
-    ],
-    "environment_keys": [
-        "CVEAPI_URL"
-    ],
-    "scan_level": 0,
-    "enabled": true
+  "id": "cve-finding-types",
+  "name": "CVE Finding Types",
+  "description": "Hydrate information of CVE finding types from the CVE API",
+  "consumes": [
+    "CVEFindingType"
+  ],
+  "environment_keys": [
+    "CVEAPI_URL"
+  ],
+  "scan_level": 0,
+  "enabled": true
 }
