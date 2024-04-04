@@ -95,3 +95,15 @@
     }
   }
 }
+
+span {
+  &.label {
+    display:inline-flex;
+    max-width:300px;
+    border-radius:4px;
+    padding:4px 8px;
+    font-size: var(--tile-font-size);
+    font-weight:700;
+  }
+
+}

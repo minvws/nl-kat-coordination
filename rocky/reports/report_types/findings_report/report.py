@@ -23,6 +23,7 @@ class FindingsReport(Report):
     plugins: ReportPlugins = {"required": [], "optional": []}
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
+    label_style = "tags-color-3-light"
 
     def get_finding_valid_time_history(self, reference: Reference) -> list[datetime]:
         transaction_record = self.octopoes_api_connector.get_history(reference=reference)

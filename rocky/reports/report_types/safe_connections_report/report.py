@@ -21,6 +21,7 @@ class SafeConnectionsReport(Report):
     plugins = {"required": ["dns-records", "testssl-sh-ciphers", "nmap"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "safe_connections_report/report.html"
+    label_style = "tags-color-2-light"
 
     def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
         ips_by_input_ooi = self.to_ips(input_oois, valid_time)

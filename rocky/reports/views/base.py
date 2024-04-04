@@ -162,7 +162,12 @@ class BaseReportView(OOIFilterView):
 
     def get_report_types(self) -> list[ReportType]:
         return [
-            {"id": report_type.id, "name": report_type.name, "description": report_type.description}
+            {
+                "id": report_type.id,
+                "name": report_type.name,
+                "description": report_type.description,
+                "label_style": report_type.description,
+            }
             for report_type in self.get_report_types_from_choice()
         ]
 

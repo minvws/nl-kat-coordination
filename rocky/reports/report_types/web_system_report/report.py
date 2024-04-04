@@ -108,6 +108,7 @@ class WebSystemReport(Report):
     }
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "web_system_report/report.html"
+    label_style = "tags-color-3-light"
 
     def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)

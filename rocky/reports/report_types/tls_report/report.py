@@ -22,6 +22,7 @@ class TLSReport(Report):
     plugins = {"required": ["testssl-sh-ciphers"], "optional": []}
     input_ooi_types = {IPService}
     template_path = "tls_report/report.html"
+    label_style = "tags-color-3-light"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         suites: dict = {}
