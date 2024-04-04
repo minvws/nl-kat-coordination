@@ -24,7 +24,7 @@ class BaseReport:
     name: str
     description: str
     template_path: str = "report.html"
-    label_style = "tags-color-1-light"
+    label_style = "tags-color-1-light"  # default/fallback color
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
