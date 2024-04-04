@@ -17,7 +17,7 @@
                 {% translate "If you choose not to give a plugin permission to run, the data that plugin would collect or produce will be left out of the report which will then be generated based on the available data collected by the enabled plugins." %}
             </p>
             <h3>{% translate "Required plugins" %}</h3>
-            <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
+            <p>{% translate "This report type requires the following plugins to be enabled" %}:</p>
             {% if all_plugins_enabled.required %}
                 <p>{% translate "Good job! All required plugins are enabled." %}</p>
             {% else %}
@@ -30,7 +30,7 @@
             {% endif %}
             <h3>{% translate "Suggested plugins" %}</h3>
             <p>
-                {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
+                {% translate "This report requires at least one of the following plugins to be enabled to generate the report" %}:
             </p>
             {% if all_plugins_enabled.optional %}
                 <p>{% translate "Good job! All suggested plugins are enabled" %}</p>

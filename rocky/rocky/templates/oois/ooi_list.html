@@ -29,7 +29,7 @@
 
                 <p class="de-emphasized">
                     {% if active_filters %}
-                        <strong>{% translate "Currently filtered on:" %}</strong>
+                        <strong>{% translate "Currently filtered on" %}:</strong>
                         {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value|title }}&nbsp;{% endfor %}
                     {% endif %}
                 </p>

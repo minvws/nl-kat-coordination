@@ -27,8 +27,8 @@
             <p class="warning"
                role="group"
                aria-label="{% translate "scan level warning" %}">
+                <span>{% translate "Warning scan level" %}:</span>
                 {% blocktranslate trimmed %}
-                    <span>Warning scan level:</span>
                     Scanning OOI's with a lower clearance level will result in OpenKAT increasing the clearance level on that OOI,
                     not only for this scan but from now on out, until it manually gets set to something else again.
                     This means that all other enabled Boefjes will use this higher clearance level aswel.
@@ -46,8 +46,9 @@
         {% else %}
             {% blocktranslate trimmed with name=plugin.name %}
                 You currently don't have scannable objects for {{ name }}.
-                Add objects to use this Boefje. This Boefje is able to scan objects of the following types:
+                Add objects to use this Boefje. This Boefje is able to scan objects of the following types
             {% endblocktranslate %}
+            :
             <p>
                 {% for ooi in plugin.consumes %}
                     <a href="{% url "ooi_add" ooi_type=ooi organization_code=organization.code %}">{{ ooi }}</a>

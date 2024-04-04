@@ -11,7 +11,7 @@
             <div>
                 {% include "oois/ooi_page_tabs.html" with view="scan_profile_detail" ooi=ooi %}
 
-                <h1>{% translate "Set clearance level for:" %} {{ ooi.human_readable }}</h1>
+                <h1>{% translate "Set clearance level for" %}: {{ ooi.human_readable }}</h1>
                 <p>
                     {% translate "Setting the scan level from \"declared\" to \"inherit\" means it will inherit a clearance level from other objects, or that no clearance level will be inherited. " %}
                 </p>
