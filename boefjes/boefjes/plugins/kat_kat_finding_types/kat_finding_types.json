@@ -467,5 +467,11 @@
     "risk": "low",
     "impact": "All Certificate Authorities may issue certificates for you domain.",
     "recommendation": "Set a CAA record to limit which CA's are allowed to issue certs."
+  },
+  "KAT-DISALLOWED-DOMAIN-IN-CSP": {
+    "description": "This CSP header contains domains that are not allowed, If the website contains a cross-site scripting vulnerability, then JavaScript code can be injected into the web page hosted on these domains which can host files for anyone.",
+    "risk": "medium",
+    "impact": "Disallowed domains are domains that are for example 'world writable', this opens up the possibility for an atacker to host malicious files on a csp whitelisted domain.",
+    "recommendation": "Remove the offending hostname from the CSP header."
   }
 }
