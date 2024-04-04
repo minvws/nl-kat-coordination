@@ -134,10 +134,10 @@ class LocalPluginRepository:
                 continue
 
             path = self.path / package.name.replace(prefix, "").replace(".", "/")
-            not_present_files = [file for file in files if not (path / file).exists()]
+            missing_files = [file for file in files if not (path / file).exists()]
 
-            if not_present_files:
-                logging.debug("Files %s not found for %s", not_present_files, package.name)
+            if missing_files:
+                logging.debug("Files %s not found for %s", missing_files, package.name)
                 continue
 
             paths.append((path, package.name))
