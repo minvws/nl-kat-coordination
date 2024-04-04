@@ -60,9 +60,9 @@ and will by default rotate the log file when it gets larger than 10 MB. See the
 about this. Tools like [filebeat][filebeat-kubernetes] also work by mounting the
 host `/var/log/containers` in the filebeat container. This is something that can
 be done with a cluster component like filebeat that is supposed to have access
-to the log files of all containers. This must must not be done with an
-application like OpenKAT, because OpenKAT should not have access to the log
-files of other applications that are running on the Kubernetes cluster.
+to the log files of all containers. This should not be done with an application
+like OpenKAT, because OpenKAT should not have access to the log files of other
+applications that are running on the Kubernetes cluster.
 
 Copying files from the container is also not an option, because for example the
 `kubectl cp` command to copy files from a container actually executes `tar` in
