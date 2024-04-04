@@ -77,10 +77,6 @@ build-backend = "setuptools.build_meta:__legacy__"
 line-length = 120
 transform-concats = true
 
-[tool.black]
-target-version = ["py310", "py311"]
-line-length = 120
-
 [tool.pytest.ini_options]
 env = [
     "KATALOGUS_DB_URI=postgresql://postgres:postgres@ci_katalogus-db:5432/ci_katalogus",

@@ -55,10 +55,11 @@ repos:
     exclude: |
       /tests/
 
-- repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: 'v0.3.4'
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: 'v0.3.5'
   hooks:
   - id: ruff
+  - id: ruff-format
 
 - repo: https://github.com/asottile/pyupgrade
   rev: v3.15.2
@@ -71,11 +72,6 @@ repos:
   hooks:
   - id: django-upgrade
     args: [--target-version, "4.2"]
-
-- repo: https://github.com/psf/black
-  rev: "24.3.0"
-  hooks:
-  - id: black
 
 - repo: https://github.com/pre-commit/mirrors-mypy
   rev: v1.9.0
@@ -145,7 +141,7 @@ repos:
     exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
 - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-  rev: v16.3.0
+  rev: v16.3.1
   hooks:
     - id: stylelint
       args: [ --fix ]
