@@ -12,7 +12,7 @@ Django = "^4.2.11"
 django-two-factor-auth = "^1.14.0"
 django-environ = "^0.11.2"
 jsonschema = "^4.17.0"
-phonenumbers = "^8.12.57"
+phonenumbers = "^8.13.33"
 psycopg2 = "^2.9.6"
 pydantic = "^2.4.2"
 python-dotenv = "^1.0.0"
@@ -79,7 +79,3 @@ max_line_length = 120
 blank_line_after_tag = "load,extends,include"
 # https://www.djlint.com/docs/linter/#rules
 ignore = "H006,H016,H017,H030,H031"
-
-[tool.black]
-target-version = ["py310", "py311"]
-line-length = 120

@@ -4,7 +4,7 @@
     "boefje/snyk-finding-types"
   ],
   "produces": [
-    "SNYKFindingType"
+    "SnykFindingType"
   ],
   "enabled": true
 }
