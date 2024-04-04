@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from pydantic import BaseModel, Field
 
 
@@ -8,15 +6,3 @@ class PrioritizedItemRequest(BaseModel):
 
     priority: int
     data: dict = Field(default_factory=dict)
-
-
-class ScheduleRequest(BaseModel):
-    scheduler_id: str
-
-    enabled: bool = True
-
-    p_item: dict = Field(default_factory=dict)
-
-    cron_expression: str | None = None
-
-    deadline_at: datetime | None = None
