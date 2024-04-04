@@ -47,8 +47,7 @@ if [ "$volume_exists" ]; then
 fi
 
 if [ -z "${snapshot:-}" ]; then
-#  snapshot="$(ls -At "${backup_path}/${volume}/" | tail -n 1)"
-  snapshot="$(ls -At "${backup_path}/${volume}/" | head -n 1)"
+  snapshot="$(ls -At "${backup_path}/${volume}/" | tail -n 1)"
 fi
 
 if [ -z "${snapshot:-}" ]; then
