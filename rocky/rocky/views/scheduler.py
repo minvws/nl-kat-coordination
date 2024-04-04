@@ -5,10 +5,10 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
 from katalogus.client import Boefje, Normalizer
 
 from octopoes.models import OOI
+from rocky.scheduler import Boefje as SchedulerBoefje
 from rocky.scheduler import (
     BoefjeTask,
     NormalizerTask,
@@ -19,6 +19,7 @@ from rocky.scheduler import (
     Task,
     scheduler_client,
 )
+from rocky.scheduler import Normalizer as SchedulerNormalizer
 from rocky.views.mixins import OctopoesView
 
 
@@ -28,22 +29,22 @@ def get_date_time(date: str | None) -> datetime | None:
     return None
 
 
-class SchedulerView(OctopoesView, TemplateView):
+class SchedulerView(OctopoesView):
     task_type: str = "boefje"  # default task type
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.scheduler_client = scheduler_client(self.organization.code)
         self.scheduler_id = f"{self.task_type}-{self.organization.code}"
-        self.task_type = self.request.GET.get("type", self.task_type)
-        self.status = self.request.GET.get("scan_history_status", None)
-        self.min_created_at = get_date_time(self.request.GET.get("scan_history_from", None))
-        self.max_created_at = get_date_time(self.request.GET.get("scan_history_to", None))
-        self.input_ooi = self.request.GET.get("scan_history_search", None)
+        self.task_type = request.GET.get("type", self.task_type)
+        self.status = request.GET.get("scan_history_status", None)
+        self.min_created_at = get_date_time(request.GET.get("scan_history_from", None))
+        self.max_created_at = get_date_time(request.GET.get("scan_history_to", None))
+        self.input_ooi = request.GET.get("scan_history_search", None)
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
-            super().get(request, *args, **kwargs)
+            return super().get(request, *args, **kwargs)
         except SchedulerError as error:
             messages.error(self.request, error.message)
         return redirect("health_beautified", organization_code=self.organization.code)
@@ -58,12 +59,11 @@ class SchedulerView(OctopoesView, TemplateView):
             "input_ooi": self.input_ooi,
         }
 
-    def get_task_list(self) -> SchedulerTaskList | list[Any]:
+    def get_task_list(self) -> SchedulerTaskList | None:
         try:
             return SchedulerTaskList(self.scheduler_client, **self.get_task_filters())
         except SchedulerError as error:
-            messages.error(self.request, error.message)
-        return []
+            return messages.error(self.request, error.message)
 
     def get_task_details(self, task_id: str) -> Task | None:
         try:
@@ -122,27 +122,27 @@ class SchedulerView(OctopoesView, TemplateView):
     # task info from the scheduler. Task data should be available from the context
     # from which the task is created.
     def reschedule_task(self, task_id: str) -> None:
-        try:
-            task = self.scheduler_client.get_task_details(task_id)
-            new_p_item = PrioritizedItem(
-                data=task.p_item.data,
-                priority=1,
-            )
+        task = self.scheduler_client.get_task_details(task_id)
+        new_p_item = PrioritizedItem(
+            data=task.p_item.data,
+            priority=1,
+        )
 
-            self.schedule_task(new_p_item)
-        except SchedulerError as error:
-            messages.error(self.request, error.message)
+        self.schedule_task(new_p_item)
 
-    def run_normalizer(self, normalizer: Normalizer, raw_data: RawData) -> None:
-        normalizer_task = NormalizerTask(normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data)
+    def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
+        normalizer_task = NormalizerTask(
+            normalizer=SchedulerNormalizer.model_validate(katalogus_normalizer.model_dump()),
+            raw_data=raw_data,
+        )
 
         p_item = PrioritizedItem(priority=1, data=normalizer_task)
 
         self.schedule_task(p_item)
 
-    def run_boefje(self, boefje: Boefje, ooi: OOI | None) -> None:
+    def run_boefje(self, katalogus_boefje: Boefje, ooi: OOI | None) -> None:
         boefje_task = BoefjeTask(
-            boefje=Boefje.model_validate(boefje.model_dump()),
+            boefje=SchedulerBoefje.model_validate(katalogus_boefje.model_dump()),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
         )

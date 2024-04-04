@@ -1113,8 +1113,8 @@ def mock_mixins_katalogus(mocker):
 
 
 @pytest.fixture
-def mock_scheduler_client_task_list(mocker):
-    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client._client")
+def mock_scheduler_client_task_list(mock_scheduler):
+    mock_scheduler_session = mock_scheduler._client
     response = Response(
         200,
         content=(
@@ -1153,9 +1153,9 @@ def mock_scheduler_client_task_list(mocker):
         ),
     )
 
-    mock_scheduler_client_session.get.return_value = response
+    mock_scheduler_session.get.return_value = response
 
-    return mock_scheduler_client_session
+    return mock_scheduler_session
 
 
 class MockOctopoesAPIConnector:

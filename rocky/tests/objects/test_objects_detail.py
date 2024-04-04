@@ -66,14 +66,13 @@ def test_ooi_detail(
     request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
-    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 200
     assert mock_organization_view_octopoes().get_tree.call_count == 2
     assertContains(response, "Object")
-    assertContains(response, "Hostname|internet|mispo.es")
+    assertContains(response, "Network|testnetwork")
 
     assertContains(response, "Plugin")
     assertContains(response, "test-boefje")

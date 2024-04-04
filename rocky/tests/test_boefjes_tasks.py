@@ -24,28 +24,27 @@ def test_boefjes_tasks(rf, client_member, mock_scheduler):
     assert response.status_code == 200
 
 
-def test_tasks_view_simple(rf, client_member, mock_scheduler, lazy_task_list_with_boefje):
-    request = setup_request(rf.get("boefjes_task_list"), client_member.user)
-    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
-
-    assertContains(response, "1b20f85f")
-    assertContains(response, "Hostname|internet|mispo.es")
-
-
-def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje):
-    mock_scheduler_client = mocker.patch("rocky.scheduler.scheduler_client")()
-    mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
-    mock_scheduler_client.get_lazy_task_list.side_effect = SchedulerError
+def test_tasks_view_simple(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
 
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assertContains(response, "error")
-    assertContains(response, "Could not connect to Scheduler. Service is possibly down.")
+    assertContains(response, "Completed")
+
+
+def test_tasks_view_error(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
+
+    mock_scheduler.list_tasks.side_effect = SchedulerError
+
+    request = setup_request(rf.get("boefjes_task_list"), client_member.user)
+    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+
+    assert list(request._messages)[0].message == "Could not connect to Scheduler. Service is possibly down."
 
 
 def test_reschedule_task(rf, client_member, mock_scheduler, task):
-    mock_scheduler.get_task_details.return_value = task
 
     request = setup_request(
         rf.post(
@@ -87,19 +86,8 @@ def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocke
         organization_code=client_member.organization.code,
     )
 
-    assert response.status_code == 302
-
-    assert (
-        list(request._messages)[0].message
-        == "Scheduling "
-        + task.type.title()
-        + " "
-        + task.p_item.data.boefje.name
-        + " with input object "
-        + task.p_item.data.input_ooi
-        + " failed. "
-        "Task queue is full, please try again later."
-    )
+    assert response.status_code == 200
+    assert list(request._messages)[0].message == "Task queue is full, please try again later."
 
 
 def test_reschedule_task_from_other_org(rf, client_member, client_member_b, mock_scheduler, task):

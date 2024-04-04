@@ -4,8 +4,8 @@ from datetime import datetime, timezone
 from enum import Enum
 
 from django.contrib import messages
-from django.core.paginator import Page, Paginator
 from django.http import Http404
+from django.http.response import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
@@ -21,7 +21,7 @@ from octopoes.models import OOI, Reference
 from octopoes.models.ooi.question import Question
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
-from rocky.views.scheduler import SchedulerView
+from rocky.views.tasks import TaskListView
 
 
 class PageActions(Enum):
@@ -31,15 +31,10 @@ class PageActions(Enum):
     CHANGE_CLEARANCE_LEVEL = "change_clearance_level"
 
 
-class OOIDetailView(
-    SchedulerView,
-    OOIRelatedObjectAddView,
-    OOIFindingManager,
-    BaseOOIDetailView,
-):
+class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectAddView, OOIFindingManager, TaskListView):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
-    task_history_limit = 10
+    context_object_name = "task_history"
 
     def post(self, request, *args, **kwargs):
         if not self.indemnification_present:
@@ -56,10 +51,10 @@ class OOIDetailView(
         action = self.request.POST.get("action")
         return self.handle_page_action(action)
 
-    def handle_page_action(self, action: str) -> bool:
+    def handle_page_action(self, action: str) -> HttpResponse | None:
         try:
             if action == PageActions.CHANGE_CLEARANCE_LEVEL.value:
-                clearance_level = int(self.request.POST.get("level"))
+                clearance_level = int(self.request.POST.get("level", ""))
                 if not self.can_raise_clearance_level(self.ooi, clearance_level):
                     return redirect("account_detail", organization_code=self.organization.code)
                 return self.get(self.request, *self.args, **self.kwargs)
@@ -118,13 +113,6 @@ class OOIDetailView(
         filters["input_ooi"] = self.get_ooi_id()
         return filters
 
-    def get_task_history(self) -> Page:
-        page = int(self.request.GET.get("task_history_page", 1))
-
-        task_list = self.get_task_list()
-
-        return Paginator(task_list, self.task_history_limit).page(page)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -180,7 +168,7 @@ class OOIDetailView(
 
         context["possible_boefjes_filter_form"] = filter_form
         context["organization_indemnification"] = self.get_organization_indemnification()
-        context["task_history"] = self.get_task_history()
+
         context["task_history_form_fields"] = [
             "task_history_from",
             "task_history_to",
