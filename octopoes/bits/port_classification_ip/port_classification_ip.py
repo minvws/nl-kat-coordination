@@ -1,4 +1,5 @@
 from collections.abc import Iterator
+from typing import Any
 
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -44,7 +45,7 @@ def get_ports_from_config(config, config_key, default):
     return list(map(int, ports.split(","))) if ports else []
 
 
-def run(input_ooi: IPPort, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: IPPort, additional_oois: list, config: dict[str, Any]) -> Iterator[OOI]:
     aggregate_findings = config.get("aggregate_findings", "False").lower() == "true" if config else False
     open_ports = []
 
