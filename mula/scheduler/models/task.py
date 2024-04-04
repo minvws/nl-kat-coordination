@@ -54,11 +54,11 @@ class Task(BaseModel):
     schema_id: uuid.UUID | None = None
     # schema: TaskSchema ## FIXME: naming conflict with pydantic .schema()
 
-    hash: str | None = Field(None, max_length=32)
-
     priority: int | None = 0
 
     status: TaskStatus = TaskStatus.PENDING
+
+    hash: str | None = Field(None, max_length=32)
 
     data: dict | None = {}
 

@@ -7,6 +7,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
 from scheduler import models
+from tests import factories
 
 
 class TestModel(pydantic.BaseModel):
@@ -75,16 +76,36 @@ def create_schema(scheduler_id: str) -> models.TaskSchema:
     )
 
 
-def create_task(scheduler_id: str) -> models.Task:
-    data = TestModel(
-        id=uuid.uuid4().hex,
-        name=uuid.uuid4().hex,
-    )
+def create_task(scheduler_id: str, data: Any | None = None) -> models.Task:
+    if data is None:
+        data = TestModel(
+            id=uuid.uuid4().hex,
+            name=uuid.uuid4().hex,
+        )
 
     return models.Task(
         scheduler_id=scheduler_id,
         hash=data.hash,
         data=data.model_dump(),
+    )
+
+
+def create_boefje() -> models.Boefje:
+    scan_profile = factories.ScanProfileFactory(level=0)
+    ooi = factories.OOIFactory(scan_profile=scan_profile)
+    return factories.PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+
+# TODO: arg input_ooi
+def create_boefje_task(organization_id: str, input_ooi: str | None = None) -> models.BoefjeTask:
+    scan_profile = factories.ScanProfileFactory(level=0)
+    ooi = factories.OOIFactory(scan_profile=scan_profile)
+    boefje = factories.BoefjeFactory()
+
+    return models.BoefjeTask(
+        boefje=boefje,
+        input_ooi=ooi.primary_key,
+        organization=organization_id,
     )
 
 
