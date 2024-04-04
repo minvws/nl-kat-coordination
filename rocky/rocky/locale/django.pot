@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-28 08:51+0000\n"
+"POT-Creation-Date: 2024-04-04 12:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2453,9 +2453,6 @@ msgid "Host"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-#: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/web_system_report/report.html
 msgid "Findings:"
 msgstr ""
 
@@ -2702,6 +2699,8 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
 #: reports/report_types/tls_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
@@ -2779,7 +2778,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
-msgid "Mailserver compliance:"
+msgid "Mailserver compliance"
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
@@ -2986,7 +2985,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
-msgid "Name server compliance:"
+msgid "Name server compliance"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
@@ -3059,7 +3058,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
-msgid "RPKI compliance:"
+msgid "RPKI compliance"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
@@ -3101,10 +3100,6 @@ msgid ""
 "passed the performed checks. The risk level and reasoning as to why an issue "
 "was identified are shown too. The risk level may be different for your "
 "specific environment."
-msgstr ""
-
-#: reports/report_types/safe_connections_report/report.html
-msgid "Safe connections compliance:"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
@@ -3272,7 +3267,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
-msgid "Web system compliance:"
+msgid "Web system compliance"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -4289,6 +4284,7 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "Total findings"
 msgstr ""
 
@@ -4783,10 +4779,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "See finding details"
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-msgid "Total findings:"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_declarations.html
