@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 12:24+0000\n"
+"POT-Creation-Date: 2024-04-04 12:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2209,7 +2209,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
-msgid "Basic security status:"
+msgid "Basic security status"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
@@ -2419,7 +2419,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-msgid "Check overview:"
+msgid "Check overview"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
@@ -2453,7 +2453,22 @@ msgid "Host"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-msgid "Findings:"
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/mail_report/report.html
+#: reports/report_types/name_server_report/report.html
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
@@ -2604,12 +2619,8 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Other findings found"
-msgstr ""
-
-#: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
-msgid "Other findings found:"
+msgid "Other findings found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -2699,24 +2710,6 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: reports/report_types/mail_report/report.html
-#: reports/report_types/name_server_report/report.html
-#: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: reports/templates/partials/report_severity_totals_table.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
 msgid "Impact"
 msgstr ""
 
@@ -2751,7 +2744,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview:"
+msgid "IPV6 overview"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -2934,6 +2927,7 @@ msgid "Occurrences (IP addressees)"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
+#: reports/templates/summary/service_health.html
 msgid "Services"
 msgstr ""
 
@@ -2965,7 +2959,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
-msgid "Vulnerabilities grouped per system."
+msgid "Vulnerabilities grouped per system"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
@@ -3027,7 +3021,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
-msgid "Overview of open ports found for the scanned assets."
+msgid "Overview of open ports found for the scanned assets"
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
@@ -3125,7 +3119,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
-msgid "Selected assets:"
+msgid "Selected assets"
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
@@ -3153,7 +3147,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
-msgid "Ciphers:"
+msgid "Ciphers"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3219,10 +3213,6 @@ msgid ""
 "vulnerabilities that were identified on the selected systems. For each CVE "
 "the table shows the CVE scoring, the number of occurrences, and the CVE "
 "details."
-msgstr ""
-
-#: reports/report_types/vulnerability_report/report.html
-msgid "Vulnerabilities:"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
@@ -3423,8 +3413,14 @@ msgid "Continue with all OOIs"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html
-msgid "Objects:"
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html rocky/templates/indemnification_present.html
+#: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
+#: rocky/views/upload_csv.py rocky/views/upload_raw.py
+msgid "Objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3506,7 +3502,7 @@ msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total per severity overview:"
+msgid "Total per severity overview"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
@@ -3593,10 +3589,6 @@ msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin scan level"
-msgstr ""
-
-#: reports/templates/summary/service_health.html
-msgid "Services:"
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -3799,16 +3791,6 @@ msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Filter types"
-msgstr ""
-
-#: tools/forms/ooi.py tools/view_helpers.py
-#: rocky/templates/admin/delete_confirmation.html
-#: rocky/templates/admin/delete_selected_confirmation.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html rocky/templates/indemnification_present.html
-#: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
-#: rocky/views/upload_csv.py rocky/views/upload_raw.py
-msgid "Objects"
 msgstr ""
 
 #: tools/forms/ooi.py
