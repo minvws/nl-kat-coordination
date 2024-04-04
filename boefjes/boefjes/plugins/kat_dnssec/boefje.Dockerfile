@@ -5,7 +5,7 @@ RUN adduser --disabled-password --gecos '' nonroot
 RUN apt update -y && apt-get install -y --no-install-recommends ldnsutils dnsutils && pip install httpx
 RUN dig . DNSKEY @8.8.8.8 | grep -Ev '^($|;)' > root.key
 
-ARG BOEFJE_PATH
+ARG BOEFJE_PATH=./boefjes/plugins/kat_dnssec
 ENV PYTHONPATH=/app:$BOEFJE_PATH
 
 COPY ./images/docker_adapter.py ./
