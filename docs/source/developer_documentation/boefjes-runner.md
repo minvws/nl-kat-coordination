@@ -236,6 +236,50 @@ https://developer.hashicorp.com/nomad/tutorials/manage-jobs/jobs-accessing-logs:
 
 [nomad-logs-api]: https://developer.hashicorp.com/nomad/api-docs/client#stream-logs
 
+## Building images with this spec from the current boefjes
+
+The approach to building OCI images from the boefjes we currently have in our
+system has been discussed in [this ticket][ticket], with the first versions
+having been implemented in these PRs:
+- https://github.com/minvws/nl-kat-coordination/pull/2709
+
+
+#### Summary of decisions
+We decided not to focus on the following:
+- We are **not** going to provide plain zip archives in the near future.
+- Discoverability of images from external repositories (potentially containing
+  multiple boefjes) will be pushed to later versions of OpenKAT.
+
+In terms of how we are going to build images, we decided to:
+- Just leverage Docker as this has to be available for OpenKAT devs anyway.
+- Aim to keep the build scripts flexible but simple, e.g. for `kat_dnssec` we have:
+```
+docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-sec --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dnssec .
+```
+- Use, as shown above, the [naming convention][dockerfile-naming] for Dockerfiles
+  since we may want to add normaliser Dockerfiles in the same directory.
+- Use a Python base image for all our boefjes, so we can use shared Python code to
+  communicate with the boefjes api. Since there is no one tool available across Docker base images
+  that can perform HTTP communication, we might as well use python for this. Later, we can consider
+  creating platform-specific, pre-built binaries using languages such as Go or Rust.
+- In particular, build the images using a `python:3.11-slim` base image. A basic check shows the following
+  sizes per base image, but Alpine [does not support standard PyPI wheels][wheels]:
+
+| python:3.11 | python:3.11-slim | python:3.11-alpine |
+|-------------|------------------|--------------------|
+| 1.01 GB     | 157 MB           | 57 MB              |
+
+
+In terms of when to build images, we decided to:
+- Make the builds part of the installation script through `make -C boefjes images`
+- Put the responsibility to (re)build new images while developing boefjes on developers
+
+
+[ticket]: https://github.com/minvws/nl-kat-coordination/issues/2443
+[dockerfile-naming]: https://docs.docker.com/build/building/packaging/#filename
+[wheels]: https://pythonspeed.com/articles/alpine-docker-python/
+
+
 ## Limitations
 
 In this design the boefjes runner will create a new container for each task,
