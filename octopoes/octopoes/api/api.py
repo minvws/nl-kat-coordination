@@ -66,7 +66,7 @@ def http_validation_exception_handler(_: Request, exc: RequestValidationError) -
 @app.exception_handler(RequestError)
 def http_exception_handler(_: Request, exc: RequestError) -> None:
     logger.error(exc)
-    raise HTTPException(status.HTTP_502_BAD_GATEWAY, detail=str(exc))
+    raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc))
 
 
 @app.exception_handler(InvalidField)
@@ -89,7 +89,7 @@ def value_error(_: Request, exc: ValueError) -> None:
 
 @app.exception_handler(TypeNotFound)
 def type_not_found(_: Request, exc: TypeNotFound) -> None:
-    raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Type not found")
+    raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="Type not found")
 
 
 @app.exception_handler(NodeNotFound)
@@ -107,7 +107,7 @@ def not_found_exception_handler(_: Request, exc: ObjectNotFoundException) -> Non
 @app.exception_handler(Exception)
 def uncaught_exception_handler(_: Request, exc: Exception) -> None:
     logger.error(exc)
-    raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"{exc.__class__.__name__}: {exc}")
+    raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{exc.__class__.__name__}: {exc}")
 
 
 @app.get("/health")
