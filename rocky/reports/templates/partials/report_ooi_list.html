@@ -52,7 +52,7 @@
             <form method="get"
                   action="{{ next }}"
                   class="inline layout-wide checkboxes_required">
-                {% include "forms/report_form_fields.html" %}
+                {% include "forms/report_form_fields.html" with oois=None %}
 
                 <table>
                     <caption class="visually-hidden">{% translate "Objects:" %}</caption>
