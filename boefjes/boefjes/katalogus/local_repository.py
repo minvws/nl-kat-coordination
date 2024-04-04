@@ -8,7 +8,6 @@ from boefjes.katalogus.models import PluginType
 from boefjes.plugins.models import (
     BOEFJE_DEFINITION_FILE,
     BOEFJES_DIR,
-    ENTRYPOINT_BOEFJES,
     ENTRYPOINT_NORMALIZERS,
     NORMALIZER_DEFINITION_FILE,
     BoefjeResource,
@@ -92,7 +91,7 @@ class LocalPluginRepository:
         if self._cached_boefjes:
             return self._cached_boefjes
 
-        paths_and_packages = self._find_packages_in_path_containing_files([BOEFJE_DEFINITION_FILE, ENTRYPOINT_BOEFJES])
+        paths_and_packages = self._find_packages_in_path_containing_files([BOEFJE_DEFINITION_FILE])
         boefje_resources = []
 
         for path, package in paths_and_packages:
@@ -124,7 +123,7 @@ class LocalPluginRepository:
 
         return self._cached_normalizers
 
-    def _find_packages_in_path_containing_files(self, files: list[str]) -> list[tuple[Path, str]]:
+    def _find_packages_in_path_containing_files(self, required_files: list[str]) -> list[tuple[Path, str]]:
         prefix = self.create_relative_import_statement_from_cwd(self.path)
         paths = []
 
@@ -134,7 +133,7 @@ class LocalPluginRepository:
                 continue
 
             path = self.path / package.name.replace(prefix, "").replace(".", "/")
-            missing_files = [file for file in files if not (path / file).exists()]
+            missing_files = [file for file in required_files if not (path / file).exists()]
 
             if missing_files:
                 logging.debug("Files %s not found for %s", missing_files, package.name)
