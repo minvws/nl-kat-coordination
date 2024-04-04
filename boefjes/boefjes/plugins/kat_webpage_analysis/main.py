@@ -1,4 +1,3 @@
-import binascii
 import ipaddress
 import json
 import mimetypes
@@ -69,10 +68,9 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     # in case of a full response object, we hexdump to avoid issues with binary data or different encoding
     response_dump = json.dumps(create_response_object(response))
-    content = binascii.hexlify(response.content).decode()
 
     return [
-        ({"openkat-http/response"}, f"{response_dump}\n\n{content}"),
+        ({"openkat-http/response"}, response_dump.encode() + b"\n\n" + response.content),
         ({"openkat-http/headers"}, json.dumps(dict(response.headers))),
         (body_mimetypes, response.content),
     ]
