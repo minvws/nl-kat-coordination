@@ -36,7 +36,7 @@ LATEX_SPECIAL_CHARS = str.maketrans(
         "\\": r"\textbackslash{}",
         "\n": "\\newline%\n",
         "-": r"{-}",
-        "\xA0": "~",  # Non-breaking space
+        "\xa0": "~",  # Non-breaking space
         "[": r"{[}",
         "]": r"{]}",
     }
