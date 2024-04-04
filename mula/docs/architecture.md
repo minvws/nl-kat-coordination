@@ -129,20 +129,13 @@ we will check the following:
 
   - check if the same task is already on the priority queue
 
-> [!IMPORTANT]
-> Important to note is that when a `PrioritizedItem` is created and pushed onto
-> the queue. A `TaskRun` and `Schedule` is created for this item. Below we'll
-> explain the explain the role of these two entities in more detail.
-
-##### `TaskRun`
-
-When a `BoefjeTask` is created and pushed onto the queue as a `PrioritizedItem`
-a new unique `TaskRun` is generated.[^1] This ensures that each task has its
-own dedicated `TaskRun` throughout its entire lifecycle. This approach
-maintains a distinct record for each task, providing an accurate and
-independent history of task statuses. This means that each execution of a
-`BoefjeTask`, regardless of whether it's the same task being repeated in the
-future, is tracked independently with its own unique `TaskRun`.
+Important to note is that when a `BoefjeTask` is created and pushed onto the
+queue as a `PrioritizedItem` a new unique `TaskRun` is generated.[^1] This
+ensures that each task has its own dedicated `TaskRun` throughout its entire
+lifecycle. This approach maintains a distinct record for each task, providing
+an accurate and independent history of task statuses. This means that each
+execution of a `BoefjeTask`, regardless of whether it's the same task being
+repeated in the future, is tracked independently with its own unique `TaskRun`.
 
 This approach ensures that the historical record of each task's execution is
 distinct, providing a clear and isolated view of each instance of the task's
@@ -176,56 +169,22 @@ keep track of the status of this task throughout the system we update its
   `TaskRun` status by either setting the status to `COMPLETED`, `FAILED` or
   `CANCELLED`. (5)
 
-##### `Schedule`
+#### Processes
 
-Since a task within the KAT implementation of the scheduler, can generate
-findings at a specific moment in time. We want to account for additional
-findings or changes for the same task at a later moment in time. Meaning we
-want to be able to reschedule particular tasks.
+In order to create a `BoefjeTask` and trigger the dataflow we described above
+we have 4 different processes within a `BoefjeScheduler` that can create boefje
+tasks. Namely:
 
-In order to support this, every task that is executed by the
-`BoefjesScheduler` a `Schedule` is created. This `Schedule` contains
-the necessary information and the specific task in order to reschedule a task
-at a later moment in time.
+1. scan profile mutations
+2. enabling of boefjes
+3. rescheduling of prior tasks
+4. manual scan job
 
 ![diagram006](./img/diagram006.svg)
 
-A `Schedule` supports a cron-like expression as schedule, which makes it
-possible to schedule tasks at certain intervals. When such an expression isn't
-set, the task will be scheduled at a future calculated date (deadline ranker
-calculation).
-
-To see how task will be rescheduled, refer to the 'Processes' section.
-
-#### Processes
-
-In order to create a `BoefjeTask` and trigger the dataflow we described above
-we have 4 different processes within a `BoefjeScheduler` that can create boefje
-tasks. Namely:
-
-1. scan profile mutations
-2. enabling of boefjes
-3. rescheduling of prior tasks
-4. manual scan job
-
-![diagram007](./img/diagram007.svg)
-
-#### Processes
-
-In order to create a `BoefjeTask` and trigger the dataflow we described above
-we have 4 different processes within a `BoefjeScheduler` that can create boefje
-tasks. Namely:
-
-1. scan profile mutations
-2. enabling of boefjes
-3. rescheduling of prior tasks
-4. manual scan job
-
-![diagram007](./img/diagram007.svg)
-
 ##### 1. Scan profile mutations
 
-![diagram008](./img/diagram008.svg)
+![diagram007](./img/diagram007.svg)
 
 When a scan level is increased on an OOI
 (`schedulers.boefje.push_tasks_for_scan_profile_mutations`) a message is pushed
@@ -253,7 +212,7 @@ The dataflow is as follows:
 
 ##### 2. Enabling of boefjes
 
-![diagram009](./img/diagram009.svg)
+![diagram008](./img/diagram008.svg)
 
 When a plugin of type `boefje` is enabled or disabled in Rocky. The dataflow is
 triggered when the plugin cache of an organisation is flushed.
@@ -277,7 +236,7 @@ The dataflow is as follows:
 
 ##### 3. Rescheduling of prior tasks
 
-![diagram010](./img/diagram010.svg)
+![diagram009](./img/diagram009.svg)
 
 In order to re-run tasks that have been executed in the past we try to create
 new tasks on ooi's. We continuously get a batch of random ooi's from octopoes
@@ -307,7 +266,7 @@ The dataflow is as follows:
 
 ##### 4. Manual scan job
 
-![diagram011](./img/diagram011.svg)
+![diagram010](./img/diagram010.svg)
 
 Scan jobs created by the user in Rocky (`server.push_queue`), will
 get the highest priority of 1. Note, that this will circumvent all the checks
@@ -518,39 +477,25 @@ classDiagram
 
 ```mermaid
 erDiagram
-schedules {
-    uuid id PK
-    character_varying scheduler_id
-    boolean enabled
-    jsonb p_item
-    character_varying cron_expression
-    timestamp_with_time_zone deadline_at
-    timestamp_with_time_zone evaluated_at
-    timestamp_with_time_zone created_at
-    timestamp_with_time_zone modified_at
-}
-task_runs {
-    uuid id PK
-    uuid job_id FK
-    character_varying scheduler_id
-    taskstatus status
-    timestamp_with_time_zone created_at
-    timestamp_with_time_zone modified_at
-    jsonb p_item
-    character_varying type
-}
-items {
-    uuid id PK
-    character_varying scheduler_id
-    character_varying hash
-    integer priority
-    jsonb data
-    timestamp_with_time_zone created_at
-    timestamp_with_time_zone modified_at
-}
+    items {
+        uuid id PK
+        character_varying scheduler_id
+        character_varying hash
+        integer priority
+        jsonb data
+        timestamp_with_time_zone created_at
+        timestamp_with_time_zone modified_at
+    }
 
-
-tasks }o--|| jobs: ""
+    tasks {
+        uuid id PK
+        character_varying scheduler_id
+        taskstatus status
+        timestamp_with_time_zone created_at
+        timestamp_with_time_zone modified_at
+        jsonb p_item
+        character_varying type
+    }
 ```
 
 ## Project structure
