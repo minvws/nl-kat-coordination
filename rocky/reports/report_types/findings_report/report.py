@@ -5,8 +5,7 @@ from typing import Any
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
+from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.types import ALL_TYPES
 from reports.report_types.definitions import Report, ReportPlugins
 
@@ -44,13 +43,15 @@ class FindingsReport(Report):
             reference, depth=TREE_DEPTH, types={Finding}, valid_time=valid_time
         ).store
 
-        for ooi in tree.values():
-            if ooi.ooi_type == "Finding":
-                findings.append(ooi)
+        findings = [ooi for ooi in tree.values() if ooi.ooi_type == "Finding"]
+        all_finding_types = self.octopoes_api_connector.list_objects(types={FindingType}, valid_time=valid_time).items
 
         for finding in findings:
-            try:
-                finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
+            filter_finding_type = [x for x in all_finding_types if x.id == finding.finding_type.tokenized.id]
+
+            if filter_finding_type:
+                finding_type = filter_finding_type[0]
+
                 severity = finding_type.risk_severity.name.lower()
                 total_by_severity[severity] += 1
 
@@ -68,9 +69,6 @@ class FindingsReport(Report):
                 else:
                     finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding_dict]}
                     total_by_severity_per_finding_type[severity] += 1
-
-            except ObjectNotFoundException:
-                logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
 
         sorted_finding_types: list[Any] = sorted(
             finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
