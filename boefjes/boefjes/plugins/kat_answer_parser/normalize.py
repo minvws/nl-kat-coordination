@@ -18,3 +18,13 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             bit_id="port-classification-ip",
             config=json.loads(raw),
         )
+
+    if "/bit/disallowed-csp-hostnames" in mime_types:
+        if isinstance(raw, bytes):
+            raw = raw.decode()
+
+        yield Config(
+            ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
+            bit_id="disallowed-csp-hostnames",
+            config=json.loads(raw),
+        )
