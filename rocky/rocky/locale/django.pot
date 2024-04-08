@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-08 12:21+0000\n"
+"POT-Creation-Date: 2024-04-08 15:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1321,6 +1321,10 @@ msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Accounts"
+msgstr ""
+
+#: onboarding/templates/account/step_2c_account_setup_intro.html
+msgid "Organization setup with separate accounts:"
 msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
@@ -4409,6 +4413,11 @@ msgstr ""
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
+msgid "Finding type:"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
 #, python-format
 msgid "Show details for %(finding_type)s"
 msgstr ""
@@ -4967,10 +4976,6 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Top 10 most severe Findings"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Finding type:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_edit.html

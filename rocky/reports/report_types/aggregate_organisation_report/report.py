@@ -422,10 +422,10 @@ class AggregateOrganisationReport(AggregateReport):
             # Search for reports where the input ooi relates to the current service, based on ip or hostname
             for ip, system_for_service in systems_for_service.items():
                 # Assumes relevant hostnames have an ip address for now
-                if str(ip) not in report_data:
+                if ip not in report_data:
                     report_data[ip] = []
 
-                if str(ip) in data and report_id in data[str(ip)] and system_type == service:
+                if ip in data and report_id in data[str(ip)] and system_type == service:
                     report_data[ip].append(data[str(ip)][report_id])
 
                 for hostname in system_for_service["hostnames"]:

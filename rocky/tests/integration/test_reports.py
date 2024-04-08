@@ -127,10 +127,10 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         },
     }
 
-    assert len(data["services"]["Dicom"]["IPAddressV4|test|192.0.2.3"]["hostnames"]) == 6
-    assert len(data["services"]["Mail"]["IPAddressV4|test|192.0.2.3"]["hostnames"]) == 6
-    assert len(data["services"]["Web"]["IPAddressV4|test|192.0.2.3"]["hostnames"]) == 6
-    assert len(data["services"]["Other"]["IPAddressV4|test|192.0.2.3"]["hostnames"]) == 6
+    assert len(data["services"]["Dicom"]["192.0.2.3"]["hostnames"]) == 6
+    assert len(data["services"]["Mail"]["192.0.2.3"]["hostnames"]) == 6
+    assert len(data["services"]["Web"]["192.0.2.3"]["hostnames"]) == 6
+    assert len(data["services"]["Other"]["192.0.2.3"]["hostnames"]) == 6
 
     assert "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230" not in data["services"]["Dicom"]
     assert "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230" not in data["services"]["Mail"]
@@ -344,15 +344,15 @@ def test_multi_report(
         },
     ]
     assert multi_data["services"] == {
-        "Mail": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
+        "Mail": ["192.0.2.3", "192.0.2.3"],
         "Web": [
             "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "IPAddressV4|test|192.0.2.3",
+            "192.0.2.3",
             "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "IPAddressV4|test|192.0.2.3",
+            "192.0.2.3",
         ],
-        "Dicom": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
-        "Other": ["IPAddressV4|test|192.0.2.3", "IPAddressV4|test|192.0.2.3"],
+        "Dicom": ["192.0.2.3", "192.0.2.3"],
+        "Other": ["192.0.2.3", "192.0.2.3"],
     }
     assert multi_data["basic_security"]["summary"] == {
         "Mail": {

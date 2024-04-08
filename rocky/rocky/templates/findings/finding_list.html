@@ -84,7 +84,7 @@
                                     </tr>
                                     <tr class="expando-row">
                                         <td colspan="6">
-                                            <h2 class="heading-normal">{% translate "Finding type:" %:</h2>
+                                            <h2 class="heading-normal">{% translate "Finding type:" %}</h2>
                                             <a href="{% ooi_url "ooi_detail" hydrated_finding.finding_type organization.code query=mandatory_fields %}"
                                                title="{% blocktranslate trimmed with finding_type=hydrated_finding.finding_type.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ hydrated_finding.finding_type.human_readable }}</a>
                                             <h2 class="heading-normal">{% translate "OOI type:" %}</h2>
