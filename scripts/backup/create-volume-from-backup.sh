@@ -17,8 +17,8 @@ while [ $# -gt 0 ]; do
       snapshot="$2"
       ;;
     -h|-help|--help)
-      printf -- "-v | --volume: create the backup name of the volume\n"
-      printf -- "-n | --volume-name (optional): create the backup as this volume name\n"
+      printf -- "-v | --volume: the volume name in the backup\n"
+      printf -- "-n | --volume-name (optional): create the restore as this new volume name\n"
       printf -- "-p | --path: the storage path of the backup location\n"
       printf -- "-s | --snapshot: the snapshot to restore\n"
       exit 1
@@ -46,8 +46,20 @@ if [ "$volume_exists" ]; then
   exit 1
 fi
 
+# If no snapshot is given, find the newest snapshot in the backup_path/volume
+# Does not use ls in order to keep doing the correct thing even with special
+# characters like newlines in the filenames.
 if [ -z "${snapshot:-}" ]; then
-  snapshot="$(ls -At "${backup_path}/${volume}/" | tail -n 1)"
+  NEWEST=0
+  for dirent in "${backup_path}/${volume}"/*; do
+    # Get the modification time of the directory entry with stat in unix time
+    MTIME="$(stat --format="%Y" "$dirent")"
+    if [ "$MTIME" -gt "$NEWEST" ]; then
+      NEWEST="$MTIME"
+      snapshot="$dirent"
+    fi
+  done
+  snapshot="$(basename "$snapshot")"
 fi
 
 if [ -z "${snapshot:-}" ]; then
