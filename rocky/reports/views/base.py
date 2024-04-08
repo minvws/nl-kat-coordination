@@ -16,7 +16,7 @@ from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import BaseReportType, MultiReport, Report, ReportType
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
@@ -183,3 +183,38 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return redirect(reverse("generate_report_landing", kwargs=self.get_kwargs()))
+
+
+class ViewReportView(TemplateView, OOIFilterView):
+    template_name = "generate_report.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.report_id = request.GET.get("report_id", [])
+
+    def get_context_data(self, **kwargs):
+        # TODO: add missing context fields
+        # TODO: move raw to bytes
+        # TODO: add template OOI
+        context = super().get_context_data(**kwargs)
+
+        report_ooi = self.octopoes_api_connector.get(
+            Reference.from_str(f"Report|{self.report_id}"), valid_time=self.observed_at
+        )
+        input_ooi = self.octopoes_api_connector.get(
+            Reference.from_str(report_ooi.input_ooi), valid_time=self.observed_at
+        )
+
+        report_data: dict = {}
+        report_data[report_ooi.report_type] = {}
+        report_data[report_ooi.report_type][report_ooi.input_ooi] = {
+            "data": report_ooi.data,
+            "template": report_ooi.template,
+            "ooi_human_readable": report_ooi.input_ooi.human_readable,
+        }
+
+        context["created_at"] = report_ooi.date_generated
+        context["selected_oois"] = [input_ooi]
+        context["oois"] = [input_ooi]
+        context["report_data"] = report_data
+        return context

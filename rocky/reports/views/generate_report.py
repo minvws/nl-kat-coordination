@@ -1,5 +1,7 @@
 from collections.abc import Sequence
+from datetime import datetime
 from typing import Any
+from uuid import uuid4
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -10,8 +12,10 @@ from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
+from octopoes.api.models import Declaration
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
+from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     REPORTS,
@@ -184,6 +188,20 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                     "template": report_type.template_path,
                     "ooi_human_readable": ooi_human_readable,
                 }
+
+                report_ooi = ReportOOI(
+                    name="test_name",
+                    report_type=str(report_type.name),
+                    template=report_type.template_path,
+                    report_id=uuid4(),
+                    organization_code=self.organization.code,
+                    organization_name=self.organization.name,
+                    organization_tags=list(self.organization.tags.all()),
+                    data=data,
+                    date_generated=datetime.utcnow(),
+                    input_ooi=Reference.from_str(ooi),
+                )
+                self.octopoes_api_connector.save_declaration(Declaration(ooi=report_ooi, valid_time=self.observed_at))
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:

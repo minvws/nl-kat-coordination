@@ -8,7 +8,7 @@ from reports.views.aggregate_report import (
     ReportTypesSelectionAggregateReportView,
     SetupScanAggregateReportView,
 )
-from reports.views.base import ReportsLandingView
+from reports.views.base import ReportsLandingView, ViewReportView
 from reports.views.generate_report import (
     GenerateReportPDFView,
     GenerateReportView,
@@ -29,6 +29,7 @@ from reports.views.multi_report import (
 # Generate report urls
 urlpatterns = [
     path("", ReportsLandingView.as_view(), name="reports"),
+    path("view", ViewReportView.as_view(), name="view_report"),
     path("generate-report/", LandingGenerateReportView.as_view(), name="generate_report_landing"),
     path("generate-report/select/oois/", OOISelectionGenerateReportView.as_view(), name="generate_report_select_oois"),
     path(
