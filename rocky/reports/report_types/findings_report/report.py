@@ -23,17 +23,13 @@ class FindingsReport(Report):
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
 
-    def get_finding_valid_time_history(self, reference: Reference) -> list[datetime]:
-        transaction_record = self.octopoes_api_connector.get_history(reference=reference)
-        valid_time_history = [transaction.valid_time for transaction in transaction_record]
-        return valid_time_history
-
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         reference = Reference.from_str(input_ooi)
         findings = []
         finding_types: dict[str, Any] = {}
         total_by_severity = {}
         total_by_severity_per_finding_type = {}
+        history_cache = {}
 
         for severity in SEVERITY_OPTIONS:
             total_by_severity[severity] = 0
@@ -49,26 +45,31 @@ class FindingsReport(Report):
         for finding in findings:
             filter_finding_type = [x for x in all_finding_types if x.id == finding.finding_type.tokenized.id]
 
-            if filter_finding_type:
-                finding_type = filter_finding_type[0]
+            if not filter_finding_type:
+                continue
 
-                severity = finding_type.risk_severity.name.lower()
-                total_by_severity[severity] += 1
+            finding_type = filter_finding_type[0]
 
-                time_history = self.get_finding_valid_time_history(finding.reference)
+            severity = finding_type.risk_severity.name.lower()
+            total_by_severity[severity] += 1
 
-                if time_history:
-                    first_seen = str(time_history[0])
-                else:
-                    first_seen = "-"
+            if finding.primary_key not in history_cache:
+                history_cache[finding.reference] = self.octopoes_api_connector.get_history(reference=reference)
 
-                finding_dict = {"finding": finding, "first_seen": first_seen}
+            time_history = [transaction.valid_time for transaction in history_cache[finding.reference]]
 
-                if finding_type.id in finding_types:
-                    finding_types[finding_type.id]["occurrences"].append(finding_dict)
-                else:
-                    finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding_dict]}
-                    total_by_severity_per_finding_type[severity] += 1
+            if time_history:
+                first_seen = str(time_history[0])
+            else:
+                first_seen = "-"
+
+            finding_dict = {"finding": finding, "first_seen": first_seen}
+
+            if finding_type.id in finding_types:
+                finding_types[finding_type.id]["occurrences"].append(finding_dict)
+            else:
+                finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding_dict]}
+                total_by_severity_per_finding_type[severity] += 1
 
         sorted_finding_types: list[Any] = sorted(
             finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
