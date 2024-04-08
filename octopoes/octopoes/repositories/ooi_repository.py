@@ -477,9 +477,7 @@ class XTDBOOIRepository(OOIRepository):
                         :where [[?e :xt/id _xt_id]]
                     }}
                     :in-args [["{reference}"]]
-                }}""".format(
-            reference=reference, related_fields=" ".join(segment_query_sections)
-        )
+                }}""".format(reference=reference, related_fields=" ".join(segment_query_sections))
 
         return query
 
