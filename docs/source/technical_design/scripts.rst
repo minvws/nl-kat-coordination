@@ -112,8 +112,6 @@ Run the script with the chosen backup path:
 
 This directory will contain multiple folders each containing the backup file for that specific docker container as archived files (.tar.gz). If you run the command again it will create new archived files into those subdirectories. Your old backup will remain, as each backup name contains the timestamp of moment of creation. An example of such a file is: ``2024-03-28_173258_nl-kat-coordination_bytes-data.tar.gz``. 
 
-
-
 Restoring your docker volume
 ----------------------------
 
@@ -125,9 +123,7 @@ Make the script executable:
 
 ``$ sudo chmod +x create-volume-from-backup.sh``
 
-Volumes can be restored by specifying the volume container name and the backup path folder from the previous step. 
-
-Note: If multiple backup files are available the script will automatically select the **oldest**. If you wish to restore from the newest backup instead you can change this on line 50 of the script.  
+Volumes can be restored by specifying the volume container name and the backup path folder from the previous step. If multiple backup files are available the script will automatically restore from the **newest** snapshot. 
 
 Restore a backup volume:
 
@@ -136,17 +132,6 @@ Restore a backup volume:
 Optionally if you wish to create a volume with a different name from the backup the script can be invoked in the following manner:
 
 ``$ sudo ./create-volume-from-backup.sh -v <volume_name> -p <prefix> -n <new_volume_name>``
-
-Optional: Change backup script default from oldest to newest
-------------------------------------------------------------
-
-Optional: Change the backup script to automatically restore the newest file, instead of the oldest (default). Find the following line (line 50): 
-
-``snapshot="$(ls -At "${backup_path}/${volume}/" | tail -n 1)"``
-
-Change the word tail to  head to restore from the newest backup. Don't forget to save the file. It should look like this: 
-
-``snapshot="$(ls -At "${backup_path}/${volume}/" | head -n 1)"``
 
 Example
 -------
