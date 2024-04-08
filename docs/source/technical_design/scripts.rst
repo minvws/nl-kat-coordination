@@ -88,41 +88,41 @@ Backup
 
 TobiasBDO contributed `two backup and restorescripts <https://github.com/tobiasBDO/backup-openkat/tree/master>`_ included as part of his answer to `the question how to backup XTDB <https://github.com/minvws/nl-kat-coordination/issues/1757>`_ properly.
 
-We have slightly adjusted the scripts to prevent some potential issues from occurring (globbing and word splitting: shellcheck SC2086) and to clear some things up in the code. These scripts are maintained on a ‘best effort’ basis, thus no guarantees are provided. You are responsible for your own backups, OpenKAT is not responsible nor liable in case your backups are broken. 
+We have slightly adjusted the scripts to prevent some potential issues from occurring (globbing and word splitting: shellcheck SC2086) and to clear some things up in the code. These scripts are maintained on a ‘best effort’ basis, thus no guarantees are provided. You are responsible for your own backups, OpenKAT is not responsible nor liable in case your backups are broken.
 
-Below is a description on how these backup scripts can be used. 
+Below is a description on how these backup scripts can be used.
 
 How to backup your volume
 -------------------------
 
-In your OpenKAT directory go to the scripts/backup folder: 
+In your OpenKAT directory go to the scripts/backup folder:
 
 ``$ cd scripts/backup``
 
-Make the script executable: 
+Make the script executable:
 
 ``$ sudo chmod +x backup-volume.sh``
 
-Run the backup script with root rights. The -p parameter specifies the folder where your backup files will be stored. If this folder doesn't exist yet, it will automatically be created. Change <backup_path> to a descriptive backup name. The full path for this folder will be: ``/<path_to_OpenKAT_files>/scripts/backup/<backup_path>``. 
+Run the backup script with root rights. The -p parameter specifies the folder where your backup files will be stored. If this folder doesn't exist yet, it will automatically be created. Change <backup_path> to a descriptive backup name. The full path for this folder will be: ``/<path_to_OpenKAT_files>/scripts/backup/<backup_path>``.
 
-Run the script with the chosen backup path: 
+Run the script with the chosen backup path:
 
 ``$ sudo ./backup-volume.sh -p <backup_path>``
 
-This directory will contain multiple folders each containing the backup file for that specific docker container as archived files (.tar.gz). If you run the command again it will create new archived files into those subdirectories. Your old backup will remain, as each backup name contains the timestamp of moment of creation. An example of such a file is: ``2024-03-28_173258_nl-kat-coordination_bytes-data.tar.gz``. 
+This directory will contain multiple folders each containing the backup file for that specific docker container as archived files (.tar.gz). If you run the command again it will create new archived files into those subdirectories. Your old backup will remain, as each backup name contains the timestamp of moment of creation. An example of such a file is: ``2024-03-28_173258_nl-kat-coordination_bytes-data.tar.gz``.
 
 Restoring your docker volume
 ----------------------------
 
-In your OpenKAT directory go to the scripts/backup folder: 
+In your OpenKAT directory go to the scripts/backup folder:
 
 ``$ cd scripts/backup``
 
-Make the script executable: 
+Make the script executable:
 
 ``$ sudo chmod +x create-volume-from-backup.sh``
 
-Volumes can be restored by specifying the volume container name and the backup path folder from the previous step. If multiple backup files are available the script will automatically restore from the **newest** snapshot. 
+Volumes can be restored by specifying the volume container name and the backup path folder from the previous step. If multiple backup files are available the script will automatically restore from the **newest** snapshot.
 
 Restore a backup volume:
 
@@ -138,7 +138,7 @@ Example
 Create a backup: ::
 
  $ sudo ./backup-volume.sh -p MyOrganisation
- [sudo] password for user: 
+ [sudo] password for user:
  Successfully copied 40.8MB to /tmp/a3b27680-02e4-49cd-a155-e2729d8e7b70
  a3b27680-02e4-49cd-a155-e2729d8e7b70
  Successfully copied 1.54kB to /tmp/1f879ea3-c6ec-49e1-814e-863a2c0eeff1
