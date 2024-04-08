@@ -10,7 +10,7 @@
     <main id="main-content">
         <section>
             <div>
-                <h1>{% translate "Organization" %}: {{ organization.name }}</h1>
+                <h1>{% translate "Organization:" %} {{ organization.name }}</h1>
                 {% blocktranslate with organization_name=organization.name %}
                     An overview of "{{ organization_name }}" its members.
                 {% endblocktranslate %}
@@ -36,7 +36,7 @@
 
                 <div class="horizontal-scroll">
                     <table>
-                        <caption>{% translate "Member overview" %}:</caption>
+                        <caption>{% translate "Member overview:" %}</caption>
                         <thead>
                             <tr>
                                 <th>{% translate "E-mail" %}</th>

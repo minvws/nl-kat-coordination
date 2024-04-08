@@ -49,9 +49,9 @@
     {% for ip, findings in data.sc_ips.items %}
         {% if findings %}
             {% if generate_report %}
-                <h5>{% translate "Host" %}: {{ ip.tokenized.address }}</h5>
+                <h5>{% translate "Host:" %} {{ ip.tokenized.address }}</h5>
             {% else %}
-                <h5>{% translate "Host" %}: {{ ip }}</h5>
+                <h5>{% translate "Host:" %} {{ ip }}</h5>
             {% endif %}
             <table>
                 <caption class="visually-hidden">{% translate "Safe connections compliance" %}</caption>

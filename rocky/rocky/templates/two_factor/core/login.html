@@ -25,7 +25,7 @@
                             <p class="explanation"
                                role="group"
                                aria-label="{% translate "explanation" %}">
-                                <span>{% translate "Explanation" %}:</span>
+                                <span>{% translate "Explanation:" %}</span>
                                 {% blocktrans trimmed %}
                                     Use this form for entering backup tokens for logging in.
                                     These tokens have been generated for you to print and keep safe. Please
@@ -39,7 +39,7 @@
                         {# hidden submit button to enable [enter] key #}
                         <input type="submit" value="" class="d-none" />
                         {% if backup_tokens %}
-                            <p>{% trans "As a last resort, you can use a backup token" %}:</p>
+                            <p>{% trans "As a last resort, you can use a backup token:" %}</p>
                             <p>
                                 <button name="wizard_goto_step"
                                         type="submit"
