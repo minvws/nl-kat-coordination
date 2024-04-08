@@ -73,7 +73,7 @@ class TaskStore:
         with self.dbconn.session.begin() as session:
             tasks_orm = (
                 session.query(models.TaskDB)
-                .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
+                .filter(models.TaskDB.hash == task_hash)
                 .order_by(models.TaskDB.created_at.desc())
                 .all()
             )
@@ -90,7 +90,7 @@ class TaskStore:
         with self.dbconn.session.begin() as session:
             task_orm = (
                 session.query(models.TaskDB)
-                .filter(models.TaskDB.p_item["hash"].as_string() == task_hash)
+                .filter(models.TaskDB.hash == task_hash)
                 .order_by(models.TaskDB.created_at.desc())
                 .first()
             )

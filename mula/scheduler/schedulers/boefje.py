@@ -283,7 +283,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-            tasks = self.ctx.datastores.task_store.get_tasks(
+            schemas, _ = self.ctx.datastores.schema_store.get_schemas(
                 filters=filters.FilterRequest(
                     filters=[
                         filters.Filter(
@@ -297,7 +297,7 @@ class BoefjeScheduler(Scheduler):
             )
         except Exception as exc_db:
             self.logger.error(
-                "Could not get tasks for rescheduling %s",
+                "Could not get schemas for rescheduling %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
                 organisation_id=self.organisation.id,
@@ -305,9 +305,9 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
-        if not tasks:
+        if not schemas:
             self.logger.debug(
-                "No rescheduled tasks found for scheduler: %s",
+                "No schemas tasks found for scheduler: %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
                 organisation_id=self.organisation.id,
@@ -315,8 +315,8 @@ class BoefjeScheduler(Scheduler):
             return
 
         with futures.ThreadPoolExecutor() as executor:
-            for task in tasks:
-                boefje_task = BoefjeTask.parse_obj(task.data)
+            for schema in schemas:
+                boefje_task = BoefjeTask.parse_obj(schema.data)
 
                 # Boefje still exists?
                 boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
@@ -330,8 +330,8 @@ class BoefjeScheduler(Scheduler):
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                     )
-                    task.enabled = False
-                    self.ctx.datastores.task_store.update_task(task)
+                    schema.enabled = False
+                    self.ctx.datastores.schema_store.update_schema(schema)
                     continue
 
                 # Boefje still enabled?
@@ -342,8 +342,8 @@ class BoefjeScheduler(Scheduler):
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                     )
-                    task.enabled = False
-                    self.ctx.datastores.task_store.update_task(task)
+                    schema.enabled = False
+                    self.ctx.datastores.schema_store.update_schema(schema)
                     continue
 
                 # We check if the task has an input_ooi, since it is possible
@@ -359,8 +359,8 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        task.enabled = False
-                        self.ctx.datastores.task_store.update_task(task)
+                        schema.enabled = False
+                        self.ctx.datastores.task_store.update_schema(schema)
                         continue
 
                     # Boefje still consuming ooi?
@@ -372,8 +372,8 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        task.enabled = False
-                        self.ctx.datastores.task_store.update_task(task)
+                        schema.enabled = False
+                        self.ctx.datastores.schema_store.update_schema(schema)
                         continue
 
                     # Boefje allowed to scan ooi?
@@ -385,8 +385,8 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        task.enabled = False
-                        self.ctx.datastores.task_store.update_task(task)
+                        schema.enabled = False
+                        self.ctx.datastores.schema_store.update_schema(schema)
                         continue
 
                 executor.submit(
@@ -733,7 +733,10 @@ class BoefjeScheduler(Scheduler):
         )
 
         try:
-            self.push_task_to_queue_with_timeout(task, self.max_tries)
+            self.push_item_to_queue_with_timeout(
+                models.PrioritizedItem(**task.model_dump()),
+                self.max_tries,
+            )
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",

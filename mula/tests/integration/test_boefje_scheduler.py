@@ -59,6 +59,7 @@ class BoefjeSchedulerBaseTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
+                storage.SchemaStore.name: storage.SchemaStore(self.dbconn),
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
             }
@@ -733,7 +734,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task.boefje.id, task_pq.boefje.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -741,7 +742,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.pop_item_from_queue()
 
         # Assert: task should be in datastore, and dispatched
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
@@ -758,7 +759,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.push_task(boefje, ooi)
 
         # Assert: task should be in datastore, and failed
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.FAILED)
 
@@ -767,7 +768,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_post_push(self):
@@ -796,7 +797,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task.boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -826,7 +827,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task.boefje.id, task_pq.boefje.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -834,7 +835,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.scheduler.pop_item_from_queue()
 
         # Assert: task should be in datastore, and dispatched
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
 
@@ -845,11 +846,16 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange: add tasks
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        task = models.BoefjeTask(
+        boefje_task = models.BoefjeTask(
             boefje=BoefjeFactory(),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
+        task = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id,
+            data=boefje_task,
+        )
+
         p_item = functions.create_p_item(
             scheduler_id=self.organisation.id,
             priority=1,
@@ -863,7 +869,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(pq_p_item.id, p_item.id)
 
         # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(p_item.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -1040,7 +1046,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -1140,7 +1146,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -1222,7 +1228,7 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(ooi.primary_key, task_pq.input_ooi)
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.CANCELLED)
 
 
@@ -1276,7 +1282,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -1405,7 +1411,7 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -1431,6 +1437,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             return_value=True,
         ).start()
 
+        self.mock_get_schemas = mock.patch(
+            "scheduler.context.AppContext.datastores.schema_store.get_schemas",
+        ).start()
+
         self.mock_get_object = mock.patch(
             "scheduler.context.AppContext.services.octopoes.get_object",
         ).start()
@@ -1442,34 +1452,36 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
     def tearDown(self):
         mock.patch.stopall()
 
-    def test_push_tasks_for_rescheduling(self):
+    def test_push_tasks_for_rescheduling__(self):
         """When the dealine of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
 
-        task = models.BoefjeTask(
+        boefje_task = models.BoefjeTask(
             boefje=models.Boefje.parse_obj(plugin.model_dump()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
 
-        p_item = models.PrioritizedItem(
-            id=task.id,
+        task = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
             priority=1,
-            data=task.model_dump(),
-            hash=task.hash,
+            data=boefje_task.model_dump(),
+            hash=boefje_task.hash,
         )
 
-        schema = models.Schema(
+        schema = models.TaskSchema(
             scheduler_id=self.scheduler.scheduler_id,
-            hash=task.hash,
-            data=p_item,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
         )
+
+        schema_db = self.mock_ctx.datastores.schema_store.create_schema(schema)
 
         # Mocks
+        self.mock_get_schemas.return_value = ([schema_db], 1)
         self.mock_get_object.return_value = ooi
         self.mock_get_plugin.return_value = plugin
 
@@ -1481,10 +1493,10 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
 
         # Assert: new item is created with a similar task
         peek = self.scheduler.queue.peek(0)
-        self.assertEqual(schema.p_item.hash, peek.hash)
+        self.assertEqual(schema.hash, peek.hash)
 
         # Assert: task should be created, and should be the one that is queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(peek.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(peek.id)
         self.assertIsNotNone(task_db)
         self.assertEqual(peek.id, task_db.id)
 
@@ -1526,7 +1538,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(schedule_db.p_item.hash, peek.hash)
 
         # Assert: task should be created, and should be the one that is queued
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(peek.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(peek.id)
         self.assertIsNotNone(task_db)
         self.assertEqual(peek.id, task_db.id)
 

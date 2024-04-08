@@ -140,6 +140,7 @@ class PriorityQueue(abc.ABC):
 
             PrioritizedItemNotFoundError: If the item is not found on the queue.
         """
+        breakpoint()
         if not isinstance(p_item, models.PrioritizedItem):
             raise InvalidPrioritizedItemError("The item is not a PrioritizedItem")
 
