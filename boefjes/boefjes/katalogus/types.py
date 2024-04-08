@@ -6,7 +6,7 @@ from pydantic import BaseModel
 KATALOGUS_DIR = Path(__file__).parent
 STATIC_DIR = KATALOGUS_DIR / "static"
 
-LIMIT = 100
+LIMIT = 200
 
 
 class PaginationParameters(BaseModel):
