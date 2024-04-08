@@ -97,6 +97,8 @@ class KATalogusClientV1:
         response.raise_for_status()
 
         schema = response.json()
+        if not schema:
+            return None
 
         try:
             Draft202012Validator.check_schema(schema)

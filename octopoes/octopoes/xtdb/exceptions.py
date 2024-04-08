@@ -4,3 +4,7 @@ class XTDBException(Exception):
 
 class NodeNotFound(XTDBException):
     """The XTDB node was not found"""
+
+
+class ObjectNotFound(XTDBException):
+    """The XTDB object was not found"""
