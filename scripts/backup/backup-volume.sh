@@ -13,7 +13,7 @@ while [ $# -gt 0 ]; do
       ;;
     *)
       printf "*******************************\n"
-      printf "* Error: Invalid argument: $1 *\n"
+      printf "* Error: Invalid argument: %s *\n" "$1"
       printf "*******************************\n"
       exit 1
   esac
@@ -33,7 +33,7 @@ do
   --mount "type=volume,src=${volume},dst=/data" \
   --name "$uuid" \
   "$IMAGE"
-  
+
   timestamp="$(date +%Y-%m-%d_%H%M%S)"
   docker cp -a "$uuid:/data" "/tmp/$uuid"
   tar -C "/tmp/$uuid" -czf "$backup_path/$volume/${timestamp}_${volume}.tar.gz" .
