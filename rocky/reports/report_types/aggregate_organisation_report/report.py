@@ -80,9 +80,9 @@ class AggregateOrganisationReport(AggregateReport):
 
                         for service in system["services"]:
                             if service not in services:
-                                services[service] = {ip: systems["services"][ip]}
+                                services[service] = {str(ip.tokenized.address): systems["services"][ip]}
                             else:
-                                services[service][ip] = systems["services"][ip]
+                                services[service][str(ip.tokenized.address)] = systems["services"][ip]
                         unique_hostnames.update(systems["services"][ip]["hostnames"])
                     total_systems += report_specific_data["summary"]["total_systems"]
 

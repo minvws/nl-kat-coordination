@@ -17,7 +17,7 @@
                 <thead>
                     <tr>
                         <th scope="col">{% translate "Domain" %}</th>
-                        {% if show_heading %}
+                        {% if show_system_type %}
                             <th scope="col">{% translate "System type" %}</th>
                         {% endif %}
                         <th scope="col">IPv6</th>
@@ -27,7 +27,7 @@
                     {% for hostname, info in data.items %}
                         <tr>
                             <td>{{ hostname }}</td>
-                            {% if show_heading %}
+                            {% if show_system_type %}
                                 <td>
                                     {% if info.systems %}
                                         {{ info.systems|join:", " }}
