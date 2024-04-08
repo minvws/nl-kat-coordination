@@ -4,7 +4,6 @@ from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
-from django.core.exceptions import BadRequest
 from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
@@ -117,7 +116,8 @@ class BoefjeDetailView(PluginDetailView):
             return self.get(request, *args, **kwargs)
 
         if "boefje_id" not in request.POST:
-            raise BadRequest("No boefje_id provided")
+            messages.error(request, _("No boefje_id provided"))
+            return self.get(request, *args, **kwargs)
 
         selected_oois = request.POST.getlist("ooi")
         plugin_id = request.POST["boefje_id"]

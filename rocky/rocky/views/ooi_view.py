@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 from time import sleep
-from typing import Any
 
-from django import forms, http
+from django import forms
+from django.contrib import messages
+from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -20,6 +21,7 @@ from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
+from rocky.views.page_actions import PageActionsView
 
 
 class OOIFilterView(ConnectorFormMixin, OctopoesView):
@@ -101,15 +103,35 @@ class BaseOOIListView(OOIFilterView, ListView):
         return context
 
 
-class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView):
-    def get(self, request: http.HttpRequest, *args: Any, **kwargs: Any) -> http.HttpResponse:
+class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView, PageActionsView):
+    connector_form_class = ObservedAtForm
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.ooi = self.get_ooi()
-        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if not self.indemnification_present:
+            messages.add_message(
+                request, messages.ERROR, f"Indemnification not present at organization {self.organization}."
+            )
+        return super().post(request, *args, **kwargs)
+
+    def get_current_ooi(self) -> OOI | None:
+        # self.ooi is already the current state of the OOI
+        now = datetime.now(timezone.utc)
+        if self.observed_at.date() == now.date():
+            return self.ooi
+        try:
+            return self.get_ooi(pk=self.get_ooi_id(), observed_at=now)
+        except Http404:
+            return None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context["ooi"] = self.ooi
+        context["ooi_current"] = self.get_current_ooi()
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["observed_at"] = self.observed_at
 

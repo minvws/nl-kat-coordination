@@ -1,112 +1,20 @@
-import json
 from collections import defaultdict
-from datetime import datetime, timezone
-from enum import Enum
+from datetime import datetime
 
-from django.contrib import messages
-from django.http import Http404
-from django.http.response import HttpResponse
-from django.shortcuts import redirect
-from django.utils.translation import gettext_lazy as _
-from httpx import HTTPError
-from jsonschema.validators import Draft202012Validator
-from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
-from tools.forms.base import ObservedAtForm
 from tools.forms.ooi import PossibleBoefjesFilterForm
-from tools.models import Indemnification
 from tools.ooi_helpers import format_display
 
-from octopoes.models import OOI, Reference
+from octopoes.models import Reference
 from octopoes.models.ooi.question import Question
 from rocky.views.ooi_detail_related_object import OOIFindingManager, OOIRelatedObjectAddView
 from rocky.views.ooi_view import BaseOOIDetailView
 from rocky.views.tasks import TaskListView
 
 
-class PageActions(Enum):
-    START_SCAN = "start_scan"
-    SUBMIT_ANSWER = "submit_answer"
-    RESCHEDULE_TASK = "reschedule_task"
-    CHANGE_CLEARANCE_LEVEL = "change_clearance_level"
-
-
 class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectAddView, OOIFindingManager, TaskListView):
     template_name = "oois/ooi_detail.html"
-    connector_form_class = ObservedAtForm
     context_object_name = "task_history"
-
-    def post(self, request, *args, **kwargs):
-        if not self.indemnification_present:
-            messages.add_message(
-                request, messages.ERROR, f"Indemnification not present at organization {self.organization}."
-            )
-            return self.get(request, status_code=403, *args, **kwargs)
-
-        if "action" not in self.request.POST:
-            return self.get(request, status_code=404, *args, **kwargs)
-
-        self.ooi = self.get_ooi()
-
-        action = self.request.POST.get("action")
-        return self.handle_page_action(action)
-
-    def handle_page_action(self, action: str) -> HttpResponse | None:
-        try:
-            if action == PageActions.CHANGE_CLEARANCE_LEVEL.value:
-                clearance_level = int(self.request.POST.get("level", ""))
-                if not self.can_raise_clearance_level(self.ooi, clearance_level):
-                    return redirect("account_detail", organization_code=self.organization.code)
-                return self.get(self.request, *self.args, **self.kwargs)
-
-            if action == PageActions.RESCHEDULE_TASK.value:
-                task_id = self.request.POST.get("task_id", "")
-                self.reschedule_task(task_id)
-
-            if action == PageActions.START_SCAN.value:
-                boefje_id = self.request.POST.get("boefje_id")
-                ooi_id = self.request.GET.get("ooi_id")
-
-                boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
-                ooi = self.get_single_ooi(pk=ooi_id)
-                self.run_boefje_for_oois(boefje, [ooi])
-                return redirect("task_list", organization_code=self.organization.code)
-
-            if action == PageActions.SUBMIT_ANSWER.value:
-                if not isinstance(self.ooi, Question):
-                    messages.add_message(self.request, messages.ERROR, _("Only Question OOIs can be answered."))
-                    return self.get(self.request, status_code=500, *self.args, **self.kwargs)
-
-                schema_answer = self.request.POST.get("schema")
-                parsed_schema_answer = json.loads(schema_answer)
-                validator = Draft202012Validator(json.loads(self.ooi.json_schema))
-
-                if not validator.is_valid(parsed_schema_answer):
-                    for error in validator.iter_errors(parsed_schema_answer):
-                        messages.add_message(self.request, messages.ERROR, error.message)
-
-                    return self.get(self.request, status_code=422, *self.args, **self.kwargs)
-
-                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
-                messages.add_message(self.request, messages.SUCCESS, "Question has been answered.")
-                return self.get(self.request, status_code=201, *self.args, **self.kwargs)
-
-            return self.get(self.request, status_code=404, *self.args, **self.kwargs)
-        except HTTPError as exception:
-            messages.add_message(self.request, messages.ERROR, f"{action} failed: '{exception}'")
-            return self.get(self.request, status_code=500, *self.args, **self.kwargs)
-
-    def get_current_ooi(self) -> OOI | None:
-        # self.ooi is already the current state of the OOI
-        if self.observed_at.date() == datetime.utcnow().date():
-            return self.ooi
-        try:
-            return self.get_ooi(pk=self.get_ooi_id(), observed_at=datetime.now(timezone.utc))
-        except Http404:
-            return None
-
-    def get_organization_indemnification(self):
-        return Indemnification.objects.filter(organization=self.organization).exists()
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
@@ -120,7 +28,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectAddView, OOIFindingManage
 
         # List from katalogus
         boefjes = []
-        if self.get_organization_indemnification():
+        if self.indemnification_present:
             boefjes = get_enabled_boefjes_for_ooi_class(self.ooi.__class__, self.organization)
 
         if boefjes:
@@ -161,13 +69,12 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectAddView, OOIFindingManage
         context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects(context["observed_at"])
-        context["ooi_current"] = self.get_current_ooi()
 
         context["count_findings_per_severity"] = dict(self.count_findings_per_severity())
         context["severity_summary_totals"] = sum(context["count_findings_per_severity"].values())
 
         context["possible_boefjes_filter_form"] = filter_form
-        context["organization_indemnification"] = self.get_organization_indemnification()
+        context["organization_indemnification"] = self.indemnification_present
 
         context["task_history_form_fields"] = [
             "task_history_from",

@@ -214,12 +214,14 @@ direction RL
     class OrganizationView
     class OctopoesView
     class SchedulerView
+    class TaskListView
 
     OctopoesView <|-- OrganizationView
 
     SchedulerView <|-- OctopoesView
-    BoefjeDetailView <|-- SchedulerView
-    OOIDetailView <|-- SchedulerView
+    TaskListView <|-- SchedulerView
+    BoefjeDetailView <|-- TaskListView
+    OOIDetailView <|-- TaskListView
     OOIDetailView <|-- OOIRelatedObjectAddView
     OOIDetailView <|-- OOIFindingManager
     ChangeClearanceLevel <|-- SchedulerView
@@ -294,13 +296,14 @@ direction RL
 
     class PluginSettingsDeleteView
     class BoefjeDetailView
+    class TaskListView
 
     KATalogusView  <|--  OrganizationView
     KATalogusView  <|--  FormView
     SinglePluginView  <|--  OrganizationView
     SingleSettingView  <|--  SinglePluginView
     BoefjeDetailView  <|--  PluginSettingsListView
-    BoefjeDetailView  <|--  SchedulerView
+    BoefjeDetailView  <|--  TaskListView
     PluginEnableDisableView  <|--  SinglePluginView
     PluginSettingsAddView  <|--  FormView
     PluginSettingsAddView  <|--  SinglePluginView
