@@ -187,7 +187,7 @@ jobs:
         run: python3.10 -m venv /var/www/html/.venv
 
       - name: Install requirements
-        run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
+        run: source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
         working-directory: /var/www/html
 
       - name: Create archive
