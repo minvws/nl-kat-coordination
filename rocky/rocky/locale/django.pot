@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-04 13:42+0000\n"
+"POT-Creation-Date: 2024-04-08 12:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -343,8 +343,6 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
 msgid "Organization"
 msgstr ""
 
@@ -454,7 +452,7 @@ msgstr ""
 
 #: account/templates/password_reset_email.html
 #: account/templates/registration_email.html
-msgid "Please go to the following page and choose a new password"
+msgid "Please go to the following page and choose a new password:"
 msgstr ""
 
 #: account/templates/password_reset_email.html
@@ -486,7 +484,7 @@ msgstr ""
 
 #: account/templates/recover_email.html
 msgid ""
-"If you don’t remember the email address connected to your account, contact"
+"If you don’t remember the email address connected to your account, contact:"
 msgstr ""
 
 #: account/templates/recover_email.html
@@ -638,7 +636,6 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/boefje_detail.html
-#: katalogus/templates/partials/boefje_tile.html
 msgid "Scan level"
 msgstr ""
 
@@ -661,7 +658,7 @@ msgstr ""
 
 #: katalogus/templates/boefje_detail.html
 #, python-format
-msgid "%(plugin_name)s is able to scan the following object types"
+msgid "%(plugin_name)s is able to scan the following object types:"
 msgstr ""
 
 #: katalogus/templates/boefje_detail.html
@@ -678,7 +675,7 @@ msgstr ""
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
 #, python-format
-msgid "%(plugin_name)s can produce the following output"
+msgid "%(plugin_name)s can produce the following output:"
 msgstr ""
 
 #: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
@@ -710,9 +707,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "Selected objects"
+msgid "Selected objects:"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -727,7 +722,6 @@ msgstr ""
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Clearance level"
 msgstr ""
 
@@ -808,7 +802,7 @@ msgid "This is an overview of the latest settings of all plugins."
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
-msgid "Latest plugin settings"
+msgid "Latest plugin settings:"
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
@@ -824,11 +818,15 @@ msgstr ""
 
 #: katalogus/templates/normalizer_detail.html
 #, python-format
-msgid "%(plugin_name)s is able to process the following mime types"
+msgid "%(plugin_name)s is able to process the following mime types:"
 msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
-msgid "Publisher"
+msgid "Scan level:"
+msgstr ""
+
+#: katalogus/templates/partials/boefje_tile.html
+msgid "Publisher:"
 msgstr ""
 
 #: katalogus/templates/partials/boefje_tile.html
@@ -906,7 +904,7 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
-msgid "Warning scan level"
+msgid "Warning scan level:"
 msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
@@ -929,7 +927,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You currently don't have scannable objects for %(name)s. Add objects to use "
-"this Boefje. This Boefje is able to scan objects of the following types"
+"this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
 
 #: katalogus/templates/partials/plugin_settings_required.html
@@ -948,7 +946,7 @@ msgid "Add"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
-msgid "Plugins overview"
+msgid "Plugins overview:"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
@@ -980,14 +978,12 @@ msgid "All"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
+#: rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Normalizers"
@@ -1063,7 +1059,7 @@ msgid " Details"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
-msgid "Overview of settings"
+msgid "Overview of settings:"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
@@ -1328,10 +1324,6 @@ msgid "Accounts"
 msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Organization setup with separate accounts"
-msgstr ""
-
-#: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
 "Within OpenKAT it is possible to create separate user accounts with the "
 "specific roles. Each with their own functionalities and permissions. This is "
@@ -1341,7 +1333,7 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
-msgid "Single account setup"
+msgid "Single account setup:"
 msgstr ""
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
@@ -1943,9 +1935,18 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: rocky/templates/scan.html
+msgid "Boefjes:"
+msgstr ""
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
+msgstr ""
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+msgid "Normalizers:"
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
@@ -1954,8 +1955,7 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: reports/report_types/tls_report/report.html
-msgid "Bits"
+msgid "Bits:"
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
@@ -2103,7 +2103,11 @@ msgid "Appendix"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: rocky/templates/oois/ooi_list.html
+#: reports/templates/summary/report_asset_overview.html
+msgid "Selected objects"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Currently filtered on"
 msgstr ""
 
@@ -2266,20 +2270,20 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Created with data from"
+msgid "Created with data from:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Created on"
+msgid "Created on:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Created by"
+msgid "Created by:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/recommendations.html
@@ -2386,8 +2390,7 @@ msgid "Terms in report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
-#: rocky/templates/partials/elements/ooi_detail_settings.html
-msgid "Observed at"
+msgid "Observed at:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -2448,7 +2451,7 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/system_specific.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/vulnerability_report/report.html
-msgid "Host"
+msgid "Host:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
@@ -2588,7 +2591,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "All existing DNS record types can be found here"
+msgid "All existing DNS record types can be found here:"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -2847,7 +2850,7 @@ msgid "This is the OpenKAT Sector rapport."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
-msgid "Created with date from"
+msgid "Created with date from:"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
@@ -3167,6 +3170,10 @@ msgid "Encryption Algorithm"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
+msgid "Bits"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
 msgid "Key Size"
 msgstr ""
 
@@ -3374,6 +3381,7 @@ msgid "Filter"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
 msgid "Currently filtered on:"
 msgstr ""
 
@@ -3396,7 +3404,7 @@ msgid "explanation select all"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Explanation 'Continue with all OOIs'"
+msgid "Explanation 'Continue with all OOIs:'"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3467,7 +3475,7 @@ msgid "Required plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "This report type requires the following plugins to be enabled"
+msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3481,7 +3489,7 @@ msgstr ""
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
 "This report requires at least one of the following plugins to be enabled to "
-"generate the report"
+"generate the report:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3858,7 +3866,6 @@ msgid "quickfix"
 msgstr ""
 
 #: tools/forms/settings.py
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared"
 msgstr ""
 
@@ -3867,7 +3874,6 @@ msgid "Inherited"
 msgstr ""
 
 #: tools/forms/settings.py
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Empty"
 msgstr ""
 
@@ -4264,7 +4270,6 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "Total findings"
 msgstr ""
 
@@ -4317,7 +4322,7 @@ msgid "Welcome"
 msgstr ""
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-msgid "User overview"
+msgid "User overview:"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
@@ -4329,11 +4334,19 @@ msgstr ""
 #: rocky/templates/dashboard_redteam.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
+msgid "Warning:"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
 msgid "Organization code missing"
+msgstr ""
+
+#: rocky/templates/finding_type_add.html
+msgid "Add finding type:"
+msgstr ""
+
+#: rocky/templates/finding_type_add.html
+msgid "Finding Type"
 msgstr ""
 
 #: rocky/templates/finding_type_add.html
@@ -4342,15 +4355,8 @@ msgstr ""
 msgid "Add finding type"
 msgstr ""
 
-#: rocky/templates/finding_type_add.html
-msgid "Finding Type"
-msgstr ""
-
 #: rocky/templates/findings/finding_add.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_findings.html
-#: rocky/templates/partials/findings_list_toolbar.html
-msgid "Add finding"
+msgid "Add finding:"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4403,19 +4409,13 @@ msgstr ""
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-msgid "Finding type"
-msgstr ""
-
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
 #, python-format
 msgid "Show details for %(finding_type)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
-msgid "OOI type"
+msgid "OOI type:"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4426,7 +4426,7 @@ msgstr ""
 
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
-msgid "Source OOI"
+msgid "Source OOI:"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4435,7 +4435,7 @@ msgid "Show details for %(ooi)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Risk score"
+msgid "Risk score:"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4443,7 +4443,7 @@ msgid "Mute findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Reason"
+msgid "Reason:"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4492,9 +4492,7 @@ msgstr ""
 msgid "OpenKAT logo, go to the homepage of OpenKAT"
 msgstr ""
 
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/views/finding_list.py
+#: rocky/templates/header.html rocky/views/finding_list.py
 msgid "Crisis room"
 msgstr ""
 
@@ -4690,7 +4688,6 @@ msgid "There are no boefjes enabled to scan an OOI of type"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
 msgid "See"
 msgstr ""
 
@@ -4738,6 +4735,12 @@ msgid "Add object"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_findings.html
+#: rocky/templates/partials/findings_list_toolbar.html
+msgid "Add finding"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_findings_list.html
 msgid "Overview of findings for"
 msgstr ""
 
@@ -4763,6 +4766,10 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 msgid "See finding details"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+msgid "Total findings:"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_origins_declarations.html
@@ -4820,11 +4827,15 @@ msgid "Delete object(s)"
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
-msgid "Mute finding"
+msgid "Mute finding:"
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
 msgid "Give a reason below why you want to mute this finding."
+msgstr ""
+
+#: rocky/templates/oois/ooi_mute_finding.html
+msgid "Mute finding"
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
@@ -4927,6 +4938,10 @@ msgid "Object tree"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
+msgid "Crisis room:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "indemnification warning"
 msgstr ""
@@ -4954,6 +4969,10 @@ msgstr ""
 msgid "Top 10 most severe Findings"
 msgstr ""
 
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Finding type:"
+msgstr ""
+
 #: rocky/templates/organizations/organization_edit.html
 msgid "Edit organization"
 msgstr ""
@@ -4967,7 +4986,7 @@ msgid "Add new organization"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
-msgid "Organization overview"
+msgid "Organization overview:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_list.html
@@ -5005,6 +5024,11 @@ msgid "Save member"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Organization:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_member_list.html
 #, python-format
 msgid ""
 "\n"
@@ -5025,7 +5049,7 @@ msgid "Upload a CSV"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
-msgid "Member overview"
+msgid "Member overview:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
@@ -5066,7 +5090,7 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
 #: rocky/templates/upload_csv.html
-msgid "These are the criteria for CSV upload"
+msgid "These are the criteria for CSV upload:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_upload.html
@@ -5097,6 +5121,10 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_settings.html
 msgid "Rerun all bits"
+msgstr ""
+
+#: rocky/templates/partials/elements/ooi_detail_settings.html
+msgid "Observed at"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_detail_settings.html
@@ -5134,7 +5162,7 @@ msgid "Unfold %(object_id)s with %(child_count)s children"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
-msgid "go to"
+msgid "go to:"
 msgstr ""
 
 #: rocky/templates/partials/elements/ooi_tree_table.html
@@ -5162,7 +5190,7 @@ msgid "graph"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
-msgid "Clearance level inheritance"
+msgid "Clearance level inheritance:"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
@@ -5212,7 +5240,7 @@ msgstr ""
 #: rocky/templates/partials/form/field_input_errors.html
 #: rocky/templates/partials/form/form_errors.html
 #: rocky/templates/partials/notifications_block.html
-msgid "Error"
+msgid "Error:"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_help_text.html
@@ -5232,11 +5260,11 @@ msgstr ""
 #: rocky/templates/partials/form/field_input_help_text.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/two_factor/core/login.html
-msgid "Explanation"
+msgid "Explanation:"
 msgstr ""
 
 #: rocky/templates/partials/form/indemnification_add_form.html
-msgid "Here, an indemnification can be given on behalf of your organization"
+msgid "Here, an indemnification can be given on behalf of your organization:"
 msgstr ""
 
 #: rocky/templates/partials/form/indemnification_add_form.html
@@ -5311,7 +5339,7 @@ msgid "confirmation"
 msgstr ""
 
 #: rocky/templates/partials/notifications_block.html
-msgid "Confirmation"
+msgid "Confirmation:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -5377,7 +5405,11 @@ msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #, python-format
-msgid "Findings for %(type)s %(name)s on %(observed_at)s"
+msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+msgid "Finding type"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
@@ -5398,6 +5430,10 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total occurrences"
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_severity_totals.html
+msgid "See:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
@@ -5441,7 +5477,7 @@ msgid "All organizations"
 msgstr ""
 
 #: rocky/templates/partials/page-meta.html
-msgid "Logged in as"
+msgid "Logged in as:"
 msgstr ""
 
 #: rocky/templates/partials/pagination.html
@@ -5560,7 +5596,15 @@ msgid "Download task data"
 msgstr ""
 
 #: rocky/templates/scan.html
-msgid "Boefjes overview"
+msgid "Boefjes overview:"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Clearance level:"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Declared:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
@@ -5587,6 +5631,10 @@ msgid "Set clearance level to inherit"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Empty:"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
 "\n"
 "                This object has a clearance level of \"L0\". This means that "
@@ -5598,8 +5646,12 @@ msgid ""
 "            "
 msgstr ""
 
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Set clearance level:"
+msgstr ""
+
 #: rocky/templates/scan_profiles/scan_profile_reset.html
-msgid "Set clearance level for"
+msgid "Set clearance level for:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
@@ -5779,7 +5831,7 @@ msgid ""
 msgstr ""
 
 #: rocky/templates/two_factor/core/login.html
-msgid "As a last resort, you can use a backup token"
+msgid "As a last resort, you can use a backup token:"
 msgstr ""
 
 #: rocky/templates/two_factor/core/login.html
