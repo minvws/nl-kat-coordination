@@ -40,9 +40,8 @@
                 {% if plugin.consumes %}
                     <p>
                         {% blocktranslate trimmed with plugin_name=plugin.name %}
-                            {{ plugin_name }} is able to process the following mime types
+                            {{ plugin_name }} is able to process the following mime types:
                         {% endblocktranslate %}
-                        :
                     </p>
                     <p>
                         <ul>
@@ -61,9 +60,8 @@
                 <h2>{% translate "Produces" %}</h2>
                 <p>
                     {% blocktranslate trimmed with plugin_name=plugin.name %}
-                        {{ plugin_name }} can produce the following output
+                        {{ plugin_name }} can produce the following output:
                     {% endblocktranslate %}
-                    :
                 </p>
                 <p>
                     {% if plugin.produces %}

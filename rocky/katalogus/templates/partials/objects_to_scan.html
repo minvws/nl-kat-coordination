@@ -46,9 +46,8 @@
         {% else %}
             {% blocktranslate trimmed with name=plugin.name %}
                 You currently don't have scannable objects for {{ name }}.
-                Add objects to use this Boefje. This Boefje is able to scan objects of the following types
+                Add objects to use this Boefje. This Boefje is able to scan objects of the following types:
             {% endblocktranslate %}
-            :
             <p>
                 {% for ooi in plugin.consumes %}
                     <a href="{% url "ooi_add" ooi_type=ooi organization_code=organization.code %}">{{ ooi }}</a>

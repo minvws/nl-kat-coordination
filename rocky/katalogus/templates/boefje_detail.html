@@ -46,9 +46,8 @@
                 {% if plugin.consumes %}
                     <p>
                         {% blocktranslate trimmed with plugin_name=plugin.name %}
-                            {{ plugin_name }} is able to scan the following object types
+                            {{ plugin_name }} is able to scan the following object types:
                         {% endblocktranslate %}
-                        :
                     </p>
                     <p>
                         {% for ooi_type in plugin.consumes %}
@@ -64,9 +63,8 @@
                 <h2>{% translate "Produces" %}</h2>
                 <p>
                     {% blocktranslate trimmed with plugin_name=plugin.name %}
-                        {{ plugin_name }} can produce the following output
+                        {{ plugin_name }} can produce the following output:
                     {% endblocktranslate %}
-                    :
                 </p>
                 <p>
                     {{ plugin.produce }}
