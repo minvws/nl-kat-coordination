@@ -43,12 +43,10 @@ class FindingsReport(Report):
         all_finding_types = self.octopoes_api_connector.list_objects(types={FindingType}, valid_time=valid_time).items
 
         for finding in findings:
-            filter_finding_type = [x for x in all_finding_types if x.id == finding.finding_type.tokenized.id]
-
-            if not filter_finding_type:
+            try:
+                finding_type = next(filter(lambda x: x.id == finding.finding_type.tokenized.id, all_finding_types))
+            except StopIteration:
                 continue
-
-            finding_type = filter_finding_type[0]
 
             severity = finding_type.risk_severity.name.lower()
             total_by_severity[severity] += 1
