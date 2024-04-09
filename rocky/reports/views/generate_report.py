@@ -123,11 +123,43 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
 
         return super().get(request, *args, **kwargs)
 
+    def get_plugin_data(self):
+        report_types: dict[str, Any] = {}
+        total_enabled_plugins = {"required": 0, "optional": 0}
+        total_available_plugins = {"required": 0, "optional": 0}
+
+        for report_type in self.report_types:
+            for plugin_type in ["required", "optional"]:
+                number_of_enabled = sum(
+                    1
+                    for plugin in self.plugins[plugin_type]
+                    if plugin.enabled and plugin.id in report_type.plugins[plugin_type]
+                )
+
+                number_of_available = len(report_type.plugins[plugin_type])
+                total_enabled_plugins[plugin_type] += number_of_enabled
+                total_available_plugins[plugin_type] += number_of_available
+
+                if report_type.name not in report_types:
+                    report_types[report_type.name] = {}
+
+                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
+                report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
+
+        plugin_data = {
+            "total_enabled_plugins": total_enabled_plugins,
+            "total_available_plugins": total_available_plugins,
+            "report_types": report_types,
+        }
+
+        return plugin_data
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
             get_plugins_for_report_ids(self.selected_report_types)
         )
+        context["plugin_data"] = self.get_plugin_data()
         return context
 
 
@@ -198,40 +230,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
         return report_data
 
-    def get_plugin_data(self):
-        report_types: dict[str, Any] = {}
-        total_enabled_plugins = {"required": 0, "optional": 0}
-        total_available_plugins = {"required": 0, "optional": 0}
-
-        for report_type in self.report_types:
-            for plugin_type in ["required", "optional"]:
-                number_of_enabled = sum(
-                    1
-                    for plugin in self.plugins[plugin_type]
-                    if plugin.enabled and plugin.id in report_type.plugins[plugin_type]
-                )
-
-                number_of_available = len(report_type.plugins[plugin_type])
-                total_enabled_plugins[plugin_type] += number_of_enabled
-                total_available_plugins[plugin_type] += number_of_available
-
-                if report_type.name not in report_types:
-                    report_types[report_type.name] = {}
-
-                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
-                report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
-
-        plugin_data = {
-            "total_enabled_plugins": total_enabled_plugins,
-            "total_available_plugins": total_available_plugins,
-            "report_types": report_types,
-        }
-
-        return plugin_data
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugin_data"] = self.get_plugin_data()
         context["report_data"] = self.generate_reports_for_oois()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(
