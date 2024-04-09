@@ -1,78 +1,74 @@
 {% load i18n %}
 
-<section>
-    <div>
-        <h3>{% translate "Overview" %}</h3>
-        <div class="horizontal-scroll">
-            <table>
-                <caption class="visually-hidden">{% translate "Plugin overview table" %}</caption>
-                <thead>
-                    <tr>
-                        <th>{% translate "Report type" %}</th>
-                        <th>{% translate "Status" %}</th>
-                        <th>{% translate "Required plugins" %}</th>
-                        <th>{% translate "Suggested plugins" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for report_type, data in plugin_data.report_types.items %}
-                        <tr>
-                            <td>{{ report_type }}</td>
-                            <td>
-                                {% if data.number_of_enabled_required != data.number_of_available_required or data.number_of_enabled_optional != data.number_of_available_optional %}
-                                    <span class="icon warning"></span>{% translate "Action required" %}
-                                {% else %}
-                                    <span class="icon positive"></span>{% translate "Ready" %}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if data.number_of_available_required > 0 and data.number_of_enabled_required != data.number_of_available_required %}
-                                    <span class="icon warning"></span>
-                                {% else %}
-                                    <span class="icon positive"></span>
-                                {% endif %}
-                                {{ data.number_of_enabled_required }}/{{ data.number_of_available_required }}
-                            </td>
-                            <td>
-                                {% if data.number_of_available_optional > 0 and data.number_of_enabled_optional != data.data.number_of_available_optional %}
-                                    <span class="icon warning"></span>
-                                {% else %}
-                                    <span class="icon positive"></span>
-                                {% endif %}
-                                {{ data.number_of_enabled_optional }}/{{ data.number_of_available_optional }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    <tfoot>
-                        <tr>
-                            <td>Total</td>
-                            <td>
-                                {% if plugin_data.total_enabled_plugins.required != plugin_data.total_available_plugins.required or plugin_data.total_enabled_plugins.optional != plugin_data.total_available_plugins.optional %}
-                                    <span class="icon warning"></span>{% translate "Action required" %}
-                                {% else %}
-                                    <span class="icon positive"></span>{% translate "Ready" %}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if plugin_data.total_available_plugins.required > 0 and plugin_data.total_enabled_plugins.required != plugin_data.total_available_plugins.required %}
-                                    <span class="icon warning"></span>
-                                {% else %}
-                                    <span class="icon positive"></span>
-                                {% endif %}
-                                {{ plugin_data.total_enabled_plugins.required }}/{{ plugin_data.total_available_plugins.required }}
-                            </td>
-                            <td>
-                                {% if plugin_data.total_available_plugins.optional > 0 and plugin_data.total_enabled_plugins.optional != plugin_data.total_available_plugins.optional %}
-                                    <span class="icon warning"></span>
-                                {% else %}
-                                    <span class="icon positive"></span>
-                                {% endif %}
-                                {{ plugin_data.total_enabled_plugins.optional }}/{{ plugin_data.total_available_plugins.optional }}
-                            </td>
-                        </tr>
-                    </tfoot>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
+<h3>{% translate "Overview" %}</h3>
+<div class="horizontal-scroll">
+    <table>
+        <caption class="visually-hidden">{% translate "Plugin overview table" %}</caption>
+        <thead>
+            <tr>
+                <th>{% translate "Report type" %}</th>
+                <th>{% translate "Status" %}</th>
+                <th>{% translate "Required plugins" %}</th>
+                <th>{% translate "Suggested plugins" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report_type, data in plugin_data.report_types.items %}
+                <tr>
+                    <td>{{ report_type }}</td>
+                    <td>
+                        {% if data.number_of_enabled_required != data.number_of_available_required or data.number_of_enabled_optional != data.number_of_available_optional %}
+                            <span class="icon warning"></span>{% translate "Action required" %}
+                        {% else %}
+                            <span class="icon positive"></span>{% translate "Ready" %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if data.number_of_available_required > 0 and data.number_of_enabled_required != data.number_of_available_required %}
+                            <span class="icon warning"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_enabled_required }}/{{ data.number_of_available_required }}
+                    </td>
+                    <td>
+                        {% if data.number_of_available_optional > 0 and data.number_of_enabled_optional != data.data.number_of_available_optional %}
+                            <span class="icon warning"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_enabled_optional }}/{{ data.number_of_available_optional }}
+                    </td>
+                </tr>
+            {% endfor %}
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td>
+                        {% if plugin_data.total_enabled_plugins.required != plugin_data.total_available_plugins.required or plugin_data.total_enabled_plugins.optional != plugin_data.total_available_plugins.optional %}
+                            <span class="icon warning"></span>{% translate "Action required" %}
+                        {% else %}
+                            <span class="icon positive"></span>{% translate "Ready" %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if plugin_data.total_available_plugins.required > 0 and plugin_data.total_enabled_plugins.required != plugin_data.total_available_plugins.required %}
+                            <span class="icon warning"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ plugin_data.total_enabled_plugins.required }}/{{ plugin_data.total_available_plugins.required }}
+                    </td>
+                    <td>
+                        {% if plugin_data.total_available_plugins.optional > 0 and plugin_data.total_enabled_plugins.optional != plugin_data.total_available_plugins.optional %}
+                            <span class="icon warning"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ plugin_data.total_enabled_plugins.optional }}/{{ plugin_data.total_available_plugins.optional }}
+                    </td>
+                </tr>
+            </tfoot>
+        </tbody>
+    </table>
+</div>
