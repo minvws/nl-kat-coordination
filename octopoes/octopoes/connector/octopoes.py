@@ -48,10 +48,10 @@ class OctopoesAPIConnector:
         except HTTPError as error:
             if response.status_code == 404:
                 data = response.json()
-                raise ObjectNotFoundException(data["value"])
+                raise ObjectNotFoundException(data["detail"])
             if 500 <= response.status_code < 600:
                 data = response.json()
-                raise RemoteException(value=data["value"])
+                raise RemoteException(value=data["detail"])
             raise error
         except json.decoder.JSONDecodeError as error:
             raise DecodeException("JSON decode error") from error
