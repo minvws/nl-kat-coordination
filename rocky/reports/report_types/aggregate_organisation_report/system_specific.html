@@ -45,7 +45,7 @@
 </div>
 {% for ip, findings in data.ips.items %}
     {% if findings %}
-        <h5>{% translate "Host:" %} {{ ip }}</h5>
+        <h5>{% translate "Host:" %} {{ ip.human_readable }}</h5>
         <table>
             <caption class="visually-hidden">{% translate "Findings" %}</caption>
             <thead>
