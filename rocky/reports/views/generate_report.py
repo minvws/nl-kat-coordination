@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, Literal, cast
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -130,6 +130,8 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
 
         for report_type in self.report_types:
             for plugin_type in ["required", "optional"]:
+                # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
+                plugin_type = cast(Literal["required", "optional"], plugin_type)
                 number_of_enabled = sum(
                     1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0
                     for plugin in self.plugins[plugin_type]
