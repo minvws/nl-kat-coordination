@@ -95,6 +95,10 @@ With docker compose you would run this as:
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py setup_dev_account
 ```
 
+## IPv6 support
+In order to perform scans against IPv6 addresses you need to manually enabled IPv6 support in Dockerized setups. See the [Docker documentation](https://docs.docker.com/config/daemon/ipv6/) on how to do this.
+
+
 ## Container commands
 
 We have two container images that are used to run multiple containers. What the container runs is be specified by overriding the CMD of the container.
