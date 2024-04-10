@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-08 15:54+0000\n"
+"POT-Creation-Date: 2024-04-10 07:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3599,6 +3599,12 @@ msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
 msgid "Plugin scan level"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid ""
+"There are no required or optional plugins needed for the selected report "
+"types."
 msgstr ""
 
 #: reports/views/aggregate_report.py
