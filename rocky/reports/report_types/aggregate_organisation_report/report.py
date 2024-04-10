@@ -241,8 +241,7 @@ class AggregateOrganisationReport(AggregateReport):
                             {  # Flattening the finding_types field of the mail report output
                                 finding_type
                                 for mail_report in mail_report_data[ip]
-                                for hostname, finding_types in mail_report["finding_types"].items()
-                                for finding_type in finding_types
+                                for finding_type in mail_report["finding_types"]
                             },
                             reverse=True,
                             key=lambda x: x.risk_severity,
