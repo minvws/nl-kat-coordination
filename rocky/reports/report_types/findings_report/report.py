@@ -48,6 +48,9 @@ class FindingsReport(Report):
             except StopIteration:
                 continue
 
+            if finding_type.risk_severity is None:
+                continue
+
             severity = finding_type.risk_severity.name.lower()
             total_by_severity[severity] += 1
 
