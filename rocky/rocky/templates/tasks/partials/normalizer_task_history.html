@@ -5,6 +5,8 @@
     {% if not task_history %}
         {% translate "No tasks found for this object." %}
     {% else %}
+        {% include "tasks/partials/task_filter.html" %}
+
         <table rf-selector="table-scan-history">
             <thead>
                 <tr>
@@ -85,4 +87,4 @@
         </table>
     {% endif %}
 </div>
-{% include "partials/list_paginator.html" with page_obj=task_history page_param="task_history_page" %}
+{% include "partials/list_paginator.html" %}

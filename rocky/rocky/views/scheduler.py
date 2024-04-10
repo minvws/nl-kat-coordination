@@ -16,6 +16,7 @@ from rocky.scheduler import (
     RawData,
     SchedulerError,
     SchedulerTaskList,
+    SchedulerValidationError,
     Task,
     scheduler_client,
 )
@@ -35,33 +36,29 @@ class SchedulerView(OctopoesView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.scheduler_client = scheduler_client(self.organization.code)
-        self.scheduler_id = f"{self.task_type}-{self.organization.code}"
-        self.task_type = request.GET.get("type", self.task_type)
-        self.status = request.GET.get("scan_history_status", None)
-        self.min_created_at = get_date_time(request.GET.get("scan_history_from", None))
-        self.max_created_at = get_date_time(request.GET.get("scan_history_to", None))
-        self.input_ooi = request.GET.get("scan_history_search", None)
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
             return super().get(request, *args, **kwargs)
-        except SchedulerError:
+        except (SchedulerValidationError, SchedulerError) as error:
+            messages.error(self.request, error.message)
             return redirect("health_beautified", organization_code=self.organization.code)
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         return {
-            "scheduler_id": self.scheduler_id,
-            "task_type": self.task_type,
-            "status": self.status,
-            "min_created_at": self.min_created_at,
-            "max_created_at": self.max_created_at,
-            "input_ooi": self.input_ooi,
+            "scheduler_id": f"{self.task_type}-{self.organization.code}",
+            "task_type": self.request.GET.get("type", self.task_type),
+            "status": self.request.GET.get("scan_history_status", None),
+            "min_created_at": get_date_time(self.request.GET.get("scan_history_from", None)),
+            "max_created_at": get_date_time(self.request.GET.get("scan_history_to", None)),
+            "input_ooi": self.request.GET.get("scan_history_search", None),
+            "plugin_id": None,
         }
 
     def get_task_list(self) -> SchedulerTaskList | None:
         try:
             return SchedulerTaskList(self.scheduler_client, **self.get_task_filters())
-        except SchedulerError as error:
+        except (SchedulerValidationError, SchedulerError) as error:
             return messages.error(self.request, error.message)
 
     def get_task_details(self, task_id: str) -> Task | None:

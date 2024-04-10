@@ -75,13 +75,6 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectAddView, OOIFindingManage
         context["possible_boefjes_filter_form"] = filter_form
         context["organization_indemnification"] = self.indemnification_present
 
-        context["task_history_form_fields"] = [
-            "task_history_from",
-            "task_history_to",
-            "task_history_status",
-            "task_history_search",
-            "task_history_page",
-        ]
         if self.request.GET.get("show_clearance_level_inheritance"):
             clearance_level_inheritance = self.get_scan_profile_inheritance(self.ooi)
             formatted_inheritance = [

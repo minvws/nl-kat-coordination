@@ -14,8 +14,6 @@
                 {% include "tasks/partials/tab_navigation.html" with view="normalizers_tasks" %}
 
                 <h1>{% translate "Normalizers" %}</h1>
-                {% include "tasks/partials/task_filter.html" %}
-
                 {% if not object_list %}
                     <p class="emphasized">{% translate "There are no tasks for normalizers" %}</p>
                 {% else %}
@@ -24,8 +22,6 @@
                         {% include "tasks/partials/normalizer_task_history.html" with task_history=object_list %}
 
                     </div>
-                    {% include "partials/list_paginator.html" %}
-
                 {% endif %}
             </div>
         </section>

@@ -8,7 +8,6 @@ from django.http import FileResponse
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
 from tools.forms.ooi import SelectOOIFilterForm, SelectOOIForm
 
 from katalogus.client import Boefje, get_katalogus
@@ -27,27 +26,24 @@ class PluginCoverImgView(OrganizationView):
         return file
 
 
-class PluginDetailView(TaskListView, PluginSettingsListView, TemplateView):
+class PluginDetailView(TaskListView, PluginSettingsListView):
     paginate_by = 10
     context_object_name = "task_history"
 
+    def get_task_filters(self) -> dict[str, str | datetime | None]:
+        filters = super().get_task_filters()
+        filters["plugin_id"] = self.plugin.id  # fetch only tasks for a specific plugin by id
+        return filters
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context["plugin"] = self.plugin.model_dump()
-        context["task_history_form_fields"] = [
-            "task_history_from",
-            "task_history_to",
-            "task_history_status",
-            "task_history_search",
-            "task_history_page",
-        ]
-
         return context
 
 
 class NormalizerDetailView(PluginDetailView):
     template_name = "normalizer_detail.html"
+    task_type = "normalizer"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

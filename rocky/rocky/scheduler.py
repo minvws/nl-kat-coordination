@@ -12,7 +12,7 @@ import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
-from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny
+from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
 
 from rocky.health import ServiceHealth
 
@@ -192,6 +192,10 @@ class TaskNotFoundError(SchedulerError):
     message = _("Task could not be found.")
 
 
+class SchedulerValidationError(SchedulerError):
+    message = _("Your request could not be validated. Bad request.")
+
+
 class SchedulerClient:
     def __init__(self, base_uri: str, organization_code: str):
         self._client = httpx.Client(base_url=base_uri)
@@ -205,6 +209,8 @@ class SchedulerClient:
             kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
             res = self._client.get("/tasks", params=kwargs)
             return PaginatedTasksResponse.model_validate_json(res.content)
+        except ValidationError:
+            raise SchedulerValidationError()
         except ConnectError:
             raise SchedulerError()
 
