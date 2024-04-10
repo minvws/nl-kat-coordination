@@ -1,15 +1,15 @@
 import datetime
 import uuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Normalizer(BaseModel):
     """Normalizer representation."""
 
     id: str
-    name: str | None = None
-    version: str | None = None
+    name: str | None = Field(default=None)
+    version: str | None = Field(default=None)
 
 
 class NormalizerMeta(BaseModel):

@@ -20,7 +20,15 @@
                 {% for task in task_history %}
                     <tr data-task-id="{{ task.id }}">
                         <td>
-                            <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
+                            <a href="{% url 'normalizer_detail' organization_code=organization.code plugin_id=task.p_item.data.normalizer.id %}">
+                                {{ task.p_item.data.normalizer.name }}
+                                <br>
+                                {% if task.p_item.data.normalizer.name %}
+                                    {{ task.p_item.data.normalizer.name }}
+                                {% else %}
+                                    {{ task.p_item.data.normalizer.id }}
+                                {% endif %}
+                            </a>
                         </td>
                         <td class="nowrap">
                             {% if task.status.value == "pending" or task.status.value == "queued" %}

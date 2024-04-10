@@ -1,4 +1,5 @@
 from logging import getLogger
+from uuid import uuid4
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -65,8 +66,12 @@ class NormalizerMixin(OctopoesView):
     this mixin provides the method to construct the normalizer task for that data and run it.
     """
 
-    def run_normalizer(self, normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
-        normalizer_task = NormalizerTask(normalizer=Normalizer(id=normalizer.id, version=None), raw_data=raw_data)
+    def run_normalizer(self, katalogus_normalizer: KATalogusNormalizer, raw_data: RawData) -> None:
+        normalizer_task = NormalizerTask(
+            id=uuid4().hex,
+            normalizer=Normalizer.parse_obj(katalogus_normalizer.dict()),
+            raw_data=raw_data,
+        )
 
         task = PrioritizedItem(priority=1, data=normalizer_task)
 

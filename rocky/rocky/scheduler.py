@@ -50,7 +50,7 @@ class Normalizer(BaseModel):
     """Normalizer representation."""
 
     id: str | None = None
-    name: str | None = None
+    name: str | None = Field(default=None)
     version: str | None = Field(default=None)
 
 
