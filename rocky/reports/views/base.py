@@ -206,6 +206,7 @@ class ViewReportView(TemplateView, OOIFilterView):
             Reference.from_str(report_ooi.input_ooi), valid_time=self.observed_at
         )
 
+        self.bytes_client.login()
         report_data: dict = {}
         report_data[report_ooi.report_type] = {}
         report_data[report_ooi.report_type][report_ooi.input_ooi] = {
