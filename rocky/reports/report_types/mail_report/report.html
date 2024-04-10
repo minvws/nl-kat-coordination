@@ -69,15 +69,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for values in data.finding_types.values %}
-                        {% for finding_type in values %}
-                            <tr>
-                                <td>{{ finding_type.description }}</td>
-                                <td>
-                                    <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
-                                </td>
-                            </tr>
-                        {% endfor %}
+                    {% for finding_type in data.finding_types %}
+                        <tr>
+                            <td>{{ finding_type.description }}</td>
+                            <td>
+                                <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
