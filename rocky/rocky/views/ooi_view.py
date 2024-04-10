@@ -7,7 +7,7 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError
 from tools.forms.base import BaseRockyForm, ObservedAtForm
@@ -21,7 +21,6 @@ from octopoes.models.ooi.findings import Finding, FindingType
 from octopoes.models.types import get_collapsed_types, type_by_name
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import ConnectorFormMixin, OctopoesView, OOIList, SingleOOIMixin, SingleOOITreeMixin
-from rocky.views.page_actions import PageActionsView
 
 
 class OOIFilterView(ConnectorFormMixin, OctopoesView):
@@ -103,7 +102,7 @@ class BaseOOIListView(OOIFilterView, ListView):
         return context
 
 
-class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin, TemplateView, PageActionsView):
+class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin):
     connector_form_class = ObservedAtForm
 
     def setup(self, request, *args, **kwargs):
@@ -134,6 +133,7 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
         context["ooi_current"] = self.get_current_ooi()
         context["mandatory_fields"] = get_mandatory_fields(self.request)
         context["observed_at"] = self.observed_at
+        context["observed_at_form"] = self.get_connector_form()
 
         return context
 

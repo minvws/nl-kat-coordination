@@ -18,7 +18,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectAddView, OOIFindingManage
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
-        filters["input_ooi"] = self.get_ooi_id()
+        filters["input_ooi"] = self.ooi.primary_key  # shows only tasks for this particular ooi
         return filters
 
     def get_context_data(self, **kwargs):
@@ -64,8 +64,7 @@ class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectAddView, OOIFindingManage
         # TODO: generic solution to render ooi fields properly: https://github.com/minvws/nl-kat-coordination/issues/145
         context["object_details"] = format_display(self.get_ooi_properties(self.ooi), ignore=["json_schema"])
         context["ooi_types"] = self.get_ooi_types_input_values(self.ooi)
-        context["observed_at_form"] = self.get_connector_form()
-        context["observed_at"] = self.observed_at
+
         context["is_question"] = isinstance(self.ooi, Question)
         context["ooi_past_due"] = context["observed_at"].date() < datetime.utcnow().date()
         context["related"] = self.get_related_objects(context["observed_at"])

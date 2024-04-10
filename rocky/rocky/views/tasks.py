@@ -1,5 +1,3 @@
-from typing import Any
-
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
@@ -11,8 +9,7 @@ from rocky.views.scheduler import SchedulerView
 
 class TaskListView(SchedulerView, ListView, PageActionsView):
     paginator_class = RockyPaginator
-    paginate_by = 20
-    object_list: list[Any] = []
+    paginate_by = 2
 
     def get_queryset(self):
         return self.get_task_list()

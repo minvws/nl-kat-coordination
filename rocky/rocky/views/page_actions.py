@@ -22,14 +22,12 @@ class PageActions(Enum):
 
 
 class PageActionsView(ProcessFormView):
-
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         try:
-
             action = request.POST.get("action", "")
 
             if not action:
-                messages.error(request, _("Could not process your request, no action set."))
+                messages.error(request, _("Could not process your request, no action received."))
 
             if action == PageActions.RESCHEDULE_TASK.value:
                 task_id = request.POST.get("task_id", "")
