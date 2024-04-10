@@ -5,6 +5,7 @@ import structlog
 from opentelemetry import trace
 
 from scheduler import context, schedulers, server
+from scheduler.exceptions import ExternalServiceError
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -58,7 +59,8 @@ class App:
         self.lock: threading.Lock = threading.Lock()
 
         self.schedulers: dict[
-            str, schedulers.Scheduler | schedulers.BoefjeScheduler | schedulers.NormalizerScheduler
+            str,
+            schedulers.Scheduler | schedulers.BoefjeScheduler | schedulers.NormalizerScheduler,
         ] = {}
         self.server: server.Server | None = None
 
@@ -76,7 +78,13 @@ class App:
         scheduler_orgs: set[str] = {
             s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
         }
-        katalogus_orgs: set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
+        try:
+            orgs = self.ctx.services.katalogus.get_organisations()
+        except ExternalServiceError as e:
+            self.logger.error("Failed to get organisations from Katalogus", error=e)
+            return
+
+        katalogus_orgs: set[str] = {org.id for org in orgs}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
         self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
@@ -108,7 +116,11 @@ class App:
 
         # Add schedulers for organisation
         for org_id in additions:
-            org = self.ctx.services.katalogus.get_organisation(org_id)
+            try:
+                org = self.ctx.services.katalogus.get_organisation(org_id)
+            except ExternalServiceError as e:
+                self.logger.error("Failed to get organisation from Katalogus", error=e, org_id=org_id)
+                continue
 
             scheduler_boefje = schedulers.BoefjeScheduler(
                 ctx=self.ctx,
@@ -166,7 +178,12 @@ class App:
 
     def start_schedulers(self) -> None:
         # Initialize the schedulers
-        orgs = self.ctx.services.katalogus.get_organisations()
+        try:
+            orgs = self.ctx.services.katalogus.get_organisations()
+        except ExternalServiceError as e:
+            self.logger.error("Failed to get organisations from Katalogus", error=e)
+            return
+
         for org in orgs:
             boefje_scheduler = schedulers.BoefjeScheduler(
                 ctx=self.ctx,

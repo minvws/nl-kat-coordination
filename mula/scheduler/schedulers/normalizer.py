@@ -2,12 +2,12 @@ from collections.abc import Callable
 from concurrent import futures
 from types import SimpleNamespace
 
-import httpx
 import structlog
 from opentelemetry import trace
 
 from scheduler import context, queues, rankers
 from scheduler.connectors import listeners
+from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
     Normalizer,
     NormalizerTask,
@@ -133,9 +133,7 @@ class NormalizerScheduler(Scheduler):
         # Get all normalizers for the mime types of the raw data
         normalizers: dict[str, Normalizer] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(
-                mime_type.get("value")
-            )
+            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -161,9 +159,7 @@ class NormalizerScheduler(Scheduler):
                 )
 
     @tracer.start_as_current_span("normalizer_push_task")
-    def push_task(
-        self, normalizer: Plugin, raw_data: RawData, caller: str = ""
-    ) -> None:
+    def push_task(self, normalizer: Plugin, raw_data: RawData, caller: str = "") -> None:
         """Given a normalizer and raw data, create a task and push it to the
         queue.
 
@@ -276,29 +272,17 @@ class NormalizerScheduler(Scheduler):
             A list of normalizers for the given mime type.
         """
         try:
-            normalizers = (
-                self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                    self.organisation.id,
-                    mime_type,
-                )
+            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
+                self.organisation.id,
+                mime_type,
             )
-        except httpx.HTTPError:
+        except ExternalServiceError:
             self.logger.warning(
                 "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,
                 mime_type,
                 self.organisation.id,
                 self.scheduler_id,
-            )
-            return []
-        except Exception as exc:
-            self.logger.error(
-                "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
-                mime_type,
-                mime_type,
-                self.organisation.id,
-                self.scheduler_id,
-                exc_info=exc,
             )
             return []
 
