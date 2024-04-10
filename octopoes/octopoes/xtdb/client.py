@@ -59,11 +59,17 @@ class XTDBHTTPClient:
         try:
             response.raise_for_status()
         except HTTPStatusError as e:
+            logger.error(e.response.status_code)
             if e.response.status_code != codes.NOT_FOUND:
                 logger.error(response.request.url)
                 logger.error(response.request.content)
                 logger.error(response.text)
-            raise e
+                raise e
+            else:
+                if response.json()["error"] == "Node not found":
+                    raise NodeNotFound() from e
+                else:
+                    raise e
 
     def client_url(self) -> str:
         return f"/{self._client}"
