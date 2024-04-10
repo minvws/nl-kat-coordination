@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-10 16:16+0000\n"
+"POT-Creation-Date: 2024-04-10 16:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1635,8 +1635,6 @@ msgstr ""
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
 msgid "Setup scan"
 msgstr ""
 
@@ -3426,6 +3424,8 @@ msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
 msgid "Configuration"
 msgstr ""
 
