@@ -18,9 +18,14 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
 from httpx import Response
 from katalogus.client import parse_plugin
-from octopoes.models.pagination import Paginated
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+)
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
@@ -29,16 +34,11 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
+from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
 from rocky.scheduler import Task
-from octopoes.config.settings import (
-    DEFAULT_LIMIT,
-    DEFAULT_OFFSET,
-    DEFAULT_SCAN_LEVEL_FILTER,
-    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
-)
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
 
