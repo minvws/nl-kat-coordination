@@ -2,11 +2,37 @@ import time
 import unittest
 from unittest import mock
 
-from scheduler import config, models, storage
+from scheduler import config, connectors, models, storage
 from scheduler.connectors import services
 from scheduler.utils import remove_trailing_slash
-
 from tests.factories import PluginFactory
+
+
+class TestHTTPService(services.HTTPService):
+    name = "test"
+    health_endpoint = None
+
+    @connectors.errors.exception_handler
+    def get_list(self):
+        pass
+
+    @connectors.errors.exception_handler
+    def get_detail(self):
+        pass
+
+
+class ServicesTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.config = config.settings.Settings()
+        self.service_test = TestHTTPService(
+            host=remove_trailing_slash(str("http://localhost:8000")),
+            source="scheduler_test",
+            pool_connections=self.config.test_pool_connections,
+        )
+
+    @unittest.skip
+    def test_validation_error(self):
+        pass
 
 
 class BytesTestCase(unittest.TestCase):
@@ -78,7 +104,10 @@ class KatalogusTestCase(unittest.TestCase):
         self.service_katalogus.flush_organisations_plugin_cache()
 
         # Assert
-        self.assertCountEqual(self.service_katalogus.organisations_plugin_cache.cache.keys(), ("org-1", "org-2"))
+        self.assertCountEqual(
+            self.service_katalogus.organisations_plugin_cache.cache.keys(),
+            ("org-1", "org-2"),
+        )
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
     def test_flush_organisations_plugin_cache_empty(self, mock_get_organisations):
@@ -89,11 +118,15 @@ class KatalogusTestCase(unittest.TestCase):
         self.service_katalogus.flush_organisations_plugin_cache()
 
         # Assert
-        self.assertDictEqual(self.service_katalogus.organisations_plugin_cache.cache, {})
+        self.assertDictEqual(
+            self.service_katalogus.organisations_plugin_cache.cache, {}
+        )
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
     @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
-    def test_flush_organisations_boefje_type_cache(self, mock_get_organisations, mock_get_plugins_by_organisation):
+    def test_flush_organisations_boefje_type_cache(
+        self, mock_get_organisations, mock_get_plugins_by_organisation
+    ):
         # Mock
         mock_get_organisations.return_value = [
             models.Organisation(id="org-1", name="org-1"),
@@ -101,10 +134,18 @@ class KatalogusTestCase(unittest.TestCase):
         ]
 
         mock_get_plugins_by_organisation.return_value = [
-            PluginFactory(id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]),
-            PluginFactory(id="plugin-2", type="boefje", enabled=True, consumes=["Hostname"]),
-            PluginFactory(id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]),
-            PluginFactory(id="plugin-4", type="normalizer", enabled=True, consumes=["Hostname"]),
+            PluginFactory(
+                id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]
+            ),
+            PluginFactory(
+                id="plugin-2", type="boefje", enabled=True, consumes=["Hostname"]
+            ),
+            PluginFactory(
+                id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]
+            ),
+            PluginFactory(
+                id="plugin-4", type="normalizer", enabled=True, consumes=["Hostname"]
+            ),
         ]
 
         # Act
@@ -112,16 +153,44 @@ class KatalogusTestCase(unittest.TestCase):
 
         # Assert
         self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache), 2)
-        self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-1"))
-        self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-1").get("Hostname"))
-        self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache.get("org-1").get("Hostname")), 2)
-        self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-2"))
-        self.assertIsNotNone(self.service_katalogus.organisations_boefje_type_cache.get("org-2").get("Hostname"))
-        self.assertEqual(len(self.service_katalogus.organisations_boefje_type_cache.get("org-2").get("Hostname")), 2)
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_boefje_type_cache.get("org-1")
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_boefje_type_cache.get("org-1").get(
+                "Hostname"
+            )
+        )
+        self.assertEqual(
+            len(
+                self.service_katalogus.organisations_boefje_type_cache.get("org-1").get(
+                    "Hostname"
+                )
+            ),
+            2,
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_boefje_type_cache.get("org-2")
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_boefje_type_cache.get("org-2").get(
+                "Hostname"
+            )
+        )
+        self.assertEqual(
+            len(
+                self.service_katalogus.organisations_boefje_type_cache.get("org-2").get(
+                    "Hostname"
+                )
+            ),
+            2,
+        )
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
     @mock.patch("scheduler.connectors.services.Katalogus.get_organisations")
-    def test_flush_organisations_normalizer_type_cache(self, mock_get_organisations, mock_get_plugins_by_organisation):
+    def test_flush_organisations_normalizer_type_cache(
+        self, mock_get_organisations, mock_get_plugins_by_organisation
+    ):
         # Mock
         mock_get_organisations.return_value = [
             models.Organisation(id="org-1", name="org-1"),
@@ -129,26 +198,58 @@ class KatalogusTestCase(unittest.TestCase):
         ]
 
         mock_get_plugins_by_organisation.return_value = [
-            PluginFactory(id="plugin-1", type="normalizer", enabled=True, consumes=["Hostname"]),
-            PluginFactory(id="plugin-2", type="normalizer", enabled=True, consumes=["Hostname"]),
-            PluginFactory(id="plugin-3", type="normalizer", enabled=False, consumes=["Hostname"]),
-            PluginFactory(id="plugin-4", type="boefje", enabled=True, consumes=["Hostname"]),
+            PluginFactory(
+                id="plugin-1", type="normalizer", enabled=True, consumes=["Hostname"]
+            ),
+            PluginFactory(
+                id="plugin-2", type="normalizer", enabled=True, consumes=["Hostname"]
+            ),
+            PluginFactory(
+                id="plugin-3", type="normalizer", enabled=False, consumes=["Hostname"]
+            ),
+            PluginFactory(
+                id="plugin-4", type="boefje", enabled=True, consumes=["Hostname"]
+            ),
         ]
 
         # Act
         self.service_katalogus.flush_organisations_normalizer_type_cache()
 
         # Assert
-        self.assertEqual(len(self.service_katalogus.organisations_normalizer_type_cache), 2)
-        self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-1"))
-        self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname"))
         self.assertEqual(
-            len(self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get("Hostname")), 2
+            len(self.service_katalogus.organisations_normalizer_type_cache), 2
         )
-        self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-2"))
-        self.assertIsNotNone(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname"))
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_normalizer_type_cache.get("org-1")
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_normalizer_type_cache.get("org-1").get(
+                "Hostname"
+            )
+        )
         self.assertEqual(
-            len(self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get("Hostname")), 2
+            len(
+                self.service_katalogus.organisations_normalizer_type_cache.get(
+                    "org-1"
+                ).get("Hostname")
+            ),
+            2,
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_normalizer_type_cache.get("org-2")
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_normalizer_type_cache.get("org-2").get(
+                "Hostname"
+            )
+        )
+        self.assertEqual(
+            len(
+                self.service_katalogus.organisations_normalizer_type_cache.get(
+                    "org-2"
+                ).get("Hostname")
+            ),
+            2,
         )
 
     @mock.patch("scheduler.connectors.services.Katalogus.get_plugins_by_organisation")
@@ -156,16 +257,38 @@ class KatalogusTestCase(unittest.TestCase):
         # Mock
         mock_get_plugins_by_organisation.side_effect = [
             [
-                PluginFactory(id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]),
-                PluginFactory(id="plugin-2", type="boefje", enabled=True, consumes=["Hostname"]),
-                PluginFactory(id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]),
-                PluginFactory(id="plugin-4", type="normalizer", enabled=True, consumes=["Hostname"]),
+                PluginFactory(
+                    id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]
+                ),
+                PluginFactory(
+                    id="plugin-2", type="boefje", enabled=True, consumes=["Hostname"]
+                ),
+                PluginFactory(
+                    id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]
+                ),
+                PluginFactory(
+                    id="plugin-4",
+                    type="normalizer",
+                    enabled=True,
+                    consumes=["Hostname"],
+                ),
             ],
             [
-                PluginFactory(id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]),
-                PluginFactory(id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]),
-                PluginFactory(id="plugin-4", type="normalizer", enabled=True, consumes=["Hostname"]),
-                PluginFactory(id="plugin-5", type="boefje", enabled=True, consumes=["Hostname"]),
+                PluginFactory(
+                    id="plugin-1", type="boefje", enabled=True, consumes=["Hostname"]
+                ),
+                PluginFactory(
+                    id="plugin-3", type="boefje", enabled=False, consumes=["Hostname"]
+                ),
+                PluginFactory(
+                    id="plugin-4",
+                    type="normalizer",
+                    enabled=True,
+                    consumes=["Hostname"],
+                ),
+                PluginFactory(
+                    id="plugin-5", type="boefje", enabled=True, consumes=["Hostname"]
+                ),
             ],
         ]
 
@@ -174,10 +297,22 @@ class KatalogusTestCase(unittest.TestCase):
 
         # Assert
         self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache), 2)
-        self.assertIsNotNone(self.service_katalogus.organisations_new_boefjes_cache.get("org-1"))
-        self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache.get("org-1")), 2)
-        self.assertIsNotNone(self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get("plugin-1"))
-        self.assertIsNotNone(self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get("plugin-2"))
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_new_boefjes_cache.get("org-1")
+        )
+        self.assertEqual(
+            len(self.service_katalogus.organisations_new_boefjes_cache.get("org-1")), 2
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get(
+                "plugin-1"
+            )
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get(
+                "plugin-2"
+            )
+        )
         self.assertEqual(len(new_boefjes), 2)
         self.assertEqual(new_boefjes[0].id, "plugin-1")
         self.assertEqual(new_boefjes[1].id, "plugin-2")
@@ -187,9 +322,21 @@ class KatalogusTestCase(unittest.TestCase):
 
         # Assert
         self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache), 2)
-        self.assertIsNotNone(self.service_katalogus.organisations_new_boefjes_cache.get("org-1"))
-        self.assertEqual(len(self.service_katalogus.organisations_new_boefjes_cache.get("org-1")), 2)
-        self.assertIsNotNone(self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get("plugin-5"))
-        self.assertIsNotNone(self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get("plugin-5"))
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_new_boefjes_cache.get("org-1")
+        )
+        self.assertEqual(
+            len(self.service_katalogus.organisations_new_boefjes_cache.get("org-1")), 2
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get(
+                "plugin-5"
+            )
+        )
+        self.assertIsNotNone(
+            self.service_katalogus.organisations_new_boefjes_cache.get("org-1").get(
+                "plugin-5"
+            )
+        )
         self.assertEqual(len(new_boefjes), 1)
         self.assertEqual(new_boefjes[0].id, "plugin-5")
