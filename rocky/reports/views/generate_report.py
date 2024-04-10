@@ -1,3 +1,5 @@
+import json
+import logging
 from collections.abc import Sequence
 from datetime import datetime
 from typing import Any
@@ -10,9 +12,9 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
+from tools.ooi_helpers import create_ooi
 from tools.view_helpers import url_with_querystring
 
-from octopoes.api.models import Declaration
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import Report as ReportOOI
@@ -25,6 +27,8 @@ from reports.report_types.helpers import (
 )
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
+
+logger = logging.getLogger(__name__)
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
@@ -189,6 +193,10 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                     "ooi_human_readable": ooi_human_readable,
                 }
 
+                report_data_raw_id = self.bytes_client.upload_raw(
+                    raw=json.dumps(data), manual_mime_types={"openkat/report"}
+                )
+
                 report_ooi = ReportOOI(
                     name="test_name",
                     report_type=str(report_type.name),
@@ -197,11 +205,17 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                     organization_code=self.organization.code,
                     organization_name=self.organization.name,
                     organization_tags=list(self.organization.tags.all()),
-                    data=data,
+                    data_raw_id=report_data_raw_id,
                     date_generated=datetime.utcnow(),
                     input_ooi=Reference.from_str(ooi),
                 )
-                self.octopoes_api_connector.save_declaration(Declaration(ooi=report_ooi, valid_time=self.observed_at))
+
+                create_ooi(
+                    api_connector=self.octopoes_api_connector,
+                    bytes_client=self.bytes_client,
+                    ooi=report_ooi,
+                    observed_at=self.observed_at,
+                )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:

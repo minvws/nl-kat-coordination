@@ -1,3 +1,4 @@
+import json
 from collections.abc import Iterable, Sequence
 from datetime import datetime
 from logging import getLogger
@@ -190,7 +191,7 @@ class ViewReportView(TemplateView, OOIFilterView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_id = request.GET.get("report_id", [])
+        self.report_id = request.GET.get("report_id", "")
 
     def get_context_data(self, **kwargs):
         # TODO: add missing context fields
@@ -208,7 +209,7 @@ class ViewReportView(TemplateView, OOIFilterView):
         report_data: dict = {}
         report_data[report_ooi.report_type] = {}
         report_data[report_ooi.report_type][report_ooi.input_ooi] = {
-            "data": report_ooi.data,
+            "data": json.loads(self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)),
             "template": report_ooi.template,
             "ooi_human_readable": report_ooi.input_ooi.human_readable,
         }

@@ -34,7 +34,7 @@ class Report(OOI):
     organization_code: str
     organization_name: str
     organization_tags: list[str]
-    data: dict
+    data_raw_id: str
 
     _natural_key_attrs = ["report_id"]
 
