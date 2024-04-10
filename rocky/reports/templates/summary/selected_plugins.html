@@ -1,45 +1,49 @@
 {% load i18n %}
 
 <h3>{% translate "Selected Plugins" %}</h3>
-<p>
-    {% blocktranslate trimmed %}
-        The table below shows all required or optional plugins for the selected reports.
-    {% endblocktranslate %}
-</p>
-<table>
-    <thead>
-        <tr>
-            <th>{% translate "Plugin enabled" %}</th>
-            <th>{% translate "Plugin options" %}</th>
-            <th>{% translate "Plugin name" %}</th>
-            <th>{% translate "Plugin scan level" %}</th>
-            <th>{% translate "Plugin type" %}</th>
-            <th>{% translate "Plugin description" %}</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for option, plugins in plugins.items %}
-            {% for plugin in plugins %}
-                <tr>
-                    <td>
-                        {% if plugin.enabled %}
-                            <span class="icon positive"></span>
-                        {% else %}
-                            <span class="icon incomplete"></span>
-                        {% endif %}
-                    </td>
-                    <td>{{ option }}</td>
-                    <td>{{ plugin.name }}</td>
-                    <td>
-                        {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}
+{% if plugins.required or plugins.optional %}
+    <p>
+        {% blocktranslate trimmed %}
+            The table below shows all required or optional plugins for the selected reports.
+        {% endblocktranslate %}
+    </p>
+    <table>
+        <thead>
+            <tr>
+                <th>{% translate "Plugin enabled" %}</th>
+                <th>{% translate "Plugin options" %}</th>
+                <th>{% translate "Plugin name" %}</th>
+                <th>{% translate "Plugin scan level" %}</th>
+                <th>{% translate "Plugin type" %}</th>
+                <th>{% translate "Plugin description" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for option, plugins in plugins.items %}
+                {% for plugin in plugins %}
+                    <tr>
+                        <td>
+                            {% if plugin.enabled %}
+                                <span class="icon positive"></span>
+                            {% else %}
+                                <span class="icon incomplete"></span>
+                            {% endif %}
+                        </td>
+                        <td>{{ option }}</td>
+                        <td>{{ plugin.name }}</td>
+                        <td>
+                            {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}
 
-                    </td>
-                    <td>
-                        <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
-                    </td>
-                    <td>{{ plugin.description }}</td>
-                </tr>
+                        </td>
+                        <td>
+                            <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
+                        </td>
+                        <td>{{ plugin.description }}</td>
+                    </tr>
+                {% endfor %}
             {% endfor %}
-        {% endfor %}
-    </tbody>
-</table>
+        </tbody>
+    </table>
+{% else %}
+    {% translate "There are no required or optional plugins needed for the selected report types." %}
+{% endif %}

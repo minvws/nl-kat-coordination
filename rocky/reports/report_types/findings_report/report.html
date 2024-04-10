@@ -1,18 +1,18 @@
 {% load i18n %}
 
-{% if generate_report %}
-    <p>
-        {% blocktranslate trimmed %}
-            The findings report provides an overview of the identified findings on the scanned
-            systems. For each finding it shows the risk level and the number of occurrences of
-            the finding. Under the 'Details' section a description, impact, recommendation and
-            location of the finding can be found. The risk level may be different for your
-            specific environment.
-        {% endblocktranslate %}
-    </p>
-{% endif %}
-<div class="horizontal-scroll">
-    {% if data %}
+{% if data.finding_types %}
+    {% if show_introduction %}
+        <p>
+            {% blocktranslate trimmed %}
+                The findings report provides an overview of the identified findings on the scanned
+                systems. For each finding it shows the risk level and the number of occurrences of
+                the finding. Under the 'Details' section a description, impact, recommendation and
+                location of the finding can be found. The risk level may be different for your
+                specific environment.
+            {% endblocktranslate %}
+        </p>
+    {% endif %}
+    <div class="horizontal-scroll">
         {% include "partials/report_severity_totals_table.html" with data=data.summary %}
 
         <h3>{% translate "Findings" %}</h3>
@@ -72,7 +72,7 @@
                 </tbody>
             </table>
         </div>
-    {% else %}
-        <p>{% translate "No findings have been found." %}</p>
-    {% endif %}
-</div>
+    </div>
+{% else %}
+    <p>{% translate "No findings have been found." %}</p>
+{% endif %}
