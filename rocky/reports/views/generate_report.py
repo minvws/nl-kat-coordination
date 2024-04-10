@@ -131,9 +131,8 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
         for report_type in self.report_types:
             for plugin_type in ["required", "optional"]:
                 number_of_enabled = sum(
-                    1
+                    1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0
                     for plugin in self.plugins[plugin_type]
-                    if plugin.enabled and plugin.id in report_type.plugins[plugin_type]
                 )
 
                 number_of_available = len(report_type.plugins[plugin_type])
