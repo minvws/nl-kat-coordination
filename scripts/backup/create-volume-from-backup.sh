@@ -73,7 +73,6 @@ else
 fi
 
 uuid="$(cat /proc/sys/kernel/random/uuid)"
-cwd="$(pwd)"
 
 IMAGE=alpine:latest
 docker run \
@@ -81,10 +80,8 @@ docker run \
     --name "$uuid" \
     "$IMAGE"
 
-mkdir "/tmp/$uuid"
-tar -xf "$backup_path/$volume/$snapshot" -C "/tmp/$uuid"
-cd "/tmp/$uuid"
+dir="$(mktemp -d -t $uuid)"
+tar -xf "$backup_path/$volume/$snapshot" -C "$dir"
 
-docker cp -a . "$uuid:/data"
+docker cp -a "$dir" "$uuid:/data"
 docker rm "$uuid"
-cd "$cwd"
