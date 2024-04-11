@@ -86,7 +86,7 @@ stops your OpenKAT processes, empties the job queue and starts all processes.
 Backup
 ------
 
-TobiasBDO contributed `two backup and restorescripts <https://github.com/tobiasBDO/backup-openkat/tree/master>`_ included as part of his answer to `the question how to backup XTDB <https://github.com/minvws/nl-kat-coordination/issues/1757>`_ properly.
+TobiasBDO contributed `two backup and restore scripts <https://github.com/tobiasBDO/backup-openkat/tree/master>`_ included as part of his answer to `the question how to backup XTDB <https://github.com/minvws/nl-kat-coordination/issues/1757>`_ properly.
 
 We have slightly adjusted the scripts to prevent some potential issues from occurring (globbing and word splitting: shellcheck SC2086) and to clear some things up in the code. These scripts are maintained on a ‘best effort’ basis, thus no guarantees are provided. You are responsible for your own backups, OpenKAT is not responsible nor liable in case your backups are broken.
 
@@ -95,7 +95,7 @@ Below is a description on how these backup scripts can be used.
 How to backup your volume
 -------------------------
 
-In your OpenKAT directory go to the scripts/backup folder:
+In your OpenKAT directory go to the ``scripts/backup`` folder:
 
 ``$ cd scripts/backup``
 
@@ -114,7 +114,7 @@ This directory will contain multiple folders each containing the backup file for
 Restoring your docker volume
 ----------------------------
 
-In your OpenKAT directory go to the scripts/backup folder:
+In your OpenKAT directory go to the ``scripts/backup`` folder:
 
 ``$ cd scripts/backup``
 
