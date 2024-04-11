@@ -195,7 +195,6 @@ class ViewReportView(TemplateView, OOIFilterView):
 
     def get_context_data(self, **kwargs):
         # TODO: add missing context fields
-        # TODO: move raw to bytes
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
 
