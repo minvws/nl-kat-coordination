@@ -80,7 +80,7 @@ docker run \
     --name "$uuid" \
     "$IMAGE"
 
-dir="$(mktemp -d -t $uuid)"
+dir="$(mktemp -d -t "$uuid")"
 tar -xf "$backup_path/$volume/$snapshot" -C "$dir"
 
 docker cp -a "$dir" "$uuid:/data"
