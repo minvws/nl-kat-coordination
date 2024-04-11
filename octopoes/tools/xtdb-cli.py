@@ -67,6 +67,11 @@ class XTDB:
         req = httpx.get(self._root("tx-log"), headers=headers)
         return req.text
 
+    def tx_log_docs(self):
+        headers = {"Accept": "application/json"}
+        req = httpx.get(self._root("tx-log?with-ops?=true"), headers=headers)
+        return req.text
+
     def submit_tx(self, txs):
         headers = {"Accept": "application/json", "Content-Type": "application/json"}
         data = '{{"tx-ops": {}}}'.format(" ".join(txs))
@@ -122,11 +127,11 @@ def dispatch(xtdb, instruction):
                     return call()
 
 
-KEYWORDS = [
+KEYWORDS = set([
     keyword.replace("_", "-")
     for keyword in dir(XTDB)
     if callable(getattr(XTDB, keyword)) and not keyword.startswith("_")
-] + ["list-keys", "list-values"]
+] + ["list-keys", "list-values"])
 
 EPILOG = """
 As instructions the following keywords with arguments are supported:
@@ -142,6 +147,7 @@ As instructions the following keywords with arguments are supported:
   await-tx [transaction id]
   await-tx-time [time]
   tx-log
+  tx-log-docs
   submit-tx [transaction list]
   tx-committed [transaction id]
   latest-completed-tx
