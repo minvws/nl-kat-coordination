@@ -206,8 +206,7 @@ class ViewReportView(BaseReportView, TemplateView):
         )
 
         self.bytes_client.login()
-        report_data: dict = {}
-        report_data[report_ooi.report_type] = {}
+        report_data: dict = {report_ooi.report_type: {}}
         report_data[report_ooi.report_type][report_ooi.input_ooi] = {
             "data": json.loads(self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)),
             "template": report_ooi.template,
