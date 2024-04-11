@@ -183,7 +183,7 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
     """
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return redirect(reverse("generate_report_landing", kwargs=self.get_kwargs()))
+        return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
 class ViewReportView(TemplateView, OOIFilterView):

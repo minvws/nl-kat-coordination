@@ -25,10 +25,17 @@ from reports.views.multi_report import (
     ReportTypesSelectionMultiReportView,
     SetupScanMultiReportView,
 )
+from reports.views.report_overview import ReportHistoryView
 
-# Generate report urls
+# Report overview urls
 urlpatterns = [
     path("", ReportsLandingView.as_view(), name="reports"),
+    path("report-history/", ReportHistoryView.as_view(), name="report_history"),
+]
+
+
+# Generate report urls
+urlpatterns += [
     path("view", ViewReportView.as_view(), name="view_report"),
     path("generate-report/", LandingGenerateReportView.as_view(), name="generate_report_landing"),
     path("generate-report/select/oois/", OOISelectionGenerateReportView.as_view(), name="generate_report_select_oois"),
@@ -58,7 +65,7 @@ urlpatterns += [
     path("aggregate-report/view/pdf/", AggregateReportPDFView.as_view(), name="aggregate_report_pdf"),
 ]
 
-# Generate report urls
+# Multi report urls
 urlpatterns += [
     path("multi-report/", LandingMultiReportView.as_view(), name="multi_report_landing"),
     path("multi-report/select/oois/", OOISelectionMultiReportView.as_view(), name="multi_report_select_oois"),
