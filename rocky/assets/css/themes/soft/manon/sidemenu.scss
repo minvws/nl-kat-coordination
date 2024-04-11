@@ -22,9 +22,9 @@ main.sidemenu {
     left: 0;
     width: var(--sidemenu-nav-width);
     padding-top: var(--sidemenu-nav-padding-top);
-    padding-right: var(--sidemenu-nav-padding-right);
+    padding-right: 0;
     padding-bottom: var(--sidemenu-nav-padding-bottom);
-    padding-left: var(--sidemenu-nav-padding-left);
+    padding-left: 0;
     box-sizing: border-box;
     background-color: #ffffff;
     border-right: 1px solid var(--sidemenu-nav-border-color);
@@ -41,6 +41,15 @@ main.sidemenu {
       position: relative;
       height: unset;
       overflow: unset;
+    }
+
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      padding-left: var(--sidemenu-nav-padding-left);
+      padding-right: var(--sidemenu-nav-padding-right);
     }
 
     ol,
@@ -75,7 +84,26 @@ main.sidemenu {
 
     .sticky {
       position: sticky;
+
+      /* This should be changed into something more robust. */
+      top: 8.7rem;
+
+      /* Available height estimate with space for header */
+
+      /* Not stable as this value can be incorrect when the header height changes */
+      max-height: 73vh;
+      overflow: auto;
+      background-color: inherit;
+
+      &.overflow {
+        padding-left: var(--sidemenu-nav-padding-left);
+        padding-right: var(--sidemenu-nav-padding-right);
+      }
+    }
+
+    h2.sticky {
       top: 4.5rem;
+      z-index: 2;
     }
 
     /* Menu button */
@@ -91,7 +119,7 @@ main.sidemenu {
       gap: 0;
       min-width: var(--sidemenu-toggle-button-min-width);
       min-height: var(--sidemenu-toggle-button-min-height);
-      margin-left: 0;
+      margin-left: var(--sidemenu-nav-padding-left);
       padding-top: 0;
       padding-right: 0;
       padding-bottom: 0;
@@ -127,7 +155,7 @@ main.sidemenu {
       }
 
       &[aria-expanded="false"] {
-        margin-left: calc(var(--sidemenu-nav-width));
+        margin-left: var(--sidemenu-nav-width);
         transition: margin-left 1s;
 
         &::before {
