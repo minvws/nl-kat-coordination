@@ -9,13 +9,20 @@ from rocky.views.scheduler import SchedulerView
 
 class TaskListView(SchedulerView, ListView, PageActionsView):
     paginator_class = RockyPaginator
-    paginate_by = 2
+    paginate_by = 20
 
     def get_queryset(self):
         return self.get_task_list()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["scan_history_form_fields"] = [
+            "scan_history_from",
+            "scan_history_to",
+            "scan_history_status",
+            "scan_history_search",
+            "scan_history_page",
+        ]
         context["breadcrumbs"] = [
             {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
         ]
