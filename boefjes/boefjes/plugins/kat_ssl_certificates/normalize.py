@@ -4,9 +4,9 @@ import logging
 import re
 from collections.abc import Iterable
 
-import cryptography
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import ec, rsa
 from dateutil.parser import parse
 
 from boefjes.job_models import NormalizerMeta
@@ -126,11 +126,11 @@ def read_certificates(
         logging.info("Parsing certificate of type %s", type(cert.public_key()))
         if isinstance(
             cert.public_key(),
-            cryptography.hazmat.backends.openssl.rsa.RSAPublicKey,
+            rsa.RSAPublicKey,
         ):
             pk_algorithm = str(AlgorithmType.RSA)
             pk_number = cert.public_key().public_numbers().n.to_bytes(pk_size // 8, "big").hex()
-        elif isinstance(cert.public_key(), cryptography.hazmat.backends.openssl.ec._EllipticCurvePublicKey):
+        elif isinstance(cert.public_key(), ec.EllipticCurvePublicKey):
             pk_algorithm = str(AlgorithmType.ECC)
             pk_number = hex(cert.public_key().public_numbers().x) + hex(cert.public_key().public_numbers().y)
         else:
