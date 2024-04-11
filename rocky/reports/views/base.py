@@ -186,7 +186,7 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
-class ViewReportView(TemplateView, OOIFilterView):
+class ViewReportView(BaseReportView, TemplateView):
     template_name = "generate_report.html"
 
     def setup(self, request, *args, **kwargs):
