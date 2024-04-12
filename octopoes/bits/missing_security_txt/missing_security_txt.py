@@ -12,5 +12,5 @@ def run(input_ooi: Website, additional_oois: list[SecurityTXT], config: dict[str
         yield Finding(
             ooi=input_ooi.reference,
             finding_type=ft.reference,
-            description="This website does not have a Security.txt file",
+            description="This website does not have a security.txt file",
         )
