@@ -92,5 +92,5 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         ft = KATFindingType(id="KAT-LEGACY-SECURITY-LOCATION")
         yield ft
         yield Finding(
-            description="Only legacy Security.txt location found.", finding_type=ft.reference, ooi=website_original
+            description="Only legacy /security.txt location found.", finding_type=ft.reference, ooi=website_original
         )
