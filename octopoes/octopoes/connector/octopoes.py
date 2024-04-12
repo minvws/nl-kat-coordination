@@ -48,10 +48,10 @@ class OctopoesAPIConnector:
         except HTTPError as error:
             if response.status_code == 404:
                 data = response.json()
-                raise ObjectNotFoundException(data["value"])
+                raise ObjectNotFoundException(data["detail"])
             if 500 <= response.status_code < 600:
                 data = response.json()
-                raise RemoteException(value=data["value"])
+                raise RemoteException(value=data["detail"])
             raise error
         except json.decoder.JSONDecodeError as error:
             raise DecodeException("JSON decode error") from error
@@ -199,7 +199,7 @@ class OctopoesAPIConnector:
         self.session.post(f"/{self.client}/objects/delete_many", params=params, json=[str(ref) for ref in references])
 
     def list_origin_parameters(self, origin_id: set[str], valid_time: datetime) -> list[OriginParameter]:
-        params = {"origin_id": origin_id, "valid_time": str(valid_time)}
+        params = {"origin_id": list(origin_id), "valid_time": str(valid_time)}
         res = self.session.get(f"/{self.client}/origin_parameters", params=params)
         return TypeAdapter(list[OriginParameter]).validate_json(res.content)
 
@@ -269,7 +269,7 @@ class OctopoesAPIConnector:
         params = {k: v for k, v in params.items() if v is not None}  # filter out None values
 
         return [
-            TypeAdapter(OOIType).validate_python(ooi)
+            TypeAdapter(OOIType | str).validate_python(ooi)
             for ooi in self.session.get(f"/{self.client}/query", params=params).json()
         ]
 
@@ -290,4 +290,4 @@ class OctopoesAPIConnector:
 
         result = self.session.get(f"/{self.client}/query-many", params=params).json()
 
-        return TypeAdapter(list[tuple[str, OOIType]]).validate_python(result)
+        return TypeAdapter(list[tuple[str, OOIType | str]]).validate_python(result)

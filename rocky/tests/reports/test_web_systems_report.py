@@ -60,8 +60,10 @@ def test_web_report_all_findings(
         "Hostname.<hostname[is Website].<ooi[is Finding].finding_type": {
             hostname.reference: web_report_finding_types,
         },
-        "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort]."
-        "<ooi[is Finding].finding_type": {
+        "Hostname.<hostname[is Website].<website[is SecurityTXT]": {
+            hostname.reference: [],
+        },
+        "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type": {
             hostname.reference: web_report_finding_types,
         },
         "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type": {

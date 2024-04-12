@@ -1,12 +1,12 @@
 {
-    "id": "kat_snyk_normalize",
-    "consumes": [
-        "boefje/snyk"
-    ],
-    "produces": [
-        "Finding",
-        "KATFindingType",
-        "SnykFindingType",
-        "CVEFindingType"
-    ]
+  "id": "kat_snyk_normalize",
+  "consumes": [
+    "boefje/snyk"
+  ],
+  "produces": [
+    "Finding",
+    "KATFindingType",
+    "SnykFindingType",
+    "CVEFindingType"
+  ]
 }

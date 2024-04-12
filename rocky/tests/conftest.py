@@ -20,7 +20,13 @@ from httpx import Response
 from katalogus.client import parse_plugin
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+)
+from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
@@ -28,6 +34,7 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
+from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
@@ -502,6 +509,19 @@ def software() -> Software:
 
 
 @pytest.fixture
+def cve_finding_type_2023_38408() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-2023-38408",
+        description="The PKCS#11 feature in ssh-agent in OpenSSH before 9.3p2 has an insufficiently "
+        "trustworthy search path, leading to remote code execution if an agent is forwarded to an "
+        "attacker-controlled system. ",
+        source="https://cve.circl.lu/cve/CVE-2023-38408",
+        risk_score=9.8,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
 def cve_finding_type_2019_8331() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-2019-8331",
@@ -524,6 +544,19 @@ def cve_finding_type_2019_2019() -> CVEFindingType:
         source="https://cve.circl.lu/cve/CVE-2019-2019",
         risk_score=6.5,
         risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def cve_finding_2023_38408() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2023-38408"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2023-38408"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2023-38408 detected",
+        reproduce=None,
     )
 
 
@@ -557,7 +590,7 @@ def cve_finding_2019_2019() -> Finding:
 def cve_finding_type_no_score() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-0000-0001",
-        description="CVE Finding without scopre",
+        description="CVE Finding without score",
         source="https://cve.circl.lu/cve/CVE-0000-0001",
         risk_severity=RiskLevelSeverity.UNKNOWN,
     )
@@ -1191,6 +1224,17 @@ class MockOctopoesAPIConnector:
         origin_type: OriginType | None = None,
     ) -> list[Origin]:
         return []
+
+    def list_objects(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+        scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    ) -> Paginated[OOIType]:
+        return Paginated[OOIType](items=list(self.oois.values()), count=len(self.oois))
 
 
 @pytest.fixture

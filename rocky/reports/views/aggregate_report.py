@@ -43,7 +43,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Setup scan"),
+                "text": _("Configuration"),
             },
             {
                 "url": reverse("aggregate_report_view", kwargs=kwargs) + selection,
@@ -214,7 +214,8 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         )
 
         context["oois"] = self.get_oois()
-        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+        plugins, _ = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
+        context["plugins"] = plugins
         return context
 
 

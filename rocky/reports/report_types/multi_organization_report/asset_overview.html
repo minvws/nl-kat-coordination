@@ -48,15 +48,7 @@
                         {% if asset_vulnerability.vulnerabilities %}
                             <tr>
                                 <td>{{ asset_vulnerability.asset }}</td>
-                                <td>
-                                    {% for vulnerability in asset_vulnerability.vulnerabilities %}
-                                        {% if not forloop.last %}
-                                            {{ vulnerability }},
-                                        {% else %}
-                                            {{ vulnerability }}
-                                        {% endif %}
-                                    {% endfor %}
-                                </td>
+                                <td>{{ asset_vulnerability.vulnerabilities|join:", " }}</td>
                                 <td>{% translate "Organisation" %} {{ asset_vulnerability.organisation }}</td>
                             </tr>
                         {% endif %}
