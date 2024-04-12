@@ -661,13 +661,13 @@ jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
 name = "settings-doc"
-version = "4.0.0"
+version = "4.0.1"
 description = "A command line tool for generating Markdown documentation and .env files from pydantic BaseSettings."
 optional = false
-python-versions = ">=3.8.1,<4.0.0"
+python-versions = "<4.0.0,>=3.8.1"
 files = [
-    {file = "settings_doc-4.0.0-py3-none-any.whl", hash = "sha256:89542f8165ecc3e72b8d8241d6d83034ca824e890c961c935e38d5c15b75b582"},
-    {file = "settings_doc-4.0.0.tar.gz", hash = "sha256:2b6cc1529707ebf1e47c655b7e4f190254e9b3784b87b5c2cb7174346694e921"},
+    {file = "settings_doc-4.0.1-py3-none-any.whl", hash = "sha256:3130ebf535b5be926ba830746fd085dac59e8fb0a5042f44c0216d6d7e69a2ae"},
+    {file = "settings_doc-4.0.1.tar.gz", hash = "sha256:773248f54408d0e523978ee1729a449a635cb88c2a3cb72998f5b653cf80f334"},
 ]
 
 [package.dependencies]
@@ -925,4 +925,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "69473fbbc881e8cf7078645ac25f8ed393a9465f19250b76ba990f266d7c6593"
+content-hash = "ea78c8326b947a9e506bf105a4eeffb958c65ff3d8f3fdf716bc60765d68a7f7"

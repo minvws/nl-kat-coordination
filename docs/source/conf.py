@@ -28,6 +28,7 @@ extensions = [
     "sphinx_rtd_theme",
     "myst_parser",
     "sphinxcontrib.mermaid",
+    "sphinxcontrib.autodoc_pydantic"
 ]
 
 myst_enable_extensions = ["tasklist"]
