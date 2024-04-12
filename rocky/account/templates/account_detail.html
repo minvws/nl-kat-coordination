@@ -48,7 +48,7 @@
                     </div>
                     {% if organization_member.acknowledged_clearance_level >= 0 %}
                         <div>
-                            <dt>{% translate "Permission to set OOI clearance levels " %}</dt>
+                            <dt>{% translate "Permission to set OOI clearance levels" %}</dt>
                             <dd>
                                 L{{ organization_member.acknowledged_clearance_level }}
                             </dd>
@@ -70,7 +70,7 @@
                                 </p>
                             {% elif tcl >= 0 and tcl == acl %}
                                 <p>
-                                    {% translate "You have currently accepted clearance up to level " %} <strong>L{{ acl }}</strong>
+                                    {% translate "You have currently accepted clearance up to level" %} <strong>L{{ acl }}</strong>
                                 </p>
                                 <p class="explanation"
                                    role="group"
