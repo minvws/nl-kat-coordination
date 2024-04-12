@@ -13,7 +13,7 @@
     </p>
 {% endif %}
 {% if data.rpki_ips %}
-    {% if show_heading or show_introduction %}
+    {% if show_heading or generate_report %}
         <p>
             {% blocktranslate trimmed %}
                 This section contains basic security information about resource public key
@@ -32,7 +32,7 @@
     {% endif %}
     <div class="horizontal-scroll">
         <table>
-            <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
+            <caption class="visually-hidden">{% translate "RPKI compliance" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Check" %}</th>
@@ -69,7 +69,7 @@
         {% if not info.valid or not info.exists %}
             <h5>{{ ip }}</h5>
             <table>
-                <caption class="visually-hidden">{% translate "RPKI compliance:" %}</caption>
+                <caption class="visually-hidden">{% translate "RPKI compliance" %}</caption>
                 <thead>
                     <tr>
                         <th>{% translate "Compliance issue" %}</th>
