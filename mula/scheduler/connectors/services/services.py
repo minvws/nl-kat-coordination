@@ -77,7 +77,7 @@ class HTTPService(Connector):
         self.source: str = source
 
         if self.source:
-            self.headers["User-Agent"] = self.source
+            self.session.headers["User-Agent"] = self.source
 
         self._do_checks()
 
@@ -149,7 +149,7 @@ class HTTPService(Connector):
         return response
 
     @property
-    def headers(self) -> MutableMapping[str, str | bytes]:
+    def headers(self) -> MutableMapping[str, str]:
         return self.session.headers
 
     def _do_checks(self) -> None:
