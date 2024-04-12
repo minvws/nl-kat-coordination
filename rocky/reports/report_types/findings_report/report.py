@@ -54,7 +54,7 @@ class FindingsReport(Report):
             severity = finding_type.risk_severity.name.lower()
             total_by_severity[severity] += 1
 
-            if finding.primary_key not in history_cache:
+            if finding.reference not in history_cache:
                 history_cache[finding.reference] = self.octopoes_api_connector.get_history(reference=reference)
 
             time_history = [transaction.valid_time for transaction in history_cache[finding.reference]]
