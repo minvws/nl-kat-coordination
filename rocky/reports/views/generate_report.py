@@ -2,7 +2,7 @@ import json
 import logging
 from collections.abc import Sequence
 from dataclasses import asdict
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -213,7 +213,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                         return super().default(obj)
 
                 report_data_raw_id = self.bytes_client.upload_raw(
-                    raw=json.dumps(data, cls=CustomEncoder, indent=10), manual_mime_types={"openkat/report"}
+                    raw=json.dumps(data, cls=CustomEncoder, indent=10),
+                    manual_mime_types={"openkat/report"},
                 )
 
                 report_ooi = ReportOOI(
@@ -225,7 +226,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                     organization_name=self.organization.name,
                     organization_tags=list(self.organization.tags.all()),
                     data_raw_id=report_data_raw_id,
-                    date_generated=datetime.utcnow(),
+                    date_generated=datetime.now(timezone.utc),
                     input_ooi=Reference.from_str(ooi),
                 )
 
@@ -253,7 +254,10 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         context["report_data"] = self.generate_reports_for_oois()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(
-            reverse("generate_report_pdf", kwargs={"organization_code": self.organization.code}),
+            reverse(
+                "generate_report_pdf",
+                kwargs={"organization_code": self.organization.code},
+            ),
             True,
             **self.request.GET,
         )
