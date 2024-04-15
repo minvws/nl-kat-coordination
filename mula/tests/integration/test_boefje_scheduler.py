@@ -488,26 +488,18 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        task = models.BoefjeTask(
+        boefje_task = models.BoefjeTask(
             boefje=BoefjeFactory(),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
 
-        p_item = models.PrioritizedItem(
-            id=task.id,
+        task_db = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
             priority=1,
-            data=task.model_dump(),
-            hash=task.hash,
-        )
-
-        task_db = models.TaskRun(
-            id=p_item.id,
-            scheduler_id=self.scheduler.scheduler_id,
-            type="boefje",
-            p_item=p_item,
             status=models.TaskStatus.COMPLETED,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
             modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
@@ -517,7 +509,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
 
         # Act
-        has_passed = self.scheduler.has_grace_period_passed(task)
+        has_passed = self.scheduler.has_grace_period_passed(boefje_task)
 
         # Assert
         self.assertTrue(has_passed)
@@ -527,26 +519,18 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        task = models.BoefjeTask(
+        boefje_task = models.BoefjeTask(
             boefje=BoefjeFactory(),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
 
-        p_item = models.PrioritizedItem(
-            id=task.id,
+        task_db = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
             priority=1,
-            data=task.model_dump(),
-            hash=task.hash,
-        )
-
-        task_db = models.TaskRun(
-            id=p_item.id,
-            scheduler_id=self.scheduler.scheduler_id,
-            type="boefje",
-            p_item=p_item,
             status=models.TaskStatus.COMPLETED,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
             modified_at=datetime.now(timezone.utc),
         )
@@ -556,7 +540,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = None
 
         # Act
-        has_passed = self.scheduler.has_grace_period_passed(task)
+        has_passed = self.scheduler.has_grace_period_passed(boefje_task)
 
         # Assert
         self.assertFalse(has_passed)
@@ -566,26 +550,18 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        task = models.BoefjeTask(
+        boefje_task = models.BoefjeTask(
             boefje=boefje,
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
 
-        p_item = models.PrioritizedItem(
-            id=task.id,
+        task_db = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
             priority=1,
-            data=task.model_dump(),
-            hash=task.hash,
-        )
-
-        task_db = models.TaskRun(
-            id=p_item.id,
-            scheduler_id=self.scheduler.scheduler_id,
-            type="boefje",
-            p_item=p_item,
             status=models.TaskStatus.COMPLETED,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
             modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
@@ -601,7 +577,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = last_run_boefje
 
         # Act
-        has_passed = self.scheduler.has_grace_period_passed(task)
+        has_passed = self.scheduler.has_grace_period_passed(boefje_task)
 
         # Assert
         self.assertTrue(has_passed)
@@ -611,26 +587,18 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
         boefje = BoefjeFactory()
-        task = models.BoefjeTask(
+        boefje_task = models.BoefjeTask(
             boefje=boefje,
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
 
-        p_item = models.PrioritizedItem(
-            id=task.id,
+        task_db = models.Task(
             scheduler_id=self.scheduler.scheduler_id,
             priority=1,
-            data=task.model_dump(),
-            hash=task.hash,
-        )
-
-        task_db = models.TaskRun(
-            id=p_item.id,
-            scheduler_id=self.scheduler.scheduler_id,
-            type="boefje",
-            p_item=p_item,
             status=models.TaskStatus.COMPLETED,
+            hash=boefje_task.hash,
+            data=boefje_task.model_dump(),
             created_at=datetime.now(timezone.utc),
             modified_at=datetime.now(timezone.utc) - timedelta(seconds=self.mock_ctx.config.pq_grace_period),
         )
@@ -646,7 +614,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.mock_get_last_run_boefje.return_value = last_run_boefje
 
         # Act
-        has_passed = self.scheduler.has_grace_period_passed(task)
+        has_passed = self.scheduler.has_grace_period_passed(boefje_task)
 
         # Assert
         self.assertFalse(has_passed)
