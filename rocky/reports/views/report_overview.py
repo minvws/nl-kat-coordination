@@ -1,4 +1,4 @@
-from datetime import datetime, time
+from datetime import datetime
 
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -34,8 +34,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, BaseOOIListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        observed_at = self.observed_at
-        context["observed_at"] = datetime.combine(observed_at, time.max)
+        context["observed_at"] = datetime.strftime(self.observed_at, "%Y-%m-%d")
         return context
 
 

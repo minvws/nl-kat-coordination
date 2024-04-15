@@ -16,7 +16,7 @@
                 <a href="">{% translate "Folders" %}</a>
             </li>
             <li {% if active == "history" %}aria-current="page"{% endif %}>
-                <a href="">{% translate "History" %}</a>
+                <a href="{% url 'report_history' organization.code %}?observed_at={{ observed_at }}">{% translate "History" %}</a>
             </li>
         </ul>
     </nav>
