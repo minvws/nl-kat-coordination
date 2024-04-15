@@ -1,10 +1,11 @@
+import json
 import uuid
 from collections import Counter
 from collections.abc import Generator
 from datetime import datetime
 from logging import getLogger
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
 from pydantic import AwareDatetime
 
@@ -30,7 +31,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.client import OperationType, XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
@@ -471,3 +472,62 @@ def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> i
     octopoes.commit()
 
     return inference_count
+
+
+@router.get("/io/export", tags=["io"])
+def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)):
+    return xtdb_session_.client.export_transactions()
+
+
+def importer(data: bytes, xtdb_session_: XTDBSession):
+    try:
+        ops = list(map(lambda x: x["txOps"], json.loads(data)))
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error parsing objects") from e
+    for op in ops:
+        try:
+            operations = list(
+                map(
+                    lambda x: (
+                        [member for member in OperationType if member.value == x[0]][0],
+                        x[1],
+                        datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
+                    ),
+                    op,
+                )
+            )
+            logger.info(operations)
+            xtdb_session_.client.submit_transaction(operations)  # type: ignore
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error importing object {op}") from e
+    return str({"detail": len(ops)})
+
+
+@router.post("/io/import/add", tags=["io"])
+async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)):
+    try:
+        data = await request.body()
+    except XTDBException as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects"
+        ) from e
+    return importer(data, xtdb_session_)
+
+
+@router.post("/io/import/new", tags=["io"])
+async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)):
+    try:
+        xtdb_session_.client.delete_node()
+        xtdb_session_.client.create_node()
+        xtdb_session_.commit()
+    except XTDBException as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error recreating nodes"
+        ) from e
+    try:
+        data = await request.body()
+    except XTDBException as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects"
+        ) from e
+    return importer(data, xtdb_session_)

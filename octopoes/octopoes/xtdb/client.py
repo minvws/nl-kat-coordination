@@ -163,6 +163,11 @@ class XTDBHTTPClient:
 
             raise XTDBException("Could not delete node") from e
 
+    def export_transactions(self):
+        res = self._session.get(f"{self.client_url()}/tx-log?with-ops?=true", headers={"Accept": "application/json"})
+        self._verify_response(res)
+        return res.json()
+
     def sync(self, timeout: int | None = None):
         params = {}
 

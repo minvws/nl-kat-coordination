@@ -127,11 +127,14 @@ def dispatch(xtdb, instruction):
                     return call()
 
 
-KEYWORDS = set([
-    keyword.replace("_", "-")
-    for keyword in dir(XTDB)
-    if callable(getattr(XTDB, keyword)) and not keyword.startswith("_")
-] + ["list-keys", "list-values"])
+KEYWORDS = set(
+    [
+        keyword.replace("_", "-")
+        for keyword in dir(XTDB)
+        if callable(getattr(XTDB, keyword)) and not keyword.startswith("_")
+    ]
+    + ["list-keys", "list-values"]
+)
 
 EPILOG = """
 As instructions the following keywords with arguments are supported:
