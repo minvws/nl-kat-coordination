@@ -25,7 +25,6 @@ def test_findings_report_two_findings_one_finding_type(
     mock_octopoes_api_connector, valid_time, hostname, tree_data_findings, finding_types
 ):
     mock_octopoes_api_connector.oois = {
-        hostname.reference: hostname,
         finding_types[0].reference: finding_types[0],
         finding_types[1].reference: finding_types[1],
     }
