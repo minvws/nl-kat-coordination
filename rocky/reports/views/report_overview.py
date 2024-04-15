@@ -1,3 +1,5 @@
+from datetime import datetime, time
+
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_weasyprint import WeasyTemplateResponseMixin
@@ -29,6 +31,12 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, BaseOOIListView):
     template_name = "report_overview.html"
     ooi_types = {Report}
     context_object_name = "reports"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        observed_at = self.observed_at
+        context["observed_at"] = datetime.combine(observed_at, time.max)
+        return context
 
 
 class ReportHistoryPDFView(ReportHistoryView, WeasyTemplateResponseMixin):

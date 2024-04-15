@@ -8,19 +8,19 @@
                 An overview of all your generated reports.
             {% endblocktranslate %}
         </p>
-        <p class="de-emphasized">{% blocktranslate %}0 reports selected {% endblocktranslate %}</p>
         <form method="get"
               action="{{ next }}"
               class="inline layout-wide checkboxes_required">
             {% include "report_overview/report_history_form.html" %}
 
+            <p class="de-emphasized">
+                {% blocktranslate with length=reports|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
+            </p>
             <table>
                 <caption class="visually-hidden">{% translate "Reports:" %}</caption>
                 <thead>
                     <tr>
-                        <th scope="col">
-                            <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
-                        </th>
+                        <th scope="col">{% translate "ID" %}</th>
                         <th scope="col">{% translate "Name" %}</th>
                         <th scope="col">{% translate "Report type" %}</th>
                         <th scope="col">{% translate "Objects" %}</th>
@@ -29,49 +29,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois %}checked{% endif %}>
-                        </td>
-                        <td>Report test name</td>
-                        <td>TLS report</td>
-                        <td>2</td>
-                        <td>22 jan. 2024</td>
-                        <td>22 jan. 2024</td>
-                        <td class="actions">
-                            <button class="expando-button"
-                                    type="button"
-                                    data-icon-open-class="icon ti-chevron-down"
-                                    data-icon-close-class="icon ti-chevron-up"
-                                    data-close-label="{% translate "Close details" %}">
-                                {% translate "Open details" %}
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="expando-row">
-                        <td colspan="5">
-                            <h3 class="heading-normal">{% translate "Objects in this report" %}</h3>
-                            <table>
-                                <caption class="visually-hidden">{% translate "Reports:" %}</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">{% translate "Object name" %}</th>
-                                        <th scope="col">{% translate "Object type" %}</th>
-                                        <th scope="col">{% translate "Clearance level" %}</th>
-                                        <th scope="col">{% translate "Tags" %}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>mispo.es</td>
-                                        <td>IP-port</td>
-                                        <td>L2</td>
-                                        <td>Tag-example</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
+                    {% for report in reports %}
+                        <tr>
+                            <td>
+                                <a href="{% ooi_url "ooi_detail" report.reference organization.code %}"
+                                   title="{% translate "Shows report detail" %}">{{ report.reference }}</a>
+                            </td>
+                            <td>{{ report.name }}</td>
+                            <td>{{ report.report_type }}</td>
+                            <td>{{ report.input_ooi }}</td>
+                            <td>{{ observed_at }}</td>
+                            <td>{{ report.date_generated }}</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </form>
