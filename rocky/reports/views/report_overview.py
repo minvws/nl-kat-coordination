@@ -1,9 +1,10 @@
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 
-from reports.views.base import BaseReportView, ReportBreadcrumbs, get_selection
+from octopoes.models.ooi.reports import Report
+from reports.views.base import ReportBreadcrumbs, get_selection
+from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
@@ -20,20 +21,14 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class ReportHistoryView(BreadcrumbsReportOverviewView, BaseReportView, TemplateView):
+class ReportHistoryView(BreadcrumbsReportOverviewView, BaseOOIListView):
     """
     Shows all the reports that have ever been generated for the organization.
     """
 
     template_name = "report_overview.html"
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
-        return context
+    ooi_types = {Report}
+    context_object_name = "reports"
 
 
 class ReportHistoryPDFView(ReportHistoryView, WeasyTemplateResponseMixin):
