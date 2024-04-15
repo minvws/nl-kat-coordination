@@ -1,9 +1,10 @@
 import json
 import logging
 from collections.abc import Sequence
+from dataclasses import asdict
 from datetime import datetime
 from typing import Any
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -12,11 +13,13 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
+from pydantic_core import Url
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import url_with_querystring
 
-from octopoes.models import Reference
+from octopoes.models import OOI, Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
+from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
@@ -25,6 +28,8 @@ from reports.report_types.helpers import (
     get_plugins_for_report_ids,
     get_report_types_for_oois,
 )
+from reports.report_types.name_server_report.report import NameServerChecks
+from reports.report_types.web_system_report.report import WebChecks
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -193,8 +198,22 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                     "ooi_human_readable": ooi_human_readable,
                 }
 
+                class CustomEncoder(json.JSONEncoder):
+                    def default(self, obj):
+                        if isinstance(obj, OOI):
+                            return obj.model_dump()
+                        elif isinstance(obj, Url):
+                            return str(obj)
+                        elif isinstance(obj, RiskLevelSeverity):
+                            return obj.value
+                        elif isinstance(obj, UUID):
+                            return str(obj)
+                        elif isinstance(obj, WebChecks | NameServerChecks):
+                            return [asdict(check) for check in obj.checks]
+                        return super().default(obj)
+
                 report_data_raw_id = self.bytes_client.upload_raw(
-                    raw=json.dumps(data), manual_mime_types={"openkat/report"}
+                    raw=json.dumps(data, cls=CustomEncoder, indent=10), manual_mime_types={"openkat/report"}
                 )
 
                 report_ooi = ReportOOI(
