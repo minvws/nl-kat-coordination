@@ -496,10 +496,11 @@ def importer(data: bytes, xtdb_session_: XTDBSession):
                     op,
                 )
             )
-            logger.info(operations)
             xtdb_session_.client.submit_transaction(operations)  # type: ignore
         except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error importing object {op}") from e
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error importing object {op}"
+            ) from e
     return str({"detail": len(ops)})
 
 
@@ -508,9 +509,7 @@ async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xt
     try:
         data = await request.body()
     except XTDBException as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects"
-        ) from e
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     return importer(data, xtdb_session_)
 
 
@@ -521,13 +520,9 @@ async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xt
         xtdb_session_.client.create_node()
         xtdb_session_.commit()
     except XTDBException as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error recreating nodes"
-        ) from e
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error recreating nodes") from e
     try:
         data = await request.body()
     except XTDBException as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects"
-        ) from e
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     return importer(data, xtdb_session_)
