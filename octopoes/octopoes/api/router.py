@@ -4,6 +4,8 @@ from collections import Counter
 from collections.abc import Generator
 from datetime import datetime
 from logging import getLogger
+from operator import itemgetter
+from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
@@ -31,7 +33,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import OperationType, XTDBSession
+from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
@@ -481,27 +483,18 @@ def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)):
 
 def importer(data: bytes, xtdb_session_: XTDBSession) -> dict[str, int]:
     try:
-        ops = list(map(lambda x: x["txOps"], json.loads(data)))
+        ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
     except Exception as e:
+        logger.debug("Error parsing objects", exc_info=True)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error parsing objects") from e
     for op in ops:
         try:
-            operations = list(
-                map(
-                    lambda x: (
-                        next(
-                            temporaryoperationtypevariable
-                            for temporaryoperationtypevariable in OperationType
-                            if temporaryoperationtypevariable.value == x[0]
-                        ),
-                        x[1],
-                        datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
-                    ),
-                    op,
-                )
-            )
-            xtdb_session_.client.submit_transaction(operations)  # type: ignore
+            operations: list[Operation] = [
+                (OperationType(x[0]), x[1], datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ")) for x in op
+            ]
+            xtdb_session_.client.submit_transaction(operations)
         except Exception as e:
+            logger.debug("Error importing objects", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error importing object {op}",
