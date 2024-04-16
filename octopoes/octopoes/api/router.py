@@ -489,7 +489,7 @@ def importer(data: bytes, xtdb_session_: XTDBSession):
             operations = list(
                 map(
                     lambda x: (
-                        [member for member in OperationType if member.value == x[0]][0],
+                        next(ot for ot in OperationType if ot.value == x[0]),
                         x[1],
                         datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
                     ),
@@ -499,9 +499,10 @@ def importer(data: bytes, xtdb_session_: XTDBSession):
             xtdb_session_.client.submit_transaction(operations)  # type: ignore
         except Exception as e:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error importing object {op}"
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error importing object {op}",
             ) from e
-    return str({"detail": len(ops)})
+    return {"detail": len(ops)}
 
 
 @router.post("/io/import/add", tags=["io"])
