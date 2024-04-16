@@ -479,7 +479,7 @@ def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)):
     return xtdb_session_.client.export_transactions()
 
 
-def importer(data: bytes, xtdb_session_: XTDBSession):
+def importer(data: bytes, xtdb_session_: XTDBSession) -> dict[str, int]:
     try:
         ops = list(map(lambda x: x["txOps"], json.loads(data)))
     except Exception as e:
@@ -510,7 +510,7 @@ def importer(data: bytes, xtdb_session_: XTDBSession):
 
 
 @router.post("/io/import/add", tags=["io"])
-async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)):
+async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
         data = await request.body()
     except XTDBException as e:
@@ -519,7 +519,7 @@ async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xt
 
 
 @router.post("/io/import/new", tags=["io"])
-async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)):
+async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
         xtdb_session_.client.delete_node()
         xtdb_session_.client.create_node()
