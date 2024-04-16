@@ -489,7 +489,11 @@ def importer(data: bytes, xtdb_session_: XTDBSession):
             operations = list(
                 map(
                     lambda x: (
-                        next(ot for ot in OperationType if ot.value == x[0]),
+                        next(
+                            temporaryoperationtypevariable
+                            for temporaryoperationtypevariable in OperationType
+                            if temporaryoperationtypevariable.value == x[0]
+                        ),
                         x[1],
                         datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
                     ),
