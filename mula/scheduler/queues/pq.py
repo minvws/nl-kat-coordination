@@ -100,7 +100,9 @@ class PriorityQueue(abc.ABC):
         self.pq_store: storage.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
-    def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.PrioritizedItem | None:
+    def pop(
+        self, many: bool = False, filters: storage.filters.FilterRequest | None = None
+    ) -> list[models.PrioritizedItem]:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
 
@@ -116,13 +118,13 @@ class PriorityQueue(abc.ABC):
         if self.empty():
             raise QueueEmptyError(f"Queue {self.pq_id} is empty.")
 
-        item = self.pq_store.pop(self.pq_id, filters)
-        if item is None:
-            return None
+        items = self.pq_store.pop(self.pq_id, many, filters)
+        if items is None:
+            return []
 
-        self.remove(item)
+        self.remove(items)
 
-        return item
+        return items
 
     def push(self, p_item: models.PrioritizedItem) -> models.PrioritizedItem | None:
         """Push an item onto the queue.
@@ -224,7 +226,7 @@ class PriorityQueue(abc.ABC):
         return self.pq_store.peek(self.pq_id, index)
 
     @with_lock
-    def remove(self, p_item: models.PrioritizedItem) -> None:
+    def remove(self, p_items: list[models.PrioritizedItem]) -> None:
         """Remove an item from the queue.
 
         Args:
@@ -233,7 +235,8 @@ class PriorityQueue(abc.ABC):
         Returns:
             The item that was removed from the queue.
         """
-        self.pq_store.remove(self.pq_id, p_item.id)
+        ids = [p_item.id for p_item in p_items]
+        self.pq_store.remove_many(self.pq_id, ids)
 
     @with_lock
     def clear(self) -> None:

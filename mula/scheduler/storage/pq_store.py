@@ -13,7 +13,12 @@ class PriorityQueueStore:
         self.dbconn = dbconn
 
     @retry()
-    def pop(self, scheduler_id: str, filters: FilterRequest | None = None) -> models.PrioritizedItem | None:
+    def pop(
+        self,
+        scheduler_id: str,
+        many: bool = False,
+        filters: FilterRequest | None = None,
+    ) -> list[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemDB).filter(
                 models.PrioritizedItemDB.scheduler_id == scheduler_id
@@ -22,12 +27,19 @@ class PriorityQueueStore:
             if filters is not None:
                 query = apply_filter(models.PrioritizedItemDB, query, filters)
 
-            item_orm = query.first()
+            if many:
+                item_orm = (
+                    query.order_by(models.PrioritizedItemDB.priority.asc())
+                    .order_by(models.PrioritizedItemDB.created_at.asc())
+                    .all()
+                )
+            else:
+                item_orm = [query.first()]
 
             if item_orm is None:
-                return None
+                return []
 
-            return models.PrioritizedItem.model_validate(item_orm)
+            return [models.PrioritizedItem.model_validate(item) for item in item_orm]
 
     @retry()
     def push(self, scheduler_id: str, item: models.PrioritizedItem) -> models.PrioritizedItem | None:
@@ -62,6 +74,16 @@ class PriorityQueueStore:
                 .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
                 .filter(models.PrioritizedItemDB.id == item.id)
                 .update(item.model_dump())
+            )
+
+    @retry()
+    def remove_many(self, scheduler_id: str, item_ids: list[UUID]) -> None:
+        with self.dbconn.session.begin() as session:
+            (
+                session.query(models.PrioritizedItemDB)
+                .filter(models.PrioritizedItemDB.scheduler_id == scheduler_id)
+                .filter(models.PrioritizedItemDB.id.in_([str(item_id) for item_id in item_ids]))
+                .delete(synchronize_session=False)
             )
 
     @retry()
@@ -127,7 +149,10 @@ class PriorityQueueStore:
             count = query.count()
             items_orm = query.all()
 
-            return ([models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm], count)
+            return (
+                [models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm],
+                count,
+            )
 
     @retry()
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> models.PrioritizedItem | None:
