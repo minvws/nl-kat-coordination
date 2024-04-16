@@ -22,6 +22,7 @@ import {
       }
       if (!sidemenu.querySelector("button.sidemenu-toggle")) {
         addToggleButton(sidemenu);
+        defineScrollPosition(sidemenu);
       }
     }
   }
@@ -29,6 +30,7 @@ import {
   /**
    * @param {HTMLElement} sidemenu
    */
+
   function addToggleButton(sidemenu) {
     var main = closest(sidemenu, ".sidemenu");
     var ol = sidemenu.querySelector("ol");
@@ -69,4 +71,42 @@ import {
     });
 
     prependNode(sidemenu, button);
+  }
+
+
+  /**
+   * @param {HTMLElement} sidemenu
+   */
+
+  function defineScrollPosition(sidemenu) {
+    const pageHeaderElement = document.getElementById('page-header');
+    const pageFooterElement = document.getElementById('page-footer');
+    const stickyElement = document.getElementById("sticky-overflow");
+    let stickyElementOGMaxHeight = getComputedStyle(stickyElement).getPropertyValue("max-height");
+    let pageHeaderHeight = pageHeaderElement?.offsetHeight;
+    let pageFooterHeight = pageFooterElement?.offsetHeight;
+
+    window.addEventListener("resize", (event => {
+      // Set the height of the page header and footer
+      // when the size of the window changes,
+      // to account for responsive behaviour
+      pageHeaderHeight = pageHeaderElement?.offsetHeight;
+      pageFooterHeight = pageFooterElement?.offsetHeight;
+    }));
+
+    window.addEventListener("scroll", (event => {
+      // Amount of PX the page is scrolled
+      let scrollCount = document.scrollingElement?.scrollTop;
+
+      console.log(stickyElementOGMaxHeight)
+
+      if(scrollCount > pageHeaderHeight) {
+        stickyElement.style.maxHeight = "calc(100vh - " + (pageHeaderHeight + pageFooterHeight) + ")";
+        stickyElement.style.maxHeight = "calc(100vh - 232px)";
+      } else {
+        stickyElement.style.maxHeight = stickyElementOGMaxHeight;
+      }
+
+      // console.log(scrollCount)
+    }));
   }
