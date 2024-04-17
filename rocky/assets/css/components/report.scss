@@ -99,11 +99,11 @@
 span {
   &.label {
     display:inline-flex;
-    max-width:300px;
-    border-radius:4px;
-    padding:4px 8px;
+    max-width:18.75rem;
+    border-radius:var(--spacing-grid-050);
+    padding:var(--spacing-grid-050) var(--spacing-grid-100);
     font-size: var(--tile-font-size);
-    font-weight:700;
+    font-weight:var( --list-item-completed-font-weight);
   }
 
 }

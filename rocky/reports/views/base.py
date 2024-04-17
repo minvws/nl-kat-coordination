@@ -110,13 +110,18 @@ class BaseReportView(OOIFilterView):
     def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
-                sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]), self.request.GET
+                sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]),
+                self.request.GET,
             )
         }
 
     def get_report_types_for_generate_report(self, reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
         return [
-            {"id": report_type.id, "name": report_type.name, "description": report_type.description}
+            {
+                "id": report_type.id,
+                "name": report_type.name,
+                "description": report_type.description,
+            }
             for report_type in reports
         ]
 
@@ -166,7 +171,7 @@ class BaseReportView(OOIFilterView):
                 "id": report_type.id,
                 "name": report_type.name,
                 "description": report_type.description,
-                "label_style": report_type.description,
+                "label_style": report_type.label_style,
             }
             for report_type in self.get_report_types_from_choice()
         ]
