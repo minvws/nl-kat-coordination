@@ -62,20 +62,25 @@ class LocalPluginRepository:
 
     def cover_path(self, id_: str) -> Path:
         boefjes = self.resolve_boefjes()
+        normalizers = self.resolve_normalizers()
+        default_cover_path = self.default_cover_path()
 
-        if id_ not in boefjes:
-            return self.default_cover_path()
+        if id_ not in boefjes and id_ not in normalizers:
+            return default_cover_path
 
-        boefje = boefjes[id_]
-        path = boefje.path / "cover.jpg"
+        if id_ in boefjes:
+            plugin = boefjes[id_]
+            cover_path = plugin.path / "cover.jpg"
+        elif id_ in normalizers:
+            plugin = normalizers[id_]
+            cover_path = plugin.path / "normalizer_cover.jpg"
 
-        if not path.exists():
-            logger.debug("Did not find cover for boefje %s", boefje)
-            return self.default_cover_path()
+        if not cover_path.exists():
+            logger.debug("Did not find cover for boefje %s", plugin)
+            return default_cover_path
 
-        logger.debug("Found cover for boefje %s", boefje)
-
-        return path
+        logger.debug("Found cover for boefje %s", plugin)
+        return cover_path
 
     def default_cover_path(self) -> Path:
         return self.path / "default_cover.jpg"
