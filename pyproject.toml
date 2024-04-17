@@ -13,6 +13,9 @@ disallow_untyped_defs = false
 no_implicit_reexport = false
 warn_return_any = false
 
+[[tool.mypy.overrides]]
+module = ["httpx.*"]
+follow_imports = "normal"
 
 [tool.setuptools_scm]
 write_to = "_version.py"
