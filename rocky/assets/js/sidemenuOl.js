@@ -82,7 +82,7 @@ import {
     const pageHeaderElement = document.getElementById('page-header');
     const pageFooterElement = document.getElementById('page-footer');
     const stickyElement = document.getElementById("sticky-overflow");
-    let stickyElementOGMaxHeight = getComputedStyle(stickyElement).getPropertyValue("max-height");
+    // let stickyElementOGMaxHeight = getComputedStyle(stickyElement).getPropertyValue("max-height");
     let pageHeaderHeight = pageHeaderElement?.offsetHeight;
     let pageFooterHeight = pageFooterElement?.offsetHeight;
 
