@@ -307,12 +307,13 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     "compressor.finders.CompressorFinder",
 ]
+COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", True)
 COMPRESS_OFFLINE = True
 COMPRESS_STORAGE = "compressor.storage.BrotliCompressorFileStorage"
 
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "rocky.storage.RockyStaticFilesStorage",
     },
 }
 
@@ -321,7 +322,7 @@ _IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
 
 def immutable_file_test(path, url):
     # Match filename with 12 hex digits before the extension e.g.
-    # app.db8f2edc0c8a.js. Confifguraring this is necessary because whitenoise
+    # app.db8f2edc0c8a.js. Configuring this is necessary because whitenoise
     # doesn't automatically detect the django-compressor files as immutable.
     return _IMMUTABLE_FILE_TEST_PATTERN.match(url)
 

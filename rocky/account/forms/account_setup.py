@@ -238,9 +238,9 @@ class OrganizationMemberEditForm(BaseRockyModelForm, TrustedClearanceLevelRadioP
             self.fields["trusted_clearance_level"].disabled = True
         self.fields["acknowledged_clearance_level"].label = _("Accepted clearance level")
         self.fields["acknowledged_clearance_level"].required = False
-        self.fields["acknowledged_clearance_level"].widget.attrs[
-            "fixed_paws"
-        ] = self.instance.acknowledged_clearance_level
+        self.fields["acknowledged_clearance_level"].widget.attrs["fixed_paws"] = (
+            self.instance.acknowledged_clearance_level
+        )
         self.fields["acknowledged_clearance_level"].widget.attrs["class"] = "level-indicator-form"
         if self.instance.user.is_superuser:
             self.fields["trusted_clearance_level"].disabled = True

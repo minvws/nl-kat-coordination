@@ -1,6 +1,6 @@
-============
-OpenKAT 1.15
-============
+======================
+OpenKAT 1.15 (Roeltje)
+======================
 
 This release includes some big optimizations in the new reporting functionality
 that was introduced in 1.14. Measurements show that generating a report on 100
