@@ -21,6 +21,8 @@ class SchemaStore:
         offset: int = 0,
         limit: int = 100,
     ) -> tuple[list[models.TaskSchema], int]:
+        self.logger.info("EHRHEHRHERHHER")
+        breakpoint()
         with self.dbconn.session.begin() as session:
             query = session.query(models.TaskSchemaDB)
 

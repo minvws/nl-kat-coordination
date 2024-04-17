@@ -360,7 +360,7 @@ class BoefjeScheduler(Scheduler):
                             scheduler_id=self.scheduler_id,
                         )
                         schema.enabled = False
-                        self.ctx.datastores.task_store.update_schema(schema)
+                        self.ctx.datastores.schema_store.update_schema(schema)
                         continue
 
                     # Boefje still consuming ooi?
