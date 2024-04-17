@@ -36,12 +36,12 @@ repos:
     files: pyproject.toml$
 
 - repo: https://github.com/rstcheck/rstcheck
-  rev: v6.2.0
+  rev: v6.2.1
   hooks:
   - id: rstcheck
     # https://github.com/rstcheck/rstcheck-core/issues/4
     args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid"]
-    additional_dependencies: ["rstcheck[sphinx]"]
+    additional_dependencies: ["rstcheck[sphinx]", "autodoc-pydantic==2.1.0"]
 
 - repo: https://github.com/MarketSquare/robotframework-tidy
   rev: "4.11.0"
