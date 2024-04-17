@@ -74,6 +74,8 @@ class LocalPluginRepository:
         elif id_ in normalizers:
             plugin = normalizers[id_]
             cover_path = plugin.path / "normalizer_cover.jpg"
+        else:
+            cover_path = default_cover_path
 
         if not cover_path.exists():
             logger.debug("Did not find cover for boefje %s", plugin)
