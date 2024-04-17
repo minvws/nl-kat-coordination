@@ -75,7 +75,7 @@ class LocalPluginRepository:
             cover_path = default_cover_path
 
         if not cover_path.exists():
-            logger.debug("Did not find cover for boefje %s", plugin)
+            logger.debug("Did not find cover for plugin %s", plugin)
             return default_cover_path
 
         return cover_path
