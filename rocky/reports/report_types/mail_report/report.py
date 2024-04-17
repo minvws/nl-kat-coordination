@@ -5,7 +5,6 @@ from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
@@ -46,7 +45,7 @@ class MailReport(Report):
         }
 
         for input_ooi, hostname_references in hostnames_by_input_ooi.items():
-            mail_security_measures = {}
+            all_finding_types = []
             number_of_hostnames = len(hostname_references)
             number_of_spf = number_of_hostnames
             number_of_dmarc = number_of_hostnames
@@ -59,11 +58,11 @@ class MailReport(Report):
                 number_of_dmarc -= 1 if any(finding.id == "KAT-NO-DMARC" for finding in finding_types) else 0
                 number_of_dkim -= 1 if any(finding.id == "KAT-NO-DKIM" for finding in finding_types) else 0
 
-                mail_security_measures[hostname] = finding_types
+                all_finding_types.extend(finding_types)
 
             result[input_ooi] = {
                 "input_ooi": input_ooi,
-                "finding_types": mail_security_measures,
+                "finding_types": all_finding_types,
                 "number_of_hostnames": number_of_hostnames,
                 "number_of_spf": number_of_spf,
                 "number_of_dmarc": number_of_dmarc,
@@ -71,10 +70,3 @@ class MailReport(Report):
             }
 
         return result
-
-    def _get_mail_finding_types(self, valid_time: datetime, hostname) -> list[OOI]:
-        finding_types = self.octopoes_api_connector.query(
-            "Hostname.<ooi[is Finding].finding_type", valid_time, hostname
-        )
-
-        return list(filter(lambda finding_type: finding_type.id in MAIL_FINDING_TYPES, finding_types))
