@@ -121,6 +121,7 @@ class BaseReportView(OOIFilterView):
                 "id": report_type.id,
                 "name": report_type.name,
                 "description": report_type.description,
+                "label_style": report_type.label_style,
             }
             for report_type in reports
         ]
