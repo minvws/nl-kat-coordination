@@ -493,7 +493,10 @@ def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> di
             xtdb_session_.client.create_node()
             xtdb_session_.commit()
         except XTDBException as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error recreating nodes") from e
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error recreating nodes",
+            ) from e
     for op in ops:
         try:
             operations: list[Operation] = [
