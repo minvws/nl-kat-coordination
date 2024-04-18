@@ -4,38 +4,45 @@ import argparse
 import datetime
 import sys
 from pathlib import Path
+from typing import Any
 
 import httpx
+import click
 
 
-class XTDB:
-    def __init__(self, host: str, port: int, node: str):
-        self.host = host
-        self.port = port
-        self.node = node
+class XTDBClient:
+    def __init__(self, base_url: str, node: str, timeout: int | None = None):
+        self._client = httpx.Client(
+            base_url=f"{base_url}/_xtdb/{node}",
+            headers={"Accept": "application/json"},
+            timeout=None,
+        )
 
-    def _root(self, target: str = ""):
-        return f"http://{self.host}:{self.port}/_xtdb/{self.node}/{target}"
+    def status(self) -> Any:
+        res = self._client.get("/status")
 
-    def status(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("status"), headers=headers)
-        return req.text
+        return res.json()
 
-    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}"):
-        headers = {"Accept": "application/json", "Content-Type": "application/edn"}
-        req = httpx.post(self._root("query"), headers=headers, data=query)
-        return req.text
+    def query(
+        self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}"
+    ) -> Any:
+        res = self._client.post(
+            "/query", content=query, headers={"Content-Type": "application/edn"}
+        )
+
+        return res.json()
 
     def entity(self, key: str):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"entity?eid={key}"), headers=headers)
-        return req.text
+        res = self._client.get(f"/entity", params={"eid": key})
 
-    def history(self, key: str):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"entity?eid={key}&history=true&sortOrder=asc"), headers=headers)
-        return req.text
+        return res.json()
+
+    def history(self, key: str) -> Any:
+        res = self._client.get(
+            f"/entity", params={"eid": key, "history": True, "sortOrder": "asc"}
+        )
+
+        return res.json()
 
     def entity_tx(self, key: str):
         headers = {"Accept": "application/json"}
@@ -72,11 +79,10 @@ class XTDB:
         req = httpx.get(self._root("tx-log?with-ops?=true"), headers=headers)
         return req.text
 
-    def submit_tx(self, txs):
-        headers = {"Accept": "application/json", "Content-Type": "application/json"}
-        data = '{{"tx-ops": {}}}'.format(" ".join(txs))
-        req = httpx.post(self._root("submit-tx"), headers=headers, data=data)
-        return req.text
+    def submit_tx(self, txs) -> Any:
+        res = self._client.post("/submit-tx", json={"tx-ops": txs})
+
+        return res.json()
 
     def tx_committed(self, txid: int):
         headers = {"Accept": "application/json"}
@@ -114,7 +120,9 @@ def dispatch(xtdb, instruction):
         case "list-keys":
             return xtdb.query()
         case "list-values":
-            return xtdb.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}")
+            return xtdb.query(
+                "{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}"
+            )
         case "submit-tx":
             if instruction:
                 return xtdb.submit_tx(instruction)
@@ -130,8 +138,8 @@ def dispatch(xtdb, instruction):
 KEYWORDS = set(
     [
         keyword.replace("_", "-")
-        for keyword in dir(XTDB)
-        if callable(getattr(XTDB, keyword)) and not keyword.startswith("_")
+        for keyword in dir(XTDBClient)
+        if callable(getattr(XTDBClient, keyword)) and not keyword.startswith("_")
     ]
     + ["list-keys", "list-values"]
 )
@@ -170,50 +178,86 @@ OpenKAT https://openkat.nl/.
 
 
 def iparse(instructions):
-    idxs = [idx for idx, key in enumerate(instructions) if key in KEYWORDS] + [len(instructions)]
-    return [instructions[i:j] for i, j in zip(idxs, idxs[1:] + idxs[:1]) if instructions[i:j]]
+    idxs = [idx for idx, key in enumerate(instructions) if key in KEYWORDS] + [
+        len(instructions)
+    ]
+    return [
+        instructions[i:j]
+        for i, j in zip(idxs, idxs[1:] + idxs[:1])
+        if instructions[i:j]
+    ]
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        prog="xtdb-cli",
-        description="A command-line interface for xtdb multinode as used in OpenKAT",
-        epilog=EPILOG,
-        add_help=True,
-        allow_abbrev=True,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    parser.add_argument("--port", help="xtdb server port (default 3000)", type=int, default=3000)
-    parser.add_argument("--host", help="xtdb server hostname (default localhost)", type=str, default="localhost")
-    parser.add_argument("--node", help="xtdb node (default 0)", type=str, default="0")
-    parser.add_argument("instructions", type=str, nargs="*")
-    args = parser.parse_args()
-    xtdb = XTDB(args.host, args.port, args.node)
-    if args.instructions:
-        if args.instructions[0] in KEYWORDS:
-            for instruction in iparse(args.instructions):
-                result = dispatch(xtdb, instruction)
-                if result:
-                    sys.stdout.write(f"{result}\n")
-        elif args.instructions[0] == "-":
-            for line in sys.stdin:
-                if line.rstrip() == "exit" or line.rstrip() == "quit":
-                    break
-                for instruction in iparse(line.rstrip().split(" ")):
-                    result = dispatch(xtdb, instruction)
-                    if result:
-                        sys.stdout.write(f"{result}\n")
-        else:
-            for fname in args.instructions:
-                with Path(fname).open("r") as file:
-                    for line in file.readlines():
-                        if line.rstrip() == "exit" or line.rstrip() == "quit":
-                            break
-                        for instruction in iparse(line.rstrip().split(" ")):
-                            result = dispatch(xtdb, instruction)
-                            if result:
-                                sys.stdout.write(f"{result}\n")
+@click.group()
+# @click.option("--debug/--no-debug", default=False)
+@click.option("--timeout", default=5000, help="XTDB request timeout (in ms)")
+@click.option(
+    "--base-url", default="http://localhost:3000", help="XTDB server base url"
+)
+@click.argument("node", default="0", help="XTDB node")
+@click.pass_context
+def cli(ctx: click.Context, base_url: str, node: str, timeout: int):
+    client = XTDBClient(base_url, node, timeout)
+
+    ctx.ensure_object(dict)
+    ctx.obj["client"] = client
+
+
+@cli.command()
+@click.argument(type=int)
+@click.pass_context
+def tx_committed(ctx: click.Context, txid: int) -> None:
+    client = ctx.obj["client"]
+    click.echo(client.tx_committed(txid))
+
+
+# def main():
+#     parser = argparse.ArgumentParser(
+#         prog="xtdb-cli",
+#         description="A command-line interface for xtdb multinode as used in OpenKAT",
+#         epilog=EPILOG,
+#         add_help=True,
+#         allow_abbrev=True,
+#         formatter_class=argparse.RawDescriptionHelpFormatter,
+#     )
+#     parser.add_argument(
+#         "--port", help="xtdb server port (default 3000)", type=int, default=3000
+#     )
+#     parser.add_argument(
+#         "--host",
+#         help="xtdb server hostname (default localhost)",
+#         type=str,
+#         default="localhost",
+#     )
+#     parser.add_argument("--node", help="xtdb node (default 0)", type=str, default="0")
+#     parser.add_argument("instructions", type=str, nargs="*")
+#     args = parser.parse_args()
+#     xtdb = XTDBClient(args.host, args.port, args.node)
+#     if args.instructions:
+#         if args.instructions[0] in KEYWORDS:
+#             for instruction in iparse(args.instructions):
+#                 result = dispatch(xtdb, instruction)
+#                 if result:
+#                     sys.stdout.write(f"{result}\n")
+#         elif args.instructions[0] == "-":
+#             for line in sys.stdin:
+#                 if line.rstrip() == "exit" or line.rstrip() == "quit":
+#                     break
+#                 for instruction in iparse(line.rstrip().split(" ")):
+#                     result = dispatch(xtdb, instruction)
+#                     if result:
+#                         sys.stdout.write(f"{result}\n")
+#         else:
+#             for fname in args.instructions:
+#                 with Path(fname).open("r") as file:
+#                     for line in file.readlines():
+#                         if line.rstrip() == "exit" or line.rstrip() == "quit":
+#                             break
+#                         for instruction in iparse(line.rstrip().split(" ")):
+#                             result = dispatch(xtdb, instruction)
+#                             if result:
+#                                 sys.stdout.write(f"{result}\n")
 
 
 if __name__ == "__main__":
-    main()
+    cli()
