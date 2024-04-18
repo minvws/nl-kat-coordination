@@ -1,11 +1,12 @@
 {% load i18n %}
 
-<div class="sticky-container">
+<div class="sticky-container" id="sticky-container">
     <nav data-open-label="Zijbalknavigatie"
          data-close-label="Sluit zijbalknavigatie"
-         aria-label="Zijbalknavigatie">
+         aria-label="Zijbalknavigatie"
+         id="sticky-overflow">
         <h2 class="heading-large">{% translate "Table of contents" %}</h2>
-        <div id="sticky-overflow">
+        <div>
             <ol class="chapter-numbers">
                 <li>
                     <a href="#recommendations">{% translate "Recommendations" %}</a>

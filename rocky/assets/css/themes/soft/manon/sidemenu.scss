@@ -15,7 +15,13 @@ main.sidemenu {
   align-items: stretch;
 
   .sticky-container {
-    border: 1px solid green;
+    // border: 1px solid green;
+
+    /* Behaviour */
+    position: sticky;
+    top: 0;
+
+    // max-height: 80vh;
 
     > nav {
       /* Layout */
@@ -26,19 +32,19 @@ main.sidemenu {
       width: var(--sidemenu-nav-width);
       padding-top: var(--sidemenu-nav-padding-top);
       padding-right: 0;
-      padding-bottom: var(--sidemenu-nav-padding-bottom);
+
+      // padding-bottom: var(--sidemenu-nav-padding-bottom);
+      padding-bottom: 0;
       padding-left: 0;
       box-sizing: border-box;
       background-color: #ffffff;
       border-right: 1px solid var(--sidemenu-nav-border-color);
       height: 100%;
       z-index: 1;
-      border: 1px dashed red;
+
+      // border: 1px dashed red;
 
       /* Behaviour */
-      position: sticky;
-      top: 0;
-      max-height: 80vh;
       overflow: auto;
 
       /* Transition */
@@ -186,7 +192,9 @@ main.sidemenu {
       width: var(--sidemenu-nav-width);
       padding-top: var(--sidemenu-nav-padding-top);
       padding-right: var(--sidemenu-nav-padding-right);
-      padding-bottom: var(--sidemenu-nav-padding-bottom);
+
+      // padding-bottom: var(--sidemenu-nav-padding-bottom);
+      padding-bottom: 0;
       padding-left: var(--sidemenu-nav-padding-left);
       box-sizing: border-box;
     }

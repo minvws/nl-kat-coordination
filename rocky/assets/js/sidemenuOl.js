@@ -14,7 +14,7 @@ import {
    * apply to newly added sidemenus.
    */
   export function initSidemenus() {
-    var sidemenus = document.querySelectorAll(".sidemenu > nav");
+    var sidemenus = document.querySelectorAll(".sidemenu > .sticky-container > nav");
     for (var i = 0; i < sidemenus.length; i++) {
       var sidemenu = sidemenus[i];
       if (!(sidemenu instanceof HTMLElement)) {
@@ -22,8 +22,8 @@ import {
       }
       if (!sidemenu.querySelector("button.sidemenu-toggle")) {
         addToggleButton(sidemenu);
-        defineScrollPosition(sidemenu);
       }
+      adjustMaxHeight(sidemenu);
     }
   }
 
@@ -78,11 +78,13 @@ import {
    * @param {HTMLElement} sidemenu
    */
 
-  function defineScrollPosition(sidemenu) {
+  function adjustMaxHeight(sidemenu) {
+    const pageHeight = document.querySelector('body')?.scrollHeight;
+
     const pageHeaderElement = document.getElementById('page-header');
     const pageFooterElement = document.getElementById('page-footer');
-    const stickyElement = document.getElementById("sticky-overflow");
-    // let stickyElementOGMaxHeight = getComputedStyle(stickyElement).getPropertyValue("max-height");
+    const stickyElement = document.getElementById("sticky-container");
+
     let pageHeaderHeight = pageHeaderElement?.offsetHeight;
     let pageFooterHeight = pageFooterElement?.offsetHeight;
 
@@ -95,18 +97,29 @@ import {
     }));
 
     window.addEventListener("scroll", (event => {
-      // Amount of PX the page is scrolled
+      // Amount of pixels the page is scrolled
       let scrollCount = document.scrollingElement?.scrollTop;
 
-      console.log(stickyElementOGMaxHeight)
-
-      if(scrollCount > pageHeaderHeight) {
-        stickyElement.style.maxHeight = "calc(100vh - " + (pageHeaderHeight + pageFooterHeight) + ")";
-        stickyElement.style.maxHeight = "calc(100vh - 232px)";
-      } else {
-        stickyElement.style.maxHeight = stickyElementOGMaxHeight;
+      // As long as the page header is in viewport while scrolling, adjust sidebar max-height
+      if(scrollCount < pageHeaderHeight) {
+          stickyElement.style.maxHeight = "calc(100vh - (" + pageHeaderHeight + "px - " + scrollCount + "px))";
       }
+      else {
+        var viewPortHeight = document.documentElement.clientHeight;
 
-      // console.log(scrollCount)
+        // When the page footer is in viewport while scrolling, adjust sidebar max-height
+        if((scrollCount + viewPortHeight) >= (pageHeight - pageFooterHeight)) {
+          // Determine how much of the footer is in viewort
+          let notVisibleFooterPx = (pageHeight - (scrollCount + viewPortHeight));
+          let visibleFooterPx = pageFooterHeight - notVisibleFooterPx;
+
+          // Adjust sidebar with visible footer pixels amount
+          stickyElement.style.maxHeight = "calc(100vh - " + visibleFooterPx + "px)";
+        }
+        else {
+          // When both page header and page footer are outside of viewport, max-height should be 100vh
+          stickyElement.style.maxHeight = "calc(100vh)";
+        }
+      }
     }));
   }
