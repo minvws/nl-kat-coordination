@@ -26,8 +26,6 @@ DEFAULT_RECORD_TYPES = {
     "DNAME",
     "SOA",
 }
-RECORD_TYPES = getenv("RECORD_TYPES", "")
-REMOTE_NS = getenv("REMOTE_NS", "1.1.1.1")
 
 
 class ZoneNotFoundException(Exception):
@@ -35,7 +33,7 @@ class ZoneNotFoundException(Exception):
 
 
 def get_record_types() -> list[str]:
-    requested_record_types = RECORD_TYPES
+    requested_record_types = getenv("RECORD_TYPES", "")
     if not requested_record_types:
         return list(DEFAULT_RECORD_TYPES)
     requested_record_types = list(
@@ -52,7 +50,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
-    nameserver = REMOTE_NS
+    nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
 
     record_types = get_record_types()
