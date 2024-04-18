@@ -1,4 +1,3 @@
-import asyncio
 import json
 import uuid
 from collections import Counter
@@ -482,11 +481,7 @@ def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
     return xtdb_session_.client.export_transactions()
 
 
-def importer(request: Request, xtdb_session_: XTDBSession) -> dict[str, int]:
-    try:
-        data = asyncio.run(request.body())
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+def importer(data: bytes, xtdb_session_: XTDBSession) -> dict[str, int]:
     try:
         ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
     except Exception as e:
@@ -513,16 +508,24 @@ def importer(request: Request, xtdb_session_: XTDBSession) -> dict[str, int]:
 
 
 @router.post("/io/import/add", tags=["io"])
-def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
-    return importer(request, xtdb_session_)
+async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    return importer(data, xtdb_session_)
 
 
 @router.post("/io/import/new", tags=["io"])
-def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
         xtdb_session_.client.delete_node()
         xtdb_session_.client.create_node()
         xtdb_session_.commit()
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error recreating nodes") from e
-    return importer(request, xtdb_session_)
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    return importer(data, xtdb_session_)
