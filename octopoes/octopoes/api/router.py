@@ -1,3 +1,4 @@
+import asyncio
 import json
 import uuid
 from collections import Counter
@@ -477,11 +478,15 @@ def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> i
 
 
 @router.get("/io/export", tags=["io"])
-def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)):
+def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
     return xtdb_session_.client.export_transactions()
 
 
-def importer(data: bytes, xtdb_session_: XTDBSession) -> dict[str, int]:
+def importer(request: Request, xtdb_session_: XTDBSession) -> dict[str, int]:
+    try:
+        data = asyncio.run(request.body())
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     try:
         ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
     except Exception as e:
@@ -490,7 +495,12 @@ def importer(data: bytes, xtdb_session_: XTDBSession) -> dict[str, int]:
     for op in ops:
         try:
             operations: list[Operation] = [
-                (OperationType(x[0]), x[1], datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ")) for x in op
+                (
+                    OperationType(x[0]),
+                    x[1],
+                    datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
+                )
+                for x in op
             ]
             xtdb_session_.client.submit_transaction(operations)
         except Exception as e:
@@ -503,24 +513,16 @@ def importer(data: bytes, xtdb_session_: XTDBSession) -> dict[str, int]:
 
 
 @router.post("/io/import/add", tags=["io"])
-async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
-    try:
-        data = await request.body()
-    except XTDBException as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_)
+def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+    return importer(request, xtdb_session_)
 
 
 @router.post("/io/import/new", tags=["io"])
-async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
         xtdb_session_.client.delete_node()
         xtdb_session_.client.create_node()
         xtdb_session_.commit()
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error recreating nodes") from e
-    try:
-        data = await request.body()
-    except XTDBException as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
-    return importer(data, xtdb_session_)
+    return importer(request, xtdb_session_)
