@@ -21,18 +21,16 @@ OCI images can be distributed in any OCI registry, such as Docker Hub or
 GitHub Container Registry. Several open source projects are available to
 create a self-hosted OCI registry, such as [Harbor][harbor].
 
-The boefje can be imported into the katalogus using its OCI image URL. It can
+In the future, boefjes can be imported into the KATalogus using its OCI image URL. It can
 be pinned to a version-specific tag, SHA256 identifier, or simply use the `latest`
-tag.
-
-A JSON list of recommended boefjes will be included with each OpenKAT release,
+tag. A JSON list of recommended boefjes will be included with each OpenKAT release,
 or published to https://openkat.nl.
 
 [harbor]: https://goharbor.io/
 
 ### Metadata
 
-To import a boefje into the katalogus, we need some of its metadata. We can
+To import a boefje into the KATalogus, we need some of its metadata. We can
 distribute this metadata together with the image by leveraging the [OCI image
 manifest][oci-manifest-spec]. For example, we could add an annotation to the
 manifest with a well-known name and predefined format, such as JSON, or add
@@ -179,9 +177,9 @@ The tags for each file can include a MIME type.
 
 ## Logging
 
-Logging will be captured through the container orchestrator/runtime's API and
-stored in bytes. Alternatively, the boefje can output its own logging in a
-separate file as part of its output, which will be stored in bytes as well.
+Logging will be captured through the container orchestrator's/runtime's API and
+stored in Bytes. Alternatively, the boefje can output its own logging in a
+separate file as part of its output, which will be stored in Bytes as well.
 
 ## Runtimes
 
@@ -244,6 +242,7 @@ The approach to building OCI images from the boefjes we currently have in our
 system has been discussed in [this ticket][ticket], with the first versions
 having been implemented in these PRs:
 - https://github.com/minvws/nl-kat-coordination/pull/2709
+- https://github.com/minvws/nl-kat-coordination/pull/2832
 
 
 #### Summary of decisions
@@ -273,8 +272,8 @@ docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-se
 
 
 In terms of when to build images, we decided to:
-- Make the builds part of the installation script through `make -C boefjes images`
-- Put the responsibility to (re)build new images while developing boefjes on developers
+- Make the builds part of the installation script through `make -C boefjes images`.
+- Put the responsibility to (re)build new images while developing boefjes on developers.
 
 
 [ticket]: https://github.com/minvws/nl-kat-coordination/issues/2443
@@ -289,4 +288,8 @@ which has a non-negligible overhead. This overhead can be reduced by batching
 multiple tasks in a single container run. This design does not currently
 consider that to ensure the implementation is as simple as possible. It can be
 added to the runner in the future, but will also require changes to the KAT
-scheduler to support scheduling batched tasks.
+scheduler to support scheduling batched tasks. Also see the following issues
+and discussions to see the progress on this (performance) feature:
+- https://github.com/minvws/nl-kat-coordination/issues/2613
+- https://github.com/minvws/nl-kat-coordination/issues/2857
+- https://github.com/minvws/nl-kat-coordination/issues/2811
