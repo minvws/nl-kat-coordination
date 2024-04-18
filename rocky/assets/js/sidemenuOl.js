@@ -87,6 +87,7 @@ import {
 
     let pageHeaderHeight = pageHeaderElement?.offsetHeight;
     let pageFooterHeight = pageFooterElement?.offsetHeight;
+    determineSidebarMaxHeight();
 
     window.addEventListener("resize", (event => {
       // Set the height of the page header and footer
@@ -94,9 +95,14 @@ import {
       // to account for responsive behaviour
       pageHeaderHeight = pageHeaderElement?.offsetHeight;
       pageFooterHeight = pageFooterElement?.offsetHeight;
+      determineSidebarMaxHeight();
     }));
 
     window.addEventListener("scroll", (event => {
+      determineSidebarMaxHeight();
+    }));
+
+    function determineSidebarMaxHeight() {
       // Amount of pixels the page is scrolled
       let scrollCount = document.scrollingElement?.scrollTop;
 
@@ -121,5 +127,5 @@ import {
           stickyElement.style.maxHeight = "calc(100vh)";
         }
       }
-    }));
+    }
   }
