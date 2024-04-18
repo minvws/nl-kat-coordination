@@ -458,6 +458,10 @@ class Server:
                 detail="task not found",
             )
 
+        # Check if status changed and update duration
+        if "status" in item and item["status"] != task_db.status:
+            task_db.update_status(item["status"])
+
         updated_task = task_db.model_copy(update=item)
 
         # Update task in database
@@ -468,6 +472,16 @@ class Server:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="failed to update task",
+            ) from exc
+
+        # Retrieve updated task
+        try:
+            updated_task = self.ctx.datastores.task_store.get_task_by_id(task_id)
+        except Exception as exc:
+            self.logger.error(exc)
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="failed to get updated task",
             ) from exc
 
         return updated_task

@@ -22,10 +22,13 @@ def test_one_process(manager: SchedulerWorkerManager, item_handler: MockHandler)
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
-    assert len(patched_tasks) == 3
-    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert len(patched_tasks) == 6
+    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
     assert patched_tasks[1] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
-    assert patched_tasks[2] == ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")
+    assert patched_tasks[2] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
+    assert patched_tasks[3] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert patched_tasks[4] == ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "running")
+    assert patched_tasks[5] == ("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")
 
 
 def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandler) -> None:
@@ -39,7 +42,7 @@ def test_two_processes(manager: SchedulerWorkerManager, item_handler: MockHandle
     assert len(items) == 2
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
-    assert len(patched_tasks) == 3
+    assert len(patched_tasks) == 6
     assert patched_tasks.count(("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")) == 2
     assert patched_tasks.count(("9071c9fd-2b9f-440f-a524-ef1ca4824fd4", "failed")) == 1
 
@@ -78,7 +81,7 @@ def test_two_processes_handler_exception(manager: SchedulerWorkerManager, item_h
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
-    assert len(patched_tasks) == 3
+    assert len(patched_tasks) == 6
     # Handler starts raising an Exception from the second call onward,
     # so we have 2 completed tasks and 4 failed tasks.
     assert patched_tasks.count(("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")) == 1
@@ -112,7 +115,7 @@ def test_two_processes_cleanup_unfinished_tasks(
     assert len(items) == 0
 
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
-    assert len(patched_tasks) == 1
+    assert len(patched_tasks) == 3
 
     # Task was running but main process crashed intentionally and cleaned it up
     assert patched_tasks.count(("70da7d4f-f41f-4940-901b-d98a92e9014b", "failed")) == 1
@@ -149,9 +152,13 @@ def test_null(manager: SchedulerWorkerManager, tmp_path: Path, item_handler: Moc
     patched_tasks = manager.scheduler_client.get_all_patched_tasks()
 
     assert len(items) == 3
-    assert len(patched_tasks) == 3
-    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
-    assert patched_tasks[2] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert len(patched_tasks) == 6
+    assert patched_tasks[0] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
+    assert patched_tasks[1] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert patched_tasks[2] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
+    assert patched_tasks[3] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
+    assert patched_tasks[4] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "running")
+    assert patched_tasks[5] == ("70da7d4f-f41f-4940-901b-d98a92e9014b", "completed")
 
 
 def test_create_manager():
