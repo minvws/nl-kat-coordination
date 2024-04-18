@@ -259,8 +259,8 @@ docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-se
 - Use, as shown above, the [naming convention][dockerfile-naming] for Dockerfiles
   since we may want to add normaliser Dockerfiles in the same directory.
 - Use a Python base image for all our boefjes, so we can use shared Python code to
-  communicate with the boefjes api. Since there is no one tool available across Docker base images
-  that can perform HTTP communication, we might as well use python for this. Later, we can consider
+  communicate with the boefjes API. Since there is no one tool available across Docker base images
+  that can perform HTTP communication, we might as well use Python for this. Later, we can consider
   creating platform-specific, pre-built binaries using languages such as Go or Rust.
 - In particular, build the images using a `python:3.11-slim` base image. A basic check shows the following
   sizes per base image, but Alpine [does not support standard PyPI wheels][wheels]:
