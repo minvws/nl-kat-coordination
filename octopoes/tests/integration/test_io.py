@@ -1,9 +1,8 @@
+import json
 import os
 import time
 from datetime import datetime
 from operator import itemgetter
-
-import json
 
 import pytest
 
@@ -32,7 +31,12 @@ def test_io(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
 
     txops = octopoes_api_connector.export_all()
     transactions = list(map(itemgetter("txOps"), txops))
-    data = {"object_type": "Network", "Network/primary_key": "Network|internet", "Network/name": "internet", "xt/id": "Network|internet"}
+    data = {
+        "object_type": "Network",
+        "Network/primary_key": "Network|internet",
+        "Network/name": "internet",
+        "xt/id": "Network|internet",
+    }
     dt = valid_time.strftime("%Y-%m-%dT%H:%M:%SZ")
     target = json.loads(json.dumps(["put", data, dt]))
     assert any([target in tx for tx in transactions])
