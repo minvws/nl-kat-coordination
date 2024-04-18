@@ -72,8 +72,6 @@ class OOISelectionMultiReportView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_ooi_filter_forms(self.ooi_types))
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 
@@ -98,8 +96,6 @@ class ReportTypesSelectionMultiReportView(
         context = super().get_context_data(**kwargs)
         context["oois"] = self.get_oois()
         context["available_report_types"] = self.get_report_types_for_generate_report({MultiOrganizationReport})
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 
@@ -124,8 +120,6 @@ class SetupScanMultiReportView(BreadcrumbsMultiReportView, BaseReportView, Templ
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugins"] = {"required": [], "optional": []}
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 

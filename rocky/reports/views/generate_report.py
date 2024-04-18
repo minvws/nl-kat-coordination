@@ -82,8 +82,6 @@ class OOISelectionGenerateReportView(
         context = super().get_context_data(**kwargs)
         context["channel"] = "generate_report"
         context.update(self.get_ooi_filter_forms(self.ooi_types))
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 
@@ -111,8 +109,6 @@ class ReportTypesSelectionGenerateReportView(
         context["available_report_types"] = self.get_report_types_for_generate_report(
             get_report_types_for_oois(self.selected_oois)
         )
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 
@@ -142,8 +138,6 @@ class SetupScanGenerateReportView(
         context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
             get_plugins_for_report_ids(self.selected_report_types)
         )
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 
