@@ -20,6 +20,7 @@ from reports.report_types.helpers import (
     get_report_types_for_oois,
 )
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
+from reports.views.view_helpers import KatGenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -65,24 +66,30 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
         )
 
 
-class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):
+class OOISelectionGenerateReportView(
+    BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView, KatGenerateReportStepsMixin
+):
     """
     Select objects for the 'Generate Report' flow.
     """
 
     template_name = "generate_report/select_oois.html"
     breadcrumbs_step = 3
-    current_step = 3
+    current_step = 1
     ooi_types = get_ooi_types_with_report()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["channel"] = "generate_report"
         context.update(self.get_ooi_filter_forms(self.ooi_types))
+        context["steps"] = self.build_steps()
+        context["current_step"] = self.get_current_step()
         return context
 
 
-class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
+class ReportTypesSelectionGenerateReportView(
+    BreadcrumbsGenerateReportView, BaseReportView, TemplateView, KatGenerateReportStepsMixin
+):
     """
     Shows all possible report types from a list of OOIs.
     Chooses report types for the 'Generate Report' flow.
@@ -90,7 +97,7 @@ class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, Base
 
     template_name = "generate_report/select_report_types.html"
     breadcrumbs_step = 4
-    current_step = 4
+    current_step = 2
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
@@ -104,17 +111,21 @@ class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, Base
         context["available_report_types"] = self.get_report_types_for_generate_report(
             get_report_types_for_oois(self.selected_oois)
         )
+        context["steps"] = self.build_steps()
+        context["current_step"] = self.get_current_step()
         return context
 
 
-class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
+class SetupScanGenerateReportView(
+    BreadcrumbsGenerateReportView, BaseReportView, TemplateView, KatGenerateReportStepsMixin
+):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
 
     template_name = "generate_report/setup_scan.html"
     breadcrumbs_step = 5
-    current_step = 5
+    current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
@@ -131,6 +142,8 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
         context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
             get_plugins_for_report_ids(self.selected_report_types)
         )
+        context["steps"] = self.build_steps()
+        context["current_step"] = self.get_current_step()
         return context
 
 

@@ -11,6 +11,7 @@ from tools.view_helpers import url_with_querystring
 
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
+from reports.views.view_helpers import KatMultiReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -56,23 +57,29 @@ class LandingMultiReportView(BreadcrumbsMultiReportView, BaseReportView):
         )
 
 
-class OOISelectionMultiReportView(BreadcrumbsMultiReportView, BaseReportView, BaseOOIListView):
+class OOISelectionMultiReportView(
+    BreadcrumbsMultiReportView, BaseReportView, BaseOOIListView, KatMultiReportStepsMixin
+):
     """
     Select OOIs for the 'Multi Report' flow.
     """
 
     template_name = "generate_report/select_oois.html"
     breadcrumbs_step = 3
-    current_step = 3
+    current_step = 1
     ooi_types = MultiOrganizationReport.input_ooi_types
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_ooi_filter_forms(self.ooi_types))
+        context["steps"] = self.build_steps()
+        context["current_step"] = self.get_current_step()
         return context
 
 
-class ReportTypesSelectionMultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView):
+class ReportTypesSelectionMultiReportView(
+    BreadcrumbsMultiReportView, BaseReportView, TemplateView, KatMultiReportStepsMixin
+):
     """
     Shows all possible report types from a list of OOIs.
     Chooses report types for the 'Multi Report' flow.
@@ -80,7 +87,7 @@ class ReportTypesSelectionMultiReportView(BreadcrumbsMultiReportView, BaseReport
 
     template_name = "generate_report/select_report_types.html"
     breadcrumbs_step = 4
-    current_step = 4
+    current_step = 2
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
@@ -91,17 +98,19 @@ class ReportTypesSelectionMultiReportView(BreadcrumbsMultiReportView, BaseReport
         context = super().get_context_data(**kwargs)
         context["oois"] = self.get_oois()
         context["available_report_types"] = self.get_report_types_for_generate_report({MultiOrganizationReport})
+        context["steps"] = self.build_steps()
+        context["current_step"] = self.get_current_step()
         return context
 
 
-class SetupScanMultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView):
+class SetupScanMultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView, KatMultiReportStepsMixin):
     """
     Show required and optional plugins to start scans to multi OOIs to include in report.
     """
 
     template_name = "generate_report/setup_scan.html"
     breadcrumbs_step = 5
-    current_step = 5
+    current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
@@ -115,6 +124,8 @@ class SetupScanMultiReportView(BreadcrumbsMultiReportView, BaseReportView, Templ
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugins"] = {"required": [], "optional": []}
+        context["steps"] = self.build_steps()
+        context["current_step"] = self.get_current_step()
         return context
 
 
