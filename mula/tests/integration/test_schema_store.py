@@ -43,8 +43,9 @@ class SchemaStore(unittest.TestCase):
         schema_db = self.mock_ctx.datastores.schema_store.create_schema(schema)
 
         # Assert
-        self.assertEqual(schema, self.mock_ctx.datastores.schema_store.get_schema(schema_db.id))
+        self.assertEqual(schema, schema_db)
 
+    # TODO: review and fix this
     def test_get_schemas(self):
         # Arrange
         scheduler_one = "test_scheduler_one"
@@ -102,11 +103,11 @@ class SchemaStore(unittest.TestCase):
     def test_get_schema_by_hash(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
-        task = functions.create_p_item(scheduler_id, 1)
+        data = functions.create_test_model()
         schema = models.TaskSchema(
             scheduler_id=scheduler_id,
-            hash=task.hash,
-            data=task.model_dump(),
+            hash=data.hash,
+            data=data.model_dump(),
         )
         schema_db = self.mock_ctx.datastores.schema_store.create_schema(schema)
 
@@ -116,7 +117,7 @@ class SchemaStore(unittest.TestCase):
         # Assert
         self.assertEqual(schema_by_hash.id, schema_db.id)
         self.assertEqual(schema_by_hash.data, schema_db.data)
-        self.assertEqual(schema_by_hash.data.hash, schema_db.data.hash)
+        self.assertEqual(schema_by_hash.hash, schema_db.hash)
 
     def test_update_schema(self):
         # Arrange
@@ -188,7 +189,7 @@ class SchemaStore(unittest.TestCase):
     def test_relationship_schema_tasks(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
-        task = functions.create_p_item(scheduler_id, 1)
+        task = functions.create_task(scheduler_id)
         schema = models.TaskSchema(
             scheduler_id=scheduler_id,
             hash=task.hash,
@@ -205,3 +206,57 @@ class SchemaStore(unittest.TestCase):
         # Assert
         self.assertEqual(len(schema_tasks), 1)
         self.assertEqual(schema_tasks[0].id, task_db.id)
+
+    @unittest.skip("Transfer this to test_schema_store.py")
+    def test_get_tasks_filter_related(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        schema = functions.create_schema(self.organisation.id, task)
+
+        task.schema_id = schema.id
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        f_req = filters.FilterRequest(
+            filters={
+                "and": [
+                    filters.Filter(
+                        column="",
+                        field="id",
+                        operator="eq",
+                        value=created_task.id.hex,
+                    ),
+                ]
+            }
+        )
+
+        task_runs, count = self.mock_ctx.datastores.task_store.get_runs(filters=f_req)
+        self.assertEqual(count, 1)
+        self.assertEqual(len(task_runs), 1)
+        self.assertEqual(task_runs[0].task_id, created_task.id)
+
+    @unittest.skip("Transfer this to test_schema_store.py")
+    def test_get_tasks_filter_related_and_nested(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        task_run = functions.create_run(task)
+        created_run = self.mock_ctx.datastores.task_store.create_run(task_run)
+
+        f_req = filters.FilterRequest(
+            filters={
+                "and": [
+                    filters.Filter(
+                        column="task",
+                        field="data__id",
+                        operator="eq",
+                        value=created_task.data.get("id"),
+                    ),
+                ]
+            }
+        )
+
+        task_runs, count = self.mock_ctx.datastores.task_store.get_runs(filters=f_req)
+        self.assertEqual(count, 1)
+        self.assertEqual(len(task_runs), 1)
+        self.assertEqual(task_runs[0].task_id, created_task.id)

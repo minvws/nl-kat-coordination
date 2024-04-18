@@ -24,7 +24,6 @@ class StoreTestCase(unittest.TestCase):
 
         self.mock_ctx.datastores = SimpleNamespace(
             **{
-                storage.RunStore.name: storage.RunStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
             }
@@ -38,11 +37,94 @@ class StoreTestCase(unittest.TestCase):
         self.dbconn.engine.dispose()
 
     def test_create_task(self):
-        task = functions.create_task()
+        task = functions.create_task(scheduler_id=self.organisation.id)
         created_task = self.mock_ctx.datastores.task_store.create_task(task)
         self.assertIsNotNone(created_task)
 
-    # TODO: Add more tests
+    def test_get_tasks(self):
+        # Arrange
+        for i in range(5):
+            task = functions.create_task(scheduler_id=self.organisation.id)
+            self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        tasks, count = self.mock_ctx.datastores.task_store.get_tasks(scheduler_id=self.organisation.id)
+
+        # Assert
+        self.assertEqual(len(tasks), 5)
+        self.assertEqual(count, 5)
+
+    def test_get_task(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        task = self.mock_ctx.datastores.task_store.get_task(created_task.id)
+
+        # Assert
+        self.assertIsNotNone(task)
+
+    def test_get_tasks_by_hash(self):
+        # Arrange
+        hashes = []
+        data = functions.create_test_model()
+        for i in range(5):
+            task = functions.create_task(scheduler_id=self.organisation.id, data=data)
+            self.mock_ctx.datastores.task_store.create_task(task)
+            hashes.append(task.hash)
+
+        # Every task should have the same hash
+        self.assertEqual(len(set(hashes)), 1)
+
+        # Act
+        tasks = self.mock_ctx.datastores.task_store.get_tasks_by_hash(data.hash)
+
+        # Assert
+        self.assertEqual(len(tasks), 5)
+
+    def test_get_latest_task_by_hash(self):
+        # Arrange
+        hashes = []
+        data = functions.create_test_model()
+        for i in range(5):
+            task = functions.create_task(scheduler_id=self.organisation.id, data=data)
+            self.mock_ctx.datastores.task_store.create_task(task)
+            hashes.append(task.hash)
+
+        # Every task should have the same hash
+        self.assertEqual(len(set(hashes)), 1)
+
+        # Act
+        task = self.mock_ctx.datastores.task_store.get_latest_task_by_hash(data.hash)
+
+        # Assert
+        self.assertIsNotNone(task)
+
+    def test_update_task(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        created_task.status = models.TaskStatus.COMPLETED
+        self.mock_ctx.datastores.task_store.update_task(created_task)
+
+        # Assert
+        updated_task = self.mock_ctx.datastores.task_store.get_task(created_task.id)
+        self.assertEqual(updated_task.status, models.TaskStatus.COMPLETED)
+
+    def test_cancel_task(self):
+        # Arrange
+        task = functions.create_task(scheduler_id=self.organisation.id)
+        created_task = self.mock_ctx.datastores.task_store.create_task(task)
+
+        # Act
+        self.mock_ctx.datastores.task_store.cancel_tasks(self.organisation.id, [created_task.id])
+
+        # Assert
+        updated_task = self.mock_ctx.datastores.task_store.get_task(created_task.id)
+        self.assertEqual(updated_task.status, models.TaskStatus.CANCELLED)
 
     def test_get_status_counts(self):
         # Arrange
@@ -75,20 +157,19 @@ class StoreTestCase(unittest.TestCase):
             ),
         ):
             for _ in r:
-                p_item = functions.create_p_item(self.organisation.id, 1)
-                task = models.TaskRun(
-                    id=p_item.id,
-                    hash=p_item.hash,
-                    type=functions.TestModel.type,
-                    scheduler_id=p_item.scheduler_id,
-                    p_item=p_item,
+                data = functions.create_test_model()
+                task = models.Task(
+                    scheduler_id=self.organisation.id,
+                    priority=1,
                     status=status,
+                    hash=data.hash,
+                    data=data.model_dump(),
                     modified_at=modified_at,
                 )
-                self.mock_ctx.datastores.run_store.create_task(task)
+                self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
-        results = self.mock_ctx.datastores.run_store.get_status_counts()
+        results = self.mock_ctx.datastores.task_store.get_status_counts()
 
         # Assert
         self.assertEqual(results[models.TaskStatus.QUEUED], 2)
@@ -127,20 +208,19 @@ class StoreTestCase(unittest.TestCase):
             ),
         ):
             for _ in r:
-                p_item = functions.create_p_item(self.organisation.id, 1)
-                task = models.TaskRun(
-                    id=p_item.id,
-                    hash=p_item.hash,
-                    type=functions.TestModel.type,
-                    scheduler_id=p_item.scheduler_id,
-                    p_item=p_item,
+                data = functions.create_test_model()
+                task = models.Task(
+                    scheduler_id=self.organisation.id,
+                    priority=1,
                     status=status,
+                    hash=data.hash,
+                    data=data.model_dump(),
                     modified_at=modified_at,
                 )
-                self.mock_ctx.datastores.run_store.create_task(task)
+                self.mock_ctx.datastores.task_store.create_task(task)
 
         # Act
-        results = self.mock_ctx.datastores.run_store.get_status_count_per_hour()
+        results = self.mock_ctx.datastores.task_store.get_status_count_per_hour()
         keys = [k for k in results]
 
         # Assert
@@ -150,840 +230,3 @@ class StoreTestCase(unittest.TestCase):
         self.assertEqual(results.get(keys[1]).get("completed"), 2)
         self.assertEqual(results.get(keys[1]).get("total"), 2)
         self.assertEqual(results.get(keys[2]).get("queued"), 2)
-
-    def test_get_tasks_filter_related(self):
-        # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
-        created_task = self.mock_ctx.datastores.task_store.create_task(task)
-
-        task_run = functions.create_run(task)
-        created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
-
-        f_req = filters.FilterRequest(
-            filters={
-                "and": [
-                    filters.Filter(column="task", field="id", operator="eq", value=created_task.id.hex),
-                ]
-            }
-        )
-
-        task_runs, count = self.mock_ctx.datastores.run_store.get_runs(filters=f_req)
-        self.assertEqual(count, 1)
-        self.assertEqual(len(task_runs), 1)
-        self.assertEqual(task_runs[0].task_id, created_task.id)
-
-    def test_get_tasks_filter_related_and_nested(self):
-        # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
-        created_task = self.mock_ctx.datastores.task_store.create_task(task)
-
-        task_run = functions.create_run(task)
-        created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
-
-        f_req = filters.FilterRequest(
-            filters={
-                "and": [
-                    filters.Filter(
-                        column="task",
-                        field="data__id",
-                        operator="eq",
-                        value=created_task.data.get("id"),
-                    ),
-                ]
-            }
-        )
-
-        task_runs, count = self.mock_ctx.datastores.run_store.get_runs(filters=f_req)
-        self.assertEqual(count, 1)
-        self.assertEqual(len(task_runs), 1)
-        self.assertEqual(task_runs[0].task_id, created_task.id)
-
-    def test_get_tasks_filter_multiple_and(self):
-        # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
-        created_task = self.mock_ctx.datastores.task_store.create_task(task)
-
-        task_run = functions.create_run(task)
-        created_run = self.mock_ctx.datastores.run_store.create_run(task_run)
-
-        f_req = filters.FilterRequest(
-            filters={
-                "and": [
-                    filters.Filter(
-                        column="id",
-                        field=None,
-                        operator="eq",
-                        value=first_task.id.hex,
-                    ),
-                    filters.Filter(
-                        column="p_item",
-                        field="data__id",
-                        operator="eq",
-                        value=first_p_item.data.get("id"),
-                    ),
-                ]
-            },
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, first_task.id)
-
-    def test_get_tasks_filter_multiple_or(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters={
-                "or": [
-                    filters.Filter(
-                        column="id",
-                        field=None,
-                        operator="eq",
-                        value=first_task.id.hex,
-                    ),
-                    filters.Filter(
-                        column="id",
-                        field=None,
-                        operator="eq",
-                        value=second_task.id.hex,
-                    ),
-                ]
-            },
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 2)
-        self.assertEqual(len(tasks), 2)
-        self.assertEqual(tasks[0].id, second_task.id)
-        self.assertEqual(tasks[1].id, first_task.id)
-
-    def test_get_tasks_filter_multiple_not(self):
-        # Arrange
-        first_p_item = functions.create_p_item(
-            self.organisation.id,
-            0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"]),
-        )
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(
-            self.organisation.id,
-            0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"]),
-        )
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        third_p_item = functions.create_p_item(
-            self.organisation.id,
-            0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"]),
-        )
-        third_task = functions.create_task(third_p_item)
-        self.mock_ctx.datastores.run_store.create_task(third_task)
-
-        f_req = filters.FilterRequest(
-            filters={
-                "and": [
-                    filters.Filter(
-                        column="id",
-                        field=None,
-                        operator="eq",
-                        value=first_task.id.hex,
-                    ),
-                    filters.Filter(
-                        column="p_item",
-                        field="data",
-                        operator="@>",
-                        value=json.dumps({"categories": ["test-a"]}),
-                    ),
-                ],
-                "not": [
-                    filters.Filter(
-                        column="p_item",
-                        field="data__count",
-                        operator=">",
-                        value=1,
-                    ),
-                ],
-            },
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, first_task.id)
-
-    def test_get_tasks_filter_eq(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="id",
-                    field=None,
-                    operator="eq",
-                    value=first_task.id.hex,
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, first_task.id)
-
-    def test_get_tasks_filter_ne(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="id",
-                    field=None,
-                    operator="ne",
-                    value=first_task.id.hex,
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, second_task.id)
-
-    def test_get_tasks_filter_json_eq(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__id",
-                    operator="eq",
-                    value=first_p_item.data.get("id"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].p_item.data["id"], first_p_item.data.get("id"))
-
-        # Arrange
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__id",
-                    operator="==",
-                    value=first_p_item.data.get("id"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].p_item.data["id"], first_p_item.data.get("id"))
-
-    def test_get_tasks_filter_json_ne(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__id",
-                    operator="ne",
-                    value=second_p_item.data.get("id"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].p_item.data["id"], first_p_item.data.get("id"))
-
-    def test_get_tasks_filter_json_gt(self):
-        # Arrange
-        first_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
-        )
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
-        )
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="gt",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, second_task.id)
-
-        # Arrange
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator=">",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, second_task.id)
-
-    def test_get_tasks_filter_json_gte(self):
-        # Arrange
-        first_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
-        )
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
-        )
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="gte",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 2)
-        self.assertEqual(len(tasks), 2)
-        self.assertEqual(tasks[0].id, second_task.id)
-        self.assertEqual(tasks[1].id, first_task.id)
-
-        # Arrange
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator=">=",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 2)
-        self.assertEqual(len(tasks), 2)
-        self.assertEqual(tasks[0].id, second_task.id)
-        self.assertEqual(tasks[1].id, first_task.id)
-
-    def test_get_tasks_filter_json_lt(self):
-        # Arrange
-        first_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
-        )
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
-        )
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="lt",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, second_task.id)
-
-        # Arrange
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="<",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, second_task.id)
-
-    def test_get_tasks_filter_json_lte(self):
-        # Arrange
-        first_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
-        )
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
-        )
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="lte",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 2)
-        self.assertEqual(len(tasks), 2)
-        self.assertEqual(tasks[0].id, second_task.id)
-        self.assertEqual(tasks[1].id, first_task.id)
-
-        # Arrange
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="<=",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 2)
-        self.assertEqual(len(tasks), 2)
-        self.assertEqual(tasks[0].id, second_task.id)
-        self.assertEqual(tasks[1].id, first_task.id)
-
-    def test_get_tasks_filter_json_like(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="like",
-                    value=f"%{first_p_item.data.get('name')[0:10]}%",
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, first_task.id)
-
-    def test_get_tasks_filter_json_not_like(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="not_like",
-                    value=f"%{first_p_item.data.get('name')[0:10]}%",
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, second_task.id)
-
-    def test_get_tasks_filter_json_ilike(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="ilike",
-                    value=f"%{first_p_item.data.get('name')[0:10].upper()}%",
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, first_task.id)
-
-    def test_get_tasks_filter_json_not_ilike(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="not_ilike",
-                    value=f"%{first_p_item.data.get('name')[0:10].upper()}%",
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, second_task.id)
-
-    def test_get_tasks_filter_json_in(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="in",
-                    value=[first_p_item.data.get("name"), second_p_item.data.get("name")],
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 2)
-        self.assertEqual(len(tasks), 2)
-        self.assertEqual(tasks[0].id, second_task.id)
-        self.assertEqual(tasks[1].id, first_task.id)
-
-    def test_get_tasks_filter_json_not_in(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="not_in",
-                    value=[first_p_item.data.get("name")],
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, second_task.id)
-
-    def test_get_tasks_filter_json_contains(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="contains",
-                    value=first_p_item.data.get("name")[0:10],
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, first_task.id)
-
-    def test_get_tasks_filter_json_starts_with(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="starts_with",
-                    value=first_p_item.data.get("name")[0:10],
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 1)
-        self.assertEqual(len(tasks), 1)
-        self.assertEqual(tasks[0].id, first_task.id)
-
-    def test_get_tasks_filter_jsonb_contains(self):
-        # Arrange
-        first_p_item = functions.create_p_item(
-            self.organisation.id,
-            0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"]),
-        )
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(
-            self.organisation.id,
-            0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"]),
-        )
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        third_p_item = functions.create_p_item(
-            self.organisation.id,
-            0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"]),
-        )
-        third_task = functions.create_task(third_p_item)
-        self.mock_ctx.datastores.run_store.create_task(third_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data",
-                    operator="@>",
-                    value=json.dumps({"categories": ["test-a"]}),
-                )
-            ],
-        )
-
-        # Act
-        tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)
-
-        # Assert
-        self.assertEqual(count, 2)
-        self.assertEqual(len(tasks), 2)
-        self.assertEqual(tasks[0].id, second_task.id)
-        self.assertEqual(tasks[1].id, first_task.id)
-
-    def test_get_tasks_filter_json_mismatch(self):
-        # Arrange
-        first_p_item = functions.create_p_item(self.organisation.id, 0)
-        first_task = functions.create_task(first_p_item)
-        self.mock_ctx.datastores.run_store.create_task(first_task)
-
-        second_p_item = functions.create_p_item(self.organisation.id, 0)
-        second_task = functions.create_task(second_p_item)
-        self.mock_ctx.datastores.run_store.create_task(second_task)
-
-        f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__id",
-                    operator="eq",
-                    value=False,
-                )
-            ],
-        )
-
-        # Act
-        with self.assertRaises(ValueError):
-            tasks, count = self.mock_ctx.datastores.run_store.get_tasks(filters=f_req)

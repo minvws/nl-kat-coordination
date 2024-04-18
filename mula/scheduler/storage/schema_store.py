@@ -84,3 +84,8 @@ class SchemaStore:
                 .filter(models.TaskSchemaDB.id == schema.id)
                 .update(schema.model_dump(exclude={"tasks"}))
             )
+
+    @retry()
+    def delete_schema(self, schema_id: str) -> None:
+        with self.dbconn.session.begin() as session:
+            session.query(models.TaskSchemaDB).filter(models.TaskSchemaDB.id == schema_id).delete()

@@ -63,11 +63,12 @@ def create_p_item(scheduler_id: str, priority: int, task: models.Task | None = N
     return p_item
 
 
-def create_schema(scheduler_id: str) -> models.TaskSchema:
-    data = TestModel(
-        id=uuid.uuid4().hex,
-        name=uuid.uuid4().hex,
-    )
+def create_schema(scheduler_id: str, data: Any | None = None) -> models.TaskSchema:
+    if data is None:
+        data = TestModel(
+            id=uuid.uuid4().hex,
+            name=uuid.uuid4().hex,
+        )
 
     return models.TaskSchema(
         scheduler_id=scheduler_id,
