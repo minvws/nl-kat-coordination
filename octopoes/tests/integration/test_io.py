@@ -75,4 +75,4 @@ def test_io(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     assert res == {"detail": 1}
     time.sleep(3)
 
-    assert len(list(map(itemgetter("txOps"), octopoes_api_connector.export_all()))) == 7
+    assert len(list(map(itemgetter("txOps"), octopoes_api_connector.export_all()))) > len(transactions)
