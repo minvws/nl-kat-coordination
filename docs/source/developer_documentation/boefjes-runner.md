@@ -1,4 +1,4 @@
-# Design for new boefjes runner
+# Design considerations for new boefjes runner
 
 The new boefjes runner will run boefjes in a containerized environment. This
 ensures isolation of code and dependencies, and allows for easy distribution
@@ -55,6 +55,8 @@ The essential metadata includes:
 Because stdin and stdout in container orchestrators are relatively complicated
 and work on a best-effort basis, this is not reliable enough for boefje input
 and output. Instead, we use a simple HTTP API for input and output.
+Also see the [Swagger API docs](http://localhost:8006/docs),
+where you can also find the full [json schema](http://localhost:8006/openapi.json).
 
 This HTTP API will be part of new boefjes runner and will communicate with
 existing parts of KAT such as bytes and mula (the scheduler) to get the boefje
