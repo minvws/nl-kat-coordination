@@ -71,6 +71,7 @@ class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportVi
     """
 
     template_name = "generate_report/select_oois.html"
+    breadcrumbs_step = 3
     current_step = 3
     ooi_types = get_ooi_types_with_report()
 
@@ -88,6 +89,7 @@ class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, Base
     """
 
     template_name = "generate_report/select_report_types.html"
+    breadcrumbs_step = 4
     current_step = 4
 
     def get(self, request, *args, **kwargs):
@@ -111,6 +113,7 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
     """
 
     template_name = "generate_report/setup_scan.html"
+    breadcrumbs_step = 5
     current_step = 5
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:

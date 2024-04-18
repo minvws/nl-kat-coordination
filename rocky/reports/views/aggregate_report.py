@@ -71,6 +71,7 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOILis
     """
 
     template_name = "aggregate_report/select_oois.html"
+    breadcrumbs_step = 3
     current_step = 3
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
@@ -88,6 +89,7 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Ba
     """
 
     template_name = "aggregate_report/select_report_types.html"
+    breadcrumbs_step = 4
     current_step = 4
 
     def setup(self, request, *args, **kwargs):
@@ -120,6 +122,7 @@ class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportVie
     """
 
     template_name = "aggregate_report/setup_scan.html"
+    breadcrumbs_step = 5
     current_step = 5
 
     def get(self, request, *args, **kwargs):
