@@ -82,8 +82,6 @@ class OOISelectionAggregateReportView(
         context = super().get_context_data(**kwargs)
         context.update(self.get_ooi_filter_forms(self.ooi_types))
         context["channel"] = "aggregate_report"
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 
@@ -120,8 +118,6 @@ class ReportTypesSelectionAggregateReportView(
         context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
             self.available_report_types["optional"]
         )
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 
@@ -150,8 +146,6 @@ class SetupScanAggregateReportView(
         context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
             get_plugins_for_report_ids(self.selected_report_types)
         )
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 

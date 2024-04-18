@@ -74,6 +74,8 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         context["breadcrumbs"] = self.get_current()
         context["next"] = self.get_next()
         context["previous"] = self.get_previous()
+        context["steps"] = self.build_steps()
+        context["current_step"] = self.get_current_step()
         return context
 
 
