@@ -58,7 +58,7 @@ class LandingMultiReportView(BreadcrumbsMultiReportView, BaseReportView):
 
 
 class OOISelectionMultiReportView(
-    BreadcrumbsMultiReportView, BaseReportView, BaseOOIListView, KatMultiReportStepsMixin
+    KatMultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, BaseOOIListView
 ):
     """
     Select OOIs for the 'Multi Report' flow.
@@ -76,7 +76,7 @@ class OOISelectionMultiReportView(
 
 
 class ReportTypesSelectionMultiReportView(
-    BreadcrumbsMultiReportView, BaseReportView, TemplateView, KatMultiReportStepsMixin
+    KatMultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -99,7 +99,7 @@ class ReportTypesSelectionMultiReportView(
         return context
 
 
-class SetupScanMultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView, KatMultiReportStepsMixin):
+class SetupScanMultiReportView(KatMultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, TemplateView):
     """
     Show required and optional plugins to start scans to multi OOIs to include in report.
     """

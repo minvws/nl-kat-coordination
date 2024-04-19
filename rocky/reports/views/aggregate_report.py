@@ -67,7 +67,7 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
 
 
 class OOISelectionAggregateReportView(
-    BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView, KatAggregateReportStepsMixin
+    KatAggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView
 ):
     """
     Select Objects for the 'Aggregate Report' flow.
@@ -86,7 +86,7 @@ class OOISelectionAggregateReportView(
 
 
 class ReportTypesSelectionAggregateReportView(
-    BreadcrumbsAggregateReportView, BaseReportView, TemplateView, KatAggregateReportStepsMixin
+    KatAggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -122,7 +122,7 @@ class ReportTypesSelectionAggregateReportView(
 
 
 class SetupScanAggregateReportView(
-    BreadcrumbsAggregateReportView, BaseReportView, TemplateView, KatAggregateReportStepsMixin
+    KatAggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.

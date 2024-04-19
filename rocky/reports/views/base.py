@@ -74,8 +74,6 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         context["breadcrumbs"] = self.get_current()
         context["next"] = self.get_next()
         context["previous"] = self.get_previous()
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 
@@ -175,8 +173,6 @@ class BaseReportView(OOIFilterView):
         context["selected_report_types"] = self.selected_report_types
         context["plugins"] = self.plugins
         context["oois"] = self.get_oois()
-        context["steps"] = self.build_steps()
-        context["current_step"] = self.get_current_step()
         return context
 
 

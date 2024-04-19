@@ -67,7 +67,7 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
 
 
 class OOISelectionGenerateReportView(
-    KatGenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView,
+    KatGenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView
 ):
     """
     Select objects for the 'Generate Report' flow.
@@ -86,7 +86,7 @@ class OOISelectionGenerateReportView(
 
 
 class ReportTypesSelectionGenerateReportView(
-    BreadcrumbsGenerateReportView, BaseReportView, TemplateView, KatGenerateReportStepsMixin
+    KatGenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -113,7 +113,7 @@ class ReportTypesSelectionGenerateReportView(
 
 
 class SetupScanGenerateReportView(
-    BreadcrumbsGenerateReportView, BaseReportView, TemplateView, KatGenerateReportStepsMixin
+    KatGenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
