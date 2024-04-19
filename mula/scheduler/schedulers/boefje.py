@@ -653,7 +653,7 @@ class BoefjeScheduler(Scheduler):
                     caller=caller,
                 )
                 return
-        except Exception as exc_queue:
+        except Exception:
             self.logger.warning(
                 "Could not check if task is running: %s",
                 task.id,
@@ -661,7 +661,7 @@ class BoefjeScheduler(Scheduler):
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
-                exc_info=exc_queue,
+                exc_info=True,
             )
             return
 
