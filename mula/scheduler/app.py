@@ -84,7 +84,7 @@ class App:
             self.logger.error("Failed to get organisations from Katalogus", exc_info=True)
             return
 
-        katalogus_orgs: set[str] = {org.id for org in orgs}
+        katalogus_orgs = {org.id for org in orgs}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
         self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
