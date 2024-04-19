@@ -288,13 +288,13 @@ class BoefjeScheduler(Scheduler):
                 n=self.ctx.config.pq_max_random_objects,
                 scan_level=[1, 2, 3, 4],
             )
-        except ExternalServiceError as exc:
+        except ExternalServiceError:
             self.logger.error(
                 "Could not get random oois for organisation: %s from octopoes",
                 self.organisation.name,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
-                exc_info=exc,
+                exc_info=True,
             )
             return
 
