@@ -36,7 +36,7 @@ censys = "2.1.8"
 # required by kat_dicom boefje
 pynetdicom = "2.0.2"
 # required by kat_dns, kat_dns_zone boefjes
-dnspython = "2.1.0"
+dnspython = "^2.6.1"
 # required by kat_fierce
 tldextract = "^3.4.4"
 # required by kat_log4shell boefje, kat_webpage_analysis/find_images_in_html normalizer
