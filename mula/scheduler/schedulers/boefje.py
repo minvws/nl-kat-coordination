@@ -645,7 +645,7 @@ class BoefjeScheduler(Scheduler):
         try:
             if self.is_item_on_queue_by_hash(task.hash):
                 self.logger.debug(
-                    "Task is already on queue: %s",
+                    'Task "%s" is already enqueued',
                     task.id,
                     task_id=task.id,
                     organisation_id=self.organisation.id,
