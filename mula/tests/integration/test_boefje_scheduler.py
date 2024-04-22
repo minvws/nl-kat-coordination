@@ -709,6 +709,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.FAILED)
 
+        breakpoint()
         # Assert: new task should be queued
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -1155,25 +1156,13 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
             value=ooi,
         ).model_dump_json()
 
-        mutation2 = models.ScanProfileMutation(
-            operation=models.MutationOperationType.CREATE,
-            primary_key=ooi.primary_key,
-            value=ooi,
-        ).model_dump_json()
-
-        models.ScanProfileMutation(
-            operation=models.MutationOperationType.CREATE,
-            primary_key=ooi.primary_key,
-            value=ooi,
-        ).model_dump_json()
-
         # Mocks
         self.mock_get_boefjes_for_ooi.return_value = [boefje]
 
         # Act
         self.scheduler.push_tasks_for_scan_profile_mutations(mutation1)
 
-        # Assert
+        # Assert: task should be on priority queue
         p_item = self.scheduler.queue.peek(0)
         task_pq = models.BoefjeTask(**p_item.data)
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -1181,7 +1170,6 @@ class ScanProfileMutationTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(boefje.id, task_pq.boefje.id)
 
         # Arrange
-        ooi.scan_profile.level = 1
         mutation2 = models.ScanProfileMutation(
             operation=models.MutationOperationType.DELETE,
             primary_key=ooi.primary_key,

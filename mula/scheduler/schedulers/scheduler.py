@@ -193,6 +193,7 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The PrioritizedItem to push to the queue.
         """
+        breakpoint()
         if not self.is_enabled():
             self.logger.warning(
                 "Scheduler is disabled, not pushing item to queue %s",
@@ -204,7 +205,7 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
-            p_item.status = models.PrioritizedItemStatus.QUEUED
+            p_item.status = models.PrioritizedItemStatus.QUEUED.value
             p_item = self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
             self.logger.warning(

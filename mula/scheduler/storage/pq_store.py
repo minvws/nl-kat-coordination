@@ -47,6 +47,7 @@ class PriorityQueueStore:
             item_orm = (
                 session.query(models.TaskDB)
                 .filter(models.TaskDB.scheduler_id == scheduler_id)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
                 .order_by(models.TaskDB.priority.asc())
                 .order_by(models.TaskDB.created_at.asc())
                 .offset(index)

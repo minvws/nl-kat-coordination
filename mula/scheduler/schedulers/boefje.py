@@ -172,15 +172,7 @@ class BoefjeScheduler(Scheduler):
             # Delete all items for this ooi, update all tasks for this ooi
             # to cancelled.
             for item in items:
-                self.ctx.datastores.pq_store.remove(
-                    scheduler_id=self.scheduler_id,
-                    item_id=item.id,
-                )
-
-                if item.hash is None:
-                    continue
-
-                task = self.ctx.datastores.task_store.get_latest_task_by_hash(item.hash)
+                task = self.ctx.datastores.task_store.get_task(item.id)
                 if task is None:
                     continue
 
@@ -665,9 +657,9 @@ class BoefjeScheduler(Scheduler):
                 )
 
                 # Update task in datastore to be failed
-                task_run_db = self.ctx.datastores.task_run_store.get_latest_task_by_hash(boefje_task.hash)
-                task_run_db.status = TaskStatus.FAILED
-                self.ctx.datastores.task_store.update_task(task_run_db)
+                task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
+                task_db.status = TaskStatus.FAILED
+                self.ctx.datastores.task_store.update_task(task_db)
         except Exception as exc_stalled:
             self.logger.warning(
                 "Could not check if task is stalled: %s",
