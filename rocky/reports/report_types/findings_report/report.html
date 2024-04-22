@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load ooi_extra %}
 
 {% if show_introduction %}
     <p>
@@ -56,7 +57,7 @@
                                 <ul class="accordion break-title">
                                     {% for occurrence in info.occurrences %}
                                         <li>
-                                            <button aria-expanded="false">{{ occurrence.finding.ooi.human_readable }}</button>
+                                            <button aria-expanded="false">{{ occurrence.finding.ooi|human_readable }}</button>
                                             <div aria-labelledby="finding-details">
                                                 <h5>{% translate "First seen" %}</h5>
                                                 <p>{{ occurrence.first_seen }}</p>
