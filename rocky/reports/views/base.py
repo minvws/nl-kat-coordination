@@ -1,4 +1,3 @@
-import json
 from collections.abc import Iterable, Sequence
 from datetime import datetime
 from logging import getLogger
@@ -15,6 +14,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
+from pydantic import RootModel, TypeAdapter
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI, Reference
@@ -186,6 +186,13 @@ class ReportsLandingView(ReportBreadcrumbs, TemplateView):
         return redirect(reverse("report_history", kwargs=self.get_kwargs()))
 
 
+class ReportDataDict(RootModel):
+    root: Any
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
 class ViewReportView(BaseReportView, TemplateView):
     template_name = "generate_report.html"
 
@@ -208,7 +215,9 @@ class ViewReportView(BaseReportView, TemplateView):
         self.bytes_client.login()
         report_data: dict = {report_ooi.report_type: {}}
         report_data[report_ooi.report_type][report_ooi.input_ooi] = {
-            "data": json.loads(self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)),
+            "data": TypeAdapter(any, config={"arbitrary_types_allowed": True}).validate_json(
+                self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)
+            ),
             "template": report_ooi.template,
             "ooi_human_readable": report_ooi.input_ooi.human_readable,
         }
