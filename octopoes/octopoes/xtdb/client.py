@@ -3,6 +3,7 @@ import logging
 from collections.abc import Callable
 from datetime import datetime, timezone
 from enum import Enum
+from json import JSONDecodeError
 from typing import Any
 
 import httpx
@@ -59,17 +60,12 @@ class XTDBHTTPClient:
         try:
             response.raise_for_status()
         except HTTPStatusError as e:
-            logger.error(e.response.status_code)
-            if e.response.status_code != codes.NOT_FOUND:
-                logger.error(response.request.url)
-                logger.error(response.request.content)
-                logger.error(response.text)
-                raise e
-            else:
+            try:
                 if response.json()["error"] == "Node not found":
                     raise NodeNotFound() from e
-                else:
-                    raise e
+            except (KeyError, JSONDecodeError):
+                pass
+            raise e
 
     def client_url(self) -> str:
         return f"/{self._client}"

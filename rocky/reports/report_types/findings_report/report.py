@@ -5,8 +5,7 @@ from typing import Any
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
+from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.types import ALL_TYPES
 from reports.report_types.definitions import Report, ReportPlugins
 
@@ -24,17 +23,13 @@ class FindingsReport(Report):
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
 
-    def get_finding_valid_time_history(self, reference: Reference) -> list[datetime]:
-        transaction_record = self.octopoes_api_connector.get_history(reference=reference)
-        valid_time_history = [transaction.valid_time for transaction in transaction_record]
-        return valid_time_history
-
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         reference = Reference.from_str(input_ooi)
         findings = []
         finding_types: dict[str, Any] = {}
         total_by_severity = {}
         total_by_severity_per_finding_type = {}
+        history_cache = {}
 
         for severity in SEVERITY_OPTIONS:
             total_by_severity[severity] = 0
@@ -44,33 +39,38 @@ class FindingsReport(Report):
             reference, depth=TREE_DEPTH, types={Finding}, valid_time=valid_time
         ).store
 
-        for ooi in tree.values():
-            if ooi.ooi_type == "Finding":
-                findings.append(ooi)
+        findings = [ooi for ooi in tree.values() if ooi.ooi_type == "Finding"]
+        all_finding_types = self.octopoes_api_connector.list_objects(types={FindingType}, valid_time=valid_time).items
 
         for finding in findings:
             try:
-                finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
-                severity = finding_type.risk_severity.name.lower()
-                total_by_severity[severity] += 1
+                finding_type = next(filter(lambda x: x.id == finding.finding_type.tokenized.id, all_finding_types))
+            except StopIteration:
+                continue
 
-                time_history = self.get_finding_valid_time_history(finding.reference)
+            if finding_type.risk_severity is None:
+                continue
 
-                if time_history:
-                    first_seen = str(time_history[0])
-                else:
-                    first_seen = "-"
+            severity = finding_type.risk_severity.name.lower()
+            total_by_severity[severity] += 1
 
-                finding_dict = {"finding": finding, "first_seen": first_seen}
+            if finding.reference not in history_cache:
+                history_cache[finding.reference] = self.octopoes_api_connector.get_history(reference=reference)
 
-                if finding_type.id in finding_types:
-                    finding_types[finding_type.id]["occurrences"].append(finding_dict)
-                else:
-                    finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding_dict]}
-                    total_by_severity_per_finding_type[severity] += 1
+            time_history = [transaction.valid_time for transaction in history_cache[finding.reference]]
 
-            except ObjectNotFoundException:
-                logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
+            if time_history:
+                first_seen = str(time_history[0])
+            else:
+                first_seen = "-"
+
+            finding_dict = {"finding": finding, "first_seen": first_seen}
+
+            if finding_type.id in finding_types:
+                finding_types[finding_type.id]["occurrences"].append(finding_dict)
+            else:
+                finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding_dict]}
+                total_by_severity_per_finding_type[severity] += 1
 
         sorted_finding_types: list[Any] = sorted(
             finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True

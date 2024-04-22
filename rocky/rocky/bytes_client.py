@@ -106,7 +106,7 @@ class BytesClient:
             "/bytes/raw",
             content=raw,
             headers={"content-type": "application/octet-stream"},
-            params={"mime_types": mime_types, "boefje_meta_id": str(boefje_meta_id)},
+            params={"mime_types": list(mime_types), "boefje_meta_id": str(boefje_meta_id)},
         )
 
         response.raise_for_status()
