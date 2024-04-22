@@ -289,12 +289,11 @@ class BoefjeScheduler(Scheduler):
                 scan_level=[1, 2, 3, 4],
             )
         except ExternalServiceError:
-            self.logger.error(
+            self.logger.exception(
                 "Could not get random oois for organisation: %s from octopoes",
                 self.organisation.name,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
-                exc_info=True,
             )
             return
 

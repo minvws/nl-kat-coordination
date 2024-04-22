@@ -81,7 +81,7 @@ class App:
         try:
             orgs = self.ctx.services.katalogus.get_organisations()
         except ExternalServiceError:
-            self.logger.error("Failed to get organisations from Katalogus", exc_info=True)
+            self.logger.exception("Failed to get organisations from Katalogus")
             return
 
         katalogus_orgs = {org.id for org in orgs}
