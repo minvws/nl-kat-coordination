@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 from time import sleep
 
 from django import forms
-from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -109,13 +108,6 @@ class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin
         super().setup(request, *args, **kwargs)
         self.ooi = self.get_ooi()
 
-    def post(self, request, *args, **kwargs):
-        if not self.indemnification_present:
-            messages.add_message(
-                request, messages.ERROR, f"Indemnification not present at organization {self.organization}."
-            )
-        return super().post(request, *args, **kwargs)
-
     def get_current_ooi(self) -> OOI | None:
         # self.ooi is already the current state of the OOI
         now = datetime.now(timezone.utc)
@@ -188,7 +180,12 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         # Transform into OOI
         try:
             new_ooi = self.ooi_class.parse_obj(form.cleaned_data)
-            create_ooi(self.octopoes_api_connector, self.bytes_client, new_ooi, datetime.now(timezone.utc))
+            create_ooi(
+                self.octopoes_api_connector,
+                self.bytes_client,
+                new_ooi,
+                datetime.now(timezone.utc),
+            )
             sleep(1)
             return redirect(self.get_ooi_success_url(new_ooi))
         except ValidationError as exception:

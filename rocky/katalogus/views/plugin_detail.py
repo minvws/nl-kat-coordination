@@ -30,10 +30,72 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
     paginate_by = 10
     context_object_name = "task_history"
 
+    def post(self, request, *args, **kwargs):
+        if self.action == self.START_SCAN:
+            boefje_id = request.POST.get("boefje_id")
+            boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
+            ooi_id = request.GET.get("ooi_id")
+            ooi = self.get_single_ooi(pk=ooi_id)
+            self.run_boefje_for_oois(boefje, [ooi])
+
+        if self.action == self.SCAN_OOIS:
+            selected_oois = request.POST.getlist("ooi", [])
+
+            if selected_oois and self.plugin.id:
+                oois = self.get_oois(selected_oois)
+                boefje = self.katalogus_client.get_plugin(self.plugin.id)
+
+                oois_with_clearance_level = oois["oois_with_clearance"]
+                oois_without_clearance_level = oois["oois_without_clearance"]
+
+                if oois_with_clearance_level:
+                    self.run_boefje_for_oois(
+                        boefje=boefje,
+                        oois=oois_with_clearance_level,
+                    )
+
+                if oois_without_clearance_level:
+                    if not self.organization_member.has_perm("tools.can_set_clearance_level"):
+                        messages.error(
+                            request,
+                            _(
+                                "Some selected OOIs needs an increase of clearance level to perform scans."
+                                " You do not have the permission to change clearance level."
+                            ),
+                        )
+                    else:
+                        request.session["selected_oois"] = oois_without_clearance_level
+                        return redirect(
+                            reverse(
+                                "change_clearance_level",
+                                kwargs={
+                                    "plugin_type": "boefje",
+                                    "organization_code": self.organization.code,
+                                    "plugin_id": self.plugin.id,
+                                    "scan_level": self.plugin.scan_level.value,
+                                },
+                            )
+                        )
+        return super().post(request, *args, **kwargs)
+
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
         filters["plugin_id"] = self.plugin.id  # fetch only tasks for a specific plugin by id
         return filters
+
+    def get_oois(self, selected_oois: list[str]) -> dict[str, Any]:
+        oois_with_clearance = []
+        oois_without_clearance = []
+        for ooi in selected_oois:
+            ooi_object = self.get_single_ooi(pk=ooi)
+            if ooi_object.scan_profile and ooi_object.scan_profile.level >= self.plugin.scan_level.value:
+                oois_with_clearance.append(ooi_object)
+            else:
+                oois_without_clearance.append(ooi_object.primary_key)
+        return {
+            "oois_with_clearance": oois_with_clearance,
+            "oois_without_clearance": oois_without_clearance,
+        }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,13 +142,15 @@ class BoefjeDetailView(PluginDetailView):
         context["select_ooi_filter_form"] = SelectOOIFilterForm
         if "show_all" in self.request.GET:
             context["select_oois_form"] = SelectOOIForm(
-                oois=self.get_form_consumable_oois(), organization_code=self.organization.code
+                oois=self.get_form_consumable_oois(),
+                organization_code=self.organization.code,
             )
         else:
             context["select_oois_form"] = SelectOOIForm(
-                oois=self.get_form_filtered_consumable_oois(), organization_code=self.organization.code
+                oois=self.get_form_filtered_consumable_oois(),
+                organization_code=self.organization.code,
             )
-        context["plugin"] = self.plugin.model_dump()
+
         context["breadcrumbs"] = [
             {
                 "url": reverse("katalogus", kwargs={"organization_code": self.organization.code}),
@@ -106,79 +170,15 @@ class BoefjeDetailView(PluginDetailView):
 
         return context
 
-    def post(self, request, *args, **kwargs):
-        """Start scanning oois at plugin detail page."""
-        if not self.indemnification_present:
-            return self.get(request, *args, **kwargs)
-
-        if "boefje_id" not in request.POST:
-            messages.error(request, _("No boefje_id provided"))
-            return self.get(request, *args, **kwargs)
-
-        selected_oois = request.POST.getlist("ooi")
-        plugin_id = request.POST["boefje_id"]
-        if selected_oois and plugin_id:
-            oois = self.get_oois(selected_oois)
-            boefje = self.katalogus_client.get_plugin(plugin_id)
-
-            oois_with_clearance_level = oois["oois_with_clearance"]
-            oois_without_clearance_level = oois["oois_without_clearance"]
-
-            if oois_with_clearance_level:
-                self.run_boefje_for_oois(
-                    boefje=boefje,
-                    oois=oois_with_clearance_level,
-                )
-
-            if oois_without_clearance_level:
-                if not self.organization_member.has_perm("tools.can_set_clearance_level"):
-                    messages.add_message(
-                        self.request,
-                        messages.ERROR,
-                        _(
-                            "Some selected OOIs needs an increase of clearance level to perform scans."
-                            " You do not have the permission to change clearance level."
-                        ),
-                    )
-                else:
-                    request.session["selected_oois"] = oois_without_clearance_level
-                    return redirect(
-                        reverse(
-                            "change_clearance_level",
-                            kwargs={
-                                "plugin_type": "boefje",
-                                "organization_code": self.organization.code,
-                                "plugin_id": plugin_id,
-                                "scan_level": self.plugin.scan_level.value,
-                            },
-                        )
-                    )
-            return redirect(reverse("task_list", kwargs={"organization_code": self.organization.code}))
-
-        messages.add_message(self.request, messages.ERROR, _("Please select an OOI to start scan."))
-        return self.get(request, *args, **kwargs)
-
     def get_form_consumable_oois(self):
         """Get all available OOIS that plugin can consume."""
         return self.octopoes_api_connector.list_objects(
-            self.plugin.consumes, valid_time=datetime.now(timezone.utc), limit=self.limit_ooi_list
+            self.plugin.consumes,
+            valid_time=datetime.now(timezone.utc),
+            limit=self.limit_ooi_list,
         ).items
 
     def get_form_filtered_consumable_oois(self):
         """Return a list of oois that is filtered for oois that meets clearance level."""
         oois = self.get_form_consumable_oois()
         return [ooi for ooi in oois if ooi.scan_profile.level >= self.plugin.scan_level.value]
-
-    def get_oois(self, selected_oois: list[str]) -> dict[str, Any]:
-        oois_with_clearance = []
-        oois_without_clearance = []
-        for ooi in selected_oois:
-            ooi_object = self.get_single_ooi(pk=ooi)
-            if ooi_object.scan_profile and ooi_object.scan_profile.level >= self.plugin.scan_level.value:
-                oois_with_clearance.append(ooi_object)
-            else:
-                oois_without_clearance.append(ooi_object.primary_key)
-        return {
-            "oois_with_clearance": oois_with_clearance,
-            "oois_without_clearance": oois_without_clearance,
-        }

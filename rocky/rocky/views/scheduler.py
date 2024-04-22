@@ -1,9 +1,7 @@
 from datetime import datetime
-from typing import Any
 
 from django.contrib import messages
-from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import redirect
+from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
 
@@ -37,13 +35,6 @@ class SchedulerView(OctopoesView):
         super().setup(request, *args, **kwargs)
         self.scheduler_client = scheduler_client(self.organization.code)
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        try:
-            return super().get(request, *args, **kwargs)
-        except (SchedulerValidationError, SchedulerError) as error:
-            messages.error(self.request, error.message)
-            return redirect("health_beautified", organization_code=self.organization.code)
-
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         return {
             "scheduler_id": f"{self.task_type}-{self.organization.code}",
@@ -70,7 +61,8 @@ class SchedulerView(OctopoesView):
     def get_output_oois(self, task):
         try:
             return self.octopoes_api_connector.list_origins(
-                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at, task_id=task.id
+                valid_time=task.p_item.data.raw_data.boefje_meta.ended_at,
+                task_id=task.id,
             )[0].result
         except IndexError:
             return []

@@ -1,6 +1,10 @@
+import json
 from collections import defaultdict
 from datetime import datetime
 
+from django.contrib import messages
+from django.utils.translation import gettext_lazy as _
+from jsonschema.validators import Draft202012Validator
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.ooi_helpers import format_display
@@ -12,9 +16,40 @@ from rocky.views.ooi_view import BaseOOIDetailView
 from rocky.views.tasks import TaskListView
 
 
-class OOIDetailView(BaseOOIDetailView, OOIRelatedObjectAddView, OOIFindingManager, TaskListView):
+class OOIDetailView(
+    BaseOOIDetailView,
+    OOIRelatedObjectAddView,
+    OOIFindingManager,
+    TaskListView,
+):
     template_name = "oois/ooi_detail.html"
     context_object_name = "task_history"
+
+    def post(self, request, *args, **kwargs):
+        if self.action == self.SUBMIT_ANSWER:
+            if not isinstance(self.ooi, Question):
+                messages.error(self.request, _("Only Question OOIs can be answered."))
+
+            schema_answer = self.request.POST.get("schema", "")
+            parsed_schema_answer = json.loads(schema_answer)
+            validator = Draft202012Validator(json.loads(self.ooi.json_schema))
+
+            if not validator.is_valid(parsed_schema_answer):
+                for error in validator.iter_errors(parsed_schema_answer):
+                    messages.error(self.request, error.message)
+
+            self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
+            messages.success(self.request, _("Question has been answered."))
+
+        if self.action == self.CHANGE_CLEARANCE_LEVEL and self.indemnification_present:
+            clearance_level = int(request.POST.get("level"))
+            self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+        else:
+            messages.error(
+                request,
+                f"Indemnification not present at organization {self.organization}.",
+            )
+        return self.get(request, *args, **kwargs)
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
