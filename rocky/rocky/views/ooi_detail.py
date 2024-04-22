@@ -5,6 +5,7 @@ from datetime import datetime
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from jsonschema.validators import Draft202012Validator
+from katalogus.client import get_katalogus
 from katalogus.utils import get_enabled_boefjes_for_ooi_class
 from tools.forms.ooi import PossibleBoefjesFilterForm
 from tools.ooi_helpers import format_display
@@ -41,15 +42,23 @@ class OOIDetailView(
             self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
             messages.success(self.request, _("Question has been answered."))
 
-        if self.action == self.CHANGE_CLEARANCE_LEVEL and self.indemnification_present:
-            clearance_level = int(request.POST.get("level"))
-            self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
-        else:
-            messages.error(
-                request,
-                f"Indemnification not present at organization {self.organization}.",
-            )
-        return self.get(request, *args, **kwargs)
+        if self.action == self.CHANGE_CLEARANCE_LEVEL:
+            if not self.indemnification_present:
+                messages.error(
+                    request,
+                    f"Indemnification not present at organization {self.organization}.",
+                )
+            else:
+                clearance_level = int(request.POST.get("level"))
+                self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+
+        if self.action == self.START_SCAN:
+            boefje_id = request.POST.get("boefje_id")
+            boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
+            ooi_id = request.GET.get("ooi_id")
+            ooi = self.get_single_ooi(pk=ooi_id)
+            self.run_boefje_for_oois(boefje, [ooi])
+        return super().post(request, *args, **kwargs)
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()

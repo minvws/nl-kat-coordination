@@ -31,13 +31,6 @@ class PluginDetailView(TaskListView, PluginSettingsListView):
     context_object_name = "task_history"
 
     def post(self, request, *args, **kwargs):
-        if self.action == self.START_SCAN:
-            boefje_id = request.POST.get("boefje_id")
-            boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
-            ooi_id = request.GET.get("ooi_id")
-            ooi = self.get_single_ooi(pk=ooi_id)
-            self.run_boefje_for_oois(boefje, [ooi])
-
         if self.action == self.SCAN_OOIS:
             selected_oois = request.POST.getlist("ooi", [])
 
