@@ -2,7 +2,7 @@ services:
 
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     ports:
       - "127.0.0.1:29003:15672"
       - "127.0.0.1:29004:5672"
@@ -65,7 +65,7 @@ services:
         hard: 262144
 
   katalogus_mock:
-    image: "wiremock/wiremock:2.34.0"
+    image: "docker.io/library/wiremock/wiremock:2.34.0"
     volumes:
       - ./.ci/wiremock:/home/wiremock
     ports:
