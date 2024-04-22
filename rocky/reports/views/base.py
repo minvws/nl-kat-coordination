@@ -215,7 +215,7 @@ class ViewReportView(BaseReportView, TemplateView):
         self.bytes_client.login()
         report_data: dict = {report_ooi.report_type: {}}
         report_data[report_ooi.report_type][report_ooi.input_ooi] = {
-            "data": TypeAdapter(any, config={"arbitrary_types_allowed": True}).validate_json(
+            "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
                 self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)
             ),
             "template": report_ooi.template,
