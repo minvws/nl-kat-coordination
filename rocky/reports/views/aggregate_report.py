@@ -20,7 +20,7 @@ from reports.report_types.helpers import (
 )
 from reports.utils import JSONEncoder, debug_json_keys
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
-from reports.views.view_helpers import KatAggregateReportStepsMixin
+from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -67,7 +67,7 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
 
 
 class OOISelectionAggregateReportView(
-    KatAggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView
 ):
     """
     Select Objects for the 'Aggregate Report' flow.
@@ -86,7 +86,7 @@ class OOISelectionAggregateReportView(
 
 
 class ReportTypesSelectionAggregateReportView(
-    KatAggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -122,7 +122,7 @@ class ReportTypesSelectionAggregateReportView(
 
 
 class SetupScanAggregateReportView(
-    KatAggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.

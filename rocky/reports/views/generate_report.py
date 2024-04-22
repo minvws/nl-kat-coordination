@@ -20,7 +20,7 @@ from reports.report_types.helpers import (
     get_report_types_for_oois,
 )
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
-from reports.views.view_helpers import KatGenerateReportStepsMixin
+from reports.views.view_helpers import GenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -67,7 +67,7 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
 
 
 class OOISelectionGenerateReportView(
-    KatGenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView
 ):
     """
     Select objects for the 'Generate Report' flow.
@@ -86,7 +86,7 @@ class OOISelectionGenerateReportView(
 
 
 class ReportTypesSelectionGenerateReportView(
-    KatGenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -113,7 +113,7 @@ class ReportTypesSelectionGenerateReportView(
 
 
 class SetupScanGenerateReportView(
-    KatGenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.

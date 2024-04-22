@@ -6,7 +6,7 @@ from tools.view_helpers import StepsMixin
 from reports.views.base import get_selection
 
 
-class KatGenerateReportStepsMixin(StepsMixin):
+class GenerateReportStepsMixin(StepsMixin):
     organization: Organization
 
     def build_steps(self):
@@ -33,7 +33,7 @@ class KatGenerateReportStepsMixin(StepsMixin):
         return steps
 
 
-class KatAggregateReportStepsMixin(StepsMixin):
+class AggregateReportStepsMixin(StepsMixin):
     organization: Organization
 
     def build_steps(self):
@@ -62,7 +62,7 @@ class KatAggregateReportStepsMixin(StepsMixin):
         return steps
 
 
-class KatMultiReportStepsMixin(StepsMixin):
+class MultiReportStepsMixin(StepsMixin):
     organization: Organization
 
     def build_steps(self, **kwargs):

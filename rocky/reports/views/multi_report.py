@@ -11,7 +11,7 @@ from tools.view_helpers import url_with_querystring
 
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
-from reports.views.view_helpers import KatMultiReportStepsMixin
+from reports.views.view_helpers import MultiReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -57,9 +57,7 @@ class LandingMultiReportView(BreadcrumbsMultiReportView, BaseReportView):
         )
 
 
-class OOISelectionMultiReportView(
-    KatMultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, BaseOOIListView
-):
+class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, BaseOOIListView):
     """
     Select OOIs for the 'Multi Report' flow.
     """
@@ -76,7 +74,7 @@ class OOISelectionMultiReportView(
 
 
 class ReportTypesSelectionMultiReportView(
-    KatMultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, TemplateView
+    MultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -99,7 +97,7 @@ class ReportTypesSelectionMultiReportView(
         return context
 
 
-class SetupScanMultiReportView(KatMultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, TemplateView):
+class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, TemplateView):
     """
     Show required and optional plugins to start scans to multi OOIs to include in report.
     """
