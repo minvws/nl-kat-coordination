@@ -6,7 +6,10 @@ from typing import Any
 
 import httpx
 
-from scheduler.connectors.errors import ExternalServiceHTTPStatusError, exception_handler
+from scheduler.connectors.errors import (
+    ExternalServiceHTTPStatusError,
+    exception_handler,
+)
 from scheduler.models import BoefjeMeta
 
 from .services import HTTPService
@@ -64,7 +67,6 @@ class Bytes(HTTPService):
         super().__init__(host, source, timeout, pool_connections)
 
     def login(self) -> None:
-        self.logger.info("Logging in to Bytes API.")
         with self.lock:
             self.headers.update({"Authorization": f"bearer {self.get_token()}"})
 
@@ -85,7 +87,9 @@ class Bytes(HTTPService):
 
     @retry_with_login
     @exception_handler
-    def get_last_run_boefje(self, boefje_id: str, input_ooi: str, organization_id: str) -> BoefjeMeta | None:
+    def get_last_run_boefje(
+        self, boefje_id: str, input_ooi: str, organization_id: str
+    ) -> BoefjeMeta | None:
         url = f"{self.host}/bytes/boefje_meta"
         response = self.get(
             url=url,
@@ -107,7 +111,9 @@ class Bytes(HTTPService):
 
     @retry_with_login
     @exception_handler
-    def get_last_run_boefje_by_organisation_id(self, organization_id: str) -> BoefjeMeta | None:
+    def get_last_run_boefje_by_organisation_id(
+        self, organization_id: str
+    ) -> BoefjeMeta | None:
         url = f"{self.host}/bytes/boefje_meta"
         response = self.get(
             url=url,
