@@ -1,0 +1,7 @@
+.plugin-enabled {
+  display: hidden;
+}
+
+.display-toggle[checked] ~ .plugin-enabled {
+  display: block; // or inline-block or flex or whatever is applicible TBD
+}

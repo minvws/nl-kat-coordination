@@ -29,6 +29,13 @@
                 </div>
             {% endif %}
             <h3>{% translate "Suggested plugins" %}</h3>
+            <form action="" class="inline">
+                <input type="checkbox"
+                       class="display-toggle"
+                       checked
+                       id="checkbox-for-enabled-plugins">
+                <label for="checkbox-for-enabled-plugins">Show enabled plugins</label>
+            </form>
             <p>
                 {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
             </p>
