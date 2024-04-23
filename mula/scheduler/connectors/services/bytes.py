@@ -5,9 +5,8 @@ from functools import wraps
 from typing import Any
 
 import httpx
-from httpx import HTTPStatusError
 
-from scheduler.connectors.errors import exception_handler
+from scheduler.connectors.errors import ExternalServiceHTTPStatusError, exception_handler
 from scheduler.models import BoefjeMeta
 
 from .services import HTTPService
@@ -20,12 +19,14 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     def wrapper(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
-        except HTTPStatusError as error:
+        except ExternalServiceHTTPStatusError as error:
             if error.response.status_code != 401:
                 raise
 
             self.login()
             return function(self, *args, **kwargs)
+        except Exception as exc:
+            raise exc
 
     return typing.cast(ClientSessionMethod, wrapper)
 
@@ -35,7 +36,15 @@ class Bytes(HTTPService):
 
     name = "bytes"
 
-    def __init__(self, host: str, source: str, user: str, password: str, timeout: int, pool_connections: int):
+    def __init__(
+        self,
+        host: str,
+        source: str,
+        user: str,
+        password: str,
+        timeout: int,
+        pool_connections: int,
+    ):
         """Initialize the Bytes service.
 
         Args:
@@ -55,6 +64,7 @@ class Bytes(HTTPService):
         super().__init__(host, source, timeout, pool_connections)
 
     def login(self) -> None:
+        self.logger.info("Logging in to Bytes API.")
         with self.lock:
             self.headers.update({"Authorization": f"bearer {self.get_token()}"})
 
