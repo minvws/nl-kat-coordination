@@ -4,7 +4,7 @@
 services:
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -17,7 +17,7 @@ services:
       - .env
 
   postgres:
-    image: postgres:15
+    image: docker.io/library/postgres:15
     shm_size: 256MB
     ports:
       - "0.0.0.0:5432:5432"
