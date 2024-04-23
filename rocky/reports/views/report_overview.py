@@ -1,3 +1,5 @@
+from datetime import datetime, time, timezone
+
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_weasyprint import WeasyTemplateResponseMixin
@@ -29,6 +31,11 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, BaseOOIListView):
     template_name = "report_overview.html"
     ooi_types = {Report}
     context_object_name = "reports"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        # Setting utc end of date and time
+        self.observed_at: datetime = datetime.combine(self.observed_at, time.max, tzinfo=timezone.utc)
 
 
 class ReportHistoryPDFView(ReportHistoryView, WeasyTemplateResponseMixin):
