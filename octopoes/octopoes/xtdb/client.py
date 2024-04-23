@@ -3,6 +3,7 @@ import logging
 from collections.abc import Callable
 from datetime import datetime, timezone
 from enum import Enum
+from json import JSONDecodeError
 from typing import Any
 
 import httpx
@@ -59,10 +60,11 @@ class XTDBHTTPClient:
         try:
             response.raise_for_status()
         except HTTPStatusError as e:
-            if e.response.status_code != codes.NOT_FOUND:
-                logger.error(response.request.url)
-                logger.error(response.request.content)
-                logger.error(response.text)
+            try:
+                if response.json()["error"] == "Node not found":
+                    raise NodeNotFound() from e
+            except (KeyError, JSONDecodeError):
+                pass
             raise e
 
     def client_url(self) -> str:
@@ -160,6 +162,11 @@ class XTDBHTTPClient:
             logger.exception("Failed deleting node")
 
             raise XTDBException("Could not delete node") from e
+
+    def export_transactions(self) -> Any:
+        res = self._session.get(f"{self.client_url()}/tx-log?with-ops?=true", headers={"Accept": "application/json"})
+        self._verify_response(res)
+        return res.json()
 
     def sync(self, timeout: int | None = None):
         params = {}

@@ -43,7 +43,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Setup scan"),
+                "text": _("Configuration"),
             },
             {
                 "url": reverse("generate_report_view", kwargs=kwargs) + selection,
