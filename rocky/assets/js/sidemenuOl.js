@@ -79,7 +79,7 @@ import {
    */
 
   function adjustMaxHeight(sidemenu) {
-    const pageHeight = document.querySelector('body')?.scrollHeight;
+    let pageHeight = document.documentElement.scrollHeight;
 
     const pageHeaderElement = document.getElementById('page-header');
     const pageFooterElement = document.getElementById('page-footer');
@@ -90,15 +90,19 @@ import {
     determineSidebarMaxHeight();
 
     window.addEventListener("resize", (event => {
+      console.log('resize event')
       // Set the height of the page header and footer
       // when the size of the window changes,
       // to account for responsive behaviour
       pageHeaderHeight = pageHeaderElement?.offsetHeight;
       pageFooterHeight = pageFooterElement?.offsetHeight;
+      pageHeight = document.documentElement.scrollHeight
       determineSidebarMaxHeight();
     }));
 
     window.addEventListener("scroll", (event => {
+      console.log('scroll event')
+      pageHeight = document.documentElement.scrollHeight
       determineSidebarMaxHeight();
     }));
 
@@ -112,6 +116,14 @@ import {
       }
       else {
         var viewPortHeight = document.documentElement.clientHeight;
+
+        // console.log("Scroll count: " + scrollCount)
+        // console.log("VP height: " + viewPortHeight)
+        // console.log("'onderkant van de window' =" + (viewPortHeight + scrollCount))
+        console.log("Page height: " + pageHeight)
+        // console.log("Footer height: " + pageFooterHeight)
+        // console.log("'bovenkant van de footer' =" + (pageHeight - pageFooterHeight))
+        // console.log("Header height:" + pageHeaderHeight)
 
         // When the page footer is in viewport while scrolling, adjust sidebar max-height
         if((scrollCount + viewPortHeight) >= (pageHeight - pageFooterHeight)) {
