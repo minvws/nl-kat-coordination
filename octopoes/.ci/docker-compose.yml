@@ -65,7 +65,7 @@ services:
         hard: 262144
 
   katalogus_mock:
-    image: "docker.io/library/wiremock/wiremock:2.34.0"
+    image: "docker.io/wiremock/wiremock:2.34.0"
     volumes:
       - ./.ci/wiremock:/home/wiremock
     ports:
