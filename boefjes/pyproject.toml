@@ -36,7 +36,7 @@ censys = "2.1.8"
 # required by kat_dicom boefje
 pynetdicom = "2.0.2"
 # required by kat_dns, kat_dns_zone boefjes
-dnspython = "2.1.0"
+dnspython = "^2.6.1"
 # required by kat_fierce
 tldextract = "^3.4.4"
 # required by kat_log4shell boefje, kat_webpage_analysis/find_images_in_html normalizer
@@ -49,10 +49,9 @@ shodan = "1.25.0"
 cryptography = "^42.0.1"
 # required by kat_webpage_analysis
 forcediphttpsadapter = "1.1.0"
+python-wappalyzer = {git = "https://github.com/chorsley/python-Wappalyzer.git", rev = "0.4.0"}
 # required by kat_webpage_analysis (forcediphttpsadapter)
 urllib3 = "^2.1.0"
-# required by kat_website_software
-python-Wappalyzer = "0.3.1"
 # required by kat_wpscan
 wpscan-out-parse = "1.9.3"
 # required by kat_sec_txt
@@ -62,7 +61,7 @@ netaddr = "0.9.0"
 # required by kat_burpsuite, kat_cwe_finding_types and kat_ssl_scan
 defusedxml = "^0.7.1"
 # required by kat_webpage_analysis/check_images normalizer
-pillow = "^10.2.0"
+pillow = "^10.3.0"
 httpx = "^0.27.0"
 
 [tool.poetry.group.dev.dependencies]
@@ -76,10 +75,6 @@ build-backend = "setuptools.build_meta:__legacy__"
 [tool.flynt]
 line-length = 120
 transform-concats = true
-
-[tool.black]
-target-version = ["py310", "py311"]
-line-length = 120
 
 [tool.pytest.ini_options]
 env = [

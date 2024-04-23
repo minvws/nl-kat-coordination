@@ -1,1 +1,1 @@
-recursive-include bits/ *.json
+recursive-include bits/ *.json *.csv

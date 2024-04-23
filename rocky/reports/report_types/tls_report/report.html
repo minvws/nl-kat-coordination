@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% if show_introduction %}
+{% if generate_report %}
     <p>
         {% blocktranslate trimmed %}
             The TLS report shows which TLS protocols and ciphers were identified
@@ -18,7 +18,7 @@
     </p>
     <div class="horizontal-scroll">
         <table>
-            <caption class="visually-hidden">{% translate "Ciphers:" %}</caption>
+            <caption class="visually-hidden">{% translate "Ciphers" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Status" %}</th>
