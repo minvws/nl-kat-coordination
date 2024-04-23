@@ -207,6 +207,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                     data_raw_id=report_data_raw_id,
                     date_generated=datetime.now(timezone.utc),
                     input_ooi=Reference.from_str(ooi),
+                    observed_at=self.observed_at,
                 )
 
                 create_ooi(

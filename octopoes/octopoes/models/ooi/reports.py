@@ -36,6 +36,8 @@ class Report(OOI):
     organization_tags: list[str]
     data_raw_id: str
 
+    observed_at: datetime
+
     _natural_key_attrs = ["report_id"]
 
     @classmethod
