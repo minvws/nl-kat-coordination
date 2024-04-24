@@ -22,7 +22,7 @@ class FindingsReport(Report):
     plugins: ReportPlugins = {"required": [], "optional": []}
     input_ooi_types = ALL_TYPES
     template_path = "findings_report/report.html"
-    label_style = "tags-color-3-light"
+    label_style = "3-light"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         reference = Reference.from_str(input_ooi)
@@ -45,7 +45,12 @@ class FindingsReport(Report):
 
         for finding in findings:
             try:
-                finding_type = next(filter(lambda x: x.id == finding.finding_type.tokenized.id, all_finding_types))
+                finding_type = next(
+                    filter(
+                        lambda x: x.id == finding.finding_type.tokenized.id,
+                        all_finding_types,
+                    )
+                )
             except StopIteration:
                 continue
 
@@ -70,11 +75,16 @@ class FindingsReport(Report):
             if finding_type.id in finding_types:
                 finding_types[finding_type.id]["occurrences"].append(finding_dict)
             else:
-                finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding_dict]}
+                finding_types[finding_type.id] = {
+                    "finding_type": finding_type,
+                    "occurrences": [finding_dict],
+                }
                 total_by_severity_per_finding_type[severity] += 1
 
         sorted_finding_types: list[Any] = sorted(
-            finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
+            finding_types.values(),
+            key=lambda x: x["finding_type"].risk_score or 0,
+            reverse=True,
         )
 
         summary = {

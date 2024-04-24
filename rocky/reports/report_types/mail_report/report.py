@@ -21,7 +21,7 @@ class MailReport(Report):
     plugins = {"required": ["dns-records"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "mail_report/report.html"
-    label_style = "tags-color-2-light"
+    label_style = "2-light"
 
     def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)

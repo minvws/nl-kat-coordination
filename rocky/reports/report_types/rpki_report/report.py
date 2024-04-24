@@ -28,7 +28,7 @@ class RPKIReport(Report):
     plugins = {"required": ["dns-records", "rpki"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "rpki_report/report.html"
-    label_style = "tags-color-4-light"
+    label_style = "4-light"
 
     def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
         ips_by_input_ooi = self.to_ips(input_oois, valid_time)
