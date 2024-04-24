@@ -21,34 +21,49 @@
             {% if all_plugins_enabled.required %}
                 <p>{% translate "Good job! All required plugins are enabled." %}</p>
             {% else %}
-                <div class="column-4 tiles plugins images-cover">
-                    {% for required_plugin in plugins.required %}
-                        {% include "partials/plugin_tile.html" with plugin=required_plugin %}
+                <div class="required-plugin-container">
+                    <form action="" class="inline">
+                        <div class="checkbox">
+                            <input type="checkbox"
+                                   class="display-toggle"
+                                   id="checkbox-for-enabled-required-plugins"
+                                   {% if checked %}checked{% endif %}>
+                            <label for="checkbox-for-enabled-plugins">Show enabled plugins</label>
+                        </div>
+                    </form>
+                    <div class="column-4 tiles plugins images-cover">
+                        {% for required_plugin in plugins.required %}
+                            {% include "partials/plugin_tile.html" with plugin=required_plugin %}
 
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 </div>
             {% endif %}
             <h3>{% translate "Suggested plugins" %}</h3>
-            <form action="" class="inline">
-                <input type="checkbox"
-                       class="display-toggle"
-                       checked
-                       id="checkbox-for-enabled-plugins">
-                <label for="checkbox-for-enabled-plugins">Show enabled plugins</label>
-            </form>
             <p>
                 {% translate "This report requires at least one of the following plugins to be enabled to generate the report:" %}
             </p>
             {% if all_plugins_enabled.optional %}
                 <p>{% translate "Good job! All suggested plugins are enabled" %}</p>
             {% else %}
-                <div class="column-4 tiles plugins images-cover">
-                    {% for optional_plugin in plugins.optional %}
-                        {% if optional_plugin not in plugins.required %}
-                            {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
+                <div class="optional-plugin-container">
+                    <form action="" class="inline">
+                        <div class="checkbox">
+                            <input type="checkbox"
+                                   class="display-toggle"
+                                   id="checkbox-for-enabled-optional-plugins"
+                                   {% if checked %}checked{% endif %}>
+                            <label for="checkbox-for-enabled-plugins">Show enabled plugins</label>
+                        </div>
+                    </form>
+                    <div class="column-4 tiles plugins images-cover">
+                        {% for optional_plugin in plugins.optional %}
+                            {% if optional_plugin not in plugins.required %}
+                                {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
 
-                        {% endif %}
-                    {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             {% endif %}
             <form id="generate_report" class="inline" method="get" action="{{ next }}">
