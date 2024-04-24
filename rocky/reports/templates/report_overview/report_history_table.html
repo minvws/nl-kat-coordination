@@ -32,7 +32,7 @@
                     {% for report in reports %}
                         <tr>
                             <td>
-                                <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}"
+                                <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d" }}"
                                    title="{% translate "Shows report detail" %}">{{ report.reference }}</a>
                             </td>
                             <td>{{ report.name }}</td>
