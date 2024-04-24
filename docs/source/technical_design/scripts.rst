@@ -95,19 +95,22 @@ Below is a description on how these backup scripts can be used.
 How to backup your volume
 -------------------------
 
+.. warning::
+    Please note that this is currently a Linux only script.
+
 In your OpenKAT directory go to the ``scripts/backup`` folder:
 
 ``$ cd scripts/backup``
 
 Make the script executable:
 
-``$ sudo chmod +x backup-volume.sh``
+``$ sudo chmod +x backup-volumes.sh``
 
 Run the backup script with root rights. The -p parameter specifies the folder where your backup files will be stored. If this folder doesn't exist yet, it will automatically be created. Change <backup_path> to a descriptive backup name. The full path for this folder will be: ``/<path_to_OpenKAT_files>/scripts/backup/<backup_path>``.
 
 Run the script with the chosen backup path:
 
-``$ sudo ./backup-volume.sh -p <backup_path>``
+``$ sudo ./backup-volumes.sh -p <backup_path>``
 
 This directory will contain multiple folders each containing the backup file for that specific docker container as archived files (.tar.gz). If you run the command again it will create new archived files into those subdirectories. Your old backup will remain, as each backup name contains the timestamp of moment of creation. An example of such a file is: ``2024-03-28_173258_nl-kat-coordination_bytes-data.tar.gz``.
 
@@ -120,24 +123,24 @@ In your OpenKAT directory go to the ``scripts/backup`` folder:
 
 Make the script executable:
 
-``$ sudo chmod +x create-volume-from-backup.sh``
+``$ sudo chmod +x restore-volumes.sh``
 
 Volumes can be restored by specifying the volume container name and the backup path folder from the previous step. If multiple backup files are available the script will automatically restore from the **newest** snapshot.
 
 Restore a backup volume:
 
-``$ sudo ./create-volume-from-backup.sh -v <volume_name> -p <prefix>``
+``$ sudo ./restore-volumes.sh -v <volume_name> -p <prefix>``
 
 Optionally if you wish to create a volume with a different name from the backup the script can be invoked in the following manner:
 
-``$ sudo ./create-volume-from-backup.sh -v <volume_name> -p <prefix> -n <new_volume_name>``
+``$ sudo ./restore-volumes.sh -v <volume_name> -p <prefix> -n <new_volume_name>``
 
 Example
 -------
 
 Create a backup: ::
 
- $ sudo ./backup-volume.sh -p MyOrganisation
+ $ sudo ./backup-volumes.sh -p MyOrganisation
  [sudo] password for user:
  Successfully copied 40.8MB to /tmp/a3b27680-02e4-49cd-a155-e2729d8e7b70
  a3b27680-02e4-49cd-a155-e2729d8e7b70
@@ -162,7 +165,7 @@ The contents of the folder MyOrganisation are: ::
 
 Restoring then works as follows: ::
 
- $ ./create-volume-from-backup.sh -v nl-kat-coordination_bytes-data -p MyOrganisation
+ $ ./restore-volumes.sh -v nl-kat-coordination_bytes-data -p MyOrganisation
  creating from snapshot: 2024-04-03_142729_nl-kat-coordination_bytes-data.tar.gz
  Successfully copied 40.8MB to fafd7168-7b17-45e7-a41c-dee9e97c948a:/data
  fafd7168-7b17-45e7-a41c-dee9e97c948a
