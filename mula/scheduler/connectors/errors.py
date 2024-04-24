@@ -35,9 +35,7 @@ def exception_handler(func):
                 request=exc.request,
             ) from exc
         except httpx.ConnectError as exc:
-            raise ExternalServiceConnectionError(
-                "External service is not available."
-            ) from exc
+            raise ExternalServiceConnectionError("External service is not available.") from exc
         except pydantic.ValidationError as exc:
             raise ExternalServiceValidationError("Validation error occurred.") from exc
         except Exception as exc:
