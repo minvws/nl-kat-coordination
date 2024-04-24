@@ -6,7 +6,7 @@ from typing import Any
 
 import httpx
 
-from scheduler.connectors.errors import ExternalServiceHTTPStatusError, exception_handler
+from scheduler.connectors.errors import ExternalServiceResponseError, exception_handler
 from scheduler.models import BoefjeMeta
 
 from .services import HTTPService
@@ -19,7 +19,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     def wrapper(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
-        except ExternalServiceHTTPStatusError as exc:
+        except (httpx.HTTPStatusError, ExternalServiceResponseError) as exc:
             if exc.response.status_code != 401:
                 raise
 

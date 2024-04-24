@@ -12,11 +12,10 @@ class ExternalServiceConnectionError(ExternalServiceError):
     pass
 
 
-class ExternalServiceHTTPStatusError(ExternalServiceError):
-    def __init__(self, message: str, response: httpx.Response, request: httpx.Request):
+class ExternalServiceResponseError(ExternalServiceError):
+    def __init__(self, message: str, response: httpx.Response):
         super().__init__(message)
         self.response = response
-        self.request = request
 
 
 class ExternalServiceValidationError(ExternalServiceError):
@@ -29,10 +28,9 @@ def exception_handler(func):
         try:
             return func(*args, **kwargs)
         except httpx.HTTPStatusError as exc:
-            raise ExternalServiceHTTPStatusError(
+            raise ExternalServiceResponseError(
                 f"External service returned an error: {str(exc)}",
                 response=exc.response,
-                request=exc.request,
             ) from exc
         except httpx.ConnectError as exc:
             raise ExternalServiceConnectionError("External service is not available.") from exc
