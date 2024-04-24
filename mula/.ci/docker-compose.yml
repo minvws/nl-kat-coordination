@@ -28,7 +28,7 @@ services:
       - ci_rabbitmq
 
   ci_postgres:
-    image: postgres:15
+    image: docker.io/library/postgres:15
     healthcheck:
       test: ["CMD", "gosu", "postgres", "pg_isready"]
       interval: 3s
@@ -41,7 +41,7 @@ services:
       - ../init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
 
   ci_rabbitmq:
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:

@@ -291,3 +291,12 @@ class OctopoesAPIConnector:
         result = self.session.get(f"/{self.client}/query-many", params=params).json()
 
         return TypeAdapter(list[tuple[str, OOIType | str]]).validate_python(result)
+
+    def export_all(self):
+        return self.session.get(f"/{self.client}/io/export").json()
+
+    def import_add(self, content):
+        return self.session.post(f"/{self.client}/io/import/add", content=content).json()
+
+    def import_new(self, content):
+        return self.session.post(f"/{self.client}/io/import/new", content=content).json()
