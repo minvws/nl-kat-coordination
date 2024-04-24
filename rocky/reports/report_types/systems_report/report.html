@@ -26,7 +26,7 @@
             <tbody>
                 {% for ip, ip_services in data.services.items %}
                     <tr>
-                        <td>{{ ip.tokenized.address }}</td>
+                        <td>{{ ip|human_readable }}</td>
                         <td>
                             {% if ip_services.hostnames %}
                                 {{ ip_services.hostnames|join:", " }}

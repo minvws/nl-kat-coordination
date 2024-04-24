@@ -1,8 +1,6 @@
 import logging
 from collections.abc import Sequence
-from datetime import datetime, timezone
 from typing import Any
-from uuid import uuid4
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -11,12 +9,10 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from tools.ooi_helpers import create_ooi
 from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
-from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     REPORTS,
@@ -24,7 +20,7 @@ from reports.report_types.helpers import (
     get_plugins_for_report_ids,
     get_report_types_for_oois,
 )
-from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, ReportDataDict, get_selection
+from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
 
 logger = logging.getLogger(__name__)
@@ -192,30 +188,10 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                     "ooi_human_readable": ooi_human_readable,
                 }
 
-                report_data_raw_id = self.bytes_client.upload_raw(
-                    raw=ReportDataDict(data).model_dump_json(), manual_mime_types={"openkat/report"}
+                report_ooi = self.save_report(
+                    data=data, report_type=report_type, input_ooi=Reference.from_str(ooi), parent=None
                 )
-
-                report_ooi = ReportOOI(
-                    name="test_name",
-                    report_type=str(report_type.name),
-                    template=report_type.template_path,
-                    report_id=uuid4(),
-                    organization_code=self.organization.code,
-                    organization_name=self.organization.name,
-                    organization_tags=list(self.organization.tags.all()),
-                    data_raw_id=report_data_raw_id,
-                    date_generated=datetime.now(timezone.utc),
-                    input_ooi=Reference.from_str(ooi),
-                    observed_at=self.observed_at,
-                )
-
-                create_ooi(
-                    api_connector=self.octopoes_api_connector,
-                    bytes_client=self.bytes_client,
-                    ooi=report_ooi,
-                    observed_at=self.observed_at,
-                )
+                logger.error(report_ooi.report_id)
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:

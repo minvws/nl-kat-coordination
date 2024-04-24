@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Sequence
 from typing import Any
 
@@ -11,16 +12,20 @@ from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
+from octopoes.models import Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     get_ooi_types_from_aggregate_report,
     get_plugins_for_report_ids,
+    get_report_by_id,
     get_report_types_from_aggregate_report,
 )
 from reports.utils import JSONEncoder, debug_json_keys
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from rocky.views.ooi_view import BaseOOIListView
+
+logger = logging.getLogger(__name__)
 
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
@@ -192,6 +197,22 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
                 "date": date,
             }
             messages.add_message(self.request, messages.ERROR, error_message)
+
+        # first we create the parent report
+        parent_report_ooi = self.save_report(
+            data=post_processed_data, report_type=aggregate_report, input_ooi=None, parent=None
+        )
+
+        logger.error(parent_report_ooi.report_id)
+
+        for ooi, types in report_data.items():
+            for report_type, data in types.items():
+                self.save_report(
+                    data=data,
+                    report_type=get_report_by_id(report_type),
+                    input_ooi=Reference.from_str(ooi),
+                    parent=parent_report_ooi.reference,
+                )
 
         return aggregate_report, post_processed_data, report_data
 

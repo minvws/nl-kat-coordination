@@ -1,8 +1,9 @@
 from collections.abc import Iterable, Sequence
-from datetime import datetime
+from datetime import datetime, timezone
 from logging import getLogger
 from operator import attrgetter
 from typing import Any
+from uuid import uuid4
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -15,11 +16,13 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.client import Plugin, get_katalogus
 from pydantic import RootModel, TypeAdapter
+from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI, Reference
+from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import BaseReportType, MultiReport, Report, ReportType
+from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report, ReportType
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import OOIFilterView
@@ -167,6 +170,37 @@ class BaseReportView(OOIFilterView):
             for report_type in self.get_report_types_from_choice()
         ]
 
+    def save_report(
+        self, data: dict, report_type: ReportType, input_ooi: Reference | None, parent: Reference | None
+    ) -> ReportOOI:
+        report_data_raw_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict(data).model_dump_json(), manual_mime_types={"openkat/report"}
+        )
+
+        report_ooi = ReportOOI(
+            name="test_name",
+            report_type=str(report_type.id),
+            template=report_type.template_path,
+            report_id=uuid4(),
+            organization_code=self.organization.code,
+            organization_name=self.organization.name,
+            organization_tags=list(self.organization.tags.all()),
+            data_raw_id=report_data_raw_id,
+            date_generated=datetime.now(timezone.utc),
+            input_ooi=input_ooi,
+            observed_at=self.observed_at,
+            is_child_of=parent,
+        )
+
+        create_ooi(
+            api_connector=self.octopoes_api_connector,
+            bytes_client=self.bytes_client,
+            ooi=report_ooi,
+            observed_at=self.observed_at,
+        )
+
+        return report_ooi
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
@@ -194,36 +228,58 @@ class ReportDataDict(RootModel):
 
 
 class ViewReportView(BaseReportView, TemplateView):
-    template_name = "generate_report.html"
+    def get_template_names(self):
+        if issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
+            template_name = "aggregate_report.html"
+        else:
+            template_name = "generate_report.html"
+        return [
+            template_name,
+        ]
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.report_id = request.GET.get("report_id", "")
+        self.report_ooi = self.octopoes_api_connector.get(
+            Reference.from_str(f"{self.report_id}"), valid_time=self.observed_at
+        )
 
     def get_context_data(self, **kwargs):
         # TODO: add missing context fields
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
 
-        report_ooi = self.octopoes_api_connector.get(
-            Reference.from_str(f"Report|{self.report_id}"), valid_time=self.observed_at
-        )
-        input_ooi = self.octopoes_api_connector.get(
-            Reference.from_str(report_ooi.input_ooi), valid_time=self.observed_at
-        )
+        if self.report_ooi.is_child:
+            input_oois = [
+                self.octopoes_api_connector.get(
+                    Reference.from_str(self.report_ooi.input_ooi), valid_time=self.observed_at
+                )
+            ]
+            human_readable = self.report_ooi.input_ooi.human_readable
+
+        else:
+            # TODO: get the input oois from the underlying reports
+            input_oois = []
+            human_readable = ""
 
         self.bytes_client.login()
-        report_data: dict = {report_ooi.report_type: {}}
-        report_data[report_ooi.report_type][report_ooi.input_ooi] = {
-            "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-                self.bytes_client.get_raw(raw_id=report_ooi.data_raw_id)
-            ),
-            "template": report_ooi.template,
-            "ooi_human_readable": report_ooi.input_ooi.human_readable,
-        }
+        if issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
+            context["post_processed_data"] = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+                self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
+            )
+        else:
+            report_data: dict = {self.report_ooi.report_type: {}}
+            report_data[self.report_ooi.report_type][self.report_ooi.input_ooi] = {
+                "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+                    self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
+                ),
+                "template": self.report_ooi.template,
+                "ooi_human_readable": human_readable,
+            }
+            context["report_data"] = report_data
 
-        context["created_at"] = report_ooi.date_generated
-        context["selected_oois"] = [input_ooi]
-        context["oois"] = [input_ooi]
-        context["report_data"] = report_data
+        context["created_at"] = self.report_ooi.date_generated
+        context["selected_oois"] = input_oois
+        context["oois"] = input_oois
+        context["template"] = self.report_ooi.template if not self.report_ooi.is_child else None
         return context

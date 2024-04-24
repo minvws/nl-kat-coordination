@@ -37,8 +37,15 @@ class Report(OOI):
     data_raw_id: str
 
     observed_at: datetime
+    is_child_of: Reference | None = ReferenceField(
+        "Report", max_issue_scan_level=1, max_inherit_scan_level=2, default=None
+    )
 
     _natural_key_attrs = ["report_id"]
+
+    @property
+    def is_child(self) -> bool:
+        return bool(self.is_child_of)
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:

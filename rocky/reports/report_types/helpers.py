@@ -61,7 +61,7 @@ def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport]:
     """
     Get report type by id
     """
-    for report in REPORTS + MULTI_REPORTS:
+    for report in REPORTS + MULTI_REPORTS + AGGREGATE_REPORTS:
         if report.id == report_id:
             return report
     raise ValueError(f"Report with id {report_id} not found")
