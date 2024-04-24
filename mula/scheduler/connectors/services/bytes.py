@@ -22,8 +22,8 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     def wrapper(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
-        except ExternalServiceHTTPStatusError as error:
-            if error.response.status_code != 401:
+        except ExternalServiceHTTPStatusError as exc:
+            if exc.response.status_code != 401:
                 raise
 
             self.login()
