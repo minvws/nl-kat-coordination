@@ -1,3 +1,4 @@
+from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
 from logging import getLogger
@@ -233,15 +234,20 @@ class ReportDataDict(RootModel):
         arbitrary_types_allowed = True
 
 
+def recursive_dict():
+    return defaultdict(recursive_dict)
+
+
 class ViewReportView(BaseReportView, TemplateView):
     def get_template_names(self):
-        if issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
-            template_name = "aggregate_report.html"
+        if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
+            return [
+                "aggregate_report.html",
+            ]
         else:
-            template_name = "generate_report.html"
-        return [
-            template_name,
-        ]
+            return [
+                "generate_report.html",
+            ]
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -269,9 +275,28 @@ class ViewReportView(BaseReportView, TemplateView):
             human_readable = ""
 
         self.bytes_client.login()
+        report_data: dict = {}
         if not self.report_ooi.report_type:
             # its multiple single reports
-            pass
+            children = self.octopoes_api_connector.query(
+                "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
+            )
+            for report in children:
+                if report.report_type not in report_data:
+                    report_data[report.report_type] = {}
+
+                # Ensure the input_ooi exists within the report_type
+                if report.input_ooi not in report_data[report.report_type]:
+                    report_data[report.report_type][report.input_ooi] = {}
+
+                # Set the data within the input_ooi
+                report_data[report.report_type][report.input_ooi] = {
+                    "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+                        self.bytes_client.get_raw(raw_id=report.data_raw_id)
+                    ),
+                    "template": report.template,
+                }
+            context["report_data"] = report_data
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             # its an aggregate report
             context["post_processed_data"] = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
@@ -279,7 +304,7 @@ class ViewReportView(BaseReportView, TemplateView):
             )
         else:
             # its a single report
-            report_data: dict = {self.report_ooi.report_type: {}}
+            report_data[self.report_ooi.report_type] = {}
             report_data[self.report_ooi.report_type][self.report_ooi.input_ooi] = {
                 "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
                     self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
