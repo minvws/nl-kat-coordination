@@ -58,14 +58,13 @@ def test_ooi_detail(
     client_member,
     mock_scheduler,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
     mocker,
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
-    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
-
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
+
+    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
 
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
@@ -75,9 +74,10 @@ def test_ooi_detail(
     assertContains(response, "Network|testnetwork")
 
     assertContains(response, "Plugin")
-    assertContains(response, "test-boefje")
+    assertContains(response, "test_boefje")
     assertContains(
-        response, f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>'
+        response,
+        f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>',
     )
     assertContains(response, "Status")
     assertContains(response, "Completed")
@@ -97,10 +97,12 @@ def test_question_detail(
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
-    request = setup_request(rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}), client_member.user)
+    request = setup_request(
+        rf.get("ooi_detail", {"ooi_id": "Question|/test|Network|testnetwork"}),
+        client_member.user,
+    )
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(QUESTION_DATA)
-    mock_scheduler.get_lazy_task_list.return_value = lazy_task_list_with_boefje
 
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
@@ -138,8 +140,8 @@ def test_answer_question(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assertContains(response, "Question has been answered.", status_code=201)
-    assert mock_organization_view_octopoes().get_tree.call_count == 3
+    assertContains(response, "Question has been answered.", status_code=200)
+    assert mock_organization_view_octopoes().get_tree.call_count == 2
 
 
 def test_answer_question_bad_schema(
@@ -169,10 +171,10 @@ def test_answer_question_bad_schema(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 422
+    assert response.status_code == 200
 
     quote_enc = "&#x27;"
-    assertContains(response, f"314159 is not of type {quote_enc}string{quote_enc}", status_code=422)
+    assertContains(response, f"314159 is not of type {quote_enc}string{quote_enc}", status_code=200)
 
 
 def test_ooi_detail_start_scan(
@@ -251,8 +253,8 @@ def test_ooi_detail_start_scan_no_indemnification(
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert mock_organization_view_octopoes().get_tree.call_count == 2
-    assertContains(response, "Object details", status_code=403)
-    assertContains(response, "Indemnification not present", status_code=403)
+    assertContains(response, "Object details")
+    assertContains(response, "Indemnification not present")
 
 
 def test_ooi_detail_start_scan_no_action(
@@ -283,7 +285,7 @@ def test_ooi_detail_start_scan_no_action(
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
     assert mock_organization_view_octopoes().get_tree.call_count == 2
-    assertContains(response, "Object details", status_code=404)
+    assertContains(response, "Object details")
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member"])

@@ -101,7 +101,7 @@ class BaseOOIListView(OOIFilterView, ListView):
         return context
 
 
-class BaseOOIDetailView(SingleOOITreeMixin, BreadcrumbsMixin, ConnectorFormMixin):
+class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin):
     connector_form_class = ObservedAtForm
 
     def setup(self, request, *args, **kwargs):

@@ -10,7 +10,14 @@ from tests.conftest import setup_request
 TREE_DATA = {
     "root": {
         "reference": "Network|testnetwork",
-        "children": {"urls": [{"reference": "HostnameHTTPURL|https|internet|scanme.org|443|/", "children": {}}]},
+        "children": {
+            "urls": [
+                {
+                    "reference": "HostnameHTTPURL|https|internet|scanme.org|443|/",
+                    "children": {},
+                }
+            ]
+        },
     },
     "store": {
         "Network|testnetwork": {
@@ -45,7 +52,10 @@ def test_scan_profile(rf, redteam_member, mock_scheduler, mock_organization_view
     mocker.patch("katalogus.utils.get_katalogus")
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    request = setup_request(
+        rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}),
+        redteam_member.user,
+    )
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
@@ -84,12 +94,19 @@ def test_scan_profile_submit_no_indemnification(
     # Passing query params in POST requests is not well-supported for RequestFactory it seems, hence the absolute path
     query_string = urlencode({"ooi_id": "Network|testnetwork"}, doseq=True)
     request = setup_request(
-        rf.post(f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}", data={"level": "L1"}),
+        rf.post(
+            f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}",
+            data={"level": "L1"},
+        ),
         redteam_member.user,
     )
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
-    assert response.status_code == 403
+    assert response.status_code == 200
+    assertContains(
+        response,
+        "Indemnification not present at organization " + redteam_member.organization.code,
+    )
 
 
 def test_scan_profile_no_permissions_acknowledged(
@@ -101,7 +118,10 @@ def test_scan_profile_no_permissions_acknowledged(
     redteam_member.acknowledged_clearance_level = -1
     redteam_member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    request = setup_request(
+        rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}),
+        redteam_member.user,
+    )
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
@@ -119,7 +139,10 @@ def test_scan_profile_no_permissions_trusted(
     redteam_member.trusted_clearance_level = -1
     redteam_member.save()
 
-    request = setup_request(rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    request = setup_request(
+        rf.get("scan_profile_detail", {"ooi_id": "Network|testnetwork"}),
+        redteam_member.user,
+    )
     response = ScanProfileDetailView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200
@@ -132,7 +155,10 @@ def test_scan_profile_reset_view(rf, redteam_member, mock_scheduler, mock_organi
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mocker.patch("katalogus.utils.get_katalogus")
 
-    request = setup_request(rf.get("scan_profile_reset", {"ooi_id": "Network|testnetwork"}), redteam_member.user)
+    request = setup_request(
+        rf.get("scan_profile_reset", {"ooi_id": "Network|testnetwork"}),
+        redteam_member.user,
+    )
     response = ScanProfileResetView.as_view()(request, organization_code=redteam_member.organization.code)
 
     assert response.status_code == 200

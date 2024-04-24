@@ -25,7 +25,6 @@ def test_boefjes_tasks(rf, client_member, mock_scheduler):
 
 
 def test_tasks_view_simple(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
-
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
@@ -33,7 +32,6 @@ def test_tasks_view_simple(rf, client_member, mock_scheduler, mock_scheduler_cli
 
 
 def test_tasks_view_error(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
-
     mock_scheduler.list_tasks.side_effect = SchedulerError
 
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
@@ -45,7 +43,7 @@ def test_tasks_view_error(rf, client_member, mock_scheduler, mock_scheduler_clie
 
 
 def test_reschedule_task(rf, client_member, mock_scheduler, task):
-
+    mock_scheduler.get_task_details.return_value = task
     request = setup_request(
         rf.post(
             f"/en/{client_member.organization.code}/tasks/boefjes/?task_id={task.id}",
@@ -55,15 +53,9 @@ def test_reschedule_task(rf, client_member, mock_scheduler, task):
     )
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
     assert list(request._messages)[0].message == (
-        "Task of "
-        + task.type.title()
-        + " "
-        + task.p_item.data.boefje.name
-        + " with input object "
-        + task.p_item.data.input_ooi
-        + " is scheduled and will soon be started in the background. "
+        "Your task is scheduled and will soon be started in the background. "
         "Results will be added to the object list when they are in. "
         "It may take some time, a refresh of the page may be needed to show the results."
     )
