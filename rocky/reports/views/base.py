@@ -171,7 +171,12 @@ class BaseReportView(OOIFilterView):
         ]
 
     def save_report(
-        self, data: dict, report_type: ReportType, input_ooi: Reference | None, parent: Reference | None
+        self,
+        data: dict,
+        report_type: ReportType | None,
+        input_ooi: Reference | None,
+        parent: Reference | None,
+        has_parent: bool,
     ) -> ReportOOI:
         report_data_raw_id = self.bytes_client.upload_raw(
             raw=ReportDataDict(data).model_dump_json(), manual_mime_types={"openkat/report"}
@@ -179,8 +184,8 @@ class BaseReportView(OOIFilterView):
 
         report_ooi = ReportOOI(
             name="test_name",
-            report_type=str(report_type.id),
-            template=report_type.template_path,
+            report_type=str(report_type.id) if report_type else None,
+            template=report_type.template_path if report_type else None,
             report_id=uuid4(),
             organization_code=self.organization.code,
             organization_name=self.organization.name,
@@ -189,7 +194,8 @@ class BaseReportView(OOIFilterView):
             date_generated=datetime.now(timezone.utc),
             input_ooi=input_ooi,
             observed_at=self.observed_at,
-            is_child_of=parent,
+            parent_report=parent,
+            has_parent=has_parent,
         )
 
         create_ooi(
@@ -249,7 +255,7 @@ class ViewReportView(BaseReportView, TemplateView):
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
 
-        if self.report_ooi.is_child:
+        if self.report_ooi.input_ooi:
             input_oois = [
                 self.octopoes_api_connector.get(
                     Reference.from_str(self.report_ooi.input_ooi), valid_time=self.observed_at
@@ -263,11 +269,16 @@ class ViewReportView(BaseReportView, TemplateView):
             human_readable = ""
 
         self.bytes_client.login()
-        if issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
+        if not self.report_ooi.report_type:
+            # its multiple single reports
+            pass
+        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
+            # its an aggregate report
             context["post_processed_data"] = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
                 self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
             )
         else:
+            # its a single report
             report_data: dict = {self.report_ooi.report_type: {}}
             report_data[self.report_ooi.report_type][self.report_ooi.input_ooi] = {
                 "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
@@ -281,5 +292,5 @@ class ViewReportView(BaseReportView, TemplateView):
         context["created_at"] = self.report_ooi.date_generated
         context["selected_oois"] = input_oois
         context["oois"] = input_oois
-        context["template"] = self.report_ooi.template if not self.report_ooi.is_child else None
+        context["template"] = self.report_ooi.template
         return context

@@ -18,6 +18,7 @@ from reports.report_types.helpers import (
     REPORTS,
     get_ooi_types_with_report,
     get_plugins_for_report_ids,
+    get_report_by_id,
     get_report_types_for_oois,
 )
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
@@ -154,6 +155,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
 
+        number_of_reports = 0
         for ooi in self.selected_oois:
             ooi_type = Reference.from_str(ooi).class_
 
@@ -180,19 +182,42 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             for ooi, data in results.items():
                 ooi_human_readable = Reference.from_str(ooi).human_readable
                 if report_type.name not in report_data:
-                    report_data[report_type.name] = {}
+                    report_data[report_type.id] = {}
 
-                report_data[report_type.name][ooi] = {
+                report_data[report_type.id][ooi] = {
                     "data": data,
                     "template": report_type.template_path,
                     "ooi_human_readable": ooi_human_readable,
                 }
+                number_of_reports += 1
 
-                report_ooi = self.save_report(
-                    data=data, report_type=report_type, input_ooi=Reference.from_str(ooi), parent=None
-                )
-                logger.error(report_ooi.report_id)
-
+        # if its not a single report, we need a parent
+        if number_of_reports > 1:
+            parent_report_ooi = self.save_report(
+                data={}, report_type=None, input_ooi=None, parent=None, has_parent=False
+            )
+            for report_type, ooi_data in report_data.items():
+                for ooi, data in ooi_data.items():
+                    self.save_report(
+                        data=data["data"],
+                        report_type=get_report_by_id(report_type),
+                        input_ooi=Reference.from_str(ooi),
+                        parent=parent_report_ooi.reference,
+                        has_parent=True,
+                    )
+        # if its a single report we can just save it as complete
+        else:
+            logger.error(report_data)
+            report_type = next(iter(report_data))
+            ooi = next(iter(report_data[report_type]))
+            data = report_data[report_type][ooi]
+            self.save_report(
+                data=data["data"],
+                report_type=get_report_by_id(report_type),
+                input_ooi=Reference.from_str(ooi),
+                parent=None,
+                has_parent=False,
+            )
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
             report_types = ", ".join(set(error_reports))

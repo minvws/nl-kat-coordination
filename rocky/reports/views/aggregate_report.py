@@ -200,7 +200,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
         # first we create the parent report
         parent_report_ooi = self.save_report(
-            data=post_processed_data, report_type=aggregate_report, input_ooi=None, parent=None
+            data=post_processed_data, report_type=aggregate_report, input_ooi=None, parent=None, has_parent=False
         )
 
         logger.error(parent_report_ooi.report_id)
@@ -212,6 +212,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
                     report_type=get_report_by_id(report_type),
                     input_ooi=Reference.from_str(ooi),
                     parent=parent_report_ooi.reference,
+                    has_parent=True,
                 )
 
         return aggregate_report, post_processed_data, report_data
