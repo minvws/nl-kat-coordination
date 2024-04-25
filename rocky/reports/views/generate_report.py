@@ -181,7 +181,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
 
             for ooi, data in results.items():
                 ooi_human_readable = Reference.from_str(ooi).human_readable
-                if report_type.name not in report_data:
+                if report_type.id not in report_data:
                     report_data[report_type.id] = {}
 
                 report_data[report_type.id][ooi] = {
@@ -207,7 +207,6 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                     )
         # if its a single report we can just save it as complete
         else:
-            logger.error(report_data)
             report_type = next(iter(report_data))
             ooi = next(iter(report_data[report_type]))
             data = report_data[report_type][ooi]
