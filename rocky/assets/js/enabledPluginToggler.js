@@ -1,7 +1,6 @@
 function toggleEnabledPlugins(containerClass) {
   const container = document.querySelector(`.${containerClass}`);
-  const checkbox = document.querySelector(`.${containerClass}` + ' .display-toggle');
-  console.log("Checkbox: ", checkbox);
+  const checkbox = container.querySelector('.display-toggle');0
   const enabledPlugins = container.querySelectorAll('.plugin-enabled');
 
   function updateVisibility() {

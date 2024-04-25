@@ -1,7 +1,7 @@
-.plugin-enabled {
-  display: hidden;
+.display-toggle[unchecked] ~ .plugin-enabled {
+  display: none;
 }
 
-.display-toggle[checked] ~ .plugin-enabled {
-  display: block; // or inline-block or flex or whatever is applicible TBD
+.display-toggle[checked] > .plugin-enabled {
+  display: flex;
 }
