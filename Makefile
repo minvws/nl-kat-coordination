@@ -113,7 +113,9 @@ docs:
 	$(call build-settings-doc,boefjes,boefjes.config,boefjes,Boefjes)
 	$(call build-settings-doc,bytes,bytes.config,bytes,Bytes)
 	$(call build-settings-doc,mula/scheduler,config.settings,mula,Mula)
-	sphinx-build -b html docs/source docs/_build
+
+	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:keiko/:mula/:octopoes/ sphinx-build -b html docs/source docs/_build
+
 
 poetry-dependencies:
 	files=$$(find . -name pyproject.toml -maxdepth 2); \

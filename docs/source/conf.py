@@ -25,9 +25,12 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.autosectionlabel",
+    "sphinx.ext.todo",
+    "sphinx.ext.autodoc",
     "sphinx_rtd_theme",
     "myst_parser",
     "sphinxcontrib.mermaid",
+    "sphinxcontrib.autodoc_pydantic",
 ]
 
 myst_enable_extensions = ["tasklist"]
