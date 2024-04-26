@@ -53,8 +53,8 @@ The essential metadata includes:
 Because stdin and stdout in container orchestrators are relatively complicated
 and work on a best-effort basis, this is not reliable enough for boefje input
 and output. Instead, we use a simple HTTP API for input and output.
-Also see the [Swagger API docs](http://localhost:8006/docs),
-where you can also find the full [json schema](http://localhost:8006/openapi.json).
+Also see the [OpenAPI docs](http://localhost:8006/docs),
+where you can also find the full [OpenAPI specification](http://localhost:8006/openapi.json).
 
 This HTTP API will be part of new boefjes runner and will communicate with
 existing parts of KAT such as bytes and mula (the scheduler) to get the boefje
@@ -177,7 +177,7 @@ The tags for each file can include a MIME type.
 
 ## Logging
 
-Logging will be captured through the container orchestrator's/runtime's API and
+Logging will be captured through the container's orchestrator/runtime API and
 stored in Bytes. Alternatively, the boefje can output its own logging in a
 separate file as part of its output, which will be stored in Bytes as well.
 
