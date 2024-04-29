@@ -31,7 +31,7 @@
                         </div>
                     </div>
                     <div class="column-4 tiles plugins images-cover">
-                        {% for required_plugin in plugins.required %}
+                        {% for required_plugin in plugins.required|dictsort:"enabled" %}
                             {% include "partials/plugin_tile.html" with plugin=required_plugin %}
 
                         {% endfor %}
@@ -55,12 +55,25 @@
                         </div>
                     </div>
                     <div class="column-4 tiles plugins images-cover">
-                        {% for optional_plugin in plugins.optional %}
+                        {% for optional_plugin in plugins.optional|dictsort:"enabled" %}
                             {% if optional_plugin not in plugins.required %}
-                                {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
+                                {% if forloop.counter > 4 %}
+                                    {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" hidden="true" %}
 
+                                {% else %}
+                                    {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
+
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
+                    </div>
+                    <div class="toolbar">
+                        <div class="checkbox">
+                            <input type="checkbox"
+                                   class="show-all-toggle"
+                                   id="checkbox-for-show-all-toggle">
+                            <label for="checkbox-for-show-all-toggle">Show enabled plugins</label>
+                        </div>
                     </div>
                 </div>
             {% endif %}
