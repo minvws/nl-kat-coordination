@@ -12,5 +12,6 @@ Contains documentation for developers and contributors.
    boefjes
    bytes
    octopoes
+   octopoes_models
    octopoes_research
    keiko

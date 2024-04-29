@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, Literal, cast
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -133,11 +133,44 @@ class SetupScanGenerateReportView(
 
         return super().get(request, *args, **kwargs)
 
+    def get_plugin_data(self):
+        report_types: dict[str, Any] = {}
+        total_enabled_plugins = {"required": 0, "optional": 0}
+        total_available_plugins = {"required": 0, "optional": 0}
+
+        for report_type in self.report_types:
+            for plugin_type in ["required", "optional"]:
+                # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
+                plugin_type = cast(Literal["required", "optional"], plugin_type)
+                number_of_enabled = sum(
+                    1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0
+                    for plugin in self.plugins[plugin_type]
+                )
+
+                number_of_available = len(report_type.plugins[plugin_type])
+                total_enabled_plugins[plugin_type] += number_of_enabled
+                total_available_plugins[plugin_type] += number_of_available
+
+                if report_type.name not in report_types:
+                    report_types[report_type.name] = {}
+
+                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
+                report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
+
+        plugin_data = {
+            "total_enabled_plugins": total_enabled_plugins,
+            "total_available_plugins": total_available_plugins,
+            "report_types": report_types,
+        }
+
+        return plugin_data
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
             get_plugins_for_report_ids(self.selected_report_types)
         )
+        context["plugin_data"] = self.get_plugin_data()
         return context
 
 
@@ -184,10 +217,11 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                 error_reports.append(report_type.id)
                 continue
 
+            if report_type.name not in report_data:
+                report_data[report_type.name] = {}
+
             for ooi, data in results.items():
                 ooi_human_readable = Reference.from_str(ooi).human_readable
-                if report_type.name not in report_data:
-                    report_data[report_type.name] = {}
 
                 report_data[report_type.name][ooi] = {
                     "data": data,
