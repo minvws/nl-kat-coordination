@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import Boefje, Normalizer
+from tools.forms.scheduler import TaskFilterForm
 
 from octopoes.models import OOI
 from rocky.scheduler import Boefje as SchedulerBoefje
@@ -30,6 +31,7 @@ def get_date_time(date: str | None) -> datetime | None:
 
 class SchedulerView(OctopoesView):
     task_type: str = "boefje"  # default task type
+    task_filter_form = TaskFilterForm
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -39,12 +41,19 @@ class SchedulerView(OctopoesView):
         return {
             "scheduler_id": f"{self.task_type}-{self.organization.code}",
             "task_type": self.request.GET.get("type", self.task_type),
-            "status": self.request.GET.get("scan_history_status", None),
-            "min_created_at": get_date_time(self.request.GET.get("scan_history_from", None)),
-            "max_created_at": get_date_time(self.request.GET.get("scan_history_to", None)),
-            "input_ooi": self.request.GET.get("scan_history_search", None),
             "plugin_id": None,
+            **self.get_form_data(),
         }
+
+    def get_form_data(self) -> dict[str, str | datetime | None]:
+        form_data = self.get_task_filter_form().data.dict()
+        for k, v in form_data.items():
+            if not v:
+                form_data[k] = None
+        return form_data
+
+    def get_task_filter_form(self) -> TaskFilterForm:
+        return self.task_filter_form(self.request.GET)
 
     def get_task_list(self) -> SchedulerTaskList | None:
         try:

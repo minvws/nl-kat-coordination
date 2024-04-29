@@ -13,7 +13,7 @@ from octopoes.models import EmptyScanProfile, InheritedScanProfile
 from rocky.views.ooi_detail import OOIDetailView
 
 
-class ScanProfileDetailView(OOIDetailView, FormView):
+class ScanProfileDetailView(FormView, OOIDetailView):
     template_name = "scan_profiles/scan_profile_detail.html"
     form_class = SetClearanceLevelForm
 

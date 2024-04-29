@@ -33,20 +33,16 @@ class TaskListView(SchedulerView, ListView, PageActionsView):
             if self.action == self.RESCHEDULE_TASK:
                 task_id = self.request.POST.get("task_id", "")
                 self.reschedule_task(task_id)
-
-        except (SchedulerError, HTTPError) as error:
+        except HTTPError as exc:
+            message = f"HTTP error for {exc.request.url} - {exc}"
+            messages.error(request, message)
+        except SchedulerError as error:
             messages.error(request, error.message)
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["scan_history_form_fields"] = [
-            "scan_history_from",
-            "scan_history_to",
-            "scan_history_status",
-            "scan_history_search",
-            "scan_history_page",
-        ]
+        context["task_filter_form"] = self.get_task_filter_form()
         context["breadcrumbs"] = [
             {
                 "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
