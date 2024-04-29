@@ -22,15 +22,14 @@
                 <p>{% translate "Good job! All required plugins are enabled." %}</p>
             {% else %}
                 <div class="required-plugin-container">
-                    <form action="" class="inline">
+                    <div class="toolbar">
                         <div class="checkbox">
                             <input type="checkbox"
                                    class="display-toggle"
-                                   id="checkbox-for-enabled-required-plugins"
-                                   {% if checked %}checked{% endif %}>
+                                   id="checkbox-for-enabled-required-plugins">
                             <label for="checkbox-for-enabled-plugins">Show enabled plugins</label>
                         </div>
-                    </form>
+                    </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for required_plugin in plugins.required %}
                             {% include "partials/plugin_tile.html" with plugin=required_plugin %}
@@ -47,15 +46,14 @@
                 <p>{% translate "Good job! All suggested plugins are enabled" %}</p>
             {% else %}
                 <div class="optional-plugin-container">
-                    <form action="" class="inline">
+                    <div class="toolbar">
                         <div class="checkbox">
                             <input type="checkbox"
                                    class="display-toggle"
-                                   id="checkbox-for-enabled-optional-plugins"
-                                   {% if checked %}checked{% endif %}>
+                                   id="checkbox-for-enabled-optional-plugins">
                             <label for="checkbox-for-enabled-plugins">Show enabled plugins</label>
                         </div>
-                    </form>
+                    </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for optional_plugin in plugins.optional %}
                             {% if optional_plugin not in plugins.required %}

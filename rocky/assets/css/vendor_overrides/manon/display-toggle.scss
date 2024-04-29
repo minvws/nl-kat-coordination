@@ -1,7 +1,7 @@
-.display-toggle[unchecked] ~ .plugin-enabled {
+.toolbar:has(.checkbox > .display-toggle) + .plugins .plugin-enabled {
   display: none;
 }
 
-.display-toggle[checked] > .plugin-enabled {
+.toolbar:has(.checkbox > .display-toggle:checked) + .plugins .plugin-enabled {
   display: flex;
 }
