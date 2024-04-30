@@ -2,7 +2,7 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
-SUBFINDER_IMAGE = "projectdiscovery/subfinder:latest"
+SUBFINDER_IMAGE = "projectdiscovery/subfinder:v2.6.6"
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:

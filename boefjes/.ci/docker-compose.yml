@@ -14,6 +14,6 @@ services:
     - .:/app/boefjes
 
   ci_katalogus-db:
-    image: postgres:15
+    image: docker.io/library/postgres:15
     env_file:
       - .ci/.env.test
