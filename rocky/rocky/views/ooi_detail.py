@@ -25,7 +25,6 @@ class OOIDetailView(
     TaskListView,
 ):
     template_name = "oois/ooi_detail.html"
-    context_object_name = "task_history"
     task_filter_form = OOIDetailTaskFilterForm
 
     def post(self, request, *args, **kwargs):

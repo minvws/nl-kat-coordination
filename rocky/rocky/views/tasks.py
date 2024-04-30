@@ -17,6 +17,7 @@ from rocky.views.scheduler import SchedulerView
 class TaskListView(SchedulerView, ListView, PageActionsView):
     paginator_class = RockyPaginator
     paginate_by = 20
+    context_object_name = "task_list"
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:

@@ -28,7 +28,6 @@ class PluginCoverImgView(OrganizationView):
 
 class PluginDetailView(TaskListView, PluginSettingsListView):
     paginate_by = 10
-    context_object_name = "task_history"
 
     def post(self, request, *args, **kwargs):
         if self.action == self.SCAN_OOIS:
