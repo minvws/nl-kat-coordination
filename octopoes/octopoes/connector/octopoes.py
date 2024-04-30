@@ -199,7 +199,7 @@ class OctopoesAPIConnector:
         self.session.post(f"/{self.client}/objects/delete_many", params=params, json=[str(ref) for ref in references])
 
     def list_origin_parameters(self, origin_id: set[str], valid_time: datetime) -> list[OriginParameter]:
-        params = {"origin_id": origin_id, "valid_time": str(valid_time)}
+        params = {"origin_id": list(origin_id), "valid_time": str(valid_time)}
         res = self.session.get(f"/{self.client}/origin_parameters", params=params)
         return TypeAdapter(list[OriginParameter]).validate_json(res.content)
 
@@ -291,3 +291,12 @@ class OctopoesAPIConnector:
         result = self.session.get(f"/{self.client}/query-many", params=params).json()
 
         return TypeAdapter(list[tuple[str, OOIType | str]]).validate_python(result)
+
+    def export_all(self):
+        return self.session.get(f"/{self.client}/io/export").json()
+
+    def import_add(self, content):
+        return self.session.post(f"/{self.client}/io/import/add", content=content).json()
+
+    def import_new(self, content):
+        return self.session.post(f"/{self.client}/io/import/new", content=content).json()
