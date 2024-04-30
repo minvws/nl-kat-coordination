@@ -34,7 +34,7 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for required_plugin in plugins.required|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=required_plugin %}
+                            {% include "partials/plugin_tile.html" with plugin=required_plugin show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
 
                         {% endfor %}
                     </div>
@@ -60,10 +60,10 @@
                         {% for optional_plugin in plugins.optional|dictsort:"enabled" %}
                             {% if optional_plugin not in plugins.required %}
                                 {% if forloop.counter > 4 %}
-                                    {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" hidden="true" %}
+                                    {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" hidden="true" show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
 
                                 {% else %}
-                                    {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
+                                    {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
 
                                 {% endif %}
                             {% endif %}
