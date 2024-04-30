@@ -108,6 +108,7 @@ class WebSystemReport(Report):
     }
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "web_system_report/report.html"
+    label_style = "3-light"
 
     def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
         hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
@@ -115,7 +116,8 @@ class WebSystemReport(Report):
 
         query = "Hostname.<hostname[is Website].<website[is HTTPResource].<ooi[is Finding].finding_type"
         csp_finding_types = self.group_finding_types_by_source(
-            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames), ["KAT-NO-CSP"]
+            self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
+            ["KAT-NO-CSP"],
         )
         query = (
             "Hostname.<hostname[is Website].<website[is HTTPResource].<resource[is HTTPHeader]"
@@ -143,7 +145,11 @@ class WebSystemReport(Report):
         query = "Hostname.<hostname[is ResolvedHostname].address.<address[is IPPort].<ooi[is Finding].finding_type"
         port_finding_types = self.group_finding_types_by_source(
             self.octopoes_api_connector.query_many(query, valid_time, all_hostnames),
-            ["KAT-UNCOMMON-OPEN-PORT", "KAT-OPEN-SYSADMIN-PORT", "KAT-OPEN-DATABASE-PORT"],
+            [
+                "KAT-UNCOMMON-OPEN-PORT",
+                "KAT-OPEN-SYSADMIN-PORT",
+                "KAT-OPEN-DATABASE-PORT",
+            ],
         )
         query = "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type"
         certificate_finding_types = self.group_finding_types_by_source(
@@ -198,7 +204,9 @@ class WebSystemReport(Report):
                 # We need cast here because mypy doesn't understand that we only add finding_types
                 # when risk level severity isn't None
                 "finding_types": sorted(
-                    finding_types.values(), reverse=True, key=lambda x: cast(RiskLevelSeverity, x.risk_severity)
+                    finding_types.values(),
+                    reverse=True,
+                    key=lambda x: cast(RiskLevelSeverity, x.risk_severity),
                 ),
             }
 

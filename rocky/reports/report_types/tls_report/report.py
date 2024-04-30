@@ -11,7 +11,11 @@ from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
 
-CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
+CIPHER_FINDINGS = [
+    "KAT-RECOMMENDATION-BAD-CIPHER",
+    "KAT-MEDIUM-BAD-CIPHER",
+    "KAT-CRITICAL-BAD-CIPHER",
+]
 TREE_DEPTH = 3
 
 
@@ -22,6 +26,7 @@ class TLSReport(Report):
     plugins = {"required": ["testssl-sh-ciphers"], "optional": []}
     input_ooi_types = {IPService}
     template_path = "tls_report/report.html"
+    label_style = "3-light"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         suites: dict = {}
