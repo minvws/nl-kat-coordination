@@ -709,14 +709,11 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.FAILED)
 
-        breakpoint()
         # Assert: new task should be queued
         task_pq = models.BoefjeTask(**self.scheduler.queue.peek(0).data)
         self.assertEqual(1, self.scheduler.queue.qsize())
-
-        # Assert: task should be in datastore, and queued
-        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
-        self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
+        self.assertEqual(ooi.primary_key, task_pq.input_ooi)
+        self.assertEqual(boefje_task.boefje.id, task_pq.boefje.id)
 
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
@@ -801,7 +798,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Act
         self.scheduler.pop_item_from_queue()
 
-        # Assert: task should be in datastore, and dispatched
+        # Assert: task should be in datastore, and queeud
         task_db = self.mock_ctx.datastores.task_store.get_task(p_item.id)
         self.assertEqual(task_db.id, p_item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)

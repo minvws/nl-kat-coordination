@@ -17,10 +17,10 @@ class PriorityQueueStore:
         with self.dbconn.session.begin() as session:
             query = (
                 session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
                 .order_by(models.TaskDB.priority.asc())
                 .order_by(models.TaskDB.created_at.asc())
                 .filter(models.TaskDB.scheduler_id == scheduler_id)
-                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
             )
 
             if filters is not None:
@@ -46,8 +46,8 @@ class PriorityQueueStore:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.TaskDB)
-                .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .order_by(models.TaskDB.priority.asc())
                 .order_by(models.TaskDB.created_at.asc())
                 .offset(index)
@@ -64,6 +64,7 @@ class PriorityQueueStore:
         with self.dbconn.session.begin() as session:
             (
                 session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
                 .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .filter(models.TaskDB.id == item.id)
                 .update(item.model_dump())
@@ -74,6 +75,7 @@ class PriorityQueueStore:
         with self.dbconn.session.begin() as session:
             (
                 session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
                 .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .filter(models.TaskDB.id == str(item_id))
                 .delete()
@@ -84,6 +86,7 @@ class PriorityQueueStore:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
                 .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .filter(models.TaskDB.id == str(item_id))
                 .first()
@@ -97,7 +100,12 @@ class PriorityQueueStore:
     @retry()
     def empty(self, scheduler_id: str) -> bool:
         with self.dbconn.session.begin() as session:
-            count = session.query(models.TaskDB).filter(models.TaskDB.scheduler_id == scheduler_id).count()
+            count = (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
+                .count()
+            )
             return count == 0
 
     @retry()
@@ -105,8 +113,8 @@ class PriorityQueueStore:
         with self.dbconn.session.begin() as session:
             count = (
                 session.query(models.TaskDB)
-                .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .count()
             )
 
@@ -119,7 +127,11 @@ class PriorityQueueStore:
         filters: FilterRequest | None,
     ) -> tuple[list[models.PrioritizedItem], int]:
         with self.dbconn.session.begin() as session:
-            query = session.query(models.TaskDB).filter(models.TaskDB.scheduler_id == scheduler_id)
+            query = (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
+            )
 
             if filters is not None:
                 query = apply_filter(models.TaskDB, query, filters)
@@ -134,6 +146,7 @@ class PriorityQueueStore:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
                 .order_by(models.TaskDB.created_at.desc())
                 .filter(models.TaskDB.scheduler_id == scheduler_id)
                 .filter(models.TaskDB.hash == item_hash)
@@ -148,11 +161,21 @@ class PriorityQueueStore:
     @retry()
     def get_items_by_scheduler_id(self, scheduler_id: str) -> list[models.PrioritizedItem]:
         with self.dbconn.session.begin() as session:
-            items_orm = session.query(models.TaskDB).filter(models.TaskDB.scheduler_id == scheduler_id).all()
+            items_orm = (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
+                .all()
+            )
 
             return [models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm]
 
     @retry()
     def clear(self, scheduler_id: str) -> None:
         with self.dbconn.session.begin() as session:
-            (session.query(models.TaskDB).filter(models.TaskDB.scheduler_id == scheduler_id).delete())
+            (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.status == models.TaskStatus.QUEUED)
+                .filter(models.TaskDB.scheduler_id == scheduler_id)
+                .delete(),
+            )

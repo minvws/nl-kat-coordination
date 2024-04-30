@@ -193,7 +193,6 @@ class Scheduler(abc.ABC):
         Args:
             p_item: The PrioritizedItem to push to the queue.
         """
-        breakpoint()
         if not self.is_enabled():
             self.logger.warning(
                 "Scheduler is disabled, not pushing item to queue %s",
