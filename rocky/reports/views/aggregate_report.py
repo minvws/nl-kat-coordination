@@ -20,6 +20,7 @@ from reports.report_types.helpers import (
 )
 from reports.utils import JSONEncoder, debug_json_keys
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
+from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -65,13 +66,16 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
         )
 
 
-class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):
+class OOISelectionAggregateReportView(
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView
+):
     """
     Select Objects for the 'Aggregate Report' flow.
     """
 
     template_name = "aggregate_report/select_oois.html"
-    current_step = 3
+    breadcrumbs_step = 3
+    current_step = 1
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def get_context_data(self, **kwargs):
@@ -81,14 +85,17 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOILis
         return context
 
 
-class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
+class ReportTypesSelectionAggregateReportView(
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
+):
     """
     Shows all possible report types from a list of Objects.
     Chooses report types for the 'Aggregate Report' flow.
     """
 
     template_name = "aggregate_report/select_report_types.html"
-    current_step = 4
+    breadcrumbs_step = 4
+    current_step = 2
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -114,13 +121,16 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Ba
         return context
 
 
-class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
+class SetupScanAggregateReportView(
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
+):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
 
     template_name = "aggregate_report/setup_scan.html"
-    current_step = 5
+    breadcrumbs_step = 5
+    current_step = 3
 
     def get(self, request, *args, **kwargs):
         if not self.selected_report_types:
