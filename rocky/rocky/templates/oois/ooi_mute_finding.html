@@ -9,7 +9,7 @@
     <main id="main-content">
         <section>
             <div class="layout-form">
-                <h1>{% translate "Mute finding" %}: {{ ooi.human_readable }}</h1>
+                <h1>{% translate "Mute finding:" %} {{ ooi.human_readable }}</h1>
                 <p>{% translate "Give a reason below why you want to mute this finding." %}</p>
                 <form action="{% url 'ooi_add' ooi_type=ooi_type organization_code=organization.code %}"
                       novalidate

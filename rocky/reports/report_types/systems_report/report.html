@@ -2,7 +2,7 @@
 
 {% if data.services %}
     <div class="horizontal-scroll">
-        {% if show_introduction %}
+        {% if generate_report %}
             <p>
                 {% blocktranslate trimmed %}
                     The system report provides an overview of the system types (types of
@@ -15,7 +15,7 @@
             </p>
         {% endif %}
         <table>
-            <caption class="visually-hidden">{% translate "Selected assets:" %}</caption>
+            <caption class="visually-hidden">{% translate "Selected assets" %}</caption>
             <thead>
                 <tr>
                     <th scope="col">{% translate "IP address" %}</th>
@@ -29,7 +29,10 @@
                         <td>{{ ip.tokenized.address }}</td>
                         <td>
                             {% if ip_services.hostnames %}
-                                {{ ip_services.hostnames|join:", " }}
+                                {% for hostname in ip_services.hostnames %}
+                                    {{ hostname.human_readable }}
+                                    {% if not forloop.last %},{% endif %}
+                                {% endfor %}
                             {% else %}
                                 -
                             {% endif %}
