@@ -1,7 +1,6 @@
 from collections.abc import Sequence
 from typing import Any
 
-import httpx
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -14,13 +13,15 @@ from tools.view_helpers import url_with_querystring
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.definitions import Report
-from reports.report_types.helpers import (
-    get_ooi_types_from_aggregate_report,
-    get_plugins_for_report_ids,
-    get_report_types_from_aggregate_report,
-)
+from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
 from reports.utils import JSONEncoder, debug_json_keys
-from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
+from reports.views.base import (
+    REPORTS_PRE_SELECTION,
+    BaseReportPluginView,
+    BaseReportView,
+    ReportBreadcrumbs,
+    get_selection,
+)
 from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -68,7 +69,10 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
 
 
 class OOISelectionAggregateReportView(
-    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView
+    AggregateReportStepsMixin,
+    BreadcrumbsAggregateReportView,
+    BaseOOIListView,
+    BaseReportView,
 ):
     """
     Select Objects for the 'Aggregate Report' flow.
@@ -87,7 +91,10 @@ class OOISelectionAggregateReportView(
 
 
 class ReportTypesSelectionAggregateReportView(
-    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
+    AggregateReportStepsMixin,
+    BreadcrumbsAggregateReportView,
+    BaseReportView,
+    TemplateView,
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -122,9 +129,7 @@ class ReportTypesSelectionAggregateReportView(
         return context
 
 
-class SetupScanAggregateReportView(
-    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
-):
+class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportPluginView):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -133,34 +138,8 @@ class SetupScanAggregateReportView(
     breadcrumbs_step = 5
     current_step = 3
 
-    def get(self, request, *args, **kwargs):
-        if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
 
-        try:
-            self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
-        except httpx.HTTPStatusError:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
-            )
-            return redirect(self.get_previous())
-
-        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("aggregate_report_view", kwargs=kwargs) + get_selection(request))
-
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plugins"] = self.plugins
-        context["all_plugins_enabled"] = self.all_plugins_enabled
-        context["plugin_data"] = self.get_plugin_data()
-        return context
-
-
-class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
+class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, BaseReportPluginView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -171,16 +150,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
-        try:
-            self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
-        except httpx.HTTPStatusError:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
-            )
-            return redirect(self.get_previous())
-
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
 
@@ -209,9 +178,14 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
+    def generate_reports_for_oois(
+        self,
+    ) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
-            self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.observed_at
+            self.octopoes_api_connector,
+            self.get_oois(),
+            self.selected_report_types,
+            self.observed_at,
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
@@ -234,12 +208,18 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         context["post_processed_data"] = post_processed_data
         context["report_data"] = report_data
         context["report_download_pdf_url"] = url_with_querystring(
-            reverse("aggregate_report_pdf", kwargs={"organization_code": self.organization.code}),
+            reverse(
+                "aggregate_report_pdf",
+                kwargs={"organization_code": self.organization.code},
+            ),
             True,
             **self.request.GET,
         )
         context["report_download_json_url"] = url_with_querystring(
-            reverse("aggregate_report_view", kwargs={"organization_code": self.organization.code}),
+            reverse(
+                "aggregate_report_view",
+                kwargs={"organization_code": self.organization.code},
+            ),
             True,
             **dict(json="true", **self.request.GET),
         )

@@ -1,7 +1,6 @@
 from collections.abc import Sequence
 from typing import Any
 
-import httpx
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -14,13 +13,14 @@ from tools.view_helpers import url_with_querystring
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from reports.report_types.definitions import Report
-from reports.report_types.helpers import (
-    REPORTS,
-    get_ooi_types_with_report,
-    get_plugins_for_report_ids,
-    get_report_types_for_oois,
+from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_types_for_oois
+from reports.views.base import (
+    REPORTS_PRE_SELECTION,
+    BaseReportPluginView,
+    BaseReportView,
+    ReportBreadcrumbs,
+    get_selection,
 )
-from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from reports.views.view_helpers import GenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -68,7 +68,10 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
 
 
 class OOISelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView
+    GenerateReportStepsMixin,
+    BreadcrumbsGenerateReportView,
+    BaseReportView,
+    BaseOOIListView,
 ):
     """
     Select objects for the 'Generate Report' flow.
@@ -87,7 +90,10 @@ class OOISelectionGenerateReportView(
 
 
 class ReportTypesSelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
+    GenerateReportStepsMixin,
+    BreadcrumbsGenerateReportView,
+    BaseReportView,
+    TemplateView,
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -113,9 +119,7 @@ class ReportTypesSelectionGenerateReportView(
         return context
 
 
-class SetupScanGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
-):
+class SetupScanGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportPluginView):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -125,56 +129,21 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            error_message = _("Select at least one report type to proceed.")
-            messages.add_message(self.request, messages.ERROR, error_message)
-
-        try:
-            self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
-        except httpx.HTTPStatusError:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
-            )
-            return redirect(self.get_previous())
-
+        response = super().get(request, *args, **kwargs)
         if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("generate_report_view", kwargs=kwargs) + get_selection(request))
-
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plugins"] = self.plugins
-        context["all_plugins_enabled"] = self.all_plugins_enabled
-        context["plugin_data"] = self.get_plugin_data()
-        return context
+            return redirect(self.get_next())
+        return response
 
 
-class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
+class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportPluginView, BaseReportView):
     """
     Shows the report generated from OOIS and report types.
     """
 
     template_name = "generate_report.html"
+    breadcrumbs_step = 5
     current_step = 6
     report_types: Sequence[type[Report]]
-
-    def get(self, request, *args, **kwargs):
-        try:
-            self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
-        except httpx.HTTPStatusError:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
-            )
-            return redirect(self.get_previous())
-        if not self.all_plugins_enabled["required"]:
-            warning_message = _("This report may not show all the data as some required plugins are not enabled.")
-            messages.add_message(self.request, messages.WARNING, warning_message)
-        return super().get(request, *args, **kwargs)
 
     def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, Any]]]:
         error_reports = []
@@ -233,7 +202,10 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
         context["report_data"] = self.generate_reports_for_oois()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(
-            reverse("generate_report_pdf", kwargs={"organization_code": self.organization.code}),
+            reverse(
+                "generate_report_pdf",
+                kwargs={"organization_code": self.organization.code},
+            ),
             True,
             **self.request.GET,
         )

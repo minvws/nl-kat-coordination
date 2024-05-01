@@ -4,6 +4,7 @@ from logging import getLogger
 from operator import attrgetter
 from typing import Any, Literal, cast
 
+import httpx
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.forms import Form
@@ -19,7 +20,7 @@ from tools.view_helpers import BreadcrumbsMixin
 from octopoes.models import OOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import BaseReportType, MultiReport, Report, ReportType
-from reports.report_types.helpers import get_report_by_id
+from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import OOIFilterView
 
@@ -68,9 +69,10 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 
     def get_next(self):
         breadcrumbs = self.build_breadcrumbs()
-        if self.breadcrumbs_step < len(breadcrumbs):
-            return breadcrumbs[self.breadcrumbs_step]["url"]
-        return breadcrumbs[self.breadcrumbs_step - 1]["url"]
+
+        if len(breadcrumbs) <= self.breadcrumbs_step and (len(breadcrumbs) - self.breadcrumbs_step) > 1:
+            return breadcrumbs[self.breadcrumbs_step + 1]["url"]
+        return breadcrumbs[self.breadcrumbs_step]["url"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -80,7 +82,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return context
 
 
-class BaseReportView(OOIFilterView):
+class BaseReportSelectionView(OrganizationView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.selected_oois = sorted(set(request.GET.getlist("ooi", [])))
@@ -88,6 +90,114 @@ class BaseReportView(OOIFilterView):
         self.report_types: Sequence[type[Report] | type[MultiReport]] = self.get_report_types_from_choice()
         self.report_ids = [report.id for report in self.report_types]
 
+    def get_report_types_from_choice(self) -> list[type[Report] | type[MultiReport]]:
+        report_types = []
+        for report_type in self.selected_report_types:
+            try:
+                report = get_report_by_id(report_type)
+                report_types.append(report)
+            except ValueError:
+                error_message = _("Report type '%s' does not exist.") % report_type
+                messages.add_message(self.request, messages.ERROR, error_message)
+        return report_types
+
+    def get_report_types(self) -> list[ReportType]:
+        return [
+            {
+                "id": report_type.id,
+                "name": report_type.name,
+                "description": report_type.description,
+                "label_style": report_type.label_style,
+            }
+            for report_type in self.get_report_types_from_choice()
+        ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["selected_oois"] = self.selected_oois
+        context["selected_report_types"] = self.selected_report_types
+        return context
+
+
+class BaseReportPluginView(BaseReportSelectionView, TemplateView):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+
+        try:
+            self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
+                get_plugins_for_report_ids(self.report_ids)
+            )
+
+        except httpx.HTTPStatusError:
+            messages.error(
+                request,
+                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
+            )
+            return redirect(self.get_previous())
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["plugins"] = self.plugins
+        context["all_plugins_enabled"] = self.all_plugins_enabled
+        context["plugin_data"] = self.get_plugin_data()
+
+        return context
+
+    def get_required_optional_plugins(
+        self, plugin_ids_dict: dict[str, set[str]]
+    ) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
+        required_optional_plugins: dict[str, list[Plugin]] = {}
+        plugins_enabled: dict[str, bool] = {}
+
+        for required_optional, plugin_ids in plugin_ids_dict.items():
+            plugins: list[Plugin] = get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids))
+
+            sorted_plugins = sorted(plugins, key=attrgetter("name"))
+            are_plugins_enabled: list[bool] = []
+            for plugin in sorted_plugins:
+                are_plugins_enabled.append(plugin.enabled)
+            required_optional_plugins[required_optional] = plugins
+            plugins_enabled[required_optional] = all(are_plugins_enabled)
+
+        return required_optional_plugins, plugins_enabled
+
+    def get_plugin_data(self):
+        report_types: dict[str, Any] = {}
+        total_enabled_plugins = {"required": 0, "optional": 0}
+        total_available_plugins = {"required": 0, "optional": 0}
+
+        for report_type in self.report_types:
+            for plugin_type in ["required", "optional"]:
+                # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
+                plugin_type = cast(Literal["required", "optional"], plugin_type)
+                number_of_enabled = sum(
+                    (1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0)
+                    for plugin in self.plugins[plugin_type]
+                )
+
+                number_of_available = len(report_type.plugins[plugin_type])
+                total_enabled_plugins[plugin_type] += number_of_enabled
+                total_available_plugins[plugin_type] += number_of_available
+
+                if report_type.name not in report_types:
+                    report_types[report_type.name] = {}
+
+                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
+                report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
+
+        plugin_data = {
+            "total_enabled_plugins": total_enabled_plugins,
+            "total_available_plugins": total_available_plugins,
+            "report_types": report_types,
+        }
+
+        return plugin_data
+
+
+class BaseReportView(BaseReportSelectionView, OOIFilterView):
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
             return self.octopoes_api_connector.list_objects(
@@ -133,82 +243,9 @@ class BaseReportView(OOIFilterView):
             report_types[option] = self.get_report_types_for_generate_report(reports)
         return report_types
 
-    def get_required_optional_plugins(self, plugin_ids_dict: dict[str, set[str]]) -> None:
-        required_optional_plugins: dict[str, list[Plugin]] = {}
-        plugins_enabled: dict[str, bool] = {}
-
-        for required_optional, plugin_ids in plugin_ids_dict.items():
-            plugins: list[Plugin] = get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids))
-
-            sorted_plugins = sorted(plugins, key=attrgetter("name"))
-            are_plugins_enabled: list[bool] = []
-            for plugin in sorted_plugins:
-                are_plugins_enabled.append(plugin.enabled)
-            required_optional_plugins[required_optional] = plugins
-            plugins_enabled[required_optional] = all(are_plugins_enabled)
-
-        self.plugins = required_optional_plugins
-        self.all_plugins_enabled = plugins_enabled
-
-    def get_plugin_data(self):
-        report_types: dict[str, Any] = {}
-        total_enabled_plugins = {"required": 0, "optional": 0}
-        total_available_plugins = {"required": 0, "optional": 0}
-
-        for report_type in self.report_types:
-            for plugin_type in ["required", "optional"]:
-                # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
-                plugin_type = cast(Literal["required", "optional"], plugin_type)
-                number_of_enabled = sum(
-                    1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0
-                    for plugin in self.plugins[plugin_type]
-                )
-
-                number_of_available = len(report_type.plugins[plugin_type])
-                total_enabled_plugins[plugin_type] += number_of_enabled
-                total_available_plugins[plugin_type] += number_of_available
-
-                if report_type.name not in report_types:
-                    report_types[report_type.name] = {}
-
-                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
-                report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
-
-        plugin_data = {
-            "total_enabled_plugins": total_enabled_plugins,
-            "total_available_plugins": total_available_plugins,
-            "report_types": report_types,
-        }
-
-        return plugin_data
-
-    def get_report_types_from_choice(self) -> list[type[Report] | type[MultiReport]]:
-        report_types = []
-        for report_type in self.selected_report_types:
-            try:
-                report = get_report_by_id(report_type)
-                report_types.append(report)
-            except ValueError:
-                error_message = _("Report type '%s' does not exist.") % report_type
-                messages.add_message(self.request, messages.ERROR, error_message)
-        return report_types
-
-    def get_report_types(self) -> list[ReportType]:
-        return [
-            {
-                "id": report_type.id,
-                "name": report_type.name,
-                "description": report_type.description,
-                "label_style": report_type.label_style,
-            }
-            for report_type in self.get_report_types_from_choice()
-        ]
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
-        context["selected_oois"] = self.selected_oois
-        context["selected_report_types"] = self.selected_report_types
         context["oois"] = self.get_oois()
         return context
 
