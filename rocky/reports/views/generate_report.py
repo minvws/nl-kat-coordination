@@ -30,6 +30,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
+
         breadcrumbs += [
             {
                 "url": reverse("generate_report_landing", kwargs=kwargs) + selection,
@@ -52,6 +53,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
                 "text": _("View report"),
             },
         ]
+
         return breadcrumbs
 
 
@@ -141,7 +143,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportPluginView, Ba
     """
 
     template_name = "generate_report.html"
-    breadcrumbs_step = 5
+    breadcrumbs_step = 6
     current_step = 6
     report_types: Sequence[type[Report]]
 

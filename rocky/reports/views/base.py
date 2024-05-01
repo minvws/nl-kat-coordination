@@ -42,8 +42,15 @@ logger = getLogger(__name__)
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     breadcrumbs_step: int = 1
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.breadcrumbs = self.build_breadcrumbs()
+
     def get_kwargs(self):
         return {"organization_code": self.organization.code}
+
+    def is_valid_breadcrumbs(self):
+        return self.breadcrumbs_step < len(self.breadcrumbs)
 
     def build_breadcrumbs(self):
         kwargs = self.get_kwargs()
@@ -59,20 +66,22 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return breadcrumbs
 
     def get_current(self):
-        return self.build_breadcrumbs()[: self.breadcrumbs_step]
+        if self.is_valid_breadcrumbs():
+            return self.breadcrumbs[: self.breadcrumbs_step]
+        return self.breadcrumbs
 
     def get_previous(self):
-        breadcrumbs = self.build_breadcrumbs()
-        if self.breadcrumbs_step >= 2:
-            return self.build_breadcrumbs()[self.breadcrumbs_step - 2]["url"]
-        return breadcrumbs[self.breadcrumbs_step]["url"]
+        if self.is_valid_breadcrumbs():
+            if self.breadcrumbs_step >= 2:
+                return self.breadcrumbs[self.breadcrumbs_step - 2]["url"]
+            else:
+                return self.breadcrumbs[self.breadcrumbs_step]["url"]
+        return self.breadcrumbs
 
     def get_next(self):
-        breadcrumbs = self.build_breadcrumbs()
-
-        if len(breadcrumbs) <= self.breadcrumbs_step and (len(breadcrumbs) - self.breadcrumbs_step) > 1:
-            return breadcrumbs[self.breadcrumbs_step + 1]["url"]
-        return breadcrumbs[self.breadcrumbs_step]["url"]
+        if self.is_valid_breadcrumbs():
+            return self.breadcrumbs[self.breadcrumbs_step]["url"]
+        return self.breadcrumbs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
