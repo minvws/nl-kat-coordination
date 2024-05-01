@@ -34,7 +34,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, BaseOOIListView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        # Setting utc end of date and time
+        # Set time to end of day to fetch today created objects.
         self.observed_at: datetime = datetime.combine(self.observed_at, time.max, tzinfo=timezone.utc)
 
 

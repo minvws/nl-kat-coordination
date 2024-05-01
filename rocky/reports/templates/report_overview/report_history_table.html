@@ -30,17 +30,40 @@
                 </thead>
                 <tbody>
                     {% for report in reports %}
-                        <tr>
-                            <td>
-                                <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d" }}"
-                                   title="{% translate "Shows report detail" %}">{{ report.reference }}</a>
-                            </td>
-                            <td>{{ report.name }}</td>
-                            <td>{{ report.report_type }}</td>
-                            <td>{{ report.input_ooi }}</td>
-                            <td>{{ report.observed_at }}</td>
-                            <td>{{ report.date_generated }}</td>
-                        </tr>
+                        {% if not report.has_parent %}
+                            <tr>
+                                <td>
+                                    <a href="{% url "view_report" organization.code %}?report_id={{ report.reference }}&observed_at={{ report.observed_at|date:"Y-m-d" }}"
+                                       title="{% translate "Shows report detail" %}">{{ report.reference }}</a>
+                                </td>
+                                <td>{{ report.name }}</td>
+                                <td>{{ report.report_type }}</td>
+                                <td>{{ report.input_ooi }}</td>
+                                <td>{{ report.observed_at }}</td>
+                                <td>{{ report.date_generated }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if report.has_parent %}
+                            <tr class="expando-row">
+                                <td colspan="7">
+                                    <ul class="accordion break-title">
+                                        <li>
+                                            <button type="button" aria-expanded="false">{{ report.id }}</button>
+                                            <div aria-labelledby="child-report-details">
+                                                <h5>{% translate "Report type" %}</h5>
+                                                <p>{{ report.report_type }}</p>
+                                                <h5>{% translate "Object" %}</h5>
+                                                <p>{{ report.inout_ooi }}</p>
+                                                <h5>{% translate "Reference date" %}</h5>
+                                                <p>{{ report.observed_at }}</p>
+                                                <h5>{% translate "Creation date" %}</h5>
+                                                <p>{{ report.date_generated }}</p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
