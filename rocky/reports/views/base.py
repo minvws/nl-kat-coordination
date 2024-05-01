@@ -153,7 +153,9 @@ class BaseReportPluginView(BaseReportSelectionView, TemplateView):
         plugins_enabled: dict[str, bool] = {}
 
         for required_optional, plugin_ids in plugin_ids_dict.items():
-            plugins: list[Plugin] = get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids))
+            plugins: list[Plugin] = (
+                get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids)) if plugin_ids else []
+            )
 
             sorted_plugins = sorted(plugins, key=attrgetter("name"))
             are_plugins_enabled: list[bool] = []
