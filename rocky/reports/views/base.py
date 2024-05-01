@@ -19,7 +19,7 @@ from tools.view_helpers import BreadcrumbsMixin
 from octopoes.models import OOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import BaseReportType, MultiReport, Report, ReportType
-from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
+from reports.report_types.helpers import get_report_by_id
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import OOIFilterView
 
@@ -85,12 +85,8 @@ class BaseReportView(OOIFilterView):
         super().setup(request, *args, **kwargs)
         self.selected_oois = sorted(set(request.GET.getlist("ooi", [])))
         self.selected_report_types = request.GET.getlist("report_type", [])
-
         self.report_types: Sequence[type[Report] | type[MultiReport]] = self.get_report_types_from_choice()
-        report_ids = [report.id for report in self.report_types]
-        self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
-            get_plugins_for_report_ids(report_ids)
-        )
+        self.report_ids = [report.id for report in self.report_types]
 
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
@@ -137,14 +133,13 @@ class BaseReportView(OOIFilterView):
             report_types[option] = self.get_report_types_for_generate_report(reports)
         return report_types
 
-    def get_required_optional_plugins(
-        self, plugin_ids_dict: dict[str, set[str]]
-    ) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
+    def get_required_optional_plugins(self, plugin_ids_dict: dict[str, set[str]]) -> None:
         required_optional_plugins: dict[str, list[Plugin]] = {}
         plugins_enabled: dict[str, bool] = {}
 
         for required_optional, plugin_ids in plugin_ids_dict.items():
             plugins: list[Plugin] = get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids))
+
             sorted_plugins = sorted(plugins, key=attrgetter("name"))
             are_plugins_enabled: list[bool] = []
             for plugin in sorted_plugins:
@@ -152,7 +147,8 @@ class BaseReportView(OOIFilterView):
             required_optional_plugins[required_optional] = plugins
             plugins_enabled[required_optional] = all(are_plugins_enabled)
 
-        return required_optional_plugins, plugins_enabled
+        self.plugins = required_optional_plugins
+        self.all_plugins_enabled = plugins_enabled
 
     def get_plugin_data(self):
         report_types: dict[str, Any] = {}
@@ -213,9 +209,7 @@ class BaseReportView(OOIFilterView):
         context["created_at"] = datetime.now()
         context["selected_oois"] = self.selected_oois
         context["selected_report_types"] = self.selected_report_types
-        context["plugins"] = self.plugins
         context["oois"] = self.get_oois()
-        context["plugin_data"] = self.get_plugin_data()
         return context
 
 

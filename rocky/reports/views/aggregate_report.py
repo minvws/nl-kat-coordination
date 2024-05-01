@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
+import httpx
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -136,6 +137,16 @@ class SetupScanAggregateReportView(
         if not self.selected_report_types:
             messages.error(self.request, _("Select at least one report type to proceed."))
 
+        try:
+            self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
+        except httpx.HTTPStatusError:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
+            )
+            return redirect(self.get_previous())
+
         if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
             return redirect(reverse("aggregate_report_view", kwargs=kwargs) + get_selection(request))
 
@@ -143,9 +154,9 @@ class SetupScanAggregateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
-            get_plugins_for_report_ids(self.selected_report_types)
-        )
+        context["plugins"] = self.plugins
+        context["all_plugins_enabled"] = self.all_plugins_enabled
+        context["plugin_data"] = self.get_plugin_data()
         return context
 
 
@@ -160,6 +171,16 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
+        try:
+            self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
+        except httpx.HTTPStatusError:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
+            )
+            return redirect(self.get_previous())
+
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
 
@@ -224,8 +245,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         )
 
         context["oois"] = self.get_oois()
-        plugins, _ = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
-        context["plugins"] = plugins
+        context["plugins"] = self.plugins
         return context
 
 

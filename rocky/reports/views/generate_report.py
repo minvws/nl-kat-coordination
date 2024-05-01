@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from typing import Any
 
+import httpx
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
@@ -128,6 +129,16 @@ class SetupScanGenerateReportView(
             error_message = _("Select at least one report type to proceed.")
             messages.add_message(self.request, messages.ERROR, error_message)
 
+        try:
+            self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
+        except httpx.HTTPStatusError:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
+            )
+            return redirect(self.get_previous())
+
         if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
             return redirect(reverse("generate_report_view", kwargs=kwargs) + get_selection(request))
 
@@ -135,9 +146,9 @@ class SetupScanGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
-            get_plugins_for_report_ids(self.selected_report_types)
-        )
+        context["plugins"] = self.plugins
+        context["all_plugins_enabled"] = self.all_plugins_enabled
+        context["plugin_data"] = self.get_plugin_data()
         return context
 
 
@@ -151,6 +162,15 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
+        try:
+            self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
+        except httpx.HTTPStatusError:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
+            )
+            return redirect(self.get_previous())
         if not self.all_plugins_enabled["required"]:
             warning_message = _("This report may not show all the data as some required plugins are not enabled.")
             messages.add_message(self.request, messages.WARNING, warning_message)
