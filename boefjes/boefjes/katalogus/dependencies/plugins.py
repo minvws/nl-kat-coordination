@@ -75,7 +75,7 @@ class PluginService:
         raise KeyError(f"Plugin {plugin_id} not found for {organisation_id}")
 
     def by_plugin_ids(self, plugin_ids: list[str], organisation_id: str) -> list[PluginType]:
-        return [self.by_plugin_id(id, organisation_id) for id in plugin_ids]
+        return [self.by_plugin_id(plugin_id, organisation_id) for plugin_id in plugin_ids]
 
     def get_all_settings(self, organisation_id: str, plugin_id: str):
         return self.settings_storage.get_all(organisation_id, plugin_id)
