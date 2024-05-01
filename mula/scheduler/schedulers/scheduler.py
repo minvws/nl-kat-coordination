@@ -118,7 +118,7 @@ class Scheduler(abc.ABC):
 
         self.threads.append(t)
 
-    def push_items_to_queue(self, p_items: list[models.PrioritizedItem]) -> None:
+    def push_items_to_queue(self, p_items: list[models.Task]) -> None:
         """Push multiple PrioritizedItems to the queue.
 
         Args:
@@ -157,7 +157,7 @@ class Scheduler(abc.ABC):
 
     def push_item_to_queue_with_timeout(
         self,
-        p_item: models.PrioritizedItem,
+        p_item: models.Task,
         max_tries: int = 5,
         timeout: int = 1,
     ) -> None:
@@ -187,7 +187,7 @@ class Scheduler(abc.ABC):
 
         self.push_item_to_queue(p_item)
 
-    def push_item_to_queue(self, p_item: models.PrioritizedItem) -> None:
+    def push_item_to_queue(self, p_item: models.Task) -> None:
         """Push a PrioritizedItem to the queue.
 
         Args:
@@ -204,7 +204,7 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
-            p_item.status = models.PrioritizedItemStatus.QUEUED.value
+            p_item.status = models.TaskStatus.QUEUED.value
             p_item = self.queue.push(p_item)
         except queues.errors.NotAllowedError as exc:
             self.logger.warning(
@@ -248,7 +248,7 @@ class Scheduler(abc.ABC):
 
         self.post_push(p_item)
 
-    def post_push(self, p_item: models.PrioritizedItem) -> None:
+    def post_push(self, p_item: models.Task) -> None:
         """When a boefje task is being added to the queue. We
         persist a task to the datastore with the status QUEUED.
 

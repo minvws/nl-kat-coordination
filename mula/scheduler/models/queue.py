@@ -13,13 +13,6 @@ from scheduler.utils import GUID
 from .base import Base
 from .task import Task, TaskStatus
 
-# Make PrioritizedItemStatus an enum of TaskStatus
-PrioritizedItemStatus = enum.Enum("PrioritizedItemStatus", TaskStatus.__members__)
-
-
-class PrioritizedItem(Task):
-    pass
-
 
 class Queue(BaseModel):
     id: str
@@ -29,4 +22,4 @@ class Queue(BaseModel):
     allow_replace: bool
     allow_updates: bool
     allow_priority_updates: bool
-    pq: list[PrioritizedItem] | None = None
+    pq: list[Task] | None = None

@@ -13,7 +13,7 @@ class PriorityQueueStore:
         self.dbconn = dbconn
 
     @retry()
-    def pop(self, scheduler_id: str, filters: FilterRequest | None = None) -> models.PrioritizedItem | None:
+    def pop(self, scheduler_id: str, filters: FilterRequest | None = None) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             query = (
                 session.query(models.TaskDB)
@@ -31,18 +31,18 @@ class PriorityQueueStore:
             if item_orm is None:
                 return None
 
-            return models.PrioritizedItem.model_validate(item_orm)
+            return models.Task.model_validate(item_orm)
 
     @retry()
-    def push(self, scheduler_id: str, item: models.PrioritizedItem) -> models.PrioritizedItem | None:
+    def push(self, scheduler_id: str, item: models.Task) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = models.TaskDB(**item.model_dump())
             session.add(item_orm)
 
-            return models.PrioritizedItem.model_validate(item_orm)
+            return models.Task.model_validate(item_orm)
 
     @retry()
-    def peek(self, scheduler_id: str, index: int) -> models.PrioritizedItem | None:
+    def peek(self, scheduler_id: str, index: int) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.TaskDB)
@@ -57,10 +57,10 @@ class PriorityQueueStore:
             if item_orm is None:
                 return None
 
-            return models.PrioritizedItem.model_validate(item_orm)
+            return models.Task.model_validate(item_orm)
 
     @retry()
-    def update(self, scheduler_id: str, item: models.PrioritizedItem) -> None:
+    def update(self, scheduler_id: str, item: models.Task) -> None:
         with self.dbconn.session.begin() as session:
             (
                 session.query(models.TaskDB)
@@ -82,7 +82,7 @@ class PriorityQueueStore:
             )
 
     @retry()
-    def get(self, scheduler_id, item_id: UUID) -> models.PrioritizedItem | None:
+    def get(self, scheduler_id, item_id: UUID) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.TaskDB)
@@ -95,7 +95,7 @@ class PriorityQueueStore:
             if item_orm is None:
                 return None
 
-            return models.PrioritizedItem.model_validate(item_orm)
+            return models.Task.model_validate(item_orm)
 
     @retry()
     def empty(self, scheduler_id: str) -> bool:
@@ -125,7 +125,7 @@ class PriorityQueueStore:
         self,
         scheduler_id: str,
         filters: FilterRequest | None,
-    ) -> tuple[list[models.PrioritizedItem], int]:
+    ) -> tuple[list[models.Task], int]:
         with self.dbconn.session.begin() as session:
             query = (
                 session.query(models.TaskDB)
@@ -139,10 +139,10 @@ class PriorityQueueStore:
             count = query.count()
             items_orm = query.all()
 
-            return ([models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm], count)
+            return ([models.Task.model_validate(item_orm) for item_orm in items_orm], count)
 
     @retry()
-    def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> models.PrioritizedItem | None:
+    def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.TaskDB)
@@ -156,10 +156,10 @@ class PriorityQueueStore:
             if item_orm is None:
                 return None
 
-            return models.PrioritizedItem.model_validate(item_orm)
+            return models.Task.model_validate(item_orm)
 
     @retry()
-    def get_items_by_scheduler_id(self, scheduler_id: str) -> list[models.PrioritizedItem]:
+    def get_items_by_scheduler_id(self, scheduler_id: str) -> list[models.Task]:
         with self.dbconn.session.begin() as session:
             items_orm = (
                 session.query(models.TaskDB)
@@ -168,7 +168,7 @@ class PriorityQueueStore:
                 .all()
             )
 
-            return [models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm]
+            return [models.Task.model_validate(item_orm) for item_orm in items_orm]
 
     @retry()
     def clear(self, scheduler_id: str) -> None:

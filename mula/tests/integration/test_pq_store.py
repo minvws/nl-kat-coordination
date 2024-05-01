@@ -37,7 +37,7 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
 
     def test_push(self):
         # Arrange
-        task = functions.create_task()
+        task = functions.create_task(scheduler_id=self.organisation.id)
         p_item = functions.create_p_item(scheduler_id=uuid.uuid4().hex, priority=1, task=task)
         self.mock_ctx.datastores.pq_store.push(p_item.scheduler_id, p_item)
 
@@ -51,7 +51,7 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
 
     def test_pop(self):
         # Arrange
-        task = functions.create_task()
+        task = functions.create_task(scheduler_id=self.organisation.id)
         p_item = functions.create_p_item(scheduler_id=uuid.uuid4().hex, priority=1, task=task)
         created_p_item = self.mock_ctx.datastores.pq_store.push(p_item.scheduler_id, p_item)
 
