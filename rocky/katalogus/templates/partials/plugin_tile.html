@@ -2,7 +2,7 @@
 {% load static %}
 
 <div role="group"
-     class="plugin {% if plugin.enabled %} plugin-enabled {% else %} plugin-disabled {% endif %}{% if hidden %} hidden {% endif %}"
+     class="plugin {% if plugin.enabled %} plugin-is-enabled {% else %} plugin-disabled {% endif %}{% if hidden %} overflow-item {% endif %}"
      id="plugin_{{ plugin.id|slugify }}">
     {% if add_checkbox %}
         <input type="checkbox"

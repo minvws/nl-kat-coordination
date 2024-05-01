@@ -1,20 +1,13 @@
 function togglePlugins(containerClass) {
   const container = document.querySelector(`.${containerClass}`);
-  const checkbox = container.querySelector('.show-all-toggle');
-  const hiddenPlugins = container.querySelectorAll('.plugin.hidden');
+  const button = container.querySelector('#more-suggested-plugins');
 
   function updateVisibility() {
-    hiddenPlugins.forEach(function (plugin) {
-      if(checkbox.checked) {
-        plugin.classList.remove('hidden')
-      } else {
-        plugin.classList.add('hidden')
-      }
-    });
+    container.classList.toggle("hide-overflow")
   }
 
   updateVisibility();
-  checkbox.addEventListener('change', updateVisibility)
+  button.addEventListener('click', updateVisibility)
 }
 
 document.addEventListener('DOMContentLoaded', (event) => {
