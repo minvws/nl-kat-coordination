@@ -16,11 +16,15 @@ class AnswerParserNormalizerTest(TestCase):
         runner = LocalNormalizerJobRunner(local_repository)
         meta = NormalizerMeta.model_validate_json(get_dummy_data("answer-normalize.json"))
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(TypeError):
             raw = '[{"key": "test"}]'
             runner.run(meta, bytes(raw, "UTF-8"))
 
-        raw = '{"key": "test"}'
+        with pytest.raises(ValidationError):
+            raw = '{"schema": "/bit/port-classification-ip", "answer": [{"key": "test"}]}'
+            runner.run(meta, bytes(raw, "UTF-8"))
+
+        raw = '{"schema": "/bit/port-classification-ip", "answer": {"key": "test"}}'
         output = runner.run(meta, bytes(raw, "UTF-8"))
 
         self.assertEqual(1, len(output.observations))
