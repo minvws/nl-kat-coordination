@@ -140,19 +140,15 @@ class BaseReportView(OOIFilterView):
     def get_required_optional_plugins(
         self, plugin_ids_dict: dict[str, set[str]]
     ) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
-        all_plugins = get_katalogus(self.organization.code).get_plugins()
-        sorted_plugins = sorted(all_plugins, key=attrgetter("name"))
-
         required_optional_plugins: dict[str, list[Plugin]] = {}
         plugins_enabled: dict[str, bool] = {}
 
         for required_optional, plugin_ids in plugin_ids_dict.items():
-            plugins: list[Plugin] = []
+            plugins: list[Plugin] = get_katalogus(self.organization.code).get_plugins(ids=list(plugin_ids))
+            sorted_plugins = sorted(plugins, key=attrgetter("name"))
             are_plugins_enabled: list[bool] = []
             for plugin in sorted_plugins:
-                if plugin.id in plugin_ids:
-                    plugins.append(plugin)
-                    are_plugins_enabled.append(plugin.enabled)
+                are_plugins_enabled.append(plugin.enabled)
             required_optional_plugins[required_optional] = plugins
             plugins_enabled[required_optional] = all(are_plugins_enabled)
 

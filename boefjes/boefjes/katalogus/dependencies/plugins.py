@@ -4,6 +4,7 @@ from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Literal
 
+from fastapi import Query
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 from sqlalchemy.orm import Session
@@ -72,6 +73,9 @@ class PluginService:
                 return plugin
 
         raise KeyError(f"Plugin {plugin_id} not found for {organisation_id}")
+
+    def by_plugin_ids(self, plugin_ids: list[str], organisation_id: str) -> list[PluginType]:
+        return [self.by_plugin_id(id, organisation_id) for id in plugin_ids]
 
     def get_all_settings(self, organisation_id: str, plugin_id: str):
         return self.settings_storage.get_all(organisation_id, plugin_id)
@@ -211,7 +215,8 @@ def get_pagination_parameters(offset: int = 0, limit: int | None = LIMIT) -> Pag
 
 def get_plugins_filter_parameters(
     q: str | None = None,
+    ids: list[str] | None = Query(None),
     plugin_type: Literal["boefje", "normalizer", "bit"] | None = None,
     state: bool | None = None,
 ) -> FilterParameters:
-    return FilterParameters(q=q, type=plugin_type, state=state)
+    return FilterParameters(q=q, ids=ids, type=plugin_type, state=state)

@@ -1,11 +1,17 @@
+import logging
+
 from httpx import Client
 from pydantic import TypeAdapter
 
 from boefjes.katalogus.models import PluginType, Repository
 
+logger = logging.getLogger(__name__)
+
 
 class PluginRepositoryClientInterface:
-    def get_plugins(self, repository: Repository, plugin_type: PluginType | None = None) -> dict[str, PluginType]:
+    def get_plugins(
+        self, repository: Repository, plugin_type: PluginType | None = None, plugin_ids: list[str] | None = None
+    ) -> dict[str, PluginType]:
         raise NotImplementedError
 
     def get_plugin(self, repository: Repository, plugin_id: str) -> PluginType:
@@ -27,8 +33,13 @@ class PluginRepositoryClient(PluginRepositoryClientInterface):
     def __init__(self):
         self._client = Client()
 
-    def get_plugins(self, repository: Repository, plugin_type: PluginType | None = None) -> dict[str, PluginType]:
-        res = self._client.get(f"{repository.base_url}/plugins", params={"plugin_type": plugin_type})
+    def get_plugins(
+        self, repository: Repository, plugin_type: PluginType | None = None, plugin_ids: list[str] | None = None
+    ) -> dict[str, PluginType]:
+        res = self._client.get(
+            f"{repository.base_url}/plugins", params={"plugin_type": plugin_type, "plugin_ids": plugin_ids}
+        )
+        logger.error(f"Res is {res.status_code}")
         res.raise_for_status()
 
         plugins = TypeAdapter(dict[str, PluginType]).validate_json(res.content)
