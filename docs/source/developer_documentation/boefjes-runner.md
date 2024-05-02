@@ -53,7 +53,7 @@ The essential metadata includes:
 Because stdin and stdout in container orchestrators are relatively complicated
 and work on a best-effort basis, this is not reliable enough for boefje input
 and output. Also see the [OpenAPI docs](http://localhost:8006/docs),
-where you can also find the full [OpenAPI specification](http://localhost:8006/openapi.json). 
+where you can also find the full [OpenAPI specification](http://localhost:8006/openapi.json).
 Kubernetes will for example redirect stdout and stderr to log files
 and will by default rotate the log file when it gets larger than 10 MB. See the
 [Kubernetes logging documentation][kubernetes-logging] for more information
