@@ -733,33 +733,33 @@ class XTDBOOIRepository(OOIRepository):
         )
 
     def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
-        count_query = """
-                            {
-                                :query {
+        count_query = f"""
+                            {{
+                                :query {{
                                     :find [(count ?report)]
                                     :where [[?report :object_type "Report"]
                                         [?report :Report/has_parent false]]
-                                }
+                                }}
                                 :limit {limit}
                                 :offset {offset}
 
-                            }
+                            }}
                         """
         count_results = self.session.client.query(count_query, valid_time)
         count = 0
         if count_results and count_results[0]:
             count = count_results[0][0]
 
-        report_query = """
-                            {
-                                :query {
+        report_query = f"""
+                            {{
+                                :query {{
                                     :find [(pull ?report [*])]
                                     :where [[?report :object_type "Report"]
                                         [?report :Report/has_parent false]]
-                                }
+                                }}
                                 :limit {limit}
                                 :offset {offset}
-                            }
+                            }}
                         """
 
         results = self.query(report_query, valid_time)
