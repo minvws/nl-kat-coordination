@@ -167,11 +167,11 @@ class BoefjeHandler(Handler):
                         else:
                             valid_mimetypes.add(mimetype)
                     raw_file_id = self.bytes_client.save_raw(boefje_meta.id, output, mime_types.union(valid_mimetypes))
-                    logger.debug(
+                    logger.info(
                         "Saved raw file %s for boefje %s[%s]", raw_file_id, boefje_meta.boefje.id, boefje_meta.id
                     )
-
-            logger.info("Done with boefje for %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
+            else:
+                logger.info("No results for boefje %s[%s]", boefje_meta.boefje.id, boefje_meta.id)
 
 
 class NormalizerHandler(Handler):
