@@ -106,4 +106,4 @@ Now you can start OpenKat.
 Troubleshooting
 ================
 
-If you encounter any problems, please check `OpenKAT Troubleshooting <https://docs.openkat.nl/technical_design/index.html>`_.
+If you encounter any problems, please check `OpenKAT Troubleshooting <https://docs.openkat.nl/installation_and_deployment/index.html>`_.

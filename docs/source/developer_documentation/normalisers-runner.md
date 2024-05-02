@@ -1,4 +1,4 @@
-# Design for new normalisers (whiskers) runner
+# Design considerations for new normalisers (whiskers) runner
 _Status: Draft_
 
 ## Current situation
