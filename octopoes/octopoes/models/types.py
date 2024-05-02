@@ -76,6 +76,7 @@ from octopoes.models.ooi.web import (
     SecurityTXT,
     Website,
 )
+from octopoes.models.ooi.greeting import Greeting
 
 CertificateType = (
     X509Certificate | SubjectAlternativeNameHostname | SubjectAlternativeNameIP | SubjectAlternativeNameQualifier
@@ -157,6 +158,7 @@ ConcreteOOIType = (
     | ConfigType
     | Question
     | ReportsType
+    | Greeting
 )
 
 OOIType = ConcreteOOIType | NetworkType | FindingTypeType
