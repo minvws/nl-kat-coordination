@@ -7,8 +7,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
-from rocky.views.mixins import ReportList
-from rocky.views.ooi_view import OOIFilterView
+from rocky.views.mixins import OctopoesView, ReportList
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +26,12 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class ReportHistoryView(BreadcrumbsReportOverviewView, ListView, OOIFilterView):
+class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
     Shows all the reports that have ever been generated for the organization.
     """
 
-    paginate_by = 150
+    paginate_by = 1
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview.html"
@@ -42,6 +41,11 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, ListView, OOIFilterView):
             self.octopoes_api_connector,
             valid_time=self.observed_at,
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_oois"] = len(self.object_list)
+        return context
 
 
 class ReportHistoryPDFView(ReportHistoryView, WeasyTemplateResponseMixin):
