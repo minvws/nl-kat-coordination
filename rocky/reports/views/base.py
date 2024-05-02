@@ -192,33 +192,8 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-
-        self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
-            get_plugins_for_report_ids(self.report_ids)
-        )
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plugins"] = self.plugins
-        context["all_plugins_enabled"] = self.all_plugins_enabled
-        context["plugin_data"] = self.get_plugin_data()
-
-        return context
-
-    def plugins_enabled(self) -> bool:
-        return self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]
-
-    def check_plugins(self) -> bool:
         try:
-            self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
-                get_plugins_for_report_ids(self.report_ids)
-            )
-            return True
+            self.plugins, self.all_plugins_enabled = self.get_plugins()
         except httpx.HTTPStatusError:
             messages.error(
                 self.request,
@@ -227,7 +202,30 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
                     "therefore the report cannot be generated."
                 ),
             )
+            self.plugins = {}
+            self.all_plugins_enabled = {}
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["plugins"] = self.plugins
+        context["all_plugins_enabled"] = self.all_plugins_enabled
+        context["plugin_data"] = self.get_plugin_data()
+
+        return context
+
+    def plugins_enabled(self) -> bool:
+        if self.all_plugins_enabled and self.all_plugins_enabled:
+            return self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]
         return False
+
+    def get_plugins(self):
+        return self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
 
     def get_required_optional_plugins(
         self, plugin_ids_dict: dict[str, set[str]]
@@ -254,24 +252,25 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         total_enabled_plugins = {"required": 0, "optional": 0}
         total_available_plugins = {"required": 0, "optional": 0}
 
-        for report_type in self.report_types:
-            for plugin_type in ["required", "optional"]:
-                # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
-                plugin_type = cast(Literal["required", "optional"], plugin_type)
-                number_of_enabled = sum(
-                    (1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0)
-                    for plugin in self.plugins[plugin_type]
-                )
+        if self.plugins:
+            for report_type in self.report_types:
+                for plugin_type in ["required", "optional"]:
+                    # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
+                    plugin_type = cast(Literal["required", "optional"], plugin_type)
+                    number_of_enabled = sum(
+                        (1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0)
+                        for plugin in self.plugins[plugin_type]
+                    )
 
-                number_of_available = len(report_type.plugins[plugin_type])
-                total_enabled_plugins[plugin_type] += number_of_enabled
-                total_available_plugins[plugin_type] += number_of_available
+                    number_of_available = len(report_type.plugins[plugin_type])
+                    total_enabled_plugins[plugin_type] += number_of_enabled
+                    total_available_plugins[plugin_type] += number_of_available
 
-                if report_type.name not in report_types:
-                    report_types[report_type.name] = {}
+                    if report_type.name not in report_types:
+                        report_types[report_type.name] = {}
 
-                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
-                report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
+                    report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
+                    report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
 
         plugin_data = {
             "total_enabled_plugins": total_enabled_plugins,

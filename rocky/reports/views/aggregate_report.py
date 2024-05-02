@@ -154,10 +154,10 @@ class SetupScanAggregateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.check_plugins():
-            redirect(self.get_previous())
+        if not self.plugins:
+            return redirect(self.get_previous())
         if self.plugins_enabled():
-            redirect(self.get_next())
+            return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
 
 
