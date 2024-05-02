@@ -739,10 +739,9 @@ class XTDBOOIRepository(OOIRepository):
                                     :find [(count ?report)]
                                     :where [[?report :object_type "Report"]
                                         [?report :Report/has_parent false]]
-                                }}
                                 :limit {limit}
                                 :offset {offset}
-
+                                }}
                             }}
                         """
         count_results = self.session.client.query(count_query, valid_time)
@@ -756,9 +755,9 @@ class XTDBOOIRepository(OOIRepository):
                                     :find [(pull ?report [*])]
                                     :where [[?report :object_type "Report"]
                                         [?report :Report/has_parent false]]
-                                }}
                                 :limit {limit}
                                 :offset {offset}
+                                }}
                             }}
                         """
 
