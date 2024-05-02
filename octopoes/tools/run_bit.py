@@ -20,7 +20,7 @@ from octopoes.models.origin import Origin, OriginParameter, OriginType
 from octopoes.models.path import Path as OctopoesPath
 from octopoes.xtdb.client import XTDBSession
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, force=True)
 
 
 @click.command()
