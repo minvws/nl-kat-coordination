@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-01 15:24+0000\n"
+"POT-Creation-Date: 2024-05-02 15:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3662,14 +3662,14 @@ msgstr ""
 msgid "Report type '%s' does not exist."
 msgstr ""
 
-#: reports/views/base.py reports/views/multi_report.py
-msgid "Select at least one report type to proceed."
+#: reports/views/base.py
+msgid ""
+"One or more plugins of the selected reports does not exist, therefore the "
+"report cannot be generated."
 msgstr ""
 
 #: reports/views/base.py
-msgid ""
-"One or more plugins of this report does not exist, therefore this report "
-"cannot be generated"
+msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/multi_report.py
