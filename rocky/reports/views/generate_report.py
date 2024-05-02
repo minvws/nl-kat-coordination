@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import datetime
 from typing import Any
 
 from django.contrib import messages
@@ -16,9 +17,10 @@ from reports.report_types.definitions import Report
 from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_types_for_oois
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
-    BaseReportPluginView,
-    BaseReportView,
     ReportBreadcrumbs,
+    ReportOOIView,
+    ReportPluginView,
+    ReportTypeView,
     get_selection,
 )
 from reports.views.view_helpers import GenerateReportStepsMixin
@@ -57,7 +59,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
+class LandingGenerateReportView(BreadcrumbsGenerateReportView):
     """
     Landing page to start the 'Generate Report' flow.
     """
@@ -72,7 +74,7 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
 class OOISelectionGenerateReportView(
     GenerateReportStepsMixin,
     BreadcrumbsGenerateReportView,
-    BaseReportView,
+    ReportOOIView,
     BaseOOIListView,
 ):
     """
@@ -94,7 +96,8 @@ class OOISelectionGenerateReportView(
 class ReportTypesSelectionGenerateReportView(
     GenerateReportStepsMixin,
     BreadcrumbsGenerateReportView,
-    BaseReportView,
+    ReportOOIView,
+    ReportTypeView,
     TemplateView,
 ):
     """
@@ -114,14 +117,16 @@ class ReportTypesSelectionGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
-        context["available_report_types"] = self.get_report_types_for_generate_report(
-            get_report_types_for_oois(self.selected_oois)
-        )
+        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.selected_oois))
         return context
 
 
-class SetupScanGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportPluginView):
+class SetupScanGenerateReportView(
+    GenerateReportStepsMixin,
+    BreadcrumbsGenerateReportView,
+    ReportPluginView,
+    TemplateView,
+):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -131,13 +136,14 @@ class SetupScanGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateR
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        response = super().get(request, *args, **kwargs)
-        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(self.get_next())
-        return response
+        if not self.check_plugins():
+            redirect(self.get_previous())
+        if self.plugins_enabled():
+            redirect(self.get_next())
+        return super().get(request, *args, **kwargs)
 
 
-class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportPluginView, BaseReportView):
+class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -201,6 +207,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportPluginView, Ba
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["created_at"] = datetime.now()
         context["report_data"] = self.generate_reports_for_oois()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(

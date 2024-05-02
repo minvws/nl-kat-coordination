@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import datetime
 from typing import Any
 
 from django.conf import settings
@@ -17,9 +18,10 @@ from reports.report_types.helpers import get_ooi_types_from_aggregate_report, ge
 from reports.utils import JSONEncoder, debug_json_keys
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
-    BaseReportPluginView,
-    BaseReportView,
     ReportBreadcrumbs,
+    ReportOOIView,
+    ReportPluginView,
+    ReportTypeView,
     get_selection,
 )
 from reports.views.view_helpers import AggregateReportStepsMixin
@@ -56,7 +58,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView):
+class LandingAggregateReportView(BreadcrumbsAggregateReportView):
     """
     Landing page to start the 'Aggregate Report' flow.
     """
@@ -71,8 +73,8 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
 class OOISelectionAggregateReportView(
     AggregateReportStepsMixin,
     BreadcrumbsAggregateReportView,
+    ReportOOIView,
     BaseOOIListView,
-    BaseReportView,
 ):
     """
     Select Objects for the 'Aggregate Report' flow.
@@ -93,7 +95,8 @@ class OOISelectionAggregateReportView(
 class ReportTypesSelectionAggregateReportView(
     AggregateReportStepsMixin,
     BreadcrumbsAggregateReportView,
-    BaseReportView,
+    ReportOOIView,
+    ReportTypeView,
     TemplateView,
 ):
     """
@@ -116,6 +119,14 @@ class ReportTypesSelectionAggregateReportView(
             messages.error(self.request, _("Select at least one OOI to proceed."))
         return super().get(request, *args, **kwargs)
 
+    def get_report_types_for_aggregate_report(
+        self, reports_dict: dict[str, set[type[Report]]]
+    ) -> dict[str, list[dict[str, str]]]:
+        report_types = {}
+        for option, reports in reports_dict.items():
+            report_types[option] = self.get_report_types(reports)
+        return report_types
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if "all" not in self.selected_oois:
@@ -129,7 +140,11 @@ class ReportTypesSelectionAggregateReportView(
         return context
 
 
-class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportPluginView):
+class SetupScanAggregateReportView(
+    AggregateReportStepsMixin,
+    BreadcrumbsAggregateReportView,
+    ReportPluginView,
+):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -139,13 +154,14 @@ class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggrega
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        response = super().get(request, *args, **kwargs)
-        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(self.get_next())
-        return response
+        if not self.check_plugins():
+            redirect(self.get_previous())
+        if self.plugins_enabled():
+            redirect(self.get_next())
+        return super().get(request, *args, **kwargs)
 
 
-class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, BaseReportPluginView):
+class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -208,6 +224,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, BaseRe
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["created_at"] = datetime.now()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
         context["template"] = aggregate_report.template_path
@@ -229,9 +246,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, BaseRe
             True,
             **dict(json="true", **self.request.GET),
         )
-
-        context["oois"] = self.get_oois()
-        context["plugins"] = self.plugins
         return context
 
 

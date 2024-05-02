@@ -1,5 +1,4 @@
 from collections.abc import Iterable, Sequence
-from datetime import datetime
 from logging import getLogger
 from operator import attrgetter
 from typing import Any, Literal, cast
@@ -19,7 +18,7 @@ from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.definitions import BaseReportType, MultiReport, Report, ReportType
+from reports.report_types.definitions import BaseReportType, MultiReport, Report
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import OOIFilterView
@@ -76,12 +75,12 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
                 return self.breadcrumbs[self.breadcrumbs_step - 2]["url"]
             else:
                 return self.breadcrumbs[self.breadcrumbs_step]["url"]
-        return self.breadcrumbs
+        return self.get_current()
 
     def get_next(self):
         if self.is_valid_breadcrumbs():
             return self.breadcrumbs[self.breadcrumbs_step]["url"]
-        return self.breadcrumbs
+        return self.get_current()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -91,11 +90,71 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return context
 
 
-class BaseReportSelectionView(OrganizationView):
+class BaseSelectionView(OrganizationView):
+    """
+    Some views just need to check on user selection and pass selection from view to view.
+    The calculations for the selections are done in their own view.
+    """
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.selected_oois = sorted(set(request.GET.getlist("ooi", [])))
         self.selected_report_types = request.GET.getlist("report_type", [])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["selected_oois"] = self.selected_oois
+        context["selected_report_types"] = self.selected_report_types
+        return context
+
+
+class ReportOOIView(BaseSelectionView, OOIFilterView):
+    """
+    This class will show a list of OOIs with filters and handles OOIs selections.
+    Needs BaseSelectionView to get selected oois.
+    """
+
+    def get_oois(self) -> list[OOI]:
+        if "all" in self.selected_oois:
+            return self.octopoes_api_connector.list_objects(
+                self.get_ooi_types(),
+                valid_time=self.observed_at,
+                limit=OOIList.HARD_LIMIT,
+                scan_level=self.get_ooi_scan_levels(),
+                scan_profile_type=self.get_ooi_profile_types(),
+            ).items
+
+        oois = []
+        for ooi_id in self.selected_oois:
+            try:
+                oois.append(self.get_single_ooi(ooi_id))
+            except Exception:
+                logger.warning("No data could be found for '%s' ", ooi_id)
+        return oois
+
+    def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
+        return {
+            "ooi_type_form": OOITypeMultiCheckboxForReportForm(
+                sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]),
+                self.request.GET,
+            )
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["oois"] = self.get_oois()
+        return context
+
+
+class ReportTypeView(BaseSelectionView):
+    """
+    This view lists all report types that is being fetched from the OOIs selection.
+    Each report type has its own input ooi witch will be matched with the oois selection.
+    Needs BaseSelectionView to get and remember report type selection.
+    """
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.report_types: Sequence[type[Report] | type[MultiReport]] = self.get_report_types_from_choice()
         self.report_ids = [report.id for report in self.report_types]
 
@@ -110,7 +169,7 @@ class BaseReportSelectionView(OrganizationView):
                 messages.add_message(self.request, messages.ERROR, error_message)
         return report_types
 
-    def get_report_types(self) -> list[ReportType]:
+    def get_report_types(self, reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
         return [
             {
                 "id": report_type.id,
@@ -118,35 +177,29 @@ class BaseReportSelectionView(OrganizationView):
                 "description": report_type.description,
                 "label_style": report_type.label_style,
             }
-            for report_type in self.get_report_types_from_choice()
+            for report_type in reports
         ]
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["selected_oois"] = self.selected_oois
-        context["selected_report_types"] = self.selected_report_types
-        return context
 
+class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
+    """
+    This view shows the required and optional plugins.
+    Needs ReportTypeView to know which report type is selected to get their plugins.
+    The plugin ids will be collected and fetched form KAT-alogus.
+    The user is able to activate plugins they need for the scans.
+    The oois selection is also remembered by ReportOOIView.
+    """
 
-class BaseReportPluginView(BaseReportSelectionView, TemplateView):
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
+            get_plugins_for_report_ids(self.report_ids)
+        )
+
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
             messages.error(request, _("Select at least one report type to proceed."))
-
-        try:
-            self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
-                get_plugins_for_report_ids(self.report_ids)
-            )
-        except httpx.HTTPStatusError:
-            messages.error(
-                request,
-                _(
-                    "One or more plugins of the selected reports does not exist, "
-                    "therefore the report cannot be generated."
-                ),
-            )
-            return redirect(self.get_previous())
-
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -156,6 +209,25 @@ class BaseReportPluginView(BaseReportSelectionView, TemplateView):
         context["plugin_data"] = self.get_plugin_data()
 
         return context
+
+    def plugins_enabled(self) -> bool:
+        return self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]
+
+    def check_plugins(self) -> bool:
+        try:
+            self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
+                get_plugins_for_report_ids(self.report_ids)
+            )
+            return True
+        except httpx.HTTPStatusError:
+            messages.error(
+                self.request,
+                _(
+                    "One or more plugins of the selected reports does not exist, "
+                    "therefore the report cannot be generated."
+                ),
+            )
+        return False
 
     def get_required_optional_plugins(
         self, plugin_ids_dict: dict[str, set[str]]
@@ -208,59 +280,6 @@ class BaseReportPluginView(BaseReportSelectionView, TemplateView):
         }
 
         return plugin_data
-
-
-class BaseReportView(BaseReportSelectionView, OOIFilterView):
-    def get_oois(self) -> list[OOI]:
-        if "all" in self.selected_oois:
-            return self.octopoes_api_connector.list_objects(
-                self.get_ooi_types(),
-                valid_time=self.observed_at,
-                limit=OOIList.HARD_LIMIT,
-                scan_level=self.get_ooi_scan_levels(),
-                scan_profile_type=self.get_ooi_profile_types(),
-            ).items
-
-        oois = []
-        for ooi_id in self.selected_oois:
-            try:
-                oois.append(self.get_single_ooi(ooi_id))
-            except Exception:
-                logger.warning("No data could be found for '%s' ", ooi_id)
-        return oois
-
-    def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
-        return {
-            "ooi_type_form": OOITypeMultiCheckboxForReportForm(
-                sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]),
-                self.request.GET,
-            )
-        }
-
-    def get_report_types_for_generate_report(self, reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
-        return [
-            {
-                "id": report_type.id,
-                "name": report_type.name,
-                "description": report_type.description,
-                "label_style": report_type.label_style,
-            }
-            for report_type in reports
-        ]
-
-    def get_report_types_for_aggregate_report(
-        self, reports_dict: dict[str, set[type[Report]]]
-    ) -> dict[str, list[dict[str, str]]]:
-        report_types = {}
-        for option, reports in reports_dict.items():
-            report_types[option] = self.get_report_types_for_generate_report(reports)
-        return report_types
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["created_at"] = datetime.now()
-        context["oois"] = self.get_oois()
-        return context
 
 
 class ReportsLandingView(ReportBreadcrumbs, TemplateView):
