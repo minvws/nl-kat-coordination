@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-12 08:08+0000\n"
+"POT-Creation-Date: 2024-05-02 12:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -684,6 +684,7 @@ msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "scan level warning"
 msgstr ""
 
@@ -943,6 +944,10 @@ msgstr ""
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
+msgstr ""
+
+#: katalogus/templates/partials/plugin_tile.html
+msgid "Required for:"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
@@ -3506,6 +3511,26 @@ msgid ""
 "If you choose not to give a plugin permission to run, the data that plugin "
 "would collect or produce will be left out of the report which will then be "
 "generated based on the available data collected by the enabled plugins."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid ""
+"Some plugins are mandatory as they are crucial for a report type. Reports "
+"that don't have their requirements met will be skipped."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Warning! Before you proceed read the following points:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid ""
+"OpenKAT is designed to scan all known objects on a regular (daily) basis "
+"using the enabled plugins and set clearance levels. This means that scans "
+"will run automatically. Be patient; plugins may take some time before they "
+"have collected all their data. Enabling them just before report generation "
+"will likely result in inaccurate reports, as plugins have not finished "
+"collecting data."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
