@@ -14,5 +14,6 @@ Contains documentation for developers and contributors.
    normalisers-runner
    bytes
    octopoes
+   octopoes_models
    octopoes_research
    keiko

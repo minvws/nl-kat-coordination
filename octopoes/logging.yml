@@ -18,6 +18,10 @@ root:
     handlers: [console]
 
 loggers:
+  httpx:
+    level: WARN
+    propagate: 0
+    handlers: [console]
   uvicorn:
     level: INFO
     propagate: 0

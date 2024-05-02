@@ -45,10 +45,13 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
         self.local_repository = local_repository
 
     def run(self, boefje_meta: BoefjeMeta, environment: dict[str, str]) -> list[tuple[set, bytes | str]]:
-        logger.info("Running local boefje plugin")
+        logger.debug("Running local boefje plugin")
 
         boefjes = self.local_repository.resolve_boefjes()
         boefje_resource = boefjes[boefje_meta.boefje.id]
+
+        if not boefje_resource.module and boefje_resource.boefje.oci_image:
+            raise JobRuntimeError("Trying to run OCI image boefje locally")
 
         with TemporaryEnvironment() as temporary_environment:
             temporary_environment.update(environment)
@@ -63,7 +66,7 @@ class LocalNormalizerJobRunner(NormalizerJobRunner):
         self.local_repository = local_repository
 
     def run(self, normalizer_meta, raw) -> NormalizerOutput:
-        logger.info("Running local normalizer plugin")
+        logger.debug("Running local normalizer plugin")
 
         normalizers = self.local_repository.resolve_normalizers()
         normalizer = normalizers[normalizer_meta.normalizer.id]

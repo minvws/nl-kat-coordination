@@ -25,7 +25,7 @@ COMMON_UDP_PORTS = [
 def run(
     input_ooi: IPPort,
     additional_oois: list,
-    config: dict[str, str],
+    config: dict,
 ) -> Iterator[OOI]:
     port = input_ooi.port
     protocol = input_ooi.protocol

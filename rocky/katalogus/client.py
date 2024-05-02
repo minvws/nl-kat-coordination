@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
 
 from octopoes.models import OOI
+from octopoes.models.exception import TypeNotFound
 from octopoes.models.types import type_by_name
 from rocky.health import ServiceHealth
 
@@ -96,6 +97,8 @@ class KATalogusClientV1:
         response.raise_for_status()
 
         schema = response.json()
+        if not schema:
+            return None
 
         try:
             Draft202012Validator.check_schema(schema)
@@ -179,7 +182,7 @@ def parse_boefje(boefje: dict) -> Boefje:
     for type_name in boefje.get("consumes", []):
         try:
             consumes.add(type_by_name(type_name))
-        except StopIteration:
+        except TypeNotFound:
             logger.warning("Unknown OOI type %s for boefje consumes %s", type_name, boefje["id"])
 
     return Boefje(
@@ -205,7 +208,7 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
     for type_name in normalizer.get("produces", []):
         try:
             produces.add(type_by_name(type_name))
-        except StopIteration:
+        except TypeNotFound:
             logger.warning("Unknown OOI type %s for normalizer produces %s", type_name, normalizer["id"])
 
     return Normalizer(

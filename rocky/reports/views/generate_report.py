@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, Literal, cast
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -11,7 +11,7 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import (
     REPORTS,
@@ -20,6 +20,7 @@ from reports.report_types.helpers import (
     get_report_types_for_oois,
 )
 from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
+from reports.views.view_helpers import GenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -43,7 +44,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Setup scan"),
+                "text": _("Configuration"),
             },
             {
                 "url": reverse("generate_report_view", kwargs=kwargs) + selection,
@@ -65,13 +66,16 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
         )
 
 
-class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView):
+class OOISelectionGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView
+):
     """
     Select objects for the 'Generate Report' flow.
     """
 
     template_name = "generate_report/select_oois.html"
-    current_step = 3
+    breadcrumbs_step = 3
+    current_step = 1
     ooi_types = get_ooi_types_with_report()
 
     def get_context_data(self, **kwargs):
@@ -81,14 +85,17 @@ class OOISelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportVi
         return context
 
 
-class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
+class ReportTypesSelectionGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
+):
     """
     Shows all possible report types from a list of OOIs.
     Chooses report types for the 'Generate Report' flow.
     """
 
     template_name = "generate_report/select_report_types.html"
-    current_step = 4
+    breadcrumbs_step = 4
+    current_step = 2
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
@@ -105,13 +112,16 @@ class ReportTypesSelectionGenerateReportView(BreadcrumbsGenerateReportView, Base
         return context
 
 
-class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
+class SetupScanGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
+):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
 
     template_name = "generate_report/setup_scan.html"
-    current_step = 5
+    breadcrumbs_step = 5
+    current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
@@ -123,11 +133,44 @@ class SetupScanGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView,
 
         return super().get(request, *args, **kwargs)
 
+    def get_plugin_data(self):
+        report_types: dict[str, Any] = {}
+        total_enabled_plugins = {"required": 0, "optional": 0}
+        total_available_plugins = {"required": 0, "optional": 0}
+
+        for report_type in self.report_types:
+            for plugin_type in ["required", "optional"]:
+                # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
+                plugin_type = cast(Literal["required", "optional"], plugin_type)
+                number_of_enabled = sum(
+                    1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0
+                    for plugin in self.plugins[plugin_type]
+                )
+
+                number_of_available = len(report_type.plugins[plugin_type])
+                total_enabled_plugins[plugin_type] += number_of_enabled
+                total_available_plugins[plugin_type] += number_of_available
+
+                if report_type.name not in report_types:
+                    report_types[report_type.name] = {}
+
+                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
+                report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
+
+        plugin_data = {
+            "total_enabled_plugins": total_enabled_plugins,
+            "total_available_plugins": total_available_plugins,
+            "report_types": report_types,
+        }
+
+        return plugin_data
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
             get_plugins_for_report_ids(self.selected_report_types)
         )
+        context["plugin_data"] = self.get_plugin_data()
         return context
 
 
@@ -170,14 +213,15 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
             except ObjectNotFoundException:
                 error_reports.append(report_type.id)
                 continue
-            except StopIteration:
+            except TypeNotFound:
                 error_reports.append(report_type.id)
                 continue
 
+            if report_type.name not in report_data:
+                report_data[report_type.name] = {}
+
             for ooi, data in results.items():
                 ooi_human_readable = Reference.from_str(ooi).human_readable
-                if report_type.name not in report_data:
-                    report_data[report_type.name] = {}
 
                 report_data[report_type.name][ooi] = {
                     "data": data,

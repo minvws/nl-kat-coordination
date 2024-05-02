@@ -24,7 +24,7 @@ class Segment:
         source_type: type[OOI],
         direction: Direction,
         property_name: str,
-        target_type: type[OOI],
+        target_type: type[OOI] | None,
     ):
         self.source_type = source_type
         self.direction = direction
@@ -50,16 +50,41 @@ class Segment:
     @classmethod
     def calculate_step(cls, source_type: type[OOI], step: str):
         direction, property_name, explicit_target_type = cls.parse_step(step)
-        target_type = explicit_target_type if explicit_target_type else get_relation(source_type, property_name)
-        return cls(source_type, direction, property_name, target_type)
+
+        if explicit_target_type:
+            return cls(source_type, direction, property_name, explicit_target_type)
+
+        try:
+            return cls(source_type, direction, property_name, get_relation(source_type, property_name))
+        except KeyError:
+            for concrete in source_type.strict_subclasses():
+                try:
+                    return cls(source_type, direction, property_name, get_relation(concrete, property_name))
+                except KeyError:
+                    pass
+
+            # We failed to get the relation, so the target in the step is not a relation but a regular field of the OOI.
+            return cls(source_type, direction, property_name, None)
 
     def reverse(self) -> Segment:
+        if self.target_type is None:
+            raise ValueError("Cannot reverse segment without a target type.")
+
         return self.__class__(
             self.target_type,
             Direction.OUTGOING if self.direction == Direction.INCOMING else Direction.INCOMING,
             self.property_name,
             self.source_type,
         )
+
+    def encode(self) -> str:
+        if self.direction == Direction.OUTGOING:
+            return f"{self.source_type.get_object_type()}/{self.property_name}"
+        else:
+            if self.target_type is None:
+                raise ValueError("Direction cannot be incoming if target type is None")
+
+            return f"{self.target_type.get_object_type()}/_{self.property_name}"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Segment):
@@ -73,6 +98,9 @@ class Segment:
 
     def __str__(self):
         if self.direction == Direction.INCOMING:
+            if self.target_type is None:
+                raise ValueError("Direction cannot be incoming if target type is None")
+
             return f"<{self.property_name}[is {self.target_type.get_object_type()}]"
         else:
             return f"{self.property_name}"
@@ -91,11 +119,14 @@ class Path:
 
         segments = [Segment.calculate_step(type_by_name(start_type), step)]
         for next_step in rest:
+            if segments[-1].target_type is None:
+                break
             segments.append(Segment.calculate_step(segments[-1].target_type, next_step))
 
         return Path(segments)
 
     def reverse(self) -> Path:
+        # TODO: we fail if the last segment is a regular field. Another option is stripping it from the reversed path?
         return Path([segment.reverse() for segment in reversed(self.segments)])
 
     def __str__(self) -> str:
@@ -134,6 +165,9 @@ def get_paths_to_neighours(source_type: type[OOI]) -> set[Path]:
 
 def get_max_scan_level_inheritance(segment: Segment) -> int | None:
     if segment.direction == Direction.INCOMING:
+        if segment.target_type is None:
+            raise ValueError("Direction cannot be incoming if target type is None")
+
         return segment.target_type.model_fields[segment.property_name].json_schema_extra.get(
             "max_issue_scan_level", None
         )
@@ -145,6 +179,9 @@ def get_max_scan_level_inheritance(segment: Segment) -> int | None:
 
 def get_max_scan_level_issuance(segment: Segment) -> int | None:
     if segment.direction == Direction.INCOMING:
+        if segment.target_type is None:
+            raise ValueError("Direction cannot be incoming if target type is None")
+
         return segment.target_type.model_fields[segment.property_name].json_schema_extra.get(
             "max_inherit_scan_level", None
         )

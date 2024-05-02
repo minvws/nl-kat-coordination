@@ -1,10 +1,13 @@
+import json
 import uuid
 from collections import Counter
 from collections.abc import Generator
 from datetime import datetime
 from logging import getLogger
+from operator import itemgetter
+from typing import Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
 from pydantic import AwareDatetime
 
@@ -30,7 +33,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
@@ -177,13 +180,14 @@ def query_many(
     q = XTDBQuery.from_path(object_path)
     source_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
 
-    return octopoes.ooi_repository.query(
-        q.find(source_alias)
-        .pull(q.result_type)
-        .where(object_path.segments[0].source_type, primary_key=source_alias)
-        .where_in(object_path.segments[0].source_type, primary_key=sources),
-        valid_time,
+    q = q.where(object_path.segments[0].source_type, primary_key=source_alias).where_in(
+        object_path.segments[0].source_type, primary_key=sources
     )
+
+    if q._find_clauses:  # Path contained a target field, so no need to pull the result type
+        return octopoes.ooi_repository.query(q.find(source_alias, index=0), valid_time)
+
+    return octopoes.ooi_repository.query(q.find(source_alias, index=0).pull(q.result_type), valid_time)
 
 
 @router.post("/objects/load_bulk", tags=["Objects"])
@@ -470,3 +474,62 @@ def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> i
     octopoes.commit()
 
     return inference_count
+
+
+@router.get("/io/export", tags=["io"])
+def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
+    return xtdb_session_.client.export_transactions()
+
+
+def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> dict[str, int]:
+    try:
+        ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
+    except Exception as e:
+        logger.debug("Error parsing objects", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error parsing objects") from e
+    if reset:
+        try:
+            xtdb_session_.client.delete_node()
+            xtdb_session_.client.create_node()
+            xtdb_session_.commit()
+        except XTDBException as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error recreating nodes",
+            ) from e
+    for op in ops:
+        try:
+            operations: list[Operation] = [
+                (
+                    OperationType(x[0]),
+                    x[1],
+                    datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
+                )
+                for x in op
+            ]
+            xtdb_session_.client.submit_transaction(operations)
+        except Exception as e:
+            logger.debug("Error importing objects", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error importing object {op}",
+            ) from e
+    return {"detail": len(ops)}
+
+
+@router.post("/io/import/add", tags=["io"])
+async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    return importer(data, xtdb_session_)
+
+
+@router.post("/io/import/new", tags=["io"])
+async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    return importer(data, xtdb_session_, True)
