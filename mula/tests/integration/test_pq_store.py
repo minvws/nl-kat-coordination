@@ -37,27 +37,48 @@ class PriorityQueueStoreTestCase(unittest.TestCase):
 
     def test_push(self):
         # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
-        p_item = functions.create_p_item(scheduler_id=uuid.uuid4().hex, priority=1, task=task)
-        self.mock_ctx.datastores.pq_store.push(p_item.scheduler_id, p_item)
+        item = functions.create_item(scheduler_id=uuid.uuid4().hex, priority=1)
+        item.status = models.TaskStatus.QUEUED
+        created_item = self.mock_ctx.datastores.pq_store.push(item)
 
-        created_p_item = self.mock_ctx.datastores.pq_store.get(scheduler_id=p_item.scheduler_id, item_id=p_item.id)
-        created_task = self.mock_ctx.datastores.task_store.get_task(task.id)
+        item_db = self.mock_ctx.datastores.pq_store.get(scheduler_id=item.scheduler_id, item_id=item.id)
 
         # Assert
-        self.assertIsNotNone(created_p_item)
-        self.assertIsNotNone(created_task)
-        self.assertEqual(created_p_item.task_id, created_task.id)
+        self.assertIsNotNone(created_item)
+        self.assertIsNotNone(item_db)
+        self.assertEqual(item_db.id, created_item.id)
+
+    def test_push_status_not_queued(self):
+        item = functions.create_item(scheduler_id=uuid.uuid4().hex, priority=1)
+        item.status = models.TaskStatus.PENDING
+        created_item = self.mock_ctx.datastores.pq_store.push(item)
+
+        item_db = self.mock_ctx.datastores.pq_store.get(scheduler_id=item.scheduler_id, item_id=item.id)
+
+        # Assert
+        self.assertIsNotNone(created_item)
+        self.assertIsNone(item_db)
 
     def test_pop(self):
         # Arrange
-        task = functions.create_task(scheduler_id=self.organisation.id)
-        p_item = functions.create_p_item(scheduler_id=uuid.uuid4().hex, priority=1, task=task)
-        created_p_item = self.mock_ctx.datastores.pq_store.push(p_item.scheduler_id, p_item)
+        item = functions.create_item(scheduler_id=uuid.uuid4().hex, priority=1)
+        item.status = models.TaskStatus.QUEUED
+        created_item = self.mock_ctx.datastores.pq_store.push(item)
 
-        popped_item = self.mock_ctx.datastores.pq_store.pop(p_item.scheduler_id)
+        popped_item = self.mock_ctx.datastores.pq_store.pop(item.scheduler_id)
 
         # Assert
         self.assertIsNotNone(popped_item)
-        self.assertEqual(popped_item.id, created_p_item.id)
-        self.assertEqual(popped_item.task_id, task.id)
+        self.assertEqual(popped_item.id, created_item.id)
+
+    def test_pop_status_not_queued(self):
+        # Arrange
+        item = functions.create_item(scheduler_id=uuid.uuid4().hex, priority=1)
+        item.status = models.TaskStatus.PENDING
+        created_item = self.mock_ctx.datastores.pq_store.push(item)
+
+        popped_item = self.mock_ctx.datastores.pq_store.pop(item.scheduler_id)
+
+        # Assert
+        self.assertIsNotNone(created_item)
+        self.assertIsNone(popped_item)

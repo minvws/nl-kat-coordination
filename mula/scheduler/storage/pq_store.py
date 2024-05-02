@@ -34,7 +34,7 @@ class PriorityQueueStore:
             return models.Task.model_validate(item_orm)
 
     @retry()
-    def push(self, scheduler_id: str, item: models.Task) -> models.Task | None:
+    def push(self, item: models.Task) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             item_orm = models.TaskDB(**item.model_dump())
             session.add(item_orm)

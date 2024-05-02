@@ -49,18 +49,18 @@ def create_p_item_request(priority: int, data: TestModel | None = None) -> model
     )
 
 
-def create_p_item(scheduler_id: str, priority: int, task: models.Task | None = None) -> models.Task:
+def create_item(scheduler_id: str, priority: int, task: models.Task | None = None) -> models.Task:
     if task is None:
         task = create_task(scheduler_id)
 
-    p_item = models.Task(
+    item = models.Task(
         **task.dict(),
     )
 
     if priority is not None:
-        p_item.priority = priority
+        item.priority = priority
 
-    return p_item
+    return item
 
 
 def create_schema(scheduler_id: str, data: Any | None = None) -> models.TaskSchema:

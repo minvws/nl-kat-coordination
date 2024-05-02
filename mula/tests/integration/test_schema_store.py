@@ -32,7 +32,7 @@ class SchemaStore(unittest.TestCase):
         # Arrange
         scheduler_id = "test_scheduler_id"
 
-        task = functions.create_p_item(scheduler_id, 1)
+        task = functions.create_item(scheduler_id, 1)
         schema = models.TaskSchema(
             scheduler_id=scheduler_id,
             hash=task.hash,
@@ -50,7 +50,7 @@ class SchemaStore(unittest.TestCase):
         # Arrange
         scheduler_one = "test_scheduler_one"
         for i in range(5):
-            task = functions.create_p_item(scheduler_one, 1)
+            task = functions.create_item(scheduler_one, 1)
             schema = models.TaskSchema(
                 scheduler_id=scheduler_one,
                 hash=task.hash,
@@ -60,7 +60,7 @@ class SchemaStore(unittest.TestCase):
 
         scheduler_two = "test_scheduler_two"
         for i in range(5):
-            task = functions.create_p_item(scheduler_two, 1)
+            task = functions.create_item(scheduler_two, 1)
             schema = models.TaskSchema(
                 scheduler_id=scheduler_two,
                 hash=task.hash,
@@ -68,13 +68,31 @@ class SchemaStore(unittest.TestCase):
             )
             self.mock_ctx.datastores.schema_store.create_schema(schema)
 
-        # FIXME: should this be done on the scheduler_id or something else?
-        # Act
         schemas_scheduler_one, schemas_scheduler_one_count = self.mock_ctx.datastores.schema_store.get_schemas(
-            scheduler_id=scheduler_one,
+            filters=storage.filters.FilterRequest(
+                filters={
+                    "and": [
+                        storage.filters.Filter(
+                            column="scheduler_id",
+                            operator="eq",
+                            value=scheduler_one,
+                        )
+                    ]
+                }
+            )
         )
         schemas_scheduler_two, schemas_scheduler_two_count = self.mock_ctx.datastores.schema_store.get_schemas(
-            scheduler_id=scheduler_two,
+            filters=storage.filters.FilterRequest(
+                filters={
+                    "and": [
+                        storage.filters.Filter(
+                            column="scheduler_id",
+                            operator="eq",
+                            value=scheduler_two,
+                        )
+                    ]
+                }
+            )
         )
 
         # Assert
@@ -86,7 +104,7 @@ class SchemaStore(unittest.TestCase):
     def test_get_schema(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
-        task = functions.create_p_item(scheduler_id, 1)
+        task = functions.create_item(scheduler_id, 1)
         schema = models.TaskSchema(
             scheduler_id=scheduler_id,
             hash=task.hash,
@@ -122,7 +140,7 @@ class SchemaStore(unittest.TestCase):
     def test_update_schema(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
-        task = functions.create_p_item(scheduler_id, 1)
+        task = functions.create_item(scheduler_id, 1)
         schema = models.TaskSchema(
             scheduler_id=scheduler_id,
             hash=task.hash,
@@ -144,7 +162,7 @@ class SchemaStore(unittest.TestCase):
     def test_delete_schema(self):
         # Arrange
         scheduler_id = "test_scheduler_id"
-        task = functions.create_p_item(scheduler_id, 1)
+        task = functions.create_item(scheduler_id, 1)
         schema = models.TaskSchema(
             scheduler_id=scheduler_id,
             hash=task.hash,
@@ -164,7 +182,7 @@ class SchemaStore(unittest.TestCase):
         """When a schema is deleted, its tasks should NOT be deleted."""
         # Arrange
         scheduler_id = "test_scheduler_id"
-        task = functions.create_p_item(scheduler_id, 1)
+        task = functions.create_item(scheduler_id, 1)
         schema = models.TaskSchema(
             scheduler_id=scheduler_id,
             hash=task.hash,
