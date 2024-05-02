@@ -22,6 +22,7 @@ from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.reports import Report
 from octopoes.models.pagination import Paginated
 from octopoes.models.path import Direction, Path, Segment, get_paths_to_neighours
 from octopoes.models.transaction import TransactionRecord
@@ -132,6 +133,9 @@ class OOIRepository(Repository):
         offset,
         limit,
     ) -> Paginated[Finding]:
+        raise NotImplementedError
+
+    def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> list[Config]:
@@ -726,6 +730,38 @@ class XTDBOOIRepository(OOIRepository):
         return Paginated(
             count=count,
             items=[x[0] for x in self.query(finding_query, valid_time)],
+        )
+
+    def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
+        count_query = """
+                            {
+                                :query {
+                                    :find [(count ?report)]
+                                    :where [[?report :object_type "Report"]
+                                        [?report :Report/has_parent false]]
+                                }
+                            }
+                        """
+        count_results = self.session.client.query(count_query, valid_time)
+        count = 0
+        if count_results and count_results[0]:
+            count = count_results[0][0]
+
+        report_query = """
+                            {
+                                :query {
+                                    :find [(pull ?report [*])]
+                                    :where [[?report :object_type "Report"]
+                                        [?report :Report/has_parent false]]
+                                }
+                            }
+                        """
+
+        results = self.query(report_query, valid_time)
+
+        return Paginated(
+            count=count,
+            items=results,
         )
 
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
