@@ -1,12 +1,16 @@
-from datetime import datetime, time, timezone
+import logging
 
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import ListView
 from django_weasyprint import WeasyTemplateResponseMixin
 
-from octopoes.models.ooi.reports import Report
 from reports.views.base import ReportBreadcrumbs, get_selection
-from rocky.views.ooi_view import BaseOOIListView
+from rocky.paginator import RockyPaginator
+from rocky.views.mixins import ReportList
+from rocky.views.ooi_view import OOIFilterView
+
+logger = logging.getLogger(__name__)
 
 
 class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
@@ -23,19 +27,21 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class ReportHistoryView(BreadcrumbsReportOverviewView, BaseOOIListView):
+class ReportHistoryView(BreadcrumbsReportOverviewView, ListView, OOIFilterView):
     """
     Shows all the reports that have ever been generated for the organization.
     """
 
-    template_name = "report_overview.html"
-    ooi_types = {Report}
+    paginate_by = 150
     context_object_name = "reports"
+    paginator = RockyPaginator
+    template_name = "report_overview.html"
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        # Set time to end of day to fetch today created objects.
-        self.observed_at: datetime = datetime.combine(self.observed_at, time.max, tzinfo=timezone.utc)
+    def get_queryset(self) -> ReportList:
+        return ReportList(
+            self.octopoes_api_connector,
+            valid_time=self.observed_at,
+        )
 
 
 class ReportHistoryPDFView(ReportHistoryView, WeasyTemplateResponseMixin):

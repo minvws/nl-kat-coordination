@@ -22,6 +22,7 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
+from octopoes.models.ooi.reports import Report
 from octopoes.models.origin import Origin, OriginType
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations
@@ -255,6 +256,45 @@ class FindingList:
             return hydrated_findings
 
         raise NotImplementedError("FindingList only supports slicing")
+
+
+class ReportList:
+    HARD_LIMIT = 99_999_999
+
+    def __init__(
+        self,
+        octopoes_connector: OctopoesAPIConnector,
+        valid_time: datetime,
+    ):
+        self.octopoes_connector = octopoes_connector
+        self.valid_time = valid_time
+        self.ordered = True
+        self._count = None
+
+    @cached_property
+    def count(self) -> int:
+        return self.octopoes_connector.list_reports(
+            valid_time=self.valid_time,
+            limit=0,
+        ).count
+
+    def __len__(self):
+        return self.count
+
+    def __getitem__(self, key: int | slice) -> list[Report]:
+        if isinstance(key, slice):
+            offset = key.start or 0
+            limit = self.HARD_LIMIT
+            if key.stop:
+                limit = key.stop - offset
+            reports = self.octopoes_connector.list_reports(
+                valid_time=self.valid_time,
+                offset=offset,
+                limit=limit,
+            ).items
+            return reports
+
+        raise NotImplementedError("ReportList only supports slicing")
 
 
 class ConnectorFormMixin:
