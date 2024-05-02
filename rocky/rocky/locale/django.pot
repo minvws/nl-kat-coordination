@@ -3706,6 +3706,18 @@ msgstr ""
 msgid "Select OOIs"
 msgstr ""
 
+#: reports/views/view_helpers.py
+msgid "1: Select objects"
+msgstr ""
+
+#: reports/views/view_helpers.py
+msgid "2: Choose report types"
+msgstr ""
+
+#: reports/views/view_helpers.py
+msgid "3: Configuration"
+msgstr ""
+
 #: tools/forms/base.py
 msgid "Date"
 msgstr ""
