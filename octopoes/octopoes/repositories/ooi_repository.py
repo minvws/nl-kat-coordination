@@ -733,16 +733,14 @@ class XTDBOOIRepository(OOIRepository):
         )
 
     def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
-        count_query = f"""
-                            {{
-                                :query {{
+        count_query = """
+                            {
+                                :query {
                                     :find [(count ?report)]
                                     :where [[?report :object_type "Report"]
                                         [?report :Report/has_parent false]]
-                                :limit {limit}
-                                :offset {offset}
-                                }}
-                            }}
+                                }
+                            }
                         """
         count_results = self.session.client.query(count_query, valid_time)
         count = 0
