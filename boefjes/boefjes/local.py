@@ -50,6 +50,9 @@ class LocalBoefjeJobRunner(BoefjeJobRunner):
         boefjes = self.local_repository.resolve_boefjes()
         boefje_resource = boefjes[boefje_meta.boefje.id]
 
+        if not boefje_resource.module and boefje_resource.boefje.oci_image:
+            raise JobRuntimeError("Trying to run OCI image boefje locally")
+
         with TemporaryEnvironment() as temporary_environment:
             temporary_environment.update(environment)
             try:

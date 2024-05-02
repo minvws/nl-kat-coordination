@@ -112,7 +112,7 @@ class TestPluginsService(TestCase):
     def test_get_plugins(self):
         plugins = self.service.get_all(self.organisation)
 
-        self.assertEqual(len(plugins), 8)
+        self.assertEqual(len(plugins), 9)
         self.assertIn("test-boefje-1", [plugin.id for plugin in plugins])
         self.assertIn("test-repo", [plugin.repository_id for plugin in plugins])
         self.assertIn("Test Normalizer 1", [plugin.name for plugin in plugins])
@@ -236,7 +236,7 @@ class TestPluginsService(TestCase):
         assert "api_key" not in self.service.get_all_settings(new_org_id, plugin_id)
 
         new_org_plugins = self.service.get_all(new_org_id)
-        assert len(new_org_plugins) == 8
+        assert len(new_org_plugins) == 9
         assert len([x for x in new_org_plugins if x.enabled]) == 6  # 4 Normalizers plus two boefjes enabled above
         assert plugin_id not in [x.id for x in new_org_plugins if x.enabled]
         assert "test-boefje-1" in [x.id for x in new_org_plugins if x.enabled]
@@ -247,7 +247,7 @@ class TestPluginsService(TestCase):
         assert self.service.get_all_settings(new_org_id, plugin_id) == {"api_key": "24"}
 
         new_org_plugins = self.service.get_all(new_org_id)
-        assert len(new_org_plugins) == 8
+        assert len(new_org_plugins) == 9
         assert len([x for x in new_org_plugins if x.enabled]) == 5
         assert plugin_id in [x.id for x in new_org_plugins if x.enabled]
         assert "test-boefje-1" not in [x.id for x in new_org_plugins if x.enabled]
