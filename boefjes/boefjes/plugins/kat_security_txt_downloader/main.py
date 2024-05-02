@@ -8,6 +8,7 @@ from requests import Session
 
 from boefjes.job_models import BoefjeMeta
 
+DEFAULT_TIMEOUT = 30
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
@@ -16,6 +17,12 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     ip = input_["ip_service"]["ip_port"]["address"]["address"]
 
     useragent = getenv("USERAGENT", default="OpenKAT")
+    
+    try:
+        timeout = int(getenv("TIMEOUT", default=DEFAULT_TIMEOUT))
+    except ValueError:
+        timeout = DEFAULT_TIMEOUT
+
     session = requests.Session()
 
     results = {}
@@ -30,7 +37,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             iploc = f"[{ip}]" if addr.version == 6 else ip
             uri = f"{scheme}://{iploc}/{path}"
 
-        response = do_request(netloc, session, uri, useragent)
+        response = do_request(netloc, session, uri, useragent, timeout)
 
         # if the response is 200, return the content
         if response.status_code == 200:
@@ -40,23 +47,25 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         # TODO return a redirected URL and have OpenKAT figure out if we want to follow this.
         elif response.status_code in [301, 302, 307, 308]:
             uri = response.headers["Location"]
-            response = requests.get(uri, stream=True, timeout=30, verify=False)  # noqa: S501
+            response = requests.get(uri, stream=True, timeout=timeout, verify=False)  # noqa: S501
             ip = response.raw._connection.sock.getpeername()[0]
             results[path] = {
                 "content": response.content.decode(),
                 "url": response.url,
+                "original_url": uri,
                 "ip": str(ip),
                 "status": response.status_code,
             }
         else:
-            results[path] = {"content": None, "url": None, "ip": None, "status": response.status_code}
+            results[path] = {"content": response.content.decode(), "url": None, "ip": None, "status": response.status_code}
     return [(set(), json.dumps(results))]
 
 
-def do_request(hostname: str, session: Session, uri: str, useragent: str):
+def do_request(hostname: str, session: Session, uri: str, useragent: str, timeout: int):
     response = session.get(
         uri,
         headers={"Host": hostname, "User-Agent": useragent},
+        timeout=timeout,
         verify=False,
         allow_redirects=False,
     )
