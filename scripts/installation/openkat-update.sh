@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Update script for Debian. The script matches the instructions on
-# https://docs.openkat.nl/technical_design/debianinstall.html
+# https://docs.openkat.nl/installation_and_deployment/debianinstall.html
 
 set -e
 
