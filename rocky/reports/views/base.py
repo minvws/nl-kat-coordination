@@ -137,11 +137,13 @@ class BaseReportPluginView(BaseReportSelectionView, TemplateView):
             self.plugins, self.all_plugins_enabled = self.get_required_optional_plugins(
                 get_plugins_for_report_ids(self.report_ids)
             )
-
         except httpx.HTTPStatusError:
             messages.error(
                 request,
-                _("One or more plugins of this report does not exist, therefore this report cannot be generated"),
+                _(
+                    "One or more plugins of the selected reports does not exist, "
+                    "therefore the report cannot be generated."
+                ),
             )
             return redirect(self.get_previous())
 

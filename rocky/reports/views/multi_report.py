@@ -10,7 +10,13 @@ from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
-from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
+from reports.views.base import (
+    REPORTS_PRE_SELECTION,
+    BaseReportPluginView,
+    BaseReportView,
+    ReportBreadcrumbs,
+    get_selection,
+)
 from reports.views.view_helpers import MultiReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -97,7 +103,7 @@ class ReportTypesSelectionMultiReportView(
         return context
 
 
-class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportView, TemplateView):
+class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, BaseReportPluginView, TemplateView):
     """
     Show required and optional plugins to start scans to multi OOIs to include in report.
     """
@@ -107,18 +113,10 @@ class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
-
+        response = super().get(request, *args, **kwargs)
         if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("multi_report_view", kwargs=kwargs) + get_selection(request))
-
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plugins"] = {"required": [], "optional": []}
-        return context
+            return redirect(self.get_next())
+        return response
 
 
 class MultiReportView(BreadcrumbsMultiReportView, BaseReportView, TemplateView):

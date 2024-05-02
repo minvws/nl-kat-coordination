@@ -138,6 +138,12 @@ class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggrega
     breadcrumbs_step = 5
     current_step = 3
 
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        response = super().get(request, *args, **kwargs)
+        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
+            return redirect(self.get_next())
+        return response
+
 
 class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, BaseReportPluginView):
     """
