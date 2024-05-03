@@ -56,7 +56,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             "url": response.url,
             "request_url": request_url,
             "ip": ip,
-            "status": response.status_code
+            "status": response.status_code,
         }
     return [(set(), json.dumps(results))]
 
