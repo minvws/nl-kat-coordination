@@ -23,7 +23,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         # remove any nonsense locations from our validresults.
         if details["content"] is None or details.get("status", 200) != 200:
             continue
-        validresults[path] = details
+        valid_results[path] = details
 
         url_original = URL(
             raw=f'{input_["ip_service"]["service"]["name"]}://{input_["hostname"]["name"]}/{path}',
@@ -92,7 +92,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             yield security_txt_original
 
     # Check for legacy url https://www.rfc-editor.org/rfc/rfc9116#section-3-1
-    if "security.txt" in validresults and ".well-known/security.txt" not in validresults:
+    if "security.txt" in valid_results and ".well-known/security.txt" not in valid_results:
         ft = KATFindingType(id="KAT-LEGACY-SECURITY-LOCATION")
         yield ft
         yield Finding(
