@@ -23,7 +23,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         # remove any nonsense locations from our validresults.
         if details["content"] is None or details.get("status", 200) != 200:
             continue
-        validresults[path] = content
+        validresults[path] = details
         
         url_original = URL(
             raw=f'{input_["ip_service"]["service"]["name"]}://{input_["hostname"]["name"]}/{path}',
