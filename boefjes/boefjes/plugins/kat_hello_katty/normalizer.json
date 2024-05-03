@@ -1,0 +1,11 @@
+{
+    "id": "hello-katty-normalize",
+    "consumes": [
+        "boefje/hello-katty"
+    ],
+    "produces": [
+        "IPAddressV6",
+        "IPAddressV4",
+        "Greeting"
+    ]
+}
