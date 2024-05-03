@@ -43,7 +43,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         # if the response is 301, we need to follow the location header to the correct security txt,
         # we can not force the ip anymore because we dont know it yet.
         # TODO return a redirected URL and have OpenKAT figure out if we want to follow this.
-        elif response.status_code in [301, 302, 307, 308]:
+        if response.status_code in [301, 302, 307, 308]:
             request_url = response.headers["Location"]
             response = requests.get(request_url, stream=True, timeout=timeout, verify=False)  # noqa: S501
             ip = str(response.raw._connection.sock.getpeername()[0])
