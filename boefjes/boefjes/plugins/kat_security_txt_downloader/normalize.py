@@ -17,7 +17,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     boefje_meta = normalizer_meta.raw_data.boefje_meta
     website_original = Reference.from_str(boefje_meta.input_ooi)
     input_ = boefje_meta.arguments["input"]
-    valid_results = []
+    valid_results = {}
 
     for path, details in results.items():
         # remove any nonsense locations from our validresults.
