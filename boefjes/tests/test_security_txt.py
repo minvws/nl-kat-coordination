@@ -111,7 +111,7 @@ class SecurityTXTTest(TestCase):
             Finding(
                 description="Only legacy /security.txt location found.",
                 finding_type=ft.reference,
-                ooi=Reference.from_str("Website|internet|1.1.1.1|tcp|443|https|internet|www.example.com")
+                ooi=Reference.from_str("Website|internet|1.1.1.1|tcp|443|https|internet|www.example.com"),
             )
         )
 
