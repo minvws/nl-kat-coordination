@@ -38,11 +38,8 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
             iploc = f"[{ip}]" if addr.version == 6 else ip
             request_url = f"{scheme}://{iploc}/{path}"
 
-        response = do_request(netloc, session, uri, useragent, timeout)
+        response = do_request(netloc, session, request_url, useragent, timeout)
 
-        # if the response is 200, return the content
-        if response.status_code == 200:
-            status = 200
         # if the response is 301, we need to follow the location header to the correct security txt,
         # we can not force the ip anymore because we dont know it yet.
         # TODO return a redirected URL and have OpenKAT figure out if we want to follow this.
