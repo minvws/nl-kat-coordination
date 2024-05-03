@@ -31,7 +31,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     Shows all the reports that have ever been generated for the organization.
     """
 
-    paginate_by = 1
+    paginate_by = 100
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview.html"
