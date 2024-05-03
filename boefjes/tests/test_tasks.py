@@ -19,6 +19,7 @@ from boefjes.job_models import (
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.runtime_interfaces import JobRuntimeError
 from tests.loading import get_dummy_data
 
 
@@ -184,6 +185,20 @@ class TaskTest(TestCase):
 
         # Assert that the original environment has been restored correctly
         assert current_env == os.environ
+
+    def test_cannot_run_local_oci_boefje(self) -> None:
+        meta = BoefjeMeta(
+            id="b49cd6f5-4d92-4a13-9d21-232993826cd9",
+            boefje={"id": "dummy_oci_boefje_no_main"},
+            input_ooi="Network|internet",
+            organization="_dev",
+        )
+
+        local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
+        runner = LocalBoefjeJobRunner(local_repository)
+
+        with self.assertRaises(JobRuntimeError):
+            runner.run(meta, {})
 
     def test_correct_local_runner_hash(self) -> None:
         """This test checks if calculating the hash of local boefjes returns the correct result"""
