@@ -95,11 +95,12 @@ class SecurityTXTTest(TestCase):
         expected = []
         url = URL(raw="https://example.com/security.txt", network=Network(name="internet").reference)
         expected.append(url)
+        content = "Contact: mailto:security@example.com\nPreferred-Languages: nl, en\nExpires: 2030-01-01T00:00:00.000Z"
         expected.append(
             SecurityTXT(
                 website=Reference.from_str("Website|internet|1.1.1.1|tcp|443|https|internet|www.example.com"),
                 url=url.reference,
-                security_txt="Contact: mailto:security@example.com\nPreferred-Languages: nl, en\nExpires: 2030-01-01T00:00:00.000Z",
+                security_txt=content,
                 redirects_to=None,
             )
         )
