@@ -21,7 +21,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
 
     for path, details in results.items():
         # remove any nonsense locations from our validresults.
-        if details["content"] is None or details["status"] != 200:
+        if details["content"] is None or details.get("status", 200) != 200:
             continue
         validresults[path] = content
         
