@@ -213,8 +213,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             data=post_processed_data, report_type=aggregate_report, input_ooi=None, parent=None, has_parent=False
         )
 
-        logger.error(parent_report_ooi.report_id)
-
         for ooi, types in report_data.items():
             for report_type, data in types.items():
                 self.save_report(
