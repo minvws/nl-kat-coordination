@@ -98,7 +98,7 @@ class SecurityTXTTest(TestCase):
         content = "Contact: mailto:security@example.com\nPreferred-Languages: nl, en\nExpires: 2030-01-01T00:00:00.000Z"
         expected.append(
             SecurityTXT(
-                website=Reference.from_str("Website|internet|1.1.1.1|tcp|443|https|internet|www.example.com"),
+                website=Reference.from_str("Website|internet|192.0.2.0|tcp|443|https|internet|example.com"),
                 url=url.reference,
                 security_txt=content,
                 redirects_to=None,
@@ -111,7 +111,7 @@ class SecurityTXTTest(TestCase):
             Finding(
                 description="Only legacy /security.txt location found.",
                 finding_type=ft.reference,
-                ooi=Reference.from_str("Website|internet|1.1.1.1|tcp|443|https|internet|www.example.com"),
+                ooi=Reference.from_str("Website|internet|192.0.2.0|tcp|443|https|internet|example.com"),
             )
         )
 
