@@ -475,10 +475,10 @@
     "recommendation": "Remove the offending hostname from the CSP header."
   },
   "KAT-LEGACY-SECURITY-LOCATION": {
-      "description": "This website only has a legacy location security.txt file.",
-      "source": "https://www.rfc-editor.org/rfc/rfc9116#section-3-1",
-      "risk": "info",
-      "impact": "Only providing the legacy url will mean, as time goes on, more and more tools and researchers will not find your Security disclosure policy possibly leading to less than ideal disclosure.",
-      "recommendation": "Add a security.txt file location in the /.well-known folder."
+    "description": "This website only has a legacy location security.txt file.",
+    "source": "https://www.rfc-editor.org/rfc/rfc9116#section-3-1",
+    "risk": "info",
+    "impact": "Only providing the legacy url will mean, as time goes on, more and more tools and researchers will not find your Security disclosure policy possibly leading to less than ideal disclosure.",
+    "recommendation": "Add a security.txt file location in the /.well-known folder."
   }
 }
