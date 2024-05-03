@@ -14,7 +14,27 @@
                 <strong>{% translate "KAT will be able to generate a full report when all the required and suggested boefjes are enabled." %}</strong>
             </p>
             <p>
-                {% translate "If you choose not to give a plugin permission to run, the data that plugin would collect or produce will be left out of the report which will then be generated based on the available data collected by the enabled plugins." %}
+                {% blocktranslate trimmed %}
+                    If you choose not to give a plugin permission to run, the data that plugin would
+                    collect or produce will be left out of the report which will then be generated
+                    based on the available data collected by the enabled plugins.
+                {% endblocktranslate %}
+            </p>
+            <p>
+                {% blocktranslate trimmed %}
+                    Some plugins are mandatory as they are crucial for a report type.
+                    Reports that don't have their requirements met will be skipped.
+                {% endblocktranslate %}
+            </p>
+            <p class="warning"
+               role="group"
+               aria-label="{% translate "scan level warning" %}">
+                <span>{% translate "Warning! Before you proceed read the following points:" %}</span>
+                {% blocktranslate trimmed %}
+                    OpenKAT is designed to scan all known objects on a regular (daily) basis using the enabled plugins and set clearance levels. This means that scans will run automatically.
+                    Be patient; plugins may take some time before they have collected all their data.
+                    Enabling them just before report generation will likely result in inaccurate reports, as plugins have not finished collecting data.
+                {% endblocktranslate %}
             </p>
             {% include "partials/plugin_overview_table.html" %}
 

@@ -27,19 +27,18 @@
         {% endif %}
         <span class="plugin-author-link de-emphasized"><a target="_blank" href="https://openkat.nl" rel="noopener noreferrer">OpenKAT</a></span>
         {% if show_report_types %}
-            <p>
+            <div class="tags">
+                <p>
+                    <strong>{% translate "Required for:" %}</strong>
+                </p>
                 {% for plugin_id, report_types in plugin_report_types.items %}
                     {% if plugin_id == plugin.id %}
-                        {% if report_types|length > 1 %}
-                            {% translate "Required for" %} {{ report_types|length }} {% translate "report types" %}
-                        {% else %}
-                            {% for report_type in report_types %}
-                                {% translate "Required for:" %} <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
-                            {% endfor %}
-                        {% endif %}
+                        {% for report_type in report_types %}
+                            <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                        {% endfor %}
                     {% endif %}
                 {% endfor %}
-            </p>
+            </div>
         {% endif %}
         {% if not remove_action_buttons %}
             <div class="action-buttons">
