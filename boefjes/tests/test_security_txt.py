@@ -29,7 +29,7 @@ class SecurityTXTTest(TestCase):
         expected.append(url)
         expected.append(
             SecurityTXT(
-                website=Reference.from_str("Website|internet|1.1.1.1|tcp|443|https|internet|example.com"),
+                website=Reference.from_str("Website|internet|192.0.2.0|tcp|443|https|internet|example.com"),
                 url=url.reference,
                 security_txt="This is the content",
                 redirects_to=None,
