@@ -1,14 +1,14 @@
 {
-    ".well-known/security.txt": {
-        "content": "<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL \"https://www.example.com/.well-known/security.txt\" was not found on this server.</p></body></html>",
-        "url": "https://www.example.com/.well-known/security.txt",
-        "ip": "1.1.1.1",
-        "status": 404
-    },
-    "security.txt": {
-        "content": "<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL \"https://www.example.com/security.txt\" was not found on this server.</p></body></html>",
-        "url": "https://www.example.com/security.txt",
-        "ip": "1.1.1.1",
-        "status": 404
-    }
+  ".well-known/security.txt": {
+    "content": "<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL \"https://www.example.com/.well-known/security.txt\" was not found on this server.</p></body></html>",
+    "url": "https://www.example.com/.well-known/security.txt",
+    "ip": "1.1.1.1",
+    "status": 404
+},
+  "security.txt": {
+    "content": "<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>Not Found</h1><p>The requested URL \"https://www.example.com/security.txt\" was not found on this server.</p></body></html>",
+    "url": "https://www.example.com/security.txt",
+    "ip": "1.1.1.1",
+    "status": 404
+  }
 }
