@@ -53,6 +53,10 @@ class OOIForm(BaseRockyForm):
             if hasattr(annotation, "__origin__") and annotation.__origin__ == Literal:
                 continue
 
+            # skip scan_profile
+            if name == "scan_profile":
+                continue
+
             if hidden_ooi_fields and name in hidden_ooi_fields:
                 # Hidden ooi fields will have the value of an OOI ID
                 fields[name] = forms.CharField(widget=forms.HiddenInput())
@@ -70,7 +74,7 @@ class OOIForm(BaseRockyForm):
                 fields[name] = forms.IntegerField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, Enum):
                 fields[name] = generate_select_ooi_type(name, annotation, field)
-            elif self.ooi_class == Question and issubclass(annotation, str) and name == "json_schema":
+            elif self.ooi_class == Question and name == "json_schema":
                 fields[name] = forms.CharField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, str) or optional_type is str:
                 if name in self.ooi_class.__annotations__ and self.ooi_class.__annotations__[name] == dict[str, str]:
