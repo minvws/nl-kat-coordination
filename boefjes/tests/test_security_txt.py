@@ -88,7 +88,7 @@ class SecurityTXTTest(TestCase):
         oois = list(
             run(
                 meta,
-                get_dummy_data("inputs/security_txt_legacy-only.json"),
+                get_dummy_data("inputs/security_txt_results_legacy_only.json"),
             )
         )
 
