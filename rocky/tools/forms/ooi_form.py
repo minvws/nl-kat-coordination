@@ -83,6 +83,8 @@ class OOIForm(BaseRockyForm):
                     fields[name] = forms.CharField(
                         max_length=256, **default_attrs, empty_value=None if not field.is_required() else ""
                     )
+            else:
+                fields[name] = forms.CharField(max_length=256, **default_attrs)
 
         return fields
 
