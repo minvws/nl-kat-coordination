@@ -1,4 +1,6 @@
-from typing import Any, Literal
+from typing import Literal
+
+from pydantic import JsonValue
 
 from octopoes.models import OOI, Reference
 from octopoes.models.persistence import ReferenceField
@@ -19,6 +21,6 @@ class Incident(OOI):
     event_type: str
     event_title: str
     severity: str
-    meta_data: dict[str, Any]
+    meta_data: JsonValue
 
     _natural_key_attrs = ["application", "event_id"]
