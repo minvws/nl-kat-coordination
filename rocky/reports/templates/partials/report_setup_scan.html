@@ -29,7 +29,7 @@
                             <input type="checkbox"
                                    class="display-toggle"
                                    id="checkbox-for-enabled-required-plugins">
-                            <label for="checkbox-for-enabled-plugins">Show enabled plugins</label>
+                            <label for="checkbox-for-enabled-required-plugins">Show enabled plugins</label>
                         </div>
                     </div>
                     <div class="column-4 tiles plugins images-cover">
@@ -47,13 +47,13 @@
             {% if all_plugins_enabled.optional %}
                 <p>{% translate "Good job! All suggested plugins are enabled" %}</p>
             {% else %}
-                <div class="optional-plugin-container">
+                <div class="optional-plugin-container hide-overflow">
                     <div class="toolbar">
                         <div class="checkbox">
                             <input type="checkbox"
                                    class="display-toggle"
                                    id="checkbox-for-enabled-optional-plugins">
-                            <label for="checkbox-for-enabled-plugins">Show enabled plugins</label>
+                            <label for="checkbox-for-enabled-optional-plugins">Show enabled plugins</label>
                         </div>
                     </div>
                     <div class="column-4 tiles plugins images-cover">
@@ -70,7 +70,10 @@
                         {% endfor %}
                     </div>
                     <div class="toolbar">
-                        <button class="button ghost" id="more-suggested-plugins">Show more suggested plugins</button>
+                        <button class="button ghost"
+                                id="more-suggested-plugins"
+                                data-hide-text="Hide suggested plugins"
+                                data-show-text="Show more suggested plugins"></button>
                     </div>
                 </div>
             {% endif %}
