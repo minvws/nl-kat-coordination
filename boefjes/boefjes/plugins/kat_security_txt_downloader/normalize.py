@@ -24,7 +24,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         if details["content"] is None or details.get("status", 200) != 200:
             continue
         validresults[path] = details
-        
+
         url_original = URL(
             raw=f'{input_["ip_service"]["service"]["name"]}://{input_["hostname"]["name"]}/{path}',
             network=Network(name=input_["hostname"]["network"]["name"]).reference,
