@@ -3,8 +3,8 @@
   "name": "Security.txt downloader",
   "description": "Downloads the security.txt file from the target host.",
   "environment_keys": [
-      "USERAGENT",
-      "TIMEOUT"
+    "USERAGENT",
+    "TIMEOUT"
   ],
   "consumes": [
     "Website"
