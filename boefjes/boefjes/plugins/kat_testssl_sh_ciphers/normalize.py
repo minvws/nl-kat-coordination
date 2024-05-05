@@ -38,12 +38,14 @@ def parse_cipher(cipher: dict) -> dict | None:
             )
 
         return cipher_dict
+    else:
+        return None
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     ip_service_reference = Reference.from_str(input_ooi["primary_key"])
     output = json.loads(raw)
-    tls_dict = {}
+    tls_dict: dict = {}
     for item in output:
         cipher = parse_cipher(item)
         if cipher:

@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 import requests
 from bs4 import BeautifulSoup
@@ -12,7 +13,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     software_name = input_["name"]
     software_version = input_["version"]
 
-    result = {
+    result: dict[str, Any] = {
         "table_versions": [],
         "table_vulnerabilities": [],
         "cve_vulnerabilities": [],
