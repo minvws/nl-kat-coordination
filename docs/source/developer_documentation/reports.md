@@ -18,7 +18,7 @@ class YourNameReport(Report):
     # The name users will see:
     name = _("Your Name Report")
     description = _("Give a description to your new report.")
-    # All the required and optional plugins (can be an empty list):
+    # All the required and optional plugins (can be empty lists):
     plugins = {"required": ["nmap"], "optional": ["shodan", "nmap-udp", "nmap-ports", "nmap-ip-range"]}
     # The OOI types that can serve as input to generate this report:
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
@@ -33,20 +33,20 @@ class YourNameReport(Report):
 ### Collecting data
 Use all existing reports as examples to gather data for your report.
 - In the file `rocky/reports/report_types/definitions.py` you can find some methods that may  be useful.
-- For querying data from Octopoes, consult `octopoes/octopoes/connector/octopoes.py` which contains various useful methods. Additional information on queries can be found [here](https://docs.openkat.nl/developer_documentation/octopoes.html#querying).
+- For querying data from Octopoes, consult `octopoes/octopoes/connector/octopoes.py` which contains various useful methods. Additional information on how to write queries can be found [here](https://docs.openkat.nl/developer_documentation/octopoes.html#querying).
 
 ## Writing report unit tests
 ### Purpose of unit testing
 Unit tests validate whether the output of your newly created report matches the expected results. To do this, you need to recreate the report using mocked data.
 
 ### Steps for writing unit tests
-1.	Create a new test file within `tests/reports` with the name of your report, ending with `_report.py`.
+1.	Create a new test file within `tests/reports` with the name of your report, starting with `test_` and ending with `_report.py`.
 2.	Inside this file, create at least one function with the name of your test, starting with `test_your_report_name_`, followed by a description of the test. Try to create different tests to cover various scenarios, such as:
     - Empty list returned from the Octopoes query.
     - Single value returned from the Octopoes query.
     - Multiple values returned from the Octopoes query.
 3.	Write the test within this function. The unit test consist out of multiple parts:
-    - **Mocking data:**  Add mocked data to `rocky/tests/conftest.py`. Adding `@pytest.fixture` above the function makes it callable from within your test. Make sure to return a value.
+    - **Mocking data:**  Add mocked data to `rocky/tests/conftest.py`. Adding `@pytest.fixture` above the function makes it callable from within your test. Make sure to return a value. In your test file, define the mocked data. Call the `mock_octopoes_api_connector` and tell him which input should return which output.
     - **Collecting data:** Create a variable for your report and call the data collection method with the necessary parameters.
     - **Checking data:** Compare collected data with expected results, verifying various details to prevent failures.
 
@@ -55,11 +55,11 @@ Your unit test will look something like this:
 def test_my_new_report_multiple_results(mock_octopoes_api_connector, valid_time, hostname, my_mocked_data):
     # Mocking data:
     mock_octopoes_api_connector.oois = {
-        hostname.reference: hostname,
+        hostname.reference: hostname,   # When 'hostname.reference' is requested, return 'hostname'
     }
     mock_octopoes_api_connector.queries = {
         "Hostname.<ooi[is Finding].finding_type": {
-            hostname.reference: [my_mocked_data],
+            hostname.reference: [my_mocked_data],   # When this query is requested, return '[my_mocked_data]'
         }
     }
 
