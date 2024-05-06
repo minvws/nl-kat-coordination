@@ -67,7 +67,10 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
 
 
 class OOISelectionAggregateReportView(
-    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView
+    AggregateReportStepsMixin,
+    BreadcrumbsAggregateReportView,
+    BaseOOIListView,
+    BaseReportView,
 ):
     """
     Select Objects for the 'Aggregate Report' flow.
@@ -78,6 +81,17 @@ class OOISelectionAggregateReportView(
     current_step = 1
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if "all" in self.selected_oois and len(self.selected_oois) > 1:
+            messages.warning(
+                self.request,
+                _(
+                    "You have selected all OOIs and also you've also selected some OOIs from the list. "
+                    "Clear choice or the next step will use all OOIs."
+                ),
+            )
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_ooi_filter_forms(self.ooi_types))
@@ -86,7 +100,10 @@ class OOISelectionAggregateReportView(
 
 
 class ReportTypesSelectionAggregateReportView(
-    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
+    AggregateReportStepsMixin,
+    BreadcrumbsAggregateReportView,
+    BaseReportView,
+    TemplateView,
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -106,6 +123,7 @@ class ReportTypesSelectionAggregateReportView(
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
             messages.error(self.request, _("Select at least one OOI to proceed."))
+
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -122,7 +140,10 @@ class ReportTypesSelectionAggregateReportView(
 
 
 class SetupScanAggregateReportView(
-    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, BaseReportView, TemplateView
+    AggregateReportStepsMixin,
+    BreadcrumbsAggregateReportView,
+    BaseReportView,
+    TemplateView,
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
@@ -188,9 +209,14 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
+    def generate_reports_for_oois(
+        self,
+    ) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
-            self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.observed_at
+            self.octopoes_api_connector,
+            self.get_oois(),
+            self.selected_report_types,
+            self.observed_at,
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
@@ -213,12 +239,18 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
         context["post_processed_data"] = post_processed_data
         context["report_data"] = report_data
         context["report_download_pdf_url"] = url_with_querystring(
-            reverse("aggregate_report_pdf", kwargs={"organization_code": self.organization.code}),
+            reverse(
+                "aggregate_report_pdf",
+                kwargs={"organization_code": self.organization.code},
+            ),
             True,
             **self.request.GET,
         )
         context["report_download_json_url"] = url_with_querystring(
-            reverse("aggregate_report_view", kwargs={"organization_code": self.organization.code}),
+            reverse(
+                "aggregate_report_view",
+                kwargs={"organization_code": self.organization.code},
+            ),
             True,
             **dict(json="true", **self.request.GET),
         )
