@@ -14,23 +14,27 @@ Make sure rocky is running so you can see the changes you are about to make.
 ```
 class YourNameReport(Report):
     # The id of your report:
-    id = "your-name-report"
+    id = "your_report_name"
     # The name users will see:
-    name = _("Your Name Report")
+    name = _("Your Report Name")
     description = _("Give a description to your new report.")
     # All the required and optional plugins (can be empty lists):
     plugins = {"required": ["nmap"], "optional": ["shodan", "nmap-udp", "nmap-ports", "nmap-ip-range"]}
     # The OOI types that can serve as input to generate this report:
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     # Path of report.html:
-    template_path = "your_name_report/report.html"
+    template_path = "your_report_name/report.html"
 ```
 5.	Open `reports/report_types/helpers.py` and add your new class to the `REPORTS` constant list.
-6.	Implement a method within `report.py` to gather the required data for report generation. This data can be used in `report.html`. See the “Collecting data” section for more information.
-7.	Design the HTML structure for your report within `report.html`.
+6.	Implement a method within `report.py` to gather the required data for report generation. See the “Collecting data” section for more information.
+7.	Design the HTML structure for your report within `report.html`. The generated data from `report.py` can be used with Django Template in this file. For example by referring to the returned value like `{{ data }}`.
 8.	Save your changes and refresh the page to see the changes you made immediately.
 
 ### Collecting data
+There are two ways to collect data:
+- Create a method called `collect_data` and use the `self.octopoes_api_connector.query_many()` method to data for multiple OOIs at the same time. This can reduce the number of queries to Octopoes, which is better for report performance.
+- Create a method called `generate_data`. This method is the old way of receiving the data from Octopoes. It is less efficient and therefore should only be used with `self.octopoes_api_connector.get_tree()` to collect data from a tree.
+
 Use all existing reports as examples to gather data for your report.
 - In the file `rocky/reports/report_types/definitions.py` you can find some methods that may  be useful.
 - For querying data from Octopoes, consult `octopoes/octopoes/connector/octopoes.py` which contains various useful methods. Additional information on how to write queries can be found [here](https://docs.openkat.nl/developer_documentation/octopoes.html#querying).
