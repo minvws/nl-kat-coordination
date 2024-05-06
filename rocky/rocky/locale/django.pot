@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-06 12:50+0000\n"
+"POT-Creation-Date: 2024-05-06 13:03+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3646,12 +3646,6 @@ msgstr ""
 msgid "View report"
 msgstr ""
 
-#: reports/views/aggregate_report.py
-msgid ""
-"You have selected all OOIs and also you've also selected some OOIs from the "
-"list. Clear choice or the next step will use all OOIs."
-msgstr ""
-
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
 msgid "Select at least one OOI to proceed."
@@ -3666,6 +3660,12 @@ msgstr ""
 msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
 "%(date)s."
+msgstr ""
+
+#: reports/views/base.py
+msgid ""
+"You have selected all OOIs and also you've also selected some OOIs from the "
+"list. The selected OOIS will be overridden and all OOIs are selected."
 msgstr ""
 
 #: reports/views/base.py
