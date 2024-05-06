@@ -92,6 +92,16 @@ class BaseReportView(OOIFilterView):
             get_plugins_for_report_ids(report_ids)
         )
 
+    def check_oois_selection(self):
+        if "all" in self.selected_oois and len(self.selected_oois) > 1:
+            messages.warning(
+                self.request,
+                _(
+                    "You have selected all OOIs and also you've also selected some OOIs from the list. "
+                    "The selected OOIS will be overridden and all OOIs are selected."
+                ),
+            )
+
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
             return self.octopoes_api_connector.list_objects(

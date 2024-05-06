@@ -82,14 +82,7 @@ class OOISelectionAggregateReportView(
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if "all" in self.selected_oois and len(self.selected_oois) > 1:
-            messages.warning(
-                self.request,
-                _(
-                    "You have selected all OOIs and also you've also selected some OOIs from the list. "
-                    "Clear choice or the next step will use all OOIs."
-                ),
-            )
+        self.check_oois_selection()
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -123,6 +116,7 @@ class ReportTypesSelectionAggregateReportView(
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
             messages.error(self.request, _("Select at least one OOI to proceed."))
+        self.check_oois_selection()
 
         return super().get(request, *args, **kwargs)
 
