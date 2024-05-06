@@ -109,7 +109,9 @@ class BaseOOIDetailView(BreadcrumbsMixin, SingleOOITreeMixin, ConnectorFormMixin
         self.ooi = self.get_ooi()
 
     def get_current_ooi(self) -> OOI | None:
-        # self.ooi is already the current state of the OOI
+        """
+        Some OOIs have an old valid time, this will fetch the latest OOI for today.
+        """
         now = datetime.now(timezone.utc)
         if self.observed_at.date() == now.date():
             return self.ooi
