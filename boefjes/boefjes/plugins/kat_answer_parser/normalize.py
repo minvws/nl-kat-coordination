@@ -7,24 +7,12 @@ from octopoes.models.ooi.config import Config
 
 
 def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    mime_types = [mime_type["value"] for mime_type in normalizer_meta.raw_data.mime_types]
+    data = json.loads(raw)
 
-    if "/bit/port-classification-ip" in mime_types:
-        if isinstance(raw, bytes):
-            raw = raw.decode()
+    bit_id = data["schema"].removeprefix("/bit/")
 
-        yield Config(
-            ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
-            bit_id="port-classification-ip",
-            config=json.loads(raw),
-        )
-
-    if "/bit/disallowed-csp-hostnames" in mime_types:
-        if isinstance(raw, bytes):
-            raw = raw.decode()
-
-        yield Config(
-            ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
-            bit_id="disallowed-csp-hostnames",
-            config=json.loads(raw),
-        )
+    yield Config(
+        ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
+        bit_id=bit_id,
+        config=data["answer"],
+    )
