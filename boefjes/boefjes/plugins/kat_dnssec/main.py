@@ -17,7 +17,7 @@ def run(boefje_meta: dict):
         )
 
     remote_ns = os.getenv("REMOTE_NS", "1.1.1.1")
-    cmd = ["/usr/bin/drill", "-S", "-k", "root.key", str(domain), "@" + remote_ns]
+    cmd = ["/usr/bin/drill", "-S", "-k", "/usr/share/dns/root.key", str(domain), "@" + remote_ns]
     output = subprocess.run(cmd, capture_output=True)
 
     results = json.dumps(output.stdout.decode())
