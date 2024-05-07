@@ -1,5 +1,7 @@
 # Use this playbook to create an initial install of OpenKAT on Debian 12 (amd64 only at this time).
 # Please change the default_pw below, this is used for all internally used database connections
+# Some of the apps do have password-compexity requirements, so please make sure the password is long
+# enough and at least has lowercase and uppercase letters and digits.
 #
 # Tested procedure:
 #   - Order Debian12 VM (hetzner)
@@ -18,7 +20,7 @@
   become: true
   become_user: root
   vars:
-    kat_version: "1.14.0"
+    kat_version: "1.15.0"
     xtdb_version: "1.0.8"
     deb_arch: "amd64"
     default_pw: "aHahdeethobohG7i"
