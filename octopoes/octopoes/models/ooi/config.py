@@ -11,7 +11,7 @@ class Config(OOI):
 
     ooi: Reference = ReferenceField(OOI)
     bit_id: str
-    config: JsonValue
+    config: dict[str, JsonValue]
 
     _natural_key_attrs = ["ooi", "bit_id"]
 
