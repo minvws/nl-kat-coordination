@@ -14,47 +14,38 @@ function togglePlugins(containerClass) {
     const elementsHtmlCollection = container.getElementsByClassName("plugin");
     const itemsArray = Array.prototype.slice.call(elementsHtmlCollection);
 
-    let disabledCounter = 0;
-
-    // Determine amount of not yet enabled plugins
-    itemsArray.forEach((pluginElement) => {
-      if(pluginElement.classList.contains("plugin-is-disabled")) {
-        disabledCounter++;
-      }
-    });
-
-    let baseText = ""
+    let disabledCounter = container.getElementsByClassName("plugin-is-disabled").length;
+    let baseText = "";
 
     // Determine if the button text should be "Show" or "Hide"
     if(container.classList.contains("hide-overflow")) {
-      baseText = button.dataset.showText
+      baseText = button.dataset.showText;
     } else {
-      baseText = button.dataset.hideText
+      baseText = button.dataset.hideText;
     }
-
 
     // Determine amount of "to be shown" plugins. Hide button if amount !> 0
     if(checkbox.checked) {
       if((itemsArray.length - 4 > 0)) {
-        button.classList.remove("hidden")
-        button.innerHTML = `${baseText} (${itemsArray.length - 4})`
+        button.classList.remove("hidden");
+        button.innerHTML = `${baseText} (${itemsArray.length - 4})`;
       } else {
-        button.classList.add("hidden")
+        button.classList.add("hidden");
       }
     }
     else {
       if((disabledCounter - 4) > 0) {
-        button.classList.remove("hidden")
-        button.innerHTML = `${baseText} (${disabledCounter - 4})`
+        button.classList.remove("hidden");
+        button.innerHTML = `${baseText} (${disabledCounter - 4})`;
       } else {
-        button.classList.add("hidden")
+        button.classList.add("hidden");
       }
     }
   }
 
   setButtonAmountText();
-  button.addEventListener("click", updateVisibility)
-  checkbox.addEventListener("change", setButtonAmountText)
+  button.addEventListener("click", updateVisibility);
+  checkbox.addEventListener("change", setButtonAmountText);
 }
 
 document.addEventListener("DOMContentLoaded", (event) => {
