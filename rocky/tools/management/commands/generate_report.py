@@ -75,7 +75,9 @@ class Command(BaseCommand):
         self.stdout.buffer.write(report.read())
 
     @staticmethod
-    def get_findings_metadata(organization, valid_time, severities) -> list[dict[str, Any]]:
+    def get_findings_metadata(
+        organization: Organization, valid_time: datetime, severities: list[RiskLevelSeverity]
+    ) -> list[dict[str, Any]]:
         findings = FindingList(
             OctopoesAPIConnector(settings.OCTOPOES_API, organization.code),
             valid_time,
@@ -85,7 +87,7 @@ class Command(BaseCommand):
         return generate_findings_metadata(findings, severities)
 
     @staticmethod
-    def get_organization(**options) -> Organization | None:
+    def get_organization(**options: str) -> Organization | None:
         if options["code"] and options["id"]:
             return None
 

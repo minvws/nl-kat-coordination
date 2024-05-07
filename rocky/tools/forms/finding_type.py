@@ -1,12 +1,13 @@
 from datetime import datetime, timezone
+from typing import Any
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
+from octopoes.models.exception import ObjectNotFoundException
 from tools.forms.base import BaseRockyForm, DataListInput, DateTimeInput
 from tools.forms.settings import (
     FINDING_DATETIME_HELP_TEXT,
@@ -141,8 +142,8 @@ CVE-2021-00000""",
         self,
         connector: OctopoesAPIConnector,
         ooi_list: list[tuple[str, str]],
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ):
         self.octopoes_connector = connector
         super().__init__(*args, **kwargs)

@@ -257,7 +257,7 @@ def collect_report_data(
     connector: OctopoesAPIConnector,
     input_ooi_references: list[str],
     observed_at: datetime,
-):
+) -> dict:
     report_data = {}
     for ooi in [x for x in input_ooi_references if Reference.from_str(x).class_type == ReportData]:
         report_data[ooi] = connector.get(Reference.from_str(ooi), observed_at).dict()

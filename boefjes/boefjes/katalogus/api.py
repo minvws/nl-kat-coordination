@@ -45,7 +45,7 @@ app.include_router(router, prefix="/v1")
 
 
 @app.exception_handler(StorageError)
-def entity_not_found_handler(request: Request, exc: StorageError):
+def entity_not_found_handler(request: Request, exc: StorageError) -> JSONResponse:
     logger.exception("some error", exc_info=exc)
 
     return JSONResponse(

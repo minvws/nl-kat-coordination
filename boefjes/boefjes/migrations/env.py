@@ -4,7 +4,7 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from boefjes.config import settings
-from boefjes.sql.db_models import SQL_BASE
+from boefjes.sql.db import SQL_BASE
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

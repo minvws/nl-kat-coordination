@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from tools.forms.base import ObservedAtForm
 from tools.forms.findings import FindingSeverityMultiSelectForm, MutedFindingSelectionForm
-from tools.view_helpers import BreadcrumbsMixin
+from tools.view_helpers import Breadcrumb, BreadcrumbsMixin
 
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, SeveritiesMixin
@@ -15,7 +15,7 @@ from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, Se
 logger = logging.getLogger(__name__)
 
 
-def sort_by_severity_desc(findings) -> list[dict[str, Any]]:
+def sort_by_severity_desc(findings: Iterable) -> list[dict[str, Any]]:
     # Sorting is stable (when multiple records have the same key, their original
     # order is preserved) so if we first sort by finding id the findings with
     # the same risk score will be sorted by finding id
@@ -83,7 +83,7 @@ class FindingListView(BreadcrumbsMixin, FindingListFilter):
     template_name = "findings/finding_list.html"
     paginate_by = 20
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [
             {
                 "url": reverse_lazy("finding_list", kwargs={"organization_code": self.organization.code}),
@@ -96,7 +96,7 @@ class Top10FindingListView(FindingListView):
     template_name = "findings/finding_list.html"
     paginate_by = 10
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [
             {
                 "url": reverse_lazy("organization_crisis_room", kwargs={"organization_code": self.organization.code}),

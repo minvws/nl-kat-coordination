@@ -30,7 +30,7 @@ class Plugin(BaseModel):
     related: list[str] | None = None
     enabled: bool = False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.id}:{self.version}"
 
 

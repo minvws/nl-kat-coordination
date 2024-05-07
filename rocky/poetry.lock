@@ -639,6 +639,21 @@ reference = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9"
 resolved_reference = "dd7b062147bc4b9718e22d5acd6cf1301a1036b9"
 
 [[package]]
+name = "django-stubs-ext"
+version = "5.0.0"
+description = "Monkey-patching and extensions for django-stubs"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_stubs_ext-5.0.0-py3-none-any.whl", hash = "sha256:8e1334fdf0c8bff87e25d593b33d4247487338aaed943037826244ff788b56a8"},
+    {file = "django_stubs_ext-5.0.0.tar.gz", hash = "sha256:5bacfbb498a206d5938454222b843d81da79ea8b6fcd1a59003f529e775bc115"},
+]
+
+[package.dependencies]
+django = "*"
+typing-extensions = "*"
+
+[[package]]
 name = "django-tagulous"
 version = "1.3.3"
 description = "Fabulous Tagging for Django"
@@ -3383,4 +3398,4 @@ test = ["pytest"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a7a5b4190bcdb94605c963d061082eb405d38c0f037e23bdb0dbf98424a43068"
+content-hash = "d5cfc36d60d1c0f4d328cb0571887b8b6722619aff5d08cc3e1e70e0536e95f4"

@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, timezone
 from logging import config, getLogger
 from pathlib import Path
+from typing import Any
 
 import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
@@ -44,7 +45,7 @@ log = get_task_logger(__name__)
 
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
-def handle_event(event: dict):
+def handle_event(event: dict) -> None:
     try:
         parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
 
@@ -75,7 +76,7 @@ def schedule_scan_profile_recalculations():
 
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
-def recalculate_scan_profiles(org: str, *args, **kwargs):
+def recalculate_scan_profiles(org: str, *args: Any, **kwargs: Any) -> None:
     session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org))
     octopoes = bootstrap_octopoes(settings, org, session)
 

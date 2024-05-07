@@ -20,7 +20,7 @@ from katalogus.exceptions import KATalogusDownException, KATalogusException, KAT
 
 from octopoes.api.models import Declaration
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models.ooi.web import Network
+from octopoes.models.ooi.network import Network
 from rocky.exceptions import OctopoesDownException, OctopoesException, OctopoesUnhealthyException
 from tools.add_ooi_information import SEPARATOR, get_info
 from tools.enums import SCAN_LEVEL
@@ -91,7 +91,7 @@ class Organization(models.Model):
     )
     tags = tagulous.models.TagField(to=OrganizationTag, blank=True)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
     class Meta:
@@ -258,7 +258,7 @@ class OrganizationMember(models.Model):
     class Meta:
         unique_together = ["user", "organization"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.user)
 
 
@@ -304,5 +304,5 @@ class OOIInformation(models.Model):
             self.data[key] = value
         self.save()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.id

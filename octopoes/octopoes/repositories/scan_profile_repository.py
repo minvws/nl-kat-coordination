@@ -53,7 +53,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         self.session.commit()
 
     @classmethod
-    def format_id(cls, ooi_reference: Reference):
+    def format_id(cls, ooi_reference: Reference) -> str:
         return f"{cls.object_type}|{ooi_reference}"
 
     @classmethod

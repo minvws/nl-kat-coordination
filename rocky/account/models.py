@@ -129,7 +129,7 @@ class AuthToken(AbstractAuthToken):
             models.UniqueConstraint("user", Lower("name"), name="unique name"),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.user})"
 
     def generate_new_token(self) -> str:

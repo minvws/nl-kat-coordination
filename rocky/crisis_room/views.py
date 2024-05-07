@@ -14,8 +14,7 @@ from tools.view_helpers import BreadcrumbsMixin
 from octopoes.connector import ConnectorException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models.ooi.findings import RiskLevelSeverity
-from rocky.views.mixins import ObservedAtMixin
-from rocky.views.ooi_view import ConnectorFormMixin
+from rocky.views.mixins import ConnectorFormMixin, ObservedAtMixin
 
 logger = logging.getLogger(__name__)
 

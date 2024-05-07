@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
@@ -17,9 +18,9 @@ from tools.models import Organization
 from tools.ooi_helpers import get_knowledge_base_data_for_ooi_store
 from tools.view_helpers import convert_date_to_datetime, get_ooi_url
 
-from octopoes.connector import ObjectNotFoundException
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference, ScanLevel, ScanProfileType
+from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.origin import Origin, OriginType
@@ -122,7 +123,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             logger.error(e)
             return [], [], []
 
-    def handle_connector_exception(self, exception: Exception):
+    def handle_connector_exception(self, exception: Exception) -> None:
         if isinstance(exception, ObjectNotFoundException):
             raise Http404("OOI not found")
 
@@ -198,7 +199,7 @@ class FindingList:
         self,
         octopoes_connector: OctopoesAPIConnector,
         valid_time: datetime,
-        severities: set[RiskLevelSeverity],
+        severities: Iterable[RiskLevelSeverity],
         exclude_muted: bool = True,
         only_muted: bool = False,
     ):
@@ -305,7 +306,7 @@ class SingleOOIMixin(OctopoesView):
             },
         ]
 
-    def get_ooi_properties(self, ooi: OOI):
+    def get_ooi_properties(self, ooi: OOI) -> dict:
         class_relations = get_relations(ooi.__class__)
         props = {field_name: value for field_name, value in ooi if field_name not in class_relations}
 

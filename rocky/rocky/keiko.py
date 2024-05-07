@@ -196,7 +196,7 @@ class ReportsService:
         return self.get_report(valid_time, "Organisatie", organization_name, store, filters)
 
     @classmethod
-    def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str):
+    def ooi_report_file_name(cls, valid_time: datetime, organization_code: str, ooi_id: str) -> str:
         report_file_name = "_".join(
             [
                 "bevindingenrapport",
@@ -214,7 +214,7 @@ class ReportsService:
         return report_file_name
 
     @classmethod
-    def organization_report_file_name(cls, organization_code: str):
+    def organization_report_file_name(cls, organization_code: str) -> str:
         file_name = "_".join(
             [
                 "bevindingenrapport_nl",
@@ -226,7 +226,7 @@ class ReportsService:
         return f"{file_name}.pdf"
 
 
-def _ooi_field_as_string(findings_grouped: dict, store: dict):
+def _ooi_field_as_string(findings_grouped: dict, store: dict) -> dict:
     new_findings_grouped = {}
 
     for finding_type, finding_group in findings_grouped.items():

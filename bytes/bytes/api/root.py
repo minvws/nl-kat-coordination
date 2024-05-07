@@ -52,7 +52,7 @@ def health() -> ServiceHealth:
 
 
 @router.get("/metrics", dependencies=[Depends(authenticate_token)])
-def metrics(meta_repository: MetaDataRepository = Depends(create_meta_data_repository)):
+def metrics(meta_repository: MetaDataRepository = Depends(create_meta_data_repository)) -> Response:
     collector_registry = get_registry(meta_repository)
     data = prometheus_client.generate_latest(collector_registry)
 

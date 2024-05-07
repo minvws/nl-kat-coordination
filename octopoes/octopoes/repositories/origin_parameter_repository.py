@@ -80,7 +80,7 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
         results = self.session.client.query(query, valid_time=valid_time)
         return [self.deserialize(r[0]) for r in results]
 
-    def list_by_reference(self, reference: Reference, valid_time: datetime):
+    def list_by_reference(self, reference: Reference, valid_time: datetime) -> list[OriginParameter]:
         query = generate_pull_query(
             FieldSet.ALL_FIELDS,
             {

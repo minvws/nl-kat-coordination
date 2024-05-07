@@ -5,6 +5,7 @@ from os import getenv
 import requests
 from forcediphttpsadapter.adapters import ForcedIPHTTPSAdapter
 from requests import Session
+from requests.models import Response
 
 from boefjes.job_models import BoefjeMeta
 
@@ -53,7 +54,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     return [(set(), json.dumps(results))]
 
 
-def do_request(hostname: str, session: Session, uri: str, useragent: str):
+def do_request(hostname: str, session: Session, uri: str, useragent: str) -> Response:
     response = session.get(
         uri,
         headers={"Host": hostname, "User-Agent": useragent},

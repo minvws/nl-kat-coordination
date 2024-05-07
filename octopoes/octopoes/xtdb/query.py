@@ -75,7 +75,7 @@ class Query:
     _limit: int | None = None
     _offset: int | None = None
 
-    def where(self, ooi_type: Ref, **kwargs) -> "Query":
+    def where(self, ooi_type: Ref, **kwargs: Ref | str | set[str]) -> "Query":
         for field_name, value in kwargs.items():
             self._where_field_is(ooi_type, field_name, value)
 
@@ -321,7 +321,7 @@ class Query:
     def _to_object_type_statement(self, ref: Ref, other_type: type[OOI]) -> str:
         return f'[ {self._get_object_alias(ref)} :object_type "{other_type.get_object_type()}" ]'
 
-    def _compile_where_clauses(self, *, separator=" ") -> str:
+    def _compile_where_clauses(self, *, separator: str = " ") -> str:
         """Sorted and deduplicated where clauses, since they are both idempotent and commutative"""
 
         return separator + separator.join(sorted(set(self._where_clauses)))
@@ -329,7 +329,7 @@ class Query:
     def _compile_find_clauses(self) -> str:
         return " ".join(self._find_clauses)
 
-    def _compile(self, *, separator=" ") -> str:
+    def _compile(self, *, separator: str = " ") -> str:
         result_ooi_type = self.result_type.type if isinstance(self.result_type, Aliased) else self.result_type
 
         self._where_clauses.append(self._assert_type(self.result_type, result_ooi_type))
@@ -361,7 +361,7 @@ class Query:
     def __str__(self) -> str:
         return self._compile()
 
-    def __eq__(self, other: object):
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Query):
             return NotImplemented
 

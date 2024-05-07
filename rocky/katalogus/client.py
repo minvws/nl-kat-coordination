@@ -8,6 +8,7 @@ from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
+from tools.models import OrganizationMember
 
 from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
@@ -34,7 +35,7 @@ class Plugin(BaseModel):
     #     """Pydantic does not stringify the OOI classes, but then templates can't render them"""
     #     # todo: use field_serializer instead
 
-    def can_scan(self, member) -> bool:
+    def can_scan(self, member: OrganizationMember) -> bool:
         return member.has_perm("tools.can_scan_organization")
 
 
@@ -47,10 +48,10 @@ class Boefje(Plugin):
 
     # use a custom field_serializer for `consumes`
     @field_serializer("consumes")
-    def serialize_consumes(self, consumes: set[type[OOI]]):
+    def serialize_consumes(self, consumes: set[type[OOI]]) -> set[str]:
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
-    def can_scan(self, member) -> bool:
+    def can_scan(self, member: OrganizationMember) -> bool:
         return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value
 
 
@@ -60,7 +61,7 @@ class Normalizer(Plugin):
 
     # use a custom field_serializer for `produces`
     @field_serializer("produces")
-    def serialize_produces(self, produces: set[type[OOI]]):
+    def serialize_produces(self, produces: set[type[OOI]]) -> set[str]:
         return {ooi_class.get_ooi_type() for ooi_class in produces}
 
 
@@ -91,11 +92,11 @@ class KATalogusClientV1:
 
         return response.status_code != 404
 
-    def create_organization(self, name: str):
+    def create_organization(self, name: str) -> None:
         response = self.session.post("/v1/organisations/", json={"id": self.organization, "name": name})
         response.raise_for_status()
 
-    def delete_organization(self):
+    def delete_organization(self) -> None:
         response = self.session.delete(self.organization_uri)
         response.raise_for_status()
 
@@ -112,7 +113,7 @@ class KATalogusClientV1:
         response.raise_for_status()
         return parse_plugin(response.json())
 
-    def get_plugin_schema(self, plugin_id) -> dict | None:
+    def get_plugin_schema(self, plugin_id: str) -> dict | None:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}/schema.json")
         response.raise_for_status()
 
@@ -138,16 +139,13 @@ class KATalogusClientV1:
         response = self.session.put(f"{self.organization_uri}/{plugin_id}/settings", json=values)
         response.raise_for_status()
 
-    def delete_plugin_settings(self, plugin_id: str):
+    def delete_plugin_settings(self, plugin_id: str) -> None:
         response = self.session.delete(f"{self.organization_uri}/{plugin_id}/settings")
         response.raise_for_status()
-        return response
 
-    def clone_all_configuration_to_organization(self, to_organization: str):
+    def clone_all_configuration_to_organization(self, to_organization: str) -> None:
         response = self.session.post(f"{self.organization_uri}/settings/clone/{to_organization}")
         response.raise_for_status()
-
-        return response
 
     def health(self) -> ServiceHealth:
         response = self.session.get("/health")

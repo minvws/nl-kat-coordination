@@ -39,7 +39,7 @@ from onboarding.view_helpers import (
 from rocky.exceptions import RockyError
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
-from rocky.views.ooi_view import SingleOOITreeMixin
+from rocky.views.mixins import SingleOOITreeMixin
 
 User = get_user_model()
 
@@ -119,6 +119,7 @@ class OnboardingSetupScanOOIInfoView(
 class OnboardingSetupScanOOIAddView(
     OrganizationPermissionRequiredMixin,
     IntroductionStepsMixin,
+    OnboardingBreadcrumbsMixin,
     SingleOOITreeMixin,
     FormView,
 ):
@@ -421,11 +422,8 @@ class OnboardingOrganizationSetupView(
     permission_required = "tools.add_organization"
 
     def get(self, request, *args, **kwargs):
-        members = OrganizationMember.objects.filter(user=self.request.user)
-        if members:
-            return redirect(
-                reverse("step_organization_update", kwargs={"organization_code": members.first().organization.code})
-            )
+        if member := OrganizationMember.objects.filter(user=self.request.user).first():
+            return redirect(reverse("step_organization_update", kwargs={"organization_code": member.organization.code}))
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):

@@ -137,7 +137,7 @@ class Katalogus(HTTPService):
         return Boefje(**response.json())
 
     @exception_handler
-    def get_organisation(self, organisation_id) -> Organisation:
+    def get_organisation(self, organisation_id: str) -> Organisation:
         url = f"{self.host}/v1/organisations/{organisation_id}"
         response = self.get(url)
         return Organisation(**response.json())

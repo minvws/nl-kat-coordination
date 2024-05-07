@@ -13,7 +13,7 @@ import httpx
 logger = logging.getLogger("cveapi")
 
 
-def download_files(directory, last_update, update_timestamp):
+def download_files(directory: pathlib.Path, last_update: datetime | None, update_timestamp: datetime) -> None:
     index = 0
     client = httpx.Client()
     error_count = 0
@@ -66,7 +66,7 @@ def download_files(directory, last_update, update_timestamp):
     logger.info("Downloaded new information of %s CVEs", response_json["totalResults"])
 
 
-def run():
+def run() -> None:
     loglevel = os.getenv("CVEAPI_LOGLEVEL", "INFO")
     numeric_level = getattr(logging, loglevel.upper(), None)
     if not isinstance(numeric_level, int):

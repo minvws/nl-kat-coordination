@@ -48,7 +48,7 @@ class Segment:
                 raise ValueError(f"Could not parse step: {step}")
 
     @classmethod
-    def calculate_step(cls, source_type: type[OOI], step: str):
+    def calculate_step(cls, source_type: type[OOI], step: str) -> Segment:
         direction, property_name, explicit_target_type = cls.parse_step(step)
 
         if explicit_target_type:
@@ -96,7 +96,7 @@ class Segment:
             and self.property_name == other.property_name
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.direction == Direction.INCOMING:
             if self.target_type is None:
                 raise ValueError("Direction cannot be incoming if target type is None")
@@ -105,7 +105,7 @@ class Segment:
         else:
             return f"{self.property_name}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
 
@@ -114,7 +114,7 @@ class Path:
         self.segments = segments
 
     @classmethod
-    def parse(cls, path: str):
+    def parse(cls, path: str) -> Path:
         start_type, step, *rest = path.split(".")
 
         segments = [Segment.calculate_step(type_by_name(start_type), step)]
@@ -146,7 +146,7 @@ class Path:
     def __hash__(self):
         return hash(str(self))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
 

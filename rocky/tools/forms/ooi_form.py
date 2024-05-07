@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
-from typing import Literal, Union, get_args, get_origin
+from typing import Any, Literal, Union, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -13,13 +13,13 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI
 from octopoes.models.ooi.question import Question
 from octopoes.models.types import get_collapsed_types, get_relations
+from tools.enums import SCAN_LEVEL
 from tools.forms.base import BaseRockyForm, CheckboxGroup
 from tools.forms.settings import CLEARANCE_TYPE_CHOICES
-from tools.models import SCAN_LEVEL
 
 
 class OOIForm(BaseRockyForm):
-    def __init__(self, ooi_class: type[OOI], connector: OctopoesAPIConnector, *args, **kwargs):
+    def __init__(self, ooi_class: type[OOI], connector: OctopoesAPIConnector, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.ooi_class = ooi_class
         self.api_connector = connector

@@ -5,7 +5,7 @@ from enum import Enum
 
 from django.contrib import messages
 from django.core.paginator import Page, Paginator
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from httpx import HTTPError
@@ -58,7 +58,7 @@ class OOIDetailView(
         action = self.request.POST.get("action")
         return self.handle_page_action(action)
 
-    def handle_page_action(self, action: str) -> bool:
+    def handle_page_action(self, action: str) -> HttpResponse:
         try:
             if action == PageActions.CHANGE_CLEARANCE_LEVEL.value:
                 clearance_level = int(self.request.POST.get("level"))
@@ -127,13 +127,13 @@ class OOIDetailView(
 
         status = self.request.GET.get("task_history_status")
 
-        if self.request.GET.get("task_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("task_history_from"), "%Y-%m-%d")
+        if task_history_from := self.request.GET.get("task_history_from"):
+            min_created_at = datetime.strptime(task_history_from, "%Y-%m-%d")
         else:
             min_created_at = None
 
-        if self.request.GET.get("task_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("task_history_to"), "%Y-%m-%d")
+        if task_history_to := self.request.GET.get("task_history_to"):
+            max_created_at = datetime.strptime(task_history_to, "%Y-%m-%d")
         else:
             max_created_at = None
 

@@ -67,7 +67,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
         return instance
 
 
-def create_setting_storage(session) -> SettingsStorage:
+def create_setting_storage(session: Session) -> SettingsStorage:
     encrypter = create_encrypter()
     return SQLSettingsStorage(session, encrypter)
 

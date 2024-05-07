@@ -67,5 +67,5 @@ class SQLRepositoryStorage(SessionMixin, RepositoryStorage):
         )
 
 
-def create_repository_storage(session) -> SQLRepositoryStorage:
+def create_repository_storage(session: Session) -> SQLRepositoryStorage:
     return SQLRepositoryStorage(session, settings)

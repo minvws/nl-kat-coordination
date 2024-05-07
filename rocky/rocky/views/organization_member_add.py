@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
+from django.forms import Form
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -19,7 +20,7 @@ from django.views.generic.edit import FormView
 from onboarding.view_helpers import DNS_REPORT_LEAST_CLEARANCE_LEVEL
 from tools.forms.upload_csv import UploadCSVForm
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, OrganizationMember
-from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
+from tools.view_helpers import Breadcrumb, OrganizationMemberBreadcrumbsMixin
 
 from rocky.messaging import clearance_level_warning_dns_report
 
@@ -65,7 +66,7 @@ class OrganizationMemberAddAccountTypeView(
             )
         )
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.append(
             {
@@ -110,7 +111,7 @@ class OrganizationMemberAddView(
     def get_success_url(self, **kwargs):
         return reverse_lazy("organization_member_list", kwargs={"organization_code": self.organization.code})
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         breadcrumbs = super().build_breadcrumbs()
         breadcrumbs.extend(
             [
@@ -159,7 +160,7 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
         self.process_csv(form)
         return super().form_valid(form)
 
-    def process_csv(self, form) -> None:
+    def process_csv(self, form: Form) -> None:
         csv_raw_data = form.cleaned_data["csv_file"].read()
         csv_data = io.StringIO(csv_raw_data.decode("UTF-8"))
 
@@ -215,7 +216,7 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
 
     def save_models(
         self, name: str, email: str, account_type: str, trusted_clearance: int, acknowledged_clearance: int
-    ):
+    ) -> None:
         user, user_created = User.objects.get_or_create(email=email, defaults={"full_name": name})
 
         member_kwargs = {

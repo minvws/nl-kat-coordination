@@ -4,6 +4,8 @@ from logging import getLogger
 from pathlib import Path
 from typing import Any, TypedDict, TypeVar
 
+from django_stubs_ext import StrPromise
+
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -21,7 +23,7 @@ class ReportPlugins(TypedDict):
 
 class BaseReport:
     id: str
-    name: str
+    name: StrPromise
     description: str
     template_path: str = "report.html"
     label_style = "1-light"  # default/fallback color

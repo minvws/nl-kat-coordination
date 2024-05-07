@@ -95,7 +95,7 @@ def list_repository_plugins(
     repository_id: str,
     organisation_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),
-):
+) -> dict[str, PluginType]:
     with plugin_service as p:
         return p.repository_plugins(repository_id, organisation_id)
 
@@ -123,7 +123,7 @@ def update_plugin_state(
     organisation_id: str,
     enabled: bool = Body(False, embed=True),
     plugin_service: PluginService = Depends(get_plugin_service),
-):
+) -> None:
     try:
         with plugin_service as p:
             p.update_by_id(repository_id, plugin_id, organisation_id, enabled)
@@ -181,6 +181,6 @@ def clone_organisation_settings(
     organisation_id: str,
     to_organisation_id: str,
     storage: PluginService = Depends(get_plugin_service),
-):
+) -> None:
     with storage as store:
         store.clone_settings_to_organisation(organisation_id, to_organisation_id)

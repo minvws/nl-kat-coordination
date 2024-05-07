@@ -37,6 +37,7 @@ class DownloadTaskDetail(OrganizationView):
 class TaskListView(OrganizationView, ListView):
     paginate_by = 20
     paginator_class = RockyPaginator
+    plugin_type: str
 
     def get_queryset(self):
         scheduler_id = self.plugin_type + "-" + self.organization.code
@@ -46,13 +47,13 @@ class TaskListView(OrganizationView, ListView):
 
         input_ooi = self.request.GET.get("scan_history_search") if self.request.GET.get("scan_history_search") else None
 
-        if self.request.GET.get("scan_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
+        if scan_history_from := self.request.GET.get("scan_history_from"):
+            min_created_at = datetime.strptime(scan_history_from, "%Y-%m-%d")
         else:
             min_created_at = None
 
-        if self.request.GET.get("scan_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("scan_history_to"), "%Y-%m-%d")
+        if scan_history_to := self.request.GET.get("scan_history_to"):
+            max_created_at = datetime.strptime(scan_history_to, "%Y-%m-%d")
         else:
             max_created_at = None
 

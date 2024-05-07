@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from logging import getLogger
 from operator import attrgetter
 from typing import Any, Literal, cast
@@ -13,7 +13,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.client import KATalogusError, Plugin, get_katalogus
-from tools.view_helpers import BreadcrumbsMixin
+from tools.view_helpers import Breadcrumb, BreadcrumbsMixin
 
 from octopoes.models import OOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
@@ -28,7 +28,7 @@ REPORTS_PRE_SELECTION = {
 }
 
 
-def get_selection(request: HttpRequest, pre_selection: dict[str, str | Sequence[str]] | None = None) -> str:
+def get_selection(request: HttpRequest, pre_selection: Mapping[str, str | Sequence[str]] | None = None) -> str:
     if pre_selection is not None:
         return "?" + urlencode(pre_selection, True)
     return "?" + urlencode(request.GET, True)
@@ -50,18 +50,16 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
     def is_valid_breadcrumbs(self):
         return self.breadcrumbs_step < len(self.breadcrumbs)
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
 
-        breadcrumbs = [
+        return [
             {
                 "url": reverse("reports", kwargs=kwargs) + selection,
                 "text": _("Reports"),
             },
         ]
-
-        return breadcrumbs
 
     def get_breadcrumbs(self):
         if self.is_valid_breadcrumbs():

@@ -6,7 +6,7 @@ from boefjes.sql.db import get_engine
 from boefjes.sql.db_models import RepositoryInDB
 
 
-def main():
+def main() -> None:
     session = sessionmaker(bind=get_engine())()
 
     try:

@@ -2,7 +2,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from reports.views.base import get_selection
 from tools.models import Organization
-from tools.view_helpers import BreadcrumbsMixin, StepsMixin
+from tools.view_helpers import Breadcrumb, BreadcrumbsMixin, StepsMixin
 
 ONBOARDING_PERMISSIONS = (
     "tools.can_scan_organization",
@@ -89,7 +89,7 @@ class IntroductionAdminStepsMixin(StepsMixin):
 class OnboardingBreadcrumbsMixin(BreadcrumbsMixin):
     organization: Organization
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [
             {
                 "url": reverse_lazy("step_introduction", kwargs={"organization_code": self.organization.code}),

@@ -174,7 +174,7 @@ class Report(OrganizationView):
         return [ooi.get_ooi_type() for ooi in cls.allowed_ooi_types]
 
     @classmethod
-    def get_boefjes(cls, organization: Organization):
+    def get_boefjes(cls, organization: Organization) -> list:
         cls.boefjes = []
 
         katalogus_boefjes = get_katalogus(organization.code).get_boefjes()

@@ -75,7 +75,7 @@ class PriorityQueueStore:
             )
 
     @retry()
-    def get(self, scheduler_id, item_id: UUID) -> models.PrioritizedItem | None:
+    def get(self, scheduler_id: str, item_id: UUID) -> models.PrioritizedItem | None:
         with self.dbconn.session.begin() as session:
             item_orm = (
                 session.query(models.PrioritizedItemDB)

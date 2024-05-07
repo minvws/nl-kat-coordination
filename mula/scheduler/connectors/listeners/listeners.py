@@ -164,7 +164,7 @@ class RabbitMQ(Listener):
         # Submit the message to the thread pool executor
         self.executor.submit(self.dispatch, channel, method.delivery_tag, body)
 
-    def dispatch(self, channel, delivery_tag, body: bytes) -> None:
+    def dispatch(self, channel: pika.channel.Channel, delivery_tag: int, body: bytes) -> None:
         # Check if we still have a connection
         if not self.connection:
             self.logger.debug("No connection available, cannot dispatch message!")

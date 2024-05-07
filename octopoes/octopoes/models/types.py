@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 
+from pydantic.fields import FieldInfo
+
 from octopoes.models import OOI, Reference
 from octopoes.models.exception import TypeNotFound
 from octopoes.models.ooi.certificate import (
@@ -206,14 +208,14 @@ def to_concrete(object_types: set[type[OOI]]) -> set[type[OOI]]:
     return concrete_types
 
 
-def type_by_name(type_name: str):
+def type_by_name(type_name: str) -> type[OOI]:
     try:
         return next(t for t in ALL_TYPES if t.__name__ == type_name)
     except StopIteration:
         raise TypeNotFound
 
 
-def related_object_type(field) -> type[OOI]:
+def related_object_type(field: FieldInfo) -> type[OOI]:
     object_type: str | type[OOI] = field.json_schema_extra["object_type"]
     if isinstance(object_type, str):
         return type_by_name(object_type)

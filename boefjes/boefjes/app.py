@@ -77,7 +77,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 raise
 
-    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue):
+    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue) -> None:
         if task_queue.qsize() > self.settings.pool_size:
             time.sleep(self.settings.worker_heartbeat)
             return
@@ -186,7 +186,7 @@ class SchedulerWorkerManager(WorkerManager):
     def _worker_args(self) -> tuple:
         return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
 
-    def exit(self, queue_type: WorkerManager.Queue, signum: int | None = None):
+    def exit(self, queue_type: WorkerManager.Queue, signum: int | None = None) -> None:
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
@@ -235,7 +235,7 @@ def _start_working(
     handler: Handler,
     scheduler_client: SchedulerClientInterface,
     handling_tasks: dict[int, str],
-):
+) -> None:
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
     while True:

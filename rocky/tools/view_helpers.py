@@ -1,12 +1,13 @@
 import uuid
 from datetime import date, datetime, timezone
-from typing import TypedDict
+from typing import Any, TypedDict
 from urllib.parse import urlencode, urlparse, urlunparse
 
 from django.contrib import messages
 from django.http import HttpRequest
 from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django_stubs_ext import StrPromise
 
 from octopoes.models.types import OOI_TYPES
 from rocky.scheduler import PrioritizedItem, SchedulerError, client
@@ -18,7 +19,7 @@ def convert_date_to_datetime(d: date) -> datetime:
     return datetime.combine(d, datetime.max.time(), tzinfo=timezone.utc)
 
 
-def get_mandatory_fields(request, params: list[str] | None = None):
+def get_mandatory_fields(request: HttpRequest, params: list[str] | None = None) -> list:
     mandatory_fields = []
 
     if not params:
@@ -38,7 +39,7 @@ def generate_job_id():
     return str(uuid.uuid4())
 
 
-def url_with_querystring(path, doseq=False, **kwargs) -> str:
+def url_with_querystring(path: str, doseq: bool = False, /, **kwargs: Any) -> str:
     parsed_route = urlparse(path)
 
     return str(
@@ -55,7 +56,7 @@ def url_with_querystring(path, doseq=False, **kwargs) -> str:
     )
 
 
-def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -> str:
+def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs: Any) -> str:
     if ooi_id:
         kwargs["ooi_id"] = ooi_id
 
@@ -68,7 +69,7 @@ def get_ooi_url(routename: str, ooi_id: str, organization_code: str, **kwargs) -
     return url_with_querystring(reverse(routename, kwargs={"organization_code": organization_code}), **kwargs)
 
 
-def existing_ooi_type(ooi_type: str):
+def existing_ooi_type(ooi_type: str) -> bool:
     if not ooi_type:
         return False
 
@@ -76,7 +77,7 @@ def existing_ooi_type(ooi_type: str):
 
 
 class Breadcrumb(TypedDict):
-    text: str
+    text: StrPromise
     url: str
 
 
@@ -130,35 +131,31 @@ class OrganizationBreadcrumbsMixin(BreadcrumbsMixin):
 class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin):
     organization: Organization
 
-    def build_breadcrumbs(self):
-        breadcrumbs = [
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
+        return [
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
                 "text": _("Settings"),
             },
         ]
 
-        return breadcrumbs
-
 
 class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
     organization: Organization
 
-    def build_breadcrumbs(self):
-        breadcrumbs = [
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
+        return [
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
                 "text": _("Members"),
             },
         ]
 
-        return breadcrumbs
-
 
 class ObjectsBreadcrumbsMixin(BreadcrumbsMixin):
     organization: Organization
 
-    def build_breadcrumbs(self):
+    def build_breadcrumbs(self) -> list[Breadcrumb]:
         return [
             {
                 "url": reverse_lazy("ooi_list", kwargs={"organization_code": self.organization.code}),

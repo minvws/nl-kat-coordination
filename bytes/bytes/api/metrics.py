@@ -24,7 +24,7 @@ bytes_database_raw_files_total = Gauge(
 logger = logging.getLogger(__name__)
 
 
-def ignore_arguments_key(meta_repository: MetaDataRepository):
+def ignore_arguments_key(meta_repository: MetaDataRepository) -> str:
     return ""
 
 

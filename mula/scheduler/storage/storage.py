@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+from collections.abc import Callable
 from functools import partial, wraps
 
 import sqlalchemy
@@ -39,7 +40,7 @@ class DBConn:
         )
 
 
-def retry(max_retries: int = 3, retry_delay: float = 5.0):
+def retry(max_retries: int = 3, retry_delay: float = 5.0) -> Callable:
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):

@@ -69,7 +69,7 @@ class RelatedFieldNode:
                         self.path + (foreign_key,),
                     )
 
-    def build_tree(self, depth: int):
+    def build_tree(self, depth: int) -> None:
         if depth > 0:
             self.construct_outgoing_relations()
             for child_node in self.relations_out.values():
@@ -79,7 +79,7 @@ class RelatedFieldNode:
             for child_node in self.relations_in.values():
                 child_node.build_tree(depth - 1)
 
-    def generate_field(self, field_set: FieldSet, pk_prefix: str):
+    def generate_field(self, field_set: FieldSet, pk_prefix: str) -> str:
         queried_fields = pk_prefix if field_set is FieldSet.ONLY_ID else "*"
         """
         Output dicts in XTDB Query Language
@@ -123,10 +123,10 @@ class RelatedFieldNode:
         # Match self
         return not self.object_types.isdisjoint(search_object_types)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"QueryNode[{self}]"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return ",".join(self.object_types)
 
     def __eq__(self, other):

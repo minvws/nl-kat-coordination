@@ -90,7 +90,7 @@ class IPPort(OOI):
     _information_value = ["protocol", "port"]
 
     @classmethod
-    def format_reference_human_readable(cls, reference: Reference):
+    def format_reference_human_readable(cls, reference: Reference) -> str:
         tokenized = reference.tokenized
         return f"{tokenized.address.address}:{tokenized.port}/{tokenized.protocol}"
 

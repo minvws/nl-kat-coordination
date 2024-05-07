@@ -1,4 +1,5 @@
 from collections import Counter
+from typing import Any
 
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -10,7 +11,7 @@ from tools.view_helpers import existing_ooi_type, get_mandatory_fields, url_with
 from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, FindingType, RiskLevelSeverity
 from octopoes.models.types import OOI_TYPES, get_relations, to_concrete
-from rocky.views.ooi_view import SingleOOITreeMixin
+from rocky.views.mixins import SingleOOITreeMixin
 
 
 class OOIRelatedObjectManager(SingleOOITreeMixin):
@@ -78,7 +79,7 @@ class OOIRelatedObjectAddView(OOIRelatedObjectManager, TemplateView):
 
         return super().get(request, *args, **kwargs)
 
-    def split_ooi_type_choice(self, ooi_type_choice) -> dict[str, str]:
+    def split_ooi_type_choice(self, ooi_type_choice: str) -> dict[str, Any]:
         ooi_type = ooi_type_choice.split("|", 1)
 
         return {

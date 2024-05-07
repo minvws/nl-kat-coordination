@@ -126,7 +126,7 @@ class LazyTaskList:
     def __init__(
         self,
         scheduler_client: SchedulerClient,
-        **kwargs,
+        **kwargs: Any,
     ):
         self.scheduler_client = scheduler_client
         self.kwargs = kwargs
@@ -144,7 +144,7 @@ class LazyTaskList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key) -> list[Task]:
+    def __getitem__(self, key: slice | int) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = key.stop - offset
@@ -167,7 +167,7 @@ class LazyTaskList:
 class SchedulerError(Exception):
     message = _("Connectivity issues with Mula.")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.message)
 
 
@@ -193,7 +193,7 @@ class SchedulerClient:
 
     def list_tasks(
         self,
-        **kwargs,
+        **kwargs: Any,
     ) -> PaginatedTasksResponse:
         kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
         res = self._client.get("/tasks", params=kwargs)

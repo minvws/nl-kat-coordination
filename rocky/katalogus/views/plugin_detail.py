@@ -47,13 +47,13 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
         input_ooi = self.request.GET.get("task_history_search")
         status = self.request.GET.get("task_history_status")
 
-        if self.request.GET.get("task_history_from"):
-            min_created_at = datetime.strptime(self.request.GET.get("task_history_from"), "%Y-%m-%d")
+        if task_history_from := self.request.GET.get("task_history_from"):
+            min_created_at = datetime.strptime(task_history_from, "%Y-%m-%d")
         else:
             min_created_at = None
 
-        if self.request.GET.get("task_history_to"):
-            max_created_at = datetime.strptime(self.request.GET.get("task_history_to"), "%Y-%m-%d")
+        if task_history_to := self.request.GET.get("task_history_to"):
+            max_created_at = datetime.strptime(task_history_to, "%Y-%m-%d")
         else:
             max_created_at = None
 

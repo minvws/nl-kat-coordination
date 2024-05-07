@@ -2,6 +2,7 @@ import csv
 import json
 from datetime import datetime, timezone
 from enum import Enum
+from typing import Any
 
 from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
@@ -55,14 +56,14 @@ class OOIListView(BaseOOIListView, OctopoesView):
 
         return context
 
-    def get(self, request: HttpRequest, *args, status=200, **kwargs) -> HttpResponse:
+    def get(self, request: HttpRequest, *args: Any, status: int = 200, **kwargs: Any) -> HttpResponse:
         """Override the response status in case submitting a form returns an error message"""
         response = super().get(request, *args, **kwargs)
         response.status_code = status
 
         return response
 
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         """Perform bulk action on selected oois."""
         selected_oois = request.POST.getlist("ooi")
         if not selected_oois:
@@ -87,7 +88,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, status=404, *args, **kwargs)
 
     def _set_scan_profiles(
-        self, selected_oois: list[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args, **kwargs
+        self, selected_oois: list[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse:
         try:
             self.raise_clearance_levels(selected_oois, level.value)
@@ -153,7 +154,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, *args, **kwargs)
 
     def _set_oois_to_inherit(
-        self, selected_oois: list[Reference], request: HttpRequest, *args, **kwargs
+        self, selected_oois: list[Reference], request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse:
         scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
 
@@ -181,7 +182,9 @@ class OOIListView(BaseOOIListView, OctopoesView):
         )
         return self.get(request, *args, **kwargs)
 
-    def _delete_oois(self, selected_oois: list[Reference], request: HttpRequest, *args, **kwargs) -> HttpResponse:
+    def _delete_oois(
+        self, selected_oois: list[Reference], request: HttpRequest, *args: Any, **kwargs: Any
+    ) -> HttpResponse:
         connector = self.octopoes_api_connector
         valid_time = datetime.now(timezone.utc)
 

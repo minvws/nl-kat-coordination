@@ -1,8 +1,9 @@
 from logging import getLogger
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpRequest
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -24,7 +25,7 @@ class SinglePluginView(OrganizationView):
     katalogus_client: KATalogusClientV1
     plugin: KATalogusBoefje | KATalogusNormalizer
 
-    def setup(self, request, *args, plugin_id: str, **kwargs):
+    def setup(self, request: HttpRequest, *args: Any, plugin_id: str, **kwargs: Any) -> None:
         """
         Prepare organization info and KAT-alogus API client.
         """

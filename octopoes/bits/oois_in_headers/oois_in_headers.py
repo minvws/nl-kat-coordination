@@ -7,8 +7,8 @@ from pydantic import ValidationError
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.web import HTTPHeaderHostname
-from octopoes.models.types import URL, HTTPHeader, HTTPHeaderURL, Network
+from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.web import URL, HTTPHeader, HTTPHeaderHostname, HTTPHeaderURL
 
 
 def is_url(input_str):

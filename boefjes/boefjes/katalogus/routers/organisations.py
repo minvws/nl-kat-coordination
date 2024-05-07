@@ -26,7 +26,7 @@ def check_organisation_exists(
 @router.get("", response_model=dict[str, Organisation])
 def list_organisations(
     storage: OrganisationStorage = Depends(get_organisations_store),
-):
+) -> dict[str, Organisation]:
     return storage.get_all()
 
 
@@ -34,7 +34,7 @@ def list_organisations(
 def get_organisation(
     organisation_id: str,
     storage: OrganisationStorage = Depends(get_organisations_store),
-):
+) -> Organisation:
     try:
         return storage.get_by_id(organisation_id)
     except (KeyError, ObjectNotFoundException):
@@ -45,7 +45,7 @@ def get_organisation(
 def add_organisation(
     organisation: Organisation,
     storage: OrganisationStorage = Depends(get_organisations_store),
-):
+) -> None:
     with storage as store:
         store.create(organisation)
 
@@ -54,6 +54,6 @@ def add_organisation(
 def remove_organisation(
     organisation_id: str,
     storage: OrganisationStorage = Depends(get_organisations_store),
-):
+) -> None:
     with storage as store:
         store.delete_by_id(organisation_id)

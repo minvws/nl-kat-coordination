@@ -25,7 +25,7 @@ class OoiTreeSettingsForm(OOIReportSettingsForm):
         required=False,
     )
 
-    def __init__(self, ooi_types: list[str], *args, **kwargs):
+    def __init__(self, ooi_types: list[str], *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.set_ooi_types(ooi_types)
 
@@ -55,8 +55,8 @@ class SelectOOIForm(BaseRockyForm):
         oois: list[OOI],
         organization_code: str,
         mandatory_fields: list | None = None,
-        *args,
-        **kwargs,
+        *args: Any,
+        **kwargs: Any,
     ):
         super().__init__(*args, **kwargs)
         self.fields["ooi"].widget.attrs["organization_code"] = organization_code

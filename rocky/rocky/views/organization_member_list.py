@@ -66,7 +66,7 @@ class OrganizationMemberListView(
         self.handle_page_action(request.POST.get("action"))
         return redirect(reverse("organization_member_list", kwargs={"organization_code": self.organization.code}))
 
-    def handle_page_action(self, action: str):
+    def handle_page_action(self, action: str) -> None:
         member_id = self.request.POST.get("member_id")
         organizationmember = self.model.objects.get(id=member_id)
         try:

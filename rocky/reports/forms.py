@@ -1,3 +1,5 @@
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 from tools.forms.base import BaseRockyForm
@@ -12,7 +14,7 @@ class OOITypeMultiCheckboxForReportForm(BaseRockyForm):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    def __init__(self, ooi_types: list[str], *args, **kwargs):
+    def __init__(self, ooi_types: list[str], *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         self.fields["ooi_type"].choices = ((ooi_type, ooi_type) for ooi_type in ooi_types)
 
@@ -24,7 +26,7 @@ class ReportTypeMultiselectForm(BaseRockyForm):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    def __init__(self, report_types: set[Report], *args, **kwargs):
+    def __init__(self, report_types: set[Report], *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
         report_types_choices = ((report_type.id, report_type.name) for report_type in report_types)
         self.fields["report_type"].choices = report_types_choices

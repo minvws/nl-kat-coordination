@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
     help="Log level",
     default="INFO",
 )
-def cli(worker_type: str, log_level: str):
+def cli(worker_type: str, log_level: str) -> None:
     logger.setLevel(log_level)
     logger.info("Starting runtime for %s", worker_type)
 

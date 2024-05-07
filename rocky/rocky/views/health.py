@@ -1,7 +1,8 @@
 import logging
+from typing import Any
 
 from account.mixins import OrganizationView
-from django.http import JsonResponse
+from django.http import HttpRequest, JsonResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView, View
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class Health(OrganizationView, View):
-    def get(self, request, *args, **kwargs) -> JsonResponse:
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
         octopoes_connector = self.octopoes_api_connector
         rocky_health = get_rocky_health(octopoes_connector)
         return JsonResponse(rocky_health.model_dump())

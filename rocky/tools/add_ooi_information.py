@@ -60,7 +60,7 @@ def iana_service_table(search_query: str) -> list[_Service]:
     return services
 
 
-def service_info(value) -> tuple[str, str]:
+def service_info(value: str) -> tuple[str, str]:
     """Provides information about IP Services such as common assigned ports for certain protocols and descriptions"""
     services = iana_service_table(value)
     source = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml"

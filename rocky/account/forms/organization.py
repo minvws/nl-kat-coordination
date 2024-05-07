@@ -30,11 +30,11 @@ class OrganizationListForm(forms.Form):
                 organizations.append([organization.code, organization.name])
 
         if organizations:
-            props = {
-                "required": True,
-                "label": _("Organizations"),
-                "help_text": _("The organization from which to clone settings."),
-                "error_messages": self.error_messages,
-            }
-            self.fields["organization"] = forms.ChoiceField(**props)
+            self.fields["organization"] = forms.ChoiceField(
+                required=True,
+                label=_("Organizations"),
+                help_text=_("The organization from which to clone settings."),
+                error_messages=self.error_messages,
+            )
+
             self.fields["organization"].choices = [BLANK_CHOICE] + organizations

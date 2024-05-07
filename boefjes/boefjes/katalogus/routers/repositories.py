@@ -13,12 +13,12 @@ router = APIRouter(
 
 
 @router.get("", response_model=dict[str, Repository], response_model_exclude={0: {0: False}})
-def list_repositories(storage: RepositoryStorage = Depends(get_repository_store)):
+def list_repositories(storage: RepositoryStorage = Depends(get_repository_store)) -> dict[str, Repository]:
     return storage.get_all()
 
 
 @router.get("/{repository_id}", response_model=Repository)
-def get_repository(repository_id: str, storage: RepositoryStorage = Depends(get_repository_store)):
+def get_repository(repository_id: str, storage: RepositoryStorage = Depends(get_repository_store)) -> Repository:
     try:
         return storage.get_by_id(repository_id)
     except KeyError:
@@ -29,7 +29,7 @@ def get_repository(repository_id: str, storage: RepositoryStorage = Depends(get_
 def add_repository(
     repository: Repository,
     storage: RepositoryStorage = Depends(get_repository_store),
-):
+) -> None:
     with storage as store:
         store.create(repository)
 
@@ -38,7 +38,7 @@ def add_repository(
 def remove_repository(
     repository_id: str,
     storage: RepositoryStorage = Depends(get_repository_store),
-):
+) -> None:
     if repository_id == RESERVED_LOCAL_ID:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "LOCAL repository cannot be deleted")
     with storage as store:

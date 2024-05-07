@@ -125,12 +125,12 @@ class OOIRepository(Repository):
 
     def list_findings(
         self,
-        severities,
-        valid_time,
-        exclude_muted,
-        only_muted,
-        offset,
-        limit,
+        severities: set[RiskLevelSeverity],
+        valid_time: datetime,
+        exclude_muted: bool = False,
+        only_muted: bool = False,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
     ) -> Paginated[Finding]:
         raise NotImplementedError
 
@@ -656,10 +656,10 @@ class XTDBOOIRepository(OOIRepository):
         self,
         severities: set[RiskLevelSeverity],
         valid_time: datetime,
-        exclude_muted=False,
-        only_muted=False,
-        offset=DEFAULT_OFFSET,
-        limit=DEFAULT_LIMIT,
+        exclude_muted: bool = False,
+        only_muted: bool = False,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
     ) -> Paginated[Finding]:
         # clause to find risk_severity
         concrete_finding_types = to_concrete({FindingType})

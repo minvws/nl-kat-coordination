@@ -1,5 +1,6 @@
 from logging import getLogger
 from pathlib import Path
+from typing import Any
 
 from django.core.management import BaseCommand, CommandParser
 from django.db import DEFAULT_DB_ALIAS, connections
@@ -22,7 +23,7 @@ class Command(BaseCommand):
             help="Output folder",
         )
 
-    def handle(self, **options) -> None:
+    def handle(self, **options: Any) -> None:
         # Get the database we're operating from
         connection = connections[DEFAULT_DB_ALIAS]
 

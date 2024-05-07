@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
+from django.forms import Form
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
@@ -78,7 +79,7 @@ class FindingAddView(BaseOOIFormView):
 
         return kwargs
 
-    def get_form(self, form_class=None) -> FindingAddForm:
+    def get_form(self, form_class: type[Form] | None = None) -> FindingAddForm:
         if form_class is None:
             form_class = self.get_form_class()
 

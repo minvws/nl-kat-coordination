@@ -87,10 +87,10 @@ class PluginService:
 
         return found_plugins
 
-    def get_all_settings(self, organisation_id: str, plugin_id: str):
+    def get_all_settings(self, organisation_id: str, plugin_id: str) -> dict[str, str]:
         return self.settings_storage.get_all(organisation_id, plugin_id)
 
-    def clone_settings_to_organisation(self, from_organisation: str, to_organisation: str):
+    def clone_settings_to_organisation(self, from_organisation: str, to_organisation: str) -> None:
         # One requirement is that we also do not keep previously enabled boefjes enabled of they are not copied.
         for repository_id, plugins in self.plugin_enabled_store.get_all_enabled(to_organisation).items():
             for plugin_id in plugins:
@@ -104,12 +104,12 @@ class PluginService:
             for plugin_id in plugins:
                 self.update_by_id(repository_id, plugin_id, to_organisation, enabled=True)
 
-    def upsert_settings(self, values: dict, organisation_id: str, plugin_id: str):
+    def upsert_settings(self, values: dict, organisation_id: str, plugin_id: str) -> None:
         self._assert_settings_match_schema(values, organisation_id, plugin_id)
 
-        return self.settings_storage.upsert(values, organisation_id, plugin_id)
+        self.settings_storage.upsert(values, organisation_id, plugin_id)
 
-    def delete_settings(self, organisation_id: str, plugin_id: str):
+    def delete_settings(self, organisation_id: str, plugin_id: str) -> None:
         self.settings_storage.delete(organisation_id, plugin_id)
 
         try:
@@ -155,7 +155,7 @@ class PluginService:
 
         return plugin
 
-    def update_by_id(self, repository_id: str, plugin_id: str, organisation_id: str, enabled: bool):
+    def update_by_id(self, repository_id: str, plugin_id: str, organisation_id: str, enabled: bool) -> None:
         if enabled:
             all_settings = self.settings_storage.get_all(organisation_id, plugin_id)
             self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)
@@ -186,7 +186,7 @@ class PluginService:
 
         return plugins
 
-    def _assert_settings_match_schema(self, all_settings: dict, organisation_id: str, plugin_id: str):
+    def _assert_settings_match_schema(self, all_settings: dict, organisation_id: str, plugin_id: str) -> None:
         schema = self.schema(plugin_id)
 
         if schema:  # No schema means that there is nothing to assert
@@ -207,7 +207,7 @@ class PluginService:
 
 
 def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
-    def closure(session: Session):
+    def closure(session: Session) -> PluginService:
         return PluginService(
             create_plugin_enabled_storage(session),
             create_repository_storage(session),
