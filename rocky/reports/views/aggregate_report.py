@@ -81,9 +81,9 @@ class OOISelectionAggregateReportView(
     current_step = 1
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        self.check_oois_selection()
-        return super().get(request, *args, **kwargs)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.clear_all_oois_selection()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -116,8 +116,6 @@ class ReportTypesSelectionAggregateReportView(
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
             messages.error(self.request, _("Select at least one OOI to proceed."))
-        self.check_oois_selection()
-
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

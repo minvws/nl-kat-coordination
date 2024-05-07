@@ -83,7 +83,8 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 class BaseReportView(OOIFilterView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.selected_oois = sorted(set(request.GET.getlist("ooi", [])))
+        self.selected_oois = self.check_oois_selection(sorted(set(request.GET.getlist("ooi", []))))
+
         self.selected_report_types = request.GET.getlist("report_type", [])
 
         self.report_types: Sequence[type[Report] | type[MultiReport]] = self.get_report_types_from_choice()
@@ -92,15 +93,15 @@ class BaseReportView(OOIFilterView):
             get_plugins_for_report_ids(report_ids)
         )
 
-    def check_oois_selection(self):
-        if "all" in self.selected_oois and len(self.selected_oois) > 1:
-            messages.warning(
-                self.request,
-                _(
-                    "You have selected all OOIs and also you've also selected some OOIs from the list. "
-                    "The selected OOIS will be overridden and all OOIs are selected."
-                ),
-            )
+    def check_oois_selection(self, selected_oois: list[str]) -> list[str]:
+        """all in selection overrides the rest of the selection."""
+        if "all" in selected_oois and len(selected_oois) > 1:
+            selected_oois = ["all"]
+        return selected_oois
+
+    def clear_all_oois_selection(self) -> None:
+        if "all" in self.selected_oois:
+            self.selected_oois = []
 
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
