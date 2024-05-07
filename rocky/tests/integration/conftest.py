@@ -4,14 +4,13 @@ from ipaddress import ip_address
 
 import pytest
 from django.conf import settings
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 
 from octopoes.api.models import Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
+from octopoes.models import OOI, DeclaredScanProfile, Reference
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname, ResolvedHostname
-from octopoes.models.ooi.findings import CVEFindingType, KATFindingType, RetireJSFindingType, RiskLevelSeverity
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RetireJSFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -28,7 +27,6 @@ def octopoes_api_connector(request) -> OctopoesAPIConnector:
     test_node = f"test-{request.node.originalname}"
 
     connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
-    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     connector.create_node()
     yield connector
@@ -40,30 +38,35 @@ def octopoes_api_connector_2(request) -> OctopoesAPIConnector:
     test_node = f"test-{request.node.originalname}-2"
 
     connector = OctopoesAPIConnector(settings.OCTOPOES_API, test_node)
-    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     connector.create_node()
     yield connector
     connector.delete_node()
 
 
-def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
+def seed_system(
+    octopoes_api_connector: OctopoesAPIConnector,
+    valid_time: datetime,
+    test_hostname: str = "example.com",
+    test_ip: str = "192.0.2.3",
+    test_ipv6: str = "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
+) -> dict[str, list[OOI]]:
     network = Network(name="test")
     octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     hostnames = [
-        Hostname(network=network.reference, name="example.com"),
-        Hostname(network=network.reference, name="a.example.com"),
-        Hostname(network=network.reference, name="b.example.com"),
-        Hostname(network=network.reference, name="c.example.com"),
-        Hostname(network=network.reference, name="d.example.com"),
-        Hostname(network=network.reference, name="e.example.com"),
-        Hostname(network=network.reference, name="f.example.com"),
+        Hostname(network=network.reference, name=test_hostname),
+        Hostname(network=network.reference, name=f"a.{test_hostname}"),
+        Hostname(network=network.reference, name=f"b.{test_hostname}"),
+        Hostname(network=network.reference, name=f"c.{test_hostname}"),
+        Hostname(network=network.reference, name=f"d.{test_hostname}"),
+        Hostname(network=network.reference, name=f"e.{test_hostname}"),
+        Hostname(network=network.reference, name=f"f.{test_hostname}"),
     ]
 
     addresses = [
-        IPAddressV4(network=network.reference, address=ip_address("192.0.2.3")),
-        IPAddressV6(network=network.reference, address=ip_address("3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230")),
+        IPAddressV4(network=network.reference, address=ip_address(test_ip)),
+        IPAddressV6(network=network.reference, address=ip_address(test_ipv6)),
     ]
     ports = [
         IPPort(address=addresses[0].reference, protocol="tcp", port=25),
@@ -93,7 +96,7 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
     ]
     certificates = [
         X509Certificate(
-            subject="example.com",
+            subject=test_hostname,
             valid_from="2022-11-15T08:52:57",
             valid_until="2030-11-15T08:52:57",
             serial_number="abc123",
@@ -140,6 +143,12 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ),
     ]
 
+    findings = [
+        Finding(finding_type=finding_types[-3].reference, ooi=instances[1].reference),
+        Finding(finding_type=finding_types[-2].reference, ooi=instances[1].reference),
+        Finding(finding_type=finding_types[-1].reference, ooi=instances[1].reference),
+    ]
+
     oois = (
         hostnames
         + addresses
@@ -154,6 +163,7 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         + resources
         + headers
         + finding_types
+        + findings
         + urls
         + security_txts
         + certificates
@@ -182,3 +192,20 @@ def seed_system(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         "security_txts": security_txts,
         "certificates": certificates,
     }
+
+
+@pytest.fixture()
+def hostname_oois():
+    return [
+        Hostname(
+            object_type="Hostname",
+            scan_profile=DeclaredScanProfile(
+                scan_profile_type="declared", reference=Reference("Hostname|test|example.com"), level=2
+            ),
+            primary_key="Hostname|test|example.com",
+            network=Reference("Network|test"),
+            name="example.com",
+            dns_zone=Reference("DNSZone|test|example.com"),
+            registered_domain=None,
+        )
+    ]

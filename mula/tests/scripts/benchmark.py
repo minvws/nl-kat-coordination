@@ -5,7 +5,7 @@ import threading
 import time
 from pathlib import Path
 
-import requests
+import httpx
 
 SCHEDULER_API = "http://localhost:8004"
 TIMEOUT_FOR_LOG_CAPTURE = 5
@@ -14,13 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 def are_tasks_done() -> bool:
-    response = requests.get(
+    response = httpx.get(
         url=f"{SCHEDULER_API}/tasks/stats",
+        timeout=30,
     )
 
     try:
         response.raise_for_status()
-    except requests.exceptions.HTTPError:
+    except httpx.HTTPError:
         logger.error("Error getting tasks")
         raise
 
@@ -30,13 +31,14 @@ def are_tasks_done() -> bool:
 
 
 def parse_stats() -> None:
-    resp_tasks_stats = requests.get(
+    resp_tasks_stats = httpx.get(
         url=f"{SCHEDULER_API}/tasks/stats",
+        timeout=30,
     )
 
     try:
         resp_tasks_stats.raise_for_status()
-    except requests.exceptions.HTTPError:
+    except httpx.HTTPError:
         logger.error("Error getting tasks")
         raise
 

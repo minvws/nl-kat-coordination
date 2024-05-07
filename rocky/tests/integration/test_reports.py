@@ -1,6 +1,7 @@
 from dataclasses import asdict
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.definitions import MultiReport, Report
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.report_types.systems_report.report import SystemReport, SystemType
 from reports.report_types.web_system_report.report import WebSystemReport
@@ -18,7 +19,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
 
     report = WebSystemReport(octopoes_api_connector)
     input_ooi = "Hostname|test|example.com"
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
     assert len(data["finding_types"]) == 1
@@ -41,7 +42,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ooi=Reference.from_str("HTTPResource|test|192.0.2.3|tcp|25|smtp|test|example.com|http|test|example.com|80|/"),
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
-    checks = report.generate_data(input_ooi, valid_time)["web_checks"].checks
+    checks = report.collect_data([input_ooi], valid_time)[input_ooi]["web_checks"].checks
     assert checks[0].has_csp is False
     assert checks[0].has_no_csp_vulnerabilities is False
 
@@ -50,7 +51,7 @@ def test_web_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
         ooi=Reference.from_str("Website|test|192.0.2.3|tcp|25|smtp|test|example.com"),
     )
     octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
     assert data["web_checks"].checks[0].offers_https is False
 
     assert len(data["finding_types"]) == 3
@@ -61,11 +62,11 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
 
     report = SystemReport(octopoes_api_connector)
     input_ooi = "Hostname|test|example.com"
-    data = report.generate_data(input_ooi, valid_time)
+    data = report.collect_data([input_ooi], valid_time)[input_ooi]
 
     assert data["input_ooi"] == input_ooi
     assert data["summary"] == {
-        "total_domains": 10,  # TODO: this is not deduplicated, should it be?
+        "total_domains": 7,
         "total_systems": 2,
     }
     assert data["services"] == {
@@ -92,12 +93,14 @@ def test_system_report(octopoes_api_connector: OctopoesAPIConnector, valid_time)
     }
 
 
-def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time):
+def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_time, hostname_oois):
     seed_system(octopoes_api_connector, valid_time)
 
-    reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
-    report_types = [{"id": x.id, "name": "", "description": ""} for x in reports]
-    _, data, _ = aggregate_reports(octopoes_api_connector, ["Hostname|test|example.com"], report_types, valid_time)
+    reports: list[type[Report] | type[MultiReport]] = (
+        AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+    )
+    report_ids = [report_type.id for report_type in reports]
+    _, data, _, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
 
     v4_test_hostnames = [
         "Hostname|test|a.example.com",
@@ -147,18 +150,31 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         },
     }
     assert data["ipv6"] == {"example.com": {"enabled": True, "systems": ["Dicom", "Mail", "Other", "Web"]}}
-    assert data["vulnerabilities"] == {
-        "IPAddressV4|test|192.0.2.3": {
-            "vulnerabilities": {},
-            "title": "192.0.2.3",
-            "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
-        },
-        "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230": {
-            "vulnerabilities": {},
-            "title": "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "summary": {"total_findings": 0, "total_criticals": 0, "terms": [], "recommendations": []},
-        },
+    assert data["vulnerabilities"]["IPAddressV4|test|192.0.2.3"]["summary"] == {
+        "total_findings": 6,
+        "total_criticals": 0,
+        "terms": ["CVE-2018-20677", "CVE-2019-8331", "RetireJS-jquerymigrate-f3a3"],
+        "recommendations": [],
     }
+
+    v4_vulnerabilities = data["vulnerabilities"]["IPAddressV4|test|192.0.2.3"]
+    assert v4_vulnerabilities["title"] == "192.0.2.3"
+    assert v4_vulnerabilities["vulnerabilities"]["CVE-2018-20677"]["occurrences"] == 2
+    assert v4_vulnerabilities["vulnerabilities"]["RetireJS-jquerymigrate-f3a3"]["occurrences"] == 2
+    assert v4_vulnerabilities["vulnerabilities"]["CVE-2019-8331"]["occurrences"] == 2
+
+    v6_vulnerabilities = data["vulnerabilities"]["IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"]
+    assert v6_vulnerabilities["title"] == "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"
+    assert v6_vulnerabilities["summary"] == {
+        "total_findings": 6,
+        "total_criticals": 0,
+        "terms": ["CVE-2018-20677", "CVE-2019-8331", "RetireJS-jquerymigrate-f3a3"],
+        "recommendations": [],
+    }
+    assert v6_vulnerabilities["title"] == "3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230"
+    assert v6_vulnerabilities["vulnerabilities"]["CVE-2018-20677"]["occurrences"] == 2
+    assert v6_vulnerabilities["vulnerabilities"]["RetireJS-jquerymigrate-f3a3"]["occurrences"] == 2
+    assert v6_vulnerabilities["vulnerabilities"]["CVE-2019-8331"]["occurrences"] == 2
 
     assert data["basic_security"]["summary"]["Dicom"] == {
         "rpki": {"number_of_compliant": 1, "total": 1},
@@ -220,37 +236,31 @@ def test_aggregate_report(octopoes_api_connector: OctopoesAPIConnector, valid_ti
         "safe_connections": {"number_of_compliant": 1, "total": 1},
     }
 
+    assert data["total_findings"] == 3
+    assert data["total_systems"] == 2
+
 
 def test_multi_report(
-    octopoes_api_connector: OctopoesAPIConnector, octopoes_api_connector_2: OctopoesAPIConnector, valid_time
+    octopoes_api_connector: OctopoesAPIConnector,
+    octopoes_api_connector_2: OctopoesAPIConnector,
+    valid_time,
+    hostname_oois,
 ):
-    seed = seed_system(octopoes_api_connector, valid_time)
+    seed_system(octopoes_api_connector, valid_time)
     seed_system(octopoes_api_connector_2, valid_time)
 
-    findings = [
-        Finding(finding_type=seed["finding_types"][-3].reference, ooi=seed["instances"][1].reference),
-        Finding(finding_type=seed["finding_types"][-2].reference, ooi=seed["instances"][1].reference),
-        Finding(finding_type=seed["finding_types"][-1].reference, ooi=seed["instances"][1].reference),
-    ]
-    for finding in findings:
-        octopoes_api_connector.save_declaration(Declaration(ooi=finding, valid_time=valid_time))
-
     reports = AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
-    report_types = [{"id": x.id, "name": "", "description": ""} for x in reports]
-    _, data, report_data = aggregate_reports(
-        octopoes_api_connector, ["Hostname|test|example.com"], report_types, valid_time
-    )
-    _, data_2, report_data_2 = aggregate_reports(
-        octopoes_api_connector_2, ["Hostname|test|example.com"], report_types, valid_time
-    )
+    report_ids = [report_type.id for report_type in reports]
+    _, data, report_data, _ = aggregate_reports(octopoes_api_connector, hostname_oois, report_ids, valid_time)
+    _, data_2, report_data_2, _ = aggregate_reports(octopoes_api_connector_2, hostname_oois, report_ids, valid_time)
 
-    report_data = ReportData(
+    report_data_object = ReportData(
         organization_code=octopoes_api_connector.client,
         organization_name="Test name",
         organization_tags=["test1"],
         data={"post_processed_data": data, "report_data": report_data},
     )
-    report_data_2 = ReportData(
+    report_data_object_2 = ReportData(
         organization_code=octopoes_api_connector_2.client,
         organization_name="Name2",
         organization_tags=["test1", "test2", "test3"],
@@ -258,12 +268,14 @@ def test_multi_report(
     )
 
     # Save second organization info in the first organization
-    octopoes_api_connector.save_declaration(Declaration(ooi=report_data, valid_time=valid_time))
-    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_2, valid_time=valid_time))
+    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_object, valid_time=valid_time))
+    octopoes_api_connector.save_declaration(Declaration(ooi=report_data_object_2, valid_time=valid_time))
 
     multi_report = MultiOrganizationReport(octopoes_api_connector)
     multi_report_data = collect_report_data(
-        octopoes_api_connector, [str(report_data.reference), str(report_data_2.reference)]
+        octopoes_api_connector,
+        [str(report_data_object.reference), str(report_data_object_2.reference)],
+        valid_time,
     )
     multi_data = multi_report.post_process_data(multi_report_data)
     assert multi_data["organizations"] == [octopoes_api_connector.client, octopoes_api_connector_2.client]
@@ -275,7 +287,7 @@ def test_multi_report(
 
     assert multi_data["basic_security_score"] == 100
     assert multi_data["total_critical_vulnerabilities"] == 0
-    assert multi_data["total_findings"] == 3
+    assert multi_data["total_findings"] == 6
     assert multi_data["total_systems"] == 4
     assert multi_data["total_hostnames"] == 14
     assert multi_data["service_counts"] == {"Mail": 2, "Web": 4, "Dicom": 2, "Other": 2}
@@ -312,13 +324,21 @@ def test_multi_report(
         },
         {
             "asset": "IPAddressV6|test|3e4d:64a2:cb49:bd48:a1ba:def3:d15d:9230",
-            "vulnerabilities": {},
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report-2",
             "services": ["Web"],
         },
         {
             "asset": "IPAddressV4|test|192.0.2.3",
-            "vulnerabilities": {},
+            "vulnerabilities": {
+                "CVE-2018-20677": None,
+                "CVE-2019-8331": None,
+                "RetireJS-jquerymigrate-f3a3": None,
+            },
             "organisation": "test-test_multi_report-2",
             "services": ["Dicom", "Mail", "Other", "Web"],
         },
@@ -406,9 +426,9 @@ def test_multi_report(
         },
     }
     assert multi_data["system_vulnerabilities"] == {
-        "CVE-2018-20677": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
-        "CVE-2019-8331": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
-        "RetireJS-jquerymigrate-f3a3": {"cvss": None, "Web": 2, "Dicom": 1, "Mail": 1, "Other": 1},
+        "CVE-2018-20677": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "CVE-2019-8331": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
+        "RetireJS-jquerymigrate-f3a3": {"cvss": None, "Web": 4, "Dicom": 2, "Mail": 2, "Other": 2},
     }
     assert multi_data["ipv6"] == {
         "Dicom": {"total": 2, "enabled": 2},

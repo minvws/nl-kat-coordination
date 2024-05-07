@@ -4,10 +4,10 @@ import os
 import signal
 import sys
 import time
-from typing import Dict, List, Optional, Tuple
+from queue import Queue
 
+from httpx import HTTPError
 from pydantic import ValidationError
-from requests import HTTPError
 
 from boefjes.clients.scheduler_client import (
     QueuePrioritizedItem,
@@ -16,7 +16,7 @@ from boefjes.clients.scheduler_client import (
     TaskStatus,
 )
 from boefjes.config import Settings
-from boefjes.job_handler import BoefjeHandler, NormalizerHandler
+from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
 from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
 from boefjes.runtime_interfaces import Handler, WorkerManager
@@ -40,7 +40,7 @@ class SchedulerWorkerManager(WorkerManager):
 
         self.task_queue = manager.Queue()  # multiprocessing.Queue() will not work on macOS, see mp.Queue.qsize()
         self.handling_tasks = manager.dict()
-        self.workers = []
+        self.workers: list[mp.Process] = []
 
         logger.setLevel(log_level)
 
@@ -77,7 +77,7 @@ class SchedulerWorkerManager(WorkerManager):
 
                 raise
 
-    def _fill_queue(self, task_queue: mp.Queue, queue_type: WorkerManager.Queue):
+    def _fill_queue(self, task_queue: Queue, queue_type: WorkerManager.Queue):
         if task_queue.qsize() > self.settings.pool_size:
             time.sleep(self.settings.worker_heartbeat)
             return
@@ -141,15 +141,20 @@ class SchedulerWorkerManager(WorkerManager):
         new_workers = []
 
         for worker in self.workers:
-            if not worker._closed and worker.is_alive():
-                new_workers.append(worker)
-                continue
+            closed = False
+
+            try:
+                if worker.is_alive():
+                    new_workers.append(worker)
+                    continue
+            except ValueError:
+                closed = True  # worker is closed, so we create a new one
 
             logger.warning(
                 "Worker[pid=%s, %s] not alive, creating new worker...", worker.pid, _format_exit_code(worker.exitcode)
             )
 
-            if not worker._closed:  # Closed workers do not have a pid, so cleaning up would fail
+            if not closed:  # Closed workers do not have a pid, so cleaning up would fail
                 self._cleanup_pending_worker_task(worker)
                 worker.close()
 
@@ -178,16 +183,16 @@ class SchedulerWorkerManager(WorkerManager):
         except HTTPError:
             logger.exception("Could not get scheduler task[id=%s]", handling_task_id)
 
-    def _worker_args(self) -> Tuple:
+    def _worker_args(self) -> tuple:
         return self.task_queue, self.item_handler, self.scheduler_client, self.handling_tasks
 
-    def exit(self, queue_type: WorkerManager.Queue, signum: Optional[int] = None):
+    def exit(self, queue_type: WorkerManager.Queue, signum: int | None = None):
         try:
             if signum:
                 logger.info("Received %s, exiting", signal.Signals(signum).name)
 
             if not self.task_queue.empty():
-                items: List[QueuePrioritizedItem] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
+                items: list[QueuePrioritizedItem] = [self.task_queue.get() for _ in range(self.task_queue.qsize())]
 
                 for p_item in items:
                     try:
@@ -198,9 +203,12 @@ class SchedulerWorkerManager(WorkerManager):
             killed_workers = []
 
             for worker in self.workers:  # Send all signals before joining, speeding up shutdowns
-                if not worker._closed and worker.is_alive():
-                    worker.kill()
-                    killed_workers.append(worker)
+                try:
+                    if worker.is_alive():
+                        worker.kill()
+                        killed_workers.append(worker)
+                except ValueError:
+                    pass  # worker is already closed
 
             for worker in killed_workers:
                 worker.join()
@@ -215,8 +223,8 @@ class SchedulerWorkerManager(WorkerManager):
                 sys.exit()
 
 
-def _format_exit_code(exitcode: int) -> str:
-    if exitcode >= 0:
+def _format_exit_code(exitcode: int | None) -> str:
+    if exitcode is None or exitcode >= 0:
         return f"exitcode={exitcode}"
 
     return f"signal={signal.Signals(-exitcode).name}"
@@ -226,7 +234,7 @@ def _start_working(
     task_queue: mp.Queue,
     handler: Handler,
     scheduler_client: SchedulerClientInterface,
-    handling_tasks: Dict[int, str],
+    handling_tasks: dict[int, str],
 ):
     logger.info("Started listening for tasks from worker[pid=%s]", os.getpid())
 
@@ -254,9 +262,11 @@ def _start_working(
 def get_runtime_manager(settings: Settings, queue: WorkerManager.Queue, log_level: str) -> WorkerManager:
     local_repository = get_local_repository()
     if queue is WorkerManager.Queue.BOEFJES:
-        item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository)
+        item_handler = BoefjeHandler(LocalBoefjeJobRunner(local_repository), local_repository, bytes_api_client)
     else:
-        item_handler = NormalizerHandler(LocalNormalizerJobRunner(local_repository))
+        item_handler = NormalizerHandler(  # type: ignore
+            LocalNormalizerJobRunner(local_repository), bytes_api_client, settings.scan_profile_whitelist
+        )
 
     return SchedulerWorkerManager(
         item_handler,

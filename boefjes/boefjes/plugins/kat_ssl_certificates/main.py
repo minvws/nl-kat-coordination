@@ -1,5 +1,3 @@
-from typing import List, Tuple, Union
-
 import docker
 
 from boefjes.job_models import BoefjeMeta
@@ -7,12 +5,16 @@ from boefjes.job_models import BoefjeMeta
 OPENSSL_IMAGE = "alpine/openssl:latest"
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     client = docker.from_env()
     input_ = boefje_meta.arguments["input"]
     hostname = input_["hostname"]["name"]
+    scheme = input_["ip_service"]["service"]["name"]
     ip_address = input_["ip_service"]["ip_port"]["address"]["address"]
     port = input_["ip_service"]["ip_port"]["port"]
+
+    if scheme != "https":
+        return [({"info/boefje"}, "Skipping check due to non-TLS scheme")]
 
     try:
         output = client.containers.run(

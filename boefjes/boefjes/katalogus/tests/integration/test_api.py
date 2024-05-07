@@ -58,7 +58,7 @@ class TestAPI(TestCase):
         session = sessionmaker(bind=get_engine())()
 
         for table in SQL_BASE.metadata.tables:
-            session.execute(f"DELETE FROM {table} CASCADE")
+            session.execute(f"DELETE FROM {table} CASCADE")  # noqa: S608
 
         session.commit()
         session.close()

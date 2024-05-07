@@ -1,13 +1,11 @@
-from typing import List, Tuple, Union
-
 import docker
 
 from boefjes.job_models import BoefjeMeta
 
-SUBFINDER_IMAGE = "projectdiscovery/subfinder:latest"
+SUBFINDER_IMAGE = "projectdiscovery/subfinder:v2.6.6"
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     client = docker.from_env()
     input_ = boefje_meta.arguments["input"]
     hostname = input_["name"]

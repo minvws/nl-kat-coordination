@@ -1,12 +1,13 @@
-import xml.etree.ElementTree as ET
-from typing import Iterable, Union
+from collections.abc import Iterable
+
+import defusedxml.ElementTree as ET
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     root = ET.fromstring(raw)
     website_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 

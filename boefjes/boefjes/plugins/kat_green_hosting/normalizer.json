@@ -1,10 +1,10 @@
 {
-    "id": "kat_green_hosting_normalize",
-    "consumes": [
-        "boefje/green-hosting"
-    ],
-    "produces": [
-        "KATFindingType",
-        "Finding"
-    ]
+  "id": "kat_green_hosting_normalize",
+  "consumes": [
+    "boefje/green-hosting"
+  ],
+  "produces": [
+    "KATFindingType",
+    "Finding"
+  ]
 }

@@ -42,15 +42,13 @@
                         {% include "partials/pagination.html" %}
 
                     </div>
-                </div>
-                <div role="group"></div>
+                    <div role="group"></div>
+                {% endif %}
             </div>
-        {% endif %}
-    </div>
-</section>
-{% if form.fields %}
-    {% include "clone_settings.html" %}
+        </section>
+        {% if form.fields %}
+            {% include "clone_settings.html" %}
 
-{% endif %}
-</main>
+        {% endif %}
+    </main>
 {% endblock content %}

@@ -1,126 +1,185 @@
 {% load i18n %}
 
-<h2>{% translate "IP address lookup" %}</h2>
-<div class="horizontal-scroll">
-    {% if data.ipv4 %}
-        <table>
-            <caption class="visually-hidden">IPv4:</caption>
-            <thead>
-                <tr>
-                    <th scope="col">IPv4</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for ip in data.ipv4 %}<td>{{ ip }}</td>{% endfor %}
-                </tr>
-            </tbody>
-        </table>
-    {% endif %}
-    {% if not data.enough_ipv6_webservers %}
-        <h3 class="heading-xs">IPv6</h3>
-        <div class="warning" role="group" aria-label="{% translate "warning" %}">
-            <span>{% translate "Warning" %}:</span>
-            <p>
-                {% blocktranslate trimmed %}
-                    You have less than one webserver that is reachable over IPv6,
-                    which is <strong>not</strong> in compliance to internet.nl standards.
-                {% endblocktranslate %}
-            </p>
-        </div>
-    {% else %}
-        <table class="summary">
-            <caption class="visually-hidden">IPv6:</caption>
-            <thead>
-                <tr>
-                    <th scope="col">IPv6</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    {% for ip in data.ipv6 %}<td>{{ ip }}</td>{% endfor %}
-                </tr>
-            </tbody>
-        </table>
-    {% endif %}
-</div>
-{% if data.other_records %}
-    <h2>{% translate "Other records found" %}</h2>
+<h3>{% translate "Records found" %}</h3>
+{% if data.records %}
+    <p>
+        {% blocktranslate trimmed %}
+            The DNS report gives an overview of the DNS records that were found
+            for the DNSZone. Additionally the security measures table shows whether
+            or not DNS relating security measures are enabled.
+        {% endblocktranslate %}
+    </p>
     <div class="horizontal-scroll">
         <table>
-            <caption class="visually-hidden">{% translate "Other records found" %}</caption>
+            <caption class="visually-hidden">{% translate "Records found" %}</caption>
+            <p>
+                {% blocktranslate %}
+                    <strong>Disclaimer:</strong>
+                    Not all DNSRecords are parsed in OpenKAT.
+                    DNS record types that are parsed and could be displayed in the table are:
+                {% endblocktranslate %}
+                A, AAAA, CAA, CNAME, NS, MX, PTR, SOA, SRV, TXT.
+            </p>
+            <div class="nota-bene">
+                <span>{% translate "All existing DNS record types can be found here:" %}
+                    <a class="nota-bene"
+                       href="https://en.wikipedia.org/wiki/List_of_DNS_record_types"
+                       target="_blank"
+                       rel="noopener noreferrer">https://en.wikipedia.org/wiki/List_of_DNS_record_types</a>
+                </span>
+            </div>
             <thead>
                 <tr>
                     <th>{% translate "Record" %}</th>
-                    <th>{% translate "Value" %}</th>
-                    <th>{% translate "Found by" %}</th>
+                    <th>{% translate "Name" %}</th>
+                    <th>{% translate "TTL" %}</th>
+                    <th>{% translate "Data" %}</th>
                 </tr>
             </thead>
             <tbody>
-                {% for ooi in data.other_records %}
+                {% for ooi in data.records %}
                     <tr>
-                        <td>{{ ooi.human_readable }}</td>
+                        <td>{{ ooi.type }}</td>
+                        <td>{{ ooi.name }}</td>
+                        <td class="nowrap">{{ ooi.ttl }} {% translate "minutes" %}</td>
                         <td>{{ ooi.content }}</td>
-                        <td>{{ ooi.origin }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    <h2>{% translate "Security measures" %}</h2>
+{% else %}
+    <p>{% translate "No records have been found." %}</p>
+{% endif %}
+<h3>{% translate "Security measures" %}</h3>
+<p>
+    {% blocktranslate trimmed %}
+        The security measures table below shows which DNS relating security
+        measures are enabled based on the contents of the DNS records.
+    {% endblocktranslate %}
+</p>
+<div class="horizontal-scroll">
+    <div class="column-3">
+        <table>
+            <caption class="visually-hidden">{% translate "Security measures" %}</caption>
+            <thead>
+                <tr>
+                    <th>{% translate "Enabled" %}</th>
+                    <th>{% translate "Type" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        {% if data.security.spf %}
+                            <i class="icon positive"></i>{% translate "Yes" %}
+                        {% else %}
+                            <i class="icon alert"></i>{% translate "No" %}
+                        {% endif %}
+                    </td>
+                    <td>SPF</td>
+                </tr>
+                <tr>
+                    <td>
+                        {% if data.security.dmarc %}
+                            <i class="icon positive"></i>{% translate "Yes" %}
+                        {% else %}
+                            <i class="icon alert"></i>{% translate "No" %}
+                        {% endif %}
+                    </td>
+                    <td>DMARC</td>
+                </tr>
+                <tr>
+                    <td>
+                        {% if data.security.dkim %}
+                            <i class="icon positive"></i>{% translate "Yes" %}
+                        {% else %}
+                            <i class="icon alert"></i>{% translate "No" %}
+                        {% endif %}
+                    </td>
+                    <td>DKIM</td>
+                </tr>
+                <tr>
+                    <td>
+                        {% if data.security.dnssec %}
+                            <i class="icon positive"></i>{% translate "Yes" %}
+                        {% else %}
+                            <i class="icon alert"></i>{% translate "No" %}
+                        {% endif %}
+                    </td>
+                    <td>DNSSEC</td>
+                </tr>
+                <tr>
+                    <td>
+                        {% if data.security.caa %}
+                            <i class="icon positive"></i>{% translate "Yes" %}
+                        {% else %}
+                            <i class="icon alert"></i>{% translate "No" %}
+                        {% endif %}
+                    </td>
+                    <td>CAA</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% if data.finding_types %}
+    <h3>{% translate "Other findings found" %}</h3>
     <div class="horizontal-scroll">
-        <div class="column-3">
-            <table>
-                <caption class="visually-hidden">{% translate "Security measures" %}</caption>
-                <thead>
-                    <tr>
-                        <th>{% translate "Enabled" %}</th>
-                        <th>{% translate "Type" %}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            {% if data.security.spf %}
-                                <i class="icon positive"></i>{% translate "Yes" %}
-                            {% else %}
-                                <i class="icon alert"></i>{% translate "No" %}
-                            {% endif %}
-                        </td>
-                        <td>SPF</td>
-                    </tr>
+        <table>
+            <caption class="visually-hidden">{% translate "Other findings found" %}</caption>
+            <thead>
+                <tr>
+                    <th scope="col">{% translate "Severity" %}</th>
+                    <th scope="col">{% translate "Finding" %}</th>
+                    <th scope="col">{% translate "Details" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for info in data.finding_types %}
                     <tr>
                         <td>
-                            {% if data.security.dmarc %}
-                                <i class="icon positive"></i>{% translate "Yes" %}
-                            {% else %}
-                                <i class="icon alert"></i>{% translate "No" %}
-                            {% endif %}
+                            <span class="{{ info.finding_type.risk_severity }}">{{ info.finding_type.risk_severity|capfirst }}</span>
                         </td>
-                        <td>DMARC</td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {% if data.security.dkim %}
-                                <i class="icon positive"></i>{% translate "Yes" %}
-                            {% else %}
-                                <i class="icon alert"></i>{% translate "No" %}
-                            {% endif %}
+                        <td>{{ info.finding_type }}</td>
+                        <td class="actions">
+                            <button class="expando-button"
+                                    data-icon-open-class="icon ti-chevron-down"
+                                    data-icon-close-class="icon ti-chevron-up"
+                                    data-close-label="{% translate "Close details" %}">
+                                {% translate "Open details" %}
+                            </button>
                         </td>
-                        <td>DKIM</td>
                     </tr>
-                    <tr>
-                        <td>
-                            {% if data.security.dnssec %}
-                                <i class="icon positive"></i>{% translate "Yes" %}
-                            {% else %}
-                                <i class="icon alert"></i>{% translate "No" %}
-                            {% endif %}
+                    <tr class="expando-row">
+                        <td colspan="5">
+                            <h3>{{ info.finding_type }}</h3>
+                            <h4>{% translate "Findings information" %}</h4>
+                            <dl>
+                                <div>
+                                    <dt>{% translate "Finding" %}</dt>
+                                    <dd>
+                                        {{ info.finding_type.id }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>{% translate "Description" %}</dt>
+                                    <dd>
+                                        {{ info.finding_type.description }}
+                                    </dd>
+                                </div>
+                            </dl>
+                            <h4>{% translate "Occurrences" %}</h4>
+                            {% for occurrence in info.occurrences %}
+                                <div>
+                                    <strong>{{ occurrence.ooi.human_readable }}</strong>
+                                    <p>{{ occurrence.description }}</p>
+                                </div>
+                            {% endfor %}
                         </td>
-                        <td>DNSSEC</td>
                     </tr>
-                </tbody>
-            </table>
-        </div>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endif %}

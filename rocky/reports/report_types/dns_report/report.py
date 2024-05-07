@@ -1,11 +1,12 @@
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.models import Reference
-from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSRecord
+from octopoes.models.exception import ObjectNotFoundException
+from octopoes.models.ooi.dns.records import DNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import Finding
 from reports.report_types.definitions import Report
@@ -21,56 +22,56 @@ class DNSReport(Report):
     input_ooi_types = {Hostname}
     template_path = "dns_report/report.html"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
+    def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         ref = Reference.from_str(input_ooi)
-        tree = self.octopoes_api_connector.get_tree(
-            ref, depth=3, types={DNSRecord, Finding}, valid_time=valid_time
-        ).store
+        records_tree = self.octopoes_api_connector.get_tree(ref, valid_time, depth=1, types={DNSRecord}).store
+        findings_tree = self.octopoes_api_connector.get_tree(ref, valid_time, depth=3, types={Finding}).store
 
-        other_records = []
-        security = {
-            "spf": True,
-            "dkim": True,
-            "dmarc": True,
-            "dnssec": True,
-        }
-        ipv4 = []
-        ipv6 = []
-        for ooi_type, ooi in tree.items():
-            reference = Reference.from_str(ooi)
-            if isinstance(ooi, DNSARecord):
-                if ref.tokenized.name == ooi.hostname.tokenized.name:
-                    ipv4.append(ooi.value)
-            elif isinstance(ooi, DNSAAAARecord):
-                if ref.tokenized.name == ooi.hostname.tokenized.name:
-                    ipv6.append(ooi.value)
-            elif isinstance(ooi, DNSRecord):
-                origin = self.octopoes_api_connector.list_origins(source=ref, result=reference, valid_time=valid_time)
-                if origin:
-                    other_records.append(
-                        {
-                            "human_readable": reference.human_readable,
-                            "content": ooi.value,
-                            "origin": origin[0].method,
-                        }
-                    )
-            elif isinstance(ooi, Finding):
-                if "NO-SPF" in ooi.finding_type.tokenized.id:
+        findings = []
+        finding_types: dict[str, dict] = {}
+        records = []
+        security = {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True}
+
+        for ooi_type, ooi in findings_tree.items():
+            if isinstance(ooi, Finding):
+                for check in ["caa", "dkim", "dmarc", "dnssec", "spf"]:
+                    if "NO-%s" % check.upper() in ooi.finding_type.tokenized.id:
+                        security[check] = False
+                if ooi.finding_type.tokenized.id == "KAT-INVALID-SPF":
                     security["spf"] = False
-                if "NO-DKIM" in ooi.finding_type.tokenized.id:
-                    security["dkim"] = False
-                if "NO-DMARC" in ooi.finding_type.tokenized.id:
-                    security["dmarc"] = False
-                if "NO-DNSSEC" in ooi.finding_type.tokenized.id:
-                    security["dnssec"] = False
+                if ooi.finding_type.tokenized.id in (
+                    "KAT-INVALID-SPF",
+                    "KAT-NAMESERVER-NO-IPV6",
+                    "KAT-NAMESERVER-NO-TWO-IPV6",
+                ):
+                    findings.append(ooi)
+        for ooi_type, ooi in records_tree.items():
+            if isinstance(ooi, DNSRecord):
+                records.append(
+                    {
+                        "type": ooi.dns_record_type,
+                        "ttl": round(ooi.ttl / 60) if ooi.ttl else "",
+                        "name": ooi.hostname.tokenized.name,
+                        "content": ooi.value,
+                    }
+                )
 
-        enough_ipv6_webservers = len(ipv6) >= 2
+        for finding in findings:
+            try:
+                finding_type = self.octopoes_api_connector.get(Reference.from_str(finding.finding_type), valid_time)
 
-        return {
-            "input_ooi": input_ooi,
-            "other_records": other_records,
-            "security": security,
-            "ipv4": ipv4,
-            "ipv6": ipv6,
-            "enough_ipv6_webservers": enough_ipv6_webservers,
-        }
+                if finding_type.id in finding_types:
+                    finding_types[finding_type.id]["occurrences"].append(finding)
+                else:
+                    finding_types[finding_type.id] = {"finding_type": finding_type, "occurrences": [finding]}
+
+            except ObjectNotFoundException:
+                logger.error("No Finding Type found for Finding '%s' on date %s.", finding, str(valid_time))
+
+        finding_types_sorted = sorted(
+            finding_types.values(), key=lambda x: x["finding_type"].risk_score or 0, reverse=True
+        )
+
+        records = sorted(records, key=lambda x: x["type"])
+
+        return {"input_ooi": input_ooi, "records": records, "security": security, "finding_types": finding_types_sorted}

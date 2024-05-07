@@ -19,7 +19,7 @@
 
             {% endif %}
             {% if data.ipv6 %}
-                {% include "ipv6_report/report.html" with data=data.ipv6 show_heading="yes" %}
+                {% include "ipv6_report/report.html" with data=data.ipv6 show_heading="yes" show_system_type="yes" %}
 
             {% endif %}
             <section id="basic-security">
@@ -49,7 +49,7 @@
                             {% endfor %}
                         </div>
                     {% endif %}
-                    {% if data.basic_security.system_specific %}
+                    {% if data.basic_security.summary %}
                         <div id="system-specific">
                             <h3>{% translate "System specific" %}</h3>
                             <p>

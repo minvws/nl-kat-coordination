@@ -1,9 +1,13 @@
 {
-    "id": "dns-records",
-    "name": "DnsRecords",
-    "description": "Fetch the DNS record(s) of a hostname",
-    "consumes": [
-        "Hostname"
-    ],
-    "scan_level": 1
+  "id": "dns-records",
+  "name": "DnsRecords",
+  "description": "Fetch the DNS record(s) of a hostname",
+  "consumes": [
+    "Hostname"
+  ],
+  "environment_keys": [
+    "RECORD_TYPES",
+    "REMOTE_NS"
+  ],
+  "scan_level": 1
 }

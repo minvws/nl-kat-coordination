@@ -1,16 +1,13 @@
 import uuid
+from collections.abc import Iterator
 from datetime import datetime, timezone
 from ipaddress import IPv4Address, ip_address
-from typing import Dict, Iterator, List, Optional, Set
 from unittest.mock import Mock
 
 import pytest
 from bits.runner import BitRunner
-from requests.adapters import HTTPAdapter, Retry
 
-from octopoes.api.api import app
-from octopoes.api.router import settings
-from octopoes.config.settings import Settings, XTDBType
+from octopoes.config.settings import Settings
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.core.app import get_xtdb_client
 from octopoes.core.service import OctopoesService
@@ -37,8 +34,9 @@ from octopoes.models.types import (
     Website,
 )
 from octopoes.repositories.ooi_repository import OOIRepository, XTDBOOIRepository
+from octopoes.repositories.origin_parameter_repository import XTDBOriginParameterRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
-from octopoes.repositories.scan_profile_repository import ScanProfileRepository
+from octopoes.repositories.scan_profile_repository import ScanProfileRepository, XTDBScanProfileRepository
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
 
@@ -56,11 +54,11 @@ class MockScanProfileRepository(ScanProfileRepository):
         return self.profiles[ooi_reference]
 
     def save(
-        self, old_scan_profile: Optional[ScanProfileBase], new_scan_profile: ScanProfileBase, valid_time: datetime
+        self, old_scan_profile: ScanProfileBase | None, new_scan_profile: ScanProfileBase, valid_time: datetime
     ) -> None:
         self.profiles[new_scan_profile.reference] = new_scan_profile
 
-    def list(self, scan_profile_type: Optional[str], valid_time: datetime) -> List[ScanProfileBase]:
+    def list_scan_profiles(self, scan_profile_type: str | None, valid_time: datetime) -> list[ScanProfileBase]:
         if scan_profile_type:
             return [profile for profile in self.profiles.values() if profile.scan_profile_type == scan_profile_type]
         else:
@@ -80,13 +78,13 @@ class MockOOIRepository(OOIRepository):
         super().__init__(*args, **kwargs)
         self.oois = {}
 
-    def save(self, ooi: OOI, valid_time: datetime, end_valid_time: Optional[datetime] = None) -> None:
+    def save(self, ooi: OOI, valid_time: datetime, end_valid_time: datetime | None = None) -> None:
         self.oois[ooi.reference] = ooi
 
-    def load_bulk(self, references: Set[Reference], valid_time: datetime) -> Dict[str, OOI]:
+    def load_bulk(self, references: set[Reference], valid_time: datetime) -> dict[str, OOI]:
         return {ooi.primary_key: ooi for ooi in self.oois.values() if ooi.reference in references}
 
-    def list_neighbours(self, references: Set[Reference], paths: Set[Path], valid_time: datetime) -> Set[OOI]:
+    def list_neighbours(self, references: set[Reference], paths: set[Path], valid_time: datetime) -> set[OOI]:
         neighbours = set()
 
         for path in paths:
@@ -109,7 +107,7 @@ class MockOOIRepository(OOIRepository):
 
         return neighbours
 
-    def list_oois_without_scan_profile(self, valid_time: datetime) -> Set[Reference]:
+    def list_oois_without_scan_profile(self, valid_time: datetime) -> set[Reference]:
         return set()
 
 
@@ -200,17 +198,6 @@ def declared_scan_profile():
 
 
 @pytest.fixture
-def xtdbtype_crux():
-    def get_settings_override():
-        return Settings(xtdb_type=XTDBType.CRUX)
-
-    overrides = app.dependency_overrides.copy()
-    app.dependency_overrides[settings] = get_settings_override
-    yield
-    app.dependency_overrides = overrides
-
-
-@pytest.fixture
 def app_settings():
     return Settings()
 
@@ -228,8 +215,7 @@ def bit_runner(mocker) -> BitRunner:
 @pytest.fixture
 def xtdb_http_client(request, app_settings: Settings) -> XTDBHTTPClient:
     test_node = f"test-{request.node.originalname}"
-    client = get_xtdb_client(str(app_settings.xtdb_uri), test_node, app_settings.xtdb_type)
-    client._session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
+    client = get_xtdb_client(str(app_settings.xtdb_uri), test_node)
 
     return client
 
@@ -246,19 +232,77 @@ def xtdb_session(xtdb_http_client: XTDBHTTPClient) -> Iterator[XTDBSession]:
 @pytest.fixture
 def octopoes_api_connector(xtdb_session: XTDBSession) -> OctopoesAPIConnector:
     connector = OctopoesAPIConnector("http://ci_octopoes:80", xtdb_session.client._client)
-    connector.session.mount("http://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1)))
 
     return connector
 
 
-@pytest.fixture
-def xtdb_ooi_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOOIRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+class MockEventManager:
+    def __init__(self):
+        self.queue = []
+        self.processed = [0]
+        self.client = "test"
+
+    def publish(self, event) -> None:
+        self.queue.append(event)
+
+    def unprocessed(self) -> list:
+        retval = self.queue[self.processed[-1] :]
+        self.processed.append(len(self.queue))
+        return retval
+
+    def process_events(self, xtdb_octopoes_service: OctopoesService) -> int:
+        targets = self.unprocessed()
+        for event in targets:
+            xtdb_octopoes_service.process_event(event)
+        xtdb_octopoes_service.commit()
+        return len(targets)
+
+    def complete_process_events(self, xtdb_octopoes_service: OctopoesService, repeat: int = 3) -> int:
+        retval = 0
+        for _ in range(repeat):
+            while True:
+                val = self.process_events(xtdb_octopoes_service)
+                if val == 0:
+                    break
+                retval += val
+        return retval
 
 
 @pytest.fixture
-def xtdb_origin_repository(xtdb_session: XTDBSession) -> Iterator[XTDBOOIRepository]:
-    yield XTDBOriginRepository(Mock(spec=EventManager), xtdb_session, XTDBType.XTDB_MULTINODE)
+def event_manager(xtdb_session: XTDBSession) -> Mock:
+    return MockEventManager()
+
+
+@pytest.fixture
+def xtdb_ooi_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOOIRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_origin_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_origin_parameter_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBOriginParameterRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_scan_profile_repository(xtdb_session: XTDBSession, event_manager) -> Iterator[XTDBOOIRepository]:
+    yield XTDBScanProfileRepository(event_manager, xtdb_session)
+
+
+@pytest.fixture
+def xtdb_octopoes_service(
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_origin_repository: XTDBOriginRepository,
+    xtdb_origin_parameter_repository: XTDBOriginParameterRepository,
+    xtdb_scan_profile_repository: XTDBScanProfileRepository,
+) -> OctopoesService:
+    return OctopoesService(
+        xtdb_ooi_repository, xtdb_origin_repository, xtdb_origin_parameter_repository, xtdb_scan_profile_repository
+    )
 
 
 @pytest.fixture
@@ -268,7 +312,7 @@ def mock_xtdb_session():
 
 @pytest.fixture
 def origin_repository(mock_xtdb_session):
-    yield XTDBOriginRepository(Mock(spec=EventManager), mock_xtdb_session, XTDBType.XTDB_MULTINODE)
+    yield XTDBOriginRepository(Mock(spec=EventManager, client="test"), mock_xtdb_session)
 
 
 def seed_system(xtdb_ooi_repository: XTDBOOIRepository, xtdb_origin_repository: XTDBOriginRepository, valid_time):

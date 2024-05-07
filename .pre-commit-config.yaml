@@ -20,58 +20,72 @@ repos:
   - id: end-of-file-fixer
     exclude: |
       (?x)(
-      ^boefjes/tests/examples/rdns-nxdomain.txt$
+      \.svcg$ |
+      ^boefjes/tests/examples/rdns-nxdomain.txt$ |
+      ^boefjes/tests/examples/raw/
       )
+  - id: fix-byte-order-marker
+  - id: pretty-format-json
+    args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
 
 
 - repo: https://github.com/abravalheri/validate-pyproject
-  rev: v0.15
+  rev: v0.16
   hooks:
   - id: validate-pyproject
     files: pyproject.toml$
 
 - repo: https://github.com/rstcheck/rstcheck
-  rev: v6.2.0
+  rev: v6.2.1
   hooks:
   - id: rstcheck
     # https://github.com/rstcheck/rstcheck-core/issues/4
-    args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid"]
-    additional_dependencies: ["rstcheck[sphinx]"]
+    args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid,automodule"]
+    additional_dependencies: ["rstcheck[sphinx]", "autodoc-pydantic==2.1.0"]
 
 - repo: https://github.com/MarketSquare/robotframework-tidy
-  rev: "4.6.0"
+  rev: "4.11.0"
   hooks:
   - id: robotidy
 
 - repo: https://github.com/jendrikseipp/vulture
-  rev: v2.10
+  rev: v2.11
   hooks:
   - id: vulture
     exclude: |
       /tests/
 
-- repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: 'v0.1.7'
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: 'v0.3.5'
   hooks:
   - id: ruff
+  - id: ruff-format
 
-- repo: https://github.com/psf/black
-  rev: "23.11.0"
+- repo: https://github.com/asottile/pyupgrade
+  rev: v3.15.2
   hooks:
-  - id: black
+  - id: pyupgrade
+    args: [--py310-plus]
+
+- repo: https://github.com/adamchainz/django-upgrade
+  rev: 1.16.0
+  hooks:
+  - id: django-upgrade
+    args: [--target-version, "4.2"]
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.7.1
+  rev: v1.9.0
   hooks:
   - id: mypy
-    additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'types-retry', 'pydantic', 'pynacl']
+    additional_dependencies: ['types-PyYAML', 'types-cachetools', 'types-retry', 'pydantic', 'pynacl', 'httpx']
     exclude: |
       (?x)(
-      ^boefjes/ |
+      ^boefjes/boefjes/plugins |
+      ^boefjes/tools |
       ^keiko/templates |
       ^mula/whitelist\.py$ |
-      ^octopoes/ |
-      ^rocky/ |
+      ^octopoes/tools |
+      ^rocky/whitelist\.py$ |
       /tests/ |
       docs/source/conf\.py$ |
       setup\.py$
@@ -87,6 +101,7 @@ repos:
       (?x)(
       \.po$ |
       \.xml$ |
+      \.svg$ |
       poetry.lock$ |
       pyproject.toml$ |
       requirements-.*.txt$ |
@@ -107,7 +122,7 @@ repos:
       )
 
 - repo: https://github.com/Riverside-Healthcare/djLint
-  rev: v1.34.0
+  rev: v1.34.1
   hooks:
   - id: djlint-reformat-django
     files: |
@@ -126,7 +141,7 @@ repos:
     exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
 - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-  rev: v15.11.0
+  rev: v16.3.1
   hooks:
     - id: stylelint
       args: [ --fix ]
@@ -136,13 +151,13 @@ repos:
       files: "^(rocky\/assets\/css\/|docs\/source\/).*.(css|scss|sass)$"
 
 - repo: https://github.com/shellcheck-py/shellcheck-py
-  rev: v0.9.0.6
+  rev: v0.10.0.1
   hooks:
   - id: shellcheck
     args: ["-e", "SC1091"]
 
 - repo: https://github.com/scop/pre-commit-shfmt
-  rev: v3.7.0-4
+  rev: v3.8.0-1
   hooks:
   - id: shfmt
     args: ["-w", "-s", "-i", "4", "-sr"]

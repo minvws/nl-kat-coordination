@@ -1,10 +1,8 @@
-from typing import List, Tuple, Union
-
 import docker
 
 from boefjes.job_models import BoefjeMeta
 
-NUCLEI_IMAGE = "projectdiscovery/nuclei:v2.9.4"
+NUCLEI_IMAGE = "projectdiscovery/nuclei:v3.2.4"
 
 
 def verify_hostname_meta(input_ooi):
@@ -18,7 +16,7 @@ def verify_hostname_meta(input_ooi):
         return input_ooi["name"]
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     client = docker.from_env()
 
     # Checks if the url is of object HostnameHTTPURL or Hostname

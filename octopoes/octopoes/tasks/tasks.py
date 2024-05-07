@@ -3,13 +3,12 @@ import uuid
 from datetime import datetime, timezone
 from logging import config, getLogger
 from pathlib import Path
-from typing import Dict
 
 import yaml
 from celery.signals import worker_process_init, worker_process_shutdown
 from celery.utils.log import get_task_logger
+from httpx import HTTPError
 from pydantic import TypeAdapter
-from requests import HTTPError
 
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
 from octopoes.connector.katalogus import KATalogusClientV1
@@ -45,11 +44,11 @@ log = get_task_logger(__name__)
 
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
-def handle_event(event: Dict):
+def handle_event(event: dict):
     try:
         parsed_event: DBEvent = TypeAdapter(DBEventType).validate_python(event)
 
-        session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), parsed_event.client, settings.xtdb_type))
+        session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), parsed_event.client))
         bootstrap_octopoes(settings, parsed_event.client, session).process_event(parsed_event)
         session.commit()
     except Exception:
@@ -77,7 +76,7 @@ def schedule_scan_profile_recalculations():
 
 @app.task(queue=QUEUE_NAME_OCTOPOES)
 def recalculate_scan_profiles(org: str, *args, **kwargs):
-    session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org, settings.xtdb_type))
+    session = XTDBSession(get_xtdb_client(str(settings.xtdb_uri), org))
     octopoes = bootstrap_octopoes(settings, org, session)
 
     timer = timeit.default_timer()

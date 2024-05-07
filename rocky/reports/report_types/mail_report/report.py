@@ -1,17 +1,17 @@
+from collections.abc import Iterable
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict, List
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 
-from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
 
-MAIL_FINDINGS = ["KAT-NO-SPF", "KAT-NO-DMARC", "KAT-NO-DKIM"]
+MAIL_FINDING_TYPES = ["KAT-NO-SPF", "KAT-NO-DMARC", "KAT-NO-DKIM"]
 
 
 class MailReport(Report):
@@ -21,54 +21,52 @@ class MailReport(Report):
     plugins = {"required": ["dns-records"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "mail_report/report.html"
+    label_style = "2-light"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
-        reference = Reference.from_str(input_ooi)
-        hostnames = []
-        mail_security_measures = {}
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
+        all_hostnames = list({h for key, hostnames in hostnames_by_input_ooi.items() for h in hostnames})
 
-        if reference.class_type == Hostname:
-            hostnames = [reference]
-        elif reference.class_type in (IPAddressV4, IPAddressV6):
-            hostnames = [
-                x.reference
-                for x in self.octopoes_api_connector.query(
-                    "IPAddress.<address[is ResolvedHostname].hostname", valid_time, reference
-                )
-            ]
-
-        number_of_hostnames = len(hostnames)
-        number_of_spf = number_of_hostnames
-        number_of_dmarc = number_of_hostnames
-        number_of_dkim = number_of_hostnames
-
-        for hostname in hostnames:
-            measures = self._get_measures(valid_time, hostname)
-            mail_security_measures[hostname] = measures
-
-            number_of_spf -= (
-                1 if list(filter(lambda finding: finding.id == "KAT-NO-SPF", mail_security_measures[hostname])) else 0
-            )
-            number_of_dmarc -= (
-                1 if list(filter(lambda finding: finding.id == "KAT-NO-DMARC", mail_security_measures[hostname])) else 0
-            )
-            number_of_dkim -= (
-                1 if list(filter(lambda finding: finding.id == "KAT-NO-DKIM", mail_security_measures[hostname])) else 0
-            )
-
-        return {
-            "input_ooi": input_ooi,
-            "finding_types": mail_security_measures,
-            "number_of_hostnames": number_of_hostnames,
-            "number_of_spf": number_of_spf,
-            "number_of_dmarc": number_of_dmarc,
-            "number_of_dkim": number_of_dkim,
-        }
-
-    def _get_measures(self, valid_time: datetime, hostname) -> List[OOI]:
-        finding_types = self.octopoes_api_connector.query(
-            "Hostname.<ooi[is Finding].finding_type", valid_time, hostname
+        filtered_finding_types = self.group_finding_types_by_source(
+            self.octopoes_api_connector.query_many("Hostname.<ooi[is Finding].finding_type", valid_time, all_hostnames),
+            MAIL_FINDING_TYPES,
         )
 
-        measures = list(filter(lambda finding: finding.id in MAIL_FINDINGS, finding_types))
-        return measures
+        result = {
+            ooi: {
+                "input_ooi": ooi,
+                "finding_types": {},
+                "number_of_hostnames": 0,
+                "number_of_spf": 0,
+                "number_of_dmarc": 0,
+                "number_of_dkim": 0,
+            }
+            for ooi in input_oois
+        }
+
+        for input_ooi, hostname_references in hostnames_by_input_ooi.items():
+            all_finding_types = []
+            number_of_hostnames = len(hostname_references)
+            number_of_spf = number_of_hostnames
+            number_of_dmarc = number_of_hostnames
+            number_of_dkim = number_of_hostnames
+
+            for hostname in hostname_references:
+                finding_types = filtered_finding_types.get(hostname, [])
+
+                number_of_spf -= 1 if any(finding.id == "KAT-NO-SPF" for finding in finding_types) else 0
+                number_of_dmarc -= 1 if any(finding.id == "KAT-NO-DMARC" for finding in finding_types) else 0
+                number_of_dkim -= 1 if any(finding.id == "KAT-NO-DKIM" for finding in finding_types) else 0
+
+                all_finding_types.extend(finding_types)
+
+            result[input_ooi] = {
+                "input_ooi": input_ooi,
+                "finding_types": all_finding_types,
+                "number_of_hostnames": number_of_hostnames,
+                "number_of_spf": number_of_spf,
+                "number_of_dmarc": number_of_dmarc,
+                "number_of_dkim": number_of_dkim,
+            }
+
+        return result

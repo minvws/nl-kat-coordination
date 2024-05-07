@@ -2,11 +2,9 @@ import datetime
 import logging
 import uuid
 from enum import Enum
-from typing import List, Optional, Union
 
-import requests
+from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
-from requests.adapters import HTTPAdapter, Retry
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
 
@@ -26,8 +24,8 @@ class QueuePrioritizedItem(BaseModel):
 
     id: uuid.UUID
     priority: int
-    hash: Optional[str] = None
-    data: Union[BoefjeMeta, NormalizerMeta]
+    hash: str | None = None
+    data: BoefjeMeta | NormalizerMeta
 
 
 class TaskStatus(Enum):
@@ -52,10 +50,10 @@ class Task(BaseModel):
 
 
 class SchedulerClientInterface:
-    def get_queues(self) -> List[Queue]:
+    def get_queues(self) -> list[Queue]:
         raise NotImplementedError()
 
-    def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
+    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
         raise NotImplementedError()
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
@@ -68,51 +66,36 @@ class SchedulerClientInterface:
         raise NotImplementedError()
 
 
-class LogRetry(Retry):
-    """Add a log when retrying a request"""
-
-    def __init__(self, *args, skip_log=False, **kwargs):
-        if not skip_log:
-            logger.error("Failed to create desired call. Retrying...")
-
-        super().__init__(*args, **kwargs)
-
-
 class SchedulerAPIClient(SchedulerClientInterface):
     def __init__(self, base_url: str):
-        self.base_url = base_url.rstrip("/")
-        self._session = requests.Session()
-
-        max_retries = LogRetry(skip_log=True, total=6, backoff_factor=1)
-        self._session.mount("https://", HTTPAdapter(max_retries=max_retries))
-        self._session.mount("http://", HTTPAdapter(max_retries=max_retries))
+        self._session = Client(base_url=base_url, transport=HTTPTransport(retries=6))
 
     @staticmethod
-    def _verify_response(response: requests.Response) -> None:
+    def _verify_response(response: Response) -> None:
         response.raise_for_status()
 
-    def get_queues(self) -> List[Queue]:
-        response = self._session.get(f"{self.base_url}/queues")
+    def get_queues(self) -> list[Queue]:
+        response = self._session.get("/queues")
         self._verify_response(response)
 
-        return TypeAdapter(List[Queue]).validate_json(response.content)
+        return TypeAdapter(list[Queue]).validate_json(response.content)
 
-    def pop_item(self, queue: str) -> Optional[QueuePrioritizedItem]:
-        response = self._session.post(f"{self.base_url}/queues/{queue}/pop")
+    def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
+        response = self._session.post(f"/queues/{queue}/pop")
         self._verify_response(response)
 
-        return TypeAdapter(Optional[QueuePrioritizedItem]).validate_json(response.content)
+        return TypeAdapter(QueuePrioritizedItem | None).validate_json(response.content)
 
     def push_item(self, queue_id: str, p_item: QueuePrioritizedItem) -> None:
-        response = self._session.post(f"{self.base_url}/queues/{queue_id}/push", data=p_item.json())
+        response = self._session.post(f"/queues/{queue_id}/push", content=p_item.json())
         self._verify_response(response)
 
-    def patch_task(self, task_id: str, status: TaskStatus) -> None:
-        response = self._session.patch(f"{self.base_url}/tasks/{task_id}", json={"status": status.value})
+    def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
+        response = self._session.patch(f"/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
-    def get_task(self, task_id: str) -> Task:
-        response = self._session.get(f"{self.base_url}/tasks/{task_id}")
+    def get_task(self, task_id: uuid.UUID) -> Task:
+        response = self._session.get(f"/tasks/{task_id}")
         self._verify_response(response)
 
         return Task.model_validate_json(response.content)

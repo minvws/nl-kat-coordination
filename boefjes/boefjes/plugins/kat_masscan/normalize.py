@@ -1,18 +1,11 @@
 import ipaddress
 import json
 import logging
-from typing import Iterable, Iterator, Union
+from collections.abc import Iterable, Iterator
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.network import (
-    IPAddressV4,
-    IPAddressV6,
-    IPPort,
-    Network,
-    PortState,
-    Protocol,
-)
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 
 
 def get_ip_ports_and_service(ip_with_ports: dict, network: Network, netblock: Reference) -> Iterator[OOI]:
@@ -40,7 +33,7 @@ def get_ip_ports_and_service(ip_with_ports: dict, network: Network, netblock: Re
         yield ip_port
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     """Parse Masscan JSON and yield relevant network, IPs and ports."""
     try:
         raw = json.loads(raw) if raw else []

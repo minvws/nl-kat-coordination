@@ -1,5 +1,4 @@
 """Keiko settings module."""
-from typing import Optional
 
 from pydantic import AnyHttpUrl, DirectoryPath, Field, FilePath
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -17,7 +16,7 @@ class Settings(BaseSettings):
     assets_folder: DirectoryPath = Field("assets", description="Folder containing the assets")
     reports_folder: DirectoryPath = Field("/reports", description="Output folder containing the reports")
 
-    span_export_grpc_endpoint: Optional[AnyHttpUrl] = Field(
+    span_export_grpc_endpoint: AnyHttpUrl | None = Field(
         None, description="OpenTelemetry endpoint", validation_alias="SPAN_EXPORT_GRPC_ENDPOINT"
     )
     model_config = SettingsConfigDict(env_prefix="KEIKO_")

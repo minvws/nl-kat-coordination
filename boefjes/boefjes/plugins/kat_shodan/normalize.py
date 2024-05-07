@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
@@ -8,7 +8,7 @@ from octopoes.models.ooi.findings import CVEFindingType, Finding
 from octopoes.models.ooi.network import IPPort, PortState, Protocol
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     results = json.loads(raw)
     ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
 

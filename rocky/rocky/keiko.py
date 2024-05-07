@@ -1,15 +1,16 @@
 import re
 import time
+from collections.abc import Iterable
 from datetime import date, datetime, timezone
 from http import HTTPStatus
 from io import BytesIO
-from typing import Any, BinaryIO, Dict, Iterable, List, Optional
+from typing import Any, BinaryIO
 
-import requests
+import httpx
 from django.conf import settings
 from django.urls import reverse
 from django.utils import translation
-from requests import HTTPError
+from httpx import HTTPError
 from tools.ooi_helpers import get_ooi_dict
 from tools.view_helpers import get_ooi_url, url_with_querystring
 
@@ -33,14 +34,13 @@ class GeneratingReportFailed(ReportException):
 
 class KeikoClient:
     def __init__(self, base_uri: str, timeout: int = 60):
-        self.session = requests.Session()
-        self._base_uri = base_uri
+        self.session = httpx.Client(base_url=base_uri)
         self._timeout = timeout
 
-    def generate_report(self, template: str, data: Dict, glossary: str) -> str:
+    def generate_report(self, template: str, data: dict, glossary: str) -> str:
         try:
             res = self.session.post(
-                f"{self._base_uri}/reports",
+                "/reports",
                 json={
                     "template": template,
                     "data": data,
@@ -58,7 +58,7 @@ class KeikoClient:
         try:
             for _ in range(self._timeout):
                 time.sleep(1)
-                res = self.session.get(f"{self._base_uri}/reports/{report_id}.keiko.pdf")
+                res = self.session.get(f"/reports/{report_id}.keiko.pdf")
 
                 if res.status_code == HTTPStatus.NOT_FOUND:
                     continue
@@ -71,7 +71,7 @@ class KeikoClient:
         raise ReportNotFoundException
 
     def health(self) -> ServiceHealth:
-        res = self.session.get(f"{self._base_uri}/health")
+        res = self.session.get("/health")
         res.raise_for_status()
 
         return ServiceHealth.model_validate_json(res.content)
@@ -81,7 +81,7 @@ keiko_client = KeikoClient(settings.KEIKO_API, settings.KEIKO_REPORT_TIMEOUT)
 
 
 class ReportQuery:
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         raise NotImplementedError
 
     def to_url(self) -> str:
@@ -107,7 +107,7 @@ class FindingReportQuery(ReportQuery):
         self.exclude_muted = exclude_muted
         self.only_muted = only_muted
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "observed_at": str(self.observed_at),
             "severities": [severity.value for severity in self.severities],
@@ -138,7 +138,7 @@ class OOIReportQuery(ReportQuery):
         self.language = language
         self.origin = origin
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "observed_at": str(self.observed_at),
             "ooi": self.ooi.reference,
@@ -166,7 +166,7 @@ class ReportsService:
         valid_time: datetime,
         source_type: str,
         source_value: str,
-        store: Dict,
+        store: dict,
         filters: ReportQuery,
     ) -> BinaryIO:
         report_data = build_findings_list_from_store(store)  # reuse existing dict structure
@@ -185,7 +185,7 @@ class ReportsService:
         self,
         valid_time: datetime,
         organization_name: str,
-        findings_metadata: List[Dict[str, Any]],
+        findings_metadata: list[dict[str, Any]],
         filters: FindingReportQuery,
     ) -> BinaryIO:
         store = {}
@@ -226,7 +226,7 @@ class ReportsService:
         return f"{file_name}.pdf"
 
 
-def _ooi_field_as_string(findings_grouped: Dict, store: Dict):
+def _ooi_field_as_string(findings_grouped: dict, store: dict):
     new_findings_grouped = {}
 
     for finding_type, finding_group in findings_grouped.items():
@@ -245,7 +245,7 @@ def _ooi_field_as_string(findings_grouped: Dict, store: Dict):
     return new_findings_grouped
 
 
-def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[List[str]] = None) -> Dict:
+def build_findings_list_from_store(ooi_store: dict, finding_filter: list[str] | None = None) -> dict:
     findings = [
         build_finding_dict(finding_ooi, ooi_store)
         for finding_ooi in ooi_store.values()
@@ -279,8 +279,8 @@ def build_findings_list_from_store(ooi_store: Dict, finding_filter: Optional[Lis
 
 def build_finding_dict(
     finding_ooi: Finding,
-    ooi_store: Dict[str, OOI],
-) -> Dict:
+    ooi_store: dict[str, OOI],
+) -> dict:
     finding_dict = get_ooi_dict(finding_ooi)
 
     finding_type_ooi = ooi_store[finding_ooi.finding_type]
@@ -296,8 +296,8 @@ def build_finding_dict(
     return finding_dict
 
 
-def build_meta(findings: List[Dict]) -> Dict:
-    meta = {
+def build_meta(findings: list[dict]) -> dict:
+    meta: dict[str, Any] = {
         "total": len(findings),
         "total_by_severity": {
             RiskLevelSeverity.CRITICAL.value: 0,
@@ -338,7 +338,7 @@ def build_meta(findings: List[Dict]) -> Dict:
     return meta
 
 
-def build_finding_type_dict(finding_type_ooi: FindingType) -> Dict:
+def build_finding_type_dict(finding_type_ooi: FindingType) -> dict:
     finding_type_dict = get_ooi_dict(finding_type_ooi)
     finding_type_dict["findings"] = []
 

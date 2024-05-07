@@ -1,10 +1,10 @@
 import base64
+from collections.abc import Iterable
 from ipaddress import IPv4Address, IPv6Address, ip_address
-from typing import Iterable, Union
 from urllib.parse import urlparse
-from xml.dom import minidom
 
 from bs4 import BeautifulSoup
+from defusedxml import minidom
 
 from boefjes.job_models import NormalizerMeta
 from octopoes.models import OOI, Reference
@@ -15,7 +15,7 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, IPAddressHTTPURL, WebScheme, Website
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     parser = minidom.parse(raw)
 
     # assume that input ooi is none or a HostnameHTTPURL

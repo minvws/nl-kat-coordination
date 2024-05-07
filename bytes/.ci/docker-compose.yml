@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   bytes_unit:
     build:
@@ -45,7 +43,7 @@ services:
       - .ci/.env.test
 
   ci_rabbitmq:
-    image: "rabbitmq:3.11-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:
@@ -54,6 +52,6 @@ services:
       retries: 4
 
   ci_bytes-db:
-    image: postgres:15
+    image: docker.io/library/postgres:15
     env_file:
       - .ci/.env.test

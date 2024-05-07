@@ -1,13 +1,13 @@
+from collections.abc import Callable
 from concurrent import futures
 from types import SimpleNamespace
-from typing import Callable, Dict, List, Optional
 
-import requests
 import structlog
 from opentelemetry import trace
 
 from scheduler import context, queues, rankers
 from scheduler.connectors import listeners
+from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
     Normalizer,
     NormalizerTask,
@@ -38,8 +38,8 @@ class NormalizerScheduler(Scheduler):
         ctx: context.AppContext,
         scheduler_id: str,
         organisation: Organisation,
-        queue: Optional[queues.PriorityQueue] = None,
-        callback: Optional[Callable[..., None]] = None,
+        queue: queues.PriorityQueue | None = None,
+        callback: Callable[..., None] | None = None,
     ):
         self.logger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
@@ -83,7 +83,7 @@ class NormalizerScheduler(Scheduler):
         self.listeners["raw_data"] = listener
 
         self.run_in_thread(
-            name=f"scheduler-{self.scheduler_id}-raw_file",
+            name=f"NormalizerScheduler-{self.scheduler_id}-raw_file",
             target=self.listeners["raw_data"].listen,
             loop=False,
         )
@@ -131,9 +131,9 @@ class NormalizerScheduler(Scheduler):
                 return
 
         # Get all normalizers for the mime types of the raw data
-        normalizers: Dict[str, Normalizer] = {}
+        normalizers: dict[str, Normalizer] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: List[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -147,7 +147,9 @@ class NormalizerScheduler(Scheduler):
                 scheduler_id=self.scheduler_id,
             )
 
-        with futures.ThreadPoolExecutor() as executor:
+        with futures.ThreadPoolExecutor(
+            thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
+        ) as executor:
             for normalizer in normalizers.values():
                 executor.submit(
                     self.push_task,
@@ -260,7 +262,7 @@ class NormalizerScheduler(Scheduler):
             caller=caller,
         )
 
-    def get_normalizers_for_mime_type(self, mime_type: str) -> List[Plugin]:
+    def get_normalizers_for_mime_type(self, mime_type: str) -> list[Plugin]:
         """Get available normalizers for a given mime type.
 
         Args:
@@ -274,7 +276,7 @@ class NormalizerScheduler(Scheduler):
                 self.organisation.id,
                 mime_type,
             )
-        except (requests.exceptions.RetryError, requests.exceptions.ConnectionError):
+        except ExternalServiceError:
             self.logger.warning(
                 "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,
@@ -282,7 +284,6 @@ class NormalizerScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-
             return []
 
         if normalizers is None:
@@ -355,7 +356,10 @@ class NormalizerScheduler(Scheduler):
             raise exc_db
 
         # Is task still running according to the datastore?
-        if task_db is not None and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
+        if task_db is not None and task_db.status not in [
+            TaskStatus.COMPLETED,
+            TaskStatus.FAILED,
+        ]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
                 "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",

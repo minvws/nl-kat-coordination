@@ -1,14 +1,17 @@
+import json
 import uuid
 from collections import Counter
-from datetime import datetime, timezone
+from collections.abc import Generator
+from datetime import datetime
 from logging import getLogger
-from typing import Generator, List, Optional, Set, Type
+from operator import itemgetter
+from typing import Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
+from httpx import HTTPError
 from pydantic import AwareDatetime
-from requests import RequestException
 
-from octopoes.api.models import ServiceHealth, ValidatedDeclaration, ValidatedObservation
+from octopoes.api.models import ServiceHealth, ValidatedAffirmation, ValidatedDeclaration, ValidatedObservation
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
@@ -19,14 +22,7 @@ from octopoes.config.settings import (
 )
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfile,
-    ScanProfileBase,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileBase, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
@@ -37,8 +33,9 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBSession
-from octopoes.xtdb.exceptions import NoMultinode, XTDBException
+from octopoes.xtdb.client import Operation, OperationType, XTDBSession
+from octopoes.xtdb.exceptions import XTDBException
+from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
 
 logger = getLogger(__name__)
@@ -50,17 +47,11 @@ def extract_client(client: str = Path(...)) -> str:
     return client
 
 
-def extract_valid_time(valid_time: Optional[AwareDatetime] = Query(None)) -> datetime:
-    if valid_time is None:
-        return datetime.now(timezone.utc)
+def extract_valid_time(valid_time: AwareDatetime) -> datetime:
     return valid_time
 
 
-def extract_required_valid_time(valid_time: AwareDatetime) -> datetime:
-    return valid_time
-
-
-def extract_types(types: List[str] = Query(["OOI"])) -> Set[Type[OOI]]:
+def extract_types(types: list[str] = Query(["OOI"])) -> set[type[OOI]]:
     try:
         return {type_by_name(t) for t in types}
     except KeyError as e:
@@ -71,7 +62,7 @@ def extract_reference(reference: str = Query("")) -> Reference:
     return Reference.from_str(reference)
 
 
-def extract_references(references: List[str]) -> List[Reference]:
+def extract_references(references: list[str]) -> list[Reference]:
     return [Reference.from_str(reference) for reference in references]
 
 
@@ -82,7 +73,7 @@ def settings() -> Settings:
 def xtdb_session(
     client: str = Depends(extract_client), settings_: Settings = Depends(settings)
 ) -> Generator[XTDBSession, None, None]:
-    yield XTDBSession(get_xtdb_client(str(settings_.xtdb_uri), client, settings_.xtdb_type))
+    yield XTDBSession(get_xtdb_client(str(settings_.xtdb_uri), client))
 
 
 def octopoes_service(
@@ -106,7 +97,7 @@ def health(
             version=xtdb_status.version,
             additional=xtdb_status,
         )
-    except RequestException as ex:
+    except HTTPError as ex:
         xtdb_health = ServiceHealth(
             service="xtdb",
             healthy=False,
@@ -126,9 +117,9 @@ def health(
 def list_objects(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    types: Set[Type[OOI]] = Depends(extract_types),
-    scan_level: Set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
-    scan_profile_type: Set[ScanProfileType] = Query(DEFAULT_SCAN_PROFILE_TYPE_FILTER),
+    types: set[type[OOI]] = Depends(extract_types),
+    scan_level: set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
+    scan_profile_type: set[ScanProfileType] = Query(DEFAULT_SCAN_PROFILE_TYPE_FILTER),
     offset: int = 0,
     limit: int = 20,
 ):
@@ -138,7 +129,7 @@ def list_objects(
 @router.get("/query", tags=["Objects"])
 def query(
     path: str,
-    source: Optional[Reference] = None,
+    source: Reference | None = None,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     offset: int = DEFAULT_OFFSET,
@@ -153,11 +144,57 @@ def query(
     return octopoes.ooi_repository.query(xtdb_query, valid_time)
 
 
+@router.get("/query-many", tags=["Objects"])
+def query_many(
+    path: str,
+    sources: list[str] = Query(),
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+):
+    """
+    How does this work and why do we do this?
+
+    We want to fetch all results but be able to tie these back to the source that was used for a result.
+    If we query "Network.hostname" for a list of Networks ids, how do we know which hostname lives on which network?
+    The answer is to add the network id to the "select" statement, so the result is of the form
+
+        [(network_id_1, hostname1), (network_id_2, hostname3), ...]
+
+    Because you can only select variables in Datalog, "network_id_1" needs to be an Alias. Hence `source_alias`.
+    We need to tie that to the Network primary_key and add a where-in clause. The example projected on the code:
+
+    q = XTDBQuery.from_path(object_path)                                    # Adds "where ?Hostname.network = ?Network
+
+    q.find(source_alias).pull(query.result_type)                            # "select ?network_id, ?Hostname
+     .where(object_path.segments[0].source_type, primary_key=source_alias)  # where ?Network.primary_key = ?network_id
+     .where_in(object_path.segments[0].source_type, primary_key=sources)    # and ?Network.primary_key in ["1", ...]"
+    """
+
+    if not sources:
+        return []
+
+    object_path = ObjectPath.parse(path)
+    if not object_path.segments:
+        raise HTTPException(status_code=400, detail="No path components provided.")
+
+    q = XTDBQuery.from_path(object_path)
+    source_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
+
+    q = q.where(object_path.segments[0].source_type, primary_key=source_alias).where_in(
+        object_path.segments[0].source_type, primary_key=sources
+    )
+
+    if q._find_clauses:  # Path contained a target field, so no need to pull the result type
+        return octopoes.ooi_repository.query(q.find(source_alias, index=0), valid_time)
+
+    return octopoes.ooi_repository.query(q.find(source_alias, index=0).pull(q.result_type), valid_time)
+
+
 @router.post("/objects/load_bulk", tags=["Objects"])
 def load_objects_bulk(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    references: Set[Reference] = Depends(extract_references),
+    references: set[Reference] = Depends(extract_references),
 ):
     return octopoes.ooi_repository.load_bulk(references, valid_time)
 
@@ -176,12 +213,12 @@ def get_object_history(
     reference: Reference = Depends(extract_reference),
     sort_order: str = "asc",  # Or: "desc"
     with_docs: bool = False,
-    has_doc: Optional[bool] = None,
+    has_doc: bool | None = None,
     offset: int = 0,
-    limit: Optional[int] = None,
-    indices: Optional[List[int]] = None,
+    limit: int | None = None,
+    indices: list[int] | None = None,
     octopoes: OctopoesService = Depends(octopoes_service),
-) -> List[TransactionRecord]:
+) -> list[TransactionRecord]:
     return octopoes.get_ooi_history(
         reference,
         sort_order=sort_order,
@@ -198,7 +235,7 @@ def list_random_objects(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     amount: int = 1,
-    scan_level: Set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
+    scan_level: set[ScanLevel] = Query(DEFAULT_SCAN_LEVEL_FILTER),
 ):
     return octopoes.list_random_ooi(valid_time, amount, scan_level)
 
@@ -217,7 +254,7 @@ def delete_object(
 def delete_many(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    references: List[Reference] = Depends(extract_references),
+    references: list[Reference] = Depends(extract_references),
 ) -> None:
     for reference in references:
         octopoes.ooi_repository.delete(reference, valid_time)
@@ -229,7 +266,7 @@ def delete_many(
 def get_tree(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    types: Set[Type[OOI]] = Depends(extract_types),
+    types: set[type[OOI]] = Depends(extract_types),
     reference: Reference = Depends(extract_reference),
     depth: int = 1,
 ) -> ReferenceTree:
@@ -245,12 +282,12 @@ def get_tree(
 def list_origins(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    source: Optional[Reference] = Query(None),
-    result: Optional[Reference] = Query(None),
-    task_id: Optional[uuid.UUID] = Query(None),
-    origin_type: Optional[OriginType] = Query(None),
-) -> List[Origin]:
-    return octopoes.origin_repository.list(
+    source: Reference | None = Query(None),
+    result: Reference | None = Query(None),
+    task_id: uuid.UUID | None = Query(None),
+    origin_type: OriginType | None = Query(None),
+) -> list[Origin]:
+    return octopoes.origin_repository.list_origins(
         valid_time,
         task_id=task_id,
         source=source,
@@ -263,8 +300,8 @@ def list_origins(
 def list_origin_parameters(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    origin_id: Set[str] = Query(default=set()),
-) -> List[OriginParameter]:
+    origin_id: set[str] = Query(default=set()),
+) -> list[OriginParameter]:
     return octopoes.origin_parameter_repository.list_by_origin(origin_id, valid_time)
 
 
@@ -294,9 +331,25 @@ def save_declaration(
         method=declaration.method if declaration.method else "manual",
         source=declaration.ooi.reference,
         result=[declaration.ooi.reference],
-        task_id=declaration.task_id if declaration.task_id else str(uuid.uuid4()),
+        task_id=declaration.task_id if declaration.task_id else uuid.uuid4(),
     )
     octopoes.save_origin(origin, [declaration.ooi], declaration.valid_time)
+    octopoes.commit()
+
+
+@router.post("/affirmations", tags=["Origins"])
+def save_affirmation(
+    affirmation: ValidatedAffirmation,
+    octopoes: OctopoesService = Depends(octopoes_service),
+) -> None:
+    origin = Origin(
+        origin_type=OriginType.AFFIRMATION,
+        method=affirmation.method if affirmation.method else "hydration",
+        source=affirmation.ooi.reference,
+        result=[affirmation.ooi.reference],
+        task_id=affirmation.task_id if affirmation.task_id else uuid.uuid4(),
+    )
+    octopoes.save_origin(origin, [affirmation.ooi], affirmation.valid_time)
     octopoes.commit()
 
 
@@ -305,16 +358,16 @@ def save_declaration(
 def list_scan_profiles(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    scan_profile_type: Optional[str] = Query(None),
-) -> List[ScanProfileBase]:
-    return octopoes.scan_profile_repository.list(scan_profile_type, valid_time)
+    scan_profile_type: str | None = Query(None),
+) -> list[ScanProfileBase]:
+    return octopoes.scan_profile_repository.list_scan_profiles(scan_profile_type, valid_time)
 
 
 @router.put("/scan_profiles", tags=["Scan Profiles"])
 def save_scan_profile(
     scan_profile: ScanProfile = Body(discriminator="scan_profile_type"),
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_required_valid_time),
+    valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     try:
         old_scan_profile = octopoes.scan_profile_repository.get(scan_profile.reference, valid_time)
@@ -327,7 +380,7 @@ def save_scan_profile(
 
 @router.post("/scan_profiles/save_many", tags=["Scan Profiles"])
 def save_many(
-    scan_profiles: List[ScanProfile],
+    scan_profiles: list[ScanProfile],
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
@@ -345,7 +398,7 @@ def save_many(
 @router.get("/scan_profiles/recalculate", tags=["Scan Profiles"])
 def recalculate_scan_profiles(
     octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_required_valid_time),
+    valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     octopoes.recalculate_scan_profiles(valid_time)
     octopoes.commit()
@@ -356,12 +409,15 @@ def get_scan_profile_inheritance(
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
     reference: Reference = Depends(extract_reference),
-) -> List[InheritanceSection]:
+) -> list[InheritanceSection]:
     ooi = octopoes.get_ooi(reference, valid_time)
+    if not ooi.scan_profile:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OOI does not have a scanprofile")
+
     start = InheritanceSection(
         reference=ooi.reference, level=ooi.scan_profile.level, scan_profile_type=ooi.scan_profile.scan_profile_type
     )
-    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED:
+    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED.value:
         return [start]
     return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
 
@@ -374,15 +430,15 @@ def list_findings(
     limit=DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-    severities: Set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
+    severities: set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
         severities,
+        valid_time,
         exclude_muted,
         only_muted,
         offset,
         limit,
-        valid_time,
     )
 
 
@@ -399,10 +455,6 @@ def create_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
     try:
         xtdb_session_.client.create_node()
         xtdb_session_.commit()
-    except NoMultinode:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
-        )
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Creating node failed") from e
 
@@ -412,10 +464,6 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
     try:
         xtdb_session_.client.delete_node()
         xtdb_session_.commit()
-    except NoMultinode:
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="XTDB multinode is not set up for Octopoes."
-        )
     except XTDBException as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deleting node failed") from e
 
@@ -426,3 +474,62 @@ def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> i
     octopoes.commit()
 
     return inference_count
+
+
+@router.get("/io/export", tags=["io"])
+def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
+    return xtdb_session_.client.export_transactions()
+
+
+def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> dict[str, int]:
+    try:
+        ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
+    except Exception as e:
+        logger.debug("Error parsing objects", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error parsing objects") from e
+    if reset:
+        try:
+            xtdb_session_.client.delete_node()
+            xtdb_session_.client.create_node()
+            xtdb_session_.commit()
+        except XTDBException as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error recreating nodes",
+            ) from e
+    for op in ops:
+        try:
+            operations: list[Operation] = [
+                (
+                    OperationType(x[0]),
+                    x[1],
+                    datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
+                )
+                for x in op
+            ]
+            xtdb_session_.client.submit_transaction(operations)
+        except Exception as e:
+            logger.debug("Error importing objects", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error importing object {op}",
+            ) from e
+    return {"detail": len(ops)}
+
+
+@router.post("/io/import/add", tags=["io"])
+async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    return importer(data, xtdb_session_)
+
+
+@router.post("/io/import/new", tags=["io"])
+async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    return importer(data, xtdb_session_, True)

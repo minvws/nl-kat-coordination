@@ -1,11 +1,11 @@
 import os
 import threading
-from typing import Dict, Optional, Set, Union
 
 import structlog
 from opentelemetry import trace
 
 from scheduler import context, schedulers, server
+from scheduler.connectors.errors import ExternalServiceError
 from scheduler.utils import thread
 
 tracer = trace.get_tracer(__name__)
@@ -54,14 +54,15 @@ class App:
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
 
-        threading.excepthook = self.unhandled_exception  # type: ignore
+        threading.excepthook = self.unhandled_exception
         self.stop_event: threading.Event = threading.Event()
         self.lock: threading.Lock = threading.Lock()
 
-        self.schedulers: Dict[
-            str, Union[schedulers.Scheduler, schedulers.BoefjeScheduler, schedulers.NormalizerScheduler]
+        self.schedulers: dict[
+            str,
+            schedulers.Scheduler | schedulers.BoefjeScheduler | schedulers.NormalizerScheduler,
         ] = {}
-        self.server: Optional[server.Server] = None
+        self.server: server.Server | None = None
 
     @tracer.start_as_current_span("monitor_organisations")
     def monitor_organisations(self) -> None:
@@ -74,10 +75,16 @@ class App:
         # by the schedulers, and the organisation id's that are in the
         # Katalogus service. We will add/remove schedulers based on the
         # difference between these two sets.
-        scheduler_orgs: Set[str] = {
+        scheduler_orgs: set[str] = {
             s.organisation.id for s in current_schedulers.values() if hasattr(s, "organisation")
         }
-        katalogus_orgs: Set[str] = {org.id for org in self.ctx.services.katalogus.get_organisations()}
+        try:
+            orgs = self.ctx.services.katalogus.get_organisations()
+        except ExternalServiceError:
+            self.logger.exception("Failed to get organisations from Katalogus")
+            return
+
+        katalogus_orgs = {org.id for org in orgs}
 
         additions = katalogus_orgs.difference(scheduler_orgs)
         self.logger.debug("Organisations to add: %s", len(additions), additions=sorted(additions))
@@ -87,7 +94,7 @@ class App:
 
         # We need to get scheduler ids of the schedulers that are associated
         # with the removed organisations
-        removal_scheduler_ids: Set[str] = {
+        removal_scheduler_ids: set[str] = {
             s.scheduler_id
             for s in current_schedulers.values()
             if hasattr(s, "organisation") and s.organisation.id in removals
@@ -109,7 +116,11 @@ class App:
 
         # Add schedulers for organisation
         for org_id in additions:
-            org = self.ctx.services.katalogus.get_organisation(org_id)
+            try:
+                org = self.ctx.services.katalogus.get_organisation(org_id)
+            except ExternalServiceError as e:
+                self.logger.error("Failed to get organisation from Katalogus", error=e, org_id=org_id)
+                continue
 
             scheduler_boefje = schedulers.BoefjeScheduler(
                 ctx=self.ctx,
@@ -167,7 +178,12 @@ class App:
 
     def start_schedulers(self) -> None:
         # Initialize the schedulers
-        orgs = self.ctx.services.katalogus.get_organisations()
+        try:
+            orgs = self.ctx.services.katalogus.get_organisations()
+        except ExternalServiceError as e:
+            self.logger.error("Failed to get organisations from Katalogus", error=e)
+            return
+
         for org in orgs:
             boefje_scheduler = schedulers.BoefjeScheduler(
                 ctx=self.ctx,
@@ -191,7 +207,7 @@ class App:
 
     def start_monitors(self) -> None:
         thread.ThreadRunner(
-            name="monitor_organisations",
+            name="App-monitor_organisations",
             target=self.monitor_organisations,
             stop_event=self.stop_event,
             interval=self.ctx.config.monitor_organisations_interval,
@@ -199,7 +215,7 @@ class App:
 
     def start_collectors(self) -> None:
         thread.ThreadRunner(
-            name="metrics_collector",
+            name="App-metrics_collector",
             target=self.collect_metrics,
             stop_event=self.stop_event,
             interval=10,
@@ -208,7 +224,7 @@ class App:
     def start_server(self) -> None:
         self.server = server.Server(self.ctx, self.schedulers)
         thread.ThreadRunner(
-            name="server",
+            name="App-server",
             target=self.server.run,
             stop_event=self.stop_event,
             loop=False,
@@ -219,7 +235,6 @@ class App:
         following processes:
 
             * schedulers
-            * listeners
             * monitors
             * metrics collecting
             * api server

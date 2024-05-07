@@ -3,28 +3,24 @@ import os
 from datetime import datetime, timezone
 
 import pytest
-from requests import HTTPError
 
-from octopoes.config.settings import XTDBType
 from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import Network
+from octopoes.models.ooi.network import IPAddress, IPAddressV4, Network
+from octopoes.models.ooi.web import URL
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
-from octopoes.xtdb.query import Query
+from octopoes.xtdb.query import Aliased, Query
 from tests.conftest import seed_system
 
 logger = logging.getLogger(__name__)
 
 if os.environ.get("CI") != "1":
     pytest.skip("Needs XTDB multinode container.", allow_module_level=True)
-
-
-XTDBOOIRepository.xtdb_type = XTDBType.XTDB_MULTINODE
 
 
 def test_node_creation_and_deletion(xtdb_http_client: XTDBHTTPClient):
@@ -38,7 +34,7 @@ def test_node_creation_and_deletion(xtdb_http_client: XTDBHTTPClient):
 
     xtdb_http_client.delete_node()
 
-    with pytest.raises(HTTPError):
+    with pytest.raises(NodeNotFound):
         assert xtdb_http_client.status()
 
 
@@ -152,6 +148,71 @@ def test_query_empty_on_reference_filter_for_wrong_hostname(xtdb_session: XTDBSe
     assert len(xtdb_session.client.query(str(Query(Network)))) == 2
 
 
+def test_query_where_in(xtdb_session: XTDBSession, valid_time: datetime):
+    network = XTDBOOIRepository.serialize(Network(name="testnetwork"))
+    network2 = XTDBOOIRepository.serialize(Network(name="testnetwork2"))
+    ipv4 = XTDBOOIRepository.serialize(IPAddressV4(network="Network|testnetwork2", address="127.0.0.1"))
+    xtdb_session.put(network, valid_time)
+    xtdb_session.put(network2, valid_time)
+    xtdb_session.put(
+        XTDBOOIRepository.serialize(Hostname(network="Network|testnetwork2", name="secondhostname")), valid_time
+    )
+    xtdb_session.put(ipv4, valid_time)
+    xtdb_session.commit()
+
+    query = Query.from_path(Path.parse("Hostname.network")).where_in(Network, name=["testnetwork1"])
+    result = xtdb_session.client.query(query)
+    assert len(result) == 0
+
+    query = Query.from_path(Path.parse("Hostname.network")).where_in(Network, name=["testnetwork2"])
+    result = xtdb_session.client.query(query)
+    assert result == [[network2]]
+
+    query = Query.from_path(Path.parse("Hostname.network")).where_in(Network, name=["testnetwork", "testnetwork2"])
+    result = xtdb_session.client.query(query)
+    assert result == [[network2]]
+
+    query = Query(Network).where_in(Network, primary_key=["Network|testnetwork", "Network|testnetwork2"])
+    result = xtdb_session.client.query(query)
+    assert result == [[network], [network2]]
+
+    pk = Aliased(Network, field="primary_key")
+    query = (
+        Query(Network)
+        .find(pk)
+        .pull(Network)
+        .where(Network, primary_key=pk)
+        .where_in(Network, primary_key=["Network|testnetwork", "Network|testnetwork2"])
+    )
+    result = xtdb_session.client.query(query, valid_time)
+    assert result == [["Network|testnetwork", network], ["Network|testnetwork2", network2]]
+
+    # router logic
+    object_path = Path.parse("Hostname.<hostname[is DNSNSRecord]")
+    sources = ["Network|testnetwork", "Network|testnetwork2"]
+    source_pk_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
+    query = (
+        Query.from_path(object_path)
+        .find(source_pk_alias)
+        .pull(object_path.segments[0].source_type)
+        .where(object_path.segments[0].source_type, primary_key=source_pk_alias)
+        .where_in(object_path.segments[0].source_type, primary_key=sources)
+    )
+    assert len(xtdb_session.client.query(query, valid_time)) == 0
+
+    object_path = Path.parse("IPAddress.network")
+    pk = Aliased(IPAddress, field="primary_key")
+    query = (
+        Query.from_path(object_path)
+        .find(pk)
+        .pull(IPAddress)
+        .where(IPAddress, network=Network)
+        .where(IPAddress, primary_key=pk)
+        .where_in(IPAddress, primary_key=["IPAddressV4|testnetwork2|127.0.0.1", "IPAddressV4|testnetwork|0.0.0.0"])
+    )
+    assert xtdb_session.client.query(query, valid_time) == [["IPAddressV4|testnetwork2|127.0.0.1", ipv4]]
+
+
 def test_entity_history(xtdb_session: XTDBSession, valid_time: datetime):
     network = Network(name="testnetwork")
     xtdb_session.put(XTDBOOIRepository.serialize(network), datetime.now(timezone.utc))
@@ -227,26 +288,22 @@ def test_query_for_system_report(
                 )
             ],
             "services": list(
-                set(
-                    [
+                {
+                    str(x.name)
+                    for x in octopoes_api_connector.query(
+                        "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                        valid_time,
+                        ip.reference,
+                    )
+                }.union(
+                    {
                         str(x.name)
                         for x in octopoes_api_connector.query(
-                            "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
+                            "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
                             valid_time,
                             ip.reference,
                         )
-                    ]
-                ).union(
-                    set(
-                        [
-                            str(x.name)
-                            for x in octopoes_api_connector.query(
-                                "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
-                                valid_time,
-                                ip.reference,
-                            )
-                        ]
-                    )
+                    }
                 )
             ),
             "websites": [
@@ -314,3 +371,74 @@ def test_query_for_web_system_report(
 
     query = "Hostname.<hostname[is Website].certificate.<ooi[is Finding].finding_type"
     assert len(octopoes_api_connector.query(query, valid_time, web_hostname.reference)) == 0
+
+
+def test_query_subclass_fields_and_returning_only_fields(
+    octopoes_api_connector: OctopoesAPIConnector,
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_origin_repository: XTDBOriginRepository,
+    xtdb_session: XTDBSession,
+    valid_time: datetime,
+):
+    seed_system(xtdb_ooi_repository, xtdb_origin_repository, valid_time)
+
+    query = Query.from_path(Path.parse("URL.web_url.network"))
+    result = xtdb_session.client.query(query, valid_time)
+    assert result == [
+        [
+            {
+                "object_type": "Network",
+                "Network/primary_key": "Network|test",
+                "Network/name": "test",
+                "xt/id": "Network|test",
+            }
+        ]
+    ]
+
+    query = Query.from_path(Path.parse("URL.web_url.scheme"))
+    result = xtdb_session.client.query(query, valid_time)
+    assert result == [["https"]]
+
+    query = query.where(URL, primary_key="URL|test|https://test.com/security")
+    result = xtdb_session.client.query(query, valid_time)
+    assert result == [["https"]]
+
+    query = Query.from_path(Path.parse("URL.web_url.netloc")).where(
+        URL, primary_key="URL|test|https://test.com/security"
+    )
+    result = xtdb_session.client.query(query, valid_time)
+    assert result == [
+        [
+            {
+                "Hostname/primary_key": "Hostname|test|example.com",
+                "object_type": "Hostname",
+                "Hostname/network": "Network|test",
+                "Hostname/name": "example.com",
+                "xt/id": "Hostname|test|example.com",
+            }
+        ]
+    ]
+
+    query = Query.from_path(Path.parse("URL.web_url.netloc.name")).where(
+        URL, primary_key="URL|test|https://test.com/security"
+    )
+    result = xtdb_session.client.query(query, valid_time)
+    assert result == [["example.com"]]
+
+    pk = Aliased(URL, field="primary_key")
+    query = (
+        Query.from_path(Path.parse("URL.web_url.netloc.name"))
+        .find(pk, index=0)
+        .where(URL, primary_key=pk)
+        .where_in(URL, primary_key=["URL|test|https://test.com/security", "URL|test|https://test.com/test"])
+    )
+    result = xtdb_session.client.query(query, valid_time)
+    assert result == [["URL|test|https://test.com/security", "example.com"]]
+
+    result = octopoes_api_connector.query("Network.name", valid_time, "Network|test")
+    assert result == ["test"]
+
+    result = octopoes_api_connector.query_many(
+        "URL.web_url.netloc.name", valid_time, ["URL|test|https://test.com/security", "URL|test|https://test.com/test"]
+    )
+    assert result == [("URL|test|https://test.com/security", "example.com")]

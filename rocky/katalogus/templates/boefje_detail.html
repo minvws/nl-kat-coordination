@@ -17,10 +17,12 @@
                         {% include "partials/scan_level_indicator.html" with value=plugin.scan_level %}
 
                     </div>
-                    <p>
-                        <strong>{% translate "Description" %}</strong>
-                    </p>
-                    <p>{{ plugin.description }}</p>
+                    {% if plugin.description %}
+                        <p>
+                            <strong>{% translate "Description" %}</strong>
+                        </p>
+                        <p>{{ plugin.description }}</p>
+                    {% endif %}
                     <div class="horizontal-view">
                         {% include "partials/enable_disable_plugin.html" with plugin=plugin %}
 
@@ -48,9 +50,9 @@
                         {% endblocktranslate %}
                     </p>
                     <p>
-                        {% for ooi in plugin.consumes %}
-                            <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi %}">{{ ooi }}</a>
-                            {% if ooi != plugin.consumes|last %}-{% endif %}
+                        {% for ooi_type in plugin.consumes %}
+                            <a href="{% url "ooi_add" organization_code=organization.code ooi_type=ooi_type %}">{{ ooi_type }}</a>
+                            {% if not forloop.last %}-{% endif %}
                         {% endfor %}
                     </p>
                 {% else %}

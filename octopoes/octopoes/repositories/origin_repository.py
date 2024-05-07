@@ -1,12 +1,11 @@
 from datetime import datetime
 from http import HTTPStatus
 from logging import getLogger
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import UUID
 
-from requests import HTTPError
+from httpx import HTTPStatusError
 
-from octopoes.config.settings import XTDBType
 from octopoes.events.events import OperationType, OriginDBEvent
 from octopoes.events.manager import EventManager
 from octopoes.models import Reference
@@ -31,15 +30,15 @@ class OriginRepository(Repository):
     def save(self, origin: Origin, valid_time: datetime) -> None:
         raise NotImplementedError
 
-    def list(
+    def list_origins(
         self,
         valid_time: datetime,
         *,
-        task_id: Optional[UUID] = None,
-        source: Optional[Reference] = None,
-        result: Optional[Reference] = None,
-        origin_type: Optional[OriginType] = None,
-    ) -> List[Origin]:
+        task_id: UUID | None = None,
+        source: Reference | None = None,
+        result: Reference | None = None,
+        origin_type: OriginType | None = None,
+    ) -> list[Origin]:
         raise NotImplementedError
 
     def delete(self, origin: Origin, valid_time: datetime) -> None:
@@ -47,40 +46,35 @@ class OriginRepository(Repository):
 
 
 class XTDBOriginRepository(OriginRepository):
-    xtdb_type: XTDBType = XTDBType.CRUX
+    pk_prefix = "xt/id"
 
-    def __init__(self, event_manager: EventManager, session: XTDBSession, xtdb_type: XTDBType):
+    def __init__(self, event_manager: EventManager, session: XTDBSession):
         super().__init__(event_manager)
         self.session = session
-        self.__class__.xtdb_type = xtdb_type
 
     def commit(self):
         self.session.commit()
 
     @classmethod
-    def pk_prefix(cls):
-        return "crux.db/id" if cls.xtdb_type == XTDBType.CRUX else "xt/id"
-
-    @classmethod
-    def serialize(cls, origin: Origin) -> Dict[str, Any]:
+    def serialize(cls, origin: Origin) -> dict[str, Any]:
         data = origin.dict()
-        data[cls.pk_prefix()] = origin.id
+        data[cls.pk_prefix] = origin.id
         data["type"] = origin.__class__.__name__
         return data
 
     @classmethod
-    def deserialize(cls, data: Dict[str, Any]) -> Origin:
+    def deserialize(cls, data: dict[str, Any]) -> Origin:
         return Origin.parse_obj(data)
 
-    def list(
+    def list_origins(
         self,
         valid_time: datetime,
         *,
-        task_id: Optional[UUID] = None,
-        source: Optional[Reference] = None,
-        result: Optional[Reference] = None,
-        origin_type: Optional[OriginType] = None,
-    ) -> List[Origin]:
+        task_id: UUID | None = None,
+        source: Reference | None = None,
+        result: Reference | None = None,
+        origin_type: OriginType | None = None,
+    ) -> list[Origin]:
         where_parameters = {"type": Origin.__name__}
 
         if task_id:
@@ -96,7 +90,6 @@ class XTDBOriginRepository(OriginRepository):
             where_parameters["origin_type"] = origin_type.value
 
         query = generate_pull_query(
-            self.xtdb_type,
             FieldSet.ALL_FIELDS,
             where_parameters,
         )
@@ -107,7 +100,7 @@ class XTDBOriginRepository(OriginRepository):
     def get(self, id_: str, valid_time: datetime) -> Origin:
         try:
             return self.deserialize(self.session.client.get_entity(id_, valid_time))
-        except HTTPError as e:
+        except HTTPStatusError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(id_)
             else:
@@ -141,6 +134,7 @@ class XTDBOriginRepository(OriginRepository):
                 valid_time=valid_time,
                 old_data=old_origin,
                 new_data=origin,
+                client=self.event_manager.client,
             )
             self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -151,5 +145,6 @@ class XTDBOriginRepository(OriginRepository):
             operation_type=OperationType.DELETE,
             valid_time=valid_time,
             old_data=origin,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))

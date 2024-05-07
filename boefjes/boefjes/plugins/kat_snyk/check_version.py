@@ -1,7 +1,6 @@
 import logging
 import re
 from enum import Enum
-from typing import List
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +70,7 @@ def check_version(version1: str, version2: str) -> VersionCheck:
         return check_version(version1_split[1], version2_split[1])
 
 
-def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
+def check_version_agains_versionlist(my_version: str, all_versions: list[str]):
     lowerbound = all_versions.pop(0).strip()
     upperbound = None
 
@@ -167,6 +166,8 @@ def check_version_agains_versionlist(my_version: str, all_versions: List[str]):
 
 
 def check_version_in(version: str, versions: str):
+    if not version:
+        return False
     all_versions = versions.split(",")  # Example: https://snyk.io/vuln/composer%3Awoocommerce%2Fwoocommerce-blocks
     in_range = False
     while not in_range and all_versions:

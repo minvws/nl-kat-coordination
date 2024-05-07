@@ -3,7 +3,7 @@ import logging
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
-from requests import RequestException
+from httpx import HTTPError
 
 from katalogus.views.mixins import SinglePluginView
 
@@ -18,7 +18,7 @@ class PluginSettingsListView(SinglePluginView, ListView):
     def get(self, request, *args, **kwargs):
         try:
             self.object_list = self.get_queryset()
-        except RequestException:
+        except HTTPError:
             messages.add_message(
                 self.request, messages.ERROR, _("Failed getting settings for boefje {}").format(self.plugin.id)
             )

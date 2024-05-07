@@ -1,4 +1,5 @@
-from typing import Dict, Iterator, List
+from collections.abc import Iterator
+from typing import Any
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
@@ -6,7 +7,7 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.types import NXDOMAIN
 
 
-def run(input_ooi: Hostname, additional_oois: List[NXDOMAIN], config: Dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: Hostname, additional_oois: list[NXDOMAIN], config: dict[str, Any]) -> Iterator[OOI]:
     if additional_oois:
         nxdomain = KATFindingType(id="KAT-NXDOMAIN")
         yield nxdomain

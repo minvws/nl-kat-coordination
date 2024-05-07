@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Dict, List, Optional
+from collections.abc import Iterable
+from typing import Any
 
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -14,7 +15,7 @@ from rocky.views.mixins import ConnectorFormMixin, FindingList, OctopoesView, Se
 logger = logging.getLogger(__name__)
 
 
-def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
+def sort_by_severity_desc(findings) -> list[dict[str, Any]]:
     # Sorting is stable (when multiple records have the same key, their original
     # order is preserved) so if we first sort by finding id the findings with
     # the same risk score will be sorted by finding id
@@ -27,20 +28,20 @@ def sort_by_severity_desc(findings) -> List[Dict[str, Any]]:
 
 def generate_findings_metadata(
     findings: FindingList,
-    severity_filter: Optional[List[RiskLevelSeverity]] = None,
-) -> List[Dict[str, Any]]:
+    severity_filter: Iterable[RiskLevelSeverity] | None = None,
+) -> list[dict[str, Any]]:
     findings_meta = []
 
     for finding in findings[: FindingList.HARD_LIMIT]:
         finding_type = finding.finding_type
 
-        if not severity_filter or finding_type.risk_severity in severity_filter:
+        if not severity_filter or (finding_type.risk_severity and finding_type.risk_severity in severity_filter):
             findings_meta.append(
                 {
                     "finding_number": 0,
                     "finding": finding,
                     "finding_type": finding_type,
-                    "severity": finding_type.risk_severity.name,
+                    "severity": finding_type.risk_severity.name if finding_type.risk_severity else "",
                     "risk_level_score": finding_type.risk_score,
                 }
             )
@@ -54,7 +55,6 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.severities = self.get_severities()
-        self.valid_time = self.get_observed_at()
         self.muted_findings = request.GET.get("muted_findings", "non-muted")
 
         self.exclude_muted = self.muted_findings == "non-muted"
@@ -63,7 +63,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def get_queryset(self) -> FindingList:
         return FindingList(
             octopoes_connector=self.octopoes_api_connector,
-            valid_time=self.valid_time,
+            valid_time=self.observed_at,
             severities=self.severities,
             exclude_muted=self.exclude_muted,
             only_muted=self.only_muted,
@@ -72,7 +72,7 @@ class FindingListFilter(OctopoesView, ConnectorFormMixin, SeveritiesMixin, ListV
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["observed_at_form"] = self.get_connector_form()
-        context["valid_time"] = self.valid_time
+        context["valid_time"] = self.observed_at
         context["severity_filter"] = FindingSeverityMultiSelectForm({"severity": list(self.severities)})
         context["muted_findings_filter"] = MutedFindingSelectionForm({"muted_findings": self.muted_findings})
         context["only_muted"] = self.only_muted

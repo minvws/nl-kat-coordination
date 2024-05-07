@@ -1,13 +1,11 @@
-from typing import Dict, Optional
-
+from httpx import Client
 from pydantic import TypeAdapter
-from requests import Session
 
 from boefjes.katalogus.models import PluginType, Repository
 
 
 class PluginRepositoryClientInterface:
-    def get_plugins(self, repository: Repository, plugin_type: Optional[PluginType] = None) -> Dict[str, PluginType]:
+    def get_plugins(self, repository: Repository, plugin_type: PluginType | None = None) -> dict[str, PluginType]:
         raise NotImplementedError
 
     def get_plugin(self, repository: Repository, plugin_id: str) -> PluginType:
@@ -15,10 +13,10 @@ class PluginRepositoryClientInterface:
 
 
 class MockPluginRepositoryClient(PluginRepositoryClientInterface):
-    def __init__(self, plugin_types: Dict[str, Dict[str, PluginType]]):
+    def __init__(self, plugin_types: dict[str, dict[str, PluginType]]):
         self.plugin_types = plugin_types
 
-    def get_plugins(self, repository: Repository, plugin_type: Optional[PluginType] = None) -> Dict[str, PluginType]:
+    def get_plugins(self, repository: Repository, plugin_type: PluginType | None = None) -> dict[str, PluginType]:
         return self.plugin_types[repository.id]
 
     def get_plugin(self, repository: Repository, plugin_id: str) -> PluginType:
@@ -27,13 +25,13 @@ class MockPluginRepositoryClient(PluginRepositoryClientInterface):
 
 class PluginRepositoryClient(PluginRepositoryClientInterface):
     def __init__(self):
-        self._session = Session()
+        self._client = Client()
 
-    def get_plugins(self, repository: Repository, plugin_type: Optional[PluginType] = None) -> Dict[str, PluginType]:
-        res = self._session.get(f"{repository.base_url}/plugins", params={"plugin_type": plugin_type})
+    def get_plugins(self, repository: Repository, plugin_type: PluginType | None = None) -> dict[str, PluginType]:
+        res = self._client.get(f"{repository.base_url}/plugins", params={"plugin_type": plugin_type})
         res.raise_for_status()
 
-        plugins = TypeAdapter(Dict[str, PluginType]).validate_json(res.content)
+        plugins = TypeAdapter(dict[str, PluginType]).validate_json(res.content)
 
         for plugin in plugins.values():
             plugin.repository = repository.id
@@ -41,7 +39,7 @@ class PluginRepositoryClient(PluginRepositoryClientInterface):
         return plugins
 
     def get_plugin(self, repository: Repository, plugin_id: str) -> PluginType:
-        res = self._session.get(f"{repository.base_url}/plugins/{plugin_id}")
+        res = self._client.get(f"{repository.base_url}/plugins/{plugin_id}")
         res.raise_for_status()
 
-        return PluginType.model_validate_json(res.content)
+        return PluginType.model_validate_json(res.content)  # type: ignore

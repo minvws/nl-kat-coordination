@@ -5,8 +5,8 @@ from fastapi.exceptions import RequestValidationError
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 from opentelemetry.instrumentation.psycopg2 import Psycopg2Instrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -28,11 +28,11 @@ if get_settings().span_export_grpc_endpoint is not None:
 
     FastAPIInstrumentor.instrument_app(app)
     Psycopg2Instrumentor().instrument()
-    RequestsInstrumentor().instrument()
+    HTTPXClientInstrumentor().instrument()
 
     resource = Resource(attributes={SERVICE_NAME: "bytes"})
     provider = TracerProvider(resource=resource)
-    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=get_settings().span_export_grpc_endpoint))
+    processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(get_settings().span_export_grpc_endpoint)))
     provider.add_span_processor(processor)
     trace.set_tracer_provider(provider)
 

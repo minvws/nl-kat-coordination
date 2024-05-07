@@ -20,7 +20,7 @@ jobs:
   build-debian-image:
     strategy:
       matrix:
-        dist: [debian11, debian12, ubuntu22.04]
+        dist: [debian12, ubuntu22.04]
     runs-on: ubuntu-latest
     permissions:
       contents: read

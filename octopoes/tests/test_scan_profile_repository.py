@@ -3,17 +3,12 @@ from unittest.mock import patch
 
 from octopoes.models import DeclaredScanProfile, InheritedScanProfile, Reference
 from octopoes.repositories.scan_profile_repository import XTDBScanProfileRepository
-from tests.mocks.mock_ooi_types import (
-    ALL_OOI_TYPES,
-    MockIPAddressV4,
-    MockNetwork,
-)
+from tests.mocks.mock_ooi_types import ALL_OOI_TYPES, MockIPAddressV4, MockNetwork
 
 
 @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
 class ScanProfileRepositoryTest(TestCase):
-    def setUp(self) -> None:
-        ...
+    def setUp(self) -> None: ...
 
     def test_serialize_declared(self):
         scan_profile = DeclaredScanProfile(
@@ -23,7 +18,7 @@ class ScanProfileRepositoryTest(TestCase):
 
         serialized = XTDBScanProfileRepository.serialize(scan_profile)
 
-        self.assertEqual("ScanProfile|MockIPAddressV4|internet|1.1.1.1", serialized["crux.db/id"])
+        self.assertEqual("ScanProfile|MockIPAddressV4|internet|1.1.1.1", serialized["xt/id"])
         self.assertEqual("ScanProfile", serialized["type"])
         self.assertEqual("declared", serialized["scan_profile_type"])
         self.assertEqual(1, serialized["level"])
@@ -38,7 +33,7 @@ class ScanProfileRepositoryTest(TestCase):
         )
         serialized = XTDBScanProfileRepository.serialize(scan_profile)
 
-        self.assertEqual("ScanProfile|MockIPAddressV4|internet|1.1.1.1", serialized["crux.db/id"])
+        self.assertEqual("ScanProfile|MockIPAddressV4|internet|1.1.1.1", serialized["xt/id"])
         self.assertEqual("ScanProfile", serialized["type"])
         self.assertEqual("inherited", serialized["scan_profile_type"])
         self.assertEqual(2, serialized["level"])
@@ -50,7 +45,7 @@ class ScanProfileRepositoryTest(TestCase):
             "reference": "MockIPAddressV4|internet|1.1.1.1",
             "level": 1,
             "scan_profile_type": "declared",
-            "crux.db/id": "ScanProfile|MockIPAddressV4|internet|1.1.1.1",
+            "xt/id": "ScanProfile|MockIPAddressV4|internet|1.1.1.1",
             "type": "ScanProfile",
         }
         scan_profile = XTDBScanProfileRepository.deserialize(serialized)
@@ -66,7 +61,7 @@ class ScanProfileRepositoryTest(TestCase):
             "reference": "MockIPAddressV4|internet|1.1.1.2",
             "level": 2,
             "scan_profile_type": "inherited",
-            "crux.db/id": "ScanProfile|MockIPAddressV4|internet|1.1.1.1",
+            "xt/id": "ScanProfile|MockIPAddressV4|internet|1.1.1.1",
             "type": "ScanProfile",
             "inheritances": [
                 {

@@ -3,7 +3,7 @@
 <section>
     <div>
         <h2>{% translate "Stats - Last 24 hours" %}</h2>
-        {% if stats %}
+        {% if not stats_error %}
             <div id="stats-graph">
                 <table class="charts-css column hide-data show-heading show-labels show-primary-axis show-3-secondary-axes data-spacing-10 multiple stacked">
                     <caption>{% translate "All times in UTC, blocks of 1 hour." %}</caption>

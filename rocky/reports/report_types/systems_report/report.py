@@ -1,12 +1,12 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from django.utils.translation import gettext_lazy as _
 from strenum import StrEnum
 
-from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6
 from reports.report_types.definitions import Report
@@ -28,6 +28,30 @@ class System:
     oois: list
 
 
+SERVICE_MAPPING = {
+    "http": SystemType.WEB,
+    "http-alt": SystemType.WEB,
+    "https": SystemType.WEB,
+    "https-alt": SystemType.WEB,
+    "domain": SystemType.DNS,
+    "smtp": SystemType.MAIL,
+    "smtps": SystemType.MAIL,
+    "submission": SystemType.MAIL,
+    "imap": SystemType.MAIL,
+    "imaps": SystemType.MAIL,
+    "pop3": SystemType.MAIL,
+    "pop3s": SystemType.MAIL,
+    "dicom": SystemType.DICOM,
+    "dicom-tls": SystemType.DICOM,
+    "dicom-iscl": SystemType.DICOM,
+}
+
+
+SOFTWARE_MAPPING = {
+    "DICOM": SystemType.DICOM,
+}
+
+
 class SystemReport(Report):
     id = "systems-report"
     name = _("System Report")
@@ -35,94 +59,74 @@ class SystemReport(Report):
     plugins = {"required": ["dns-records", "nmap"], "optional": ["nmap-udp"]}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "systems_report/report.html"
+    label_style = "6-light"
 
-    def generate_data(self, input_ooi: str, valid_time: datetime) -> Dict[str, Any]:
-        reference = Reference.from_str(input_ooi)
-        ips = []
+    def collect_data(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, dict[str, Any]]:
+        ips_by_input_ooi = self.to_ips(input_oois, valid_time)
+        all_ips = list({ip for key, ips in ips_by_input_ooi.items() for ip in ips})
 
-        if reference.class_type == Hostname:
-            ips = self.octopoes_api_connector.query(
-                "Hostname.<hostname[is ResolvedHostname].address", valid_time, reference
+        hostnames_by_source = self.group_by_source(
+            self.octopoes_api_connector.query_many(
+                "IPAddress.<address[is ResolvedHostname].hostname", valid_time, all_ips
             )
-        elif reference.class_type in (IPAddressV4, IPAddressV6):
-            ips = [self.octopoes_api_connector.get(reference)]
-
-        ip_services = {}
-
-        service_mapping = {
-            "http": SystemType.WEB,
-            "http-alt": SystemType.WEB,
-            "https": SystemType.WEB,
-            "https-alt": SystemType.WEB,
-            "domain": SystemType.DNS,
-            "smtp": SystemType.MAIL,
-            "smtps": SystemType.MAIL,
-            "submission": SystemType.MAIL,
-            "imap": SystemType.MAIL,
-            "imaps": SystemType.MAIL,
-            "pop3": SystemType.MAIL,
-            "pop3s": SystemType.MAIL,
-            "dicom": SystemType.DICOM,
-            "dicom-tls": SystemType.DICOM,
-            "dicom-iscl": SystemType.DICOM,
-        }
-        software_mapping = {
-            "DICOM": SystemType.DICOM,
-        }
-
-        for ip in ips:
-            ip_services[ip.reference] = {
-                "hostnames": [
-                    x.reference
-                    for x in self.octopoes_api_connector.query(
-                        "IPAddress.<address[is ResolvedHostname].hostname",
-                        valid_time,
-                        ip.reference,
-                    )
-                ],
-                "services": list(
-                    set(
-                        [
-                            service_mapping.get(str(x.name), SystemType.OTHER)
-                            for x in self.octopoes_api_connector.query(
-                                "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
-                                valid_time,
-                                ip.reference,
-                            )
-                        ]
-                    ).union(
-                        set(
-                            [
-                                software_mapping[str(x.name)]
-                                for x in self.octopoes_api_connector.query(
-                                    "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
-                                    valid_time,
-                                    ip.reference,
-                                )
-                                if str(x.name) in software_mapping
-                            ]
-                        )
-                    ),
-                ),
-            }
-            if (
-                self.octopoes_api_connector.query(
-                    "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
+        )
+        services_by_source = {
+            source: [SERVICE_MAPPING.get(str(service.name), SystemType.OTHER) for service in services]
+            for source, services in self.group_by_source(
+                self.octopoes_api_connector.query_many(
+                    "IPAddress.<address[is IPPort].<ip_port [is IPService].service",
                     valid_time,
-                    ip.reference,
+                    all_ips,
                 )
-                and SystemType.WEB not in ip_services[ip.reference]["services"]
-            ):
-                ip_services[ip.reference]["services"].append(SystemType.WEB)
+            ).items()
+        }
+        software_by_source = {
+            source: [
+                SOFTWARE_MAPPING[str(software.name)] for software in sw_instances if software.name in SOFTWARE_MAPPING
+            ]
+            for source, sw_instances in self.group_by_source(
+                self.octopoes_api_connector.query_many(
+                    "IPAddress.<address[is IPPort].<ooi [is SoftwareInstance].software",
+                    valid_time,
+                    all_ips,
+                )
+            ).items()
+        }
+        websites_by_source = self.group_by_source(
+            self.octopoes_api_connector.query_many(
+                "IPAddress.<address[is IPPort].<ip_port [is IPService].<ip_service [is Website]",
+                valid_time,
+                all_ips,
+            )
+        )
 
-            ip_services[ip.reference]["services"].sort()
+        result = {}
 
-        total_systems = len(ip_services)
-        total_domains = 0
+        for input_ooi, ips in ips_by_input_ooi.items():
+            ip_services: dict[str, dict[str, Any]] = {}
 
-        for data in ip_services.values():
-            total_domains += len(data["hostnames"])
+            for ip in ips:
+                ip_services[ip] = {
+                    "hostnames": [hostname.reference for hostname in hostnames_by_source.get(ip, [])],
+                    "services": list(set(services_by_source.get(ip, [])).union(set(software_by_source.get(ip, [])))),
+                }
 
-        summary = {"total_systems": total_systems, "total_domains": total_domains}
+                if websites_by_source.get(ip) and SystemType.WEB not in ip_services[ip]["services"]:
+                    ip_services[ip]["services"].append(SystemType.WEB)
 
-        return {"input_ooi": input_ooi, "services": ip_services, "summary": summary}
+                ip_services[ip]["services"].sort()
+
+            domains = set()
+            for data in ip_services.values():
+                domains.update(data["hostnames"])
+
+            result[input_ooi] = {
+                "input_ooi": input_ooi,
+                "services": ip_services,
+                "summary": {
+                    "total_systems": len(ip_services),
+                    "total_domains": len(domains),
+                },
+            }
+
+        return result

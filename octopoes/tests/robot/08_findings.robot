@@ -23,22 +23,19 @@ List Findings
 
 *** Keywords ***
 Setup Test
-    Start Monitoring    ${QUEUE_URI}
+    robot.Setup Test
     Insert Normalizer Output
     Await Sync
 
-Teardown Test
-    Cleanup
-    Await Sync
-    Stop Monitoring
-
 List Findings
-    ${response}    Get    ${OCTOPOES_URI}/findings
+    ${params}    Create Dictionary    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/findings    params=${params}
     ${response_data}    Set Variable    ${response.json()}
     RETURN    ${response_data}
 
 Get Count Per Severity
-    ${response}    Get    ${OCTOPOES_URI}/findings/count_by_severity
+    ${params}    Create Dictionary    valid_time=${VALID_TIME}
+    ${response}    Get    ${OCTOPOES_URI}/findings/count_by_severity    params=${params}
     ${response_data}    Set Variable    ${response.json()}
     RETURN    ${response_data}
 

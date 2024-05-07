@@ -1,9 +1,9 @@
 import uuid
 
+import httpx
 import pytest
-import requests
+from httpx import HTTPError
 from prometheus_client.parser import text_string_to_metric_families
-from requests import HTTPError
 
 from bytes.models import MimeType
 from bytes.rabbitmq import RabbitMQEventManager
@@ -14,8 +14,8 @@ from tests.loading import get_boefje_meta, get_normalizer_meta, get_raw_data
 
 def test_login(bytes_api_client: BytesAPIClient) -> None:
     bytes_api_client.login()
-    assert "Authorization" in bytes_api_client.headers
-    assert "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" in bytes_api_client.headers["Authorization"]
+    assert "Authorization" in bytes_api_client.client.headers
+    assert "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" in bytes_api_client.client.headers["Authorization"]
 
 
 def test_metrics(bytes_api_client: BytesAPIClient) -> None:
@@ -257,17 +257,19 @@ def test_save_raw_no_mime_types(bytes_api_client: BytesAPIClient) -> None:
 
     headers = {"content-type": "application/octet-stream"}
     bytes_api_client.login()
-    headers.update(bytes_api_client.headers)
+    headers.update(bytes_api_client.client.headers)
 
-    raw_url = f"{bytes_api_client._session._base_url}/bytes/raw"
+    raw_url = f"{bytes_api_client.client.base_url}/bytes/raw"
 
     raw = b"second test 123456"
-    response = requests.post(raw_url, data=raw, headers=headers, params={"boefje_meta_id": boefje_meta.id})
+    response = httpx.post(
+        raw_url, content=raw, headers=headers, params={"boefje_meta_id": str(boefje_meta.id)}, timeout=30
+    )
 
     assert response.status_code == 200
 
-    get_raw_without_mime_type_response = requests.get(
-        f"{raw_url}/{response.json().get('id')}", headers=bytes_api_client.headers, stream=True
+    get_raw_without_mime_type_response = httpx.get(
+        f"{raw_url}/{response.json().get('id')}", headers=bytes_api_client.client.headers, timeout=30
     )
 
     assert get_raw_without_mime_type_response.status_code == 200

@@ -36,9 +36,6 @@
                             <li>
                                 <a href="{% url 'ooi_list' %}">{% translate "Objects" %}</a>
                             </li>
-                            <li>
-                                <a href="{% url 'fmea_intro' %}">{% translate "FMEA" %}</a>
-                            </li>
                         </ul>
                     </div>
                 </nav>
@@ -69,7 +66,7 @@
                                 <td>{{ organization.code }}</td>
                             {% else %}
                                 <td class="warning" aria-label="{% translate "warning" %}">
-                                    <span>{% translate "Warning" %}:</span> {% translate "Organization code missing" %}
+                                    <span>{% translate "Warning:" %}</span> {% translate "Organization code missing" %}
                                 </td>
                             {% endif %}
                         </tr>

@@ -7,7 +7,7 @@
                 <div class="confirmation"
                      role="group"
                      aria-label="{% translate "confirmation" %}">
-                    <span>{% translate "Confirmation" %}:</span>
+                    <span>{% translate "Confirmation:" %}</span>
                     <p>
                         {% if "safe" in message.tags %}
                             {{ message|safe }}
@@ -20,7 +20,7 @@
         {% elif "error" in message.tags %}
             <div class="message">
                 <div class="error" role="group" aria-label="{% translate "error" %}">
-                    <span>{% translate "Error" %}:</span>
+                    <span>{% translate "Error:" %}</span>
                     <p>
                         {% if "safe" in message.tags %}
                             {{ message|safe }}
@@ -35,7 +35,7 @@
                 <div class="explanation"
                      role="group"
                      aria-label="{% translate "explanation" %}">
-                    <span>{% translate "Explanation" %}:</span>
+                    <span>{% translate "Explanation:" %}</span>
                     <p>
                         {% if "safe" in message.tags %}
                             {{ message|safe }}
@@ -48,7 +48,7 @@
         {% elif "warning" in message.tags %}
             <div class="message">
                 <div class="warning" role="group" aria-label="{% translate "warning" %}">
-                    <span>{% translate "Warning" %}:</span>
+                    <span>{% translate "Warning:" %}</span>
                     <p>
                         {% if "safe" in message.tags %}
                             {{ message|safe }}

@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 from logging import DEBUG, ERROR, getLogger
 from pathlib import Path
-from typing import Any, Dict, Set, Tuple
+from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
 from opentelemetry import trace
@@ -36,7 +36,7 @@ LATEX_SPECIAL_CHARS = str.maketrans(
         "\\": r"\textbackslash{}",
         "\n": "\\newline%\n",
         "-": r"{-}",
-        "\xA0": "~",  # Non-breaking space
+        "\xa0": "~",  # Non-breaking space
         "[": r"{[}",
         "]": r"{]}",
     }
@@ -106,7 +106,7 @@ def generate_report(
     logger.info("Glossary loaded. [report_id=%s] [glossary=%s]", report_id, glossary)
 
     # init jinja2 template
-    env = Environment(
+    env = Environment(  # noqa: S701
         loader=FileSystemLoader(settings.templates_folder),
         variable_start_string="@@{",
         variable_end_string="}@@",
@@ -128,7 +128,7 @@ def generate_report(
         raise ex
 
     # read template and find used glossary entries
-    found_entries: Set[str] = set()
+    found_entries: set[str] = set()
     with Path(template.filename).open(encoding="utf-8") as template_file:
         for line in template_file:
             for word in line.split():
@@ -239,7 +239,7 @@ def generate_report(
     # ...tempfiles are deleted automatically when leaving the context
 
 
-def read_glossary(glossary: str, settings: Settings) -> Dict[str, Tuple[str, str]]:
+def read_glossary(glossary: str, settings: Settings) -> dict[str, tuple[str, str]]:
     """Read a glossary CSV file and return a dictionary of entries."""
     glossary_entries = {}
     glossary_file_path = settings.glossaries_folder / glossary

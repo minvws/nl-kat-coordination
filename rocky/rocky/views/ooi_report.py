@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, List, Set, Type
+from typing import Any
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -17,6 +17,7 @@ from octopoes.models import OOI
 from octopoes.models.ooi.dns.records import (
     DNSAAAARecord,
     DNSARecord,
+    DNSCAARecord,
     DNSMXRecord,
     DNSNSRecord,
     DNSSOARecord,
@@ -41,7 +42,7 @@ class OOIReportView(BaseOOIDetailView):
     connector_form_class = OOIReportSettingsForm
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if self.get_observed_at() > convert_date_to_datetime(datetime.now(timezone.utc)):
+        if self.observed_at > convert_date_to_datetime(datetime.now(timezone.utc)):
             messages.error(
                 request,
                 _("You can't generate a report for an OOI on a date in the future."),
@@ -64,7 +65,7 @@ class OOIReportView(BaseOOIDetailView):
 
 class OOIReportPDFView(SingleOOITreeMixin):
     def get(self, request, *args, **kwargs):
-        valid_time = self.get_observed_at()
+        valid_time = self.observed_at
         ooi = self.get_ooi()
         reports_service = ReportsService(keiko_client)
 
@@ -78,7 +79,7 @@ class OOIReportPDFView(SingleOOITreeMixin):
                     self.organization.code,
                     valid_time.date(),
                     ooi,
-                    self.depth,
+                    self.get_depth(),
                     origin=f"{request.scheme}://{request.get_host()}",
                 ),
             )
@@ -112,7 +113,7 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
 
         findings = FindingList(
             self.octopoes_api_connector,
-            self.get_observed_at(),
+            self.observed_at,
             severities,
             exclude_muted=exclude_muted,
             only_muted=only_muted,
@@ -122,12 +123,12 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
 
         try:
             report = reports_service.get_organization_finding_report(
-                self.get_observed_at(),
+                self.observed_at,
                 self.organization.name,
                 generate_findings_metadata(findings, severities),
                 FindingReportQuery(
                     self.organization.code,
-                    self.get_observed_at().date(),
+                    self.observed_at.date(),
                     severities,
                     origin=f"{request.scheme}://{request.get_host()}",
                     exclude_muted=exclude_muted,
@@ -153,18 +154,16 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
 
 # boefjes_required - Set of possible boefjes
 # boefjes_optional - Set of possible boefjes
-# start_ooi - OOI that is the starting point of the report
 # allowed_oois - Set of OOIs that are interesting for this specific report
 # allowed_finding_types - Set of finding types that are interesting for this report
 
 
 class Report(OrganizationView):
-    boefjes_required: Set = None  # type: ignore
-    boefjes_optional: Set = None  # type: ignore
-    start_ooi: OOI = None  # type: ignore
-    allowed_ooi_types: List[Type[OOI]] = None  # type: ignore
-    allowed_finding_types: List[str] = None  # type: ignore
-    boefjes: List = []
+    boefjes_required: set
+    boefjes_optional: set
+    allowed_ooi_types: list[type[OOI]]
+    allowed_finding_types: list[str]
+    boefjes: list
 
     @classmethod
     def get_finding_filter(cls):
@@ -201,10 +200,12 @@ class DNSReport(Report):
         DNSMXRecord,
         DNSNSRecord,
         DNSSOARecord,
+        DNSCAARecord,
         Hostname,
     ]
     allowed_finding_types = [
         "KAT-WEBSERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-TWO-IPV6",
+        "KAT-NO-CAA",
     ]

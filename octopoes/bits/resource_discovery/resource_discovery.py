@@ -1,13 +1,12 @@
-from typing import Dict, Iterator, List, Union
+from collections.abc import Iterator
+from typing import Any
 
 from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.web import HostnameHTTPURL, HTTPResource, Website
 
 
-def run(
-    hostname: Hostname, additional_oois: List[Union[HostnameHTTPURL, Website]], config: Dict[str, str]
-) -> Iterator[OOI]:
+def run(hostname: Hostname, additional_oois: list[HostnameHTTPURL | Website], config: dict[str, Any]) -> Iterator[OOI]:
     hostname_http_urls = [
         hostname_http_url for hostname_http_url in additional_oois if isinstance(hostname_http_url, HostnameHTTPURL)
     ]

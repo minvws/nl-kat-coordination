@@ -2,6 +2,11 @@ name: Keiko Check the LaTeX style using linters
 
 on:
   push:
+    branches:
+      - 'main'
+      - 'release-*'
+    tags:
+      - '*'
     paths:
       - keiko/**
   pull_request:

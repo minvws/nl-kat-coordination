@@ -3,9 +3,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
 
+from account.models import AuthToken
+
 User = get_user_model()
 
 
+@admin.register(User)
 class KATUserAdmin(UserAdmin):
     model = User
     list_display = (
@@ -31,4 +34,16 @@ class KATUserAdmin(UserAdmin):
     ordering = ("email",)
 
 
-admin.site.register(User, KATUserAdmin)
+@admin.register(AuthToken)
+class AuthTokenAdmin(admin.ModelAdmin):
+    list_display = ("user", "name", "token_key", "created", "expiry")
+    fields = ("user", "name", "expiry")
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            token = obj.generate_new_token()
+
+        super().save_model(request, obj, form, change)
+
+        if not change:
+            self.message_user(request, f"The new token is: {token}")

@@ -1,20 +1,7 @@
 from __future__ import annotations
 
-import abc
 from enum import Enum, IntEnum
-from typing import (
-    Any,
-    ClassVar,
-    Dict,
-    List,
-    Literal,
-    Optional,
-    Set,
-    Tuple,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import Any, ClassVar, Literal, TypeVar
 
 from pydantic import BaseModel, GetCoreSchemaHandler, RootModel
 from pydantic_core import CoreSchema, core_schema
@@ -23,7 +10,7 @@ from pydantic_core.core_schema import ValidationInfo
 
 class Reference(str):
     @classmethod
-    def parse(cls, ref_str: str) -> Tuple[str, str]:
+    def parse(cls, ref_str: str) -> tuple[str, str]:
         object_type, *natural_key_parts = ref_str.split("|")
         return object_type, "|".join(natural_key_parts)
 
@@ -36,7 +23,7 @@ class Reference(str):
         return self.parse(self)[1]
 
     @property
-    def class_type(self) -> Type[OOI]:
+    def class_type(self) -> type[OOI]:
         from octopoes.models.types import type_by_name
 
         object_type, natural_key = self.parse(self)
@@ -86,7 +73,7 @@ class ScanProfileType(Enum):
     EMPTY = "empty"
 
 
-class ScanProfileBase(BaseModel, abc.ABC):
+class ScanProfileBase(BaseModel):
     scan_profile_type: str
     reference: Reference
     level: ScanLevel
@@ -117,17 +104,17 @@ class InheritedScanProfile(ScanProfileBase):
     scan_profile_type: Literal["inherited"] = ScanProfileType.INHERITED.value
 
 
-ScanProfile = Union[EmptyScanProfile, InheritedScanProfile, DeclaredScanProfile]
+ScanProfile = EmptyScanProfile | InheritedScanProfile | DeclaredScanProfile
 
 
-class OOI(BaseModel, abc.ABC):
-    object_type: Literal["OOI"]
+class OOI(BaseModel):
+    object_type: str
 
-    scan_profile: Optional[ScanProfile] = None
+    scan_profile: ScanProfile | None = None
 
-    _natural_key_attrs: List[str] = []
-    _reverse_relation_names: Dict[str, str] = {}
-    _information_value: List[str] = []
+    _natural_key_attrs: ClassVar[list[str]] = []
+    _reverse_relation_names: ClassVar[dict[str, str]] = {}
+    _information_value: ClassVar[list[str]] = []
     _traversable: ClassVar[bool] = True
 
     primary_key: str = ""
@@ -143,7 +130,7 @@ class OOI(BaseModel, abc.ABC):
         return cls.__name__
 
     @classmethod
-    def strict_subclasses(cls) -> List[Type[OOI]]:
+    def strict_subclasses(cls) -> list[type[OOI]]:
         """FastAPI creates duplicate class instances when parsing return types."""
 
         return [subclass for subclass in cls.__subclasses__() if subclass.__name__ != cls.__name__]
@@ -199,14 +186,14 @@ class OOI(BaseModel, abc.ABC):
 
     @classmethod
     def get_reverse_relation_name(cls, attr: str) -> str:
-        return cls._reverse_relation_names.default.get(attr, f"{cls.get_object_type()}_{attr}")
+        return cls._reverse_relation_names.get(attr, f"{cls.get_object_type()}_{attr}")
 
     @classmethod
     def get_tokenized_primary_key(cls, natural_key: str):
         token_tree = build_token_tree(cls)
         natural_key_parts = natural_key.split("|")
 
-        def hydrate(node) -> Union[Dict, str]:
+        def hydrate(node) -> dict | str:
             for key, value in node.items():
                 if isinstance(value, dict):
                     node[key] = hydrate(value)
@@ -239,40 +226,39 @@ def format_id_short(id_: str) -> str:
 
 
 class PrimaryKeyToken(RootModel):
-    root: Dict[str, Union[str, PrimaryKeyToken]]
+    root: dict[str, str | PrimaryKeyToken]
 
-    def __getattr__(self, item) -> Union[str, PrimaryKeyToken]:
+    def __getattr__(self, item) -> Any:
         return self.root[item]
 
-    def __getitem__(self, item) -> Union[str, PrimaryKeyToken]:
+    def __getitem__(self, item) -> Any:
         return self.root[item]
 
 
 PrimaryKeyToken.model_rebuild()
 
 
-def get_leaf_subclasses(cls: Type[OOI]) -> Set[Type[OOI]]:
+def get_leaf_subclasses(cls: type[OOI]) -> set[type[OOI]]:
     if not cls.strict_subclasses():
         return {cls}
     child_sets = [get_leaf_subclasses(child_cls) for child_cls in cls.strict_subclasses()]
     return set().union(*child_sets)
 
 
-def build_token_tree(ooi_class: Type[OOI]) -> Dict:
-    tokens = {}
+def build_token_tree(ooi_class: type[OOI]) -> dict[str, dict | str]:
+    tokens: dict[str, dict | str] = {}
 
-    for attribute in ooi_class._natural_key_attrs.default:
+    for attribute in ooi_class._natural_key_attrs:
         field = ooi_class.model_fields[attribute]
-        value = ""
 
-        if field.annotation in (Reference, Optional[Reference]):
+        if field.annotation in (Reference, Reference | None):
             from octopoes.models.types import related_object_type
 
             related_class = related_object_type(field)
             trees = [build_token_tree(related_class) for related_class in get_leaf_subclasses(related_class)]
 
             # combine trees
-            value = {key: value_ for tree in trees for key, value_ in tree.items()}
-
-        tokens[attribute] = value
+            tokens[attribute] = {key: value_ for tree in trees for key, value_ in tree.items()}
+        else:
+            tokens[attribute] = ""
     return tokens

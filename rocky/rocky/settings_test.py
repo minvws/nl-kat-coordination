@@ -5,3 +5,4 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+COMPRESS_OFFLINE = False

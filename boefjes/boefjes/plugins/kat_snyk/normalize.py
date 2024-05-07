@@ -1,21 +1,16 @@
 import json
 import logging
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_snyk import check_version
 from octopoes.models import OOI, Reference
-from octopoes.models.ooi.findings import (
-    CVEFindingType,
-    Finding,
-    KATFindingType,
-    SnykFindingType,
-)
+from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, SnykFindingType
 
 logger = logging.getLogger(__name__)
 
 
-def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     results = json.loads(raw)
     boefje_meta = normalizer_meta.raw_data.boefje_meta
 

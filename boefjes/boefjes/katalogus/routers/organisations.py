@@ -1,13 +1,8 @@
-from typing import Dict
-
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from boefjes.katalogus.dependencies.organisations import get_organisations_store
 from boefjes.katalogus.models import Organisation
-from boefjes.katalogus.storage.interfaces import (
-    OrganisationNotFound,
-    OrganisationStorage,
-)
+from boefjes.katalogus.storage.interfaces import OrganisationNotFound, OrganisationStorage
 from boefjes.sql.db import ObjectNotFoundException
 
 router = APIRouter(prefix="/organisations", tags=["organisations"])
@@ -28,7 +23,7 @@ def check_organisation_exists(
             storage.get_by_id(organisation_id)
 
 
-@router.get("", response_model=Dict[str, Organisation])
+@router.get("", response_model=dict[str, Organisation])
 def list_organisations(
     storage: OrganisationStorage = Depends(get_organisations_store),
 ):

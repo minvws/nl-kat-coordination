@@ -25,17 +25,37 @@
         {% if not object_list %}
             <p>{% translate "No objects found." %}</p>
             <div class="button-container">
-                <a class="button ghost"
-                   href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
                 <a class="button"
                    href="{% url 'ooi_add_type_select' organization_code=organization.code %}">{% translate "Create object" %}</a>
+                <a class="button ghost"
+                   href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
             </div>
         {% else %}
-            <form method="get" action="{{ next }}" class="inline layout-wide">
-                {% include "forms/report_form_fields.html" %}
+            {% if channel == "aggregate_report" %}
+                <p class="explanation"
+                   role="group"
+                   aria-label="{% translate "explanation select all" %}">
+                    <span>{% translate "Explanation 'Continue with all OOIs:'" %}</span>
+                    {% blocktrans trimmed %}
+                        This option will select all OOIs (+ current filters)
+                        for {{ organization }} organization.
+                    {% endblocktrans %}
+                </p>
+                <form method="get" class="inline" action="{{ next }}">
+                    {% include "forms/report_form_fields.html" %}
+
+                    <button type="submit" class="button" name="ooi" value="all">
+                        {% translate "Continue with all OOIs" %}<span class="icon ti-chevron-right"></span>
+                    </button>
+                </form>
+            {% endif %}
+            <form method="get"
+                  action="{{ next }}"
+                  class="inline layout-wide checkboxes_required">
+                {% include "forms/report_form_fields.html" with oois=None %}
 
                 <table>
-                    <caption class="visually-hidden">{% translate "Objects:" %}</caption>
+                    <caption class="visually-hidden">{% translate "Objects" %}</caption>
                     <thead>
                         <th>
                             <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
@@ -63,7 +83,7 @@
                     </tbody>
                 </table>
                 <button type="submit" class="button">
-                    {% translate "Setup report" %}<span class="icon ti-chevron-right"></span>
+                    {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
                 </button>
             </form>
             {% include "partials/list_paginator.html" %}

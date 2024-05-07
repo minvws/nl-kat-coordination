@@ -152,6 +152,7 @@ INSTALLED_APPS = [
     "tagulous",
     "compressor",
     "reports",
+    "knox",
     # "drf_standardized_errors",
 ]
 
@@ -268,7 +269,6 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_L10N = True
 
 USE_TZ = True
 
@@ -307,12 +307,13 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     "compressor.finders.CompressorFinder",
 ]
+COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", True)
 COMPRESS_OFFLINE = True
 COMPRESS_STORAGE = "compressor.storage.BrotliCompressorFileStorage"
 
 STORAGES = {
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "rocky.storage.RockyStaticFilesStorage",
     },
 }
 
@@ -321,14 +322,13 @@ _IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
 
 def immutable_file_test(path, url):
     # Match filename with 12 hex digits before the extension e.g.
-    # app.db8f2edc0c8a.js. Confifguraring this is necessary because whitenoise
+    # app.db8f2edc0c8a.js. Configuring this is necessary because whitenoise
     # doesn't automatically detect the django-compressor files as immutable.
     return _IMMUTABLE_FILE_TEST_PATTERN.match(url)
 
 
 WHITENOISE_IMMUTABLE_FILE_TEST = immutable_file_test
-# TODO: set this to True when we aren't using uWSGI anymore
-WHITENOISE_KEEP_ONLY_HASHED_FILES = False
+WHITENOISE_KEEP_ONLY_HASHED_FILES = True
 
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "crisis_room"
@@ -459,4 +459,6 @@ TAG_BORDER_TYPES = [
     ("dotted", _("Dotted")),
 ]
 
-WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:80/")
+WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
+
+KNOX_TOKEN_MODEL = "account.AuthToken"

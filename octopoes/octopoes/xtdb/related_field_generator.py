@@ -1,5 +1,3 @@
-from typing import Dict, Optional, Set, Tuple
-
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 
 
@@ -7,8 +5,8 @@ class RelatedFieldNode:
     def __init__(
         self,
         data_model: Datamodel,
-        object_types: Set[str],
-        path: Optional[Tuple[ForeignKey, ...]] = (),
+        object_types: set[str],
+        path: tuple[ForeignKey, ...] = (),
     ):
         self.data_model = data_model
         self.object_types = object_types
@@ -16,12 +14,12 @@ class RelatedFieldNode:
         # relations_out -> { (origin_class_name, prop_name): QueryNode }
         # e.g:          -> (DNSARecord, address): QueryNode[[IPAddressV4]]
         # and:          -> (IPService, service): QueryNode[[Service]]
-        self.relations_out: Dict[Tuple[str, str], RelatedFieldNode] = {}
+        self.relations_out: dict[tuple[str, str], RelatedFieldNode] = {}
 
         # relations_in  -> { (foreign_class_name, foreign_prop_name): QueryNode }
         # e.g:          -> (DNSARecord, address, dns_a_records): QueryNode[[DNSARecord]]
         # and:          -> (DNSAAAARecord, address, dns_aaaa_records): QueryNode[[DNSAAAARecord]]
-        self.relations_in: Dict[Tuple[str, str, str], RelatedFieldNode] = {}
+        self.relations_in: dict[tuple[str, str, str], RelatedFieldNode] = {}
 
         self.path = path
 
@@ -84,22 +82,22 @@ class RelatedFieldNode:
     def generate_field(self, field_set: FieldSet, pk_prefix: str):
         queried_fields = pk_prefix if field_set is FieldSet.ONLY_ID else "*"
         """
-        Output dicts in Crux Query Language
+        Output dicts in XTDB Query Language
         """
         if not self.relations_out and not self.relations_in:
             return f"[{queried_fields}]"
 
         # Loop outgoing QueryNodes
         fields = [f"{queried_fields}"]
-        for key, node in self.relations_out.items():
-            cls, attr_name = key
+        for key_out, node in self.relations_out.items():
+            cls, attr_name = key_out
             deeper_fields = node.generate_field(field_set, pk_prefix)
             field_query = f"{{(:{cls}/{attr_name} {{:as {attr_name}}}) {deeper_fields}}}"
             fields.append(field_query)
 
         # Loop incoming QueryNodes
-        for key, node in self.relations_in.items():
-            foreign_cls, attr_name, reverse_name = key
+        for key_in, node in self.relations_in.items():
+            foreign_cls, attr_name, reverse_name = key_in
             deeper_fields = node.generate_field(field_set, pk_prefix)
             field_query = f"{{(:{foreign_cls}/_{attr_name} {{:as {reverse_name}}}) {deeper_fields}}}"
             fields.append(field_query)
@@ -107,7 +105,7 @@ class RelatedFieldNode:
         # Join fields
         return "[{}]".format(" ".join(sorted(fields)))
 
-    def search_nodes(self, search_object_types=Set[str]):
+    def search_nodes(self, search_object_types=set[str]):
         # Filter outgoing QueryNodes
         self.relations_out = {
             key: node for key, node in self.relations_out.items() if node.search_nodes(search_object_types)
@@ -146,9 +144,9 @@ class RelatedFieldNode:
         """
         d = {}
         if self.relations_out:
-            for p, v in self.relations_out.items():
-                d[f"{p[0]}/{p[1]}"] = v.to_dict()
+            for key_out, node in self.relations_out.items():
+                d[f"{key_out[0]}/{key_out[1]}"] = node.to_dict()
         if self.relations_in:
-            for p, v in self.relations_in.items():
-                d[f"{p[0]}/_{p[1]} as {p[0]}/_{p[1]}"] = v.to_dict()
+            for key_in, node in self.relations_in.items():
+                d[f"{key_in[0]}/_{key_in[1]} as {key_in[0]}/_{key_in[1]}"] = node.to_dict()
         return d
