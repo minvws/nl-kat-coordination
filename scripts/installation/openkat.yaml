@@ -23,7 +23,7 @@
     kat_version: "1.15.0"
     xtdb_version: "1.0.8"
     deb_arch: "amd64"
-    default_pw: "aHahdeethobohG7i"
+    default_pw: "Pl34s3-Ch4ng3-Th!sP@ssw0rd"
     kat_debug: true
     django_csrf: "https://127.0.0.1"
     admin_email: "admin@openkat.local"
