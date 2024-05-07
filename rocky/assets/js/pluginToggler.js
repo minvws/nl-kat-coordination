@@ -1,6 +1,6 @@
 function togglePlugins(containerClass) {
-  const container = document.querySelector(`.${containerClass}`);
-  const button = container.querySelector('#more-suggested-plugins');
+  const container = document.querySelector("."+containerClass);
+  const button = container.querySelector("#more-suggested-plugins");
   const checkbox = document.getElementById("checkbox-for-enabled-optional-plugins");
 
 
@@ -11,14 +11,14 @@ function togglePlugins(containerClass) {
   }
 
   function setButtonAmountText() {
-    const elementsHtmlCollection = container.getElementsByClassName('plugin');
+    const elementsHtmlCollection = container.getElementsByClassName("plugin");
     const itemsArray = Array.prototype.slice.call(elementsHtmlCollection);
 
     let disabledCounter = 0;
 
     // Determine amount of not yet enabled plugins
     itemsArray.forEach((pluginElement) => {
-      if(pluginElement.classList.contains('plugin-is-disabled')) {
+      if(pluginElement.classList.contains("plugin-is-disabled")) {
         disabledCounter++;
       }
     });
@@ -26,7 +26,7 @@ function togglePlugins(containerClass) {
     let baseText = ""
 
     // Determine if the button text should be "Show" or "Hide"
-    if(container.classList.contains('hide-overflow')) {
+    if(container.classList.contains("hide-overflow")) {
       baseText = button.dataset.showText
     } else {
       baseText = button.dataset.hideText
@@ -53,10 +53,10 @@ function togglePlugins(containerClass) {
   }
 
   setButtonAmountText();
-  button.addEventListener('click', updateVisibility)
-  checkbox.addEventListener('change', setButtonAmountText)
+  button.addEventListener("click", updateVisibility)
+  checkbox.addEventListener("change", setButtonAmountText)
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {
-  togglePlugins('optional-plugin-container');
+document.addEventListener("DOMContentLoaded", (event) => {
+  togglePlugins("optional-plugin-container");
 })
