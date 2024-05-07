@@ -56,8 +56,9 @@ QUESTION_DATA = {
 def test_ooi_detail(
     rf,
     client_member,
-    mock_scheduler,
     mock_organization_view_octopoes,
+    mock_scheduler,
+    mock_scheduler_client_task_list,
     mocker,
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
@@ -74,7 +75,7 @@ def test_ooi_detail(
     assertContains(response, "Network|testnetwork")
 
     assertContains(response, "Plugin")
-    assertContains(response, "test_boefje")
+    assertContains(response, "dns-sec")
     assertContains(
         response,
         f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>',

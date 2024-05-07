@@ -123,7 +123,7 @@ class PaginatedTasksResponse(BaseModel):
     results: list[Task]
 
 
-class SchedulerTaskList:
+class LazyTaskList:
     HARD_LIMIT = 99_999_999
 
     def __init__(
@@ -150,7 +150,7 @@ class SchedulerTaskList:
     def __getitem__(self, key) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
-            limit = SchedulerTaskList.HARD_LIMIT
+            limit = LazyTaskList.HARD_LIMIT
             if key.stop:
                 limit = key.stop - offset
         elif isinstance(key, int):

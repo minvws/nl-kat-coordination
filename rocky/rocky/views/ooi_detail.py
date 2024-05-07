@@ -36,10 +36,7 @@ class OOIDetailView(
     def set_clearance_level(self) -> None:
         if self.action == self.CHANGE_CLEARANCE_LEVEL:
             if not self.indemnification_present:
-                messages.error(
-                    self.request,
-                    f"Indemnification not present at organization {self.organization}.",
-                )
+                self.indemnification_error()
 
             else:
                 clearance_level = int(self.request.POST.get("level"))
