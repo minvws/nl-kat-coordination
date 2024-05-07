@@ -11,10 +11,8 @@ function togglePlugins(containerClass) {
   }
 
   function setButtonAmountText() {
-    const elementsHtmlCollection = container.getElementsByClassName("plugin");
-    const itemsArray = Array.prototype.slice.call(elementsHtmlCollection);
-
-    let disabledCounter = container.getElementsByClassName("plugin-is-disabled").length;
+    const amountOfPlugins = container.getElementsByClassName("plugin").length;
+    const amountOfDisabledPlugins = container.getElementsByClassName("plugin-is-disabled").length;
     let baseText = "";
 
     // Determine if the button text should be "Show" or "Hide"
@@ -26,17 +24,17 @@ function togglePlugins(containerClass) {
 
     // Determine amount of "to be shown" plugins. Hide button if amount !> 0
     if(checkbox.checked) {
-      if((itemsArray.length - 4 > 0)) {
+      if((amountOfPlugins - 4 > 0)) {
         button.classList.remove("hidden");
-        button.innerHTML = `${baseText} (${itemsArray.length - 4})`;
+        button.innerHTML = `${baseText} (${amountOfPlugins - 4})`;
       } else {
         button.classList.add("hidden");
       }
     }
     else {
-      if((disabledCounter - 4) > 0) {
+      if((amountOfDisabledPlugins - 4) > 0) {
         button.classList.remove("hidden");
-        button.innerHTML = `${baseText} (${disabledCounter - 4})`;
+        button.innerHTML = `${baseText} (${amountOfDisabledPlugins - 4})`;
       } else {
         button.classList.add("hidden");
       }
