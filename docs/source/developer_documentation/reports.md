@@ -2,10 +2,10 @@
 
 ## Creating reports
 ### Location of the report code
-The code of the reports is located inside the `rocky` folder.
+The code of the reports is located inside the `rocky/reports/report_types` folder.
 
 ### Steps to create a new report
-Make sure rocky is running so you can see the changes you are about to make.
+Make sure Rocky is running so you can see the changes you are about to make.
 
 1.	Navigate to the `report_types` folder that contains all the different report types.
 2.	Create a new folder with a descriptive name ending with `_report`. Alternatively, you can duplicate an existing folder, modify the names, and clear its contents. (If you’ve done this, continue to step 3.)
@@ -26,7 +26,7 @@ class YourNameReport(Report):
     template_path = "your_report_name/report.html"
 ```
 5.	Open `reports/report_types/helpers.py` and add your new class to the `REPORTS` constant list.
-6.	Implement a method within `report.py` to gather the required data for report generation. See the “Collecting data” section for more information.
+6.	Implement a method within `report.py` to gather the required data for report generation. See the [Collecting data](#collecting-data) section for more information.
 7.	Design the HTML structure for your report within `report.html`. The generated data from `report.py` can be used with Django Template in this file. For example by referring to the returned value like `{{ data }}`.
 8.	Save your changes and refresh the page to see the changes you made immediately.
 
