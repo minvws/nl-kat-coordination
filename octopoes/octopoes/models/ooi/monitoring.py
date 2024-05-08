@@ -21,6 +21,6 @@ class Incident(OOI):
     event_type: str
     event_title: str
     severity: str
-    meta_data: JsonValue
+    meta_data: dict[str, JsonValue]
 
     _natural_key_attrs = ["application", "event_id"]
