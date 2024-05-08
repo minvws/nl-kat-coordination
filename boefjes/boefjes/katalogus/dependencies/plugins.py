@@ -19,7 +19,7 @@ from boefjes.katalogus.storage.interfaces import (
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
-from boefjes.katalogus.types import LIMIT, FilterParameters, PaginationParameters
+from boefjes.katalogus.types import FilterParameters, PaginationParameters
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
 from boefjes.sql.repository_storage import create_repository_storage
@@ -209,7 +209,7 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
     yield from session_managed_iterator(closure)
 
 
-def get_pagination_parameters(offset: int = 0, limit: int | None = LIMIT) -> PaginationParameters:
+def get_pagination_parameters(offset: int = 0, limit: int | None = None) -> PaginationParameters:
     return PaginationParameters(offset=offset, limit=limit)
 
 
