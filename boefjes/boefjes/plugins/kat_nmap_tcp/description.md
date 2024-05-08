@@ -8,15 +8,15 @@ open ports with their services of an IpAddress. Nmap itself runs in a temporary 
 
 This Nmap has the following hardcoded options:
 
-| Option | Function |
-| ----------- | ----------- |
-| `T4` | assume a fast and reliable network |
-| `Pn` | skips host discovery, treats hosts as online |
-|`-r` | scan ports in order |
-|`-v10` |use verbosity level 10 |
-|`-sV` |probe open ports to determine version info |
-|`-oX` |Output in XML |
-|`-sS` |TCP SYN scan |
+| Option | Function                                     |
+| ------ | -------------------------------------------- |
+| `T4`   | assume a fast and reliable network           |
+| `Pn`   | skips host discovery, treats hosts as online |
+| `-r`   | scan ports in order                          |
+| `-v10` | use verbosity level 10                       |
+| `-sV`  | probe open ports to determine version info   |
+| `-oX`  | Output in XML                                |
+| `-sS`  | TCP SYN scan                                 |
 
 `TOP_PORTS` defaults to `250`.
 
@@ -28,13 +28,13 @@ Nmap expects an IpAddress as input which can be of type IpAddressV4 or IpAddress
 
 Nmap outputs the following OOIs:
 
-|OOI type|Description|
-|---|---|
-|IpPort|Open ports of IpAddress|
-|Service|Services that are found|
-|IpService|IpService that couples a service to an open port|
-|Finding|Finding if ports are open that should not be open (TEMP!)|
-|KatFindingType|FindingType if ports are open that should not be open (TEMP!)|
+| OOI type       | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| IpPort         | Open ports of IpAddress                                       |
+| Service        | Services that are found                                       |
+| IpService      | IpService that couples a service to an open port              |
+| Finding        | Finding if ports are open that should not be open (TEMP!)     |
+| KatFindingType | FindingType if ports are open that should not be open (TEMP!) |
 
 ### Running Boefje
 
@@ -46,9 +46,7 @@ Nmap outputs the following OOIs:
     "host": "1.1.1.1"
   },
   "dispatches": {
-    "normalizers": [
-      "kat_nmap.normalize"
-    ],
+    "normalizers": ["kat_nmap.normalize"],
     "boefjes": []
   }
 }
