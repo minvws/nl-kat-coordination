@@ -32,7 +32,7 @@ Creating a boefje
 -----------------
 
 1. Inside *boefjes/boefjes/plugins/* create a new folder with a name
-   starting with kat for this example we use *kat_hello_katty*
+   starting with kat for this example, we use *kat_hello_katty*
 
 2. Inside this folder we need to have the following files:
 
@@ -47,17 +47,17 @@ Creating a boefje
 \__init__.py
 ~~~~~~~~~~~~
 
-This file stays empty and is required for python.
+This file stays empty and is required for Python.
 
 boefje.Dockerfile
 ~~~~~~~~~~~~~~~~~
 
-Inside this file we describe the docker container that this boefje will
-run in. In here we can install external packages which might be needed
+Inside this file, we describe the docker container that this boefje will
+run in. Here we can install external packages that might be needed
 for the boefje.
 
-For this example we will create a minimal docker file. TODO: explain
-what this dockerfile contains
+for this example, we will create a minimal docker file. TODO: explain
+what this Dockerfile contains
 
 .. code::
 
@@ -74,14 +74,14 @@ what this dockerfile contains
 
    ENTRYPOINT ["/usr/local/bin/python", "-m", "oci_adapter"]
 
-After creating the dockerfile we will have to add the path to this
+After creating the Dockerfile we will have to add the path to this
 docker file to the boefje's Makefile, we will do this later on this
 page.
 
 boefje.json
 ~~~~~~~~~~~
 
-This file contains meta data about the boefje. For example this boefje
+This file contains metadata about the boefje. For example this boefje
 contains information about what OOI this boefje should look out for.
 This is the example we will be using:
 
@@ -107,7 +107,7 @@ This is the example we will be using:
 -  **name**: A name to display in the KAT-alogus
 -  **description**: A description in the KAT-alogus
 -  **consumes**: A list of OOI types that trigger the boefje to run.
-   Whenever one of these OOIs get added this boefje will run with that
+   Whenever one of these OOIs gets added this boefje will run with that
    OOI. In our case we will run our boefje whenever a new IPAddressV4 or
    IPAddressV6 gets added.
 -  **environment_keys**: A list of inputs provided by the user. More
@@ -181,7 +181,7 @@ This is an example of a schema.json file:
 -  **properties**: This contains a list of objects which each will show
    the KAT-alogus what inputs are requested from the user. This can
    range to requesting from an API-key to extra commands the boefje
-   should run. Inside the boefje.json file we specified 2 environment
+   should run. Inside the boefje.json file, we specified 2 environment
    variables which will be used by this boefje.
 
    -  **MESSAGE**: For this property we ask the user to send us a string
@@ -189,8 +189,8 @@ This is an example of a schema.json file:
    -  **NUMBER**: For this property we ask the user to send us an
       integer between 0 and 9.
 
--  **required**: In here we need to give a list of the objects' names
-   that the user has to provide to run our boefje. For this example we
+-  **required**: Here we need to give a list of the objects' names
+   that the user has to provide to run our boefje. for this example, we
    will only require the user to give us the *MESSAGE* variable. We do
    this by adding "MESSAGE" to the *required* list.
 
@@ -242,7 +242,7 @@ THE SET BEFORE RAW IS.
 
 The final task of creating a boefje is adding the docker file to the
 boefjes' Make file. This file is located in boefjes/Makefile. Inside the
-*images* rule. We have to add our boefje's docker file. This is as
+*images* rule, we have to add our boefje's docker file. This is as
 simple as adding a single line. Here is how that would look like.
 
 **BEFORE**
@@ -285,10 +285,10 @@ We recommend that you at least once go through the onboarding process
 before developing your own boefje.
 
 8.  Now we want to enable our boefje, for this we will need to go to the
-    KAT-alogus (from the top nav-bar) and look for our boefje and enable
+    KAT-alogus (from the top nav bar) and look for our boefje and enable
     it.
 9.  If you followed the steps correctly, you should see two text inputs
-    being requested from you. In the first one you can put in any text
+    being requested from you. In the first one, you can put in any text
     that you want to be part of the boefje's greeting. As you might
     remember the second input is asking for an integer between 1 and 9
     (you can see the description of the text inputs by pressing the
@@ -296,7 +296,7 @@ before developing your own boefje.
 10. After having made your choice you can press the "Add settings and
     enable boefje" button.
 11. Now it should say that the boefje has been enabled, but if we go to
-    the Tasks page (from the top nav-bar) we see that the boefje is
+    the Tasks page (from the top nav bar) we see that the boefje is
     currently not doing anything. This is because our boefje will only
     run if a valid IPAddressV4 or IPAddressV6 OOI is available. Let's
     create one of those by using existing boefjes and normalizers.
@@ -308,7 +308,7 @@ type: *IPAddressV4* > Insert an IPv4 address and choose as network
 
 12. Enable the "DnsRecords" boefje. This boefje takes in a host name and
     makes a dns-record from it.
-13. Let's add a URL OOI. Go to Objects (from the top nav-bat) and on the
+13. Let's add a URL OOI. Go to Objects (from the top nav bar) and on the
     right you will see an "Add" button. After pressing this button press
     the "Add object" button.
 14. As object type we will choose URL.
@@ -322,7 +322,7 @@ type: *IPAddressV4* > Insert an IPv4 address and choose as network
     checkbox in front of it. Then you can change the clearance level on
     the bottom of the page. To be able to get an IPAddressV4 OOI from
     this object, we will need to give it a clearance level of L1 or
-    higher. For this example lets set it to L2 for a reason explained
+    higher. for this example, lets set it to L2 for a reason explained
     later.
 17. After doing this we can go to the Tasks tab and see that boefjes
     have started running on our provided OOI. Now the "DnsRecords"
@@ -342,7 +342,7 @@ type: *IPAddressV4* > Insert an IPv4 address and choose as network
     we then press the "Download meta and raw data" it will install a zip
     file with 2 files inside.
 
-    -  **raw meta file**: The json file contains meta data that our
+    -  **raw meta file**: The json file contains metadata that our
        boefje has received. The *boefje_meta* object has been given to
        our *run* method as a parameter.
     -  **return file**: the other file without extension contains the
@@ -361,9 +361,9 @@ Creating a new model
 
 1. Inside *octopoes/octopoes/models/ooi/* create a file called
    *greeting.py*. This file will contain the model for our Greeting OOI.
-2. Inside this file we will create a class Greeting which will inherit
+2. Inside this file, we will create a class Greeting which will inherit
    from the OOI class. Inside this class we can specify attributes that
-   this model will maintain. For this example we will add :
+   this model will maintain. for this example, we will add :
 
    -  A greeting with the type string that will contain text from the
       information provided from the boefje.
@@ -618,12 +618,12 @@ our bit. Inside this folder we need to have the following files:
 \__init__.py
 ~~~~~~~~~~~~
 
-This file stays empty and is required for python.
+This file stays empty and is required for Python.
 
 bit.py
 ~~~~~~
 
-Inside this file we write information about our bit. Here we give
+Inside this file, we write information about our bit. Here we give
 information such as the id of our bit, what OOI our bit should look out
 for, other OOIs that our bit requires (which are related to the OOI the
 bit is looking out for such as the IpAddress contained inside our
@@ -705,7 +705,7 @@ After this file is created all we have to do is create a finding type of
 *KAT-GREETING* that contains the information about the finding. This is
 done inside
 *boefjes/boefjes/plugins/kat_kat_finding_types/kat_finding_types.json*.
-Inside this file we can add a new object called *KAT-GREETING* which
+Inside this file, we can add a new object called *KAT-GREETING* which
 will contain information about our finding.
 
 We will add the following object to this file:
@@ -755,15 +755,15 @@ report.html
 \__init__.py
 ~~~~~~~~~~~~
 
-This file stays empty and is required for python.
+This file stays empty and is required for Python.
 
 report.py
 ~~~~~~~~~
 
-Inside this file we will parse the data from the findings into our html.
+Inside this file, we will parse the data from the findings into our html.
 This file has to contain a class inheriting from
 *reports.report_types.definitions.Report* and requires a method which
-will generate data for our *report.html*. For this example we will use
+will generate data for our *report.html*. for this example, we will use
 the *generate_data* function which has a reference to our OOI. TODO: ASK
 MORE ABOUT INFORMATION FROM OUR REPORT GENERATOR.
 
@@ -812,7 +812,7 @@ OOI. This is what our file could look like:
 report.html
 ~~~~~~~~~~~
 
-Inside this file we create a template of how our report should look
+Inside this file, we create a template of how our report should look
 like. This html file makes use of the `Django template
 language <https://docs.djangoproject.com/en/5.0/ref/templates/language/#the-django-template-language>`__.
 In our example we will make a very simple, bare bones page that displays
