@@ -249,6 +249,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
     def get_plugin_data(self):
         report_types: dict[str, Any] = {}
+        plugin_report_types: dict[str, list] = {}
         total_enabled_plugins = {"required": 0, "optional": 0}
         total_available_plugins = {"required": 0, "optional": 0}
 
@@ -258,24 +259,36 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
                     # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
                     plugin_type = cast(Literal["required", "optional"], plugin_type)
                     number_of_enabled = sum(
-                        (1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0)
+                        1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0
                         for plugin in self.plugins[plugin_type]
                     )
 
-                    number_of_available = len(report_type.plugins[plugin_type])
+                    report_plugins = report_type.plugins[plugin_type]
+
+                    for plugin in report_plugins:
+                        if plugin not in plugin_report_types:
+                            plugin_report_types[plugin] = [
+                                {"name": report_type.name, "label_style": report_type.label_style}
+                            ]
+                        else:
+                            plugin_report_types[plugin].append(
+                                {"name": report_type.name, "label_style": report_type.label_style}
+                            )
+
                     total_enabled_plugins[plugin_type] += number_of_enabled
-                    total_available_plugins[plugin_type] += number_of_available
+                    total_available_plugins[plugin_type] += len(report_plugins)
 
                     if report_type.name not in report_types:
                         report_types[report_type.name] = {}
 
                     report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
-                    report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
+                    report_types[report_type.name][f"number_of_available_{plugin_type}"] = len(report_plugins)
 
         plugin_data = {
             "total_enabled_plugins": total_enabled_plugins,
             "total_available_plugins": total_available_plugins,
             "report_types": report_types,
+            "plugin_report_types": plugin_report_types,
         }
 
         return plugin_data
