@@ -750,9 +750,11 @@ class XTDBOOIRepository(OOIRepository):
         report_query = f"""
                             {{
                                 :query {{
-                                    :find [(pull ?report [*])]
+                                    :find [(pull ?report [*]) ?date_generated]
                                     :where [[?report :object_type "Report"]
-                                        [?report :Report/has_parent false]]
+                                        [?report :Report/has_parent false]
+                                        [?report :Report/date_generated ?date_generated]]
+                                :order-by [[?date_generated :desc]]
                                 :limit {limit}
                                 :offset {offset}
                                 }}
@@ -760,6 +762,8 @@ class XTDBOOIRepository(OOIRepository):
                         """
 
         results = self.query(report_query, valid_time)
+
+        results = [x[0] for x in results]
 
         return Paginated(
             count=count,
