@@ -74,3 +74,10 @@ ul.tiles {
     color: $normalizer-plugin-type-label;
   }
 }
+
+.tiles > div > .tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
