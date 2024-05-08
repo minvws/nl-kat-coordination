@@ -19,12 +19,14 @@ class TaskFilterForm(forms.Form):
     )
     status = forms.ChoiceField(
         choices=(
-            ("", _("--- Please select one of the available options ----")),
+            ("", _("All")),
+            ("cancelled", _("Cancelled")),
             ("completed", _("Completed")),
             ("dispatched", _("Dispatched")),
             ("failed", _("Failed")),
             ("pending", _("Pending")),
             ("queued", _("Queued")),
+            ("running", _("Running")),
         ),
         required=False,
     )
@@ -55,7 +57,7 @@ class TaskFilterForm(forms.Form):
 
 class OOIDetailTaskFilterForm(TaskFilterForm):
     """
-    Task filter at OOI detail not remembering observed_at and ooi_id
+    Task filter at OOI detail to pass observed_at and ooi_id values.
     """
 
     observed_at = forms.CharField(widget=forms.HiddenInput(), required=False)

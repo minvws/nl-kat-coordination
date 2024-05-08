@@ -172,28 +172,13 @@ class LazyTaskList:
 class SchedulerError(Exception):
     message = _("Could not connect to Scheduler. Service is possibly down.")
 
+    def __init__(self, *args: object, message: str | None = None) -> None:
+        super().__init__(*args)
+        if message is not None:
+            self.message = message
+
     def __str__(self):
         return str(self.message)
-
-
-class TooManyRequestsError(SchedulerError):
-    message = _("Task queue is full, please try again later.")
-
-
-class BadRequestError(SchedulerError):
-    message = _("Task is invalid.")
-
-
-class ConflictError(SchedulerError):
-    message = _("Task already queued.")
-
-
-class TaskNotFoundError(SchedulerError):
-    message = _("Task could not be found.")
-
-
-class SchedulerValidationError(SchedulerError):
-    message = _("Your request could not be validated. Bad request.")
 
 
 class SchedulerClient:
@@ -210,7 +195,7 @@ class SchedulerClient:
             res = self._client.get("/tasks", params=kwargs)
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:
-            raise SchedulerValidationError()
+            raise SchedulerError(_("Your request could not be validated."))
         except ConnectError:
             raise SchedulerError()
 
@@ -226,10 +211,10 @@ class SchedulerClient:
                 organization = task_details.p_item.data.organization
 
             if organization != self.organization_code:
-                raise TaskNotFoundError()
+                raise SchedulerError(_("Task not found."))
 
             return task_details
-        except ConnectError:
+        except (HTTPStatusError, ConnectError):
             raise SchedulerError()
 
     def push_task(self, prioritized_item: PrioritizedItem) -> None:
@@ -244,13 +229,11 @@ class SchedulerClient:
         except HTTPStatusError as http_error:
             code = http_error.response.status_code
             if code == codes.TOO_MANY_REQUESTS:
-                raise TooManyRequestsError()
+                raise SchedulerError(_("{}: Task queue is full, please try again later.").format(code))
             elif code == codes.BAD_REQUEST:
-                raise BadRequestError()
+                raise SchedulerError(_("{}: Bad request").format(code))
             elif code == codes.CONFLICT:
-                raise ConflictError()
-            else:
-                raise SchedulerError()
+                raise SchedulerError(_("{}: Task already queued.").format(code))
         except RequestError:
             raise SchedulerError()
 

@@ -9,7 +9,7 @@ from django.views.generic.list import ListView
 from httpx import HTTPError
 
 from rocky.paginator import RockyPaginator
-from rocky.scheduler import SchedulerError, SchedulerValidationError
+from rocky.scheduler import SchedulerError
 from rocky.views.page_actions import PageActionsView
 from rocky.views.scheduler import SchedulerView
 
@@ -22,9 +22,9 @@ class TaskListView(SchedulerView, ListView, PageActionsView):
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
             return super().get(request, *args, **kwargs)
-        except (SchedulerValidationError, SchedulerError) as error:
-            messages.error(self.request, error.message)
-            return redirect("health_beautified", organization_code=self.organization.code)
+        except SchedulerError as error:
+            messages.error(request, error.message)
+        return redirect("health_beautified", organization_code=self.organization.code)
 
     def get_queryset(self):
         return self.get_task_list()
@@ -44,6 +44,7 @@ class TaskListView(SchedulerView, ListView, PageActionsView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["task_filter_form"] = self.get_task_filter_form()
+        context["stats"] = self.get_task_statistics()
         context["breadcrumbs"] = [
             {
                 "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),

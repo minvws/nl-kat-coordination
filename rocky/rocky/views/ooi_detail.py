@@ -66,7 +66,7 @@ class OOIDetailView(
             boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
             ooi_id = self.request.GET.get("ooi_id")
             ooi = self.get_single_ooi(pk=ooi_id)
-            self.run_boefje_for_oois(boefje, [ooi])
+            self.run_boefje(boefje, ooi)
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()

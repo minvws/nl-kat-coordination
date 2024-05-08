@@ -16,7 +16,6 @@ from rocky.scheduler import (
     PrioritizedItem,
     RawData,
     SchedulerError,
-    SchedulerValidationError,
     Task,
     scheduler_client,
 )
@@ -56,7 +55,7 @@ class SchedulerView(OctopoesView):
     def get_task_list(self) -> LazyTaskList | list[Any]:
         try:
             return LazyTaskList(self.scheduler_client, **self.get_task_filters())
-        except (SchedulerValidationError, SchedulerError) as error:
+        except SchedulerError as error:
             messages.error(self.request, error.message)
         return []
 
@@ -65,6 +64,14 @@ class SchedulerView(OctopoesView):
             return self.scheduler_client.get_task_details(task_id)
         except SchedulerError as error:
             return messages.error(self.request, error.message)
+
+    def get_task_statistics(self) -> dict[Any, Any]:
+        stats = {}
+        try:
+            stats = self.scheduler_client.get_task_stats(self.organization.code, self.task_type)
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
+        return stats
 
     def get_output_oois(self, task):
         try:
@@ -126,8 +133,6 @@ class SchedulerView(OctopoesView):
     # task info from the scheduler. Task data should be available from the context
     # from which the task is created.
     def reschedule_task(self, task_id: str) -> None:
-        if not self.indemnification_present:
-            return self.indemnification_error()
         try:
             task = self.scheduler_client.get_task_details(task_id)
 
@@ -141,8 +146,6 @@ class SchedulerView(OctopoesView):
             messages.error(self.request, error.message)
 
     def run_normalizer(self, katalogus_normalizer: Normalizer, raw_data: RawData) -> None:
-        if not self.indemnification_present:
-            return self.indemnification_error()
         try:
             normalizer_task = NormalizerTask(
                 normalizer=SchedulerNormalizer.model_validate(katalogus_normalizer.model_dump()),
@@ -156,8 +159,6 @@ class SchedulerView(OctopoesView):
             messages.error(self.request, error.message)
 
     def run_boefje(self, katalogus_boefje: Boefje, ooi: OOI | None) -> None:
-        if not self.indemnification_present:
-            return self.indemnification_error()
         try:
             boefje_task = BoefjeTask(
                 boefje=SchedulerBoefje.model_validate(katalogus_boefje.model_dump()),
@@ -166,8 +167,9 @@ class SchedulerView(OctopoesView):
             )
 
             p_item = PrioritizedItem(priority=1, data=boefje_task)
-            if ooi and ooi is not None and ooi.scan_profile and ooi.scan_profile.level < katalogus_boefje.scan_level:
-                self.schedule_task(p_item)
+
+            self.schedule_task(p_item)
+
         except SchedulerError as error:
             messages.error(self.request, error.message)
 
@@ -181,7 +183,8 @@ class SchedulerView(OctopoesView):
                 self.run_boefje(boefje, None)
 
             for ooi in oois:
+                if ooi.scan_profile and ooi.scan_profile.level < boefje.scan_level:
+                    self.can_raise_clearance_level(ooi, boefje.scan_level)
                 self.run_boefje(boefje, ooi)
-
         except SchedulerError as error:
             messages.error(self.request, error.message)

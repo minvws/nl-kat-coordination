@@ -2,7 +2,7 @@ import pytest
 from django.http import Http404
 from pytest_django.asserts import assertContains
 
-from rocky.scheduler import SchedulerError, TooManyRequestsError
+from rocky.scheduler import SchedulerError
 from rocky.views.bytes_raw import BytesRawView
 from rocky.views.tasks import BoefjesTaskListView
 from tests.conftest import setup_request
@@ -63,7 +63,7 @@ def test_reschedule_task(rf, client_member, mock_scheduler, task):
 
 def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocker, task):
     mock_scheduler.get_task_details.return_value = task
-    mock_scheduler.push_task.side_effect = TooManyRequestsError
+    mock_scheduler.push_task.side_effect = SchedulerError(message="Task queue is full, please try again later.")
 
     request = setup_request(
         rf.post(
