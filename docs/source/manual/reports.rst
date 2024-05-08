@@ -166,8 +166,8 @@ The table below gives an overview of the elements that can be found in each repo
 
 Report flow
 ===========
+On the Reports page you can generate new reports and get an overview of all generated reports. With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report. Please note that enabling plugins during the report flow wizard will result in inaccurate data, as the plugins will take some time before they have gathered and analyzed all data. Check in the Tasks page if all tasks have completed.
 
-** TODO!! When you click on the Reports tab, you will see the report generation flow. In this flow you first have to decide if you want a normal, aggregate or multi report. After that you will see ….. <TODO Continue>**
 
 Plugins
 =======
@@ -177,7 +177,6 @@ Each report has both required and suggested plugins that are to show data in the
 Downloading and/or exporting a report
 =====================================
 The normal and multi report can be downloaded as PDF file. The aggregate report can be exported as a PDF and also as a JSON file. In order to do this either click the 'Download' or 'Export' button on the right. The JSON output is required in order to create a Multi-Report and compare organisation sectors against each other.
-
 
 
 Generating a Multi Report
@@ -195,13 +194,12 @@ Create two organisations and make sure both organisations have data. For this tu
 
 #. Click on ‘Reports’ and click on ‘Multi Report’.
 
-#. Select the report data of the organisations CAT and DOG and follow the report flow steps to generate the report.
+#. Select the report data of the organisations CAT and DOG and follow the report flow steps to generate the report. If you do not see your uploaded reports please make sure you have cleared the filter first. 
 
 
 
 Troubleshooting
 ===============
-
 When you do not see one (or more) of the reports options, please check the following things:
 
 - Do you have the required object selected? (This is either the Hostname or IPService for all reports, except the findings report.)
