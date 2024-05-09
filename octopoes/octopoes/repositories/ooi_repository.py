@@ -83,6 +83,13 @@ class OOIRepository(Repository):
     ) -> dict[Path, list[OOI]]:
         raise NotImplementedError
 
+    def get_oois(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+    ) -> list[OOI]:
+        raise NotImplementedError
+
     def list_oois(
         self,
         types: set[type[OOI]],
@@ -265,6 +272,26 @@ class XTDBOOIRepository(OOIRepository):
         res = self.session.client.query(query, valid_time)
         oois = [self.deserialize(x[0]) for x in res]
         return {ooi.primary_key: ooi for ooi in oois}
+
+    def get_oois(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+    ) -> list[OOI]:
+        types = to_concrete(types)
+        data_query = """
+                {{
+                    :query {{
+                        :find [(pull ?e [*])]
+                        :in [[_object_type ...]]
+                        :where [[?e :object_type _object_type]]
+                    }}
+                    :in-args [[{object_types}]]
+                }}
+        """.format(
+            object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
+        )
+        return [self.deserialize(x[0]) for x in self.session.client.query(data_query, valid_time)]
 
     def list_oois(
         self,

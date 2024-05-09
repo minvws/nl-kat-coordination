@@ -1,4 +1,6 @@
+import cProfile
 import json
+import pickle
 from collections import Counter
 from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
@@ -45,6 +47,11 @@ from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 logger = getLogger(__name__)
 settings = Settings()
+BIT_CACHE: set[int] = set()
+
+
+def bit_cache_key(*args):
+    return hash(pickle.dumps(args))
 
 
 def find_relation_in_tree(relation: str, tree: ReferenceTree) -> list[OOI]:
@@ -198,13 +205,19 @@ class OctopoesService:
             if len(configs) != 0:
                 config = configs[-1].config
 
-        try:
-            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
-        except Exception as e:
-            logger.exception("Error running inference", exc_info=e)
-            return
-
-        self.save_origin(origin, resulting_oois, valid_time)
+        params = list(parameters.values())
+        key = bit_cache_key(bit_definition, source, params, config)
+        if key not in BIT_CACHE:
+            BIT_CACHE.add(key)
+            try:
+                self.save_origin(
+                    origin,
+                    BitRunner(bit_definition).run(source, list(parameters.values()), config=config),
+                    valid_time,
+                )
+            except Exception as e:
+                logger.exception("Error running inference", exc_info=e)
+                return
 
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int):
@@ -577,6 +590,8 @@ class OctopoesService:
         return inheritance_chain
 
     def recalculate_bits(self) -> int:
+        profiler = cProfile.Profile()
+        profiler.enable()
         valid_time = datetime.now(timezone.utc)
         bit_counter: Counter[str] = Counter()
 
@@ -584,11 +599,12 @@ class OctopoesService:
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
             # loop over all oois that are consumed by the bit
-            for ooi in self.ooi_repository.list_oois(
-                {bit_definition.consumes}, limit=20000, valid_time=valid_time
-            ).items:
+            for ooi in self.ooi_repository.get_oois(
+                {bit_definition.consumes},
+                valid_time=valid_time,
+            ):
                 if not isinstance(ooi, bit_definition.consumes):
-                    logger.exception("Wut?")
+                    logger.exception("Requested OOI type not met")
 
                 # insert, if not exists
                 bit_instance = Origin(
@@ -618,6 +634,8 @@ class OctopoesService:
             self._run_inference(origin, valid_time)
             bit_counter.update({origin.method})
 
+        profiler.disable()
+        profiler.print_stats(sort=2)
         return sum(bit_counter.values())
 
     def commit(self):
