@@ -179,7 +179,7 @@ class Query:
 
         return self
 
-    def order_by(self, ref: Aliased, ascending: bool =True) -> "Query":
+    def order_by(self, ref: Aliased, ascending: bool = True) -> "Query":
         self._order_by = (ref, ascending)
 
         return self

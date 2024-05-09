@@ -1,6 +1,5 @@
 import logging
 import os
-import uuid
 from datetime import datetime, timezone
 
 import pytest
@@ -11,14 +10,13 @@ from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddress, IPAddressV4, Network
 from octopoes.models.ooi.reports import Report
 from octopoes.models.ooi.web import URL
-from octopoes.models.origin import Origin, OriginType
 from octopoes.models.path import Path
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
 from octopoes.repositories.origin_repository import XTDBOriginRepository
 from octopoes.xtdb.client import OperationType, XTDBHTTPClient, XTDBSession
 from octopoes.xtdb.exceptions import NodeNotFound
 from octopoes.xtdb.query import Aliased, Query
-from tests.conftest import seed_system
+from tests.conftest import seed_report, seed_system
 
 logger = logging.getLogger(__name__)
 
@@ -455,34 +453,34 @@ def test_order_reports(
     valid_time: datetime,
 ):
     seed_system(xtdb_ooi_repository, xtdb_origin_repository, valid_time)
+    report = seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
 
-    report = Report(
-        name="test",
-        date_generated=valid_time,
-        report_id=uuid.uuid4(),
-        organization_code="str",
-        organization_name="str",
-        organization_tags=["str"],
-        data_raw_id="str",
-        observed_at=valid_time,
-        parent_report=None,
-        has_parent=False,
-    )
-    report_origin = Origin(
-        origin_type=OriginType.DECLARATION,
-        method="manual",
-        source=report.reference,
-        result=[report.reference],
-        task_id=uuid.uuid4(),
-    )
-    xtdb_ooi_repository.save(report, valid_time=valid_time)
-    xtdb_origin_repository.save(report_origin, valid_time=valid_time)
-    xtdb_origin_repository.commit()
-    xtdb_ooi_repository.commit()
+    assert xtdb_session.client.query(Query(Report).count(Report).where(Report, has_parent=False)) == [[1]]
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 1
 
-    reports = xtdb_ooi_repository.list_reports(valid_time, 0, 2)
-    assert reports.count == 1
-
-    date_generated = Aliased(Report, field="date_generated")
-    query = Query(Report).where(Report, has_parent=False, date_generated=date_generated).limit(2).offset(0).order_by(date_generated)
+    date = Aliased(Report, field="date_generated")
+    query = Query(Report).pull(Report).find(date).where(Report, has_parent=False, date_generated=date).order_by(date)
     assert len(xtdb_session.client.query(query)) == 1
+
+    query = Query(Report).where(Report, has_parent=True)
+    assert len(xtdb_session.client.query(query)) == 0
+
+    child_report = seed_report("child", valid_time, xtdb_ooi_repository, xtdb_origin_repository, parent_report=report)
+
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 1  # We filter on has_parent = False
+
+    assert len(xtdb_session.client.query(Query(Report))) == 2
+
+    query = Query(Report).where(Report, has_parent=True)
+    assert len(xtdb_session.client.query(query)) == 1
+
+    child_alias = Aliased(Report)
+    query = Query(Report).pull(Report).pull(child_alias).where(child_alias, parent_report=Report)
+
+    result = xtdb_session.client.query(query)
+    assert len(result) == 1
+
+    parent, child = result[0]
+
+    assert xtdb_ooi_repository.serialize(report) == parent
+    assert xtdb_ooi_repository.serialize(child_report) == child
