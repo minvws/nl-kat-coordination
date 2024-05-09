@@ -15,7 +15,7 @@ class XTDBClient:
         self._client = httpx.Client(
             base_url=f"{base_url}/_xtdb/{node}",
             headers={"Accept": "application/json"},
-            timeout=None,
+            timeout=timeout,
         )
 
     def status(self) -> Any:
@@ -44,15 +44,15 @@ class XTDBClient:
 
         return res.json()
 
-    def entity_tx(self, key: str):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"entity-tx?eid={key}"), headers=headers)
-        return req.text
+    def entity_tx(self, key: str) -> Any:
+        res = self._client.get(f"/entity-tx", params={"eid": key})
 
-    def attribute_stats(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("attribute-stats"), headers=headers)
-        return req.text
+        return res.json()
+
+    def attribute_stats(self) -> Any:
+        res = self._client.get("/attribute-stats")
+
+        return res.json()
 
     def sync(self, timeout: int = 500):
         headers = {"Accept": "application/json"}
