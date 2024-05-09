@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 
-import argparse
 import datetime
-import sys
-from pathlib import Path
 from typing import Any
 
-import httpx
 import click
+import httpx
 
 
 class XTDBClient:
@@ -54,65 +51,66 @@ class XTDBClient:
 
         return res.json()
 
-    def sync(self, timeout: int = 500):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"sync?timeout={timeout}"), headers=headers)
-        return req.text
+    def sync(self, timeout: int = 500) -> Any:
+        res = self._client.get("/sync", params={"timeout": timeout})
 
-    def await_tx(self, txid: int):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"await-tx?txId={txid}"), headers=headers)
-        return req.text
+        return res.json()
 
-    def await_tx_time(self, tm: str = datetime.datetime.now().isoformat()):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"await-tx-time?tx-time={tm}"), headers=headers)
-        return req.text
+    def await_tx(self, transaction_id: int) -> Any:
+        res = self._client.get(f"/await-tx", params={"txId": transaction_id})
 
-    def tx_log(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("tx-log"), headers=headers)
-        return req.text
+        return res.json()
 
-    def tx_log_docs(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("tx-log?with-ops?=true"), headers=headers)
-        return req.text
+    def await_tx_time(self, transaction_time: str | None = None) -> Any:
+        if transaction_time is None:
+            transaction_time = datetime.datetime.now().isoformat()
+
+        res = self._client.get(f"/await-tx-time", params={"tx-time": transaction_time})
+
+        return res.json()
+
+    def tx_log(self) -> Any:
+        res = self._client.get("/tx-log")
+
+        return res.json()
+
+    def tx_log_docs(self) -> Any:
+        res = self._client.get("/tx-log", params={"with-ops": "true"})
+
+        return res.json()
 
     def submit_tx(self, txs) -> Any:
         res = self._client.post("/submit-tx", json={"tx-ops": txs})
 
         return res.json()
 
-    def tx_committed(self, txid: int):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root(f"tx_commited?txId={txid}"), headers=headers)
-        return req.text
+    def tx_committed(self, txid: int) -> Any:
+        res = self._client.get(f"/tx-committed", params={"txId": txid})
 
-    def latest_completed_tx(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("latest-completed-tx"), headers=headers)
-        return req.text
+        return res.json()
 
-    def latest_submitted_tx(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("latest-submitted-tx"), headers=headers)
-        return req.text
+    def latest_completed_tx(self) -> Any:
+        res = self._client.get("/latest-completed-tx")
 
-    def active_queries(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("active-queries"), headers=headers)
-        return req.text
+        return res.json()
 
-    def recent_queries(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("recent-queries"), headers=headers)
-        return req.text
+    def latest_submitted_tx(self) -> Any:
+        res = self._client.get("/latest-submitted-tx")
 
-    def slowest_queries(self):
-        headers = {"Accept": "application/json"}
-        req = httpx.get(self._root("recent-queries"), headers=headers)
-        return req.text
+        return res.json()
+
+    def active_queries(self) -> Any:
+        res = self._client.get("/active-queries")
+
+        return res.json()
+
+    def recent_queries(self) -> Any:
+        res = self._client.get("/recent-queries")
+        return res.json()
+
+    def slowest_queries(self) -> Any:
+        res = self._client.get("/recent-queries")
+        return res.json()
 
 
 def dispatch(xtdb, instruction):
@@ -206,9 +204,10 @@ def cli(ctx: click.Context, base_url: str, node: str, timeout: int):
 @cli.command()
 @click.argument(type=int)
 @click.pass_context
-def tx_committed(ctx: click.Context, txid: int) -> None:
-    client = ctx.obj["client"]
-    click.echo(client.tx_committed(txid))
+def tx_committed(ctx: click.Context, transaction_id: int) -> None:
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.tx_committed(transaction_id))
 
 
 # def main():
