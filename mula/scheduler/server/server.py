@@ -18,6 +18,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from scheduler import context, models, queues, schedulers, storage, version
 from scheduler.config import settings
 
+from .models import request
 from .pagination import PaginatedResponse, paginate
 
 
@@ -53,7 +54,10 @@ class Server:
 
         # Set up OpenTelemetry instrumentation
         if self.config.host_metrics is not None:
-            self.logger.info("Setting up instrumentation with span exporter endpoint [%s]", self.config.host_metrics)
+            self.logger.info(
+                "Setting up instrumentation with span exporter endpoint [%s]",
+                self.config.host_metrics,
+            )
 
             FastAPIInstrumentor.instrument_app(self.api)
             Psycopg2Instrumentor().instrument()
@@ -61,7 +65,9 @@ class Server:
 
             resource = Resource(attributes={SERVICE_NAME: "mula"})
             provider = TracerProvider(resource=resource)
-            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(self.config.host_metrics)))
+            processor = BatchSpanProcessor(
+                OTLPSpanExporter(endpoint=str(self.config.host_metrics))
+            )
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 
@@ -167,6 +173,7 @@ class Server:
             endpoint=self.patch_task,
             methods=["PATCH"],
             response_model=models.Task,
+            response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",
         )
@@ -293,7 +300,9 @@ class Server:
         plugin_id: str | None = None,  # FIXME: deprecated
         filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
-        if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
+        if (
+            min_created_at is not None and max_created_at is not None
+        ) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_date must be less than max_date",
@@ -437,13 +446,7 @@ class Server:
 
         return models.Task(**task.model_dump())
 
-    def patch_task(self, task_id: str, item: dict) -> Any:
-        if len(item) == 0:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
-
+    def patch_task(self, task_id: str, item: request.Task) -> Any:
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
         except Exception as exc:
@@ -458,7 +461,22 @@ class Server:
                 detail="task not found",
             )
 
-        updated_task = task_db.model_copy(update=item)
+        patch_data = item.model_dump(exclude_unset=True)
+        if len(patch_data) == 0:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="no data to patch",
+            )
+
+        breakpoint()
+        try:
+            updated_task = task_db.model_copy(update=patch_data)
+        except Exception as exc:
+            self.logger.error(exc)
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="failed to update task",
+            ) from exc
 
         # Update task in database
         try:
@@ -472,9 +490,13 @@ class Server:
 
         return updated_task
 
-    def get_task_stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
+    def get_task_stats(
+        self, scheduler_id: str | None = None
+    ) -> dict[str, dict[str, int]] | None:
         try:
-            stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
+            stats = self.ctx.datastores.task_store.get_status_count_per_hour(
+                scheduler_id
+            )
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
@@ -485,7 +507,10 @@ class Server:
         return stats
 
     def get_queues(self) -> Any:
-        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
+        return [
+            models.Queue(**s.queue.dict(include_pq=False))
+            for s in self.schedulers.copy().values()
+        ]
 
     def get_queue(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
@@ -504,7 +529,9 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
+    def pop_queue(
+        self, queue_id: str, filters: storage.filters.FilterRequest | None = None
+    ) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -525,7 +552,7 @@ class Server:
 
         return models.PrioritizedItem(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
+    def push_queue(self, queue_id: str, item: request.PrioritizedItem) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
