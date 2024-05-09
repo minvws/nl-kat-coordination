@@ -1,3 +1,4 @@
+import os
 import sys
 import traceback
 from base64 import b64encode
@@ -11,6 +12,7 @@ def main():
     boefje_input = httpx.get(input_url).json()
 
     try:
+        os.environ.update(boefje_input["boefje_meta"]["environment"])
         raws = run(boefje_input["boefje_meta"])
         out = {
             "status": "COMPLETED",
