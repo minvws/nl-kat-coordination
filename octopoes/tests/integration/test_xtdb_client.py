@@ -445,7 +445,27 @@ def test_query_subclass_fields_and_returning_only_fields(
     assert result == [("URL|test|https://test.com/security", "example.com")]
 
 
-def test_order_reports(
+def test_order_reports_and_filter_on_parent(
+    octopoes_api_connector: OctopoesAPIConnector,
+    xtdb_ooi_repository: XTDBOOIRepository,
+    xtdb_origin_repository: XTDBOriginRepository,
+    xtdb_session: XTDBSession,
+    valid_time: datetime,
+):
+    seed_system(xtdb_ooi_repository, xtdb_origin_repository, valid_time)
+    seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
+
+    assert xtdb_session.client.query(Query(Report).count(Report).where(Report, has_parent=False)) == [[1]]
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 1
+
+    date = Aliased(Report, field="date_generated")
+    query = Query(Report).pull(Report).find(date).where(Report, has_parent=False, date_generated=date).order_by(date)
+
+    assert len(xtdb_session.client.query(query)) == 1
+    assert len(xtdb_session.client.query(Query(Report).where(Report, has_parent=True))) == 0
+
+
+def test_query_children_of_reports(
     octopoes_api_connector: OctopoesAPIConnector,
     xtdb_ooi_repository: XTDBOOIRepository,
     xtdb_origin_repository: XTDBOriginRepository,
@@ -454,33 +474,18 @@ def test_order_reports(
 ):
     seed_system(xtdb_ooi_repository, xtdb_origin_repository, valid_time)
     report = seed_report("test", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
+    report2 = seed_report("test2", valid_time, xtdb_ooi_repository, xtdb_origin_repository)
+    child = seed_report("child", valid_time, xtdb_ooi_repository, xtdb_origin_repository, parent_report=report)
 
-    assert xtdb_session.client.query(Query(Report).count(Report).where(Report, has_parent=False)) == [[1]]
-    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 1
+    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 2  # We filter on has_parent = False
+    assert len(xtdb_session.client.query(Query(Report))) == 3
+    assert len(xtdb_session.client.query(Query(Report).where(Report, has_parent=True))) == 1
 
-    date = Aliased(Report, field="date_generated")
-    query = Query(Report).pull(Report).find(date).where(Report, has_parent=False, date_generated=date).order_by(date)
-    assert len(xtdb_session.client.query(query)) == 1
+    # See https://v1-docs.xtdb.com/language-reference/1.24.3/datalog-queries/#pull for documentation about prepending
+    # a "_" to query in the reverse direction in a pull statement.
+    query = Query(Report).pull(Report, fields="[* {:Report/_parent_report [*]}]").where(Report, has_parent=False)
 
-    query = Query(Report).where(Report, has_parent=True)
-    assert len(xtdb_session.client.query(query)) == 0
-
-    child_report = seed_report("child", valid_time, xtdb_ooi_repository, xtdb_origin_repository, parent_report=report)
-
-    assert xtdb_ooi_repository.list_reports(valid_time, 0, 2).count == 1  # We filter on has_parent = False
-
-    assert len(xtdb_session.client.query(Query(Report))) == 2
-
-    query = Query(Report).where(Report, has_parent=True)
-    assert len(xtdb_session.client.query(query)) == 1
-
-    child_alias = Aliased(Report)
-    query = Query(Report).pull(Report).pull(child_alias).where(child_alias, parent_report=Report)
-
-    result = xtdb_session.client.query(query)
-    assert len(result) == 1
-
-    parent, child = result[0]
-
-    assert xtdb_ooi_repository.serialize(report) == parent
-    assert xtdb_ooi_repository.serialize(child_report) == child
+    assert xtdb_session.client.query(query) == [
+        [xtdb_ooi_repository.serialize(report2)],
+        [xtdb_ooi_repository.serialize(report) | {"Report/_parent_report": [xtdb_ooi_repository.serialize(child)]}],
+    ]

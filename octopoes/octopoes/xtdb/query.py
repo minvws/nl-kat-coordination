@@ -147,10 +147,10 @@ class Query:
 
         return query
 
-    def pull(self, ooi_type: Ref) -> "Query":
+    def pull(self, ooi_type: Ref, *, fields: str = "[*]") -> "Query":
         """By default, we pull the target type. But when using find, count, etc., you have to pull explicitly."""
 
-        self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} [*])")
+        self._find_clauses.append(f"(pull {self._get_object_alias(ooi_type)} {fields})")
 
         return self
 
