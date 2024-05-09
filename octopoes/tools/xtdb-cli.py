@@ -79,8 +79,8 @@ class XTDBClient:
 
         return res.json()
 
-    def submit_tx(self, txs) -> Any:
-        res = self._client.post("/submit-tx", json={"tx-ops": txs})
+    def submit_tx(self, transactions: list[str]) -> Any:
+        res = self._client.post("/submit-tx", json={"tx-ops": transactions})
 
         return res.json()
 
@@ -186,7 +186,7 @@ def iparse(instructions):
     ]
 
 
-@click.group()
+@click.group
 # @click.option("--debug/--no-debug", default=False)
 @click.option("--timeout", default=5000, help="XTDB request timeout (in ms)")
 @click.option(
@@ -201,13 +201,157 @@ def cli(ctx: click.Context, base_url: str, node: str, timeout: int):
     ctx.obj["client"] = client
 
 
-@cli.command()
+@cli.command
+@click.pass_context
+def status(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.status())
+
+
+@cli.command
+@click.argument
+@click.pass_context
+def query(ctx: click.Context, query: str):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.query(query))
+
+
+@cli.command
+@click.argument
+@click.pass_context
+def entity(ctx: click.Context, key: str):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.entity(key))
+
+
+@cli.command
+@click.argument
+@click.pass_context
+def history(ctx: click.Context, key: str):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.history(key))
+
+
+@cli.command
+@click.argument
+@click.pass_context
+def entity_tx(ctx: click.Context, key: str):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.entity_tx(key))
+
+
+@cli.command
+@click.pass_context
+def attribute_stats(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.attribute_stats())
+
+
+@cli.command
+@click.argument(type=int)
+@click.pass_context
+def sync(ctx: click.Context, timeout: int):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.sync(timeout))
+
+
+@cli.command
+@click.argument(type=int)
+@click.pass_context
+def await_tx(ctx: click.Context, transaction_id: int):
+    client: XTDBClient = ctx.obj["client"]
+
+
+@cli.command
+@click.option(type=click.DateTime)  # todo: find out how this exactly works
+@click.pass_context
+def await_tx_time(
+    ctx: click.Context, transaction_time: datetime.datetime | None = None
+):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.await_tx_time(transaction_time))
+
+
+@cli.command
+@click.pass_context
+def tx_log(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.tx_log())
+
+
+@cli.command
+@click.pass_context
+def tx_log_docs(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.tx_log_docs())
+
+
+@cli.command
+@click.argument(nargs=-1)
+@click.pass_context
+def submit_tx(ctx: click.Context, transactions):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.submit_tx(transactions))
+
+
+@cli.command
 @click.argument(type=int)
 @click.pass_context
 def tx_committed(ctx: click.Context, transaction_id: int) -> None:
     client: XTDBClient = ctx.obj["client"]
 
     click.echo(client.tx_committed(transaction_id))
+
+
+@cli.command
+@click.pass_context
+def latest_completed_tx(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.latest_completed_tx())
+
+
+@cli.command
+@click.pass_context
+def latest_submitted_tx(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.latest_submitted_tx())
+
+
+@cli.command
+@click.pass_context
+def active_queries(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.active_queries())
+
+
+@cli.command
+@click.pass_context
+def recent_queries(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.recent_queries())
+
+
+@cli.command
+@click.pass_context
+def slowest_queries(ctx: click.Context):
+    client: XTDBClient = ctx.obj["client"]
+
+    click.echo(client.slowest_queries())
 
 
 # def main():
