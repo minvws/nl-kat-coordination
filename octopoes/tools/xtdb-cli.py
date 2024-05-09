@@ -187,14 +187,14 @@ def iparse(instructions):
 
 
 @click.group
-# @click.option("--debug/--no-debug", default=False)
-@click.option("--timeout", default=5000, help="XTDB request timeout (in ms)")
+@click.option("--debug/--no-debug", type=bool, default=False, help="Verbose output")
+@click.option("--timeout", type=int, default=5000, help="XTDB request timeout (in ms)")
 @click.option(
     "--base-url", default="http://localhost:3000", help="XTDB server base url"
 )
-@click.argument("node", default="0", help="XTDB node")
+@click.option("node", default="0", help="XTDB node")
 @click.pass_context
-def cli(ctx: click.Context, base_url: str, node: str, timeout: int):
+def cli(ctx: click.Context, base_url: str, node: str, timeout: int, debug: bool):
     client = XTDBClient(base_url, node, timeout)
 
     ctx.ensure_object(dict)
@@ -254,7 +254,7 @@ def attribute_stats(ctx: click.Context):
 
 
 @cli.command
-@click.argument(type=int)
+@click.argument("timeout", type=int)
 @click.pass_context
 def sync(ctx: click.Context, timeout: int):
     client: XTDBClient = ctx.obj["client"]
@@ -263,14 +263,14 @@ def sync(ctx: click.Context, timeout: int):
 
 
 @cli.command
-@click.argument(type=int)
+@click.argument("tx-id", type=int)
 @click.pass_context
 def await_tx(ctx: click.Context, transaction_id: int):
     client: XTDBClient = ctx.obj["client"]
 
 
 @cli.command
-@click.option(type=click.DateTime)  # todo: find out how this exactly works
+@click.option("tx-time", type=click.DateTime())  # todo: find out how this exactly works
 @click.pass_context
 def await_tx_time(
     ctx: click.Context, transaction_time: datetime.datetime | None = None
@@ -297,7 +297,7 @@ def tx_log_docs(ctx: click.Context):
 
 
 @cli.command
-@click.argument(nargs=-1)
+@click.argument("txs", nargs=-1)
 @click.pass_context
 def submit_tx(ctx: click.Context, transactions):
     client: XTDBClient = ctx.obj["client"]
@@ -306,7 +306,7 @@ def submit_tx(ctx: click.Context, transactions):
 
 
 @cli.command
-@click.argument(type=int)
+@click.argument("tx-id", type=int)
 @click.pass_context
 def tx_committed(ctx: click.Context, transaction_id: int) -> None:
     client: XTDBClient = ctx.obj["client"]
