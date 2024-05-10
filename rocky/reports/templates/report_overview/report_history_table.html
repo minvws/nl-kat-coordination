@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load ooi_extra %}
 
 <section>
     <div>
@@ -46,12 +47,12 @@
                                 <td colspan="7">
                                     <ul class="accordion break-title">
                                         <li>
-                                            <button type="button" aria-expanded="false">{{ child.id }}</button>
+                                            <button type="button" aria-expanded="false">{{ child.report_id }}</button>
                                             <div aria-labelledby="child-report-details">
                                                 <h5>{% translate "Report type" %}</h5>
                                                 <p>{{ child.report_type }}</p>
                                                 <h5>{% translate "Object" %}</h5>
-                                                <p>{{ child.inout_ooi }}</p>
+                                                <p>{{ child.input_ooi|human_readable }}</p>
                                                 <h5>{% translate "Reference date" %}</h5>
                                                 <p>{{ child.observed_at }}</p>
                                                 <h5>{% translate "Creation date" %}</h5>
