@@ -42,27 +42,29 @@
                             <td>{{ report.0.observed_at }}</td>
                             <td>{{ report.0.date_generated }}</td>
                         </tr>
-                        {% for child in report.1 %}
+                        {% if report.1 %}
                             <tr class="expando-row">
                                 <td colspan="7">
                                     <ul class="accordion break-title">
-                                        <li>
-                                            <button type="button" aria-expanded="false">{{ child.report_id }}</button>
-                                            <div aria-labelledby="child-report-details">
-                                                <h5>{% translate "Report type" %}</h5>
-                                                <p>{{ child.report_type }}</p>
-                                                <h5>{% translate "Object" %}</h5>
-                                                <p>{{ child.input_ooi|human_readable }}</p>
-                                                <h5>{% translate "Reference date" %}</h5>
-                                                <p>{{ child.observed_at }}</p>
-                                                <h5>{% translate "Creation date" %}</h5>
-                                                <p>{{ child.date_generated }}</p>
-                                            </div>
-                                        </li>
+                                        {% for child in report.1 %}
+                                            <li>
+                                                <button type="button" aria-expanded="false">{{ child.report_type }} of {{ child.input_ooi|human_readable }}</button>
+                                                <div aria-labelledby="child-report-details">
+                                                    <h5>{% translate "Report type" %}</h5>
+                                                    <p>{{ child.report_type }}</p>
+                                                    <h5>{% translate "Object" %}</h5>
+                                                    <p>{{ child.input_ooi|human_readable }}</p>
+                                                    <h5>{% translate "Reference date" %}</h5>
+                                                    <p>{{ child.observed_at }}</p>
+                                                    <h5>{% translate "Creation date" %}</h5>
+                                                    <p>{{ child.date_generated }}</p>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
                                     </ul>
                                 </td>
                             </tr>
-                        {% endfor %}
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
