@@ -4,17 +4,17 @@ on:
   workflow_dispatch: {}
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
-      - 'boefjes/images/masscan/Dockerfile'
-      - '.github/workflows/masscan_container_image.yml'
+      - "boefjes/images/masscan/Dockerfile"
+      - ".github/workflows/masscan_container_image.yml"
   pull_request:
     paths:
-      - 'boefjes/images/masscan/Dockerfile'
-      - '.github/workflows/masscan_container_image.yml'
+      - "boefjes/images/masscan/Dockerfile"
+      - ".github/workflows/masscan_container_image.yml"
 
 env:
   REGISTRY: ghcr.io
