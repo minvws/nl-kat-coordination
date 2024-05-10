@@ -252,7 +252,8 @@ class OctopoesAPIConnector:
             "limit": limit,
         }
         res = self.session.get(f"/{self.client}/reports", params=params)
-        return TypeAdapter(Paginated[Report]).validate_json(res.content)
+
+        return TypeAdapter(Paginated[tuple[Report, list[Report | None]]]).validate_json(res.content)
 
     def load_objects_bulk(self, references: set[Reference], valid_time):
         params = {

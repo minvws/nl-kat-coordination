@@ -32,7 +32,7 @@ from octopoes.repositories.repository import Repository
 from octopoes.xtdb import Datamodel, FieldSet, ForeignKey
 from octopoes.xtdb.client import OperationType as XTDBOperationType
 from octopoes.xtdb.client import XTDBSession
-from octopoes.xtdb.query import Query
+from octopoes.xtdb.query import Aliased, Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
@@ -732,7 +732,21 @@ class XTDBOOIRepository(OOIRepository):
             items=[x[0] for x in self.query(finding_query, valid_time)],
         )
 
-    def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
+    def simplify_keys(self, data):
+        new_data = {}
+        for key, value in data.items():
+            if isinstance(value, list):
+                new_data[key.split("/")[-1]] = [
+                    self.simplify_keys(item) if isinstance(item, dict) else item for item in value
+                ]
+            elif isinstance(value, dict):
+                new_data[key.split("/")[-1]] = self.simplify_keys(value)
+            else:
+                new_key = key.split("/")[-1] if key.startswith("Report/") else key
+                new_data[new_key] = value
+        return new_data
+
+    def list_reports(self, valid_time, offset, limit) -> Paginated[tuple[Report, list[Report | None]]]:
         count_query = """
                             {
                                 :query {
@@ -747,23 +761,28 @@ class XTDBOOIRepository(OOIRepository):
         if count_results and count_results[0]:
             count = count_results[0][0]
 
-        report_query = f"""
-                            {{
-                                :query {{
-                                    :find [(pull ?report [*]) ?date_generated]
-                                    :where [[?report :object_type "Report"]
-                                        [?report :Report/has_parent false]
-                                        [?report :Report/date_generated ?date_generated]]
-                                :order-by [[?date_generated :desc]]
-                                :limit {limit}
-                                :offset {offset}
-                                }}
-                            }}
-                        """
+        date = Aliased(Report, field="date_generated")
+        query = (
+            Query(Report)
+            .pull(Report, fields="[* {:Report/_parent_report [*]}]")
+            .find(date)
+            .where(Report, has_parent=False, date_generated=date)
+            .order_by(date)
+            .limit(limit)
+            .offset(offset)
+        )
 
-        results = self.query(report_query, valid_time)
+        results = self.session.client.query(query)
 
-        results = [x[0] for x in results]
+        results = [
+            (
+                self.simplify_keys(x[0]),
+                [self.simplify_keys(y) for y in x[0]["Report/_parent_report"]]
+                if "Report/_parent_report" in x[0]
+                else [],
+            )
+            for x in results
+        ]
 
         return Paginated(
             count=count,

@@ -449,7 +449,7 @@ def list_reports(
     limit=DEFAULT_LIMIT,
     octopoes: OctopoesService = Depends(octopoes_service),
     valid_time: datetime = Depends(extract_valid_time),
-) -> Paginated[Report]:
+) -> Paginated[tuple[Report, list[Report | None]]]:
     res = octopoes.ooi_repository.list_reports(
         valid_time,
         offset,
