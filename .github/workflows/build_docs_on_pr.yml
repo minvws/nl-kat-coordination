@@ -13,14 +13,13 @@ jobs:
   build-artifact:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout code
         uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11
-          cache: 'pip' # caching pip dependencies
+          cache: "pip" # caching pip dependencies
 
       - name: Install pip dependencies
         run: pip install -r requirements.txt
@@ -32,4 +31,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "github-pages-no-deploy"
-          path: 'docs/_build'
+          path: "docs/_build"

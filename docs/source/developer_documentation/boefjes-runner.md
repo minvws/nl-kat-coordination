@@ -37,6 +37,7 @@ manifest with a well-known name and predefined format, such as JSON, or add
 multiple annotations for each metadata attribute.
 
 The essential metadata includes:
+
 - Name
 - Version
 - Description
@@ -91,60 +92,56 @@ The input is a JSON object, specified by the following JSON schema:
 
 ```json
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://openkat.nl/boefje_input.schema.json",
-    "title": "Boefje input",
-    "properties": {
-        "task_id": {
-            "type": "string"
-        },
-        "output_url": {
-            "type": "string"
-        },
-        "boefje_meta": {
-            "type": "object",
-            "properties": {
-                "boefje": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "string"
-                        },
-                        "version": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "input_ooi": {
-                    "type": "string"
-                },
-                "arguments": {
-                    "type": "object"
-                },
-                "organization": {
-                    "type": "string"
-                },
-                "environment": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                }
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openkat.nl/boefje_input.schema.json",
+  "title": "Boefje input",
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "output_url": {
+      "type": "string"
+    },
+    "boefje_meta": {
+      "type": "object",
+      "properties": {
+        "boefje": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
             }
+          }
         },
-        "required": [
-            "boefje",
-            "input_ooi",
-            "arguments",
-            "organization",
-            "environment"
-        ]
+        "input_ooi": {
+          "type": "string"
+        },
+        "arguments": {
+          "type": "object"
+        },
+        "organization": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
     },
     "required": [
-        "task_id",
-        "output_url",
-        "boefje_meta"
+      "boefje",
+      "input_ooi",
+      "arguments",
+      "organization",
+      "environment"
     ]
+  },
+  "required": ["task_id", "output_url", "boefje_meta"]
 }
 ```
 
@@ -156,38 +153,38 @@ JSON schema:
 
 ```json
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://openkat.nl/boefje_output.schema.json",
-    "title": "Boefje output",
-    "properties": {
-        "status": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openkat.nl/boefje_output.schema.json",
+  "title": "Boefje output",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["COMPLETED", "FAILED"]
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "content": {
             "type": "string",
-            "enum": ["COMPLETED", "FAILED"]
-        },
-        "files": {
+            "contentEncoding": "base64"
+          },
+          "tags": {
             "type": "array",
             "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "content": {
-                        "type": "string",
-                        "contentEncoding": "base64"
-                    },
-                    "tags": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "required": ["content"]
+              "type": "string"
             }
-        }
-    },
-    "required": ["status"]
+          }
+        },
+        "required": ["content"]
+      }
+    }
+  },
+  "required": ["status"]
 }
 ```
 
@@ -207,6 +204,7 @@ Docker containers can be run as one-off jobs by creating a container, polling
 its status on a regular interval, and removing it when it is finished.
 
 An official, well-maintained Python API is available:
+
 - https://pypi.org/project/docker/
 - https://docker-py.readthedocs.io/en/stable/
 - https://github.com/docker/docker-py
@@ -223,6 +221,7 @@ These Jobs can be created through the Kubernetes API, and their status can be
 polled (pull-based) or watched (push-based) through the API as well.
 
 An official, well-maintained Python API is available:
+
 - https://pypi.org/project/kubernetes/
 - https://github.com/kubernetes-client/python
 
@@ -236,16 +235,19 @@ details.
 ### Nomad
 
 Nomad can run one-off jobs by setting the job type to 'batch':
+
 - https://developer.hashicorp.com/nomad/docs/job-specification/job#type
 - https://developer.hashicorp.com/nomad/docs/schedulers#batch
 
 An unofficial Python API is available:
+
 - https://pypi.org/project/python-nomad/
 - https://github.com/jrxfive/python-nomad
 
 Logging can be captured [through the API][nomad-logs-api],
 but Nomad does not retain logs for long periods of time. From
 https://developer.hashicorp.com/nomad/tutorials/manage-jobs/jobs-accessing-logs:
+
 > While the logs command works well for quickly accessing application logs, it
 > generally does not scale to large systems or systems that produce a lot of log
 > output, especially for the long-term storage of logs. Nomad's retention of log
@@ -259,22 +261,27 @@ https://developer.hashicorp.com/nomad/tutorials/manage-jobs/jobs-accessing-logs:
 The approach to building OCI images from the boefjes we currently have in our
 system has been discussed in [this ticket][ticket], with the first versions
 having been implemented in these PRs:
+
 - https://github.com/minvws/nl-kat-coordination/pull/2709
 - https://github.com/minvws/nl-kat-coordination/pull/2832
 
-
 #### Summary of decisions
+
 We decided not to focus on the following:
+
 - We are **not** going to provide plain zip archives in the near future.
 - Discoverability of images from external repositories (potentially containing
   multiple boefjes) will be pushed to later versions of OpenKAT.
 
 In terms of how we are going to build images, we decided to:
+
 - Just leverage Docker as this has to be available for OpenKAT devs anyway.
 - Aim to keep the build scripts flexible but simple, e.g. for `kat_dnssec` we have:
+
 ```
 docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-sec --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dnssec .
 ```
+
 - Use, as shown above, the [naming convention][dockerfile-naming] for Dockerfiles
   since we may want to add normaliser Dockerfiles in the same directory.
 - Use a Python base image for all our boefjes, so we can use shared Python code to
@@ -285,19 +292,17 @@ docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-se
   sizes per base image, but Alpine [does not support standard PyPI wheels][wheels]:
 
 | python:3.11 | python:3.11-slim | python:3.11-alpine |
-|-------------|------------------|--------------------|
+| ----------- | ---------------- | ------------------ |
 | 1.01 GB     | 157 MB           | 57 MB              |
 
-
 In terms of when to build images, we decided to:
+
 - Make the builds part of the installation script through `make -C boefjes images`.
 - Put the responsibility to (re)build new images while developing boefjes on developers.
-
 
 [ticket]: https://github.com/minvws/nl-kat-coordination/issues/2443
 [dockerfile-naming]: https://docs.docker.com/build/building/packaging/#filename
 [wheels]: https://pythonspeed.com/articles/alpine-docker-python/
-
 
 ## Limitations
 
@@ -308,6 +313,7 @@ consider that to ensure the implementation is as simple as possible. It can be
 added to the runner in the future, but will also require changes to the KAT
 scheduler to support scheduling batched tasks. Also see the following issues
 and discussions to see the progress on this (performance) feature:
+
 - https://github.com/minvws/nl-kat-coordination/issues/2613
 - https://github.com/minvws/nl-kat-coordination/issues/2857
 - https://github.com/minvws/nl-kat-coordination/issues/2811
