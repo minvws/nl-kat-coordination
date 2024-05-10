@@ -187,7 +187,7 @@ def iparse(instructions):
 
 
 @click.group
-@click.option("--debug/--no-debug", type=bool, default=False, help="Verbose output")
+@click.option("--debug/--no-debug", default=False, help="Verbose output")
 @click.option("--timeout", type=int, default=5000, help="XTDB request timeout (in ms)")
 @click.option(
     "--base-url", default="http://localhost:3000", help="XTDB server base url"
