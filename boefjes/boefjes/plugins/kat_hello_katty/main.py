@@ -19,11 +19,11 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     cats = "😺" * amount_of_cats
     greeting = f"{MESSAGE}{cats}!!!"
 
-    raw = json.dumps({
+    raw_data = json.dumps({
         "address": address,
         "greeting": greeting
     })
 
     return [
-        (set(), raw)
+        (set(), raw_data)
     ]
