@@ -16,9 +16,9 @@ def is_ipv4(string: str) -> bool:
         return False
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(normalizer_meta: NormalizerMeta, raw: bytes) -> Iterable[OOI]:
     """Function that gets ran to produce OOIs from the boefje it consumes"""
-
+    # TODO: ask if raw is always of type bytes
     data_string = str(raw, "utf-8")
     data: dict = json.loads(data_string)
 

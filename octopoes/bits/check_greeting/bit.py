@@ -1,4 +1,4 @@
-from bits.definitions import BitDefinition, BitParameterDefinition
+from bits.definitions import BitDefinition
 from octopoes.models.ooi.greeting import Greeting
 
 BIT = BitDefinition(
