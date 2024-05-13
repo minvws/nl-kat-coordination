@@ -767,7 +767,7 @@ class XTDBOOIRepository(OOIRepository):
             .pull(Report, fields="[* {:Report/_parent_report [*]}]")
             .find(date)
             .where(Report, has_parent=False, date_generated=date)
-            .order_by(date)
+            .order_by(date, ascending=False)
             .limit(limit)
             .offset(offset)
         )
