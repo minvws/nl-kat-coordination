@@ -4,6 +4,7 @@ from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.greeting import Greeting
 
+
 def run(
     input_ooi: Greeting,
     additional_oois: list,
