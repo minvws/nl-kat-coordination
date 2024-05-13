@@ -15,13 +15,15 @@ def is_ipv4(string: str) -> bool:
     except (AddressValueError, NetmaskValueError, ValueError) as e:
         return False
 
+
 def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    """Function that gets ran to produce OOIs from the boefje it consumes"""   
-    
+    """Function that gets ran to produce OOIs from the boefje it consumes"""
+
     data_string = str(raw, "utf-8")
     data: dict = json.loads(data_string)
-    
-    network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
+
+    network = Network(
+        name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
     yield network
 
     ip = None
@@ -29,6 +31,6 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         ip = IPAddressV4(network=network.reference, address=data["address"])
     else:
         ip = IPAddressV6(network=network.reference, address=data["address"])
-        
+
     yield ip
     yield Greeting(address=ip.reference, greeting=data["greeting"])
