@@ -1,5 +1,4 @@
 services:
-
   rabbitmq:
     restart: on-failure
     image: "docker.io/library/rabbitmq:3.12-management"
@@ -7,7 +6,7 @@ services:
       - "127.0.0.1:29003:15672"
       - "127.0.0.1:29004:5672"
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 4
     env_file:
@@ -46,7 +45,7 @@ services:
     env_file:
       - ".ci/ci.env"
     ports:
-        - "127.0.0.1:29000:80"
+      - "127.0.0.1:29000:80"
 
   ci_octopoes_api_worker:
     build:

@@ -23,7 +23,7 @@ services:
     env_file:
       - .ci/.env.test
     volumes:
-    - .:/app/bytes
+      - .:/app/bytes
 
   ci_bytes:
     build:
@@ -47,7 +47,7 @@ services:
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 4
 

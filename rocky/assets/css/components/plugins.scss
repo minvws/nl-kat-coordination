@@ -2,7 +2,6 @@ $boefje-bg: #275937;
 $bit-bg: #42145f;
 $normalizer-bg: #e17000;
 
-
 .tiles {
   &.tiles {
     img {
@@ -10,15 +9,14 @@ $normalizer-bg: #e17000;
       object-position: center;
       height: 15rem;
     }
-
   }
 
   /* Tile */
-  >div {
+  > div {
     position: relative;
 
     /* interaction */
-    >.nota-bene {
+    > .nota-bene {
       display: none;
     }
 
@@ -35,7 +33,7 @@ $normalizer-bg: #e17000;
     }
 
     /* Checkbox */
-    >input[type="checkbox"] {
+    > input[type="checkbox"] {
       accent-color: var(--form-accent-color-color, initial);
       cursor: var(--form-checkbox-cursor);
       left: 1rem;
@@ -58,8 +56,6 @@ $normalizer-bg: #e17000;
       top: 1rem;
       width: auto;
     }
-
-
 
     &.boefje {
       .tile-label {
@@ -87,9 +83,8 @@ $normalizer-bg: #e17000;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: .5rem;
+    gap: 0.5rem;
     font-size: var(--tile-font-size);
-
   }
 
   .tile-detail-link {
@@ -113,7 +108,6 @@ $normalizer-bg: #e17000;
 
       &.plugin-disabled:hover {
         border-color: var(--color-alert-negative);
-
       }
     }
   }

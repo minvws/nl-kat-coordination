@@ -24,7 +24,7 @@ this is handled by the following parameter in the "main.py" file
 
 Nuclei outputs the following OOIs:
 
-|OOI type|Description|
-|---|---|
-|CveFindingType|Returns CVE's found on the target hostnames|
-|Finding|Finding|
+| OOI type       | Description                                 |
+| -------------- | ------------------------------------------- |
+| CveFindingType | Returns CVE's found on the target hostnames |
+| Finding        | Finding                                     |

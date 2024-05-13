@@ -3,10 +3,10 @@ name: Debian packages
 on:
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
   pull_request:
 
 jobs:
@@ -15,34 +15,34 @@ jobs:
     outputs:
       packages: ${{ steps.filter.outputs.changes }}
     steps:
-    - uses: dorny/paths-filter@v3
-      if: github.event_name != 'push'
-      id: filter
-      with:
-        filters: |
-          boefjes:
-            - 'boefjes/**'
-            - 'octopoes/**'
-            - '.github/workflows/debian_package.yml'
-          bytes:
-            - 'bytes/**'
-            - '.github/workflows/debian_package.yml'
-          cveapi:
-            - 'cveapi/**'
-            - '.github/workflows/debian_package.yml'
-          keiko:
-            - 'keiko/**'
-            - '.github/workflows/debian_package.yml'
-          mula:
-            - 'mula/**'
-            - '.github/workflows/debian_package.yml'
-          octopoes:
-            - 'octopoes/**'
-            - '.github/workflows/debian_package.yml'
-          rocky:
-            - 'rocky/**'
-            - 'octopoes/**'
-            - '.github/workflows/debian_package.yml'
+      - uses: dorny/paths-filter@v3
+        if: github.event_name != 'push'
+        id: filter
+        with:
+          filters: |
+            boefjes:
+              - 'boefjes/**'
+              - 'octopoes/**'
+              - '.github/workflows/debian_package.yml'
+            bytes:
+              - 'bytes/**'
+              - '.github/workflows/debian_package.yml'
+            cveapi:
+              - 'cveapi/**'
+              - '.github/workflows/debian_package.yml'
+            keiko:
+              - 'keiko/**'
+              - '.github/workflows/debian_package.yml'
+            mula:
+              - 'mula/**'
+              - '.github/workflows/debian_package.yml'
+            octopoes:
+              - 'octopoes/**'
+              - '.github/workflows/debian_package.yml'
+            rocky:
+              - 'rocky/**'
+              - 'octopoes/**'
+              - '.github/workflows/debian_package.yml'
 
   build:
     needs: changes

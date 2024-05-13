@@ -5,25 +5,28 @@ Octopoes is KAT's knowledge-graph. It stores the knowledge KAT has gathered abou
 ## Instructions
 
 Install dependencies
+
 ```bash
 python3 -m pip install -r requirements.txt
 ```
 
 ### Run Octopoes API
+
 ```bash
 python3 -m uvicorn octopoes.api.api:app [--port 8000]
 ```
 
 ### Run the event processor
+
 ```bash
 python3 -m celery -A octopoes.tasks.tasks worker -B -s /tmp/celerybeat-schedule --loglevel=WARNING
 ```
+
 _Note: The `-B` flag instructs celery start the Celery Beat scheduler in the same process_
 _Note: The `-s` flag is used to specify the beat schedule location and should be writeable by the user the process runs in_
 
-
-
 ## Healthcheck
+
 ```bash
 # Return XTDB connection info
 curl http://localhost:8000/_dev/health
@@ -34,28 +37,31 @@ curl http://localhost:8000/_dev/objects
 curl http://localhost:8000/clientx/healthcheck
 ```
 
-
 ## OOI
-The domain of discourse, on which Octopoes operates, is described by the OOI datamodel. The OOI (Object of Interest) model is described by entities and relations between them. The OOI model is currently defined in Octopoes itself (module `octopoes.model.ooi`). However, it is planned to be defined in the Openkat schema registries, decoupling the applicable domain from the logic.
 
+The domain of discourse, on which Octopoes operates, is described by the OOI datamodel. The OOI (Object of Interest) model is described by entities and relations between them. The OOI model is currently defined in Octopoes itself (module `octopoes.model.ooi`). However, it is planned to be defined in the Openkat schema registries, decoupling the applicable domain from the logic.
 
 ## Origin
 
 Each OOI must have an origin to exist in the knowledge-graph. Origins can be supplied to Octopoes in 3 ways:
+
 - origin through declaration
 - origin through observation
 - origin through inference
 
 Each origin consists of:
+
 - the identifier of the origin-method
 - a source OOI
 - a set of result OOIs
 - additional metadata. E.g. the task-ID that made the observation
 
 ## Origin through declaration
+
 An OOI is declared to exist by a user of KAT.
 
 _In this case, OOI B is both source and result_
+
 ```{mermaid}
 flowchart RL
 
@@ -70,10 +76,13 @@ D-.result.- result
 ```
 
 ## Origin through observation
+
 An observation is reported by a normalizer
+
 - An observation has a key that identifies the normalizer
 - An observation always has a source OOI
 - An observation always has a (possibly empty) set of result OOIs
+
 ```{mermaid}
 flowchart LR
 
@@ -91,6 +100,7 @@ O-.result.- outp
 ```
 
 ## Origin through inference
+
 An object is inferred from other objects in the knowledge-graph. This is achieved by rules, declared in bits. A bit is a rule that is applied to a pattern in the knowledge-graph.
 
 ```{mermaid}
@@ -115,12 +125,13 @@ BIT-.result.- result
 
 ```
 
-
 ## Graph mutations
+
 Mutations can only be made by supplying an origin to Octopoes. This can be an origin through declaration, or origin through
 observation. When, after an origin-update, an OOI is no longer referenced by any origin. The OOI will be deleted from the knowledge-graph.
 
-*Example:* observation O has result B and C
+_Example:_ observation O has result B and C
+
 ```{mermaid}
 flowchart LR
 
@@ -138,6 +149,7 @@ O-.result.- result
 
 After a mutation, observation O has result B.
 C is no longer referenced, and is deleted from the knowledge-graph.
+
 ```{mermaid}
 flowchart LR
 
@@ -161,6 +173,7 @@ classDef someclass fill:#f96, color:#000, stroke:#000;
 If C had been referenced by another origin, it would not have been deleted.
 
 _OOI C is not deleted, since it's still referenced by Observation P_
+
 ```{mermaid}
 flowchart LR
 
@@ -188,6 +201,7 @@ P-.result.- result2
 ```
 
 ## Code Architecture
+
 In high level, the code architecture is as follows:
 
 - _Origin gets reported to the API_
@@ -196,6 +210,7 @@ In high level, the code architecture is as follows:
 - _Data layer sends out a mutation event_
 - _Listener catches the mutation event_
 - _Listener calls service layer to process mutation_
+
 ```{mermaid}
 flowchart LR
 
@@ -215,6 +230,7 @@ EventManager --> Listener
 ```
 
 ### Sequence: save_origin
+
 ```{mermaid}
 sequenceDiagram
 
@@ -243,7 +259,9 @@ OOIRepository ->- OctopoesService: #nbsp
 OctopoesService ->- API: #nbsp
 API ->- Client: #nbsp
 ```
+
 ### Sequence: process update ooi
+
 ```{mermaid}
 sequenceDiagram
 
@@ -265,12 +283,13 @@ Listener ->>- EventManager: #nbsp
 ```
 
 ## XTDB
-[XTDB](https://xtdb.com) is the central database of OOIs within KAT. XTDB is a graph-database that can store objects (schemalessly), while providing object history and audit-trail functionality out-of-the-box. The term *bitemporal* means it tracks every object on 2 time axis: valid-time and transaction-time.
 
-- Valid-time means the state of an object at a certain time *X* (mutable).
-- Transaction-time means the state of an object with all transactions-processed until time *Y* (immutable)
+[XTDB](https://xtdb.com) is the central database of OOIs within KAT. XTDB is a graph-database that can store objects (schemalessly), while providing object history and audit-trail functionality out-of-the-box. The term _bitemporal_ means it tracks every object on 2 time axis: valid-time and transaction-time.
 
-This is especially useful for forensics-type queries like: What was the state of an object at time *X (valid-time)*, with the information we had at time *Y (transaction-time)*.
+- Valid-time means the state of an object at a certain time _X_ (mutable).
+- Transaction-time means the state of an object with all transactions-processed until time _Y_ (immutable)
+
+This is especially useful for forensics-type queries like: What was the state of an object at time _X (valid-time)_, with the information we had at time _Y (transaction-time)_.
 
 Good to know: XTDB tracks the history of each object by its **primary key**.
 
@@ -285,6 +304,7 @@ Because all OOIs are stored in XTDB and XTDB tracks object history by primary ke
 The main advantage of this method, is that when enough attributes of an OOI are discovered, the primary key of this object is known. This allows reasoning about the exact same objects in several subsystems, without having to query a database.
 
 Consider this (oversimplified) Person class
+
 ```python
 from octopoes.models import OOI
 
@@ -305,13 +325,14 @@ john = Person(name='John', last_name='Doe', age=42)
 john.natural_key # 'John/Doe'
 john.primary_key # 'Person/John/Doe'
 ```
-*Note that the primary key consists of the natural key prefixed by the OOI-type, to avoid PK collisions*
+
+_Note that the primary key consists of the natural key prefixed by the OOI-type, to avoid PK collisions_
 
 ## Relationships
 
 OOIs can be related to each other. At time of writing the OOI data structure looks like this:
 
-*Directional arrows indicate a foreign key pointing to referred object*
+_Directional arrows indicate a foreign key pointing to referred object_
 ![KAT Data Structure](img/kat_data_structure.png "KAT Data Structure")
 
 In a one-to-many relationship (`A 1-* B`), the relationship is stored in B (**B points to A**). For example, an IP-address belongs to a Network. So the Network primary key is stored as a foreign key in the IP-address object.
@@ -337,6 +358,7 @@ class IpAddressV6(OOI):
 Even though foreign keys are actually simple strings, for ease of use these strings are represented in Octopoes by a special `Reference` object.
 
 OOIRefs can be obtained in several ways.
+
 ```python
 from octopoes.models import Reference
 from octopoes.models.ooi.network import Network, IPAddressV6
@@ -353,6 +375,7 @@ ip = IPAddressV6(network=internet_ref, address='2001:db8::1')
 ```
 
 Since an OOIRef is a compound key, individual parts of the foreign key can be retrieved by the `parsed` property.
+
 ```python
 from octopoes.models import Reference
 
@@ -362,9 +385,8 @@ ref.tokenized.protocol # 'tcp'
 ref.tokenized.port # '5050'
 ref.tokenized.address.address # '2001:db8::1'
 ```
+
 ![KAT Ref Example](img/kat_ref_example.png "KAT Ref Example")
-
-
 
 ## Octopoes API
 
@@ -377,12 +399,12 @@ It provides several methods for doing CRUD operations for the objects/entities.
 
 In particular, for querying objects we have:
 
--  `OctopoesAPIConnector.list_objects()` to filter on OOIs `type`, `scan_level`, `scan_profile_type` and `valid_time`.
+- `OctopoesAPIConnector.list_objects()` to filter on OOIs `type`, `scan_level`, `scan_profile_type` and `valid_time`.
 
 This is used for example in the object overview page. Returns a paginated list of OOIs.
 
--  `OctopoesAPIConnector.get_tree()` to filter out neighbouring OOIs starting from a root OOI (`reference`) in
-   the object graph.
+- `OctopoesAPIConnector.get_tree()` to filter out neighbouring OOIs starting from a root OOI (`reference`) in
+  the object graph.
 
 The graph is traversed until a specified `depth` is reached, filtering on `types` and `valid_time`.
 Returns a `ReferenceTree`: a tree-like structure of OOIs representing a subgraph of the objects graph.
@@ -391,20 +413,20 @@ nodes in the tree to avoid cycles. Because of the duplication the structure incl
 present in the tree, the `ReferenceTree.store`, for convenience. Unsurprisingly, this method is used for rendering
 object-graphs.
 
--  `OctopoesAPIConnector.list_origins()` to filter on `valid_time`, `source`, `result`, `task_id`and `origin_type`.
+- `OctopoesAPIConnector.list_origins()` to filter on `valid_time`, `source`, `result`, `task_id`and `origin_type`.
 
 Due to the `task_id` filter, this allows users to connect OOIs to the most recent normalizer task
 that found these OOIs. This is used to find the original boefje task and raw data that "proofs" the existence of the
 OOIs. Returns a list of Origins.
 
--  `OctopoesAPIConnector.list_findings()` to filter Findings on `valid_time`, `severities`, `exclude_muted`,
-   `only_muted`, `offset`, `limit`.
+- `OctopoesAPIConnector.list_findings()` to filter Findings on `valid_time`, `severities`, `exclude_muted`,
+  `only_muted`, `offset`, `limit`.
 
 This method offers some Finding-specific filters for convenience on Finding pages.
 Returns a paginated list of Findings.
 
-
 ## Abstract classes / subclassing
+
 Relationships from an OOI class to another OOI class are inferred through its property types. It is
 possible to define a relationship to an abstract class.
 
@@ -442,24 +464,27 @@ OctopoesAPIConnector('http://octopoes', '_dev').list_objects({IPAddress})
 ```
 
 ## Querying
+
 Octopoes API uses the OOI model to construct XTDB queries. For complex graph-querying, XTDB's [pull-syntax](https://v1-docs.xtdb.com/language-reference/1.24.3/datalog-queries/#pull) is used to build a query tree. XTDB can join objects to properties which hold (lists of) foreign keys.
 
-Imagine a query "Give me IpAddressV4 with primary key ***X*** and all related objects **2** levels deep".
+Imagine a query "Give me IpAddressV4 with primary key **_X_** and all related objects **2** levels deep".
 
 What happens under the hood:
-  - A relation map is created with all OOI classes and their relations
-  - A query plan is created by traversing the relation map 2 levels deep. The queryplan is a tree of QueryNode objects
-  - The query plan is transformed into a XTDB Datalog query, utilizing its pull syntax to join related objects
 
+- A relation map is created with all OOI classes and their relations
+- A query plan is created by traversing the relation map 2 levels deep. The queryplan is a tree of QueryNode objects
+- The query plan is transformed into a XTDB Datalog query, utilizing its pull syntax to join related objects
 
 **Rules**:
 A few rules come into play when planning the query.
+
 - Relations are not traversed back through the previous relation. E.g.:
   `IpAddressV4 -> IpPort -> IpAddressV4`
 - Leaf nodes are OOI classes that have too many relations to effectively traverse if they are not the starting node. Currently these are `Network`, `Finding` and `Job`
 
 **Query Plan Visualization:**
 The OOI class tree is traversed 2 levels deep. Bear in mind that both Finding and Job can be related to any OOI, so the following paths are valid:
+
 ```
 - IpAddressV4 -> Finding
 - IpAddressV4 -> Job
@@ -503,6 +528,7 @@ $ docker compose exec octopoes_api ./tools/run_bit.py ORGANIZATION_CODE BIT_ID O
 ## Tests
 
 The unit tests `octopoes/tests` are run using
+
 ```bash
 python -m unittest discover octopoes/tests
 ```

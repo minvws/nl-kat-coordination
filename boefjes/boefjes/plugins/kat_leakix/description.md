@@ -11,12 +11,12 @@ LeakIX expects an IpAddress as input.
 
 LeakIX currently outputs the following OOIs:
 
-|OOI type|Description|
-|---|---|
-|IpPort|Open IpPort found on input OOI|
-|Software|Known software behind IpPort, sometimes with software version|
-|CveFindingType|Known vulnerability of software behind IpPort|
-|Finding|Finding|
+| OOI type       | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| IpPort         | Open IpPort found on input OOI                                |
+| Software       | Known software behind IpPort, sometimes with software version |
+| CveFindingType | Known vulnerability of software behind IpPort                 |
+| Finding        | Finding                                                       |
 
 ### Running Boefje
 
@@ -29,9 +29,7 @@ LeakIX currently outputs the following OOIs:
     "pk": "IpAddressV4|internet|1.1.1.1"
   },
   "dispatches": {
-    "normalizers": [
-      "kat_leakix.normalize"
-    ],
+    "normalizers": ["kat_leakix.normalize"],
     "boefjes": []
   }
 }
