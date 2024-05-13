@@ -98,12 +98,11 @@
 
 span {
   &.label {
-    display:inline-flex;
-    max-width:18.75rem;
-    border-radius:var(--spacing-grid-050);
-    padding:var(--spacing-grid-050) var(--spacing-grid-100);
+    display: inline-flex;
+    max-width: 18.75rem;
+    border-radius: var(--spacing-grid-050);
+    padding: var(--spacing-grid-050) var(--spacing-grid-100);
     font-size: var(--tile-font-size);
-    font-weight:var( --list-item-completed-font-weight);
+    font-weight: var(--list-item-completed-font-weight);
   }
-
 }
