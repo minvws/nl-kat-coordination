@@ -7,25 +7,11 @@ from logging import getLogger
 from operator import itemgetter
 from typing import Any
 
-from fastapi import (
-    APIRouter,
-    Body,
-    Depends,
-    HTTPException,
-    Path,
-    Query,
-    Request,
-    status,
-)
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
 from httpx import HTTPError
 from pydantic import AwareDatetime
 
-from octopoes.api.models import (
-    ServiceHealth,
-    ValidatedAffirmation,
-    ValidatedDeclaration,
-    ValidatedObservation,
-)
+from octopoes.api.models import ServiceHealth, ValidatedAffirmation, ValidatedDeclaration, ValidatedObservation
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
     DEFAULT_OFFSET,
@@ -36,14 +22,7 @@ from octopoes.config.settings import (
 )
 from octopoes.core.app import bootstrap_octopoes, get_xtdb_client
 from octopoes.core.service import OctopoesService
-from octopoes.models import (
-    OOI,
-    Reference,
-    ScanLevel,
-    ScanProfile,
-    ScanProfileBase,
-    ScanProfileType,
-)
+from octopoes.models import OOI, Reference, ScanLevel, ScanProfile, ScanProfileBase, ScanProfileType
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.explanation import InheritanceSection
 from octopoes.models.ooi.findings import Finding, RiskLevelSeverity
@@ -54,7 +33,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBSession, Operation, OperationType
+from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
 from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
@@ -144,9 +123,7 @@ def list_objects(
     offset: int = 0,
     limit: int = 20,
 ):
-    return octopoes.list_ooi(
-        types, valid_time, offset, limit, scan_level, scan_profile_type
-    )
+    return octopoes.list_ooi(types, valid_time, offset, limit, scan_level, scan_profile_type)
 
 
 @router.get("/query", tags=["Objects"])
@@ -162,9 +139,7 @@ def query(
     xtdb_query = XTDBQuery.from_path(object_path).offset(offset).limit(limit)
 
     if source is not None and object_path.segments:
-        xtdb_query = xtdb_query.where(
-            object_path.segments[0].source_type, primary_key=str(source)
-        )
+        xtdb_query = xtdb_query.where(object_path.segments[0].source_type, primary_key=str(source))
 
     return octopoes.ooi_repository.query(xtdb_query, valid_time)
 
@@ -209,14 +184,10 @@ def query_many(
         object_path.segments[0].source_type, primary_key=sources
     )
 
-    if (
-        q._find_clauses
-    ):  # Path contained a target field, so no need to pull the result type
+    if q._find_clauses:  # Path contained a target field, so no need to pull the result type
         return octopoes.ooi_repository.query(q.find(source_alias, index=0), valid_time)
 
-    return octopoes.ooi_repository.query(
-        q.find(source_alias, index=0).pull(q.result_type), valid_time
-    )
+    return octopoes.ooi_repository.query(q.find(source_alias, index=0).pull(q.result_type), valid_time)
 
 
 @router.post("/objects/load_bulk", tags=["Objects"])
@@ -389,9 +360,7 @@ def list_scan_profiles(
     valid_time: datetime = Depends(extract_valid_time),
     scan_profile_type: str | None = Query(None),
 ) -> list[ScanProfileBase]:
-    return octopoes.scan_profile_repository.list_scan_profiles(
-        scan_profile_type, valid_time
-    )
+    return octopoes.scan_profile_repository.list_scan_profiles(scan_profile_type, valid_time)
 
 
 @router.put("/scan_profiles", tags=["Scan Profiles"])
@@ -401,9 +370,7 @@ def save_scan_profile(
     valid_time: datetime = Depends(extract_valid_time),
 ) -> None:
     try:
-        old_scan_profile = octopoes.scan_profile_repository.get(
-            scan_profile.reference, valid_time
-        )
+        old_scan_profile = octopoes.scan_profile_repository.get(scan_profile.reference, valid_time)
     except ObjectNotFoundException:
         old_scan_profile = None
 
@@ -419,15 +386,11 @@ def save_many(
 ) -> None:
     for scan_profile in scan_profiles:
         try:
-            old_scan_profile = octopoes.scan_profile_repository.get(
-                scan_profile.reference, valid_time
-            )
+            old_scan_profile = octopoes.scan_profile_repository.get(scan_profile.reference, valid_time)
         except ObjectNotFoundException:
             old_scan_profile = None
 
-        octopoes.scan_profile_repository.save(
-            old_scan_profile, scan_profile, valid_time
-        )
+        octopoes.scan_profile_repository.save(old_scan_profile, scan_profile, valid_time)
 
     octopoes.commit()
 
@@ -529,16 +492,12 @@ def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
     return xtdb_session_.client.export_transactions()
 
 
-def importer(
-    data: bytes, xtdb_session_: XTDBSession, reset: bool = False
-) -> dict[str, int]:
+def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> dict[str, int]:
     try:
         ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
     except Exception as e:
         logger.debug("Error parsing objects", exc_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Error parsing objects"
-        ) from e
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error parsing objects") from e
     if reset:
         try:
             xtdb_session_.client.delete_node()
@@ -570,9 +529,7 @@ def importer(
 
 
 @router.post("/io/import/add", tags=["io"])
-async def importer_add(
-    request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)
-) -> dict[str, int]:
+async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
         data = await request.body()
     except Exception as e:
@@ -584,9 +541,7 @@ async def importer_add(
 
 
 @router.post("/io/import/new", tags=["io"])
-async def importer_new(
-    request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)
-) -> dict[str, int]:
+async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
     try:
         data = await request.body()
     except Exception as e:

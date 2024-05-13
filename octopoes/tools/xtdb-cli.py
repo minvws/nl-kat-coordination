@@ -20,29 +20,23 @@ class XTDBClient:
 
         return res.json()
 
-    def query(
-        self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}"
-    ) -> Any:
-        res = self._client.post(
-            "/query", content=query, headers={"Content-Type": "application/edn"}
-        )
+    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> Any:
+        res = self._client.post("/query", content=query, headers={"Content-Type": "application/edn"})
 
         return res.json()
 
     def entity(self, key: str):
-        res = self._client.get(f"/entity", params={"eid": key})
+        res = self._client.get("/entity", params={"eid": key})
 
         return res.json()
 
     def history(self, key: str) -> Any:
-        res = self._client.get(
-            f"/entity", params={"eid": key, "history": True, "sortOrder": "asc"}
-        )
+        res = self._client.get("/entity", params={"eid": key, "history": True, "sortOrder": "asc"})
 
         return res.json()
 
     def entity_tx(self, key: str) -> Any:
-        res = self._client.get(f"/entity-tx", params={"eid": key})
+        res = self._client.get("/entity-tx", params={"eid": key})
 
         return res.json()
 
@@ -57,7 +51,7 @@ class XTDBClient:
         return res.json()
 
     def await_tx(self, transaction_id: int) -> Any:
-        res = self._client.get(f"/await-tx", params={"txId": transaction_id})
+        res = self._client.get("/await-tx", params={"txId": transaction_id})
 
         return res.json()
 
@@ -65,7 +59,7 @@ class XTDBClient:
         if transaction_time is None:
             transaction_time = datetime.datetime.now().isoformat()
 
-        res = self._client.get(f"/await-tx-time", params={"tx-time": transaction_time})
+        res = self._client.get("/await-tx-time", params={"tx-time": transaction_time})
 
         return res.json()
 
@@ -85,7 +79,7 @@ class XTDBClient:
         return res.json()
 
     def tx_committed(self, txid: int) -> Any:
-        res = self._client.get(f"/tx-committed", params={"txId": txid})
+        res = self._client.get("/tx-committed", params={"txId": txid})
 
         return res.json()
 
@@ -118,9 +112,7 @@ def dispatch(xtdb, instruction):
         case "list-keys":
             return xtdb.query()
         case "list-values":
-            return xtdb.query(
-                "{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}"
-            )
+            return xtdb.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}")
         case "submit-tx":
             if instruction:
                 return xtdb.submit_tx(instruction)
@@ -176,23 +168,15 @@ OpenKAT https://openkat.nl/.
 
 
 def iparse(instructions):
-    idxs = [idx for idx, key in enumerate(instructions) if key in KEYWORDS] + [
-        len(instructions)
-    ]
-    return [
-        instructions[i:j]
-        for i, j in zip(idxs, idxs[1:] + idxs[:1])
-        if instructions[i:j]
-    ]
+    idxs = [idx for idx, key in enumerate(instructions) if key in KEYWORDS] + [len(instructions)]
+    return [instructions[i:j] for i, j in zip(idxs, idxs[1:] + idxs[:1]) if instructions[i:j]]
 
 
 @click.group
 @click.option("--debug/--no-debug", default=False, help="Verbose output")
 @click.option("--timeout", type=int, default=5000, help="XTDB request timeout (in ms)")
-@click.option(
-    "--base-url", default="http://localhost:3000", help="XTDB server base url"
-)
-@click.option("node", default="0", help="XTDB node")
+@click.option("--node", default="0", help="XTDB node")
+@click.option("--base-url", default="http://localhost:3000", help="XTDB server base url")
 @click.pass_context
 def cli(ctx: click.Context, base_url: str, node: str, timeout: int, debug: bool):
     client = XTDBClient(base_url, node, timeout)
@@ -210,7 +194,7 @@ def status(ctx: click.Context):
 
 
 @cli.command
-@click.argument
+@click.argument("query")
 @click.pass_context
 def query(ctx: click.Context, query: str):
     client: XTDBClient = ctx.obj["client"]
@@ -219,7 +203,7 @@ def query(ctx: click.Context, query: str):
 
 
 @cli.command
-@click.argument
+@click.argument("key")
 @click.pass_context
 def entity(ctx: click.Context, key: str):
     client: XTDBClient = ctx.obj["client"]
@@ -228,7 +212,7 @@ def entity(ctx: click.Context, key: str):
 
 
 @cli.command
-@click.argument
+@click.argument("key")
 @click.pass_context
 def history(ctx: click.Context, key: str):
     client: XTDBClient = ctx.obj["client"]
@@ -237,7 +221,7 @@ def history(ctx: click.Context, key: str):
 
 
 @cli.command
-@click.argument
+@click.argument("key")
 @click.pass_context
 def entity_tx(ctx: click.Context, key: str):
     client: XTDBClient = ctx.obj["client"]
@@ -272,9 +256,7 @@ def await_tx(ctx: click.Context, transaction_id: int):
 @cli.command
 @click.option("tx-time", type=click.DateTime())  # todo: find out how this exactly works
 @click.pass_context
-def await_tx_time(
-    ctx: click.Context, transaction_time: datetime.datetime | None = None
-):
+def await_tx_time(ctx: click.Context, transaction_time: datetime.datetime | None = None):
     client: XTDBClient = ctx.obj["client"]
 
     click.echo(client.await_tx_time(transaction_time))
