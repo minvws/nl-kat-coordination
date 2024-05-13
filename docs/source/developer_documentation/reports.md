@@ -31,9 +31,8 @@ class YourNameReport(Report):
 8.	Save your changes and refresh the page to see the changes you made immediately.
 
 ### Collecting data
-There are two ways to collect data:
-- Create a method called `collect_data` and use the `self.octopoes_api_connector.query_many()` method to data for multiple OOIs at the same time. This can reduce the number of queries to Octopoes, which is better for report performance.
-- Create a method called `generate_data`. This method is the old way of receiving the data from Octopoes. It is less efficient and therefore should only be used with `self.octopoes_api_connector.get_tree()` to collect data from a tree.
+Data collection happens in the `collect_data` method that the report class should implement. Using the `self.octopoes_api_connector.query_many()` method data for multiple OOIs can be requested in one call. This is better for performance and is the preferred way to fetch data. Methods such as  `self.octopoes_api_connector.get_tree()` that work on a single OOI should only be used if the multiple OOI methods don't provide the data that is needed.
+The `generate_data` method only works on single OOIs and should not be used in new reports. As soon as the existing reports that implement `generate_data` have been moved over to `collect_data` support for `generate_data` will be removed.
 
 Use all existing reports as examples to gather data for your report.
 - In the file `rocky/reports/report_types/definitions.py` you can find some methods that may  be useful.
@@ -50,7 +49,7 @@ Unit tests validate whether the output of your newly created report matches the 
     - Single value returned from the Octopoes query.
     - Multiple values returned from the Octopoes query.
 3.	Write the test within this function. The unit test consist out of multiple parts:
-    - **Mocking data:**  Add mocked data to `rocky/tests/conftest.py`. Adding `@pytest.fixture` above the function makes it callable from within your test. Make sure to return a value. In your test file, define the mocked data. Call the `mock_octopoes_api_connector` and tell him which input should return which output.
+    - **Mocking data:**  Add mocked data to `rocky/tests/conftest.py`  as pytest fixture uses `@pytest.fixture`. Pytest fixtures are automatically injected if you add the name of the fixture as an argument to the test function. Make sure to return a value in the fixture. In your test file, define the mocked data. Set the `oois`, `queries` and/or `tree` attributes of the  `mock_octopoes_api_connector` with the Octopoes output that the mock should return.
     - **Collecting data:** Create a variable for your report and call the data collection method with the necessary parameters.
     - **Checking data:** Compare collected data with expected results, verifying various details to prevent failures.
 
