@@ -62,6 +62,13 @@
         "console"
       ],
       "propagate": 0
+    },
+    "httpx": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
     }
   }
 }

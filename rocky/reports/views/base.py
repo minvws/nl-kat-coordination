@@ -39,7 +39,7 @@ logger = getLogger(__name__)
 
 
 class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
-    current_step: int = 1
+    breadcrumbs_step: int = 1
 
     def get_kwargs(self):
         return {"organization_code": self.organization.code}
@@ -58,16 +58,19 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return breadcrumbs
 
     def get_current(self):
-        return self.build_breadcrumbs()[: self.current_step]
+        return self.build_breadcrumbs()[: self.breadcrumbs_step]
 
     def get_previous(self):
-        return self.build_breadcrumbs()[self.current_step - 2]["url"]
+        breadcrumbs = self.build_breadcrumbs()
+        if self.breadcrumbs_step >= 2:
+            return self.build_breadcrumbs()[self.breadcrumbs_step - 2]["url"]
+        return breadcrumbs[self.breadcrumbs_step]["url"]
 
     def get_next(self):
         breadcrumbs = self.build_breadcrumbs()
-        if self.current_step < len(breadcrumbs):
-            return breadcrumbs[self.current_step]["url"]
-        return breadcrumbs[self.current_step - 1]["url"]
+        if self.breadcrumbs_step < len(breadcrumbs):
+            return breadcrumbs[self.breadcrumbs_step]["url"]
+        return breadcrumbs[self.breadcrumbs_step - 1]["url"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -110,13 +113,19 @@ class BaseReportView(OOIFilterView):
     def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
-                sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]), self.request.GET
+                sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]),
+                self.request.GET,
             )
         }
 
     def get_report_types_for_generate_report(self, reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
         return [
-            {"id": report_type.id, "name": report_type.name, "description": report_type.description}
+            {
+                "id": report_type.id,
+                "name": report_type.name,
+                "description": report_type.description,
+                "label_style": report_type.label_style,
+            }
             for report_type in reports
         ]
 
@@ -162,7 +171,12 @@ class BaseReportView(OOIFilterView):
 
     def get_report_types(self) -> list[ReportType]:
         return [
-            {"id": report_type.id, "name": report_type.name, "description": report_type.description}
+            {
+                "id": report_type.id,
+                "name": report_type.name,
+                "description": report_type.description,
+                "label_style": report_type.label_style,
+            }
             for report_type in self.get_report_types_from_choice()
         ]
 

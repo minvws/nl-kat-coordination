@@ -17,8 +17,8 @@ jobs:
   build-packages:
     strategy:
       matrix:
-        dist: [ ubuntu ]
-        package: [ bytes, boefjes, rocky, keiko, octopoes, mula ]
+        dist: [ubuntu]
+        package: [bytes, boefjes, rocky, keiko, octopoes, mula]
     runs-on: ubuntu-latest
 
     steps:
@@ -61,10 +61,10 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-22.04 ]
+        os: [ubuntu-22.04]
 
     env:
-      PGPASSWORD: postgres  # No password prompt
+      PGPASSWORD: postgres # No password prompt
 
     steps:
       - uses: actions/checkout@v4
@@ -256,7 +256,7 @@ jobs:
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.10"
           cache: pip
 
       - name: Install Robot Framework

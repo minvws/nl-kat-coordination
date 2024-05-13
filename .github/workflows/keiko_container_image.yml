@@ -3,10 +3,10 @@ name: Keiko Create container image
 on:
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
       - keiko/**
       - .github/workflows/keiko_container_image.yml

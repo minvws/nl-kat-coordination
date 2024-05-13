@@ -24,14 +24,15 @@ class DNSReport(Report):
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
         ref = Reference.from_str(input_ooi)
-        tree = self.octopoes_api_connector.get_tree(ref, valid_time, depth=3, types={DNSRecord, Finding}).store
+        records_tree = self.octopoes_api_connector.get_tree(ref, valid_time, depth=1, types={DNSRecord}).store
+        findings_tree = self.octopoes_api_connector.get_tree(ref, valid_time, depth=3, types={Finding}).store
 
         findings = []
         finding_types: dict[str, dict] = {}
         records = []
         security = {"spf": True, "dkim": True, "dmarc": True, "dnssec": True, "caa": True}
 
-        for ooi_type, ooi in tree.items():
+        for ooi_type, ooi in findings_tree.items():
             if isinstance(ooi, Finding):
                 for check in ["caa", "dkim", "dmarc", "dnssec", "spf"]:
                     if "NO-%s" % check.upper() in ooi.finding_type.tokenized.id:
@@ -44,7 +45,8 @@ class DNSReport(Report):
                     "KAT-NAMESERVER-NO-TWO-IPV6",
                 ):
                     findings.append(ooi)
-            elif isinstance(ooi, DNSRecord):
+        for ooi_type, ooi in records_tree.items():
+            if isinstance(ooi, DNSRecord):
                 records.append(
                     {
                         "type": ooi.dns_record_type,

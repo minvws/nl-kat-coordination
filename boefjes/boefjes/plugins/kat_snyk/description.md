@@ -12,6 +12,6 @@ Snyk expects an Software as input.
 
 Snyk currently outputs the following OOIs:
 
-|OOI type|Description|
-|---|---|
-|KATFinding|Known vulnerability of software|
+| OOI type   | Description                     |
+| ---------- | ------------------------------- |
+| KATFinding | Known vulnerability of software |

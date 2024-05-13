@@ -9,5 +9,15 @@
   "environment_keys": [
     "TOP_PORTS"
   ],
-  "scan_level": 2
+  "scan_level": 2,
+  "oci_image": "openkat/nmap",
+  "oci_arguments": [
+    "--open",
+    "-T4",
+    "-Pn",
+    "-r",
+    "-v10",
+    "-sV",
+    "-sS"
+  ]
 }

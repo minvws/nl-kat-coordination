@@ -156,7 +156,8 @@ def create_boefje_meta(task, local_repository):
 
     organization = task.p_item.data.organization
     input_ooi = task.p_item.data.input_ooi
-    arguments = {}
+    arguments = {"oci_arguments": boefje_resource.oci_arguments}
+
     if input_ooi:
         reference = Reference.from_str(input_ooi)
         try:

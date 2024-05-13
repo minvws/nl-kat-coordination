@@ -23,7 +23,7 @@ services:
     env_file:
       - .ci/.env.test
     volumes:
-    - .:/app/bytes
+      - .:/app/bytes
 
   ci_bytes:
     build:
@@ -43,15 +43,15 @@ services:
       - .ci/.env.test
 
   ci_rabbitmq:
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 4
 
   ci_bytes-db:
-    image: postgres:15
+    image: docker.io/library/postgres:15
     env_file:
       - .ci/.env.test

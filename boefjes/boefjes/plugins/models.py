@@ -57,7 +57,10 @@ class BoefjeResource:
         self.boefje: Boefje = Boefje.parse_file(path / BOEFJE_DEFINITION_FILE)
         self.boefje.runnable_hash = get_runnable_hash(self.path)
         self.boefje.produces = self.boefje.produces.union(set(_default_mime_types(self.boefje)))
-        self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
+        self.module: Runnable | None = None
+
+        if (path / ENTRYPOINT_BOEFJES).exists():
+            self.module = get_runnable_module_from_package(package, ENTRYPOINT_BOEFJES, parameter_count=1)
 
 
 class NormalizerResource:

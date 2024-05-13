@@ -8,6 +8,11 @@
 
     <main id="main-content" tabindex="-1" class="choose-report">
         {% include "partials/main_navigation.html" %}
+
+        <section>
+            {% include "partials/stepper.html" %}
+
+        </section>
         {% include "partials/report_setup_scan.html" %}
 
     </main>
@@ -15,4 +20,5 @@
 {% block html_at_end_body %}
     {{ block.super }}
     <script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
+    <script src="{% static "js/pluginToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>
 {% endblock html_at_end_body %}

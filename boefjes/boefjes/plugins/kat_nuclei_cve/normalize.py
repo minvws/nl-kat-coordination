@@ -12,7 +12,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         for line in raw.splitlines():
             # Extract and parse values
             data = json.loads(line)
-            id_ = data["info"]["classification"]["cve-id"][0]
+            id_ = data["info"]["classification"]["cve-id"][0].upper()
             description = data["info"]["description"]
             curl_command = data["curl-command"]
 

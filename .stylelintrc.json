@@ -8,6 +8,7 @@
     "color-hex-length": "long",
     "declaration-block-no-redundant-longhand-properties": null,
     "no-descending-specificity": null,
+    "scss/operator-no-newline-after": null,
     "font-family-no-missing-generic-family-keyword": [
       true,
       {

@@ -41,7 +41,6 @@ Now you can pull and start the containers using the following command:
 docker compose --env-file .env-prod -f docker-compose.release-example.yml up -d
 ```
 
-
 The container image run the necessary database migration commands in the
 entrypoint if DATABASE_MIGRATION is set. You manually need to run setup commands
 in the katalogus and rocky containers to initialize everything. In the katalogus
@@ -82,7 +81,6 @@ With docker compose you would run this as:
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py createsuperuser
 ```
 
-
 We also need to create an organisation, this command will create a development organisation:
 
 ```shell
@@ -100,7 +98,7 @@ docker compose --env-file .env-prod -f docker-compose.release-example.yml exec r
 We have two container images that are used to run multiple containers. What the container runs is be specified by overriding the CMD of the container.
 
 | Container image | CMD         | Description                                                                       |
-|-----------------|-------------|-----------------------------------------------------------------------------------|
+| --------------- | ----------- | --------------------------------------------------------------------------------- |
 | boefjes         | boefje      | Boefjes runtime                                                                   |
 | boefjes         | normalizer  | Normalizers runtime                                                               |
 | boefjes         | katalogus   | Katalogus API                                                                     |
@@ -109,6 +107,7 @@ We have two container images that are used to run multiple containers. What the 
 | octopoes        | worker      | Celery worker. Use this if you need to more than one work container for scaling   |
 
 (Upgrading_Containers)=
+
 ## Upgrading
 
 When deploying new container images the database migrations are automatically

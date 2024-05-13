@@ -7,12 +7,13 @@ It can also encrypt the raw data, and hash it to proof that the data was seen be
 
 There are two ways to setup the API.
 
-
 ### With Docker
+
 Bytes can be fired up from the root directory of KAT using docker-compose (check out the README over there!).
 
 To run Bytes as a standalone container, spin up a Postgresql database (e.g. using Docker),
 create the database `bytes` and run
+
 ```shell
 $ docker build . -t bytes
 
@@ -27,28 +28,31 @@ $ docker run --rm -p 8002:8002 -e BYTES_USERNAME=bytes -e BYTES_PASSWORD -e BYTE
 $ docker run --rm -p 8002:8000 --env-file=/path/to/env bytes  # change accordingly!
 ```
 
-
 ### Without Docker
 
 To create and start a Python virtual environment, run
+
 ```shell
 $ python -m venv $PWD/.venv
 $ source .venv/bin/activate
 ```
 
 To install the dependencies, assuming you are in the virtual environment, run
+
 ```shell
 $ pip install -r requirements-dev.txt
 ```
+
 Bytes depends on a Postgresql database that is configurable by the BYTES_DB_URI environment variable.
 See above for a minimal set of environment variables to start Bytes and
 
 To start the API run
+
 ```shell
 $ uvicorn bytes.api:app --host 127.0.0.1 --port 8002 --reload --reload-dir /app/bytes/bytes
 ```
-See http://localhost:8002/docs for the OpenAPI documentation.
 
+See http://localhost:8002/docs for the OpenAPI documentation.
 
 ### Hashing and Encryption
 
@@ -57,12 +61,14 @@ which functions as a 'proof' of it being uploaded at that time.
 These proofs can be uploaded externally (a 3rd party) such that we can verify that this data was saved in the past.
 
 Current implementations are
+
 - `BYTES_EXT_HASH_REPOSITORY="IN_MEMORY"` (just a stub)
 - `BYTES_EXT_HASH_REPOSITORY="PASTEBIN"` (Needs pastebin API development key)
 - `BYTES_EXT_HASH_REPOSITORY="RFC3161"`
 
 For the RFC3161 implementation, see https://www.ietf.org/rfc/rfc3161.txt and https://github.com/trbs/rfc3161ng as a reference.
 To use this implementation, set your environment to
+
 - `BYTES_EXT_HASH_REPOSITORY=RFC3161`
 - `BYTES_RFC3161_PROVIDER="https://freetsa.org/tsr"` (example)
 - `BYTES_RFC3161_CERT_FILE="bytes/timestamping/certificates/freetsa.crt"` (example)
@@ -71,6 +77,7 @@ Adding a new implementation means implementing the `bytes.repositories.hash_repo
 Bind your new implementation in `bytes.timestamping.provider::create_hash_repository`.
 
 The secure-hashing-algorithm can be specified with an env var: `BYTES_HASHING_ALGORITHM="SHA512"`.
+
 ```bash
 BYTES_HASHING_ALGORITHM="SHA512"
 BYTES_EXT_HASH_REPOSITORY="IN_MEMORY"
@@ -79,6 +86,7 @@ BYTES_PASTEBIN_API_DEV_KEY=""
 
 Files in bytes can be saved encrypted to disk,
 the implementation can be set using an env-var, `BYTES_ENCRYPTION_MIDDLEWARE`. The options are:
+
 - `"IDENTITY"`
 - `"NACL_SEALBOX"`
 
@@ -91,13 +99,12 @@ such as the amount of organizations and the amount of raw files per organization
 Another important component to monitor is the disk usage of Bytes.
 It is recommended to install [node exporter](https://prometheus.io/docs/guides/node-exporter/) to keep track of this.
 
-
 ## Design
 
 We now include two levels of design, according to the [C4 model](https://c4model.com/).
 
-
 ### Design: C2 Container level
+
 The overall view of the code is as follows.
 
 ```{mermaid}
@@ -119,6 +126,7 @@ graph
 ```
 
 ### Design: C3 Component level
+
 The overall view of the code is as follows.
 
 ```{mermaid}
@@ -156,53 +164,57 @@ graph LR
 
 This diagram roughly covers the C4 level as well, as this is a small service that can be regarded as one component.
 
-
 ## Development
 
-
 The `Makefile` provides useful targets to use during development. To see the options run
+
 ```shell
 $ make help
 ```
 
 ### Code style and tests
+
 All the code style and linting checks are done by running
+
 ```shell
 $ make check
 ```
 
 The unit and integration tests targets are `utest` and `itest` respectively.
 To run all test, run
+
 ```shell
 $ make test
 ```
+
 To make sure all github actions (checks and tests) pass, run
+
 ```shell
 $ make done
 ```
+
 Ideally, you run this before each commit.
 Passing all the checks and tests in this target should ensure the github actions pass.
 
 ### Migrations
 
 To make a new migration file and run the migration, run
+
 ```shell
 $ make migrations m='Some migration message'
 $ make migrate
 ```
 
-
 ### Export SQL migrations
 
 To export raw SQL from the SQLAlchemy migration files, run the following target
 (for the diff between 0003 and 0004):
+
 ```shell
 $ make sql rev1=0003 rev2=0004 > sql_migrations/0004_change_x_to_y_add_column_z.sql
 ```
 
-
 ## Production
-
 
 ### Performance tuning
 

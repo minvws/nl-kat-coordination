@@ -4,7 +4,7 @@ import re
 import subprocess
 
 
-def run(boefje_meta):
+def run(boefje_meta: dict):
     input_ = boefje_meta["arguments"]["input"]
     domain = input_["name"]
 

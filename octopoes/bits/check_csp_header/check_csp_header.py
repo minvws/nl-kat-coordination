@@ -68,6 +68,11 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, Any]) ->
                 "'data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
             )
 
+        if policy[0] == "script-src" and "'self'" in policy:
+            findings.append(
+                "'self' for `script-src` can be problematic if you host JSONP, Angular or user uploaded files."
+            )
+
         if policy[0].endswith("-uri") and (
             "unsafe-eval" in policy[2:]
             or "unsafe-hashes" in policy[2:]

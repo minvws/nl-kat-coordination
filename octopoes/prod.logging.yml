@@ -3,8 +3,8 @@ disable_existing_loggers: 0
 
 formatters:
   default:
-    format: '%(asctime)s [%(process)d] [%(levelname)s] [%(module)s] %(message)s'
-    datefmt: '[%Y-%m-%d %H:%M:%S %z]'
+    format: "%(asctime)s [%(process)d] [%(levelname)s] [%(module)s] %(message)s"
+    datefmt: "[%Y-%m-%d %H:%M:%S %z]"
 
 handlers:
   console:
@@ -19,8 +19,8 @@ handlers:
     facility: local0
 
 root:
-    level: INFO
-    handlers: [console, syslog]
+  level: INFO
+  handlers: [console, syslog]
 
 loggers:
   uvicorn:

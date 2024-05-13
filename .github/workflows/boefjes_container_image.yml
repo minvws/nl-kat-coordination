@@ -3,10 +3,10 @@ name: Boefjes Create container image
 on:
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
       - boefjes/**
       - octopoes/**

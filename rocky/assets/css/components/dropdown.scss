@@ -18,7 +18,7 @@
     display: flex;
   }
 
-  >ul {
+  > ul {
     padding: 0;
     display: none;
     background-color: #ffffff;
@@ -43,7 +43,7 @@
         padding: 0;
         width: 100%;
 
-        >a {
+        > a {
           align-items: center;
           color: black;
           display: flex;
@@ -86,7 +86,7 @@
         }
 
         &:hover {
-          background-color: #F2F2F2;
+          background-color: #f2f2f2;
         }
       }
     }

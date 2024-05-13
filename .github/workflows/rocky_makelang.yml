@@ -3,10 +3,10 @@ name: Rocky Check if translations are up to date
 on:
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
       - rocky/**
       - .github/workflows/rocky_makelang.yml
@@ -17,7 +17,6 @@ on:
 
 jobs:
   makelang:
-
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

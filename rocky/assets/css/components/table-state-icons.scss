@@ -6,6 +6,26 @@ table td .icon {
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Resetting general table cell notification styles */
+  &.error,
+  &.warning,
+  &.confirmation,
+  &.explanation,
+  &.system {
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    width: unset;
+  }
+
+  &.warning {
+    &::before {
+      content: "\ea06"; // $ti-icon-alert-triangle
+      color: var(--color-alert-warning);
+    }
+  }
+
   &.alert {
     &::before {
       content: "\ea05"; // $ti-alert-circle

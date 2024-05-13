@@ -2,12 +2,12 @@ from collections.abc import Callable
 from concurrent import futures
 from types import SimpleNamespace
 
-import httpx
 import structlog
 from opentelemetry import trace
 
 from scheduler import context, queues, rankers
 from scheduler.connectors import listeners
+from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
     Normalizer,
     NormalizerTask,
@@ -276,7 +276,7 @@ class NormalizerScheduler(Scheduler):
                 self.organisation.id,
                 mime_type,
             )
-        except httpx.HTTPError:
+        except ExternalServiceError:
             self.logger.warning(
                 "Could not get normalizers for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
                 mime_type,
@@ -284,7 +284,6 @@ class NormalizerScheduler(Scheduler):
                 self.organisation.id,
                 self.scheduler_id,
             )
-
             return []
 
         if normalizers is None:
@@ -357,7 +356,10 @@ class NormalizerScheduler(Scheduler):
             raise exc_db
 
         # Is task still running according to the datastore?
-        if task_db is not None and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
+        if task_db is not None and task_db.status not in [
+            TaskStatus.COMPLETED,
+            TaskStatus.FAILED,
+        ]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
                 "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",

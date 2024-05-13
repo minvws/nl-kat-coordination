@@ -6,7 +6,7 @@ from typing import Literal, Union, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from pydantic import AnyUrl
+from pydantic import AnyUrl, JsonValue
 from pydantic.fields import FieldInfo
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -53,24 +53,37 @@ class OOIForm(BaseRockyForm):
             if hasattr(annotation, "__origin__") and annotation.__origin__ == Literal:
                 continue
 
+            # skip scan_profile
+            if name == "scan_profile":
+                continue
+
             if hidden_ooi_fields and name in hidden_ooi_fields:
                 # Hidden ooi fields will have the value of an OOI ID
                 fields[name] = forms.CharField(widget=forms.HiddenInput())
             elif name in get_relations(self.ooi_class):
                 fields[name] = generate_select_ooi_field(
-                    self.api_connector, name, field, get_relations(self.ooi_class)[name], self.initial.get(name, None)
+                    self.api_connector,
+                    name,
+                    field,
+                    get_relations(self.ooi_class)[name],
+                    self.initial.get(name, None),
                 )
             elif annotation in [IPv4Address, IPv6Address]:
                 fields[name] = generate_ip_field(field)
             elif annotation == AnyUrl:
                 fields[name] = generate_url_field(field)
-            elif annotation == dict or annotation == dict[str, str] or annotation == list[str]:
+            elif (
+                annotation == dict
+                or annotation == dict[str, str]
+                or annotation == list[str]
+                or annotation == dict[str, JsonValue]
+            ):
                 fields[name] = forms.JSONField(**default_attrs)
             elif annotation == int or (hasattr(annotation, "__args__") and int in annotation.__args__):
                 fields[name] = forms.IntegerField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, Enum):
                 fields[name] = generate_select_ooi_type(name, annotation, field)
-            elif self.ooi_class == Question and issubclass(annotation, str) and name == "json_schema":
+            elif self.ooi_class == Question and name == "json_schema":
                 fields[name] = forms.CharField(**default_attrs)
             elif isclass(annotation) and issubclass(annotation, str) or optional_type is str:
                 if name in self.ooi_class.__annotations__ and self.ooi_class.__annotations__[name] == dict[str, str]:
@@ -79,6 +92,8 @@ class OOIForm(BaseRockyForm):
                     fields[name] = forms.CharField(
                         max_length=256, **default_attrs, empty_value=None if not field.is_required() else ""
                     )
+            else:
+                fields[name] = forms.CharField(max_length=256, **default_attrs)
 
         return fields
 

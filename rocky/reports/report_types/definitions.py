@@ -24,6 +24,7 @@ class BaseReport:
     name: str
     description: str
     template_path: str = "report.html"
+    label_style = "1-light"  # default/fallback color
 
     def __init__(self, octopoes_api_connector: OctopoesAPIConnector):
         self.octopoes_api_connector = octopoes_api_connector
@@ -53,6 +54,7 @@ class Report(BaseReport):
             "plugins": cls.plugins,
             "input_ooi_types": cls.input_ooi_types,
             "template_path": cls.template_path,
+            "label_style": cls.label_style,
         }
 
     @staticmethod
@@ -152,3 +154,4 @@ class ReportType(TypedDict):
     id: str
     name: str
     description: str
+    label_style: str

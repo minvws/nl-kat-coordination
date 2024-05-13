@@ -57,12 +57,13 @@ def list_plugins(
         plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
 
     # filter plugins by scan level for boefje plugins
-    plugins = filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins)
+    plugins = list(filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins))
+
+    if pagination_params.limit is None:
+        return plugins[pagination_params.offset :]
 
     # paginate plugins
-    plugins = list(plugins)[pagination_params.offset : pagination_params.offset + pagination_params.limit]
-
-    return plugins
+    return plugins[pagination_params.offset : pagination_params.offset + pagination_params.limit]
 
 
 @router.get("/plugins/{plugin_id}", response_model=PluginType)

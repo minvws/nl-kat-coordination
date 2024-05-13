@@ -1,9 +1,9 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: ''
-labels: 'feature'
-assignees: 'underdarknl'
+title: ""
+labels: "feature"
+assignees: "underdarknl"
 ---
 
 _Please add one or more of the following labels to your issue:_
