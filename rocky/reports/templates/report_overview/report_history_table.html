@@ -36,7 +36,7 @@
                                    title="{% translate "Shows report detail" %}">{{ report.0.report_type }}</a>
                             </td>
                             <td>
-                                {% if report.0.input_ooi %}{{ report.0.input_ooi }}{% endif %}
+                                {% if report.0.input_ooi %}{{ report.0.input_ooi|human_readable }}{% endif %}
                             </td>
                             <td>{{ report.0.observed_at }}</td>
                             <td>{{ report.0.date_generated }}</td>
@@ -55,7 +55,7 @@
                             <tr class="expando-row">
                                 <td colspan="7">
                                     <table>
-                                        <caption><strong>{% translate "Selected Input Objects" %}</strong></caption>
+                                        <h5>{% translate "Selected Input Objects" %}</h5>
                                         <thead>
                                             <tr>
                                                 <th scope="col">{% translate "Object name" %}</th>
