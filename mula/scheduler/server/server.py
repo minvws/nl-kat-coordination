@@ -468,7 +468,6 @@ class Server:
                 detail="no data to patch",
             )
 
-        breakpoint()
         try:
             updated_task = task_db.model_copy(update=patch_data)
         except Exception as exc:
