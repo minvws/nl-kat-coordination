@@ -3,29 +3,29 @@
 $breakpoint-filter: 60rem;
 
 form {
-	button,
-	a.button,
-	input[type="button"],
-	input[type="submit"],
-	input[type="reset"] {
-		min-height: 2.75rem;
-	}
+  button,
+  a.button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 2.75rem;
+  }
 
-	.filter-fields-direction {
-		display: flex;
+  .filter-fields-direction {
+    display: flex;
 
-		&.column {
-			flex-direction: column;
-		}
-	}
+    &.column {
+      flex-direction: column;
+    }
+  }
 
-	@media (min-width:$breakpoint-filter) {
-		.filter-fields-direction {
-			&.row {
-				flex-direction: row;
-			}
-		}
-	}
+  @media (min-width: $breakpoint-filter) {
+    .filter-fields-direction {
+      &.row {
+        flex-direction: row;
+      }
+    }
+  }
 }
 
 .indented-form fieldset.indented fieldset {
@@ -33,9 +33,9 @@ form {
 }
 
 .indented-form fieldset div {
-  padding-bottom: .5rem;
+  padding-bottom: 0.5rem;
 }
 
 .indented-form fieldset button {
-  margin-left: .5rem;
+  margin-left: 0.5rem;
 }
