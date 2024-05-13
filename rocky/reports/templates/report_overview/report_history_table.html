@@ -21,12 +21,11 @@
                 <caption class="visually-hidden">{% translate "Reports:" %}</caption>
                 <thead>
                     <tr>
-                        <th scope="col">{% translate "ID" %}</th>
-                        <th scope="col">{% translate "Name" %}</th>
                         <th scope="col">{% translate "Report type" %}</th>
                         <th scope="col">{% translate "Objects" %}</th>
                         <th scope="col">{% translate "Reference date" %}</th>
                         <th scope="col">{% translate "Creation date" %}</th>
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,34 +33,49 @@
                         <tr>
                             <td>
                                 <a href="{% url "view_report" organization.code %}?report_id={{ report.0.reference }}&observed_at={{ report.observed_at|date:"Y-m-d" }}"
-                                   title="{% translate "Shows report detail" %}">{{ report.0.reference }}</a>
+                                   title="{% translate "Shows report detail" %}">{{ report.0.report_type }}</a>
                             </td>
-                            <td>{{ report.0.name }}</td>
-                            <td>{{ report.0.report_type }}</td>
-                            <td>{{ report.0.input_ooi }}</td>
+                            <td>
+                                {% if report.0.input_ooi %}{{ report.0.input_ooi }}{% endif %}
+                            </td>
                             <td>{{ report.0.observed_at }}</td>
                             <td>{{ report.0.date_generated }}</td>
+                            <td>
+                                {% if report.1 %}
+                                    <button type="button"
+                                            class="expando-button icon ti-chevron-down"
+                                            data-icon-open-class="icon ti-chevron-down"
+                                            data-icon-close-class="icon ti-chevron-up"
+                                            data-close-label="Close details"
+                                            aria-expanded="false"></button>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% if report.1 %}
                             <tr class="expando-row">
                                 <td colspan="7">
-                                    <ul class="accordion break-title">
-                                        {% for child in report.1 %}
-                                            <li>
-                                                <button type="button" aria-expanded="false">{{ child.report_type }} of {{ child.input_ooi|human_readable }}</button>
-                                                <div aria-labelledby="child-report-details">
-                                                    <h5>{% translate "Report type" %}</h5>
-                                                    <p>{{ child.report_type }}</p>
-                                                    <h5>{% translate "Object" %}</h5>
-                                                    <p>{{ child.input_ooi|human_readable }}</p>
-                                                    <h5>{% translate "Reference date" %}</h5>
-                                                    <p>{{ child.observed_at }}</p>
-                                                    <h5>{% translate "Creation date" %}</h5>
-                                                    <p>{{ child.date_generated }}</p>
-                                                </div>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
+                                    <table>
+                                        <caption><strong>{% translate "Selected Input Objects" %}</strong></caption>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">{% translate "Object name" %}</th>
+                                                <th scope="col">{% translate "Object type" %}</th>
+                                                <th scope="col">{% translate "Report type" %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for child in report.1 %}
+                                                <tr>
+                                                    <td>{{ child.input_ooi|human_readable }}</td>
+                                                    <td>{{ child.input_ooi.object_type }}</td>
+                                                    <td>
+                                                        <a href="{% url "view_report" organization.code %}?report_id={{ child.reference }}&observed_at={{ child.observed_at|date:"Y-m-d" }}"
+                                                           title="{% translate "Shows report details" %}">{{ child.report_type }}</a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </td>
                             </tr>
                         {% endif %}
