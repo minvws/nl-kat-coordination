@@ -15,8 +15,8 @@ Shodan expects an IpAddress as input.
 
 Shodan currently outputs the following OOIs:
 
-|OOI type|Description|
-|---|---|
-|IpPort|Open IpPort found on input OOI|
-|CveFindingType|Known vulnerability of software behind IpPort|
-|Finding|Finding|
+| OOI type       | Description                                   |
+| -------------- | --------------------------------------------- |
+| IpPort         | Open IpPort found on input OOI                |
+| CveFindingType | Known vulnerability of software behind IpPort |
+| Finding        | Finding                                       |
