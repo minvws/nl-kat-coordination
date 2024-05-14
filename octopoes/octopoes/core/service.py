@@ -1,4 +1,3 @@
-import cProfile
 import json
 import pickle
 from collections import Counter
@@ -47,7 +46,8 @@ from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 logger = getLogger(__name__)
 settings = Settings()
-BIT_CACHE: set[int] = set()
+USE_BIT_CACHE: bool = True
+BIT_CACHE: dict[int, list[OOI]] = {}
 
 
 def bit_cache_key(*args):
@@ -197,7 +197,7 @@ class OctopoesService:
         source = self.ooi_repository.get(origin.source, valid_time)
 
         parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
-        parameters = self.ooi_repository.load_bulk({x.reference for x in parameters_references}, valid_time)
+        parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
         config = {}
         if bit_definition.config_ooi_relation_path is not None:
@@ -205,14 +205,24 @@ class OctopoesService:
             if len(configs) != 0:
                 config = configs[-1].config
 
-        params = list(parameters.values())
-        key = bit_cache_key(bit_definition, source, params, config)
-        if key not in BIT_CACHE:
-            BIT_CACHE.add(key)
+        if USE_BIT_CACHE:
+            key = bit_cache_key(bit_definition, source, parameters, config)
+            if key not in BIT_CACHE:
+                BIT_CACHE[key] = BitRunner(bit_definition).run(source, parameters, config=config)
             try:
                 self.save_origin(
                     origin,
-                    BitRunner(bit_definition).run(source, list(parameters.values()), config=config),
+                    BIT_CACHE[key],
+                    valid_time,
+                )
+            except Exception as e:
+                logger.exception("Error running inference", exc_info=e)
+                return
+        else:
+            try:
+                self.save_origin(
+                    origin,
+                    BitRunner(bit_definition).run(source, parameters, config=config),
                     valid_time,
                 )
             except Exception as e:
@@ -590,8 +600,6 @@ class OctopoesService:
         return inheritance_chain
 
     def recalculate_bits(self) -> int:
-        profiler = cProfile.Profile()
-        profiler.enable()
         valid_time = datetime.now(timezone.utc)
         bit_counter: Counter[str] = Counter()
 
@@ -634,8 +642,6 @@ class OctopoesService:
             self._run_inference(origin, valid_time)
             bit_counter.update({origin.method})
 
-        profiler.disable()
-        profiler.print_stats(sort=2)
         return sum(bit_counter.values())
 
     def commit(self):
