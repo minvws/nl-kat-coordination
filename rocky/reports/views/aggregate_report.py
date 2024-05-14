@@ -154,6 +154,8 @@ class SetupScanAggregateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.report_has_required_plugins():
+            return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
         if self.plugins_enabled():
@@ -172,6 +174,12 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+            )
+
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
 

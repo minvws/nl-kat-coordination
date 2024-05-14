@@ -111,8 +111,8 @@ class ReportTypesSelectionGenerateReportView(
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
-            error_message = _("Select at least one OOI to proceed.")
-            messages.add_message(self.request, messages.ERROR, error_message)
+            messages.error(self.request, _("Select at least one OOI to proceed."))
+            return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -136,6 +136,8 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.report_has_required_plugins():
+            return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
         if self.plugins_enabled():
@@ -152,6 +154,14 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
     breadcrumbs_step = 6
     current_step = 6
     report_types: Sequence[type[Report]]
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+            )
+        return super().get(request, *args, **kwargs)
 
     def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, Any]]]:
         error_reports = []

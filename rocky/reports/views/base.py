@@ -64,6 +64,9 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return breadcrumbs
 
     def get_current(self):
+        return self.breadcrumbs[self.breadcrumbs_step - 2]["url"]
+
+    def get_breadcrumbs(self):
         if self.is_valid_breadcrumbs():
             return self.breadcrumbs[: self.breadcrumbs_step]
         return self.breadcrumbs
@@ -83,7 +86,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = self.get_current()
+        context["breadcrumbs"] = self.get_breadcrumbs()
         context["next"] = self.get_next()
         context["previous"] = self.get_previous()
         return context
@@ -199,11 +202,6 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             self.plugins = {}
             self.all_plugins_enabled = {}
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -213,8 +211,14 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
         return context
 
+    def report_has_required_plugins(self) -> bool:
+        if self.plugins:
+            required_plugins = self.plugins["required"]
+            return required_plugins is not None
+        return False
+
     def plugins_enabled(self) -> bool:
-        if self.all_plugins_enabled and self.all_plugins_enabled:
+        if self.all_plugins_enabled:
             return self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]
         return False
 
