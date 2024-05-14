@@ -6,7 +6,7 @@ from django import http
 from django.forms import Form
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
 from pydantic import ValidationError

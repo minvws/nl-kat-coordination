@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from account.mixins import OrganizationView
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from katalogus.client import get_katalogus
 from tools.view_helpers import Breadcrumb, ObjectsBreadcrumbsMixin
@@ -15,7 +16,7 @@ class ScanListView(ObjectsBreadcrumbsMixin, OrganizationView, TemplateView):
         breadcrumbs = super().build_breadcrumbs()
 
         breadcrumbs.append(
-            {"url": "", "text": "Scans"},
+            {"url": "", "text": _("Scans")},
         )
 
         return breadcrumbs

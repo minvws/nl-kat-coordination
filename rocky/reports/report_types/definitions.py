@@ -24,7 +24,7 @@ class ReportPlugins(TypedDict):
 class BaseReport:
     id: str
     name: StrPromise
-    description: str
+    description: StrPromise
     template_path: str = "report.html"
     label_style = "1-light"  # default/fallback color
 

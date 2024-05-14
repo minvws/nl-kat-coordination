@@ -5,7 +5,7 @@ import tagulous.admin
 from django.contrib import admin, messages
 from django.db.models import JSONField
 from django.forms import widgets
-from django.http import HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect
 
 from rocky.exceptions import RockyError
 from tools.models import Indemnification, OOIInformation, Organization, OrganizationMember, OrganizationTag
@@ -34,14 +34,16 @@ class OOIInformationAdmin(admin.ModelAdmin):
     formfield_overrides = {JSONField: {"widget": JSONInfoWidget}}
 
     # if pk is not readonly, it will create a new record upon editing
-    def get_readonly_fields(self, request, obj=None):
+    def get_readonly_fields(
+        self, request: HttpRequest, obj: OOIInformation | None = None
+    ) -> list[str] | tuple[str, ...]:
         if obj is not None:  # editing an existing object
             if not obj.value:
-                return self.readonly_fields + (
+                return tuple(self.readonly_fields) + (
                     "id",
                     "consult_api",
                 )
-            return self.readonly_fields + ("id",)
+            return tuple(self.readonly_fields) + ("id",)
         return self.readonly_fields
 
 

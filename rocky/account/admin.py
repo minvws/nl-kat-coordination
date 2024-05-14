@@ -10,7 +10,6 @@ User = get_user_model()
 
 @admin.register(User)
 class KATUserAdmin(UserAdmin):
-    model = User
     list_display = (
         "email",
         "is_staff",

@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.http import HttpRequest
 from django.urls.base import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django_stubs_ext import StrPromise
+from django_stubs_ext import StrOrPromise
 
 from octopoes.models.types import OOI_TYPES
 from rocky.scheduler import PrioritizedItem, SchedulerError, client
@@ -77,7 +77,7 @@ def existing_ooi_type(ooi_type: str) -> bool:
 
 
 class Breadcrumb(TypedDict):
-    text: StrPromise
+    text: StrOrPromise
     url: str
 
 

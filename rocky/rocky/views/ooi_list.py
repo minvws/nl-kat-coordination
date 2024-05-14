@@ -8,7 +8,8 @@ from django.contrib import messages
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 from httpx import HTTPError
 from tools.enums import CUSTOM_SCAN_LEVEL
 from tools.forms.ooi import SelectOOIForm
@@ -34,7 +35,7 @@ class PageActions(Enum):
 
 
 class OOIListView(BaseOOIListView, OctopoesView):
-    breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": _("Objects")}]
+    breadcrumbs = [{"url": reverse_lazy("ooi_list"), "text": gettext_lazy("Objects")}]
     template_name = "oois/ooi_list.html"
 
     def get_context_data(self, **kwargs):
@@ -88,10 +89,10 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, status=404, *args, **kwargs)
 
     def _set_scan_profiles(
-        self, selected_oois: list[Reference], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args: Any, **kwargs: Any
+        self, selected_oois: list[str], level: CUSTOM_SCAN_LEVEL, request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse:
         try:
-            self.raise_clearance_levels(selected_oois, level.value)
+            self.raise_clearance_levels([Reference.from_str(ooi) for ooi in selected_oois], level.value)
         except IndemnificationNotPresentException:
             messages.add_message(
                 self.request,
@@ -154,7 +155,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
         return self.get(request, *args, **kwargs)
 
     def _set_oois_to_inherit(
-        self, selected_oois: list[Reference], request: HttpRequest, *args: Any, **kwargs: Any
+        self, selected_oois: list[str], request: HttpRequest, *args: Any, **kwargs: Any
     ) -> HttpResponse:
         scan_profiles = [EmptyScanProfile(reference=Reference.from_str(ooi)) for ooi in selected_oois]
 
@@ -182,14 +183,12 @@ class OOIListView(BaseOOIListView, OctopoesView):
         )
         return self.get(request, *args, **kwargs)
 
-    def _delete_oois(
-        self, selected_oois: list[Reference], request: HttpRequest, *args: Any, **kwargs: Any
-    ) -> HttpResponse:
+    def _delete_oois(self, selected_oois: list[str], request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         connector = self.octopoes_api_connector
         valid_time = datetime.now(timezone.utc)
 
         try:
-            connector.delete_many(selected_oois, valid_time)
+            connector.delete_many([Reference.from_ooi(ooi) for ooi in selected_oois], valid_time)
         except (HTTPError, RemoteException, ConnectionError):
             messages.add_message(request, messages.ERROR, _("An error occurred while deleting oois."))
             return self.get(request, status=500, *args, **kwargs)

@@ -50,19 +50,21 @@ class OOIDetailView(
             )
             return self.get(request, status_code=403, *args, **kwargs)
 
-        if "action" not in self.request.POST:
+        action = self.request.POST.get("action")
+        if not action:
             return self.get(request, status_code=404, *args, **kwargs)
 
         self.ooi = self.get_ooi()
 
-        action = self.request.POST.get("action")
         return self.handle_page_action(action)
 
     def handle_page_action(self, action: str) -> HttpResponse:
         try:
             if action == PageActions.CHANGE_CLEARANCE_LEVEL.value:
-                clearance_level = int(self.request.POST.get("level"))
-                if not self.can_raise_clearance_level(self.ooi, clearance_level):
+                clearance_level = self.request.POST.get("level")
+                if clearance_level is None:
+                    raise ValueError("Missing boefje_id parameter")
+                if not self.can_raise_clearance_level(self.ooi, int(clearance_level)):
                     return redirect("account_detail", organization_code=self.organization.code)
                 return self.get(self.request, *self.args, **self.kwargs)
 
@@ -72,7 +74,11 @@ class OOIDetailView(
 
             if action == PageActions.START_SCAN.value:
                 boefje_id = self.request.POST.get("boefje_id")
+                if boefje_id is None:
+                    raise ValueError("Missing boefje_id parameter")
                 ooi_id = self.request.GET.get("ooi_id")
+                if ooi_id is None:
+                    raise ValueError("Missing boefje_id parameter")
 
                 boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
                 ooi = self.get_single_ooi(pk=ooi_id)
@@ -85,6 +91,8 @@ class OOIDetailView(
                     return self.get(self.request, status_code=500, *self.args, **self.kwargs)
 
                 schema_answer = self.request.POST.get("schema")
+                if schema_answer is None:
+                    raise ValueError("Missing schema parameter")
                 parsed_schema_answer = json.loads(schema_answer)
                 validator = Draft202012Validator(json.loads(self.ooi.json_schema))
 

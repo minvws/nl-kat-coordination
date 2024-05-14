@@ -179,7 +179,7 @@ class MembersUploadView(OrganizationPermissionRequiredMixin, OrganizationView, F
                     )
                 except KeyError:
                     messages.add_message(self.request, messages.ERROR, _("The csv file is missing required columns"))
-                    return redirect("organization_member_upload", self.organization.code)
+                    return
 
                 try:
                     with transaction.atomic():

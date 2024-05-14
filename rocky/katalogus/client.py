@@ -1,5 +1,6 @@
 from io import BytesIO
 from logging import getLogger
+from typing import TYPE_CHECKING
 
 import httpx
 from django.conf import settings
@@ -8,7 +9,10 @@ from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_serializer
 from tools.enums import SCAN_LEVEL
-from tools.models import OrganizationMember
+
+if TYPE_CHECKING:
+    # This prevents circurlar import
+    from tools.models import OrganizationMember
 
 from octopoes.models import OOI
 from octopoes.models.exception import TypeNotFound
@@ -35,7 +39,7 @@ class Plugin(BaseModel):
     #     """Pydantic does not stringify the OOI classes, but then templates can't render them"""
     #     # todo: use field_serializer instead
 
-    def can_scan(self, member: OrganizationMember) -> bool:
+    def can_scan(self, member: "OrganizationMember") -> bool:
         return member.has_perm("tools.can_scan_organization")
 
 
@@ -51,7 +55,7 @@ class Boefje(Plugin):
     def serialize_consumes(self, consumes: set[type[OOI]]) -> set[str]:
         return {ooi_class.get_ooi_type() for ooi_class in consumes}
 
-    def can_scan(self, member: OrganizationMember) -> bool:
+    def can_scan(self, member: "OrganizationMember") -> bool:
         return super().can_scan(member) and member.acknowledged_clearance_level >= self.scan_level.value
 
 

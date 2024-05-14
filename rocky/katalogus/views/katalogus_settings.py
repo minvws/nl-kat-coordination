@@ -87,7 +87,7 @@ class KATalogusSettingsView(OrganizationPermissionRequiredMixin, OrganizationVie
                 messages.add_message(
                     self.request,
                     messages.ERROR,
-                    _("Failed getting settings for boefje {}").format(self.plugin.id),
+                    _("Failed getting settings for boefje {}").format(boefje.id),
                 )
                 continue
 

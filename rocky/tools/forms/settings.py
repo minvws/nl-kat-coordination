@@ -1,10 +1,9 @@
-from typing import Any
-
 from django.utils.translation import gettext_lazy as _
+from django_stubs_ext import StrPromise
 
 from tools.enums import SCAN_LEVEL
 
-Choice = tuple[Any, str]
+Choice = tuple[str, StrPromise]
 Choices = list[Choice]
 ChoicesGroup = tuple[str, Choices]
 ChoicesGroups = list[ChoicesGroup]

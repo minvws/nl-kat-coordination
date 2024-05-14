@@ -104,7 +104,7 @@ class CheckboxGroup(forms.CheckboxSelectMultiple):
         super().__init__(*args, **kwargs)
         self.required_options = required_options or []
 
-    def get_context(self, name: str, value: Any, attrs: dict) -> dict[str, Any] | None:
+    def get_context(self, name: str, value: Any, attrs: dict[str, Any] | None) -> dict[str, Any]:
         context = super().get_context(name, value, attrs)
         return context
 

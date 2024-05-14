@@ -83,6 +83,8 @@ class PluginDetailView(PluginSettingsListView, TemplateView):
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
+            if not task_id:
+                raise ValueError("Missing task_id value")
             reschedule_task(self.request, self.organization.code, task_id)
 
     def get_context_data(self, **kwargs):

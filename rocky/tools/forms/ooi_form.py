@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from enum import Enum
 from inspect import isclass
 from ipaddress import IPv4Address, IPv6Address
-from typing import Any, Literal, Union, get_args, get_origin
+from typing import Any, Literal, TypedDict, Union, get_args, get_origin
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -39,7 +39,7 @@ class OOIForm(BaseRockyForm):
         self,
         hidden_ooi_fields: dict[str, str] | None = None,
     ) -> dict[str, forms.fields.Field]:
-        fields = {}
+        fields: dict[str, forms.fields.Field] = {}
         for name, field in self.ooi_class.model_fields.items():
             annotation = field.annotation
             default_attrs = default_field_options(name, field)
@@ -156,7 +156,12 @@ def generate_url_field(field: FieldInfo) -> forms.fields.Field:
     return field
 
 
-def default_field_options(name: str, field_info: FieldInfo) -> dict[str, str | bool]:
+class DefaultFieldOptions(TypedDict):
+    label: str
+    required: bool
+
+
+def default_field_options(name: str, field_info: FieldInfo) -> DefaultFieldOptions:
     return {
         "label": name,
         "required": field_info.is_required(),

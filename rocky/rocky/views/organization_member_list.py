@@ -38,7 +38,7 @@ class OrganizationMemberListView(
         queryset = self.model.objects.filter(organization=self.organization)
         if "client_status" in self.request.GET:
             status_filter = self.request.GET.getlist("client_status", [])
-            queryset = [member for member in queryset if member.status in status_filter]
+            queryset = queryset.filter(status__in=status_filter)
 
         if "blocked_status" in self.request.GET:
             blocked_filter = self.request.GET.getlist("blocked_status", [])
@@ -51,7 +51,7 @@ class OrganizationMemberListView(
                 if filter_option == "unblocked":
                     blocked_filter_bools.append(False)
 
-            queryset = [member for member in queryset if member.blocked in blocked_filter_bools]
+            queryset = queryset.filter(blocked__in=blocked_filter_bools)
         return queryset
 
     def setup(self, request, *args, **kwargs):
