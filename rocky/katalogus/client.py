@@ -248,7 +248,7 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
     )
 
 
-def parse_plugin(plugin: dict) -> Boefje | Normalizer:
+def parse_plugin(plugin: dict) -> Plugin:
     if plugin["type"] == "boefje":
         return parse_boefje(plugin)
     elif plugin["type"] == "normalizer":
