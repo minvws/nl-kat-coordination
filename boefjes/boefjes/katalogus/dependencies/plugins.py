@@ -75,7 +75,17 @@ class PluginService:
         raise KeyError(f"Plugin {plugin_id} not found for {organisation_id}")
 
     def by_plugin_ids(self, plugin_ids: list[str], organisation_id: str) -> list[PluginType]:
-        return [self.by_plugin_id(plugin_id, organisation_id) for plugin_id in plugin_ids]
+        all_plugins = self.get_all(organisation_id)
+        plugin_dict: dict[str, PluginType] = {plugin.id: plugin for plugin in all_plugins}
+
+        found_plugins = []
+        for plugin_id in plugin_ids:
+            if plugin_id in plugin_dict:
+                found_plugins.append(plugin_dict[plugin_id])
+            else:
+                raise KeyError(f"Plugin {plugin_id} not found for {organisation_id}")
+
+        return found_plugins
 
     def get_all_settings(self, organisation_id: str, plugin_id: str):
         return self.settings_storage.get_all(organisation_id, plugin_id)
