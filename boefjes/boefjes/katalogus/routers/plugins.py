@@ -39,7 +39,7 @@ def list_plugins(
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> list[PluginType]:
     with plugin_service as p:
-        if filter_params.ids is not None:
+        if filter_params.ids:
             try:
                 plugins = p.by_plugin_ids(filter_params.ids, organisation_id)
             except KeyError:
