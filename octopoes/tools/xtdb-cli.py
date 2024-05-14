@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 @click.group
-@click.option("-n", "--node", default="0", help='XTDB node (default "0")')
-@click.option("-u", "--url", default="http://localhost:3000", help="XTDB server base url")
-@click.option("-t", "--timeout", type=int, default=5000, help="XTDB request timeout (in ms)")
+@click.option("-n", "--node", default="0", show_default=True, help="XTDB node")
+@click.option("-u", "--url", default="http://localhost:3000", show_default=True, help="XTDB server base url")
+@click.option("-t", "--timeout", type=int, default=5000, show_default=True, help="XTDB request timeout (in ms)")
 @click.option("-v", count=True, help="Increase the verbosity level")
 @click.pass_context
 def cli(ctx: click.Context, url: str, node: str, timeout: int, v: int):
