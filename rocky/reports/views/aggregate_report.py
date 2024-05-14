@@ -175,6 +175,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
                 "data": {
                     "report_data": report_data,
                     "post_processed_data": post_processed_data,
+                    "report_name": aggregate_report.name,
                 },
             }
 

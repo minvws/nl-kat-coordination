@@ -57,7 +57,7 @@ def get_report_types_for_oois(ooi_pks: list[str]) -> set[type[Report]]:
     return {report for ooi_pk in ooi_pks for report in get_report_types_for_ooi(ooi_pk)}
 
 
-def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport]:
+def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport] | type[AggregateReport]:
     """
     Get report type by id
     """

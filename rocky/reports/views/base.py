@@ -309,6 +309,7 @@ class ViewReportView(BaseReportView, TemplateView):
                         self.bytes_client.get_raw(raw_id=report.data_raw_id)
                     ),
                     "template": report.template,
+                    "report_name": get_report_by_id(report.report_type).name,
                 }
             context["report_data"] = report_data
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
@@ -325,6 +326,7 @@ class ViewReportView(BaseReportView, TemplateView):
                 ),
                 "template": self.report_ooi.template,
                 "ooi_human_readable": human_readable,
+                "report_name": get_report_by_id(self.report_ooi.report_type).name,
             }
             context["report_data"] = report_data
 
