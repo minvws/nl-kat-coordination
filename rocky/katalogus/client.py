@@ -77,7 +77,7 @@ class KATalogusHTTPStatusError(KATalogusError):
         status_message = ""
         if status_code is not None:
             status_message = f"{status_code}: "
-        self.message = _(status_message + "A HTTP error occurred. Check logs for more info.")
+        self.message = status_message + _("A HTTP error occurred. Check logs for more info.")
 
 
 class KATalogusClientV1:
