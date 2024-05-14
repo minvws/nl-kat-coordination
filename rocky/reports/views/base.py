@@ -3,7 +3,6 @@ from logging import getLogger
 from operator import attrgetter
 from typing import Any, Literal, cast
 
-import httpx
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.forms import Form
@@ -13,7 +12,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from katalogus.client import Plugin, get_katalogus
+from katalogus.client import KATalogusError, Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI
@@ -166,10 +165,11 @@ class ReportTypeView(BaseSelectionView):
                 report_types.append(report)
             except ValueError:
                 error_message = _("Report type '%s' does not exist.") % report_type
-                messages.add_message(self.request, messages.ERROR, error_message)
+                messages.error(self.request, error_message)
         return report_types
 
-    def get_report_types(self, reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
+    @staticmethod
+    def get_report_types(reports: set[type[BaseReportType]]) -> list[dict[str, str]]:
         return [
             {
                 "id": report_type.id,
@@ -194,14 +194,8 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         super().setup(request, *args, **kwargs)
         try:
             self.plugins, self.all_plugins_enabled = self.get_plugins()
-        except httpx.HTTPStatusError:
-            messages.error(
-                self.request,
-                _(
-                    "One or more plugins of the selected reports does not exist, "
-                    "therefore the report cannot be generated."
-                ),
-            )
+        except KATalogusError as error:
+            messages.error(self.request, error.message)
             self.plugins = {}
             self.all_plugins_enabled = {}
 
@@ -259,7 +253,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
                     # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
                     plugin_type = cast(Literal["required", "optional"], plugin_type)
                     number_of_enabled = sum(
-                        1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0
+                        (1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0)
                         for plugin in self.plugins[plugin_type]
                     )
 
@@ -268,11 +262,17 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
                     for plugin in report_plugins:
                         if plugin not in plugin_report_types:
                             plugin_report_types[plugin] = [
-                                {"name": report_type.name, "label_style": report_type.label_style}
+                                {
+                                    "name": report_type.name,
+                                    "label_style": report_type.label_style,
+                                }
                             ]
                         else:
                             plugin_report_types[plugin].append(
-                                {"name": report_type.name, "label_style": report_type.label_style}
+                                {
+                                    "name": report_type.name,
+                                    "label_style": report_type.label_style,
+                                }
                             )
 
                     total_enabled_plugins[plugin_type] += number_of_enabled

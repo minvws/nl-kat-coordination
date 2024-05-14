@@ -201,7 +201,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
                 "report_types": report_types,
                 "date": date,
             }
-            messages.add_message(self.request, messages.ERROR, error_message)
+            messages.error(self.request, error_message)
 
         return report_data
 
