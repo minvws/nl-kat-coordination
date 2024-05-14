@@ -76,12 +76,12 @@ class PluginService:
 
     def by_plugin_ids(self, plugin_ids: list[str], organisation_id: str) -> list[PluginType]:
         all_plugins = self.get_all(organisation_id)
-        plugin_dict: dict[str, PluginType] = {plugin.id: plugin for plugin in all_plugins}
+        plugin_map: dict[str, PluginType] = {plugin.id: plugin for plugin in all_plugins}
 
         found_plugins = []
         for plugin_id in plugin_ids:
-            if plugin_id in plugin_dict:
-                found_plugins.append(plugin_dict[plugin_id])
+            if plugin_id in plugin_map:
+                found_plugins.append(plugin_map[plugin_id])
             else:
                 raise KeyError(f"Plugin {plugin_id} not found for {organisation_id}")
 
