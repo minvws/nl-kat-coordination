@@ -1,5 +1,4 @@
 import datetime
-from typing import Any
 
 import httpx
 
@@ -12,12 +11,12 @@ class XTDBClient:
             timeout=timeout,
         )
 
-    def status(self) -> Any:
+    def status(self) -> str:
         res = self._client.get("/status")
 
         return res.text
 
-    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> Any:
+    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> str:
         res = self._client.post("/query", content=query, headers={"Content-Type": "application/edn"})
 
         return res.text
@@ -28,7 +27,7 @@ class XTDBClient:
         valid_time: datetime.datetime | None = None,
         tx_time: datetime.datetime | None = None,
         tx_id: int | None = None,
-    ) -> Any:
+    ) -> str:
         params = {"eid": key}
         if valid_time is not None:
             params["valid-time"] = valid_time.isoformat()
@@ -41,7 +40,7 @@ class XTDBClient:
 
         return res.text
 
-    def history(self, key: str, with_corrections: bool, with_docs: bool) -> Any:
+    def history(self, key: str, with_corrections: bool, with_docs: bool) -> str:
         params = {"eid": key, "history": True, "sortOrder": "asc"}
         if with_corrections:
             params["with-corrections"] = "true"
@@ -58,7 +57,7 @@ class XTDBClient:
         valid_time: datetime.datetime | None = None,
         tx_time: datetime.datetime | None = None,
         tx_id: int | None = None,
-    ) -> Any:
+    ) -> str:
         params = {"eid": key}
         if valid_time is not None:
             params["valid-time"] = valid_time.isoformat()
@@ -70,12 +69,12 @@ class XTDBClient:
 
         return res.text
 
-    def attribute_stats(self) -> Any:
+    def attribute_stats(self) -> str:
         res = self._client.get("/attribute-stats")
 
         return res.text
 
-    def sync(self, timeout: int | None) -> Any:
+    def sync(self, timeout: int | None) -> str:
         if timeout is not None:
             res = self._client.get("/sync", params={"timeout": timeout})
         else:
@@ -83,7 +82,7 @@ class XTDBClient:
 
         return res.text
 
-    def await_tx(self, transaction_id: int, timeout: int | None) -> Any:
+    def await_tx(self, transaction_id: int, timeout: int | None) -> str:
         params = {"txId": transaction_id}
         if timeout is not None:
             params["timeout"] = timeout
@@ -95,7 +94,7 @@ class XTDBClient:
         self,
         transaction_time: datetime.datetime,
         timeout: int | None,
-    ) -> Any:
+    ) -> str:
         params = {"tx-time": transaction_time.isoformat()}
         if timeout is not None:
             params["timeout"] = str(timeout)
@@ -107,7 +106,7 @@ class XTDBClient:
         self,
         after_tx_id: int | None,
         with_ops: bool,
-    ) -> Any:
+    ) -> str:
         params = {}
         if after_tx_id is not None:
             params["after-tx-id"] = str(after_tx_id)
@@ -118,35 +117,35 @@ class XTDBClient:
 
         return res.text
 
-    def submit_tx(self, transactions: list[str]) -> Any:
+    def submit_tx(self, transactions: list[str]) -> str:
         res = self._client.post("/submit-tx", json={"tx-ops": transactions})
 
         return res.text
 
-    def tx_committed(self, txid: int) -> Any:
+    def tx_committed(self, txid: int) -> str:
         res = self._client.get("/tx-committed", params={"txId": txid})
 
         return res.text
 
-    def latest_completed_tx(self) -> Any:
+    def latest_completed_tx(self) -> str:
         res = self._client.get("/latest-completed-tx")
 
         return res.text
 
-    def latest_submitted_tx(self) -> Any:
+    def latest_submitted_tx(self) -> str:
         res = self._client.get("/latest-submitted-tx")
 
         return res.text
 
-    def active_queries(self) -> Any:
+    def active_queries(self) -> str:
         res = self._client.get("/active-queries")
 
         return res.text
 
-    def recent_queries(self) -> Any:
+    def recent_queries(self) -> str:
         res = self._client.get("/recent-queries")
         return res.text
 
-    def slowest_queries(self) -> Any:
+    def slowest_queries(self) -> str:
         res = self._client.get("/recent-queries")
         return res.text
