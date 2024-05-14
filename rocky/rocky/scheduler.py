@@ -11,7 +11,7 @@ from typing import Any
 import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
+from httpx import ConnectError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
 
 from rocky.health import ServiceHealth
@@ -170,15 +170,34 @@ class LazyTaskList:
 
 
 class SchedulerError(Exception):
-    message = _("Could not connect to Scheduler. Service is possibly down.")
-
-    def __init__(self, *args: object, message: str | None = None) -> None:
-        super().__init__(*args)
-        if message is not None:
-            self.message = message
+    message: str = _("The Scheduler has an unexpected error. Check the Scheduler logs for further details.")
 
     def __str__(self):
         return str(self.message)
+
+
+class SchedulerConnectError(SchedulerError):
+    message = _("Could not connect to Scheduler. Service is possibly down.")
+
+
+class SchedulerValidationError(SchedulerError):
+    message = _("Your request could not be validated.")
+
+
+class SchedulerTaskNotFound(SchedulerError):
+    message = _("Task could not be found.")
+
+
+class SchedulerTooManyRequestError(SchedulerError):
+    message = _("Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish.")
+
+
+class SchedulerBadRequestError(SchedulerError):
+    message = _("Bad request. Your request could not be interpreted by the Scheduler.")
+
+
+class SchedulerConflictError(SchedulerError):
+    message = _("The Scheduler has received a conflict. Your task is already in queue.")
 
 
 class SchedulerClient:
@@ -195,9 +214,9 @@ class SchedulerClient:
             res = self._client.get("/tasks", params=kwargs)
             return PaginatedTasksResponse.model_validate_json(res.content)
         except ValidationError:
-            raise SchedulerError(_("Your request could not be validated."))
+            raise SchedulerValidationError()
         except ConnectError:
-            raise SchedulerError()
+            raise SchedulerConnectError()
 
     def get_task_details(self, task_id: str) -> Task:
         try:
@@ -211,11 +230,11 @@ class SchedulerClient:
                 organization = task_details.p_item.data.organization
 
             if organization != self.organization_code:
-                raise SchedulerError(_("Task not found."))
+                raise SchedulerTaskNotFound()
 
             return task_details
-        except (HTTPStatusError, ConnectError):
-            raise SchedulerError()
+        except ConnectError:
+            raise SchedulerConnectError()
 
     def push_task(self, prioritized_item: PrioritizedItem) -> None:
         try:
@@ -229,11 +248,11 @@ class SchedulerClient:
         except HTTPStatusError as http_error:
             code = http_error.response.status_code
             if code == codes.TOO_MANY_REQUESTS:
-                raise SchedulerError(_("{}: Task queue is full, please try again later.").format(code))
+                raise SchedulerTooManyRequestError()
             elif code == codes.BAD_REQUEST:
-                raise SchedulerError(_("{}: Bad request").format(code))
+                raise SchedulerBadRequestError()
             elif code == codes.CONFLICT:
-                raise SchedulerError(_("{}: Task already queued.").format(code))
+                raise SchedulerConflictError()
         except RequestError:
             raise SchedulerError()
 
@@ -243,14 +262,14 @@ class SchedulerClient:
             health_endpoint.raise_for_status()
             return ServiceHealth.model_validate_json(health_endpoint.content)
         except ConnectError:
-            raise SchedulerError()
+            raise SchedulerConnectError()
 
     def get_task_stats(self, organization_code: str, task_type: str) -> dict:
         try:
             res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
             res.raise_for_status()
-        except (ConnectError, HTTPError):
-            raise SchedulerError()
+        except ConnectError:
+            raise SchedulerConnectError()
         task_stats = json.loads(res.content)
         return task_stats
 

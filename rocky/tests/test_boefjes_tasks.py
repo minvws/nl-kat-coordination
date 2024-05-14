@@ -2,7 +2,7 @@ import pytest
 from django.http import Http404
 from pytest_django.asserts import assertContains
 
-from rocky.scheduler import SchedulerError
+from rocky.scheduler import SchedulerConnectError, SchedulerTooManyRequestError, SchedulerValidationError
 from rocky.views.bytes_raw import BytesRawView
 from rocky.views.tasks import BoefjesTaskListView
 from tests.conftest import setup_request
@@ -31,8 +31,8 @@ def test_tasks_view_simple(rf, client_member, mock_scheduler, mock_scheduler_cli
     assertContains(response, "Completed")
 
 
-def test_tasks_view_error(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
-    mock_scheduler.list_tasks.side_effect = SchedulerError
+def test_tasks_view_connect_error(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
+    mock_scheduler.list_tasks.side_effect = SchedulerConnectError
 
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
@@ -40,6 +40,31 @@ def test_tasks_view_error(rf, client_member, mock_scheduler, mock_scheduler_clie
     assert response.status_code == 302
 
     assert list(request._messages)[0].message == "Could not connect to Scheduler. Service is possibly down."
+
+
+def test_tasks_view_validation_error(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
+    mock_scheduler.list_tasks.side_effect = SchedulerValidationError
+
+    request = setup_request(rf.get("boefjes_task_list"), client_member.user)
+    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+
+    assert list(request._messages)[0].message == "Your request could not be validated."
+
+
+def test_tasks_view_too_many_requests_error(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
+    mock_scheduler.list_tasks.side_effect = SchedulerValidationError
+
+    request = setup_request(rf.get("boefjes_task_list"), client_member.user)
+    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 302
+
+    assert (
+        list(request._messages)[0].message
+        == "Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish."
+    )
 
 
 def test_reschedule_task(rf, client_member, mock_scheduler, task):
@@ -63,7 +88,7 @@ def test_reschedule_task(rf, client_member, mock_scheduler, task):
 
 def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocker, task):
     mock_scheduler.get_task_details.return_value = task
-    mock_scheduler.push_task.side_effect = SchedulerError(message="Task queue is full, please try again later.")
+    mock_scheduler.push_task.side_effect = SchedulerTooManyRequestError
 
     request = setup_request(
         rf.post(
@@ -79,7 +104,10 @@ def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocke
     )
 
     assert response.status_code == 200
-    assert list(request._messages)[0].message == "Task queue is full, please try again later."
+    assert (
+        list(request._messages)[0].message
+        == "Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish."
+    )
 
 
 def test_reschedule_task_from_other_org(rf, client_member, client_member_b, mock_scheduler, task):
