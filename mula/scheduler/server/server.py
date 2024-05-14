@@ -53,7 +53,10 @@ class Server:
 
         # Set up OpenTelemetry instrumentation
         if self.config.host_metrics is not None:
-            self.logger.info("Setting up instrumentation with span exporter endpoint [%s]", self.config.host_metrics)
+            self.logger.info(
+                "Setting up instrumentation with span exporter endpoint [%s]",
+                self.config.host_metrics,
+            )
 
             FastAPIInstrumentor.instrument_app(self.api)
             Psycopg2Instrumentor().instrument()
@@ -417,6 +420,11 @@ class Server:
     def get_task(self, task_id: str) -> Any:
         try:
             task = self.ctx.datastores.task_store.get_task_by_id(task_id)
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"failed to get task [exception: {exc}]",
+            ) from exc
         except ValueError as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -446,6 +454,11 @@ class Server:
 
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
+        except storage.errors.StorageError as exc:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"failed to get task [exception: {exc}]",
+            ) from exc
         except Exception as exc:
             raise fastapi.HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
