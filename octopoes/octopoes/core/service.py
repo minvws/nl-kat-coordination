@@ -205,29 +205,18 @@ class OctopoesService:
             if len(configs) != 0:
                 config = configs[-1].config
 
-        if USE_BIT_CACHE:
-            key = bit_cache_key(bit_definition, source, parameters, config)
-            if key not in BIT_CACHE:
-                BIT_CACHE[key] = BitRunner(bit_definition).run(source, parameters, config=config)
-            try:
-                self.save_origin(
-                    origin,
-                    BIT_CACHE[key],
-                    valid_time,
-                )
-            except Exception as e:
-                logger.exception("Error running inference", exc_info=e)
-                return
-        else:
-            try:
-                self.save_origin(
-                    origin,
-                    BitRunner(bit_definition).run(source, parameters, config=config),
-                    valid_time,
-                )
-            except Exception as e:
-                logger.exception("Error running inference", exc_info=e)
-                return
+        key = bit_cache_key(bit_definition, source, parameters, config)
+        if key not in BIT_CACHE:
+            BIT_CACHE[key] = BitRunner(bit_definition).run(source, parameters, config=config)
+        try:
+            self.save_origin(
+                origin,
+                BIT_CACHE[key],
+                valid_time,
+            )
+        except Exception as e:
+            logger.exception("Error running inference", exc_info=e)
+            return
 
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int):
