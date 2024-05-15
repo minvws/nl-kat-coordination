@@ -211,7 +211,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
     def report_has_required_plugins(self) -> bool:
         if self.plugins:
             required_plugins = self.plugins["required"]
-            return required_plugins is not None
+            return required_plugins != [] or required_plugins is not None
         return False
 
     def plugins_enabled(self) -> bool:
@@ -219,7 +219,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             return self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]
         return False
 
-    def get_plugins(self):
+    def get_plugins(self) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
         return self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
 
     def get_required_optional_plugins(
