@@ -8,7 +8,7 @@ from octopoes.models.types import OOIType
 from tests.conftest import setup_request
 
 
-def test_aggregate_report_choose_report_types(
+def test_generate_report_setp_scan_wrong_plugin_id(
     rf,
     client_member,
     mock_katalogus_client,
