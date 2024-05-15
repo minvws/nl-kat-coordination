@@ -1,33 +1,28 @@
 from unittest import TestCase
 
-from boefjes.job_models import NormalizerMeta
+from boefjes.job_models import NormalizerAffirmation
 from boefjes.plugins.kat_cve_finding_types.normalize import run
 from octopoes.models.ooi.findings import RiskLevelSeverity
 from octopoes.models.types import CVEFindingType
 from tests.loading import get_dummy_data
 
 
-def dict_declare(ooi):
-    return {"type": "affirmation", "ooi": ooi.dict()}
-
-
 class CVETest(TestCase):
     maxDiff = None
 
     def test_cve_with_cvss(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("cve-normalizer.json"))
+        input_ooi = {"id": "CVE-2021-46882"}
 
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/cve-result-with-cvss.json"),
             )
         )
 
-        # noinspection PyTypeChecker
         expected = [
-            dict_declare(
-                CVEFindingType(
+            NormalizerAffirmation(
+                ooi=CVEFindingType(
                     id="CVE-2021-46882",
                     description="The video framework has memory overwriting caused by addition overflow. "
                     "Successful exploitation of this vulnerability may affect availability.",
@@ -41,19 +36,18 @@ class CVETest(TestCase):
         self.assertEqual(expected, oois)
 
     def test_cve_with_cvss2(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("cve-normalizer-cvss2.json"))
+        input_ooi = {"id": "CVE-2016-0616"}
 
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/cve-result-with-cvss2.json"),
             )
         )
 
-        # noinspection PyTypeChecker
         expected = [
-            dict_declare(
-                CVEFindingType(
+            NormalizerAffirmation(
+                ooi=CVEFindingType(
                     id="CVE-2016-0616",
                     description="Unspecified vulnerability in Oracle MySQL 5.5.46 and earlier and MariaDB before "
                     "5.5.47, 10.0.x before 10.0.23, and 10.1.x before 10.1.10 allows remote authenticated users "
@@ -68,19 +62,18 @@ class CVETest(TestCase):
         self.assertEqual(expected, oois)
 
     def test_cve_without_cvss(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("cve-normalizer.json"))
+        input_ooi = {"id": "CVE-2021-46882"}
 
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/cve-result-without-cvss.json"),
             )
         )
 
-        # noinspection PyTypeChecker
         expected = [
-            dict_declare(
-                CVEFindingType(
+            NormalizerAffirmation(
+                ooi=CVEFindingType(
                     id="CVE-2021-46882",
                     description="The Nested Pages plugin for WordPress is vulnerable to unauthorized loss of "
                     "data due to a missing capability check on the 'reset' function in versions up to, and including, "
