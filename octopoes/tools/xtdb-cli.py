@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import datetime
+import json
 import logging
 
 import click
@@ -35,7 +36,7 @@ def cli(ctx: click.Context, url: str, node: str, timeout: int, v: int):
 def status(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.status())
+    click.echo(json.dumps(client.status()))
 
 
 @cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
@@ -44,7 +45,7 @@ def status(ctx: click.Context):
 def query(ctx: click.Context, query: str):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.query(query))
+    click.echo(json.dumps(client.query(query)))
 
 
 @cli.command(help="List all keys in node")
@@ -52,7 +53,7 @@ def query(ctx: click.Context, query: str):
 def list_keys(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.query())
+    click.echo(json.dumps(client.query()))
 
 
 @cli.command(help="List all values in node")
@@ -60,7 +61,7 @@ def list_keys(ctx: click.Context):
 def list_values(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}"))
+    click.echo(json.dumps(client.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}")))
 
 
 @cli.command
@@ -78,7 +79,7 @@ def entity(
 ):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.entity(key, valid_time, tx_time, tx_id))
+    click.echo(json.dumps(client.entity(key, valid_time, tx_time, tx_id)))
 
 
 @cli.command
@@ -89,7 +90,7 @@ def entity(
 def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: bool):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.history(key, with_corrections, with_docs))
+    click.echo(json.dumps(client.history(key, with_corrections, with_docs)))
 
 
 @cli.command
@@ -107,7 +108,7 @@ def entity_tx(
 ):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.entity_tx(key, valid_time, tx_time, tx_id))
+    click.echo(json.dumps(client.entity_tx(key, valid_time, tx_time, tx_id)))
 
 
 @cli.command
@@ -115,7 +116,7 @@ def entity_tx(
 def attribute_stats(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.attribute_stats())
+    click.echo(json.dumps(client.attribute_stats()))
 
 
 @cli.command
@@ -124,7 +125,7 @@ def attribute_stats(ctx: click.Context):
 def sync(ctx: click.Context, timeout: int | None):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.sync(timeout))
+    click.echo(json.dumps(client.sync(timeout)))
 
 
 @cli.command
@@ -134,7 +135,7 @@ def sync(ctx: click.Context, timeout: int | None):
 def await_tx(ctx: click.Context, transaction_id: int, timeout: int | None):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.await_tx(transaction_id, timeout))
+    click.echo(json.dumps(client.await_tx(transaction_id, timeout)))
 
 
 @cli.command
@@ -148,7 +149,7 @@ def await_tx_time(
 ):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.await_tx_time(transaction_time, timeout))
+    click.echo(json.dumps(client.await_tx_time(transaction_time, timeout)))
 
 
 @cli.command
@@ -158,7 +159,7 @@ def await_tx_time(
 def tx_log(ctx: click.Context, after_tx_id: int | None, with_ops: bool):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.tx_log(after_tx_id, with_ops))
+    click.echo(json.dumps(client.tx_log(after_tx_id, with_ops)))
 
 
 @cli.command(help="Show all document transactions")
@@ -166,7 +167,7 @@ def tx_log(ctx: click.Context, after_tx_id: int | None, with_ops: bool):
 def txs(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.tx_log(None, True))
+    click.echo(json.dumps(client.tx_log(None, True)))
 
 
 @cli.command
@@ -175,7 +176,7 @@ def txs(ctx: click.Context):
 def submit_tx(ctx: click.Context, transactions):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.submit_tx(transactions))
+    click.echo(json.dumps(client.submit_tx(transactions)))
 
 
 @cli.command
@@ -184,7 +185,7 @@ def submit_tx(ctx: click.Context, transactions):
 def tx_committed(ctx: click.Context, transaction_id: int) -> None:
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.tx_committed(transaction_id))
+    click.echo(json.dumps(client.tx_committed(transaction_id)))
 
 
 @cli.command
@@ -192,7 +193,7 @@ def tx_committed(ctx: click.Context, transaction_id: int) -> None:
 def latest_completed_tx(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.latest_completed_tx())
+    click.echo(json.dumps(client.latest_completed_tx()))
 
 
 @cli.command
@@ -200,7 +201,7 @@ def latest_completed_tx(ctx: click.Context):
 def latest_submitted_tx(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.latest_submitted_tx())
+    click.echo(json.dumps(client.latest_submitted_tx()))
 
 
 @cli.command
@@ -208,7 +209,7 @@ def latest_submitted_tx(ctx: click.Context):
 def active_queries(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.active_queries())
+    click.echo(json.dumps(client.active_queries()))
 
 
 @cli.command
@@ -216,7 +217,7 @@ def active_queries(ctx: click.Context):
 def recent_queries(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.recent_queries())
+    click.echo(json.dumps(client.recent_queries()))
 
 
 @cli.command
@@ -224,7 +225,7 @@ def recent_queries(ctx: click.Context):
 def slowest_queries(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(client.slowest_queries())
+    click.echo(json.dumps(client.slowest_queries()))
 
 
 if __name__ == "__main__":

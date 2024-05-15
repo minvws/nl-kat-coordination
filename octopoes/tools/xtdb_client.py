@@ -14,12 +14,12 @@ class XTDBClient:
     def status(self) -> str:
         res = self._client.get("/status")
 
-        return res.text
+        return res.json()
 
     def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> str:
         res = self._client.post("/query", content=query, headers={"Content-Type": "application/edn"})
 
-        return res.text
+        return res.json()
 
     def entity(
         self,
@@ -38,7 +38,7 @@ class XTDBClient:
 
         res = self._client.get("/entity", params=params)
 
-        return res.text
+        return res.json()
 
     def history(self, key: str, with_corrections: bool, with_docs: bool) -> str:
         params = {"eid": key, "history": True, "sortOrder": "asc"}
@@ -49,7 +49,7 @@ class XTDBClient:
 
         res = self._client.get("/entity", params=params)
 
-        return res.text
+        return res.json()
 
     def entity_tx(
         self,
@@ -67,12 +67,12 @@ class XTDBClient:
             params["tx-id"] = str(tx_id)
         res = self._client.get("/entity-tx", params=params)
 
-        return res.text
+        return res.json()
 
     def attribute_stats(self) -> str:
         res = self._client.get("/attribute-stats")
 
-        return res.text
+        return res.json()
 
     def sync(self, timeout: int | None) -> str:
         if timeout is not None:
@@ -80,7 +80,7 @@ class XTDBClient:
         else:
             res = self._client.get("/sync")
 
-        return res.text
+        return res.json()
 
     def await_tx(self, transaction_id: int, timeout: int | None) -> str:
         params = {"txId": transaction_id}
@@ -88,7 +88,7 @@ class XTDBClient:
             params["timeout"] = timeout
         res = self._client.get("/await-tx", params=params)
 
-        return res.text
+        return res.json()
 
     def await_tx_time(
         self,
@@ -100,7 +100,7 @@ class XTDBClient:
             params["timeout"] = str(timeout)
         res = self._client.get("/await-tx-time", params=params)
 
-        return res.text
+        return res.json()
 
     def tx_log(
         self,
@@ -115,37 +115,37 @@ class XTDBClient:
 
         res = self._client.get("/tx-log", params=params)
 
-        return res.text
+        return res.json()
 
     def submit_tx(self, transactions: list[str]) -> str:
         res = self._client.post("/submit-tx", json={"tx-ops": transactions})
 
-        return res.text
+        return res.json()
 
     def tx_committed(self, txid: int) -> str:
         res = self._client.get("/tx-committed", params={"txId": txid})
 
-        return res.text
+        return res.json()
 
     def latest_completed_tx(self) -> str:
         res = self._client.get("/latest-completed-tx")
 
-        return res.text
+        return res.json()
 
     def latest_submitted_tx(self) -> str:
         res = self._client.get("/latest-submitted-tx")
 
-        return res.text
+        return res.json()
 
     def active_queries(self) -> str:
         res = self._client.get("/active-queries")
 
-        return res.text
+        return res.json()
 
     def recent_queries(self) -> str:
         res = self._client.get("/recent-queries")
-        return res.text
+        return res.json()
 
     def slowest_queries(self) -> str:
         res = self._client.get("/recent-queries")
-        return res.text
+        return res.json()
