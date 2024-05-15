@@ -17,12 +17,8 @@ class XTDBClient:
 
         return res.json()
 
-    def query(
-        self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}"
-    ) -> JsonValue:
-        res = self._client.post(
-            "/query", content=query, headers={"Content-Type": "application/edn"}
-        )
+    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> JsonValue:
+        res = self._client.post("/query", content=query, headers={"Content-Type": "application/edn"})
 
         return res.json()
 
