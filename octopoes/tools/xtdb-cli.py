@@ -10,10 +10,16 @@ from xtdb_client import XTDBClient
 logger = logging.getLogger(__name__)
 
 
-@click.group
-@click.option("-n", "--node", default="0", show_default=True, help="XTDB node")
-@click.option("-u", "--url", default="http://localhost:3000", show_default=True, help="XTDB server base url")
-@click.option("-t", "--timeout", type=int, default=5000, show_default=True, help="XTDB request timeout (in ms)")
+@click.group(
+    context_settings={
+        "help_option_names": ["-h", "--help"],
+        "max_content_width": 120,
+        "show_default": True,
+    }
+)
+@click.option("-n", "--node", default="0", help="XTDB node")
+@click.option("-u", "--url", default="http://localhost:3000", help="XTDB server base url")
+@click.option("-t", "--timeout", type=int, default=5000, help="XTDB request timeout (in ms)")
 @click.option("-v", count=True, help="Increase the verbosity level")
 @click.pass_context
 def cli(ctx: click.Context, url: str, node: str, timeout: int, v: int):
@@ -21,11 +27,11 @@ def cli(ctx: click.Context, url: str, node: str, timeout: int, v: int):
         logging.basicConfig(level=logging.WARN)
     elif v == 2:
         logging.basicConfig(level=logging.INFO)
-    elif v == 3:
+    elif v >= 3:
         logging.basicConfig(level=logging.DEBUG)
 
     client = XTDBClient(url, node, timeout)
-    logger.debug("Instantiated XTDB client with endpoint %s", url)
+    logger.info("Instantiated XTDB client with endpoint %s for node %s", url, node)
 
     ctx.ensure_object(dict)
     ctx.obj["client"] = client
@@ -39,7 +45,7 @@ def status(ctx: click.Context):
     click.echo(json.dumps(client.status()))
 
 
-@cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
+@cli.command(help='EDN Query [default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}"]')
 @click.argument("edn", required=False)
 @click.pass_context
 def query(ctx: click.Context, edn: str):
