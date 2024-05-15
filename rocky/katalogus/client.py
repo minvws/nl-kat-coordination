@@ -1,9 +1,9 @@
 from io import BytesIO
 from logging import getLogger
 
+import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from httpx import Client, HTTPStatusError
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_serializer
@@ -82,7 +82,7 @@ class KATalogusHTTPStatusError(KATalogusError):
 
 class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
-        self.session = Client(base_url=base_uri)
+        self.session = httpx.Client(base_url=base_uri)
         self.organization = organization
         self.organization_uri = f"/v1/organisations/{organization}"
 
@@ -103,7 +103,7 @@ class KATalogusClientV1:
         try:
             response = self.session.get(f"{self.organization_uri}/plugins", params=params)
             response.raise_for_status()
-        except HTTPStatusError as error:
+        except httpx.HTTPStatusError as error:
             raise KATalogusHTTPStatusError(status_code=str(error.response.status_code))
         return [parse_plugin(plugin) for plugin in response.json()]
 

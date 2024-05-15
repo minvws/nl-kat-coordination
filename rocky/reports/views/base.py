@@ -63,20 +63,17 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
 
         return breadcrumbs
 
-    def get_current(self):
-        return self.breadcrumbs[self.breadcrumbs_step - 2]["url"]
-
     def get_breadcrumbs(self):
         if self.is_valid_breadcrumbs():
             return self.breadcrumbs[: self.breadcrumbs_step]
         return self.breadcrumbs
 
+    def get_current(self):
+        return self.breadcrumbs[self.breadcrumbs_step - 1]["url"]
+
     def get_previous(self):
-        if self.is_valid_breadcrumbs():
-            if self.breadcrumbs_step >= 2:
-                return self.breadcrumbs[self.breadcrumbs_step - 2]["url"]
-            else:
-                return self.breadcrumbs[self.breadcrumbs_step]["url"]
+        if self.is_valid_breadcrumbs() and self.breadcrumbs_step >= 2:
+            return self.breadcrumbs[self.breadcrumbs_step - 2]["url"]
         return self.get_current()
 
     def get_next(self):
