@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from logging import getLogger
 from typing import overload
 
+import pprofile
 from bits.definitions import get_bit_definitions
 from bits.runner import BitRunner
 
@@ -588,47 +589,52 @@ class OctopoesService:
         return inheritance_chain
 
     def recalculate_bits(self) -> int:
-        valid_time = datetime.now(timezone.utc)
-        bit_counter: Counter[str] = Counter()
+        prof = pprofile.Profile()
+        with prof():
+            valid_time = datetime.now(timezone.utc)
+            bit_counter: Counter[str] = Counter()
 
-        # loop over all bit definitions and add origins and origin params
-        bit_definitions = get_bit_definitions()
-        for bit_id, bit_definition in bit_definitions.items():
-            # loop over all oois that are consumed by the bit
-            for ooi in self.ooi_repository.get_oois(
-                {bit_definition.consumes},
-                valid_time=valid_time,
-            ):
-                if not isinstance(ooi, bit_definition.consumes):
-                    logger.exception("Requested OOI type not met")
+            # loop over all bit definitions and add origins and origin params
+            bit_definitions = get_bit_definitions()
+            for bit_id, bit_definition in bit_definitions.items():
+                # loop over all oois that are consumed by the bit
+                for ooi in self.ooi_repository.get_oois(
+                    {bit_definition.consumes},
+                    valid_time=valid_time,
+                ):
+                    if not isinstance(ooi, bit_definition.consumes):
+                        logger.exception("Requested OOI type not met")
 
-                # insert, if not exists
-                bit_instance = Origin(
-                    origin_type=OriginType.INFERENCE,
-                    method=bit_id,
-                    source=ooi.reference,
-                )
-                try:
-                    self.origin_repository.get(bit_instance.id, valid_time)
-                except ObjectNotFoundException:
-                    self.origin_repository.save(bit_instance, valid_time)
-                    bit_counter.update({bit_instance.method})
+                    # insert, if not exists
+                    bit_instance = Origin(
+                        origin_type=OriginType.INFERENCE,
+                        method=bit_id,
+                        source=ooi.reference,
+                    )
+                    try:
+                        self.origin_repository.get(bit_instance.id, valid_time)
+                    except ObjectNotFoundException:
+                        self.origin_repository.save(bit_instance, valid_time)
+                        bit_counter.update({bit_instance.method})
 
-                for param_def in bit_definition.parameters:
-                    path = Path.parse(f"{param_def.ooi_type.get_object_type()}.{param_def.relation_path}").reverse()
+                    for param_def in bit_definition.parameters:
+                        path = Path.parse(f"{param_def.ooi_type.get_object_type()}.{param_def.relation_path}").reverse()
 
-                    param_oois = self.ooi_repository.list_related(ooi, path, valid_time=valid_time)
-                    for param_ooi in param_oois:
-                        param = OriginParameter(origin_id=bit_instance.id, reference=param_ooi.reference)
-                        self.origin_parameter_repository.save(param, valid_time)
+                        param_oois = self.ooi_repository.list_related(ooi, path, valid_time=valid_time)
+                        for param_ooi in param_oois:
+                            param = OriginParameter(origin_id=bit_instance.id, reference=param_ooi.reference)
+                            self.origin_parameter_repository.save(param, valid_time)
 
-        # TODO: remove all Origins and Origin Parameters, which are no longer in use
+            # TODO: remove all Origins and Origin Parameters, which are no longer in use
 
-        # rerun all existing bits
-        origins = self.origin_repository.list_origins(valid_time, origin_type=OriginType.INFERENCE)
-        for origin in origins:
-            self._run_inference(origin, valid_time)
-            bit_counter.update({origin.method})
+            # rerun all existing bits
+            origins = self.origin_repository.list_origins(valid_time, origin_type=OriginType.INFERENCE)
+            for origin in origins:
+                self._run_inference(origin, valid_time)
+                bit_counter.update({origin.method})
+
+        prof.dump_stats("pprofile.dump")
+        prof.dump_stats("cachegrind.out.pprofile.dump")
 
         return sum(bit_counter.values())
 

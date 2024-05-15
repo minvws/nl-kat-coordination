@@ -42,6 +42,7 @@ opentelemetry-proto = "^1.24.0"
 opentelemetry-semantic-conventions = "^0.45b0"
 opentelemetry-util-http = "^0.45b0"
 
+pprofile = {git = "https://github.com/originalsouth/pprofile.git"}
 [tool.poetry.group.dev.dependencies]
 robotframework = "^7.0"
 robotframework-requests = "^0.9.3"
