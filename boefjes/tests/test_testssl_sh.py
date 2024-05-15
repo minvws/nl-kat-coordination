@@ -1,19 +1,29 @@
 from unittest import TestCase
 
-from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_testssl_sh_ciphers.normalize import run
 from tests.loading import get_dummy_data
+
+input_ooi = {
+    "object_type": "IPService",
+    "scan_profile": "scan_profile_type='declared' "
+    "reference=Reference('IPService|internet|134.209.85.72|tcp|80|http') level=<ScanLevel.L2: 2>",
+    "primary_key": "IPService|internet|134.209.85.72|tcp|80|http",
+    "ip_port": {
+        "address": {"network": {"name": "internet"}, "address": "134.209.85.72"},
+        "protocol": "tcp",
+        "port": "80",
+    },
+    "service": {"name": "http"},
+}
 
 
 class TestsslSh(TestCase):
     maxDiff = None
 
     def test_cipherless_service(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("testssl-sh-cipherless-normalizer.json"))
-
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/testssl-sh-cipherless.json"),
             )
         )
@@ -24,11 +34,9 @@ class TestsslSh(TestCase):
         self.assertEqual(expected, oois)
 
     def test_ciphered_service(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("testssl-sh-cipherless-normalizer.json"))
-
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/testssl-sh-ciphered.json"),
             )
         )

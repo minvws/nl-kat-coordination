@@ -218,17 +218,17 @@ fill and yield the actual objects. (of valid object-types that are subclassed fr
 .. code-block:: python
 
  import json
- from typing import Iterable, Union
+ from typing import Iterable
 
  from octopoes.models import OOI, Reference
  from octopoes.models.ooi.findings import CVEFindingType, Finding
  from octopoes.models.ooi.network import IPPort, Protocol, PortState
 
- from boefjes.job_models import NormalizerMeta
+ from boefjes.job_models import NormalizerOutput
 
- def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterable[OOI]:
+ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    ooi = Reference.from_str(input_ooi["primary_key"])
 
     for scan in results["data"]:
         port_nr = scan["port"]
@@ -243,7 +243,7 @@ fill and yield the actual objects. (of valid object-types that are subclassed fr
         yield ip_port
 
         if "vulns" in scan:
-            for cve, _ in scan["vulns"].items():
+            for cve in scan["vulns"].keys():
                 ft = CVEFindingType(id=cve)
                 f = Finding(finding_type=ft.reference, ooi=ip_port.reference)
                 yield ft
@@ -261,7 +261,7 @@ As an example, see these lines in `kat_external_db/normalize.py`:
 
 .. code-block:: python
 
-  def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+  def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
    ...
    yield ip_address
    yield DeclaredScanProfile(reference=ip_address.reference, level=3)
@@ -279,7 +279,7 @@ Combining the code and whitelist above would therefore be equivalent to combinin
 
 .. code-block:: python
 
-  def run(normalizer_meta: NormalizerMeta, raw: Union[bytes, str]) -> Iterator[OOI]:
+  def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
    ...
    yield ip_address
    yield DeclaredScanProfile(reference=ip_address.reference, level=2)

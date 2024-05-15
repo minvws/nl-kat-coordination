@@ -8,9 +8,10 @@ from pydantic import ValidationError
 
 from boefjes.config import Settings
 from boefjes.job_handler import NormalizerHandler
-from boefjes.job_models import NormalizerMeta, NormalizerScanProfile
+from boefjes.job_models import NormalizerMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from octopoes.models import DeclaredScanProfile
 from tests.loading import get_dummy_data
 
 
@@ -33,17 +34,17 @@ class ScanProfileTest(TestCase):
         self.assertEqual(3, len(output.scan_profiles))
 
         profile = output.scan_profiles[0]
-        self.assertIsInstance(profile, NormalizerScanProfile)
+        self.assertIsInstance(profile, DeclaredScanProfile)
         self.assertEqual("IPAddressV4|internet|127.0.0.1", profile.reference)
         self.assertEqual(3, profile.level)
 
         profile = output.scan_profiles[1]
-        self.assertIsInstance(profile, NormalizerScanProfile)
+        self.assertIsInstance(profile, DeclaredScanProfile)
         self.assertEqual("IPAddressV4|internet|10.0.0.0", profile.reference)
         self.assertEqual(3, profile.level)
 
         profile = output.scan_profiles[2]
-        self.assertIsInstance(profile, NormalizerScanProfile)
+        self.assertIsInstance(profile, DeclaredScanProfile)
         self.assertEqual("Hostname|internet|example.com", profile.reference)
         self.assertEqual(3, profile.level)
 

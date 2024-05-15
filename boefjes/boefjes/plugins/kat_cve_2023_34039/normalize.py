@@ -1,14 +1,14 @@
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import CVEFindingType, Finding
 
 
-def run(normalizer_meta: NormalizerMeta, raw: str) -> Iterable[OOI]:
-    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
+    ooi = Reference.from_str(input_ooi["primary_key"])
 
-    if "is allowed access to vRealize Network Insight " in raw:
+    if "is allowed access to vRealize Network Insight " in raw.decode():
         finding_type = CVEFindingType(id="CVE-2023-34039")
         finding = Finding(
             finding_type=finding_type.reference,

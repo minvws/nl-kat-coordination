@@ -4,7 +4,7 @@ from unittest import TestCase
 
 from pydantic_core import Url
 
-from boefjes.job_models import NormalizerMeta, NormalizerOutput
+from boefjes.job_models import NormalizerMeta, NormalizerResults
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
 from octopoes.models import Reference
@@ -154,7 +154,7 @@ darknet,https://openkat.nl/""",
             output.declarations[1].ooi.dict(),
         )
 
-    def check_network_created(self, csv_idx: int) -> tuple[NormalizerMeta, NormalizerOutput, LocalNormalizerJobRunner]:
+    def check_network_created(self, csv_idx: int) -> tuple[NormalizerMeta, NormalizerResults, LocalNormalizerJobRunner]:
         meta = NormalizerMeta.model_validate_json(get_dummy_data("manual-csv.json"))
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)

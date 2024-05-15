@@ -1,10 +1,9 @@
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerOutput
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     yield {
         "I": "write",
         "bad": "normalizers",

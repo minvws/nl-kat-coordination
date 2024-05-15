@@ -1,14 +1,14 @@
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    ooi = Reference.from_str(input_ooi["primary_key"])
 
     if not results["exists"]:
         ft = KATFindingType(id="KAT-NO-RPKI")

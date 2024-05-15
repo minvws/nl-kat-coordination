@@ -3,16 +3,16 @@ from collections.abc import Iterable
 
 from Wappalyzer import Wappalyzer, WebPage
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import HostnameHTTPURL
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    pk = normalizer_meta.raw_data.boefje_meta.input_ooi
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
+    pk = input_ooi["primary_key"]
     tokenized_weburl = Reference.from_str(pk).tokenized["web_url"]
     tokenized_hostname = Reference.from_str(pk).tokenized["website"]["hostname"]
 

@@ -1,21 +1,21 @@
 import json
-from collections.abc import Iterator
+from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
+from boefjes.job_models import NormalizerDeclaration, NormalizerOutput
 from octopoes.models.ooi.monitoring import Application, Incident
 
 
-def run(normalizer_meta: NormalizerMeta, raw: str | bytes) -> Iterator[dict]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     data = json.loads(raw)
 
     for log in data:
         yield from parse_log(log)
 
 
-def parse_log(log: dict) -> Incident:
+def parse_log(log: dict) -> Iterable[NormalizerOutput]:
     app = Application(name=log.pop("client_environment_app"))
 
-    yield {"type": "declaration", "ooi": app.dict()}
+    yield NormalizerDeclaration(ooi=app)
 
     mandatory_fields = {
         "event_id": str(log.pop("eventId")),
@@ -24,11 +24,10 @@ def parse_log(log: dict) -> Incident:
         "event_type": log.pop("eventType"),
     }
 
-    yield {
-        "type": "declaration",
-        "ooi": Incident(
+    yield NormalizerDeclaration(
+        ooi=Incident(
             application=app.reference,
             **mandatory_fields,
             meta_data=log,
-        ).dict(),
-    }
+        ),
+    )

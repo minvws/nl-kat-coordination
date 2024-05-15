@@ -1,14 +1,14 @@
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.web import HTTPHeader
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     # fetch a reference to the original resource where these headers where downloaded from
-    resource = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    resource = Reference.from_str(input_ooi["primary_key"])
 
     for key, value in json.loads(raw).items():
         yield HTTPHeader(

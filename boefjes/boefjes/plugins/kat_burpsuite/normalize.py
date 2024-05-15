@@ -6,8 +6,8 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from defusedxml import minidom
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CAPECFindingType, CVEFindingType, CWEFindingType, Finding
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
@@ -15,12 +15,12 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import URL, HostnameHTTPURL, HTTPHeader, HTTPResource, IPAddressHTTPURL, WebScheme, Website
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     parser = minidom.parse(raw)
 
     # assume that input ooi is none or a HostnameHTTPURL
-    if normalizer_meta.raw_data.boefje_meta and normalizer_meta.raw_data.boefje_meta.input_ooi:
-        ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    if input_ooi:
+        ooi = Reference.from_str(input_ooi["primary_key"])
         network = Network(name=ooi.tokenized.netloc.network.name)
     else:
         network = Network(name="internet")

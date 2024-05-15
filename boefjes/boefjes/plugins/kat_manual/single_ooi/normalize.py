@@ -1,13 +1,9 @@
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerDeclaration, NormalizerOutput
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     for declaration in json.loads(raw.decode()):
-        yield {
-            "type": "declaration",
-            "ooi": declaration["ooi"],
-        }
+        yield NormalizerDeclaration(ooi=declaration["ooi"])

@@ -1,6 +1,6 @@
 from enum import Enum
 
-from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerOutput
+from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerResults
 
 
 class Handler:
@@ -14,7 +14,7 @@ class BoefjeJobRunner:
 
 
 class NormalizerJobRunner:
-    def run(self, normalizer_meta, raw) -> NormalizerOutput:
+    def run(self, normalizer_meta: NormalizerMeta, raw: bytes) -> NormalizerResults:
         raise NotImplementedError()
 
 

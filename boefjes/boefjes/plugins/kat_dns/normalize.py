@@ -14,8 +14,8 @@ from dns.rdtypes.ANY.TXT import TXT
 from dns.rdtypes.IN.A import A
 from dns.rdtypes.IN.AAAA import AAAA
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import (
     NXDOMAIN,
     DNSAAAARecord,
@@ -33,11 +33,11 @@ from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     internet = Network(name="internet")
 
     if raw.decode() == "NXDOMAIN":
-        yield NXDOMAIN(hostname=Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi))
+        yield NXDOMAIN(hostname=Reference.from_str(input_ooi["primary_key"]))
         return
 
     results = json.loads(raw)
@@ -66,7 +66,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         return record
 
     # register argument hostname
-    input_hostname = register_hostname(normalizer_meta.raw_data.boefje_meta.arguments["input"]["name"])
+    input_hostname = register_hostname(input_ooi["name"])
 
     # keep track of discovered zones
     zone_links: dict[str, DNSZone] = {}

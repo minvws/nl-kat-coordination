@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import CVEFindingType, Finding
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from packaging import version
@@ -53,8 +53,8 @@ def is_vulnerable_version(
     return any(start <= detected_version < end for start, end in vulnerable_ranges)
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes) -> Iterable[OOI]:
-    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
+    ooi = Reference.from_str(input_ooi["primary_key"])
     html = raw.decode()
     js_detected_version = extract_js_version(html)
     css_detected_version = extract_css_version(html)

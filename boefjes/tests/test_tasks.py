@@ -8,14 +8,8 @@ from uuid import UUID
 
 import pytest
 
-from boefjes.job_handler import BoefjeHandler, NormalizerHandler
-from boefjes.job_models import (
-    BoefjeMeta,
-    InvalidReturnValueNormalizer,
-    NormalizerMeta,
-    NormalizerPlainOOI,
-    UnsupportedReturnTypeNormalizer,
-)
+from boefjes.job_handler import BoefjeHandler
+from boefjes.job_models import BoefjeMeta, InvalidReturnValueNormalizer, NormalizerMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.models import Bit, Boefje, Normalizer, PluginType
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
@@ -93,11 +87,6 @@ class TaskTest(TestCase):
             organization="_dev",
         ).copy()
 
-    def test_parse_plain_ooi(self):
-        plain_ooi = NormalizerPlainOOI(object_type="Network", name="internet")
-
-        NormalizerHandler._parse_ooi(plain_ooi)
-
     def test_parse_normalizer_meta_to_json(self):
         meta = NormalizerMeta.model_validate_json(get_dummy_data("snyk-normalizer.json"))
         meta.started_at = datetime(10, 10, 10, 10, tzinfo=timezone.utc)
@@ -143,7 +132,7 @@ class TaskTest(TestCase):
         local_repository = LocalPluginRepository(Path(__file__).parent / "modules")
         runner = LocalNormalizerJobRunner(local_repository)
 
-        with self.assertRaises(UnsupportedReturnTypeNormalizer):
+        with self.assertRaises(InvalidReturnValueNormalizer):
             runner.run(meta, b"123")
 
     def test_exception_raised_invalid_return_value(self):

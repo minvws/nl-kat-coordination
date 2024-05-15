@@ -1,18 +1,17 @@
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerOutput
 from octopoes.models.ooi.config import Config
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     data = json.loads(raw)
 
     bit_id = data["schema"].removeprefix("/bit/")
 
     yield Config(
-        ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
+        ooi=input_ooi["primary_key"],
         bit_id=bit_id,
         config=data["answer"],
     )
