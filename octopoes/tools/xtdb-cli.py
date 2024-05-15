@@ -68,9 +68,9 @@ def list_values(ctx: click.Context):
 
 
 @cli.command
-@click.option("--valid-time", type=click.DateTime())
-@click.option("--tx-time", type=click.DateTime())
 @click.option("--tx-id", type=int)
+@click.option("--tx-time", type=click.DateTime())
+@click.option("--valid-time", type=click.DateTime())
 @click.argument("key")
 @click.pass_context
 def entity(
@@ -86,9 +86,9 @@ def entity(
 
 
 @cli.command
-@click.argument("key")
-@click.option("--with-corrections", is_flag=True)
 @click.option("--with-docs", is_flag=True)
+@click.option("--with-corrections", is_flag=True)
+@click.argument("key")
 @click.pass_context
 def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: bool):
     client: XTDBClient = ctx.obj["client"]
@@ -97,10 +97,10 @@ def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: boo
 
 
 @cli.command
-@click.argument("key")
-@click.option("--valid-time", type=click.DateTime())
-@click.option("--tx-time", type=click.DateTime())
 @click.option("--tx-id", type=int)
+@click.option("--tx-time", type=click.DateTime())
+@click.option("--valid-time", type=click.DateTime())
+@click.argument("key")
 @click.pass_context
 def entity_tx(
     ctx: click.Context,
@@ -132,8 +132,8 @@ def sync(ctx: click.Context, timeout: int | None):
 
 
 @cli.command
-@click.argument("tx-id", type=int)
 @click.option("--timeout", type=int)
+@click.argument("tx-id", type=int)
 @click.pass_context
 def await_tx(ctx: click.Context, transaction_id: int, timeout: int | None):
     client: XTDBClient = ctx.obj["client"]
@@ -142,8 +142,8 @@ def await_tx(ctx: click.Context, transaction_id: int, timeout: int | None):
 
 
 @cli.command
-@click.argument("tx-time", type=click.DateTime())
 @click.option("--timeout", type=int)
+@click.argument("tx-time", type=click.DateTime())
 @click.pass_context
 def await_tx_time(
     ctx: click.Context,
@@ -156,8 +156,8 @@ def await_tx_time(
 
 
 @cli.command
-@click.option("--after-tx-id", type=int)
 @click.option("--with-ops", is_flag=True)
+@click.option("--after-tx-id", type=int)
 @click.pass_context
 def tx_log(ctx: click.Context, after_tx_id: int | None, with_ops: bool):
     client: XTDBClient = ctx.obj["client"]
