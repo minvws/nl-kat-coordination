@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load ooi_extra %}
+{% load report_extra %}
 
 <section>
     <div>
@@ -33,7 +34,7 @@
                         <tr>
                             <td>
                                 <a href="{% url "view_report" organization.code %}?report_id={{ report.0.reference }}&observed_at={{ report.observed_at|date:"Y-m-d" }}"
-                                   title="{% translate "Shows report detail" %}">{{ report.0.report_type }}</a>
+                                   title="{% translate "Shows report detail" %}">{{ report.0.report_type|report_name_by_id }}</a>
                             </td>
                             <td>
                                 {% if report.0.input_ooi %}{{ report.0.input_ooi|human_readable }}{% endif %}
@@ -70,7 +71,7 @@
                                                     <td>{{ child.input_ooi.object_type }}</td>
                                                     <td>
                                                         <a href="{% url "view_report" organization.code %}?report_id={{ child.reference }}&observed_at={{ child.observed_at|date:"Y-m-d" }}"
-                                                           title="{% translate "Shows report details" %}">{{ child.report_type }}</a>
+                                                           title="{% translate "Shows report details" %}">{{ child.report_type|report_name_by_id }}</a>
                                                     </td>
                                                 </tr>
                                             {% endfor %}
