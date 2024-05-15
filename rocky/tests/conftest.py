@@ -158,14 +158,24 @@ def organization_b():
 @pytest.fixture
 def superuser(django_user_model):
     return create_user(
-        django_user_model, "superuser@openkat.nl", "SuperSuper123!!", "Superuser name", "default", superuser=True
+        django_user_model,
+        "superuser@openkat.nl",
+        "SuperSuper123!!",
+        "Superuser name",
+        "default",
+        superuser=True,
     )
 
 
 @pytest.fixture
 def superuser_b(django_user_model):
     return create_user(
-        django_user_model, "superuserB@openkat.nl", "SuperBSuperB123!!", "Superuser B name", "default_b", superuser=True
+        django_user_model,
+        "superuserB@openkat.nl",
+        "SuperBSuperB123!!",
+        "Superuser B name",
+        "default_b",
+        superuser=True,
     )
 
 
@@ -181,12 +191,24 @@ def superuser_member_b(superuser_b, organization_b):
 
 @pytest.fixture
 def adminuser(django_user_model):
-    return create_user(django_user_model, "admin@openkat.nl", "AdminAdmin123!!", "Admin name", "default_admin")
+    return create_user(
+        django_user_model,
+        "admin@openkat.nl",
+        "AdminAdmin123!!",
+        "Admin name",
+        "default_admin",
+    )
 
 
 @pytest.fixture
 def adminuser_b(django_user_model):
-    return create_user(django_user_model, "adminB@openkat.nl", "AdminBAdminB123!!", "Admin B name", "default_admin_b")
+    return create_user(
+        django_user_model,
+        "adminB@openkat.nl",
+        "AdminBAdminB123!!",
+        "Admin B name",
+        "default_admin_b",
+    )
 
 
 @pytest.fixture
@@ -208,14 +230,22 @@ def admin_member_b(adminuser_b, organization_b):
 @pytest.fixture
 def redteamuser(django_user_model):
     return create_user(
-        django_user_model, "redteamer@openkat.nl", "RedteamRedteam123!!", "Redteam name", "default_redteam"
+        django_user_model,
+        "redteamer@openkat.nl",
+        "RedteamRedteam123!!",
+        "Redteam name",
+        "default_redteam",
     )
 
 
 @pytest.fixture
 def redteamuser_b(django_user_model):
     return create_user(
-        django_user_model, "redteamerB@openkat.nl", "RedteamBRedteamB123!!", "Redteam B name", "default_redteam_b"
+        django_user_model,
+        "redteamerB@openkat.nl",
+        "RedteamBRedteamB123!!",
+        "Redteam B name",
+        "default_redteam_b",
     )
 
 
@@ -235,13 +265,23 @@ def redteam_member_b(redteamuser_b, organization_b):
 
 @pytest.fixture
 def clientuser(django_user_model):
-    return create_user(django_user_model, "client@openkat.nl", "ClientClient123!!", "Client name", "default_client")
+    return create_user(
+        django_user_model,
+        "client@openkat.nl",
+        "ClientClient123!!",
+        "Client name",
+        "default_client",
+    )
 
 
 @pytest.fixture
 def clientuser_b(django_user_model):
     return create_user(
-        django_user_model, "clientB@openkat.nl", "ClientBClientB123!!", "Client B name", "default_client_b"
+        django_user_model,
+        "clientB@openkat.nl",
+        "ClientBClientB123!!",
+        "Client B name",
+        "default_client_b",
     )
 
 
@@ -270,7 +310,13 @@ def client_user_two_organizations(clientuser, organization, organization_b):
 
 @pytest.fixture
 def new_member(django_user_model, organization):
-    user = create_user(django_user_model, "cl1@openkat.nl", "TestTest123!!", "New user", "default_new_user")
+    user = create_user(
+        django_user_model,
+        "cl1@openkat.nl",
+        "TestTest123!!",
+        "New user",
+        "default_new_user",
+    )
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.NEW
     member.save()
@@ -279,7 +325,13 @@ def new_member(django_user_model, organization):
 
 @pytest.fixture
 def active_member(django_user_model, organization):
-    user = create_user(django_user_model, "cl2@openkat.nl", "TestTest123!!", "Active user", "default_active_user")
+    user = create_user(
+        django_user_model,
+        "cl2@openkat.nl",
+        "TestTest123!!",
+        "Active user",
+        "default_active_user",
+    )
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.ACTIVE
     member.save()
@@ -288,7 +340,13 @@ def active_member(django_user_model, organization):
 
 @pytest.fixture
 def blocked_member(django_user_model, organization):
-    user = create_user(django_user_model, "cl3@openkat.nl", "TestTest123!!", "Blocked user", "default_blocked_user")
+    user = create_user(
+        django_user_model,
+        "cl3@openkat.nl",
+        "TestTest123!!",
+        "Blocked user",
+        "default_blocked_user",
+    )
     member = create_member(user, organization)
     member.status = OrganizationMember.STATUSES.ACTIVE
     member.blocked = True
@@ -304,6 +362,11 @@ def mock_models_katalogus(mocker):
 @pytest.fixture
 def mock_views_katalogus(mocker):
     return mocker.patch("rocky.views.ooi_report.get_katalogus")
+
+
+@pytest.fixture
+def mock_katalogus_client(mocker):
+    return mocker.patch("katalogus.client.get_katalogus")()
 
 
 @pytest.fixture
@@ -446,7 +509,9 @@ def network() -> Network:
 def url(network) -> URL:
     return URL(
         scan_profile=DeclaredScanProfile(
-            scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
+            scan_profile_type="declared",
+            reference=Reference("URL|testnetwork|http://example.com/"),
+            level=ScanLevel.L1,
         ),
         primary_key="URL|testnetwork|http://example.com/",
         network=network.reference,
@@ -1177,7 +1242,11 @@ class MockOctopoesAPIConnector:
         return self.oois[reference]
 
     def get_tree(
-        self, reference: Reference, valid_time: datetime, types: set = frozenset(), depth: int = 1
+        self,
+        reference: Reference,
+        valid_time: datetime,
+        types: set = frozenset(),
+        depth: int = 1,
     ) -> ReferenceTree:
         return self.tree[reference]
 

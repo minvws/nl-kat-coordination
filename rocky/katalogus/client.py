@@ -107,7 +107,7 @@ class KATalogusClientV1:
             raise KATalogusHTTPStatusError(status_code=str(error.response.status_code))
         return [parse_plugin(plugin) for plugin in response.json()]
 
-    def get_plugin(self, plugin_id: str) -> Boefje | Normalizer:
+    def get_plugin(self, plugin_id: str) -> Plugin:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
         return parse_plugin(response.json())
@@ -155,25 +155,25 @@ class KATalogusClientV1:
 
         return ServiceHealth.model_validate_json(response.content)
 
-    def get_normalizers(self) -> list[Normalizer]:
+    def get_normalizers(self) -> list[Plugin]:
         return self.get_plugins(plugin_type="normalizer")
 
-    def get_boefjes(self) -> list[Boefje]:
+    def get_boefjes(self) -> list[Plugin]:
         return self.get_plugins(plugin_type="boefje")
 
-    def enable_boefje(self, plugin: Boefje) -> None:
+    def enable_boefje(self, plugin: Plugin) -> None:
         self._patch_boefje_state(plugin.id, True, plugin.repository_id)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
         self.enable_boefje(self.get_plugin(boefje_id))
 
-    def disable_boefje(self, plugin: Boefje) -> None:
+    def disable_boefje(self, plugin: Plugin) -> None:
         self._patch_boefje_state(plugin.id, False, plugin.repository_id)
 
-    def get_enabled_boefjes(self) -> list[Boefje]:
+    def get_enabled_boefjes(self) -> list[Plugin]:
         return [plugin for plugin in self.get_boefjes() if plugin.enabled]
 
-    def get_enabled_normalizers(self) -> list[Normalizer]:
+    def get_enabled_normalizers(self) -> list[Plugin]:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
     def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
