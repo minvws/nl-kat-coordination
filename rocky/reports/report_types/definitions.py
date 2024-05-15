@@ -115,7 +115,7 @@ class Report(BaseReport):
         open_indicator: str = "(",
         close_indicator: str = ")",
         hostnames_by_input_ooi: dict | None = None,
-    ) -> dict:
+    ) -> dict[str, str]:
         """Converts input_oois to human readable hostname strings.
 
         Turns a list of either Hostname and IPAddress references into a string
@@ -123,7 +123,7 @@ class Report(BaseReport):
         grouped by input ooi.
         """
         if hostnames_by_input_ooi is None:
-            hostnames_by_input_ooi = self.to_hostnames(input_oois=input_oois, valid_time=valid_time)
+            hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
         human_readable = {}
         for input_ooi, hostnames in hostnames_by_input_ooi.items():
             hostname_str = ""
