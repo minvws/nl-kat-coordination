@@ -46,7 +46,6 @@ from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 logger = getLogger(__name__)
 settings = Settings()
-USE_BIT_CACHE: bool = True
 BIT_CACHE: dict[int, list[OOI]] = {}
 
 
