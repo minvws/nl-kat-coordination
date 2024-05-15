@@ -40,12 +40,15 @@ def status(ctx: click.Context):
 
 
 @cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
-@click.option("--query", default="{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")
+@click.argument("edn", required=False)
 @click.pass_context
-def query(ctx: click.Context, query: str):
+def query(ctx: click.Context, edn: str):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(json.dumps(client.query(query)))
+    if edn:
+        click.echo(json.dumps(client.query(edn)))
+    else:
+        click.echo(json.dumps(client.query()))
 
 
 @cli.command(help="List all keys in node")
