@@ -1,22 +1,22 @@
 {
-    "title": "Arguments",
-    "type": "object",
-    "properties": {
-        "MESSAGE": {
-            "title": "Input text to give to the boefje",
-            "type": "string",
-            "description": "Some text so the boefje has some information to work with. Normally you could feed this an API-key or a username"
-        },
-        "NUMBER": {
-            "title": "Amount of cats to add",
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9,
-            "default": 0,
-            "description": "A number between 1 and 9. To show how many cats you want to add to the greeting"
-        }
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "MESSAGE": {
+      "title": "Input text to give to the boefje",
+      "type": "string",
+      "description": "Some text so the boefje has some information to work with. Normally you could feed this an API-key or a username"
     },
-    "required": [
-        "MESSAGE"
-    ]
+    "NUMBER": {
+      "title": "Amount of cats to add",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9,
+      "default": 0,
+      "description": "A number between 1 and 9. To show how many cats you want to add to the greeting"
+    }
+  },
+  "required": [
+    "MESSAGE"
+  ]
 }

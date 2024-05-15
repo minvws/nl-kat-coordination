@@ -29,7 +29,7 @@ REPORTS = [
     NameServerSystemReport,
     RPKIReport,
     IPv6Report,
-    GreetingsReport
+    GreetingsReport,
 ]
 AGGREGATE_REPORTS = [AggregateOrganisationReport]
 

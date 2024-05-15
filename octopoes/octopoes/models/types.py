@@ -46,6 +46,7 @@ from octopoes.models.ooi.findings import (
     RetireJSFindingType,
     SnykFindingType,
 )
+from octopoes.models.ooi.greeting import Greeting
 from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
     AutonomousSystem,
@@ -76,7 +77,6 @@ from octopoes.models.ooi.web import (
     SecurityTXT,
     Website,
 )
-from octopoes.models.ooi.greeting import Greeting
 
 CertificateType = (
     X509Certificate | SubjectAlternativeNameHostname | SubjectAlternativeNameIP | SubjectAlternativeNameQualifier
