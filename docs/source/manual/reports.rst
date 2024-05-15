@@ -8,7 +8,7 @@ There are 3 different kinds of reports available. These are:
 
 - **Normal report:** selecting one or more reports will show the contents of each report below each other. These reports can be exported as PDF.
 - **Aggregate report:** selecting one or more reports will show aggregation of the data for each selected reports. This means that certain results from boefjes are aggregated together and can be used to get a general overview of the current compliance status of the scanned objects. These reports can be exported as PDF and JSON.
-- **Multi report:** allow you to compare an organisation with another organisation based on the organisation tags. This is only possible for aggregate reports.
+- **Multi report:** allow you to compare an organisation with another organisation based on the organisation tags. This is only possible for aggregate reports. The report is very similar to the data within the aggregate report, but then consists of data across multiple organisations. 
 
 The table below gives an overview of which 12 reports are available. It also describes which Object is required in the selection process and whether the report is available as normal and/or as aggregate report.
 
@@ -91,7 +91,6 @@ The general elements and order of the three different reports are listed below:
  - Name server report
  - RPKI report
  - IPv6 report
-
 - Aggregate report
 - Multi report: 
 
@@ -114,55 +113,66 @@ The table below gives an overview of the elements that can be found in each repo
        * Basic Security overview table (groups the systems based on types and (compliance) checks to get a general impression of the current status.)
        * Vulnerabilities
        * Appendices (Terms, selected objects, reports, plugins and used config objects)
-     - TODO
+     - Standard elements
+     - * Introduction
+       * Summary
+       * Recommendations
+       * Asset overview 
+       * Open port occurences
+       * IPv6 connectivity overview
+       * Basic Security overview table (groups the systems based on types and (compliance) checks to get a general impression of the current status.)
+       * Safe connections overview
+       * System specific overview
+       * RPKI overview
+       * Appendices (Terms, selected objects, reports, plugins and used config objects)
    * - DNS
      - The table gives an overview of all identified DNS records for the selected hostname. This can help to identify potential misconfigurations for hostnames. The Security Measures table shows which DNS security measures are applied and/or missing.
      - The report shows per system type how many of the identified IPs/systems are compliant with the DNS checks. If in-compliant systems are identified, a compliance issue description is provided with the corresponding risk level.
-     - TODO
+     - Overview on the compliance status of various DNS checks across all systems.
    * - Findings
      - Shows an overview table with the number of findings and occurrences per risk level (Critical, high, medium, low, recommendation), followed by a list of all findings. Each finding can be opened to view more details, such as a description of the finding, the possible impact, a general recommendation and the hosts where this finding was identified. 
      - Gives an overview of all findings (KAT, CVE and/or custom findings). 
-     - TODO
+     - Overview on the vulnerabilities checks across all systems.
    * - IPv6
      - Shows if IPv6 was detected on the scanned system.
      - The report shows per host name if an IPv6 address was detected.
-     - TODO
+     - Overview on the IPv6 status categorised per system type.
    * - Mail
      - The table gives an overview of some security configurations that are recommended to be implemented to ensure authenticated e-mails are sent on behalf of the hostname. The compliance checks look at the presence of SPF, DKIM and DMARC, which are used to prevent spammers from sending unwanted e-mails.. Each check will show whether or not the system is compliant with this security configuration. If a lack of compliance is identified, the table below will show what compliance issue was identified with what risk.
      - The report shows per system type how many of the identified IPs/systems are compliant with the e-mail checks. If in-compliant systems are identified, a compliance issue description is provided with the corresponding risk level.
-     - TODO
+     - Overview on the compliance status of various e-mail checks across all systems.
    * - Name server
      - The table gives an overview of the recommended security configurations to ensure an increased level of security for the domain name servers for the scanned domain. The compliance checks look at the presence and configuration of DNSSEC, and the open ports that are enabled. Each check will show whether or not the system is compliant with this security configuration. If a lack of compliance is identified, the table below will show what compliance issue was identified with what risk. **This requires that the hostnames of the name servers are selected!**
-     - he aggregate findings of the name server report can be found under the DNS checks. 
-     - TODO
+     - The aggregate findings of the name server report can be found under the DNS checks. 
+     - The aggregated data can be found under the DNS checks. 
    * - Open ports
      - Shows for the identified IP addresses which ports were found to be open and thus reachable. If available the table will show the IPv4 and/or IPv6 addresses, the hostname(s) and all open ports identified on both IPv4 and IPv6 (if available). Please note that you have to manually enable IPv6 support in Dockerized environments. See the docs on how to do this.
      - The report shows the open ports for all scanned IP addresses.
-     - TODO
+     - The table gives an overview on the number of occurences for each open port.  
    * - RPKI
      - The table gives an overview of the RPKI status for the selected domain. It currently shows if RPKI is available and if the data is not expired.
      - The table gives an overview of the RPKI status grouped per system type. It currently shows if RPKI is available and if the data is not expired.
-     - TODO
+     - The table gives an overview on the number of occurences of the RPKI status grouped per system type. It currently shows if RPKI is available and if the data is not expired.
    * - Safe connections
      - The table gives an overview of some security configurations that are recommended to be implemented to ensure safe connections (encryption). The compliance checks look at the TLS protocols and TLS Ciphers offered by the system. Each check will show whether or not the system is compliant with this security configuration. If a lack of compliance is identified, the table below will show what compliance issue was identified with what risk.
      - The report shows per system type how many of the identified IPs/systems are compliant with the safe connections checks. If in-compliant systems are identified, a compliance issue description is provided with the corresponding risk level.
-     - TODO
+     - The table shows the number of occurences matching the compliance checks. 
    * - Systems
      - The table gives an overview of which system types were identified on the system. This is performed based on the identified open ports, which can have one or more of the following labels: DICOM, DNS, Mail, Web, Other.
      - For each identified system type all checks are grouped together.
-     - TODO
+     - Overview of the compliance checks grouped per system type with the number of occurences. 
    * - TLS
      - The table shows which TLS protocol versions and TLS ciphers were identified on the system, including the status of the identified data. This means that if outdated protocols (such as SSL3) are identified, the table will show a recommendation such as ‘Phase out’.
      - The aggregate findings of the TLS report can be found under the safe connections checks.
-     - TODO
+     - This data is aggregated unden the safe connections checks. 
    * - Vulnerability
      - The table gives an overview of the identified CVE's on the system.
      - The table gives an overview of the identified CVE's on the system.
-     - TODO
+     - The table gives an overview of the identified CVE's on the system.
    * - Web system
      - The table gives an overview of some basic security configurations that are recommended to be implemented. These checks are performed against the scanned systems/hosts.  Each check will show whether or not the system is compliant with this security configuration. If a lack of compliance is identified, the table below will show what compliance issue was identified with what risk.
-     - he results of the web server checks against all web servers are grouped together and an overview is provided how many of the web servers are compliant with each check. If in-compliant systems are identified, a compliance issue description is provided with the corresponding risk level.
-     - TODO
+     - The results of the web server checks against all web servers are grouped together and an overview is provided how many of the web servers are compliant with each check. If in-compliant systems are identified, a compliance issue description is provided with the corresponding risk level.
+     - The number of occurences for each web check are shown. 
 
 Report flow
 ===========
