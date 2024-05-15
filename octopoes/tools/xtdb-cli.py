@@ -12,17 +12,34 @@ logger = logging.getLogger(__name__)
 
 @click.group
 @click.option("-n", "--node", default="0", show_default=True, help="XTDB node")
-@click.option("-u", "--url", default="http://localhost:3000", show_default=True, help="XTDB server base url")
-@click.option("-t", "--timeout", type=int, default=5000, show_default=True, help="XTDB request timeout (in ms)")
-@click.option("-v", count=True, help="Increase the verbosity level")
+@click.option(
+    "-u",
+    "--url",
+    default="http://localhost:3000",
+    show_default=True,
+    help="XTDB server base url",
+)
+@click.option(
+    "-t",
+    "--timeout",
+    type=int,
+    default=5000,
+    show_default=True,
+    help="XTDB request timeout (in ms)",
+)
+@click.option(
+    "-v", "--verbosity", count=True, default=1, help="Increase the verbosity level"
+)
 @click.pass_context
-def cli(ctx: click.Context, url: str, node: str, timeout: int, v: int):
-    if v == 1:
+def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
+    if verbosity == 1:
         logging.basicConfig(level=logging.WARN)
-    elif v == 2:
+    elif verbosity == 2:
         logging.basicConfig(level=logging.INFO)
-    elif v == 3:
+    elif verbosity == 3:
         logging.basicConfig(level=logging.DEBUG)
+    else:
+        raise click.UsageError("Invalid verbosity level (use -v, -vv, or -vvv)")
 
     client = XTDBClient(url, node, timeout)
     logger.debug("Instantiated XTDB client with endpoint %s", url)
@@ -39,7 +56,9 @@ def status(ctx: click.Context):
     click.echo(json.dumps(client.status()))
 
 
-@cli.command(help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")')
+@cli.command(
+    help='EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")'
+)
 @click.option("--query", default="{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")
 @click.pass_context
 def query(ctx: click.Context, query: str):
@@ -61,7 +80,11 @@ def list_keys(ctx: click.Context):
 def list_values(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(json.dumps(client.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}")))
+    click.echo(
+        json.dumps(
+            client.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}")
+        )
+    )
 
 
 @cli.command

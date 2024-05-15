@@ -1,6 +1,7 @@
 import datetime
 
 import httpx
+from pydantic import JsonValue
 
 
 class XTDBClient:
@@ -11,13 +12,17 @@ class XTDBClient:
             timeout=timeout,
         )
 
-    def status(self) -> str:
+    def status(self) -> JsonValue:
         res = self._client.get("/status")
 
         return res.json()
 
-    def query(self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}") -> str:
-        res = self._client.post("/query", content=query, headers={"Content-Type": "application/edn"})
+    def query(
+        self, query: str = "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}"
+    ) -> JsonValue:
+        res = self._client.post(
+            "/query", content=query, headers={"Content-Type": "application/edn"}
+        )
 
         return res.json()
 
@@ -27,7 +32,7 @@ class XTDBClient:
         valid_time: datetime.datetime | None = None,
         tx_time: datetime.datetime | None = None,
         tx_id: int | None = None,
-    ) -> str:
+    ) -> JsonValue:
         params = {"eid": key}
         if valid_time is not None:
             params["valid-time"] = valid_time.isoformat()
@@ -40,7 +45,7 @@ class XTDBClient:
 
         return res.json()
 
-    def history(self, key: str, with_corrections: bool, with_docs: bool) -> str:
+    def history(self, key: str, with_corrections: bool, with_docs: bool) -> JsonValue:
         params = {"eid": key, "history": True, "sortOrder": "asc"}
         if with_corrections:
             params["with-corrections"] = "true"
@@ -57,7 +62,7 @@ class XTDBClient:
         valid_time: datetime.datetime | None = None,
         tx_time: datetime.datetime | None = None,
         tx_id: int | None = None,
-    ) -> str:
+    ) -> JsonValue:
         params = {"eid": key}
         if valid_time is not None:
             params["valid-time"] = valid_time.isoformat()
@@ -69,12 +74,12 @@ class XTDBClient:
 
         return res.json()
 
-    def attribute_stats(self) -> str:
+    def attribute_stats(self) -> JsonValue:
         res = self._client.get("/attribute-stats")
 
         return res.json()
 
-    def sync(self, timeout: int | None) -> str:
+    def sync(self, timeout: int | None) -> JsonValue:
         if timeout is not None:
             res = self._client.get("/sync", params={"timeout": timeout})
         else:
@@ -82,7 +87,7 @@ class XTDBClient:
 
         return res.json()
 
-    def await_tx(self, transaction_id: int, timeout: int | None) -> str:
+    def await_tx(self, transaction_id: int, timeout: int | None) -> JsonValue:
         params = {"txId": transaction_id}
         if timeout is not None:
             params["timeout"] = timeout
@@ -94,7 +99,7 @@ class XTDBClient:
         self,
         transaction_time: datetime.datetime,
         timeout: int | None,
-    ) -> str:
+    ) -> JsonValue:
         params = {"tx-time": transaction_time.isoformat()}
         if timeout is not None:
             params["timeout"] = str(timeout)
@@ -106,46 +111,48 @@ class XTDBClient:
         self,
         after_tx_id: int | None,
         with_ops: bool,
-    ) -> str:
+    ) -> JsonValue:
         params = {}
         if after_tx_id is not None:
-            params["after-tx-id"] = str(after_tx_id)
+            params["after-tx-id"] = after_tx_id
         if with_ops:
-            params["with-ops?"] = "true"
+            params["with-ops?"] = True
 
         res = self._client.get("/tx-log", params=params)
 
         return res.json()
 
-    def submit_tx(self, transactions: list[str]) -> str:
+    def submit_tx(self, transactions: list[str]) -> JsonValue:
         res = self._client.post("/submit-tx", json={"tx-ops": transactions})
 
         return res.json()
 
-    def tx_committed(self, txid: int) -> str:
+    def tx_committed(self, txid: int) -> JsonValue:
         res = self._client.get("/tx-committed", params={"txId": txid})
 
         return res.json()
 
-    def latest_completed_tx(self) -> str:
+    def latest_completed_tx(self) -> JsonValue:
         res = self._client.get("/latest-completed-tx")
 
         return res.json()
 
-    def latest_submitted_tx(self) -> str:
+    def latest_submitted_tx(self) -> JsonValue:
         res = self._client.get("/latest-submitted-tx")
 
         return res.json()
 
-    def active_queries(self) -> str:
+    def active_queries(self) -> JsonValue:
         res = self._client.get("/active-queries")
 
         return res.json()
 
-    def recent_queries(self) -> str:
+    def recent_queries(self) -> JsonValue:
         res = self._client.get("/recent-queries")
+
         return res.json()
 
-    def slowest_queries(self) -> str:
+    def slowest_queries(self) -> JsonValue:
         res = self._client.get("/recent-queries")
+
         return res.json()
