@@ -31,24 +31,6 @@
                    href="{% url 'ooi_list' organization_code=organization.code %}">{% translate "Go to the object page" %}</a>
             </div>
         {% else %}
-            {% if channel == "aggregate_report" %}
-                <p class="explanation"
-                   role="group"
-                   aria-label="{% translate "explanation select all" %}">
-                    <span>{% translate "Explanation 'Continue with all OOIs:'" %}</span>
-                    {% blocktrans trimmed %}
-                        This option will select all OOIs (+ current filters)
-                        for {{ organization }} organization.
-                    {% endblocktrans %}
-                </p>
-                <form method="get" class="inline" action="{{ next }}">
-                    {% include "forms/report_form_fields.html" %}
-
-                    <button type="submit" class="button" name="ooi" value="all">
-                        {% translate "Continue with all OOIs" %}<span class="icon ti-chevron-right"></span>
-                    </button>
-                </form>
-            {% endif %}
             <form method="get"
                   action="{{ next }}"
                   class="inline layout-wide checkboxes_required">
@@ -58,7 +40,9 @@
                     <caption class="visually-hidden">{% translate "Objects" %}</caption>
                     <thead>
                         <th>
-                            <input class="toggle-all" data-toggle-target="ooi" type="checkbox">
+                            <input type="checkbox"
+                                   id="submit-form"
+                                   {% if "all" in request.GET.ooi %}checked{% endif %}>
                         </th>
                         <th>{% translate "Object" %}</th>
                         <th>{% translate "Type" %}</th>
@@ -69,7 +53,7 @@
                         {% for object in object_list %}
                             <tr>
                                 <td>
-                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois %}checked{% endif %}>
+                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in request.GET.ooi %}checked{% endif %} {% if "all" in request.GET.ooi %}disabled{% endif %}>
                                 </td>
                                 <td>{{ object.human_readable }}</td>
                                 <td>{{ object.ooi_type }}</td>
@@ -82,6 +66,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                {% if "all" in request.GET.ooi %}<input type="hidden" name="ooi" value="all">{% endif %}
                 <button type="submit" class="button">
                     {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
                 </button>
@@ -91,3 +76,12 @@
         {% endif %}
     </div>
 </section>
+<form id="submit-with-checkbox-form" class="inline" method="get">
+    <input type="hidden" name="ooi" value="all">
+    {% include "forms/report_form_fields.html" %}
+
+</form>
+<form id="submit-without-checkbox-form" class="inline" method="get">
+    {% include "forms/report_form_fields.html" %}
+
+</form>

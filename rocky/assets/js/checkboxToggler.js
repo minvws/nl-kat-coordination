@@ -86,3 +86,27 @@ function reset_validity(error_element, event){
   // we need to remove the custom error on change, because otherwise the submit won't allow us to revalidate as the form immediately raises an invalid state.
   error_element.setCustomValidity('');
 }
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  var checkbox_form = document.getElementById('submit-with-checkbox-form');
+  var no_checkbox_form = document.getElementById('submit-without-checkbox-form');
+  var checkbox = document.getElementById('submit-form');
+
+  if (checkbox_form && no_checkbox_form && checkbox) {
+
+      checkbox.addEventListener('change', function() {
+        if (checkbox.checked){
+          checkbox_form.submit();
+
+        }else{
+          no_checkbox_form.submit();
+        }
+      });
+
+    }
+
+
+});

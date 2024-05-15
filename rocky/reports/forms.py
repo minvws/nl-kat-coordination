@@ -28,3 +28,11 @@ class ReportTypeMultiselectForm(BaseRockyForm):
         super().__init__(*args, **kwargs)
         report_types_choices = ((report_type.id, report_type.name) for report_type in report_types)
         self.fields["report_type"].choices = report_types_choices
+
+
+class SelectAllObjectsForm(forms.Form):
+    select_all_objects = forms.BooleanField(
+        widget=forms.CheckboxInput(attrs={"onclick": "this.form.submit();"}),
+        required=False,
+        label="",
+    )
