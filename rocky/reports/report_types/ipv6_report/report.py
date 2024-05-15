@@ -23,7 +23,7 @@ class IPv6Report(Report):
     id = "ipv6-report"
     name = _("IPv6 Report")
     description = _("Check whether hostnames point to ipv6 addresses.")
-    plugins = {"required": ["dns-record"], "optional": []}
+    plugins = {"required": ["dns-records"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "ipv6_report/report.html"
     label_style = "4-light"
