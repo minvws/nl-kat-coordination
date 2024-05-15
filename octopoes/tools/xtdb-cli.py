@@ -10,7 +10,13 @@ from xtdb_client import XTDBClient
 logger = logging.getLogger(__name__)
 
 
-@click.group
+@click.group(
+    context_settings={
+        "help_option_names": ["-h", "--help"],
+        "max_content_width": 120,
+        "show_default": True,
+    }
+)
 @click.option("-n", "--node", default="0", show_default=True, help="XTDB node")
 @click.option(
     "-u",
@@ -28,7 +34,7 @@ logger = logging.getLogger(__name__)
     help="XTDB request timeout (in ms)",
 )
 @click.option(
-    "-v", "--verbosity", count=True, default=1, help="Increase the verbosity level"
+    "-v", "--verbosity", count=True, help="Increase the verbosity level"
 )
 @click.pass_context
 def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
@@ -42,7 +48,7 @@ def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
         raise click.UsageError("Invalid verbosity level (use -v, -vv, or -vvv)")
 
     client = XTDBClient(url, node, timeout)
-    logger.debug("Instantiated XTDB client with endpoint %s", url)
+    logger.info("Instantiated XTDB client with endpoint %s for node %s", url, node)
 
     ctx.ensure_object(dict)
     ctx.obj["client"] = client
