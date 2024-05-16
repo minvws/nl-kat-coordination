@@ -99,11 +99,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
       checkbox.addEventListener('change', function() {
         if (checkbox.checked){
-          no_checkbox_form.submit();
+          checkbox_form.submit();
 
 
         }else{
-          checkbox_form.submit();
+          no_checkbox_form.submit();
         }
       });
 

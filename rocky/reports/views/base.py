@@ -17,7 +17,7 @@ from katalogus.client import Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
 from octopoes.models import OOI
-from reports.forms import OOITypeMultiCheckboxForReportForm, SelectAllObjectsForm
+from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import BaseReportType, MultiReport, Report, ReportType
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from rocky.views.mixins import OOIList
@@ -194,7 +194,6 @@ class BaseReportView(OOIFilterView):
         context["selected_report_types"] = self.selected_report_types
         context["plugins"] = self.plugins
         context["oois"] = self.get_oois()
-        context["select_all_oois_form"] = SelectAllObjectsForm
         return context
 
 

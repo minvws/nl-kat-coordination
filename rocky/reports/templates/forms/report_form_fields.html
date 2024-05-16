@@ -14,3 +14,4 @@
         <input type="hidden" name="plugin" value={{ required_plugin.id }}>
     {% endfor %}
 {% endif %}
+{% if request.GET.page %}<input type="hidden" name="page" value={{ request.GET.page }}>{% endif %}
