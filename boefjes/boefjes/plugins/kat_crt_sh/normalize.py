@@ -4,17 +4,15 @@ from collections.abc import Iterable
 
 from dateutil.parser import parse
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerOutput
 from octopoes.models.ooi.certificate import X509Certificate
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    input_ = normalizer_meta.raw_data.boefje_meta.arguments["input"]
-    fqdn = input_["hostname"]["name"]
+    fqdn = input_ooi["hostname"]["name"]
     current = fqdn.lstrip(".")
 
     network = Network(name="internet")
