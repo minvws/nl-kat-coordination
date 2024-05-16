@@ -431,6 +431,7 @@ class Server:
                 detail=f"error occurred while accessing the database [exception: {exc}]",
             ) from exc
         except Exception as exc:
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"failed to get task [exception: {exc}]",
@@ -459,6 +460,7 @@ class Server:
                 detail=f"error occurred while accessing the database [exception: {exc}]",
             ) from exc
         except Exception as exc:
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"failed to get task [exception: {exc}]",
@@ -476,7 +478,7 @@ class Server:
         try:
             self.ctx.datastores.task_store.update_task(updated_task)
         except Exception as exc:
-            self.logger.error(exc)
+            self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="failed to update task",
@@ -492,6 +494,7 @@ class Server:
                 scheduler_id
             )
         except Exception as exc:
+            self.logger.exception(exc)
             self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
