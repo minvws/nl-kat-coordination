@@ -1,6 +1,5 @@
 from django.urls import resolve, reverse
 from katalogus.client import KATalogusHTTPStatusError
-from reports.report_types.ipv6_report.report import IPv6Report
 from reports.views.generate_report import SetupScanGenerateReportView
 
 from octopoes.models.pagination import Paginated
@@ -16,15 +15,7 @@ def test_generate_report_setup_scan_wrong_plugin_id(
     mock_organization_view_octopoes,
     listed_hostnames,
 ):
-    base = mocker.patch("reports.views.base")
     katalogus_client = mocker.patch("reports.views.base.get_katalogus")()
-
-    ipv6_report_wrong_plugin_id = IPv6Report.plugins = {
-        "required": ["dns-reco"],
-        "optional": [],
-    }
-    base.get_report_by_id.return_value = ipv6_report_wrong_plugin_id
-
     mock_organization_view_octopoes().list_objects.return_value = Paginated[OOIType](
         count=len(listed_hostnames), items=listed_hostnames
     )
