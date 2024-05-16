@@ -193,7 +193,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         try:
-            self.plugins, self.all_plugins_enabled = self.get_plugins()
+            self.plugins, self.all_plugins_enabled = self.get_all_plugins()
         except KATalogusError as error:
             messages.error(self.request, error.message)
             self.plugins = {}
@@ -219,7 +219,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             return self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]
         return False
 
-    def get_plugins(self) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
+    def get_all_plugins(self) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
         return self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
 
     def get_required_optional_plugins(
