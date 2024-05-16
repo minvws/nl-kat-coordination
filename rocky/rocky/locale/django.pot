@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-07 13:05+0000\n"
+"POT-Creation-Date: 2024-04-19 08:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3514,35 +3514,11 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid ""
-"Some plugins are mandatory as they are crucial for a report type. Reports "
-"that don't have their requirements met will be skipped."
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
-msgid "Warning! Before you proceed read the following points:"
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
-msgid ""
-"OpenKAT is designed to scan all known objects on a regular (daily) basis "
-"using the enabled plugins and set clearance levels. This means that scans "
-"will run automatically. Be patient; plugins may take some time before they "
-"have collected all their data. Enabling them just before report generation "
-"will likely result in inaccurate reports, as plugins have not finished "
-"collecting data."
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
 msgid "This report type requires the following plugins to be enabled:"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Good job! All required plugins are enabled."
-msgstr ""
-
-#: reports/templates/partials/report_setup_scan.html
-msgid "Show enabled plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
