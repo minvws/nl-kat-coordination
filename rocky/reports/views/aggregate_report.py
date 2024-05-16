@@ -82,10 +82,6 @@ class OOISelectionAggregateReportView(
     paginate_by = 20
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.clear_all_oois_selection()
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(self.get_ooi_filter_forms(self.ooi_types))

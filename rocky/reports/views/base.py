@@ -99,10 +99,6 @@ class BaseReportView(OOIFilterView):
             selected_oois = ["all"]
         return selected_oois
 
-    def clear_all_oois_selection(self) -> None:
-        if "all" in self.selected_oois:
-            self.selected_oois = []
-
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
             return self.octopoes_api_connector.list_objects(
