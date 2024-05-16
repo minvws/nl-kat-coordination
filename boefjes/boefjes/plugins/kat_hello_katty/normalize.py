@@ -2,8 +2,7 @@ import json
 from collections.abc import Iterable
 from ipaddress import AddressValueError, IPv4Network, NetmaskValueError
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerOutput
 from octopoes.models.ooi.greeting import Greeting
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
@@ -16,13 +15,13 @@ def is_ipv4(string: str) -> bool:
         return False
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     """Function that gets ran to produce OOIs from the boefje it consumes"""
     # TODO: ask if raw is always of type bytes
     data_string = str(raw, "utf-8")
     data: dict = json.loads(data_string)
 
-    network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["network"]["name"])
+    network = Network(name=input_ooi["network"]["name"])
     yield network
 
     ip = None
