@@ -1,8 +1,8 @@
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.service import TLSCipher
 
 
@@ -40,9 +40,8 @@ def parse_cipher(cipher: dict) -> dict | None:
         return cipher_dict
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    boefje_meta = normalizer_meta.raw_data.boefje_meta
-    input_ooi = Reference.from_str(boefje_meta.input_ooi)
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
+    ip_service_reference = Reference.from_str(input_ooi["primary_key"])
     output = json.loads(raw)
     tls_dict = {}
     for item in output:
@@ -53,4 +52,4 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
                     tls_dict[protocol] = []
                 tls_dict[protocol].append(suite)
     if tls_dict:
-        yield TLSCipher(ip_service=input_ooi, suites=tls_dict)
+        yield TLSCipher(ip_service=ip_service_reference, suites=tls_dict)
