@@ -15,6 +15,6 @@ def exception_handler(func):
         except sqlalchemy.exc.DataError as exc:
             raise StorageError(f"Invalid data: {exc}") from exc
         except Exception as exc:
-            raise StorageError("External service returned an error.") from exc
+            raise StorageError(f"An error occurred: {exc}") from exc
 
     return inner_function

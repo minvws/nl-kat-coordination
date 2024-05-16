@@ -21,7 +21,7 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
         A filtered SQLAlchemy query.
     """
     if not isinstance(filter_request.filters, dict):
-        raise ValueError("Filter request must be a dict")
+        raise FilterError("Filter request must be a dict")
 
     for operator in filter_request.filters:
         expressions = []
@@ -45,21 +45,31 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
             # If the filter field is the same as the column name, return the
             # expression as is.
             else:
-                entity_attr = entity_attr if filter_field == filter_.column else entity_attr[filter_field]
+                entity_attr = (
+                    entity_attr
+                    if filter_field == filter_.column
+                    else entity_attr[filter_field]
+                )
 
             # Cast the expression to the correct type based on the filter value
             if isinstance(entity_attr, BinaryExpression):
                 try:
                     entity_attr = cast_expression(entity_attr, filter_)
                 except (UnsupportedTypeError, MismatchedTypeError) as exc:
-                    raise FilterError(f"Invalid filter value: {filter_.value} (error: {exc})")
+                    raise FilterError(
+                        f"Invalid filter value: {filter_.value} (error: {exc})"
+                    )
 
             # Based on the operator in the filter request we apply the correct
             # comparator function to the expression.
             try:
-                expression = Comparator(filter_.operator).compare(entity_attr, filter_.value)
+                expression = Comparator(filter_.operator).compare(
+                    entity_attr, filter_.value
+                )
             except sqlalchemy.exc.ArgumentError as exc:
-                raise FilterError(f"Invalid filter value: {filter_.value} (sql error: {exc})")
+                raise FilterError(
+                    f"Invalid filter value: {filter_.value} (sql error: {exc})"
+                )
 
             expressions.append(expression)
 
