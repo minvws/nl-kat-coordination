@@ -32,7 +32,6 @@
             </div>
         {% else %}
             <form method="get"
-                  id="submit-with-checkbox-form"
                   action="{{ next }}"
                   class="inline layout-wide checkboxes_required">
                 {% include "forms/report_form_fields.html" %}
@@ -56,7 +55,7 @@
                         {% for object in object_list %}
                             <tr>
                                 <td>
-                                    <input type="checkbox" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in request.GET.ooi %}checked{% endif %} {% if "all" in request.GET.ooi %}disabled{% endif %}>
+                                    <input type="checkbox" id="submit-form" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in request.GET.ooi %}checked{% endif %} {% if "all" in request.GET.ooi %}disabled{% endif %}>
                                 </td>
                                 <td>{{ object.human_readable }}</td>
                                 <td>{{ object.ooi_type }}</td>
@@ -69,7 +68,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                {% if "all" in request.GET.ooi %}<input type="hidden" name="ooi" value="all">{% endif %}
                 <button type="submit" class="button">
                     {% translate "Continue with selection" %}<span class="icon ti-chevron-right"></span>
                 </button>
@@ -79,6 +77,10 @@
         {% endif %}
     </div>
 </section>
+<form id="submit-with-checkbox-form" class="inline" method="get">
+    {% include "forms/report_form_fields.html" %}
+
+</form>
 <form id="submit-without-checkbox-form" class="inline" method="get">
     {% include "forms/report_form_fields.html" %}
 
