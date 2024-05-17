@@ -37,6 +37,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = wappalyzer.analyze_with_versions_and_categories(web_page)
 
     for name, data in results.items():
-        software = Software(name=name, version=data["versions"].pop(0))
+        software = Software(name=name, version=data["versions"].pop(0) if data["versions"] else None)
         software_instance = SoftwareInstance(ooi=web_url.reference, software=software.reference)
         yield from [software, software_instance]
