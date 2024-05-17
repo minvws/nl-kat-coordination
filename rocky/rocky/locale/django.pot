@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-07 13:05+0000\n"
+"POT-Creation-Date: 2024-05-16 07:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -570,6 +570,15 @@ msgstr ""
 msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
 "more details."
+msgstr ""
+
+#: katalogus/client.py
+msgid ""
+"The KATalogus has an unexpected error. Check the logs for further details."
+msgstr ""
+
+#: katalogus/client.py
+msgid "A HTTP error occurred. Check logs for more info."
 msgstr ""
 
 #: katalogus/forms/katalogus_filter.py
@@ -3508,9 +3517,9 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
-"If you choose not to give a plugin permission to run, the data that plugin "
-"would collect or produce will be left out of the report which will then be "
-"generated based on the available data collected by the enabled plugins."
+"If you choose not to enable a plugin, the data that plugin would collect or "
+"produce will be left out of the report which will then be generated based on "
+"the available data collected by the enabled plugins."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3525,12 +3534,12 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
-"OpenKAT is designed to scan all known objects on a regular (daily) basis "
-"using the enabled plugins and set clearance levels. This means that scans "
-"will run automatically. Be patient; plugins may take some time before they "
-"have collected all their data. Enabling them just before report generation "
-"will likely result in inaccurate reports, as plugins have not finished "
-"collecting data."
+"OpenKAT is designed to scan all known objects on a regular basis using the "
+"enabled plugins and set clearance levels. This means that scans will run "
+"automatically. Be patient; plugins may take some time before they have "
+"collected all their data. Enabling them just before report generation will "
+"likely result in inaccurate reports, as plugins have not finished collecting "
+"data."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3689,7 +3698,6 @@ msgid "Select at least one OOI to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
@@ -3702,12 +3710,6 @@ msgstr ""
 #: reports/views/base.py
 #, python-format
 msgid "Report type '%s' does not exist."
-msgstr ""
-
-#: reports/views/generate_report.py
-msgid ""
-"This report may not show all the data as some required plugins are not "
-"enabled."
 msgstr ""
 
 #: reports/views/multi_report.py
