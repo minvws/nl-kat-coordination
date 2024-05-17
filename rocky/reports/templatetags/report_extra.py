@@ -10,3 +10,8 @@ def report_name_by_id(report_id: str):
     for report in REPORTS + MULTI_REPORTS + AGGREGATE_REPORTS:
         if report.id == report_id:
             return report.name
+
+
+@register.filter
+def sum_attribute(checks, attribute):
+    return sum(check[attribute] for check in checks)

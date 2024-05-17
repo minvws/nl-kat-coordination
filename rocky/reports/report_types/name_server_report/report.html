@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load report_extra %}
 
 {% if data.name_server_checks|length > 0 %}
     {% if generate_report %}
@@ -27,34 +28,34 @@
                 <tr>
                     <td>{% translate "DNSSEC Present" %}</td>
                     <td>
-                        {% if data.name_server_checks.has_dnssec != data.name_server_checks|length %}
+                        {% if data.name_server_checks.checks|sum_attribute:"has_dnssec" != data.name_server_checks.checks|length %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ data.name_server_checks.has_dnssec }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                        {{ data.name_server_checks.checks|sum_attribute:"has_dnssec" }}/{{ data.name_server_checks.checks|length }} {% translate "name servers compliant" %}
                     </td>
                 </tr>
                 <tr>
                     <td>{% translate "Valid DNSSEC" %}</td>
                     <td>
-                        {% if data.name_server_checks.has_valid_dnssec != data.name_server_checks|length %}
+                        {% if data.name_server_checks.checks|sum_attribute:"has_valid_dnssec" != data.name_server_checks.checks|length %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ data.name_server_checks.has_valid_dnssec }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                        {{ data.name_server_checks.checks|sum_attribute:"has_valid_dnssec" }}/{{ data.name_server_checks.checks|length }} {% translate "name servers compliant" %}
                     </td>
                 </tr>
                 <tr>
                     <td>{% translate "No unnecessary ports open" %}</td>
                     <td>
-                        {% if data.name_server_checks.no_uncommon_ports != data.name_server_checks|length %}
+                        {% if data.name_server_checks.checks|sum_attribute:"no_uncommon_ports" != data.name_server_checks.checks|length %}
                             <span class="icon incomplete"></span>
                         {% else %}
                             <span class="icon positive"></span>
                         {% endif %}
-                        {{ data.name_server_checks.no_uncommon_ports }}/{{ data.name_server_checks|length }} {% translate "name servers compliant" %}
+                        {{ data.name_server_checks.checks|sum_attribute:"no_uncommon_ports" }}/{{ data.name_server_checks.checks|length }} {% translate "name servers compliant" %}
                     </td>
                 </tr>
             </tbody>
