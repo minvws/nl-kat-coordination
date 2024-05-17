@@ -230,11 +230,7 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
         try:
             produces.add(type_by_name(type_name))
         except TypeNotFound:
-            logger.warning(
-                "Unknown OOI type %s for normalizer produces %s",
-                type_name,
-                normalizer["id"],
-            )
+            logger.warning("Unknown OOI type %s for normalizer produces %s", type_name, normalizer["id"])
 
     return Normalizer(
         id=normalizer["id"],

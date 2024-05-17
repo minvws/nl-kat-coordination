@@ -108,12 +108,7 @@ class ReportTypesSelectionMultiReportView(
         return context
 
 
-class SetupScanMultiReportView(
-    MultiReportStepsMixin,
-    BreadcrumbsMultiReportView,
-    ReportPluginView,
-    TemplateView,
-):
+class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportPluginView, TemplateView):
     """
     Show required and optional plugins to start scans to multi OOIs to include in report.
     """

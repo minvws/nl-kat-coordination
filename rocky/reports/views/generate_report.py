@@ -32,7 +32,6 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         breadcrumbs = super().build_breadcrumbs()
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
-
         breadcrumbs += [
             {
                 "url": reverse("generate_report_landing", kwargs=kwargs) + selection,
@@ -55,7 +54,6 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
                 "text": _("View report"),
             },
         ]
-
         return breadcrumbs
 
 
@@ -221,10 +219,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
         context["report_data"] = self.generate_reports_for_oois()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(
-            reverse(
-                "generate_report_pdf",
-                kwargs={"organization_code": self.organization.code},
-            ),
+            reverse("generate_report_pdf", kwargs={"organization_code": self.organization.code}),
             True,
             **self.request.GET,
         )

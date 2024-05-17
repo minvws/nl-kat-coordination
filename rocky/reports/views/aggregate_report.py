@@ -140,11 +140,7 @@ class ReportTypesSelectionAggregateReportView(
         return context
 
 
-class SetupScanAggregateReportView(
-    AggregateReportStepsMixin,
-    BreadcrumbsAggregateReportView,
-    ReportPluginView,
-):
+class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -239,18 +235,12 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
         context["post_processed_data"] = post_processed_data
         context["report_data"] = report_data
         context["report_download_pdf_url"] = url_with_querystring(
-            reverse(
-                "aggregate_report_pdf",
-                kwargs={"organization_code": self.organization.code},
-            ),
+            reverse("aggregate_report_pdf", kwargs={"organization_code": self.organization.code}),
             True,
             **self.request.GET,
         )
         context["report_download_json_url"] = url_with_querystring(
-            reverse(
-                "aggregate_report_view",
-                kwargs={"organization_code": self.organization.code},
-            ),
+            reverse("aggregate_report_view", kwargs={"organization_code": self.organization.code}),
             True,
             **dict(json="true", **self.request.GET),
         )
