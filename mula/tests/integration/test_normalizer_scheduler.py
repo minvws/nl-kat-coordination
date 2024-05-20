@@ -4,9 +4,9 @@ from types import SimpleNamespace
 from unittest import mock
 
 import httpx
-from scheduler import config, models, schedulers, storage
 from structlog.testing import capture_logs
 
+from scheduler import config, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -35,7 +35,7 @@ class NormalizerSchedulerBaseTestCase(unittest.TestCase):
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
                 storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
+                storage.SchemaStore.name: storage.SchemaStore(self.dbconn),
             }
         )
 
@@ -202,14 +202,22 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
+        task = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id,
+            data=boefje_task,
+        )
+
+        item = functions.create_item(
+            scheduler_id=self.scheduler.scheduler_id,
+            priority=1,
+            task=task,
+        )
 
         # Arrange: create the BoefjeTask
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
-        task = functions.create_task(p_item)
+        task = functions.create_task(item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -252,7 +260,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -291,7 +299,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -333,7 +341,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -376,7 +384,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -419,7 +427,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -476,7 +484,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
+        p_item = functions.create_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
         task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
@@ -513,13 +521,21 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
                 input_ooi=ooi.primary_key,
                 organization=self.organisation.id,
             )
+            task = functions.create_task(
+                scheduler_id=self.scheduler.scheduler_id,
+                data=boefje_task,
+            )
 
-            p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task)
-            task = functions.create_task(p_item)
+            item = functions.create_item(
+                scheduler_id=self.scheduler.scheduler_id,
+                priority=1,
+                task=task,
+            )
+            task = functions.create_task(item)
             self.mock_ctx.datastores.task_store.create_task(task)
 
             boefje_meta = BoefjeMetaFactory(
-                id=p_item.id,
+                id=item.id,
                 boefje=boefje,
                 input_ooi=ooi.primary_key,
             )
