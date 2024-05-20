@@ -81,7 +81,6 @@ class Scheduler(abc.ABC):
         self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.ctx: context.AppContext = ctx
         self.queue: queues.PriorityQueue = queue
-        self.deadline_ranker = rankers.DefaultDeadlineRanker(ctx=self.ctx)
         self.callback: Callable[[], Any] | None = callback
 
         # Properties
@@ -354,30 +353,11 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
-    def signal_handler_task(self, task: models.Task) -> None:
-        """Handle a task that has been completed or failed."""
-        if task.status not in [models.TaskStatus.COMPLETED, models.TaskStatus.FAILED]:
-            return
-
-        def _calculate_deadline(task: models.Task):
-            schema = self.ctx.datastores.schema_store.get_schema_by_hash(task.hash)
-
-            try:
-                schema.deadline_at = datetime.fromtimestamp(self.deadline_ranker.rank(schema))
-            except Exception:
-                self.logger.error(
-                    "Unable to calculate deadline for schedule %s. Disabling schedule",
-                    schema.id,
-                    schema_id=schema.id,
-                    task_hash=task.item.hash,
-                    scheduler_id=self.scheduler_id,
-                )
-                schema.enabled = False
-
-            self.ctx.datastores.schema_store.update_schema(schema)
-
-        # TODO: explain why we're using executor here
-        self.executor.submit(_calculate_deadline, task)
+    # TODO: not sure if it needs to be an abstract method, don't know if every
+    # scheduler will need to calculate the deadline, and will use a schema
+    # @abc.abstractmethod
+    def calculate_deadline(self, task: models.Task) -> datetime | None:
+        raise NotImplementedError
 
     def enable(self) -> None:
         """Enable the scheduler.

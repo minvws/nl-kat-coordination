@@ -197,7 +197,7 @@ class PriorityQueue(abc.ABC):
             identifier = self.create_hash(task)
             task.hash = identifier
             task.status = models.TaskStatus.QUEUED
-            item_db = self.pq_store.push(self.pq_id, task)
+            item_db = self.pq_store.push(task)
         else:
             self.pq_store.update(self.pq_id, task)
             item_db = self.get_item_by_identifier(task)

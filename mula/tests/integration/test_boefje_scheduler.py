@@ -798,7 +798,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Act
         self.scheduler.pop_item_from_queue()
 
-        # Assert: task should be in datastore, and queeud
+        # Assert: task should be in datastore, and queued
         task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
         self.assertEqual(task_db.id, item.id)
         self.assertEqual(task_db.status, models.TaskStatus.DISPATCHED)
@@ -1408,7 +1408,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
         mock.patch.stopall()
 
     def test_push_tasks_for_rescheduling(self):
-        """When the dealine of schedules have passed, the resulting task should be added to the queue"""
+        """When the deadline of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)

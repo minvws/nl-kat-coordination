@@ -1,3 +1,4 @@
+import random
 from collections.abc import Callable
 from concurrent import futures
 from datetime import datetime, timedelta, timezone
@@ -21,6 +22,7 @@ from scheduler.models import (
     TaskStatus,
 )
 from scheduler.storage import filters
+from scheduler.utils import cron
 
 from .scheduler import Scheduler
 
@@ -64,9 +66,6 @@ class BoefjeScheduler(Scheduler):
 
         # Priority ranker
         self.priority_ranker = rankers.BoefjeRanker(self.ctx)
-
-        # Deadline ranker
-        self.deadline_ranker = rankers.DefaultDeadlineRanker(self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -752,6 +751,28 @@ class BoefjeScheduler(Scheduler):
             caller=caller,
         )
 
+        # TODO: check exception handling here
+        try:
+            schema = self.ctx.datastores.schema_store.get_schema_by_hash(task.hash)
+            if schema is None:
+                return
+
+            next_deadline = self.calculate_deadline(task)
+            if next_deadline is None:
+                return  # TODO:
+
+            schema.deadline_at = next_deadline
+            self.ctx.datastores.schema_store.update_schema(schema)
+        except Exception as exc:
+            self.logger.error(
+                "Could not update schema with deadline",
+                task_id=task.id,
+                task_hash=task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                exc_info=exc,
+            )
+
     @tracer.start_as_current_span("boefje_has_grace_period_passed")
     def has_grace_period_passed(self, task: BoefjeTask) -> bool:
         """Check if the grace period has passed for a task in both the
@@ -870,3 +891,35 @@ class BoefjeScheduler(Scheduler):
         )
 
         return boefjes
+
+    def calculate_deadline(self, task: models.Task) -> datetime | None:
+        """Calculate the deadline for a task.
+
+        Args:
+            task: The task to calculate the deadline for.
+
+        Returns:
+            The calculated deadline for the task.
+        """
+        # Do we have a schedule?
+        if task.schedule is not None and task.schedule != "":
+            try:
+                next_run = cron.next_run(task.schedule)
+            except Exception as exc:
+                raise ValueError(f"Invalid cron expression: {task.schedule}") from exc
+            return next_run
+
+        # We at least delay a job by the grace period
+        minimum = self.ctx.config.pq_grace_period
+        deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)
+
+        # We want to delay the job by a random amount of time, in a range of 5 hours
+        jitter_range_seconds = 5 * 60 * 60
+        jitter_offset = timedelta(seconds=random.uniform(-jitter_range_seconds, jitter_range_seconds))
+
+        # Check if the adjusted time is earlier than the minimum, and
+        # ensure that the adjusted time is not earlier than the deadline
+        adjusted_time = deadline + jitter_offset
+        adjusted_time = max(adjusted_time, deadline)
+
+        return datetime.now(timezone.utc) + timedelta(seconds=minimum)
