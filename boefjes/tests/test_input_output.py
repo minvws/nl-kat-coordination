@@ -41,7 +41,7 @@ def get_test_files(pluginspath, normalizerspath, testspath):
                 if Path(output_filename).with_suffix(".json").is_file():
                     output_data = json.loads(get_dummy_data(output_filename))
                 elif Path(output_filename).with_suffix(".txt").is_file():
-                    output_data = get_dummy_data(Path(output_filename).with_suffix(".txt"))
+                    output_data = get_dummy_data(Path(output_filename).with_suffix(".txt")).decode('UTF-8')
                 elif Path(output_filename).with_suffix(".py").is_file():
                     output_module = import_module(str(Path(output_filename).with_suffix("")).replace("/", "."))
                     output_data = getattr(output_module, "output")
