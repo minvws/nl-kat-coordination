@@ -40,13 +40,15 @@ def get_test_files(pluginspath, normalizerspath, testspath):
 
                 if Path(output_filename).with_suffix(".json").is_file():
                     output_data = json.loads(get_dummy_data(output_filename))
+                elif Path(output_filename).with_suffix(".txt").is_file():
+                    output_data = get_dummy_data(Path(output_filename).with_suffix(".txt"))
                 elif Path(output_filename).with_suffix(".py").is_file():
                     output_module = import_module(str(Path(output_filename).with_suffix("")).replace("/", "."))
                     output_data = getattr(output_module, "output")
                 else:
                     raise NoOutputFileException(f"no output file located for {input_filename}")
 
-                ooi_data_filename = input_filename.replace("input", "ooi")
+                ooi_data_filename = str(input_filename).replace("input", "ooi")
                 if Path(ooi_data_filename).is_file():
                     input_ooi_data = json.loads(get_dummy_data(ooi_data_filename))
                 else:
