@@ -3,7 +3,7 @@ from importlib import import_module
 from pathlib import Path
 
 PLUGINS_PATH = "boefjes/plugins/*"
-NORMALIZER_PATH = "**/normalize.py"
+NORMALIZERS_PATH = "**/normalize.py"
 TESTS_PATH = "tests/*-input*"
 DEFAULT_INPUT_OOI = {
     "object_type": "HostnameHTTPURL",
@@ -28,13 +28,13 @@ def get_run_method(normalizer: str):
     return getattr(normalizer, "run")
 
 
-def get_test_files(pluginspath, normalizerpath, testpath):
+def get_test_files(pluginspath, normalizerspath, testspath):
     """Finds all files with the test-input filename and the related output files"""
     tests = []
 
     for plugin in Path().glob(pluginspath):
-        for normalizer in Path(plugin).glob(normalizerpath):
-            for input_filename in Path(normalizer.parent).glob(testpath):
+        for normalizer in Path(plugin).glob(normalizerspath):
+            for input_filename in Path(normalizer.parent).glob(testspath):
                 input_data = get_dummy_data(input_filename)
                 output_filename = str(input_filename).replace("input", "output")
 
@@ -52,15 +52,11 @@ def get_test_files(pluginspath, normalizerpath, testpath):
                 else:
                     input_ooi_data = DEFAULT_INPUT_OOI
                 tests.append((get_run_method(normalizer), input_data, output_data, input_ooi_data))
-        return tests
-
-
-def run_normalizer(method, input_ooi, inputdata):
-    return list(method(input_ooi, inputdata))
+    return tests
 
 
 def pytest_generate_tests(metafunc):
-    test_files = get_test_files(PLUGINS_PATH, NORMALIZER_PATH, TESTS_PATH)
+    test_files = get_test_files(PLUGINS_PATH, NORMALIZERS_PATH, TESTS_PATH)
     if "test_input" in metafunc.fixturenames:
         # Generate test cases based on the test_data list
         metafunc.parametrize("method,test_input,expected_output,input_ooi_data", test_files)
@@ -78,7 +74,7 @@ def field_filter(filters, objectlist):
 
 
 def test_input_output(method, test_input, expected_output, input_ooi_data):
-    results = set(run_normalizer(method, input_ooi_data, test_input))
+    results = set(list(method(input_ooi_data, test_input)))
     extra_in_given = results - expected_output  # this expects the yielded objects to be hasheable.
     extra_in_expected = expected_output - results
     assert not extra_in_given
