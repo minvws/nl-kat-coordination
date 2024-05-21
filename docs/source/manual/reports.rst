@@ -74,26 +74,6 @@ The table below gives an overview of the 12 reports available. It also describes
 Report contents:
 ================
 
-The general elements and order of the three different reports are listed below:
-
-- Normal report:
- - Introduction
- - Asset overview (selected objects, reports and plugins)
- - Output of the selected reports are listed as chapters in the following order: 
- - Findings report
- - Vulnerability report
- - Open ports report
- - Web system report
- - Safe connections report
- - System report
- - DNS report
- - Mail report
- - Name server report
- - RPKI report
- - IPv6 report
-- Aggregate report
-- Multi report: 
-
 The table below gives an overview of the elements that can be found in each report type based on the required plugins:
 
 .. list-table:: Report overview
@@ -110,10 +90,11 @@ The table below gives an overview of the elements that can be found in each repo
      - * Summary overview
        * Recommendations
        * Asset overview
+       * Open ports overview
+       * IPv6 overview
        * Basic Security overview table (groups the systems based on types and (compliance) checks to get a general impression of the current status.)
        * Vulnerabilities
        * Appendices (Terms, selected objects, reports, plugins and used config objects)
-     - Standard elements
      - * Introduction
        * Summary
        * Recommendations
@@ -194,7 +175,7 @@ Generating a Multi Report
 With the Multi report you can compare organisations, for example if both are similar health care institutions.
 Create two organisations and make sure both organisations have data. For this tutorial they are named `CAT` and `DOG`.
 
-#. Generate an ‘Aggregate Report’ and export this to JSON format.
+#. In `CAT` generate an ‘Aggregate Report’ and export this to JSON format. Repeat this step for `DOG`.
 
 #. Create a third organisation called ‘BIRD’.
 
