@@ -7,10 +7,10 @@ With the Reports functionality you can create reports with a specific focus.
 There are 3 different kinds of reports available. These are:
 
 - **Normal report:** selecting one or more reports will show the contents of each report below each other. These reports can be exported as PDF.
-- **Aggregate report:** selecting one or more reports will show aggregation of the data for each selected report. This means that certain results from boefjes are aggregated together and can be used to get a general overview of the current compliance status of the scanned objects. These reports can be exported as PDF and JSON.
-- **Multi report:** allow you to compare an organisation with another organisation based on the organisation tags. This is only possible for aggregate reports. The report is very similar to the data within the aggregate report, but then consists of data across multiple organisations. These reports can be exported as PDF.
+- **Aggregate report:** selecting one or more reports will show aggregated data for each selected report. This means that some results are aggregated to provide a general overview of the current compliance status of the scanned objects. These reports can be exported as PDF and JSON.
+- **Multi report:** allows you to compare one organisation with another based on the organisation tags. This is only possible for aggregate reports. A multi report is very similar to an aggregate report, but shows data across multiple organisations. These reports can be exported as PDF.
 
-The table below gives an overview of which 12 reports are available. It also describes which Object is required in the selection process and whether the report is available as normal and/or as aggregate report.
+The table below gives an overview of the 12 reports available. It also describes which Object needs to be selected and whether the report is available as a normal and/or as an aggregate report.
 
 .. list-table:: Report overview table
    :widths: 25 50 25 75
@@ -176,7 +176,7 @@ The table below gives an overview of the elements that can be found in each repo
 
 Report flow
 ===========
-On the Reports page you can generate new reports and get an overview of all generated reports. With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report. Please note that enabling plugins during the report flow wizard will result in inaccurate data, as the plugins will take some time before they have gathered and analyzed all data. Check in the Tasks page if all tasks have completed.
+On the Reports page you can generate new reports and get an overview of all generated reports. With the button 'Generate report' you get into the Report flow wizard, which can be used to choose your report, objects and plugins that are required for the report. Please note that enabling plugins during the report flow wizard will result in inaccurate data, as the plugins will take some time before they have gathered and analyzed all data. Check the Tasks page to verify that all tasks have completed.
 
 
 Plugins
@@ -186,12 +186,12 @@ Each report has both required and suggested plugins that are used to show data i
 
 Downloading and/or exporting a report
 =====================================
-The normal and multi report can be downloaded as PDF file. The aggregate report can be exported as a PDF and also as a JSON file. In order to do this either click the 'Download' or 'Export' button on the right. The JSON output is required in order to create a Multi-Report and compare organisation sectors against each other.
+The normal and multi report can be downloaded as PDF file. The aggregate report can be exported as a PDF and also as a JSON file. Just click the 'Download' or 'Export' button on the right. The JSON output can be used to create a Multi-Report and compare organisation sectors.
 
 
 Generating a Multi Report
 =========================
-With the Multi report you can compare organisations against each other, for example if both organisations are similar health care institutions.
+With the Multi report you can compare organisations, for example if both are similar health care institutions.
 Create two organisations and make sure both organisations have data. For this tutorial they are named `CAT` and `DOG`.
 
 #. Generate an ‘Aggregate Report’ and export this to JSON format.
