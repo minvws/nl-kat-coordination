@@ -76,8 +76,12 @@ def field_filter(filters, objectlist):
 
 
 def test_input_output(method, test_input, expected_output, input_ooi_data):
-    results = set(list(method(input_ooi_data, test_input)))
-    extra_in_given = results - expected_output  # this expects the yielded objects to be hasheable.
-    extra_in_expected = expected_output - results
-    assert not extra_in_given
-    assert not extra_in_expected
+    test_output = method(input_ooi_data, test_input)
+    if isinstance(expected_output, str):
+        assettEqueal(str(test_output), expected_output)
+    else:
+        results = set(list(test_output))
+        extra_in_given = results - expected_output  # this expects the yielded objects to be hasheable.
+        extra_in_expected = expected_output - results
+        assert not extra_in_given
+        assert not extra_in_expected
