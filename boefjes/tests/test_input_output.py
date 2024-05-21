@@ -2,8 +2,6 @@ import json
 from importlib import import_module
 from pathlib import Path
 
-from boefjes.plugins.kat_leakix.normalize import run
-
 PLUGINS_PATH = "boefjes/plugins/*"
 NORMALIZER_PATH = "**/normalize.py"
 TESTS_PATH = "tests/*test-input*"
