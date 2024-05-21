@@ -26,7 +26,7 @@ opentelemetry-instrumentation-psycopg2 = "^0.45b0"
 opentelemetry-instrumentation-requests = "^0.45b0"
 opentelemetry-instrumentation = "^0.45b0"
 # required by kat_snyk, kat_crt_sh, kat_crt_sh boefjes
-requests = "^2.31.0"
+requests = "^2.32.1"
 # required by kat_binaryedge boefje
 pybinaryedge = "0.5"
 # required by kat_burpsuite, kat_snyk boefjes, kat_webpage_analysis/find_images_in_html normalizer
