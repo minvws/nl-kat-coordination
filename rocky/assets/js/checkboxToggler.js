@@ -91,23 +91,15 @@ function reset_validity(error_element, event){
 
 document.addEventListener("DOMContentLoaded", function() {
 
-  var checkbox_form = document.getElementById('submit-with-checkbox-form');
-  var no_checkbox_form = document.getElementById('submit-without-checkbox-form');
-  var checkbox = document.getElementById('submit-form');
+  const select_all_objects_element = document.querySelectorAll('.select_all_objects_element');
+  const select_all_objects_form = document.getElementById('select_all_objects_form');
 
-  if (checkbox_form && no_checkbox_form && checkbox) {
-
-      checkbox.addEventListener('change', function() {
-        if (checkbox.checked){
-          checkbox_form.submit();
-
-
-        }else{
-          no_checkbox_form.submit();
-        }
-      });
-
-    }
-
+  select_all_objects_element.forEach(function(element) {
+      if (select_all_objects_form) {
+        element.addEventListener('click', function() {
+          select_all_objects_form.submit();
+        });
+      }
+  });
 
 });

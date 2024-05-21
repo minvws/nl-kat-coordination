@@ -29,9 +29,26 @@
             </div>
         {% else %}
             {% if "all" in request.GET.ooi %}
-                <strong>
-                    <p class="de-emphasized">{{ total_oois }} {% translate "objects selected" %}</p>
-                </strong>
+                <div class="horizontal-view horizontal-scroll toolbar start">
+                    <div>
+                        <p class="de-emphasized">{{ total_oois }} {% translate "objects selected" %}</p>
+                    </div>
+                {% endif %}
+                {% if "all" in request.GET.ooi %}
+                    <div>
+                        <a class="select_all_objects_element">{% translate "Deselect all objects" %}</a>
+                    </div>
+                </div>
+            {% else %}
+                <div>
+                    <a class="select_all_objects_element">
+                        {% blocktranslate trimmed count counter=object_list|length %}
+                            Select all {{ total_oois }} object
+                        {% plural %}
+                            Select all {{ total_oois }} objects
+                        {% endblocktranslate %}
+                    </a>
+                </div>
             {% endif %}
             <form method="get"
                   action="{{ next }}"
@@ -47,7 +64,7 @@
                     <caption class="visually-hidden">{% translate "Objects" %}</caption>
                     <thead>
                         <th>
-                            <input id="submit-form"
+                            <input class="select_all_objects_element"
                                    type="checkbox"
                                    {% if "all" in request.GET.ooi %}checked{% endif %}>
                         </th>
@@ -82,12 +99,13 @@
         {% endif %}
     </div>
 </section>
-<form id="submit-with-checkbox-form" class="inline" method="get">
-    <input type="hidden" name="ooi" value="all">
-    {% include "forms/report_form_fields.html" with selected_oois=None %}
+<form id="select_all_objects_form" class="inline" method="get">
+    {% if "all" in selected_oois %}
+        {% include "forms/report_form_fields.html" with selected_oois=None %}
 
-</form>
-<form id="submit-without-checkbox-form" class="inline" method="get">
-    {% include "forms/report_form_fields.html" with selected_oois=None %}
+    {% else %}
+        {% include "forms/report_form_fields.html" with selected_oois=None %}
 
+        <input type="hidden" name="ooi" value="all">
+    {% endif %}
 </form>
