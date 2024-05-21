@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import datetime
 from typing import Any
 
 from django.conf import settings
@@ -13,13 +14,16 @@ from tools.view_helpers import url_with_querystring
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.definitions import Report
-from reports.report_types.helpers import (
-    get_ooi_types_from_aggregate_report,
-    get_plugins_for_report_ids,
-    get_report_types_from_aggregate_report,
-)
+from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
 from reports.utils import JSONEncoder, debug_json_keys
-from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
+from reports.views.base import (
+    REPORTS_PRE_SELECTION,
+    ReportBreadcrumbs,
+    ReportOOIView,
+    ReportPluginView,
+    ReportTypeView,
+    get_selection,
+)
 from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -54,7 +58,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView):
+class LandingAggregateReportView(BreadcrumbsAggregateReportView):
     """
     Landing page to start the 'Aggregate Report' flow.
     """
@@ -69,8 +73,8 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
 class OOISelectionAggregateReportView(
     AggregateReportStepsMixin,
     BreadcrumbsAggregateReportView,
+    ReportOOIView,
     BaseOOIListView,
-    BaseReportView,
 ):
     """
     Select Objects for the 'Aggregate Report' flow.
@@ -92,7 +96,8 @@ class OOISelectionAggregateReportView(
 class ReportTypesSelectionAggregateReportView(
     AggregateReportStepsMixin,
     BreadcrumbsAggregateReportView,
-    BaseReportView,
+    ReportOOIView,
+    ReportTypeView,
     TemplateView,
 ):
     """
@@ -115,6 +120,14 @@ class ReportTypesSelectionAggregateReportView(
             messages.error(self.request, _("Select at least one OOI to proceed."))
         return super().get(request, *args, **kwargs)
 
+    def get_report_types_for_aggregate_report(
+        self, reports_dict: dict[str, set[type[Report]]]
+    ) -> dict[str, list[dict[str, str]]]:
+        report_types = {}
+        for option, reports in reports_dict.items():
+            report_types[option] = self.get_report_types(reports)
+        return report_types
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if "all" not in self.selected_oois:
@@ -128,12 +141,7 @@ class ReportTypesSelectionAggregateReportView(
         return context
 
 
-class SetupScanAggregateReportView(
-    AggregateReportStepsMixin,
-    BreadcrumbsAggregateReportView,
-    BaseReportView,
-    TemplateView,
-):
+class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
@@ -142,24 +150,17 @@ class SetupScanAggregateReportView(
     breadcrumbs_step = 5
     current_step = 3
 
-    def get(self, request, *args, **kwargs):
-        if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
-
-        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("aggregate_report_view", kwargs=kwargs) + get_selection(request))
-
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.report_has_required_plugins():
+            return redirect(self.get_next())
+        if not self.plugins:
+            return redirect(self.get_previous())
+        if self.plugins_enabled():
+            return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
-            get_plugins_for_report_ids(self.selected_report_types)
-        )
-        return context
 
-
-class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
+class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -170,6 +171,12 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+            )
+
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
 
@@ -222,6 +229,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["created_at"] = datetime.now()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
         context["template"] = aggregate_report.template_path
@@ -243,10 +251,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             True,
             **dict(json="true", **self.request.GET),
         )
-
-        context["oois"] = self.get_oois()
-        plugins, _ = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
-        context["plugins"] = plugins
         return context
 
 

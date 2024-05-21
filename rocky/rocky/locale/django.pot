@@ -572,6 +572,15 @@ msgid ""
 "more details."
 msgstr ""
 
+#: katalogus/client.py
+msgid ""
+"The KATalogus has an unexpected error. Check the logs for further details."
+msgstr ""
+
+#: katalogus/client.py
+msgid "A HTTP error occurred. Check logs for more info."
+msgstr ""
+
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
 msgstr ""
@@ -684,6 +693,7 @@ msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "scan level warning"
 msgstr ""
 
@@ -943,6 +953,10 @@ msgstr ""
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
+msgstr ""
+
+#: katalogus/templates/partials/plugin_tile.html
+msgid "Required for:"
 msgstr ""
 
 #: katalogus/templates/partials/plugins.html
@@ -3503,9 +3517,29 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
-"If you choose not to give a plugin permission to run, the data that plugin "
-"would collect or produce will be left out of the report which will then be "
-"generated based on the available data collected by the enabled plugins."
+"If you choose not to enable a plugin, the data that plugin would collect or "
+"produce will be left out of the report which will then be generated based on "
+"the available data collected by the enabled plugins."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid ""
+"Some plugins are mandatory as they are crucial for a report type. Reports "
+"that don't have their requirements met will be skipped."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Warning! Before you proceed read the following points:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid ""
+"OpenKAT is designed to scan all known objects on a regular basis using the "
+"enabled plugins and set clearance levels. This means that scans will run "
+"automatically. Be patient; plugins may take some time before they have "
+"collected all their data. Enabling them just before report generation will "
+"likely result in inaccurate reports, as plugins have not finished collecting "
+"data."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3517,6 +3551,10 @@ msgid "Good job! All required plugins are enabled."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Show enabled plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 msgid ""
 "This report requires at least one of the following plugins to be enabled to "
 "generate the report:"
@@ -3524,6 +3562,14 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Good job! All suggested plugins are enabled"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Hide suggested plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Show more suggested plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3652,7 +3698,6 @@ msgid "Select at least one OOI to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
@@ -3671,12 +3716,6 @@ msgstr ""
 #: reports/views/base.py
 #, python-format
 msgid "Report type '%s' does not exist."
-msgstr ""
-
-#: reports/views/generate_report.py
-msgid ""
-"This report may not show all the data as some required plugins are not "
-"enabled."
 msgstr ""
 
 #: reports/views/multi_report.py

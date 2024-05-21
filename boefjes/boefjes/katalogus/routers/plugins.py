@@ -39,7 +39,13 @@ def list_plugins(
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> list[PluginType]:
     with plugin_service as p:
-        plugins = p.get_all(organisation_id)
+        if filter_params.ids:
+            try:
+                plugins = p.by_plugin_ids(filter_params.ids, organisation_id)
+            except KeyError:
+                raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
+        else:
+            plugins = p.get_all(organisation_id)
 
     # filter plugins by id, name or description
     if filter_params.q is not None:
@@ -57,12 +63,13 @@ def list_plugins(
         plugins = filter(lambda x: x.enabled is filter_params.state, plugins)
 
     # filter plugins by scan level for boefje plugins
-    plugins = filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins)
+    plugins = list(filter(lambda x: x.type != "boefje" or x.scan_level >= filter_params.scan_level, plugins))
+
+    if pagination_params.limit is None:
+        return plugins[pagination_params.offset :]
 
     # paginate plugins
-    plugins = list(plugins)[pagination_params.offset : pagination_params.offset + pagination_params.limit]
-
-    return plugins
+    return plugins[pagination_params.offset : pagination_params.offset + pagination_params.limit]
 
 
 @router.get("/plugins/{plugin_id}", response_model=PluginType)
