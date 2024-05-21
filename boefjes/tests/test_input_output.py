@@ -1,6 +1,7 @@
 import json
-from pathlib import Path
 from importlib import import_module
+from pathlib import Path
+
 from pydantic import parse_obj_as
 
 from boefjes.job_handler import serialize_ooi
@@ -14,6 +15,7 @@ TESTS_PATH = "boefjes/plugins/*/tests/normalizer/*test-input*"
 class NoOutputFileException(Exception):
     """Exception class for unit-tests where no output file was located"""
 
+
 def get_dummy_data(filename: str) -> bytes:
     return Path(filename).read_bytes()
 
@@ -24,7 +26,7 @@ def get_test_files(testpath):
     for input_filename in Path().glob(testpath):
         input_data = get_dummy_data(input_filename)
         output_filename = str(input_filename).replace("input", "output")
-        
+
         if Path(output_filename).with_suffix(".json").is_file():
             output_data = json.loads(get_dummy_data(output_filename))
         elif Path(output_filename).with_suffix(".py").is_file():
