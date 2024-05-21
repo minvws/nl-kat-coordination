@@ -83,7 +83,6 @@ class OOISelectionAggregateReportView(
     template_name = "aggregate_report/select_oois.html"
     breadcrumbs_step = 3
     current_step = 1
-    paginate_by = 20
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def get_context_data(self, **kwargs):

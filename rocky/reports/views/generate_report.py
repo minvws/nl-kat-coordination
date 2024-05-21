@@ -107,13 +107,6 @@ class ReportTypesSelectionGenerateReportView(
     breadcrumbs_step = 4
     current_step = 2
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        oois_pk = self.selected_oois
-        if "all" in self.selected_oois:
-            oois_pk = [ooi.primary_key for ooi in self.oois]
-        self.available_report_types = self.get_report_types(get_report_types_for_oois(oois_pk))
-
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
             messages.error(self.request, _("Select at least one OOI to proceed."))
@@ -122,7 +115,10 @@ class ReportTypesSelectionGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["available_report_types"] = self.available_report_types
+        oois_pk = self.selected_oois
+        if "all" in self.selected_oois:
+            oois_pk = [ooi.primary_key for ooi in self.oois]
+        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(oois_pk))
         return context
 
 
