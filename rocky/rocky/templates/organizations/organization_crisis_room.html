@@ -10,6 +10,18 @@
         <section>
             <div>
                 <h1>{% translate "Crisis room:" %} {{ organization.name }}</h1>
+                <h2>primary</h2>
+                <button>Lorem</button>
+                <h2>ghost</h2>
+                <button class="ghost">Lorem</button>
+                <button class="destructive">Lorem</button>
+                <button class="plain">Lorem</button>
+                <button class="ghost destructive">Lorem</button>
+                <button class="plain destructive">Lorem</button>
+                <button class="destructive small">Lorem</button>
+                <button class="plain small">Lorem</button>
+                <button class="ghost destructive small">Lorem</button>
+                <button class="plain destructive small">Lorem</button>
                 {% if not indemnification_present %}
                     <p class="warning"
                        role="group"

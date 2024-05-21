@@ -1,0 +1,26 @@
+button,
+a.button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  &.plain {
+    border-color: transparent;
+    background-color: transparent;
+    color: var(--link-text-color);
+
+    &:hover {
+      background-color: rgb(0 0 0 / 5%);
+      border-color: transparent;
+    }
+
+    &.destructive {
+      color: var(--color-alert-negative);
+
+      &:hover {
+        background-color: rgb(0 0 0 / 5%);
+        border-color: transparent;
+        color: #a22e25;
+      }
+    }
+  }
+}
