@@ -11,6 +11,7 @@ from tests.loading import get_dummy_data
 
 input_ooi = get_dummy_data("security-txt-normalizer.json")
 
+
 class SecurityTXTTest(TestCase):
     maxDiff = None
 
