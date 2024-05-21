@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-21 09:49+0000\n"
+"POT-Creation-Date: 2024-05-21 11:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3454,6 +3454,12 @@ msgid "Deselect all objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
 #, python-format
 msgid "Select all %(total_oois)s object"
 msgid_plural "Select all %(total_oois)s objects"
@@ -4898,11 +4904,6 @@ msgid ""
 "An overview of objects found for organization <strong>%(organization_name)s</"
 "strong>. Objects can be added manually or by running Boefjes. Click an "
 "object for additional information."
-msgstr ""
-
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
 msgstr ""
 
 #: rocky/templates/oois/ooi_list.html
