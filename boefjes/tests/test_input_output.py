@@ -2,11 +2,7 @@ import json
 from importlib import import_module
 from pathlib import Path
 
-from pydantic import parse_obj_as
-
-from boefjes.job_handler import serialize_ooi
 from boefjes.plugins.kat_leakix.normalize import run
-from octopoes.models.types import OOIType
 
 TESTS_PATH = "boefjes/plugins/*/tests/normalizer/*test-input*"
 DEFAULT_INPUT_OOI = {
