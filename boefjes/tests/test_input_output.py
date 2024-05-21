@@ -25,7 +25,7 @@ def get_dummy_data(filename: str) -> bytes:
 
 def get_run_method(normalizer: str):
     normalizer = import_module(str(Path(normalizer).with_suffix("")).replace("/", "."))
-    return getattr(output_module, "run")
+    return getattr(normalizer, "run")
 
 
 def get_test_files(pluginspath, normalizerpath, testpath):
@@ -55,8 +55,8 @@ def get_test_files(pluginspath, normalizerpath, testpath):
         return tests
 
 
-def run_normalizer(input_ooi, inputdata):
-    return list(run(input_ooi, inputdata))
+def run_normalizer(method, input_ooi, inputdata):
+    return list(method(input_ooi, inputdata))
 
 
 def pytest_generate_tests(metafunc):
