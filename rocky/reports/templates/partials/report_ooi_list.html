@@ -30,22 +30,28 @@
         {% else %}
             {% if "all" in request.GET.ooi %}
                 <div class="horizontal-view horizontal-scroll toolbar start">
-                    <div>
-                        <p class="de-emphasized">{{ total_oois }} {% translate "objects selected" %}</p>
-                    </div>
-                    <div>
-                        <a class="select_all_objects_element">{% translate "Deselect all objects" %}</a>
-                    </div>
+                    <p class="de-emphasized">{{ total_oois }} {% translate "objects selected" %}</p>
+                    <a class="select_all_objects_element">{% translate "Deselect all objects" %}</a>
+                    <p class="de-emphasized end">
+                        {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
+                    </p>
                 </div>
             {% else %}
-                <div>
-                    <a class="select_all_objects_element">
-                        {% blocktranslate trimmed count counter=object_list|length %}
-                            Select all {{ total_oois }} object
-                        {% plural %}
-                            Select all {{ total_oois }} objects
-                        {% endblocktranslate %}
-                    </a>
+                <div class="horizontal-view horizontal-scroll toolbar">
+                    <div>
+                        <a class="select_all_objects_element">
+                            {% blocktranslate trimmed count counter=object_list|length %}
+                                Select all {{ total_oois }} object
+                            {% plural %}
+                                Select all {{ total_oois }} objects
+                            {% endblocktranslate %}
+                        </a>
+                    </div>
+                    <div class="end">
+                        <p class="de-emphasized">
+                            {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
+                        </p>
+                    </div>
                 </div>
             {% endif %}
             <form method="get"

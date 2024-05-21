@@ -6,6 +6,10 @@
   width: 100%;
 
   &.start {
-    justify-content: start;
+    justify-content: flex-start;
+  }
+
+  .end {
+    margin-left: auto;
   }
 }
