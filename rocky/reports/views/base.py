@@ -98,8 +98,13 @@ class BaseSelectionView(OrganizationView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.selected_oois = self.check_oois_selection(sorted(set(request.GET.getlist("ooi", []))))
-
         self.selected_report_types = request.GET.getlist("report_type", [])
+
+    def check_oois_selection(self, selected_oois: list[str]) -> list[str]:
+        """all in selection overrides the rest of the selection."""
+        if "all" in selected_oois and len(selected_oois) > 1:
+            selected_oois = ["all"]
+        return selected_oois
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -114,11 +119,9 @@ class ReportOOIView(BaseSelectionView, OOIFilterView):
     Needs BaseSelectionView to get selected oois.
     """
 
-    def check_oois_selection(self, selected_oois: list[str]) -> list[str]:
-        """all in selection overrides the rest of the selection."""
-        if "all" in selected_oois and len(selected_oois) > 1:
-            selected_oois = ["all"]
-        return selected_oois
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.oois = self.get_oois()
 
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
@@ -148,7 +151,7 @@ class ReportOOIView(BaseSelectionView, OOIFilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
+        context["oois"] = self.oois
         return context
 
 

@@ -109,7 +109,6 @@ class ReportTypesSelectionGenerateReportView(
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.oois = self.get_oois()
         oois_pk = self.selected_oois
         if "all" in self.selected_oois:
             oois_pk = [ooi.primary_key for ooi in self.oois]
@@ -123,10 +122,6 @@ class ReportTypesSelectionGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if "all" not in self.selected_oois:
-            context["oois"] = self.oois
-        else:
-            context["oois"] = "all"
         context["available_report_types"] = self.available_report_types
         return context
 
