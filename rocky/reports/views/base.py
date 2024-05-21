@@ -22,10 +22,7 @@ from reports.report_types.helpers import get_plugins_for_report_ids, get_report_
 from rocky.views.mixins import OOIList
 from rocky.views.ooi_view import OOIFilterView
 
-REPORTS_PRE_SELECTION = {
-    "clearance_level": ["2", "3", "4"],
-    "clearance_type": "declared",
-}
+REPORTS_PRE_SELECTION = {"clearance_level": ["2", "3", "4"], "clearance_type": "declared"}
 
 
 def get_selection(request: HttpRequest, pre_selection: dict[str, str | Sequence[str]] | None = None) -> str:
@@ -54,12 +51,7 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
 
-        breadcrumbs = [
-            {
-                "url": reverse("reports", kwargs=kwargs) + selection,
-                "text": _("Reports"),
-            },
-        ]
+        breadcrumbs = [{"url": reverse("reports", kwargs=kwargs) + selection, "text": _("Reports")}]
 
         return breadcrumbs
 
@@ -134,8 +126,7 @@ class ReportOOIView(BaseSelectionView, OOIFilterView):
     def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
             "ooi_type_form": OOITypeMultiCheckboxForReportForm(
-                sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]),
-                self.request.GET,
+                sorted([ooi_class.get_ooi_type() for ooi_class in ooi_types]), self.request.GET
             )
         }
 
@@ -263,17 +254,11 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
                     for plugin in report_plugins:
                         if plugin not in plugin_report_types:
                             plugin_report_types[plugin] = [
-                                {
-                                    "name": report_type.name,
-                                    "label_style": report_type.label_style,
-                                }
+                                {"name": report_type.name, "label_style": report_type.label_style}
                             ]
                         else:
                             plugin_report_types[plugin].append(
-                                {
-                                    "name": report_type.name,
-                                    "label_style": report_type.label_style,
-                                }
+                                {"name": report_type.name, "label_style": report_type.label_style}
                             )
 
                     total_enabled_plugins[plugin_type] += number_of_enabled

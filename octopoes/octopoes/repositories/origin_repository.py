@@ -89,10 +89,7 @@ class XTDBOriginRepository(OriginRepository):
         if origin_type:
             where_parameters["origin_type"] = origin_type.value
 
-        query = generate_pull_query(
-            FieldSet.ALL_FIELDS,
-            where_parameters,
-        )
+        query = generate_pull_query(FieldSet.ALL_FIELDS, where_parameters)
 
         results = self.session.client.query(query, valid_time=valid_time)
         return [self.deserialize(r[0]) for r in results]

@@ -88,7 +88,7 @@ class FilteringTestCase(unittest.TestCase):
                     Filter(column="name", operator="eq", value="Alice"),
                     Filter(column="data", field="foo", operator="eq", value="bar"),
                 ]
-            },
+            }
         )
 
         query = session.query(TestModel)
@@ -162,11 +162,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Alice")
 
     def test_apply_filter_not(self):
-        filter_request = FilterRequest(
-            filters={
-                "not": [Filter(column="name", operator="eq", value="Alice")],
-            }
-        )
+        filter_request = FilterRequest(filters={"not": [Filter(column="name", operator="eq", value="Alice")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -231,13 +227,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[1].name, "Charlie")
 
     def test_apply_filter_eq(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="eq", value="Alice"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="eq", value="Alice")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -247,13 +237,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].name, "Alice")
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="==", value="Alice"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="==", value="Alice")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -265,11 +249,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_eq(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="eq", value="bar"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="eq", value="bar")]}
         )
 
         query = session.query(TestModel)
@@ -282,11 +262,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[1].name, "Charlie")
 
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="==", value="bar"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="==", value="bar")]}
         )
 
         query = session.query(TestModel)
@@ -299,13 +275,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[1].name, "Charlie")
 
     def test_apply_filter_ne(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="ne", value="Alice"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="ne", value="Alice")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -316,13 +286,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Bob")
         self.assertEqual(results[1].name, "Charlie")
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="!=", value="Alice"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="!=", value="Alice")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -334,11 +298,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_ne(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="ne", value="bar"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="ne", value="bar")]}
         )
 
         query = session.query(TestModel)
@@ -350,11 +310,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Bob")
 
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="!=", value="bar"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="!=", value="bar")]}
         )
 
         query = session.query(TestModel)
@@ -366,11 +322,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Bob")
 
     def test_apply_filter_is(self):
-        filter_request = FilterRequest(
-            filters=[
-                Filter(column="is_active", operator="is", value=True),
-            ]
-        )
+        filter_request = FilterRequest(filters=[Filter(column="is_active", operator="is", value=True)])
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -381,11 +333,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Charlie", [r.name for r in results])
 
     def test_apply_filter_is_not(self):
-        filter_request = FilterRequest(
-            filters=[
-                Filter(column="is_active", operator="is_not", value=True),
-            ]
-        )
+        filter_request = FilterRequest(filters=[Filter(column="is_active", operator="is_not", value=True)])
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -395,13 +343,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Bob", [r.name for r in results])
 
     def test_apply_filter_gt(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="age", operator="gt", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="age", operator="gt", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -412,13 +354,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Bob", [r.name for r in results])
         self.assertIn("Charlie", [r.name for r in results])
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="age", operator=">", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="age", operator=">", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -430,13 +366,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Charlie", [r.name for r in results])
 
     def test_apply_filter_json_gt(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="score", operator="gt", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="data", field="score", operator="gt", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -446,13 +376,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].name, "Charlie")
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="score", operator=">", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="data", field="score", operator=">", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -463,13 +387,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Charlie")
 
     def test_apply_filter_gte(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="age", operator="gte", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="age", operator="gte", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -481,13 +399,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Bob", [r.name for r in results])
         self.assertIn("Charlie", [r.name for r in results])
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="age", operator=">=", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="age", operator=">=", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -501,11 +413,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_gte(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="score", operator="gte", value=25),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="score", operator="gte", value=25)]}
         )
 
         query = session.query(TestModel)
@@ -517,13 +425,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Bob", [r.name for r in results])
         self.assertIn("Charlie", [r.name for r in results])
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="score", operator=">=", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="data", field="score", operator=">=", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -535,13 +437,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Charlie", [r.name for r in results])
 
     def test_apply_filter_lt(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="age", operator="lt", value=28),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="age", operator="lt", value=28)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -551,13 +447,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].name, "Alice")
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="age", operator="<", value=28),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="age", operator="<", value=28)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -568,13 +458,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Alice")
 
     def test_apply_filter_json_lt(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="score", operator="lt", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="data", field="score", operator="lt", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -584,13 +468,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].name, "Alice")
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="score", operator="<", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="data", field="score", operator="<", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -601,13 +479,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Alice")
 
     def test_apply_filter_lte(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="age", operator="lte", value=28),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="age", operator="lte", value=28)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -618,13 +490,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Alice", [r.name for r in results])
         self.assertIn("Charlie", [r.name for r in results])
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="age", operator="<=", value=28),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="age", operator="<=", value=28)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -637,11 +503,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_lte(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="score", operator="lte", value=25),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="score", operator="lte", value=25)]}
         )
 
         query = session.query(TestModel)
@@ -653,13 +515,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Alice", [r.name for r in results])
         self.assertIn("Bob", [r.name for r in results])
 
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="score", operator="<=", value=25),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="data", field="score", operator="<=", value=25)]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -671,13 +527,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Bob", [r.name for r in results])
 
     def test_apply_filter_like(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="like", value="B%"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="like", value="B%")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -689,11 +539,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_like(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="like", value="%ar"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="like", value="%ar")]}
         )
 
         query = session.query(TestModel)
@@ -705,13 +551,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[1].name, "Charlie")
 
     def test_apply_filter_not_like(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="not_like", value="B%"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="not_like", value="B%")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -724,11 +564,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_not_like(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="not_like", value="%ar"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="not_like", value="%ar")]}
         )
 
         query = session.query(TestModel)
@@ -739,13 +575,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Bob")
 
     def test_apply_filter_ilike(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="ilike", value="B%"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="ilike", value="B%")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -757,11 +587,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_ilike(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="ilike", value="%AR"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="ilike", value="%AR")]}
         )
 
         query = session.query(TestModel)
@@ -773,13 +599,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Charlie", [r.name for r in results])
 
     def test_apply_filter_not_ilike(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="not_ilike", value="B%"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="not_ilike", value="B%")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -792,11 +612,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_not_ilike(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="not_ilike", value="%AR"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="not_ilike", value="%AR")]}
         )
 
         query = session.query(TestModel)
@@ -807,13 +623,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Bob")
 
     def test_apply_filter_in(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="in", value=["Alice", "Bob"]),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="in", value=["Alice", "Bob"])]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -826,11 +636,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_in(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="in", value=["bar", "baz"]),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="in", value=["bar", "baz"])]}
         )
 
         query = session.query(TestModel)
@@ -841,11 +647,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_not_in(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="not_in", value=["Alice", "Bob"]),
-                ]
-            }
+            filters={"and": [Filter(column="name", operator="not_in", value=["Alice", "Bob"])]}
         )
 
         query = session.query(TestModel)
@@ -858,11 +660,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_not_in(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="not_in", value=["bar"]),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="not_in", value=["bar"])]}
         )
 
         query = session.query(TestModel)
@@ -873,13 +671,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertEqual(results[0].name, "Bob")
 
     def test_apply_filter_contains(self):
-        filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="name", operator="contains", value="li"),
-                ]
-            }
-        )
+        filter_request = FilterRequest(filters={"and": [Filter(column="name", operator="contains", value="li")]})
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)
@@ -891,11 +683,7 @@ class FilteringTestCase(unittest.TestCase):
 
     def test_apply_filter_json_contains(self):
         filter_request = FilterRequest(
-            filters={
-                "and": [
-                    Filter(column="data", field="foo", operator="contains", value="ar"),
-                ]
-            }
+            filters={"and": [Filter(column="data", field="foo", operator="contains", value="ar")]}
         )
 
         query = session.query(TestModel)
@@ -907,11 +695,7 @@ class FilteringTestCase(unittest.TestCase):
         self.assertIn("Charlie", [r.name for r in results])
 
     def test_apply_filter_jsonb_contains(self):
-        filter_request = FilterRequest(
-            filters=[
-                Filter(column="data", operator="@>", value=json.dumps({"foo": "bar"})),
-            ]
-        )
+        filter_request = FilterRequest(filters=[Filter(column="data", operator="@>", value=json.dumps({"foo": "bar"}))])
 
         query = session.query(TestModel)
         filtered_query = apply_filter(TestModel, query, filter_request)

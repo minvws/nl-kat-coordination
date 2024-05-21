@@ -19,14 +19,7 @@ class Octopoes(HTTPService):
     name = "octopoes"
     health_endpoint = None
 
-    def __init__(
-        self,
-        host: str,
-        source: str,
-        orgs: list[Organisation],
-        pool_connections: int,
-        timeout: int = 10,
-    ):
+    def __init__(self, host: str, source: str, orgs: list[Organisation], pool_connections: int, timeout: int = 10):
         self.orgs: list[Organisation] = orgs
         super().__init__(host, source, timeout, pool_connections)
 
@@ -75,11 +68,7 @@ class Octopoes(HTTPService):
 
         url = f"{self.host}/{organisation_id}/objects/random"
 
-        params = {
-            "amount": str(n),
-            "scan_level": [s for s in scan_level],
-            "valid_time": datetime.now(timezone.utc),
-        }
+        params = {"amount": str(n), "scan_level": [s for s in scan_level], "valid_time": datetime.now(timezone.utc)}
 
         response = self.get(url, params=params)
 
@@ -89,10 +78,7 @@ class Octopoes(HTTPService):
     def get_object(self, organisation_id: str, reference: str) -> OOI:
         """Get an ooi from octopoes"""
         url = f"{self.host}/{organisation_id}"
-        response = self.get(
-            url,
-            params={"reference": reference, "valid_time": datetime.now(timezone.utc)},
-        )
+        response = self.get(url, params={"reference": reference, "valid_time": datetime.now(timezone.utc)})
         return OOI(**response.json())
 
     def is_healthy(self) -> bool:

@@ -11,21 +11,14 @@ router = APIRouter(
 
 
 @router.get("", response_model=dict)
-def list_settings(
-    organisation_id: str,
-    plugin_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
-):
+def list_settings(organisation_id: str, plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)):
     with plugin_service as p:
         return p.get_all_settings(organisation_id, plugin_id)
 
 
 @router.put("")
 def upsert_settings(
-    organisation_id: str,
-    plugin_id: str,
-    values: dict,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    organisation_id: str, plugin_id: str, values: dict, plugin_service: PluginService = Depends(get_plugin_service)
 ):
     with plugin_service as p:
         p.upsert_settings(values, organisation_id, plugin_id)

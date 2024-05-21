@@ -99,9 +99,7 @@ def read_certificates(
     certificate_subject_alternative_names = []
     hostnames = []
     for m in re.finditer(
-        r"(?<=-----BEGIN CERTIFICATE-----).*?(?=-----END CERTIFICATE-----)",
-        contents,
-        flags=re.DOTALL,
+        r"(?<=-----BEGIN CERTIFICATE-----).*?(?=-----END CERTIFICATE-----)", contents, flags=re.DOTALL
     ):
         pem_contents = f"-----BEGIN CERTIFICATE-----{m.group()}-----END CERTIFICATE-----"
 
@@ -122,10 +120,7 @@ def read_certificates(
         pk_algorithm = ""
         pk_size = cert.public_key().key_size
         logging.info("Parsing certificate of type %s", type(cert.public_key()))
-        if isinstance(
-            cert.public_key(),
-            rsa.RSAPublicKey,
-        ):
+        if isinstance(cert.public_key(), rsa.RSAPublicKey):
             pk_algorithm = str(AlgorithmType.RSA)
             pk_number = cert.public_key().public_numbers().n.to_bytes(pk_size // 8, "big").hex()
         elif isinstance(cert.public_key(), ec.EllipticCurvePublicKey):

@@ -32,11 +32,7 @@ class Server:
         api: A fastapi.FastAPI object used for exposing API endpoints.
     """
 
-    def __init__(
-        self,
-        ctx: context.AppContext,
-        s: dict[str, schedulers.Scheduler],
-    ):
+    def __init__(self, ctx: context.AppContext, s: dict[str, schedulers.Scheduler]):
         """Initializer of the Server class.
 
         Args:
@@ -68,11 +64,7 @@ class Server:
             self.logger.debug("Finished setting up OpenTelemetry instrumentation")
 
         self.api.add_api_route(
-            path="/",
-            endpoint=self.root,
-            methods=["GET"],
-            status_code=status.HTTP_200_OK,
-            description="Root endpoint",
+            path="/", endpoint=self.root, methods=["GET"], status_code=status.HTTP_200_OK, description="Root endpoint"
         )
 
         self.api.add_api_route(
@@ -212,11 +204,7 @@ class Server:
         return None
 
     def health(self, externals: bool = False) -> Any:
-        response = models.ServiceHealth(
-            service="scheduler",
-            healthy=True,
-            version=version.__version__,
-        )
+        response = models.ServiceHealth(service="scheduler", healthy=True, version=version.__version__)
 
         if externals:
             for service in self.ctx.services.__dict__.values():
@@ -235,28 +223,19 @@ class Server:
     def get_scheduler(self, scheduler_id: str) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="scheduler not found",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
 
         return models.Scheduler(**s.dict())
 
     def patch_scheduler(self, scheduler_id: str, item: models.Scheduler) -> Any:
         s = self.schedulers.get(scheduler_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="scheduler not found",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found")
 
         stored_scheduler_model = models.Scheduler(**s.dict())
         patch_data = item.model_dump(exclude_unset=True)
         if len(patch_data) == 0:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no data to patch")
 
         updated_scheduler = stored_scheduler_model.model_copy(update=patch_data)
 
@@ -267,8 +246,7 @@ class Server:
                 setattr(s, attr, value)
             except AttributeError as exc:
                 raise fastapi.HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="attribute not found",
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="attribute not found"
                 ) from exc
 
         # Enable or disable the scheduler if needed.
@@ -295,8 +273,7 @@ class Server:
     ) -> Any:
         if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="min_date must be less than max_date",
+                status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail="min_date must be less than max_date"
             )
 
         # FIXME: deprecated; backwards compatibility for rocky that uses the
@@ -306,12 +283,7 @@ class Server:
             if task_type == "boefje":
                 f_ooi = {
                     "and": [
-                        storage.filters.Filter(
-                            column="p_item",
-                            field="data__input_ooi",
-                            operator="eq",
-                            value=input_ooi,
-                        )
+                        storage.filters.Filter(column="p_item", field="data__input_ooi", operator="eq", value=input_ooi)
                     ]
                 }
             elif task_type == "normalizer":
@@ -329,10 +301,7 @@ class Server:
                 f_ooi = {
                     "or": [
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__input_ooi",
-                            operator="eq",
-                            value=input_ooi,
+                            column="p_item", field="data__input_ooi", operator="eq", value=input_ooi
                         ),
                         storage.filters.Filter(
                             column="p_item",
@@ -350,34 +319,22 @@ class Server:
                 f_plugin = {
                     "and": [
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__boefje__id",
-                            operator="eq",
-                            value=plugin_id,
+                            column="p_item", field="data__boefje__id", operator="eq", value=plugin_id
                         )
                     ]
                 }
             elif task_type == "normalizer":
                 f_plugin = storage.filters.Filter(
-                    column="p_item",
-                    field="data__normalizer__id",
-                    operator="eq",
-                    value=plugin_id,
+                    column="p_item", field="data__normalizer__id", operator="eq", value=plugin_id
                 )
             else:
                 f_plugin = {
                     "or": [
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__boefje__id",
-                            operator="eq",
-                            value=plugin_id,
+                            column="p_item", field="data__boefje__id", operator="eq", value=plugin_id
                         ),
                         storage.filters.Filter(
-                            column="p_item",
-                            field="data__normalizer__id",
-                            operator="eq",
-                            value=plugin_id,
+                            column="p_item", field="data__normalizer__id", operator="eq", value=plugin_id
                         ),
                     ]
                 }
@@ -396,20 +353,13 @@ class Server:
                 filters=f_req,
             )
         except storage.filters.errors.FilterError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
-            ) from exc
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
         except ValueError as exc:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
-            ) from exc
+            raise fastapi.HTTPException(status_code=fastapi.status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get tasks",
+                status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to get tasks"
             ) from exc
 
         return paginate(request, results, count=count, offset=offset, limit=limit)
@@ -418,45 +368,31 @@ class Server:
         try:
             task = self.ctx.datastores.task_store.get_task_by_id(task_id)
         except ValueError as exc:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(exc),
-            ) from exc
+            raise fastapi.HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get task",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to get task"
             ) from exc
 
         if task is None:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="task not found",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="task not found")
 
         return models.Task(**task.model_dump())
 
     def patch_task(self, task_id: str, item: dict) -> Any:
         if len(item) == 0:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no data to patch")
 
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
         except Exception as exc:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"failed to get task [exception: {exc}]",
+                status_code=status.HTTP_400_BAD_REQUEST, detail=f"failed to get task [exception: {exc}]"
             ) from exc
 
         if task_db is None:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="task not found",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="task not found")
 
         updated_task = task_db.model_copy(update=item)
 
@@ -466,8 +402,7 @@ class Server:
         except Exception as exc:
             self.logger.error(exc)
             raise fastapi.HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to update task",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to update task"
             ) from exc
 
         return updated_task
@@ -478,8 +413,7 @@ class Server:
         except Exception as exc:
             self.logger.exception(exc)
             raise fastapi.HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="failed to get task stats",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="failed to get task stats"
             ) from exc
 
         return stats
@@ -491,26 +425,19 @@ class Server:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="scheduler not found, by queue_id",
+                status_code=status.HTTP_404_NOT_FOUND, detail="scheduler not found, by queue_id"
             )
 
         q = s.queue
         if q is None:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="queue not found",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="queue not found")
 
         return models.Queue(**q.dict())
 
     def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="queue not found",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="queue not found")
 
         try:
             p_item = s.pop_item_from_queue(filters)
@@ -519,8 +446,7 @@ class Server:
 
         if p_item is None:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="could not pop item from queue, check your filters",
+                status_code=status.HTTP_404_NOT_FOUND, detail="could not pop item from queue, check your filters"
             )
 
         return models.PrioritizedItem(**p_item.model_dump())
@@ -528,10 +454,7 @@ class Server:
     def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="queue not found",
-            )
+            raise fastapi.HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="queue not found")
 
         try:
             # Load default values
@@ -553,36 +476,22 @@ class Server:
                 p_item.data = item.data
         except Exception as exc:
             self.logger.exception(exc)
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=str(exc),
-            ) from exc
+            raise fastapi.HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
 
         try:
             s.push_item_to_queue(p_item)
         except ValueError as exc_value:
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="malformed item",
-            ) from exc_value
+            raise fastapi.HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="malformed item") from exc_value
         except queues.QueueFullError as exc_full:
             raise fastapi.HTTPException(
-                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="queue is full",
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="queue is full"
             ) from exc_full
         except queues.errors.NotAllowedError as exc_not_allowed:
             raise fastapi.HTTPException(
-                headers={"Retry-After": "60"},
-                status_code=status.HTTP_409_CONFLICT,
-                detail=str(exc_not_allowed),
+                headers={"Retry-After": "60"}, status_code=status.HTTP_409_CONFLICT, detail=str(exc_not_allowed)
             ) from exc_not_allowed
 
         return p_item
 
     def run(self) -> None:
-        uvicorn.run(
-            self.api,
-            host=str(self.ctx.config.api_host),
-            port=self.ctx.config.api_port,
-            log_config=None,
-        )
+        uvicorn.run(self.api, host=str(self.ctx.config.api_host), port=self.ctx.config.api_port, log_config=None)

@@ -13,9 +13,7 @@ from keiko.settings import Settings
 
 @click.command()
 @click.argument("sample", type=click.File("r"))
-def main(
-    sample: TextIO,
-) -> None:
+def main(sample: TextIO) -> None:
     """
     Click entry point.
 

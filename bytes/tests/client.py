@@ -35,10 +35,7 @@ class BytesAPIClient:
         self.client = httpx.Client(
             base_url=base_url, headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"}
         )
-        self._credentials = {
-            "username": username,
-            "password": password,
-        }
+        self._credentials = {"username": username, "password": password}
 
     def login(self) -> None:
         self.client.headers.update(self._get_authentication_headers())
@@ -52,9 +49,7 @@ class BytesAPIClient:
 
     def _get_token(self) -> str:
         response = self.client.post(
-            "/token",
-            data=self._credentials,
-            headers={"content-type": "application/x-www-form-urlencoded"},
+            "/token", data=self._credentials, headers={"content-type": "application/x-www-form-urlencoded"}
         )
 
         return str(response.json()["access_token"])

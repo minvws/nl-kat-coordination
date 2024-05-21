@@ -29,11 +29,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
         except SettingsNotFound:
             organisation = self.session.query(OrganisationInDB).filter(OrganisationInDB.id == organisation_id).first()
 
-            setting_in_db = SettingsInDB(
-                values=encrypted_values,
-                plugin_id=plugin_id,
-                organisation_pk=organisation.pk,
-            )
+            setting_in_db = SettingsInDB(values=encrypted_values, plugin_id=plugin_id, organisation_pk=organisation.pk)
             self.session.add(setting_in_db)
 
     def get_all(self, organisation_id: str, plugin_id: str) -> dict:
@@ -76,8 +72,7 @@ def create_encrypter():
     encrypter: EncryptMiddleware = IdentityMiddleware()
     if get_context().env.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
         encrypter = NaclBoxMiddleware(
-            get_context().env.katalogus_private_key_b64,
-            get_context().env.katalogus_public_key_b64,
+            get_context().env.katalogus_private_key_b64, get_context().env.katalogus_public_key_b64
         )
 
     return encrypter

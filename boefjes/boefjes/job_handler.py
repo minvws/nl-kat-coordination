@@ -26,9 +26,7 @@ MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought t
 logger = logging.getLogger(__name__)
 
 bytes_api_client = BytesAPIClient(
-    str(settings.bytes_api),
-    username=settings.bytes_username,
-    password=settings.bytes_password,
+    str(settings.bytes_api), username=settings.bytes_username, password=settings.bytes_password
 )
 
 
@@ -68,8 +66,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str
     try:
         katalogus_api = str(settings.katalogus_api).rstrip("/")
         response = httpx.get(
-            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings",
-            timeout=30,
+            f"{katalogus_api}/v1/organisations/{boefje_meta.organization}/{boefje_meta.boefje.id}/settings", timeout=30
         )
         response.raise_for_status()
         environment = response.json()
@@ -91,10 +88,7 @@ def get_environment_settings(boefje_meta: BoefjeMeta, environment_keys: list[str
 
 class BoefjeHandler(Handler):
     def __init__(
-        self,
-        job_runner: BoefjeJobRunner,
-        local_repository: LocalPluginRepository,
-        bytes_client: BytesAPIClient,
+        self, job_runner: BoefjeJobRunner, local_repository: LocalPluginRepository, bytes_client: BytesAPIClient
     ):
         self.job_runner = job_runner
         self.local_repository = local_repository

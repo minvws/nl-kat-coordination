@@ -178,8 +178,7 @@ class KATalogusClientV1:
 
     def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
         response = self.session.patch(
-            f"{self.organization_uri}/repositories/{repository_id}/plugins/{boefje_id}",
-            json={"enabled": enabled},
+            f"{self.organization_uri}/repositories/{repository_id}/plugins/{boefje_id}", json={"enabled": enabled}
         )
         response.raise_for_status()
 

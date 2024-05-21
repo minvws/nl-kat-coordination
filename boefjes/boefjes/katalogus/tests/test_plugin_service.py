@@ -265,9 +265,4 @@ class TestPluginsService(TestCase):
 
         all_settings_for_new_org = self.service.get_all_settings("org2", "test-boefje-1")
         assert len(all_settings_for_new_org) == 4
-        assert all_settings_for_new_org == {
-            "0": "1",
-            "2": "3",
-            "4": "5",
-            "6": "7",
-        }
+        assert all_settings_for_new_org == {"0": "1", "2": "3", "4": "5", "6": "7"}

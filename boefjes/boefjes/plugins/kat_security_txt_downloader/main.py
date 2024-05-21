@@ -55,10 +55,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
 def do_request(hostname: str, session: Session, uri: str, useragent: str):
     response = session.get(
-        uri,
-        headers={"Host": hostname, "User-Agent": useragent},
-        verify=False,
-        allow_redirects=False,
+        uri, headers={"Host": hostname, "User-Agent": useragent}, verify=False, allow_redirects=False
     )
 
     return response

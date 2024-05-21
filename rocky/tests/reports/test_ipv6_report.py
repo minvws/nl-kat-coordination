@@ -2,13 +2,9 @@ from reports.report_types.ipv6_report.report import IPv6Report
 
 
 def test_ipv6_report_hostname_with_ipv6(mock_octopoes_api_connector, valid_time, hostname, ipaddressv6, ipaddressv4):
-    mock_octopoes_api_connector.oois = {
-        hostname.reference: hostname,
-    }
+    mock_octopoes_api_connector.oois = {hostname.reference: hostname}
     mock_octopoes_api_connector.queries = {
-        "Hostname.<hostname[is ResolvedHostname].address": {
-            hostname.reference: [ipaddressv4, ipaddressv6],
-        },
+        "Hostname.<hostname[is ResolvedHostname].address": {hostname.reference: [ipaddressv4, ipaddressv6]}
     }
 
     report = IPv6Report(mock_octopoes_api_connector)
@@ -19,13 +15,9 @@ def test_ipv6_report_hostname_with_ipv6(mock_octopoes_api_connector, valid_time,
 
 
 def test_ipv6_report_hostname_without_ipv6(mock_octopoes_api_connector, valid_time, hostname, ipaddressv4):
-    mock_octopoes_api_connector.oois = {
-        hostname.reference: hostname,
-    }
+    mock_octopoes_api_connector.oois = {hostname.reference: hostname}
     mock_octopoes_api_connector.queries = {
-        "Hostname.<hostname[is ResolvedHostname].address": {
-            hostname.reference: [ipaddressv4],
-        },
+        "Hostname.<hostname[is ResolvedHostname].address": {hostname.reference: [ipaddressv4]}
     }
 
     report = IPv6Report(mock_octopoes_api_connector)
@@ -36,16 +28,10 @@ def test_ipv6_report_hostname_without_ipv6(mock_octopoes_api_connector, valid_ti
 
 
 def test_ipv6_report_ipv4_without_ipv6(mock_octopoes_api_connector, valid_time, hostname, ipaddressv4):
-    mock_octopoes_api_connector.oois = {
-        ipaddressv4.reference: ipaddressv4,
-    }
+    mock_octopoes_api_connector.oois = {ipaddressv4.reference: ipaddressv4}
     mock_octopoes_api_connector.queries = {
-        "Hostname.<hostname[is ResolvedHostname].address": {
-            hostname.reference: [ipaddressv4],
-        },
-        "IPAddress.<address[is ResolvedHostname].hostname": {
-            ipaddressv4.reference: [hostname],
-        },
+        "Hostname.<hostname[is ResolvedHostname].address": {hostname.reference: [ipaddressv4]},
+        "IPAddress.<address[is ResolvedHostname].hostname": {ipaddressv4.reference: [hostname]},
     }
 
     report = IPv6Report(mock_octopoes_api_connector)
@@ -56,16 +42,10 @@ def test_ipv6_report_ipv4_without_ipv6(mock_octopoes_api_connector, valid_time, 
 
 
 def test_ipv6_report_ipv4_with_ipv6(mock_octopoes_api_connector, valid_time, hostname, ipaddressv4, ipaddressv6):
-    mock_octopoes_api_connector.oois = {
-        ipaddressv4.reference: ipaddressv4,
-    }
+    mock_octopoes_api_connector.oois = {ipaddressv4.reference: ipaddressv4}
     mock_octopoes_api_connector.queries = {
-        "Hostname.<hostname[is ResolvedHostname].address": {
-            hostname.reference: [ipaddressv4, ipaddressv6],
-        },
-        "IPAddress.<address[is ResolvedHostname].hostname": {
-            ipaddressv4.reference: [hostname],
-        },
+        "Hostname.<hostname[is ResolvedHostname].address": {hostname.reference: [ipaddressv4, ipaddressv6]},
+        "IPAddress.<address[is ResolvedHostname].hostname": {ipaddressv4.reference: [hostname]},
     }
 
     report = IPv6Report(mock_octopoes_api_connector)
@@ -76,16 +56,10 @@ def test_ipv6_report_ipv4_with_ipv6(mock_octopoes_api_connector, valid_time, hos
 
 
 def test_ipv6_report_ipv6_wit_ipv6(mock_octopoes_api_connector, valid_time, hostname, ipaddressv6):
-    mock_octopoes_api_connector.oois = {
-        ipaddressv6.reference: ipaddressv6,
-    }
+    mock_octopoes_api_connector.oois = {ipaddressv6.reference: ipaddressv6}
     mock_octopoes_api_connector.queries = {
-        "Hostname.<hostname[is ResolvedHostname].address": {
-            hostname.reference: [ipaddressv6],
-        },
-        "IPAddress.<address[is ResolvedHostname].hostname": {
-            ipaddressv6.reference: [hostname],
-        },
+        "Hostname.<hostname[is ResolvedHostname].address": {hostname.reference: [ipaddressv6]},
+        "IPAddress.<address[is ResolvedHostname].hostname": {ipaddressv6.reference: [hostname]},
     }
 
     report = IPv6Report(mock_octopoes_api_connector)

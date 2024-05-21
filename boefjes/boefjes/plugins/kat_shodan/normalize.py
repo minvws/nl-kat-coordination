@@ -21,12 +21,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             port_nr = scan["port"]
             transport = scan["transport"]
 
-            ip_port = IPPort(
-                address=ooi,
-                protocol=Protocol(transport),
-                port=int(port_nr),
-                state=PortState("open"),
-            )
+            ip_port = IPPort(address=ooi, protocol=Protocol(transport), port=int(port_nr), state=PortState("open"))
             yield ip_port
 
             if "vulns" in scan:

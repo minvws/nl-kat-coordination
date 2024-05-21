@@ -18,11 +18,7 @@ TREE_DATA = {
         "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
     },
     "store": {
-        "Network|testnetwork": {
-            "object_type": "Network",
-            "primary_key": "Network|testnetwork",
-            "name": "testnetwork",
-        },
+        "Network|testnetwork": {"object_type": "Network", "primary_key": "Network|testnetwork", "name": "testnetwork"},
         "Finding|Network|testnetwork|KAT-000": {
             "object_type": "Finding",
             "primary_key": "Finding|Network|testnetwork|KAT-000",
@@ -45,11 +41,7 @@ MUTED_FINDING_TREE_DATA = {
             "finding": "Finding|Network|testnetwork|KAT-000",
             "reason": "Hallo",
         },
-        "Network|testnetwork": {
-            "object_type": "Network",
-            "primary_key": "Network|testnetwork",
-            "name": "testnetwork",
-        },
+        "Network|testnetwork": {"object_type": "Network", "primary_key": "Network|testnetwork", "name": "testnetwork"},
         "Finding|Network|testnetwork|KAT-000": {
             "object_type": "Finding",
             "primary_key": "Finding|Network|testnetwork|KAT-000",
@@ -191,7 +183,7 @@ def test_muted_finding_button_not_presence(rf, mock_organization_view_octopoes, 
                 proof="proof",
                 description="test description 123",
                 reproduce="reproduce",
-            ),
+            )
         ],
     )
     mock_organization_view_octopoes().load_objects_bulk.return_value = {
@@ -200,8 +192,7 @@ def test_muted_finding_button_not_presence(rf, mock_organization_view_octopoes, 
     }
 
     response = FindingListView.as_view()(
-        setup_request(rf.get("finding_list"), redteam_member.user),
-        organization_code=redteam_member.organization.code,
+        setup_request(rf.get("finding_list"), redteam_member.user), organization_code=redteam_member.organization.code
     )
 
     assert response.status_code == 200
@@ -237,8 +228,7 @@ def test_muted_finding_button_presence_more_findings_and_post(
         reproduce="reproduce",
     )
     mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
-        count=2,
-        items=[finding_1, finding_2],
+        count=2, items=[finding_1, finding_2]
     )
 
     mock_organization_view_octopoes().load_objects_bulk.return_value = {
@@ -248,8 +238,7 @@ def test_muted_finding_button_presence_more_findings_and_post(
     }
 
     response = FindingListView.as_view()(
-        setup_request(rf.get("finding_list"), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.get("finding_list"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
@@ -258,14 +247,7 @@ def test_muted_finding_button_presence_more_findings_and_post(
     assertContains(response, '<button type="submit">Mute Findings</button>')
 
     request = setup_request(
-        rf.post(
-            "finding_mute_bulk",
-            {
-                "finding": [finding_1, finding_2],
-                "reason": "testing",
-            },
-        ),
-        member.user,
+        rf.post("finding_mute_bulk", {"finding": [finding_1, finding_2], "reason": "testing"}), member.user
     )
 
     response_post = MuteFindingsBulkView.as_view()(request, organization_code=member.organization.code)
@@ -274,14 +256,7 @@ def test_muted_finding_button_presence_more_findings_and_post(
 
 
 @pytest.mark.parametrize("member", ["admin_member", "client_member"])
-def test_can_mute_findings_perms(
-    rf,
-    request,
-    member,
-    mock_organization_view_octopoes,
-    network,
-    finding_types,
-):
+def test_can_mute_findings_perms(rf, request, member, mock_organization_view_octopoes, network, finding_types):
     member = request.getfixturevalue(member)
     mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
         count=2,
@@ -310,8 +285,7 @@ def test_can_mute_findings_perms(
     }
 
     response = FindingListView.as_view()(
-        setup_request(rf.get("finding_list"), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.get("finding_list"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
@@ -348,8 +322,7 @@ def test_findings_list_filtering(
         reproduce="reproduce",
     )
     mock_organization_view_octopoes().list_findings.return_value = Paginated[Finding](
-        count=2,
-        items=[finding_1, finding_2],
+        count=2, items=[finding_1, finding_2]
     )
 
     mock_organization_view_octopoes().load_objects_bulk.return_value = {
@@ -359,22 +332,13 @@ def test_findings_list_filtering(
     }
 
     response = FindingListView.as_view()(
-        setup_request(rf.get("finding_list"), member.user),
-        organization_code=member.organization.code,
+        setup_request(rf.get("finding_list"), member.user), organization_code=member.organization.code
     )
 
     assert response.status_code == 200
     assert len(response.context_data["object_list"]) == 2
 
-    request_filtering = setup_request(
-        rf.get(
-            "finding_list",
-            {
-                "severity": "low",
-            },
-        ),
-        member.user,
-    )
+    request_filtering = setup_request(rf.get("finding_list", {"severity": "low"}), member.user)
     FindingListView.as_view()(request_filtering, organization_code=member.organization.code)
 
     assert mock_organization_view_octopoes().list_findings.mock_calls[2].kwargs["severities"] == {RiskLevelSeverity.LOW}

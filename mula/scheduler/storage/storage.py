@@ -23,20 +23,14 @@ class DBConn:
 
         logger.info("Connecting to database %s with pool size %s...", db_uri_redacted, pool_size)
         self.engine = sqlalchemy.create_engine(
-            dsn,
-            pool_pre_ping=True,
-            pool_size=pool_size,
-            pool_recycle=300,
-            json_serializer=serializer,
+            dsn, pool_pre_ping=True, pool_size=pool_size, pool_recycle=300, json_serializer=serializer
         )
         logger.info("Connected to database %s.", db_uri_redacted)
 
         if self.engine is None:
             raise Exception("Invalid datastore type")
 
-        self.session = sqlalchemy.orm.sessionmaker(
-            bind=self.engine,
-        )
+        self.session = sqlalchemy.orm.sessionmaker(bind=self.engine)
 
 
 def retry(max_retries: int = 3, retry_delay: float = 5.0):
@@ -46,10 +40,7 @@ def retry(max_retries: int = 3, retry_delay: float = 5.0):
             for i in range(max_retries):
                 try:
                     return func(*args, **kwargs)
-                except (
-                    sqlalchemy.exc.OperationalError,
-                    sqlalchemy.exc.InternalError,
-                ) as e:
+                except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.InternalError) as e:
                     if i == max_retries - 1:
                         raise e
 

@@ -14,10 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def are_tasks_done() -> bool:
-    response = httpx.get(
-        url=f"{SCHEDULER_API}/tasks/stats",
-        timeout=30,
-    )
+    response = httpx.get(url=f"{SCHEDULER_API}/tasks/stats", timeout=30)
 
     try:
         response.raise_for_status()
@@ -31,10 +28,7 @@ def are_tasks_done() -> bool:
 
 
 def parse_stats() -> None:
-    resp_tasks_stats = httpx.get(
-        url=f"{SCHEDULER_API}/tasks/stats",
-        timeout=30,
-    )
+    resp_tasks_stats = httpx.get(url=f"{SCHEDULER_API}/tasks/stats", timeout=30)
 
     try:
         resp_tasks_stats.raise_for_status()
@@ -49,25 +43,13 @@ def parse_stats() -> None:
         failed = tasks_stats[hour].get("failed")
         completed = tasks_stats[hour].get("completed")
 
-        logger.info(
-            "HOUR %s, QUEUED %s, RUNNING %s, FAILED %s, COMPLETED %s",
-            hour,
-            queued,
-            running,
-            failed,
-            completed,
-        )
+        logger.info("HOUR %s, QUEUED %s, RUNNING %s, FAILED %s, COMPLETED %s", hour, queued, running, failed, completed)
 
 
 def capture_logs(container_id: str, output_file: str) -> None:
     # Capture logs
     with Path.open(output_file, "w", encoding="utf-8") as file:
-        subprocess.run(
-            ["docker", "logs", container_id],
-            stdout=file,
-            stderr=file,
-            check=True,
-        )
+        subprocess.run(["docker", "logs", container_id], stdout=file, stderr=file, check=True)
 
 
 def parse_logs(path: str) -> None:
@@ -148,11 +130,7 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", "-v", action="store_true", help="Set to enable verbose logging.")
 
     parser.add_argument(
-        "--container-id",
-        "-c",
-        type=str,
-        required=False,
-        help="The container id of the process to monitor.",
+        "--container-id", "-c", type=str, required=False, help="The container id of the process to monitor."
     )
 
     # Parse arguments
@@ -165,9 +143,6 @@ if __name__ == "__main__":
     if args.verbose:
         default_loglevel = logging.DEBUG
 
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s %(name)-10s %(levelname)-8s %(message)s",
-    )
+    logging.basicConfig(level=level, format="%(asctime)s %(name)-10s %(levelname)-8s %(message)s")
 
     run(args.container_id)

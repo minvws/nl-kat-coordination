@@ -48,18 +48,9 @@ class PrioritizedItemDB(Base):
 
     data = Column(JSONB, nullable=False)
 
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    modified_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        onupdate=func.now(),
-    )
+    modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
 
 class Queue(BaseModel):

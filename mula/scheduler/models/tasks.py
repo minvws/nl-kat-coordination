@@ -76,32 +76,13 @@ class TaskDB(Base):
 
     p_item = Column(JSONB, nullable=False)
 
-    status = Column(
-        Enum(TaskStatus),
-        nullable=False,
-        default=TaskStatus.PENDING,
-    )
+    status = Column(Enum(TaskStatus), nullable=False, default=TaskStatus.PENDING)
 
-    created_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-    )
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    modified_at = Column(
-        DateTime(timezone=True),
-        nullable=False,
-        server_default=func.now(),
-        onupdate=func.now(),
-    )
+    modified_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
-    __table_args__ = (
-        Index(
-            "ix_p_item_hash",
-            text("(p_item->>'hash')"),
-            created_at.desc(),
-        ),
-    )
+    __table_args__ = (Index("ix_p_item_hash", text("(p_item->>'hash')"), created_at.desc()),)
 
 
 class NormalizerTask(BaseModel):

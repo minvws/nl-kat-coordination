@@ -104,10 +104,7 @@ def test_reschedule_task_already_queued(rf, client_member, mocker, task):
         client_member.user,
     )
 
-    response = BoefjesTaskListView.as_view()(
-        request,
-        organization_code=client_member.organization.code,
-    )
+    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
     assert response.status_code == 302
     assert list(request._messages)[0].message == "Task queue is full, please try again later."
@@ -146,9 +143,7 @@ def test_download_task_same_org(rf, client_member, mock_bytes_client, bytes_raw_
     request = setup_request(rf.get("bytes_raw"), client_member.user)
 
     response = BytesRawView.as_view()(
-        request,
-        organization_code=client_member.organization.code,
-        boefje_meta_id=bytes_raw_metas[0]["id"],
+        request, organization_code=client_member.organization.code, boefje_meta_id=bytes_raw_metas[0]["id"]
     )
 
     assert response.status_code == 200
@@ -160,9 +155,7 @@ def test_download_task_forbidden(rf, client_member, mock_bytes_client, bytes_raw
     request = setup_request(rf.get("bytes_raw"), client_member.user)
 
     response = BytesRawView.as_view()(
-        request,
-        organization_code=client_member.organization.code,
-        boefje_meta_id=bytes_raw_metas[0]["id"],
+        request, organization_code=client_member.organization.code, boefje_meta_id=bytes_raw_metas[0]["id"]
     )
 
     assert response.status_code == 302

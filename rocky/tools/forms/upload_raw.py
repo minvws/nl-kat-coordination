@@ -17,10 +17,7 @@ class UploadRawForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={"placeholder": "text/html, image/jpeg, ..."}),
     )
-    raw_file = forms.FileField(
-        label=_("Upload raw file"),
-        allow_empty_file=False,
-    )
+    raw_file = forms.FileField(label=_("Upload raw file"), allow_empty_file=False)
 
     def clean_mime_types(self) -> set[str]:
         mime_types = self.cleaned_data["mime_types"]

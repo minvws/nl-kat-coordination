@@ -75,11 +75,7 @@ class TestRepositories(TestCase):
         repository_id = "test"
 
         with self.repository_storage as repository_storage:
-            repo = Repository(
-                id=repository_id,
-                name="Test",
-                base_url="http://test.url",
-            )
+            repo = Repository(id=repository_id, name="Test", base_url="http://test.url")
             repository_storage.create(repo)
 
         returned_repo = repository_storage.get_by_id(repository_id)
@@ -93,11 +89,7 @@ class TestRepositories(TestCase):
 
     def test_organisations_repositories(self):
         org = Organisation(id="org1", name="Test")
-        repo = Repository(
-            id="repo-123",
-            name="Test",
-            base_url="http://test.url",
-        )
+        repo = Repository(id="repo-123", name="Test", base_url="http://test.url")
 
         with self.repository_storage as storage:
             storage.create(repo)
@@ -113,11 +105,7 @@ class TestRepositories(TestCase):
         self.assertEqual(1, len(repositories))
         self.assertEqual(repo, repositories[0])
 
-        repo2 = Repository(
-            id="repo-321",
-            name="Test",
-            base_url="http://test.url",
-        )
+        repo2 = Repository(id="repo-321", name="Test", base_url="http://test.url")
 
         with self.repository_storage as storage:
             storage.create(repo2)
@@ -202,11 +190,7 @@ class TestRepositories(TestCase):
             storage.create(org)
 
         with self.repository_storage as storage:
-            repo = Repository(
-                id="repo-test",
-                name="Test",
-                base_url="http://test.url",
-            )
+            repo = Repository(id="repo-test", name="Test", base_url="http://test.url")
             storage.create(repo)
 
         with self.plugin_state_storage as plugin_state_storage:

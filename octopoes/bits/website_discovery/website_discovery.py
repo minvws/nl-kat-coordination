@@ -21,7 +21,4 @@ def run(
     # website is cartesian product of hostname and http services
     for http_service in http_services:
         for hostname in hostnames:
-            yield Website(
-                hostname=hostname,
-                ip_service=http_service.reference,
-            )
+            yield Website(hostname=hostname, ip_service=http_service.reference)

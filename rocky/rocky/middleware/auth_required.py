@@ -30,11 +30,7 @@ def AuthRequiredMiddleware(get_response):
             f"/{translation.get_language()}/reset/",
         ]
         # URLs only excluded from 2fa
-        excluded_2fa = [
-            two_factor_setup_path,
-            reverse("two_factor:qr"),
-            reverse("logout"),
-        ]
+        excluded_2fa = [two_factor_setup_path, reverse("two_factor:qr"), reverse("logout")]
 
         if not request.user.is_authenticated and "authorization" in request.headers:
             authenticator = TokenAuthentication()

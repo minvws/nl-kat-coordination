@@ -162,9 +162,7 @@ class AppContext:
         self.metrics_registry: CollectorRegistry = CollectorRegistry()
 
         Info(
-            name="app_settings",
-            documentation="Scheduler configuration settings",
-            registry=self.metrics_registry,
+            name="app_settings", documentation="Scheduler configuration settings", registry=self.metrics_registry
         ).info(
             {
                 "pq_maxsize": str(self.config.pq_maxsize),

@@ -30,12 +30,7 @@ class SecurityTXTTest(TestCase):
     maxDiff = None
 
     def test_security_txt_same_website(self):
-        oois = list(
-            run(
-                input_ooi,
-                get_dummy_data("inputs/security_txt_result_same_website.json"),
-            )
-        )
+        oois = list(run(input_ooi, get_dummy_data("inputs/security_txt_result_same_website.json")))
 
         expected = []
         expected.append(
@@ -55,12 +50,7 @@ class SecurityTXTTest(TestCase):
         self.assertEqual(expected, oois)
 
     def test_security_txt_different_website(self):
-        oois = list(
-            run(
-                input_ooi,
-                get_dummy_data("inputs/security_txt_result_different_website.json"),
-            )
-        )
+        oois = list(run(input_ooi, get_dummy_data("inputs/security_txt_result_different_website.json")))
 
         expected = []
         url_original = URL(

@@ -16,12 +16,7 @@ if os.environ.get("CI") != "1":
 
 def test_io(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="internet")
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
     time.sleep(2)
 
     assert octopoes_api_connector.list_objects(types={Network}, valid_time=valid_time).count == 1

@@ -47,13 +47,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     results = {"vrps_records": roas, "notexpired": notexpired, "exists": exists}
 
-    return [
-        (set(), json.dumps(results)),
-        (
-            {"rpki/cache-meta"},
-            json.dumps(rpki_meta),
-        ),
-    ]
+    return [(set(), json.dumps(results)), ({"rpki/cache-meta"}, json.dumps(rpki_meta))]
 
 
 def create_hash(data: bytes, algo: str) -> str:

@@ -40,14 +40,7 @@ class TestPlugins(TestCase):
         res = self.client.get("/v1/organisations/test-org/plugins?plugin_type=boefje")
         self.assertEqual(200, res.status_code)
         self.assertSetEqual(
-            {
-                "test-boefje-1",
-                "test-boefje-2",
-                "kat_test",
-                "kat_test_2",
-                "kat_test_4",
-            },
-            {x["id"] for x in res.json()},
+            {"test-boefje-1", "test-boefje-2", "kat_test", "kat_test_2", "kat_test_4"}, {x["id"] for x in res.json()}
         )
 
     def test_list_filter_by_state(self):
@@ -55,12 +48,7 @@ class TestPlugins(TestCase):
         self.assertEqual(200, res.status_code)
         plugins = res.json()
         self.assertSetEqual(
-            {
-                "test-bit-1",
-                "test-normalizer-1",
-                "kat_test_normalize",
-                "kat_test_normalize_2",
-            },
+            {"test-bit-1", "test-normalizer-1", "kat_test_normalize", "kat_test_normalize_2"},
             {x["id"] for x in plugins},
         )
         self.assertTrue(all([x["enabled"] for x in plugins]))
@@ -69,42 +57,24 @@ class TestPlugins(TestCase):
         res = self.client.get("/v1/organisations/test-org/plugins?q=kat")
         self.assertEqual(200, res.status_code)
         self.assertSetEqual(
-            {
-                "kat_test",
-                "kat_test_2",
-                "kat_test_4",
-                "kat_test_normalize",
-                "kat_test_normalize_2",
-            },
+            {"kat_test", "kat_test_2", "kat_test_4", "kat_test_normalize", "kat_test_normalize_2"},
             {x["id"] for x in (res.json())},
         )
 
     def test_list_pagination(self):
         res = self.client.get("/v1/organisations/test-org/plugins?offset=2&limit=2")
         self.assertEqual(200, res.status_code)
-        self.assertSetEqual(
-            {
-                "test-bit-1",
-                "test-normalizer-1",
-            },
-            {x["id"] for x in (res.json())},
-        )
+        self.assertSetEqual({"test-bit-1", "test-normalizer-1"}, {x["id"] for x in (res.json())})
 
     def test_list_repository(self):
         res = self.client.get("/v1/organisations/test-org/repositories/test-repo/plugins")
         self.assertEqual(200, res.status_code)
-        self.assertListEqual(
-            ["test-boefje-1", "test-boefje-2"],
-            list(res.json().keys()),
-        )
+        self.assertListEqual(["test-boefje-1", "test-boefje-2"], list(res.json().keys()))
 
     def test_list_repository2(self):
         res = self.client.get("/v1/organisations/test-org/repositories/test-repo-2/plugins")
         self.assertEqual(200, res.status_code)
-        self.assertListEqual(
-            ["test-bit-1", "test-normalizer-1"],
-            list(res.json().keys()),
-        )
+        self.assertListEqual(["test-bit-1", "test-normalizer-1"], list(res.json().keys()))
 
     def test_get_plugin(self):
         res = self.client.get("/v1/organisations/test-org/repositories/test-repo/plugins/test-boefje-1")
@@ -132,8 +102,7 @@ class TestPlugins(TestCase):
 
     def test_patching_enabled_state(self):
         res = self.client.patch(
-            "/v1/organisations/test-org/repositories/test-repo/plugins/test-boefje-1",
-            json={"enabled": False},
+            "/v1/organisations/test-org/repositories/test-repo/plugins/test-boefje-1", json={"enabled": False}
         )
         self.assertEqual(200, res.status_code)
 
@@ -156,8 +125,7 @@ class TestPlugins(TestCase):
 
     def test_patching_enabled_state_non_existing_org(self):
         res = self.client.patch(
-            "/v1/organisations/non-existing-org/repositories/test-repo/plugins/test-boefje-1",
-            json={"enabled": False},
+            "/v1/organisations/non-existing-org/repositories/test-repo/plugins/test-boefje-1", json={"enabled": False}
         )
 
         self.assertEqual(200, res.status_code)

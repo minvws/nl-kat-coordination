@@ -15,9 +15,7 @@ from boefjes.katalogus.routers.organisations import check_organisation_exists
 from boefjes.katalogus.types import FilterParameters, PaginationParameters
 
 router = APIRouter(
-    prefix="/organisations/{organisation_id}",
-    tags=["plugins"],
-    dependencies=[Depends(check_organisation_exists)],
+    prefix="/organisations/{organisation_id}", tags=["plugins"], dependencies=[Depends(check_organisation_exists)]
 )
 
 
@@ -49,10 +47,7 @@ def list_plugins(
 
     # filter plugins by id, name or description
     if filter_params.q is not None:
-        plugins = filter(
-            partial(_plugin_matches_query, query=filter_params.q),
-            plugins,
-        )
+        plugins = filter(partial(_plugin_matches_query, query=filter_params.q), plugins)
 
     # filter plugins by type
     if filter_params.type is not None:
@@ -74,9 +69,7 @@ def list_plugins(
 
 @router.get("/plugins/{plugin_id}", response_model=PluginType)
 def get_plugin(
-    plugin_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> PluginType:
     try:
         with plugin_service as p:
@@ -87,14 +80,9 @@ def get_plugin(
         raise HTTPException(ex.response.status_code)
 
 
-@router.get(
-    "/repositories/{repository_id}/plugins",
-    response_model=dict[str, PluginType],
-)
+@router.get("/repositories/{repository_id}/plugins", response_model=dict[str, PluginType])
 def list_repository_plugins(
-    repository_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    repository_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ):
     with plugin_service as p:
         return p.repository_plugins(repository_id, organisation_id)
@@ -135,8 +123,7 @@ def update_plugin_state(
 
 @router.get("/plugins/{plugin_id}/schema.json", include_in_schema=False)
 def get_plugin_schema(
-    plugin_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> JSONResponse:  # TODO: support for plugin covers in plugin repositories (?)
     try:
         with plugin_service as p:
@@ -149,8 +136,7 @@ def get_plugin_schema(
 
 @router.get("/plugins/{plugin_id}/cover.jpg", include_in_schema=False)
 def get_plugin_cover(
-    plugin_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> FileResponse:  # TODO: support for plugin covers in plugin repositories (?)
     try:
         with plugin_service as p:
@@ -163,9 +149,7 @@ def get_plugin_cover(
 
 @router.get("/plugins/{plugin_id}/description.md", include_in_schema=False)
 def get_plugin_description(
-    plugin_id: str,
-    organisation_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
+    plugin_id: str, organisation_id: str, plugin_service: PluginService = Depends(get_plugin_service)
 ) -> Response:  # TODO: support for markdown descriptions in plugin repositories (?)
     try:
         with plugin_service as p:
@@ -178,9 +162,7 @@ def get_plugin_description(
 
 @router.post("/settings/clone/{to_organisation_id}")
 def clone_organisation_settings(
-    organisation_id: str,
-    to_organisation_id: str,
-    storage: PluginService = Depends(get_plugin_service),
+    organisation_id: str, to_organisation_id: str, storage: PluginService = Depends(get_plugin_service)
 ):
     with storage as store:
         store.clone_settings_to_organisation(organisation_id, to_organisation_id)

@@ -47,11 +47,7 @@ def test_hostname_nxd_ooi(octopoes_api_connector: OctopoesAPIConnector, valid_ti
     nxd = NXDOMAIN(hostname=hostname.reference)
     octopoes_api_connector.save_observation(
         Observation(
-            method="normalizer_id",
-            source=hostname.reference,
-            task_id=uuid.uuid4(),
-            valid_time=valid_time,
-            result=[nxd],
+            method="normalizer_id", source=hostname.reference, task_id=uuid.uuid4(), valid_time=valid_time, result=[nxd]
         )
     )
     octopoes_api_connector.recalculate_bits()

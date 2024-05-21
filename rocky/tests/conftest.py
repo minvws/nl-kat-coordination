@@ -82,10 +82,7 @@ def create_organization(name, organization_code):
 
 
 def create_member(user, organization):
-    Indemnification.objects.create(
-        user=user,
-        organization=organization,
-    )
+    Indemnification.objects.create(user=user, organization=organization)
 
     return OrganizationMember.objects.create(
         user=user,
@@ -132,9 +129,7 @@ def add_redteam_group_permissions(member):
 def add_client_group_permissions(member):
     group = Group.objects.get(name=GROUP_CLIENT)
     member.groups.add(group)
-    client_permissions = [
-        Permission.objects.get(codename="can_scan_organization").id,
-    ]
+    client_permissions = [Permission.objects.get(codename="can_scan_organization").id]
     group.permissions.set(client_permissions)
 
 
@@ -482,10 +477,7 @@ def hostname(network) -> Hostname:
 
 @pytest.fixture
 def website(ip_service: IPService, hostname: Hostname):
-    return Website(
-        ip_service=ip_service.reference,
-        hostname=hostname.reference,
-    )
+    return Website(ip_service=ip_service.reference, hostname=hostname.reference)
 
 
 @pytest.fixture
@@ -960,10 +952,7 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
 @pytest.fixture
 def tree_data_tls_findings_and_suites():
     return {
-        "root": {
-            "reference": "",
-            "children": {"ooi": [{"reference": "", "children": {}}]},
-        },
+        "root": {"reference": "", "children": {"ooi": [{"reference": "", "children": {}}]}},
         "store": {
             "Finding|Network|testnetwork|KAT-0001": {
                 "object_type": "Finding",
@@ -1011,7 +1000,7 @@ def tree_data_tls_findings_and_suites():
                             "key_exchange_algorithm": "ECDH",
                             "cipher_suite_code": "xc014",
                         },
-                    ],
+                    ]
                 },
             },
         },
@@ -1182,20 +1171,12 @@ class MockOctopoesAPIConnector:
         return self.tree[reference]
 
     def query(
-        self,
-        path: str,
-        valid_time: datetime,
-        source: Reference | str | None = None,
-        offset: int = 0,
-        limit: int = 50,
+        self, path: str, valid_time: datetime, source: Reference | str | None = None, offset: int = 0, limit: int = 50
     ) -> list[OOI]:
         return self.queries[path][source]
 
     def query_many(
-        self,
-        path: str,
-        valid_time: datetime,
-        sources: list[OOI | Reference | str],
+        self, path: str, valid_time: datetime, sources: list[OOI | Reference | str]
     ) -> list[tuple[str, OOIType]]:
         result = []
 

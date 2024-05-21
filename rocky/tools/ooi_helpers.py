@@ -86,11 +86,7 @@ def process_value(value: Any) -> Any:
 
 
 def get_ooi_dict(ooi: OOI) -> dict:
-    ooi_dict = {
-        "id": ooi.primary_key,
-        "ooi_type": ooi.get_ooi_type(),
-        "human_readable": ooi.human_readable,
-    }
+    ooi_dict = {"id": ooi.primary_key, "ooi_type": ooi.get_ooi_type(), "human_readable": ooi.human_readable}
 
     ignore_properties = ["primary_key", "scan_profile"]
 
@@ -224,12 +220,7 @@ def filter_ooi_tree_item(ooi_node, show_types, hide_types, self_excluded_from_fi
 def get_finding_type_from_finding(finding: Finding) -> FindingType:
     return TypeAdapter(
         KATFindingType | CVEFindingType | CWEFindingType | RetireJSFindingType | SnykFindingType | CAPECFindingType
-    ).validate_python(
-        {
-            "object_type": finding.finding_type.class_,
-            "id": finding.finding_type.natural_key,
-        }
-    )
+    ).validate_python({"object_type": finding.finding_type.class_, "id": finding.finding_type.natural_key})
 
 
 _EXCLUDED = [Finding] + FindingType.strict_subclasses()

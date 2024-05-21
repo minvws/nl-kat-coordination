@@ -4,10 +4,7 @@ from octopoes.models.ooi.dns.records import DNSPTRRecord
 from octopoes.models.ooi.dns.zone import Hostname
 from tests.loading import get_dummy_data
 
-input_ooi = {
-    "primary_key": "IPAddressV4|internet|192.0.2.1",
-    "network": {"name": "internet"},
-}
+input_ooi = {"primary_key": "IPAddressV4|internet|192.0.2.1", "network": {"name": "internet"}}
 
 
 def test_rdns_nxdomain():

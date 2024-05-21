@@ -9,9 +9,7 @@ class OrganizationListForm(forms.Form):
     Creates a dropdown list of Organizations of a particular member.
     """
 
-    error_messages = {
-        "required": _("Organization is required."),
-    }
+    error_messages = {"required": _("Organization is required.")}
 
     def __init__(self, user, exclude_organization=None, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -109,11 +109,7 @@ class OOIRepository(Repository):
         raise NotImplementedError
 
     def get_tree(
-        self,
-        reference: Reference,
-        valid_time: datetime,
-        search_types: set[type[OOI]] | None = None,
-        depth: int = 1,
+        self, reference: Reference, valid_time: datetime, search_types: set[type[OOI]] | None = None, depth: int = 1
     ) -> ReferenceTree:
         raise NotImplementedError
 
@@ -123,15 +119,7 @@ class OOIRepository(Repository):
     def count_findings_by_severity(self, valid_time: datetime) -> Counter:
         raise NotImplementedError
 
-    def list_findings(
-        self,
-        severities,
-        valid_time,
-        exclude_muted,
-        only_muted,
-        offset,
-        limit,
-    ) -> Paginated[Finding]:
+    def list_findings(self, severities, valid_time, exclude_muted, only_muted, offset, limit) -> Paginated[Finding]:
         raise NotImplementedError
 
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> list[Config]:
@@ -324,10 +312,7 @@ class XTDBOOIRepository(OOIRepository):
 
         res = self.session.client.query(data_query, valid_time)
         oois = [self.deserialize(x[0]) for x in res]
-        return Paginated(
-            count=count,
-            items=oois,
-        )
+        return Paginated(count=count, items=oois)
 
     def list_random(
         self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
@@ -347,10 +332,7 @@ class XTDBOOIRepository(OOIRepository):
                 }}
                 :in-args [[{scan_levels}]]
             }}
-            """.format(
-            amount=amount,
-            scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]),
-        )
+            """.format(amount=amount, scan_levels=" ".join([str(scan_level.value) for scan_level in scan_levels]))
 
         res = self.session.client.query(query, valid_time)
         if not res:
@@ -359,11 +341,7 @@ class XTDBOOIRepository(OOIRepository):
         return list(self.load_bulk(references, valid_time).values())
 
     def get_tree(
-        self,
-        reference: Reference,
-        valid_time: datetime,
-        search_types: set[type[OOI]] | None = None,
-        depth: int = 1,
+        self, reference: Reference, valid_time: datetime, search_types: set[type[OOI]] | None = None, depth: int = 1
     ) -> ReferenceTree:
         if search_types is None:
             search_types = {OOI}
@@ -387,10 +365,7 @@ class XTDBOOIRepository(OOIRepository):
         """
         ooi_classes = {ooi.class_ for ooi in references}
         ooi_ids = [str(reference) for reference in references]
-        field_node = RelatedFieldNode(
-            data_model=datamodel,
-            object_types=ooi_classes,
-        )
+        field_node = RelatedFieldNode(data_model=datamodel, object_types=ooi_classes)
         field_node.build_tree(1)
         query = generate_pull_query(FieldSet.ONLY_ID, {self.pk_prefix: ooi_ids}, field_node=field_node)
         res = self.session.client.query(query, valid_time=valid_time)
@@ -587,10 +562,7 @@ class XTDBOOIRepository(OOIRepository):
         self.session.add((XTDBOperationType.DELETE, str(reference), valid_time))
 
         event = OOIDBEvent(
-            operation_type=OperationType.DELETE,
-            valid_time=valid_time,
-            old_data=ooi,
-            client=self.event_manager.client,
+            operation_type=OperationType.DELETE, valid_time=valid_time, old_data=ooi, client=self.event_manager.client
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -723,10 +695,7 @@ class XTDBOOIRepository(OOIRepository):
             }}
         """
 
-        return Paginated(
-            count=count,
-            items=[x[0] for x in self.query(finding_query, valid_time)],
-        )
+        return Paginated(count=count, items=[x[0] for x in self.query(finding_query, valid_time)])
 
     def query(self, query: str | Query, valid_time: datetime) -> list[OOI | tuple]:
         results = self.session.client.query(query, valid_time=valid_time)

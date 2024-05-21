@@ -45,13 +45,7 @@ class TaskStoreTestCase(unittest.TestCase):
         twenty_five_hours = datetime.now(timezone.utc) - timedelta(hours=25)
 
         for r, status, modified_at in zip(
-            (
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-            ),
+            (range(2), range(2), range(2), range(2), range(2)),
             (
                 models.TaskStatus.QUEUED,
                 models.TaskStatus.COMPLETED,
@@ -59,13 +53,7 @@ class TaskStoreTestCase(unittest.TestCase):
                 models.TaskStatus.DISPATCHED,
                 models.TaskStatus.DISPATCHED,
             ),
-            (
-                one_hour,
-                four_hours,
-                one_hour,
-                twenty_five_hours,
-                twenty_three_hours,
-            ),
+            (one_hour, four_hours, one_hour, twenty_five_hours, twenty_three_hours),
         ):
             for _ in r:
                 p_item = functions.create_p_item(self.organisation.id, 1)
@@ -97,13 +85,7 @@ class TaskStoreTestCase(unittest.TestCase):
         twenty_five_hours = datetime.now(timezone.utc) - timedelta(hours=25)
 
         for r, status, modified_at in zip(
-            (
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-                range(2),
-            ),
+            (range(2), range(2), range(2), range(2), range(2)),
             (
                 models.TaskStatus.QUEUED,
                 models.TaskStatus.COMPLETED,
@@ -111,13 +93,7 @@ class TaskStoreTestCase(unittest.TestCase):
                 models.TaskStatus.DISPATCHED,
                 models.TaskStatus.DISPATCHED,
             ),
-            (
-                one_hour,
-                four_hours,
-                one_hour,
-                twenty_five_hours,
-                twenty_three_hours,
-            ),
+            (one_hour, four_hours, one_hour, twenty_five_hours, twenty_three_hours),
         ):
             for _ in r:
                 p_item = functions.create_p_item(self.organisation.id, 1)
@@ -153,20 +129,10 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters={
                 "and": [
-                    filters.Filter(
-                        column="id",
-                        field=None,
-                        operator="eq",
-                        value=first_task.id.hex,
-                    ),
-                    filters.Filter(
-                        column="p_item",
-                        field="data__id",
-                        operator="eq",
-                        value=first_p_item.data.get("id"),
-                    ),
+                    filters.Filter(column="id", field=None, operator="eq", value=first_task.id.hex),
+                    filters.Filter(column="p_item", field="data__id", operator="eq", value=first_p_item.data.get("id")),
                 ]
-            },
+            }
         )
 
         # Act
@@ -190,20 +156,10 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters={
                 "or": [
-                    filters.Filter(
-                        column="id",
-                        field=None,
-                        operator="eq",
-                        value=first_task.id.hex,
-                    ),
-                    filters.Filter(
-                        column="id",
-                        field=None,
-                        operator="eq",
-                        value=second_task.id.hex,
-                    ),
+                    filters.Filter(column="id", field=None, operator="eq", value=first_task.id.hex),
+                    filters.Filter(column="id", field=None, operator="eq", value=second_task.id.hex),
                 ]
-            },
+            }
         )
 
         # Act
@@ -244,28 +200,13 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters={
                 "and": [
+                    filters.Filter(column="id", field=None, operator="eq", value=first_task.id.hex),
                     filters.Filter(
-                        column="id",
-                        field=None,
-                        operator="eq",
-                        value=first_task.id.hex,
-                    ),
-                    filters.Filter(
-                        column="p_item",
-                        field="data",
-                        operator="@>",
-                        value=json.dumps({"categories": ["test-a"]}),
+                        column="p_item", field="data", operator="@>", value=json.dumps({"categories": ["test-a"]})
                     ),
                 ],
-                "not": [
-                    filters.Filter(
-                        column="p_item",
-                        field="data__count",
-                        operator=">",
-                        value=1,
-                    ),
-                ],
-            },
+                "not": [filters.Filter(column="p_item", field="data__count", operator=">", value=1)],
+            }
         )
 
         # Act
@@ -287,14 +228,7 @@ class TaskStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.task_store.create_task(second_task)
 
         f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="id",
-                    field=None,
-                    operator="eq",
-                    value=first_task.id.hex,
-                )
-            ],
+            filters=[filters.Filter(column="id", field=None, operator="eq", value=first_task.id.hex)]
         )
 
         # Act
@@ -316,14 +250,7 @@ class TaskStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.task_store.create_task(second_task)
 
         f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="id",
-                    field=None,
-                    operator="ne",
-                    value=first_task.id.hex,
-                )
-            ],
+            filters=[filters.Filter(column="id", field=None, operator="ne", value=first_task.id.hex)]
         )
 
         # Act
@@ -346,13 +273,8 @@ class TaskStoreTestCase(unittest.TestCase):
 
         f_req = filters.FilterRequest(
             filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__id",
-                    operator="eq",
-                    value=first_p_item.data.get("id"),
-                )
-            ],
+                filters.Filter(column="p_item", field="data__id", operator="eq", value=first_p_item.data.get("id"))
+            ]
         )
 
         # Act
@@ -366,13 +288,8 @@ class TaskStoreTestCase(unittest.TestCase):
         # Arrange
         f_req = filters.FilterRequest(
             filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__id",
-                    operator="==",
-                    value=first_p_item.data.get("id"),
-                )
-            ],
+                filters.Filter(column="p_item", field="data__id", operator="==", value=first_p_item.data.get("id"))
+            ]
         )
 
         # Act
@@ -395,13 +312,8 @@ class TaskStoreTestCase(unittest.TestCase):
 
         f_req = filters.FilterRequest(
             filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__id",
-                    operator="ne",
-                    value=second_p_item.data.get("id"),
-                )
-            ],
+                filters.Filter(column="p_item", field="data__id", operator="ne", value=second_p_item.data.get("id"))
+            ]
         )
 
         # Act
@@ -429,12 +341,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="gt",
-                    value=first_p_item.data.get("count"),
+                    column="p_item", field="data__count", operator="gt", value=first_p_item.data.get("count")
                 )
-            ],
+            ]
         )
 
         # Act
@@ -448,13 +357,8 @@ class TaskStoreTestCase(unittest.TestCase):
         # Arrange
         f_req = filters.FilterRequest(
             filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator=">",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
+                filters.Filter(column="p_item", field="data__count", operator=">", value=first_p_item.data.get("count"))
+            ]
         )
 
         # Act
@@ -482,12 +386,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="gte",
-                    value=first_p_item.data.get("count"),
+                    column="p_item", field="data__count", operator="gte", value=first_p_item.data.get("count")
                 )
-            ],
+            ]
         )
 
         # Act
@@ -503,12 +404,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator=">=",
-                    value=first_p_item.data.get("count"),
+                    column="p_item", field="data__count", operator=">=", value=first_p_item.data.get("count")
                 )
-            ],
+            ]
         )
 
         # Act
@@ -537,12 +435,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="lt",
-                    value=first_p_item.data.get("count"),
+                    column="p_item", field="data__count", operator="lt", value=first_p_item.data.get("count")
                 )
-            ],
+            ]
         )
 
         # Act
@@ -556,13 +451,8 @@ class TaskStoreTestCase(unittest.TestCase):
         # Arrange
         f_req = filters.FilterRequest(
             filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="<",
-                    value=first_p_item.data.get("count"),
-                )
-            ],
+                filters.Filter(column="p_item", field="data__count", operator="<", value=first_p_item.data.get("count"))
+            ]
         )
 
         # Act
@@ -590,12 +480,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="lte",
-                    value=first_p_item.data.get("count"),
+                    column="p_item", field="data__count", operator="lte", value=first_p_item.data.get("count")
                 )
-            ],
+            ]
         )
 
         # Act
@@ -611,12 +498,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data__count",
-                    operator="<=",
-                    value=first_p_item.data.get("count"),
+                    column="p_item", field="data__count", operator="<=", value=first_p_item.data.get("count")
                 )
-            ],
+            ]
         )
 
         # Act
@@ -646,7 +530,7 @@ class TaskStoreTestCase(unittest.TestCase):
                     operator="like",
                     value=f"%{first_p_item.data.get('name')[0:10]}%",
                 )
-            ],
+            ]
         )
 
         # Act
@@ -675,7 +559,7 @@ class TaskStoreTestCase(unittest.TestCase):
                     operator="not_like",
                     value=f"%{first_p_item.data.get('name')[0:10]}%",
                 )
-            ],
+            ]
         )
 
         # Act
@@ -704,7 +588,7 @@ class TaskStoreTestCase(unittest.TestCase):
                     operator="ilike",
                     value=f"%{first_p_item.data.get('name')[0:10].upper()}%",
                 )
-            ],
+            ]
         )
 
         # Act
@@ -733,7 +617,7 @@ class TaskStoreTestCase(unittest.TestCase):
                     operator="not_ilike",
                     value=f"%{first_p_item.data.get('name')[0:10].upper()}%",
                 )
-            ],
+            ]
         )
 
         # Act
@@ -762,7 +646,7 @@ class TaskStoreTestCase(unittest.TestCase):
                     operator="in",
                     value=[first_p_item.data.get("name"), second_p_item.data.get("name")],
                 )
-            ],
+            ]
         )
 
         # Act
@@ -787,12 +671,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="not_in",
-                    value=[first_p_item.data.get("name")],
+                    column="p_item", field="data__name", operator="not_in", value=[first_p_item.data.get("name")]
                 )
-            ],
+            ]
         )
 
         # Act
@@ -816,12 +697,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data__name",
-                    operator="contains",
-                    value=first_p_item.data.get("name")[0:10],
+                    column="p_item", field="data__name", operator="contains", value=first_p_item.data.get("name")[0:10]
                 )
-            ],
+            ]
         )
 
         # Act
@@ -850,7 +728,7 @@ class TaskStoreTestCase(unittest.TestCase):
                     operator="starts_with",
                     value=first_p_item.data.get("name")[0:10],
                 )
-            ],
+            ]
         )
 
         # Act
@@ -890,12 +768,9 @@ class TaskStoreTestCase(unittest.TestCase):
         f_req = filters.FilterRequest(
             filters=[
                 filters.Filter(
-                    column="p_item",
-                    field="data",
-                    operator="@>",
-                    value=json.dumps({"categories": ["test-a"]}),
+                    column="p_item", field="data", operator="@>", value=json.dumps({"categories": ["test-a"]})
                 )
-            ],
+            ]
         )
 
         # Act
@@ -918,14 +793,7 @@ class TaskStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores.task_store.create_task(second_task)
 
         f_req = filters.FilterRequest(
-            filters=[
-                filters.Filter(
-                    column="p_item",
-                    field="data__id",
-                    operator="eq",
-                    value=False,
-                )
-            ],
+            filters=[filters.Filter(column="p_item", field="data__id", operator="eq", value=False)]
         )
 
         # Act

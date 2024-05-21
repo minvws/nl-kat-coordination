@@ -32,24 +32,13 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         else:
             ipvx = ipaddress.ip_address(ip)
             if ipvx.version == 4:
-                ip_ooi = IPAddressV4(
-                    address=ip,
-                    network=network,
-                )
+                ip_ooi = IPAddressV4(address=ip, network=network)
             else:
-                ip_ooi = IPAddressV6(
-                    address=ip,
-                    network=network,
-                )
+                ip_ooi = IPAddressV6(address=ip, network=network)
             yield ip_ooi
             ip_ref = ip_ooi.reference
 
-        ip_port_ooi = IPPort(
-            address=ip_ref,
-            protocol=Protocol(protocol),
-            port=port_nr,
-            state=PortState("open"),
-        )
+        ip_port_ooi = IPPort(address=ip_ref, protocol=Protocol(protocol), port=port_nr, state=PortState("open"))
         yield ip_port_ooi
 
         if "service" in scan["result"]["data"]:
@@ -65,8 +54,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
                     software_ooi = Software(name=get_name_from_cpe(cpe), cpe=cpe)
                     yield software_ooi
                     software_instance_ooi = SoftwareInstance(
-                        ooi=ip_service_ooi.reference,
-                        software=software_ooi.reference,
+                        ooi=ip_service_ooi.reference, software=software_ooi.reference
                     )
                     yield software_instance_ooi
 
@@ -90,8 +78,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
                     yield software_ooi
                     software_instance_ooi = SoftwareInstance(
-                        ooi=ip_service_ooi.reference,
-                        software=software_ooi.reference,
+                        ooi=ip_service_ooi.reference, software=software_ooi.reference
                     )
                     yield software_instance_ooi
 

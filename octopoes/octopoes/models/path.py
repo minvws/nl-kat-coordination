@@ -19,13 +19,7 @@ class Direction(Enum):
 
 
 class Segment:
-    def __init__(
-        self,
-        source_type: type[OOI],
-        direction: Direction,
-        property_name: str,
-        target_type: type[OOI] | None,
-    ):
+    def __init__(self, source_type: type[OOI], direction: Direction, property_name: str, target_type: type[OOI] | None):
         self.source_type = source_type
         self.direction = direction
         self.property_name = property_name

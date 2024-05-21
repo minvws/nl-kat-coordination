@@ -135,11 +135,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "ordering": ("name",),
-                "abstract": False,
-                "unique_together": {("slug", "parent")},
-            },
+            options={"ordering": ("name",), "abstract": False, "unique_together": {("slug", "parent")}},
             bases=(tagulous.models.models.BaseTagTreeModel, models.Model),
         ),
         migrations.CreateModel(
@@ -252,8 +248,6 @@ class Migration(migrations.Migration):
                 ("blocked", models.BooleanField(default=False)),
                 ("groups", models.ManyToManyField(blank=True, to="auth.group")),
             ],
-            options={
-                "unique_together": {("user", "organization")},
-            },
+            options={"unique_together": {("user", "organization")}},
         ),
     ]

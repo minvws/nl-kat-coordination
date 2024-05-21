@@ -2,14 +2,8 @@ from reports.report_types.safe_connections_report.report import SafeConnectionsR
 
 
 def test_safe_connections_report_no_finding_types(mock_octopoes_api_connector, valid_time, hostname):
-    mock_octopoes_api_connector.oois = {
-        hostname.reference: hostname,
-    }
-    mock_octopoes_api_connector.queries = {
-        "Hostname.<hostname[is ResolvedHostname].address": {
-            hostname.reference: [],
-        },
-    }
+    mock_octopoes_api_connector.oois = {hostname.reference: hostname}
+    mock_octopoes_api_connector.queries = {"Hostname.<hostname[is ResolvedHostname].address": {hostname.reference: []}}
 
     report = SafeConnectionsReport(mock_octopoes_api_connector)
 
@@ -23,14 +17,12 @@ def test_safe_connections_report_no_finding_types(mock_octopoes_api_connector, v
 def test_safe_connections_report_single_cipher_finding_type(
     mock_octopoes_api_connector, valid_time, ipaddressv4, cipher_finding_type, finding_types
 ):
-    mock_octopoes_api_connector.oois = {
-        ipaddressv4.reference: ipaddressv4,
-    }
+    mock_octopoes_api_connector.oois = {ipaddressv4.reference: ipaddressv4}
     mock_octopoes_api_connector.queries = {
         "IPAddress.<address[is IPPort].<ip_port [is IPService]"
         ".<ip_service [is TLSCipher].<ooi[is Finding].finding_type": {
-            ipaddressv4.reference: [cipher_finding_type, finding_types[0]],
-        },
+            ipaddressv4.reference: [cipher_finding_type, finding_types[0]]
+        }
     }
 
     report = SafeConnectionsReport(mock_octopoes_api_connector)
@@ -45,14 +37,12 @@ def test_safe_connections_report_single_cipher_finding_type(
 def test_safe_connections_report_multiple_cipher_finding_types(
     mock_octopoes_api_connector, valid_time, ipaddressv4, cipher_finding_types, finding_types
 ):
-    mock_octopoes_api_connector.oois = {
-        ipaddressv4.reference: ipaddressv4,
-    }
+    mock_octopoes_api_connector.oois = {ipaddressv4.reference: ipaddressv4}
     mock_octopoes_api_connector.queries = {
         "IPAddress.<address[is IPPort].<ip_port [is IPService]"
         ".<ip_service [is TLSCipher].<ooi[is Finding].finding_type": {
-            ipaddressv4.reference: cipher_finding_types + finding_types,
-        },
+            ipaddressv4.reference: cipher_finding_types + finding_types
+        }
     }
 
     report = SafeConnectionsReport(mock_octopoes_api_connector)
@@ -67,14 +57,10 @@ def test_safe_connections_report_multiple_cipher_finding_types(
 def test_safe_connections_report_no_cipher_finding_types(
     mock_octopoes_api_connector, valid_time, ipaddressv4, finding_types
 ):
-    mock_octopoes_api_connector.oois = {
-        ipaddressv4.reference: ipaddressv4,
-    }
+    mock_octopoes_api_connector.oois = {ipaddressv4.reference: ipaddressv4}
     mock_octopoes_api_connector.queries = {
         "IPAddress.<address[is IPPort].<ip_port [is IPService]"
-        ".<ip_service [is TLSCipher].<ooi[is Finding].finding_type": {
-            ipaddressv4.reference: finding_types,
-        },
+        ".<ip_service [is TLSCipher].<ooi[is Finding].finding_type": {ipaddressv4.reference: finding_types}
     }
 
     report = SafeConnectionsReport(mock_octopoes_api_connector)

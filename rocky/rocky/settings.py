@@ -55,15 +55,8 @@ DEBUG = env.bool("DEBUG", False)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "WARNING",
-    },
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "WARNING"},
 }
 
 # Make sure this header can never be set by an attacker, see also the security
@@ -75,13 +68,9 @@ if REMOTE_USER_HEADER:
     # Optional list of default organizations to add remote users to,
     # format: space separated list of ORGANIZATION_CODE:GROUP_NAME, e.g. `test:admin test2:redteam`
     REMOTE_USER_DEFAULT_ORGANIZATIONS = env.list("REMOTE_USER_DEFAULT_ORGANIZATIONS", default=[])
-    AUTHENTICATION_BACKENDS = [
-        "rocky.auth.remote_user.RemoteUserBackend",
-    ]
+    AUTHENTICATION_BACKENDS = ["rocky.auth.remote_user.RemoteUserBackend"]
     if REMOTE_USER_FALLBACK:
-        AUTHENTICATION_BACKENDS += [
-            "django.contrib.auth.backends.ModelBackend",
-        ]
+        AUTHENTICATION_BACKENDS += ["django.contrib.auth.backends.ModelBackend"]
 
 # SECURITY WARNING: enable two factor authentication in production!
 TWOFACTOR_ENABLED = env.bool("TWOFACTOR_ENABLED", not REMOTE_USER_HEADER)
@@ -200,7 +189,7 @@ TEMPLATES = [
             ],
             "builtins": ["tools.templatetags.ooi_extra"],
         },
-    },
+    }
 ]
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
@@ -241,9 +230,7 @@ if env.bool("POSTGRES_SSL_ENABLED", False):
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {
-            "min_length": env.int("PASSWORD_MIN_LENGTH", 12),
-        },
+        "OPTIONS": {"min_length": env.int("PASSWORD_MIN_LENGTH", 12)},
     },
     {
         "NAME": "django_password_validators.password_character_requirements"
@@ -283,18 +270,11 @@ LANG_INFO = locale.LANG_INFO.copy()
 LANG_INFO.update(EXTRA_LANG_INFO)
 locale.LANG_INFO = LANG_INFO
 
-LANGUAGES = [
-    ("en", "en"),
-    ("nl", "nl"),
-    ("pap", "pap"),
-    ("it", "it"),
-]
+LANGUAGES = [("en", "en"), ("nl", "nl"), ("pap", "pap"), ("it", "it")]
 
 if env.bool("PIRATE", False):
     LANGUAGE_CODE = "en@pirate"
-    LANGUAGES += [
-        ("en@pirate", "en@pirate"),
-    ]
+    LANGUAGES += [("en@pirate", "en@pirate")]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -311,11 +291,7 @@ COMPRESS_ENABLED = env.bool("COMPRESS_ENABLED", True)
 COMPRESS_OFFLINE = True
 COMPRESS_STORAGE = "compressor.storage.BrotliCompressorFileStorage"
 
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "rocky.storage.RockyStaticFilesStorage",
-    },
-}
+STORAGES = {"staticfiles": {"BACKEND": "rocky.storage.RockyStaticFilesStorage"}}
 
 _IMMUTABLE_FILE_TEST_PATTERN = re.compile(r"^.+\.[0-9a-f]{12}\..+$")
 
@@ -417,7 +393,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         # For now this will provide a safe default, but non-admin users will
         # need to be able to use the API in the future..
-        "rest_framework.permissions.IsAdminUser",
+        "rest_framework.permissions.IsAdminUser"
     ],
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
     "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
@@ -452,12 +428,7 @@ TAG_COLORS = [
     ("color-6-dark", _("Violet dark")),
 ]
 
-TAG_BORDER_TYPES = [
-    ("plain", _("Plain")),
-    ("solid", _("Solid")),
-    ("dashed", _("Dashed")),
-    ("dotted", _("Dotted")),
-]
+TAG_BORDER_TYPES = [("plain", _("Plain")), ("solid", _("Solid")), ("dashed", _("Dashed")), ("dotted", _("Dotted"))]
 
 WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
 

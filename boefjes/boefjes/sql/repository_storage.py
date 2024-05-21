@@ -52,19 +52,11 @@ class SQLRepositoryStorage(SessionMixin, RepositoryStorage):
 
     @staticmethod
     def to_repository_in_db(repository: Repository) -> RepositoryInDB:
-        return RepositoryInDB(
-            id=repository.id,
-            name=repository.name,
-            base_url=str(repository.base_url),
-        )
+        return RepositoryInDB(id=repository.id, name=repository.name, base_url=str(repository.base_url))
 
     @staticmethod
     def to_repository(repository_in_db: RepositoryInDB) -> Repository:
-        return Repository(
-            id=repository_in_db.id,
-            name=repository_in_db.name,
-            base_url=repository_in_db.base_url,
-        )
+        return Repository(id=repository_in_db.id, name=repository_in_db.name, base_url=repository_in_db.base_url)
 
 
 def create_repository_storage(session) -> SQLRepositoryStorage:

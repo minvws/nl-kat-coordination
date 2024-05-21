@@ -61,10 +61,7 @@ class ObservedAtMixin:
             datetime_format = "%Y-%m-%d"
             date_time = convert_date_to_datetime(datetime.strptime(observed_at, datetime_format))
             if date_time.date() > datetime.now(timezone.utc).date():
-                messages.warning(
-                    self.request,
-                    _("The selected date is in the future."),
-                )
+                messages.warning(self.request, _("The selected date is in the future."))
             return date_time
         except ValueError:
             try:
@@ -90,9 +87,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
         return ooi
 
     def get_origins(
-        self,
-        reference: Reference,
-        organization: Organization,
+        self, reference: Reference, organization: Organization
     ) -> tuple[list[OriginData], list[OriginData], list[OriginData]]:
         try:
             origins = self.octopoes_api_connector.list_origins(self.observed_at, result=reference)
@@ -287,10 +282,7 @@ class SingleOOIMixin(OctopoesView):
         return self.get_single_ooi(pk)
 
     def get_breadcrumb_list(self):
-        start = {
-            "url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}),
-            "text": "Objects",
-        }
+        start = {"url": reverse("ooi_list", kwargs={"organization_code": self.organization.code}), "text": "Objects"}
         if isinstance(self.ooi, Finding):
             start = {
                 "url": reverse("finding_list", kwargs={"organization_code": self.organization.code}),

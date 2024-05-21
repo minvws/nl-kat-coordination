@@ -90,7 +90,7 @@ class TaskListView(OrganizationView, ListView):
         else:
             context["stats_error"] = False
         context["breadcrumbs"] = [
-            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")}
         ]
         return context
 
@@ -108,10 +108,7 @@ class NormalizersTaskListView(NormalizerMixin, TaskListView):
         context = super().get_context_data(**kwargs)
 
         context["breadcrumbs"] = [
-            {
-                "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Tasks"),
-            },
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")}
         ]
 
         return context

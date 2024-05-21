@@ -48,10 +48,7 @@ app.include_router(router, prefix="/v1")
 def entity_not_found_handler(request: Request, exc: StorageError):
     logger.exception("some error", exc_info=exc)
 
-    return JSONResponse(
-        status_code=status.HTTP_404_NOT_FOUND,
-        content={"message": exc.message},
-    )
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": exc.message})
 
 
 class ServiceHealth(BaseModel):

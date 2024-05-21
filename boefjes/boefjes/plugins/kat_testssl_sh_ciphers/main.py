@@ -24,18 +24,10 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     timeout = getenv("TIMEOUT", 30)
 
-    environment_vars = {
-        "OPENSSL_TIMEOUT": timeout,
-        "CONNECT_TIMEOUT": timeout,
-    }
+    environment_vars = {"OPENSSL_TIMEOUT": timeout, "CONNECT_TIMEOUT": timeout}
 
     client = docker.from_env()
-    container = client.containers.run(
-        SSL_TEST_IMAGE,
-        args,
-        detach=True,
-        environment=environment_vars,
-    )
+    container = client.containers.run(SSL_TEST_IMAGE, args, detach=True, environment=environment_vars)
 
     try:
         container.wait(timeout=300)

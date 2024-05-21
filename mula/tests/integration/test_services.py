@@ -29,20 +29,12 @@ class BytesTestCase(unittest.TestCase):
 
     @unittest.skip
     def test_expired_token_refresh(self):
-        self.service_bytes.get_last_run_boefje(
-            boefje_id="boefje-1",
-            input_ooi="ooi-1",
-            organization_id="org-1",
-        )
+        self.service_bytes.get_last_run_boefje(boefje_id="boefje-1", input_ooi="ooi-1", organization_id="org-1")
         initial_token = id(self.service_bytes.headers.get("Authorization"))
 
         time.sleep(70)
 
-        self.service_bytes.get_last_run_boefje(
-            boefje_id="boefje-1",
-            input_ooi="ooi-1",
-            organization_id="org-1",
-        )
+        self.service_bytes.get_last_run_boefje(boefje_id="boefje-1", input_ooi="ooi-1", organization_id="org-1")
         refresh_token = id(self.service_bytes.headers.get("Authorization"))
 
         self.assertNotEqual(initial_token, refresh_token)

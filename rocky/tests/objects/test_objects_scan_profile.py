@@ -17,11 +17,7 @@ TREE_DATA = {
             "object_type": "Network",
             "primary_key": "Network|testnetwork",
             "name": "testnetwork",
-            "scan_profile": {
-                "scan_profile_type": "declared",
-                "reference": "Network|testnetwork",
-                "level": 1,
-            },
+            "scan_profile": {"scan_profile_type": "declared", "reference": "Network|testnetwork", "level": 1},
         },
         "HostnameHTTPURL|https|internet|scanme.org|443|/": {
             "object_type": "HostnameHTTPURL",

@@ -33,12 +33,7 @@ class PageActions(Enum):
     CHANGE_CLEARANCE_LEVEL = "change_clearance_level"
 
 
-class OOIDetailView(
-    BoefjeMixin,
-    OOIRelatedObjectAddView,
-    OOIFindingManager,
-    BaseOOIDetailView,
-):
+class OOIDetailView(BoefjeMixin, OOIRelatedObjectAddView, OOIFindingManager, BaseOOIDetailView):
     template_name = "oois/ooi_detail.html"
     connector_form_class = ObservedAtForm
     task_history_limit = 10
@@ -172,8 +167,7 @@ class OOIDetailView(
         declarations, observations, inferences = self.get_origins(self.ooi.reference, self.organization)
 
         inference_params = self.octopoes_api_connector.list_origin_parameters(
-            {inference.origin.id for inference in inferences},
-            self.observed_at,
+            {inference.origin.id for inference in inferences}, self.observed_at
         )
         inference_params_per_inference = defaultdict(list)
         for inference_param in inference_params:

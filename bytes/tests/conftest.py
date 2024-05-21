@@ -89,11 +89,7 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
     alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
     alembic.config.main(argv=alembicArgs)
 
-    client = BytesAPIClient(
-        "http://ci_bytes:8000",
-        settings.username,
-        settings.password,
-    )
+    client = BytesAPIClient("http://ci_bytes:8000", settings.username, settings.password)
     client.login()
 
     yield client

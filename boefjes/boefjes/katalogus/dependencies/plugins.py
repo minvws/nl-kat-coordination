@@ -160,12 +160,7 @@ class PluginService:
             all_settings = self.settings_storage.get_all(organisation_id, plugin_id)
             self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)
 
-        self.plugin_enabled_store.update_or_create_by_id(
-            plugin_id,
-            repository_id,
-            enabled,
-            organisation_id,
-        )
+        self.plugin_enabled_store.update_or_create_by_id(plugin_id, repository_id, enabled, organisation_id)
 
     def _plugins_for_repos(
         self, repositories: Iterable[Repository], organisation_id: str

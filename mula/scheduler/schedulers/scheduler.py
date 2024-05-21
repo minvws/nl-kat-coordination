@@ -283,10 +283,7 @@ class Scheduler(abc.ABC):
             count += 1
 
     def push_item_to_queue_with_timeout(
-        self,
-        p_item: models.PrioritizedItem,
-        max_tries: int = 5,
-        timeout: int = 1,
+        self, p_item: models.PrioritizedItem, max_tries: int = 5, timeout: int = 1
     ) -> None:
         """Push an item to the queue, with a timeout.
 
@@ -315,12 +312,7 @@ class Scheduler(abc.ABC):
         self.push_item_to_queue(p_item)
 
     def run_in_thread(
-        self,
-        name: str,
-        target: Callable[[], Any],
-        interval: float = 0.01,
-        daemon: bool = False,
-        loop: bool = True,
+        self, name: str, target: Callable[[], Any], interval: float = 0.01, daemon: bool = False, loop: bool = True
     ) -> None:
         """Make a function run in a thread, and add it to the dict of threads.
 
@@ -332,12 +324,7 @@ class Scheduler(abc.ABC):
             loop: Whether the thread should loop.
         """
         t = utils.ThreadRunner(
-            name=name,
-            target=target,
-            stop_event=self.stop_event_threads,
-            interval=interval,
-            daemon=daemon,
-            loop=loop,
+            name=name, target=target, stop_event=self.stop_event_threads, interval=interval, daemon=daemon, loop=loop
         )
         t.start()
 
@@ -379,8 +366,7 @@ class Scheduler(abc.ABC):
 
         # Get all tasks that were on the queue and set them to CANCELLED
         tasks, _ = self.ctx.datastores.task_store.get_tasks(
-            scheduler_id=self.scheduler_id,
-            status=models.TaskStatus.QUEUED,
+            scheduler_id=self.scheduler_id, status=models.TaskStatus.QUEUED
         )
         task_ids = [task.id for task in tasks]
         self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)

@@ -150,7 +150,7 @@ def test_organization_pdf_report(rf, client_member, mock_organization_view_octop
                 proof="proof",
                 description="test description 123",
                 reproduce="reproduce",
-            ),
+            )
         ]
         * 150,
     )
