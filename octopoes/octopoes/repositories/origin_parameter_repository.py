@@ -3,7 +3,7 @@ from http import HTTPStatus
 from logging import getLogger
 from typing import Any
 
-from requests import HTTPError
+from httpx import HTTPStatusError
 
 from octopoes.events.events import OperationType, OriginParameterDBEvent
 from octopoes.events.manager import EventManager
@@ -63,7 +63,7 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
     def get(self, origin_parameter_id: str, valid_time: datetime) -> OriginParameter:
         try:
             return self.deserialize(self.session.client.get_entity(origin_parameter_id, valid_time))
-        except HTTPError as e:
+        except HTTPStatusError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(origin_parameter_id)
             else:
@@ -107,6 +107,7 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             valid_time=valid_time,
             old_data=old_origin_parameter,
             new_data=origin_parameter,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -117,5 +118,6 @@ class XTDBOriginParameterRepository(OriginParameterRepository):
             operation_type=OperationType.DELETE,
             valid_time=valid_time,
             old_data=origin_parameter,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))

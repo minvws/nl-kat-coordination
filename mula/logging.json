@@ -1,67 +1,74 @@
 {
-    "version": 1,
-    "disable_existing_loggers": false,
-    "formatters": {
-        "default": {
-            "format": "%(message)s"
-        }
-    },
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "INFO",
-            "formatter": "default",
-            "stream": "ext://sys.stdout"
-        }
-    },
-    "root": {
-        "level": "INFO",
-        "handlers": [
-            "console"
-        ]
-    },
-    "loggers": {
-        "alembic.runtime.migration": {
-            "level": "CRITICAL",
-            "handlers": [
-                "console"
-            ],
-            "propagate": 0
-        },
-        "urllib3.connectionpool": {
-            "level": "CRITICAL",
-            "handlers": [
-                "console"
-            ],
-            "propagate": 0
-        },
-        "uvicorn.error": {
-            "level": "CRITICAL",
-            "handlers": [
-                "console"
-            ],
-            "propagate": 0
-        },
-        "uvicorn.access": {
-            "level": "CRITICAL",
-            "handlers": [
-                "console"
-            ],
-            "propagate": 0
-        },
-        "pika": {
-            "level": "CRITICAL",
-            "handlers": [
-                "console"
-            ],
-            "propagate": 0
-        },
-        "sqlalchemy.engine": {
-            "level": "CRITICAL",
-            "handlers": [
-                "console"
-            ],
-            "propagate": 0
-        }
+  "version": 1,
+  "disable_existing_loggers": false,
+  "formatters": {
+    "default": {
+      "format": "%(message)s"
     }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "INFO",
+      "formatter": "default",
+      "stream": "ext://sys.stdout"
+    }
+  },
+  "root": {
+    "level": "INFO",
+    "handlers": [
+      "console"
+    ]
+  },
+  "loggers": {
+    "alembic.runtime.migration": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
+    },
+    "urllib3.connectionpool": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
+    },
+    "uvicorn.error": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
+    },
+    "uvicorn.access": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
+    },
+    "pika": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
+    },
+    "sqlalchemy.engine": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
+    },
+    "httpx": {
+      "level": "CRITICAL",
+      "handlers": [
+        "console"
+      ],
+      "propagate": 0
+    }
+  }
 }

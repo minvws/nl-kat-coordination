@@ -72,7 +72,7 @@ def meta_repository(
     alembicArgs = ["--config", "/app/bytes/bytes/alembic.ini", "--raiseerr", "upgrade", "head"]
     alembic.config.main(argv=alembicArgs)
 
-    engine = get_engine(str(settings.db_uri))
+    engine = get_engine(db_uri=str(settings.db_uri), pool_size=settings.db_connection_pool_size)
     session = sessionmaker(bind=engine)()
 
     yield SQLMetaDataRepository(session, raw_repository, mock_hash_repository, settings)
@@ -98,9 +98,9 @@ def bytes_api_client(settings) -> Iterator[BytesAPIClient]:
 
     yield client
 
-    sessionmaker(bind=get_engine(str(settings.db_uri)), autocommit=True)().execute(
-        ";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables])
-    )
+    sessionmaker(
+        bind=get_engine(str(settings.db_uri), pool_size=settings.db_connection_pool_size), autocommit=True
+    )().execute(";".join([f"TRUNCATE TABLE {t} CASCADE" for t in SQL_BASE.metadata.tables]))
 
 
 @pytest.fixture

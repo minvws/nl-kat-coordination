@@ -1,9 +1,16 @@
 from datetime import datetime, timezone
 
+from pydantic import BaseModel
+
 from scheduler.connectors.errors import exception_handler
 from scheduler.models import OOI, Organisation
 
 from .services import HTTPService
+
+
+class ListObjectsResponse(BaseModel):
+    count: int
+    items: list[OOI]
 
 
 class Octopoes(HTTPService):
@@ -35,7 +42,7 @@ class Octopoes(HTTPService):
 
         params = {
             "types": object_types,
-            "scan_level": {s for s in scan_level},
+            "scan_level": [s for s in scan_level],
             "offset": 0,
             "limit": 1,
             "valid_time": datetime.now(timezone.utc),
@@ -43,9 +50,10 @@ class Octopoes(HTTPService):
 
         # Get the total count of objects
         response = self.get(url, params=params)
-        count = response.json().get("count")
+        list_objects = ListObjectsResponse(**response.json())
+        count = list_objects.count
 
-        # Set the limit
+        # Update the limit for the paginated results
         limit = 1000
         params["limit"] = limit
 
@@ -54,7 +62,8 @@ class Octopoes(HTTPService):
         for offset in range(0, count, limit):
             params["offset"] = offset
             response = self.get(url, params=params)
-            oois.extend([OOI(**ooi) for ooi in response.json().get("items", [])])
+            list_objects = ListObjectsResponse(**response.json())
+            oois.extend([ooi for ooi in list_objects.items])
 
         return oois
 
@@ -68,7 +77,7 @@ class Octopoes(HTTPService):
 
         params = {
             "amount": str(n),
-            "scan_level": {s for s in scan_level},
+            "scan_level": [s for s in scan_level],
             "valid_time": datetime.now(timezone.utc),
         }
 
@@ -80,7 +89,10 @@ class Octopoes(HTTPService):
     def get_object(self, organisation_id: str, reference: str) -> OOI:
         """Get an ooi from octopoes"""
         url = f"{self.host}/{organisation_id}"
-        response = self.get(url, params={"reference": reference, "valid_time": datetime.now(timezone.utc)})
+        response = self.get(
+            url,
+            params={"reference": reference, "valid_time": datetime.now(timezone.utc)},
+        )
         return OOI(**response.json())
 
     def is_healthy(self) -> bool:

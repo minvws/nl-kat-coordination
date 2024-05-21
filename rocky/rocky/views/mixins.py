@@ -3,12 +3,12 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
 
-import requests.exceptions
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import Http404, HttpRequest
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from httpx import HTTPError
 from katalogus.client import Boefje, get_katalogus
 from pydantic import BaseModel
 from tools.forms.base import ObservedAtForm
@@ -82,10 +82,12 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
     def get_single_ooi(self, pk: str) -> OOI:
         try:
             ref = Reference.from_str(pk)
-            return self.octopoes_api_connector.get(ref, valid_time=self.observed_at)
+            ooi = self.octopoes_api_connector.get(ref, valid_time=self.observed_at)
         except Exception as e:
             # TODO: raise the exception but let the handling be done by  the method that implements "get_single_ooi"
             self.handle_connector_exception(e)
+
+        return ooi
 
     def get_origins(
         self,
@@ -97,7 +99,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
             origin_data = [OriginData(origin=origin) for origin in origins]
 
             for origin in origin_data:
-                if origin.origin.origin_type != OriginType.OBSERVATION:
+                if origin.origin.origin_type != OriginType.OBSERVATION or not origin.origin.task_id:
                     continue
 
                 try:
@@ -108,7 +110,7 @@ class OctopoesView(ObservedAtMixin, OrganizationView):
                     boefje_id = normalizer_data["raw_data"]["boefje_meta"]["boefje"]["id"]
                     origin.normalizer = normalizer_data
                     origin.boefje = get_katalogus(organization.code).get_plugin(boefje_id)
-                except requests.exceptions.RequestException as e:
+                except HTTPError as e:
                     logger.error(e)
 
             return (

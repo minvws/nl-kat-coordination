@@ -25,6 +25,7 @@ For a local set up, you need to start the Django app and compile the frontend.
 
 This requires a working Python (>3.10) environment.
 One example of how to create, activate and initialize a development environment is:
+
 ```bash
 $ python3 -m venv $PWD/.venv
 $ source .venv/bin/activate
@@ -32,11 +33,13 @@ $ python3 -m pip install -r requirements-dev.txt
 ```
 
 Copy the `.env-dist` to a `.env` and configure the hosts and credentials to PostgreSQL, RabbitMQ and the other services.
+
 ```bash
 $ cp .env-dist .env
 ```
 
 For instance, to configure the PostgreSQL database set the following variables:
+
 ```
 ROCKY_DB_HOST=
 ROCKY_DB_PORT=
@@ -48,7 +51,6 @@ ROCKY_DB_DSN=
 
 Here, `ROCKY_DB_DSN` is optional (e.g. `postgresql://username:password@hostname:port/database_name`)
 and if not set, the other DB variables will be used.
-
 
 Once your environment variables are set up (see `.env-dist`, you can initialize Rocky using:
 
@@ -62,18 +64,19 @@ To start the Django server, run:
 $ make run
 ```
 
-
 #### Frontend
 
 Yarn is used to bundle CSS and Javascript.
 
 To compile the frontend using yarn locally, run:
+
 ```bash
 $ yarn --ignore-engine
 $ yarn build
 ```
 
 To compile the frontend using Docker, run:
+
 ```bash
 $ make build-rocky-frontend
 ```
@@ -81,6 +84,7 @@ $ make build-rocky-frontend
 The app should be running at [localhost:8000](http://localhost:8000).
 
 #### TL;DR
+
 Given a proper `.env` file, run:
 
 ```bash
@@ -94,7 +98,6 @@ $ make build-rocky-frontend
 
 ## Development
 
-
 ### Testing
 
 To run all unit tests, run:
@@ -104,10 +107,12 @@ $ make utest
 ```
 
 #### Tip
+
 A local Python environment is useful for unit testing even when using Docker.
 Follow the first instructions in the local setup to create a Python environment.
 Then create a `rocky/.env` from the template `rocky/.env-dist` and set `ROCKY_DB_HOST=localhost`.
 Now for the unit tests you should be able to just run
+
 ```bash
 $ pytest
 ```
@@ -115,6 +120,7 @@ $ pytest
 to run them locally.
 
 You can easily parallelize the tests can be parallelized using pytest-xdist:
+
 ```bash
 $ python -m pip install pytest-xdist
 $ time pytest  # 1:08,92 on 13-02-2024
@@ -130,12 +136,15 @@ All fonts used within Rocky remain under their own license. For example: Fredoka
 For more information check their respective folders for extra/ more specific license (if available) or visit:
 
 #### Fredoka
+
 https://fonts.google.com/specimen/Fredoka/about
 
 #### Open Sans
+
 https://fonts.google.com/specimen/Open+Sans/about
 
 #### Tabler icons
+
 https://tabler-icons.io/
 
 ## Technical Design
@@ -143,6 +152,7 @@ https://tabler-icons.io/
 ### Running a boefje
 
 The following diagram shows the triggered flows when running a Boefje from Rocky.
+
 ```{mermaid}
 sequenceDiagram
     participant Rocky
@@ -166,7 +176,6 @@ sequenceDiagram
     Normalizer->>Scheduler: normalizer_task.status = completed
     Scheduler->>-Rocky: normalizer_task.status = completed
 ```
-
 
 ### Rocky View Structure
 
@@ -204,8 +213,6 @@ direction RL
     FindingTypeAddView <|-- OrganizationView
 ```
 
-
-
 #### Exhaustive overview of OctopoesViews
 
 ```{mermaid}
@@ -234,7 +241,6 @@ direction RL
     OOIFindingListView <|-- BaseOOIDetailView
     MuteFindingView <|-- BaseOOIDetailView
     BaseReportView <|-- BaseOOIDetailView
-    DnsReportView <|-- BaseReportView
 
     OOIReportView <|-- BaseOOIDetailView
     OOITreeView <|-- BaseOOIDetailView
@@ -264,7 +270,6 @@ direction RL
     ScanProfileDetailView <|-- OOIDetailView
     ScanProfileResetView <|-- OOIDetailView
 ```
-
 
 #### KATalogus Views
 

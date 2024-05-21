@@ -1,5 +1,4 @@
 import binascii
-import io
 import json
 import logging
 from datetime import datetime, timezone
@@ -17,18 +16,28 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
+from httpx import Response
 from katalogus.client import parse_plugin
-from requests import Response
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+)
+from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
-from octopoes.models.ooi.service import Service
+from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
+from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
+from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
+from octopoes.models.tree import ReferenceTree
+from octopoes.models.types import OOIType
 from rocky.scheduler import Task
 
 LANG_LIST = [code for code, _ in settings.LANGUAGES]
@@ -434,6 +443,19 @@ def network() -> Network:
 
 
 @pytest.fixture
+def url(network) -> URL:
+    return URL(
+        scan_profile=DeclaredScanProfile(
+            scan_profile_type="declared", reference=Reference("URL|testnetwork|http://example.com/"), level=ScanLevel.L1
+        ),
+        primary_key="URL|testnetwork|http://example.com/",
+        network=network.reference,
+        raw="http://example.com",
+        web_url=Reference("HostnameHTTPURL|http|testnetwork|example.com|80|/"),
+    )
+
+
+@pytest.fixture
 def ipaddressv4(network) -> IPAddressV4:
     return IPAddressV4(network=network.reference, address=IPv4Address("192.0.2.1"))
 
@@ -449,8 +471,26 @@ def ip_port(ipaddressv4) -> IPPort:
 
 
 @pytest.fixture
+def ip_port_443(ipaddressv4) -> IPPort:
+    return IPPort(address=ipaddressv4.reference, port=443, protocol=Protocol.TCP)
+
+
+@pytest.fixture
 def hostname(network) -> Hostname:
     return Hostname(name="example.com", network=network.reference)
+
+
+@pytest.fixture
+def website(ip_service: IPService, hostname: Hostname):
+    return Website(
+        ip_service=ip_service.reference,
+        hostname=hostname.reference,
+    )
+
+
+@pytest.fixture
+def security_txt(website: Website, url: URL):
+    return SecurityTXT(website=website.reference, url=url.reference, security_txt="example")
 
 
 @pytest.fixture
@@ -459,8 +499,26 @@ def service() -> Service:
 
 
 @pytest.fixture
+def ip_service(ip_port: IPPort, service: Service):
+    return IPService(ip_port=ip_port.reference, service=service.reference)
+
+
+@pytest.fixture
 def software() -> Software:
     return Software(name="DICOM")
+
+
+@pytest.fixture
+def cve_finding_type_2023_38408() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-2023-38408",
+        description="The PKCS#11 feature in ssh-agent in OpenSSH before 9.3p2 has an insufficiently "
+        "trustworthy search path, leading to remote code execution if an agent is forwarded to an "
+        "attacker-controlled system. ",
+        source="https://cve.circl.lu/cve/CVE-2023-38408",
+        risk_score=9.8,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
 
 
 @pytest.fixture
@@ -486,6 +544,19 @@ def cve_finding_type_2019_2019() -> CVEFindingType:
         source="https://cve.circl.lu/cve/CVE-2019-2019",
         risk_score=6.5,
         risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def cve_finding_2023_38408() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2023-38408"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2023-38408"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2023-38408 detected",
+        reproduce=None,
     )
 
 
@@ -519,7 +590,7 @@ def cve_finding_2019_2019() -> Finding:
 def cve_finding_type_no_score() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-0000-0001",
-        description="CVE Finding without scopre",
+        description="CVE Finding without score",
         source="https://cve.circl.lu/cve/CVE-0000-0001",
         risk_severity=RiskLevelSeverity.UNKNOWN,
     )
@@ -547,6 +618,22 @@ def finding() -> Finding:
         description="description",
         reproduce="reproduce",
     )
+
+
+@pytest.fixture
+def web_report_finding_types():
+    return [
+        KATFindingType(id="KAT-NO-CSP"),
+        KATFindingType(id="KAT-CSP-VULNERABILITIES"),
+        KATFindingType(id="KAT-NO-HTTPS-REDIRECT"),
+        KATFindingType(id="KAT-NO-CERTIFICATE"),
+        KATFindingType(id="KAT-NO-SECURITY-TXT"),
+        KATFindingType(id="KAT-UNCOMMON-OPEN-PORT"),
+        KATFindingType(id="KAT-OPEN-SYSADMIN-PORT"),
+        KATFindingType(id="KAT-OPEN-DATABASE-PORT"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRED"),
+        KATFindingType(id="KAT-CERTIFICATE-EXPIRING-SOON"),
+    ]
 
 
 @pytest.fixture
@@ -584,6 +671,173 @@ def finding_types() -> list[KATFindingType]:
             risk_severity=RiskLevelSeverity.LOW,
         ),
     ]
+
+
+@pytest.fixture
+def tree_data_no_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {},
+    }
+
+
+@pytest.fixture
+def tree_data_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {
+            "Network|testnetwork": {
+                "object_type": "Network",
+                "primary_key": "Network|testnetwork",
+                "name": "testnetwork",
+            },
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0002",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-0001",
+            },
+        },
+    }
+
+
+@pytest.fixture
+def tree_data_dns_findings():
+    return {
+        "root": {
+            "reference": "Finding|Network|testnetwork|KAT-0001",
+            "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
+        },
+        "store": {
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-CAA",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-DKIM",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-DMARC",
+            },
+            "Finding|Network|testnetwork|KAT-0004": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0004",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-DNSSEC",
+            },
+            "Finding|Network|testnetwork|KAT-0005": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0005",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NO-SPF",
+            },
+            "Finding|Network|testnetwork|KAT-0006": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0006",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-INVALID-SPF",
+            },
+            "Finding|Network|testnetwork|KAT-0007": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0007",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NAMESERVER-NO-IPV6",
+            },
+            "Finding|Network|testnetwork|KAT-0008": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0008",
+                "ooi": "Network|testnetwork",
+                "finding_type": "KATFindingType|KAT-NAMESERVER-NO-TWO-IPV6",
+            },
+            "DNSSOARecord|Network|testnetwork|KAT-0009": {
+                "object_type": "DNSSOARecord",
+                "primary_key": "DNSSOARecord|Network|testnetwork|KAT-0009",
+                "hostname": "Hostname|internet|example.com",
+                "dns_record_type": "SOA",
+                "value": "fake value",
+                "ttl": 3600,
+                "soa_hostname": "Hostname|internet|example.com",
+            },
+            "DNSARecord|Network|testnetwork|KAT-00010": {
+                "object_type": "DNSARecord",
+                "primary_key": "DNSARecord|Network|testnetwork|KAT-00010",
+                "hostname": "Hostname|internet|example.com",
+                "dns_record_type": "A",
+                "value": "fake value",
+                "address": "IPAddressV4|internet|127.0.0.1",
+            },
+        },
+    }
+
+
+@pytest.fixture
+def finding_type_kat_no_caa() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NO-CAA",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_invalid_spf() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-INVALID-SPF",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=6.0,
+        risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_nameserver_no_ipv6() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NAMESERVER-NO-IPV6",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=9.5,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
+def finding_type_kat_no_two_ipv6() -> KATFindingType:
+    return KATFindingType(
+        id="KAT-NAMESERVER-NO-TWO-IPV6",
+        description="Fake description...",
+        recommendation="Fake recommendation...",
+        risk_score=1.0,
+        risk_severity=RiskLevelSeverity.LOW,
+    )
 
 
 @pytest.fixture
@@ -704,6 +958,67 @@ def finding_type_kat_invalid_dnssec() -> KATFindingType:
 
 
 @pytest.fixture
+def tree_data_tls_findings_and_suites():
+    return {
+        "root": {
+            "reference": "",
+            "children": {"ooi": [{"reference": "", "children": {}}]},
+        },
+        "store": {
+            "Finding|Network|testnetwork|KAT-0001": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0001",
+                "ooi": "Network|testnetwork",
+                "description": "Fake description with cipher_suite_name ECDHE-RSA-AES128-SHA",
+                "finding_type": "KATFindingType|KAT-RECOMMENDATION-BAD-CIPHER",
+            },
+            "Finding|Network|testnetwork|KAT-0002": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0002",
+                "ooi": "Network|testnetwork",
+                "description": "Fake description with cipher_suite_name ECDHE-RSA-AES256-SHA",
+                "finding_type": "KATFindingType|KAT-MEDIUM-BAD-CIPHER",
+            },
+            "Finding|Network|testnetwork|KAT-0003": {
+                "object_type": "Finding",
+                "primary_key": "Finding|Network|testnetwork|KAT-0003",
+                "ooi": "Network|testnetwork",
+                "description": "Fake description...",
+                "finding_type": "KATFindingType|KAT-CRITICAL-BAD-CIPHER",
+            },
+            "TLSCipher|Network|testnetwork|KAT-0004": {
+                "object_type": "TLSCipher",
+                "primary_key": "TLSCipher|Network|testnetwork|KAT-0004|tcp|443|https",
+                "ip_service": "IPService",
+                "ooi": "Network|testnetwork",
+                "suites": {
+                    "TLSv1": [
+                        {
+                            "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+                            "encryption_algorithm": "AES",
+                            "cipher_suite_name": "ECDHE-RSA-AES128-SHA",
+                            "bits": 128,
+                            "key_size": 256,
+                            "key_exchange_algorithm": "ECDH",
+                            "cipher_suite_code": "xc013",
+                        },
+                        {
+                            "cipher_suite_alias": "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+                            "encryption_algorithm": "AES",
+                            "cipher_suite_name": "ECDHE-RSA-AES256-SHA",
+                            "bits": 256,
+                            "key_size": 256,
+                            "key_exchange_algorithm": "ECDH",
+                            "cipher_suite_code": "xc014",
+                        },
+                    ],
+                },
+            },
+        },
+    }
+
+
+@pytest.fixture
 def plugin_details():
     return parse_plugin(
         {
@@ -806,41 +1121,43 @@ def mock_mixins_katalogus(mocker):
 
 @pytest.fixture
 def mock_scheduler_client_task_list(mocker):
-    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client.session")
-    response = Response()
-    response.raw = io.BytesIO(
-        json.dumps(
-            {
-                "count": 1,
-                "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
-                "previous": None,
-                "results": [
-                    {
-                        "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
-                        "scheduler_id": "boefje-test",
-                        "type": "boefje",
-                        "p_item": {
+    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client._client")
+    response = Response(
+        200,
+        content=(
+            json.dumps(
+                {
+                    "count": 1,
+                    "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
+                    "previous": None,
+                    "results": [
+                        {
                             "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
                             "scheduler_id": "boefje-test",
-                            "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
-                            "priority": 631,
-                            "data": {
-                                "id": "2e757dd366c746b899877cd18252cc6d",
-                                "boefje": {"id": "test-plugin", "version": None},
-                                "input_ooi": "Hostname|internet|example.com",
-                                "organization": "test",
-                                "dispatches": [],
+                            "type": "boefje",
+                            "p_item": {
+                                "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                                "scheduler_id": "boefje-test",
+                                "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
+                                "priority": 631,
+                                "data": {
+                                    "id": "2e757dd366c746b899877cd18252cc6d",
+                                    "boefje": {"id": "test-plugin", "version": None},
+                                    "input_ooi": "Hostname|internet|example.com",
+                                    "organization": "test",
+                                    "dispatches": [],
+                                },
+                                "created_at": "2023-05-09T09:37:20.899668+00:00",
+                                "modified_at": "2023-05-09T09:37:20.899675+00:00",
                             },
-                            "created_at": "2023-05-09T09:37:20.899668+00:00",
-                            "modified_at": "2023-05-09T09:37:20.899675+00:00",
-                        },
-                        "status": "completed",
-                        "created_at": "2023-05-09T09:37:20.909069+00:00",
-                        "modified_at": "2023-05-09T09:37:20.909071+00:00",
-                    }
-                ],
-            }
-        ).encode()
+                            "status": "completed",
+                            "created_at": "2023-05-09T09:37:20.909069+00:00",
+                            "modified_at": "2023-05-09T09:37:20.909071+00:00",
+                        }
+                    ],
+                }
+            ).encode()
+        ),
     )
 
     mock_scheduler_client_session.get.return_value = response
@@ -859,6 +1176,11 @@ class MockOctopoesAPIConnector:
     def get(self, reference: Reference, valid_time: datetime | None = None) -> OOI:
         return self.oois[reference]
 
+    def get_tree(
+        self, reference: Reference, valid_time: datetime, types: set = frozenset(), depth: int = 1
+    ) -> ReferenceTree:
+        return self.tree[reference]
+
     def query(
         self,
         path: str,
@@ -868,6 +1190,20 @@ class MockOctopoesAPIConnector:
         limit: int = 50,
     ) -> list[OOI]:
         return self.queries[path][source]
+
+    def query_many(
+        self,
+        path: str,
+        valid_time: datetime,
+        sources: list[OOI | Reference | str],
+    ) -> list[tuple[str, OOIType]]:
+        result = []
+
+        for source in sources:
+            for ooi in self.queries[path][str(source)]:
+                result.append((str(source), ooi))
+
+        return result
 
     def get_history(self, reference: Reference) -> list[TransactionRecord]:
         return [
@@ -888,6 +1224,17 @@ class MockOctopoesAPIConnector:
         origin_type: OriginType | None = None,
     ) -> list[Origin]:
         return []
+
+    def list_objects(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+        scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    ) -> Paginated[OOIType]:
+        return Paginated[OOIType](items=list(self.oois.values()), count=len(self.oois))
 
 
 @pytest.fixture

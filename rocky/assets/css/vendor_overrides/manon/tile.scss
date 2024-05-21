@@ -1,16 +1,16 @@
 /* Tiles - Variables */
 
-$normalizer-plugin-type-label-background: #ABDBF8;
-$normalizer-plugin-type-label: #005C94;
-$boefje-plugin-type-label-background: #D6D1EF;
-$boefje-plugin-type-label: #5B4F90;
+$normalizer-plugin-type-label-background: #abdbf8;
+$normalizer-plugin-type-label: #005c94;
+$boefje-plugin-type-label-background: #d6d1ef;
+$boefje-plugin-type-label: #5b4f90;
 
 %tile-style-overrides {
-  >a {
+  > a {
     color: var(--link-text-color, initial);
   }
 
-  >p {
+  > p {
     font-size: var(--tile-font-size);
   }
 }
@@ -18,7 +18,7 @@ $boefje-plugin-type-label: #5B4F90;
 .tile,
 .tiles,
 ul.tiles {
-  >li {
+  > li {
     @extend %tile-style-overrides;
   }
 
@@ -26,7 +26,7 @@ ul.tiles {
     padding-left: 0;
   }
 
-  &>div {
+  & > div {
     @extend %tile-style-overrides;
 
     min-width: 0;
@@ -40,8 +40,7 @@ ul.tiles {
     }
   }
 
-
-  img+div {
+  img + div {
     border-top: 0;
   }
 
@@ -49,14 +48,11 @@ ul.tiles {
     gap: 1.25rem;
   }
 
-
   @extend %tile-style-overrides;
-
-
 }
 
 .tiles.images-cover {
-  >div,
+  > div,
   li {
     img {
       border-radius: var(--tile-border-radius) var(--tile-border-radius) 0 0;
@@ -68,7 +64,6 @@ ul.tiles {
   padding: 4px 8px;
   border-radius: 4px;
 
-
   &.boefje {
     background-color: $boefje-plugin-type-label-background;
     color: $boefje-plugin-type-label;
@@ -78,5 +73,11 @@ ul.tiles {
     background-color: $normalizer-plugin-type-label-background;
     color: $normalizer-plugin-type-label;
   }
+}
 
+.tiles > div > .tags {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }

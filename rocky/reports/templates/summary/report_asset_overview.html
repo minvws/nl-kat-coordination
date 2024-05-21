@@ -1,0 +1,45 @@
+{% load i18n %}
+
+<section id="asset-overview">
+    <div>
+        <h2>{% translate "Asset overview" %}</h2>
+        <h3>{% translate "Selected objects" %}</h3>
+        <p>
+            {% blocktranslate trimmed %}
+                The objects listed in the table below were used to generate this report.
+                For each object in the table it additionally shows the clearance level and whether or not the object was
+                added by a user ('Declared') or indirectly identified through another service or system ('Inherited').
+            {% endblocktranslate %}
+        </p>
+        {% include "summary/ooi_selection.html" %}
+
+        <h3>{% translate "Selected Report Types" %}</h3>
+        <p>
+            {% blocktranslate trimmed %}
+                The table below shows which reports were chosen to generate this report,
+                including a report description.
+            {% endblocktranslate %}
+        </p>
+        <table>
+            <caption class="visually-hidden">{% translate "Selected Report Types" %}</caption>
+            <thead>
+                <tr>
+                    <th>{% translate "Report type" %}</th>
+                    <th>{% translate "Description" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report_type in report_types %}
+                    <tr>
+                        <td>
+                            <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                        </td>
+                        <td>{{ report_type.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include "summary/selected_plugins.html" %}
+
+    </div>
+</section>

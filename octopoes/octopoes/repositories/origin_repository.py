@@ -4,7 +4,7 @@ from logging import getLogger
 from typing import Any
 from uuid import UUID
 
-from requests import HTTPError
+from httpx import HTTPStatusError
 
 from octopoes.events.events import OperationType, OriginDBEvent
 from octopoes.events.manager import EventManager
@@ -100,7 +100,7 @@ class XTDBOriginRepository(OriginRepository):
     def get(self, id_: str, valid_time: datetime) -> Origin:
         try:
             return self.deserialize(self.session.client.get_entity(id_, valid_time))
-        except HTTPError as e:
+        except HTTPStatusError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(id_)
             else:
@@ -134,6 +134,7 @@ class XTDBOriginRepository(OriginRepository):
                 valid_time=valid_time,
                 old_data=old_origin,
                 new_data=origin,
+                client=self.event_manager.client,
             )
             self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -144,5 +145,6 @@ class XTDBOriginRepository(OriginRepository):
             operation_type=OperationType.DELETE,
             valid_time=valid_time,
             old_data=origin,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))

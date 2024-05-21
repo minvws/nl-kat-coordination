@@ -5,7 +5,7 @@ from typing import Any
 from django.utils.translation import gettext_lazy as _
 
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.exception import ObjectNotFoundException
 from octopoes.models.ooi.config import Config
 from reports.report_types.definitions import AggregateReport
@@ -49,7 +49,6 @@ class AggregateOrganisationReport(AggregateReport):
         ipv6 = {}
         vulnerabilities = {}
         total_criticals = 0
-        total_findings = 0
         total_systems = 0
         unique_ips = set()
         unique_hostnames = set()
@@ -81,9 +80,9 @@ class AggregateOrganisationReport(AggregateReport):
 
                         for service in system["services"]:
                             if service not in services:
-                                services[service] = {str(ip): systems["services"][ip]}
+                                services[service] = {ip: systems["services"][ip]}
                             else:
-                                services[service][str(ip)] = systems["services"][ip]
+                                services[service][ip] = systems["services"][ip]
                         unique_hostnames.update(systems["services"][ip]["hostnames"])
                     total_systems += report_specific_data["summary"]["total_systems"]
 
@@ -103,7 +102,6 @@ class AggregateOrganisationReport(AggregateReport):
 
                 if report_id == VulnerabilityReport.id:
                     for ip, vulnerabilities_data in report_specific_data.items():
-                        total_findings += vulnerabilities_data["summary"]["total_findings"]
                         terms.extend(vulnerabilities_data["summary"]["terms"])
                         recommendations.extend(vulnerabilities_data["summary"]["recommendations"])
                         vulnerabilities_data["title"] = ip.split("|")[2]
@@ -243,8 +241,7 @@ class AggregateOrganisationReport(AggregateReport):
                             {  # Flattening the finding_types field of the mail report output
                                 finding_type
                                 for mail_report in mail_report_data[ip]
-                                for hostname, finding_types in mail_report["finding_types"].items()
-                                for finding_type in finding_types
+                                for finding_type in mail_report["finding_types"]
                             },
                             reverse=True,
                             key=lambda x: x.risk_severity,
@@ -371,6 +368,7 @@ class AggregateOrganisationReport(AggregateReport):
         recommendations = list(set(filter(None, recommendations)))
         total_ips = len(unique_ips)
         total_hostnames = len(unique_hostnames)
+        total_criticals = sum(vulnerability["summary"]["total_criticals"] for vulnerability in vulnerabilities.values())
 
         summary = {
             # _("General recommendations"): "",
@@ -423,15 +421,15 @@ class AggregateOrganisationReport(AggregateReport):
             # Search for reports where the input ooi relates to the current service, based on ip or hostname
             for ip, system_for_service in systems_for_service.items():
                 # Assumes relevant hostnames have an ip address for now
-                if str(ip) not in report_data:
-                    report_data[str(ip)] = []
+                if ip not in report_data:
+                    report_data[ip] = []
 
-                if str(ip) in data and report_id in data[str(ip)] and system_type == service:
-                    report_data[str(ip)].append(data[str(ip)][report_id])
+                if ip in data and report_id in data[str(ip)] and system_type == service:
+                    report_data[ip].append(data[str(ip)][report_id])
 
                 for hostname in system_for_service["hostnames"]:
                     if str(hostname) in data and report_id in data[str(hostname)] and system_type == service:
-                        report_data[str(ip)].append(data[str(hostname)][report_id])
+                        report_data[ip].append(data[str(hostname)][report_id])
 
         report_data = {key: value for key, value in report_data.items() if value}
 
@@ -444,27 +442,39 @@ def aggregate_reports(
     selected_report_types: list[str],
     valid_time: datetime,
 ) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any], list[str]]:
-    aggregate_report = AggregateOrganisationReport(connector)
-    report_data: dict[str, Any] = {}
-    error_oois = []
+    by_type: dict[str, list[str]] = {}
 
     for ooi in input_ooi_references:
-        report_data[ooi.primary_key] = {}
+        if ooi.get_object_type() not in by_type:
+            by_type[ooi.get_object_type()] = []
+
+        by_type[ooi.get_object_type()].append(str(ooi.reference))
+
+    all_types = [
+        t
+        for t in AggregateOrganisationReport.reports["required"] + AggregateOrganisationReport.reports["optional"]
+        if t.id in selected_report_types
+    ]
+    report_data: dict[str, Any] = {}
+    errors = []
+
+    for report_type in all_types:
+        oois = {x for ooi_type in report_type.input_ooi_types for x in by_type.get(ooi_type.get_object_type(), [])}
+
         try:
-            for options, report_types in aggregate_report.reports.items():
-                # Mypy doesn't support TypedDict and .values()
-                # https://github.com/python/mypy/issues/7981
-                for report_type in report_types:  # type: ignore[attr-defined]
-                    if (
-                        Reference.from_str(ooi).class_type in report_type.input_ooi_types
-                        and report_type.id in selected_report_types
-                    ):
-                        report = report_type(connector)
-                        data = report.generate_data(ooi.primary_key, valid_time=valid_time)
-                        report_data[ooi.primary_key][report_type.id] = data
+            results = report_type(connector).collect_data(oois, valid_time)
         except ObjectNotFoundException:
-            logger.error("Object not found: %s", ooi.primary_key)
-            error_oois.append(ooi.primary_key)
+            logger.error("Object not found")
+            errors.append(report_type.id)
+            continue
+
+        for ooi_str, data in results.items():
+            if ooi_str not in report_data:
+                report_data[ooi_str] = {}
+
+            report_data[ooi_str][report_type.id] = data
+
+    aggregate_report = AggregateOrganisationReport(connector)
     post_processed_data = aggregate_report.post_process_data(report_data, valid_time=valid_time)
 
-    return aggregate_report, post_processed_data, report_data, error_oois
+    return aggregate_report, post_processed_data, report_data, errors

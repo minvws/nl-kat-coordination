@@ -1,169 +1,189 @@
 repos:
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
-  hooks:
-  - id: trailing-whitespace
-  - id: mixed-line-ending
-    args: ["--fix=lf"]
-  - id: detect-private-key
-    exclude: ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
-  - id: check-case-conflict
-  - id: check-yaml
-  - id: check-json
-  - id: check-toml
-  - id: debug-statements
-    exclude: |
-      (?x)(
-      ^boefjes/tools |
-      ^octopoes/tools
-      )
-  - id: end-of-file-fixer
-    exclude: |
-      (?x)(
-      \.svcg$ |
-      ^boefjes/tests/examples/rdns-nxdomain.txt$
-      )
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: detect-private-key
+        exclude: ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/
+      - id: check-case-conflict
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: debug-statements
+        exclude: |
+          (?x)(
+          ^boefjes/tools |
+          ^octopoes/tools
+          )
+      - id: end-of-file-fixer
+        exclude: |
+          (?x)(
+          \.svcg$ |
+          ^boefjes/tests/examples/rdns-nxdomain.txt$ |
+          ^boefjes/tests/examples/raw/
+          )
+      - id: fix-byte-order-marker
+      - id: pretty-format-json
+        args: ["--autofix", "--no-ensure-ascii", "--no-sort-keys"]
 
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.16
+    hooks:
+      - id: validate-pyproject
+        files: pyproject.toml$
 
-- repo: https://github.com/abravalheri/validate-pyproject
-  rev: v0.15
-  hooks:
-  - id: validate-pyproject
-    files: pyproject.toml$
+  - repo: https://github.com/rstcheck/rstcheck
+    rev: v6.2.1
+    hooks:
+      - id: rstcheck
+        # https://github.com/rstcheck/rstcheck-core/issues/4
+        args:
+          [
+            "--ignore-messages",
+            "Hyperlink target .* is not referenced",
+            "--ignore-directives",
+            "mermaid,automodule",
+          ]
+        additional_dependencies: ["rstcheck[sphinx]", "autodoc-pydantic==2.1.0"]
 
-- repo: https://github.com/rstcheck/rstcheck
-  rev: v6.2.0
-  hooks:
-  - id: rstcheck
-    # https://github.com/rstcheck/rstcheck-core/issues/4
-    args: ["--ignore-messages", "Hyperlink target .* is not referenced", "--ignore-directives", "mermaid"]
-    additional_dependencies: ["rstcheck[sphinx]"]
+  - repo: https://github.com/MarketSquare/robotframework-tidy
+    rev: "4.11.0"
+    hooks:
+      - id: robotidy
 
-- repo: https://github.com/MarketSquare/robotframework-tidy
-  rev: "4.8.1"
-  hooks:
-  - id: robotidy
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.11
+    hooks:
+      - id: vulture
+        exclude: |
+          /tests/
 
-- repo: https://github.com/jendrikseipp/vulture
-  rev: v2.10
-  hooks:
-  - id: vulture
-    exclude: |
-      /tests/
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.3.5"
+    hooks:
+      - id: ruff
+      - id: ruff-format
 
-- repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: 'v0.1.13'
-  hooks:
-  - id: ruff
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.2
+    hooks:
+      - id: pyupgrade
+        args: [--py310-plus]
 
-- repo: https://github.com/asottile/pyupgrade
-  rev: v3.15.0
-  hooks:
-  - id: pyupgrade
-    args: [--py310-plus]
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.16.0
+    hooks:
+      - id: django-upgrade
+        args: [--target-version, "4.2"]
 
-- repo: https://github.com/adamchainz/django-upgrade
-  rev: 1.16.0
-  hooks:
-  - id: django-upgrade
-    args: [--target-version, "4.2"]
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.9.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-PyYAML
+          - types-cachetools
+          - types-retry
+          - pydantic
+          - pynacl
+          - httpx
+        exclude: |
+          (?x)(
+          ^boefjes/boefjes/plugins |
+          ^boefjes/tools |
+          ^keiko/templates |
+          ^mula/whitelist\.py$ |
+          ^octopoes/tools |
+          ^rocky/whitelist\.py$ |
+          /tests/ |
+          docs/source/conf\.py$ |
+          setup\.py$
+          )
 
-- repo: https://github.com/psf/black
-  rev: "23.12.1"
-  hooks:
-  - id: black
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+      - id: codespell
+        additional_dependencies: ["tomli"]
+        args: [-L, lama]
+        exclude: |
+          (?x)(
+          \.po$ |
+          \.xml$ |
+          \.svg$ |
+          poetry.lock$ |
+          pyproject.toml$ |
+          requirements-.*.txt$ |
+          retirejs.json$ |
+          ^boefjes/boefjes/plugins/kat_fierce/lists |
+          ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
+          ^boefjes/tests/examples |
+          ^keiko/glossaries |
+          ^keiko/templates/.*/template.tex$ |
+          ^rocky/assets/js/vendor |
+          ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
+          ^rocky/tests/stubs |
+          ^rocky/reports/report_types/aggregate_organisation_report |
+          ^rocky/reports/report_types/multi_organization_report |
+          ^docs/source/_static |
+          ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/ |
+          ^boefjes/boefjes/plugins/kat_rpki/rpki.json
+          )
 
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.8.0
-  hooks:
-  - id: mypy
-    additional_dependencies: ['types-PyYAML', 'types-requests', 'types-cachetools', 'types-retry', 'pydantic', 'pynacl']
-    exclude: |
-      (?x)(
-      ^boefjes/boefjes/plugins |
-      ^boefjes/tools |
-      ^keiko/templates |
-      ^mula/whitelist\.py$ |
-      ^octopoes/bits |
-      ^octopoes/octopoes/core |
-      ^octopoes/octopoes/events |
-      ^octopoes/octopoes/models |
-      ^octopoes/octopoes/repositories |
-      ^octopoes/octopoes/xtdb |
-      ^octopoes/tools |
-      ^rocky/whitelist\.py$ |
-      /tests/ |
-      docs/source/conf\.py$ |
-      setup\.py$
-      )
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.34.1
+    hooks:
+      - id: djlint-reformat-django
+        files: |
+          (?x)(
+          ^rocky/.*/templates/.*$ |
+          ^rocky/reports/report_types/.*/.*\.html
+          )
+        exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
-- repo: https://github.com/codespell-project/codespell
-  rev: v2.2.6
-  hooks:
-  - id: codespell
-    additional_dependencies: ['tomli']
-    args: [-L, lama]
-    exclude: |
-      (?x)(
-      \.po$ |
-      \.xml$ |
-      \.svg$ |
-      poetry.lock$ |
-      pyproject.toml$ |
-      requirements-.*.txt$ |
-      retirejs.json$ |
-      ^boefjes/boefjes/plugins/kat_fierce/lists |
-      ^boefjes/tests/examples/inputs/cve-result-without-cvss.json |
-      ^boefjes/tests/examples |
-      ^keiko/glossaries |
-      ^keiko/templates/.*/template.tex$ |
-      ^rocky/assets/js/vendor |
-      ^rocky/assets/css/themes/soft/fonts/tabler-icons/tabler-icons.scss$ |
-      ^rocky/tests/stubs |
-      ^rocky/reports/report_types/aggregate_organisation_report |
-      ^rocky/reports/report_types/multi_organization_report |
-      ^docs/source/_static |
-      ^boefjes/boefjes/plugins/kat_cve_2023_34039/keys/ |
-      ^boefjes/boefjes/plugins/kat_rpki/rpki.json
-      )
+      - id: djlint-django
+        files: |
+          (?x)(
+          ^rocky/.*/templates/.*$ |
+          ^rocky/reports/report_types/.*/.*\.html
+          )
+        exclude: '^rocky/rocky/templates/admin/.*\.html$'
 
-- repo: https://github.com/Riverside-Healthcare/djLint
-  rev: v1.34.1
-  hooks:
-  - id: djlint-reformat-django
-    files: |
-      (?x)(
-      ^rocky/.*/templates/.*$ |
-      ^rocky/reports/report_types/.*/.*\.html
-      )
-    exclude: '^rocky/rocky/templates/admin/.*\.html$'
+  - repo: https://github.com/thibaudcolas/pre-commit-stylelint
+    rev: v16.3.1
+    hooks:
+      - id: stylelint
+        args: [--fix]
+        additional_dependencies:
+          - stylelint@15.10.1
+          - stylelint-config-standard-scss@10.0.0
+        files: "^(rocky\/assets\/css\/|docs\/source\/).*.(css|scss|sass)$"
 
-  - id: djlint-django
-    files: |
-      (?x)(
-      ^rocky/.*/templates/.*$ |
-      ^rocky/reports/report_types/.*/.*\.html
-      )
-    exclude: '^rocky/rocky/templates/admin/.*\.html$'
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        args: ["-e", "SC1091"]
 
-- repo: https://github.com/thibaudcolas/pre-commit-stylelint
-  rev: v16.1.0
-  hooks:
-    - id: stylelint
-      args: [ --fix ]
-      additional_dependencies:
-        - stylelint@15.10.1
-        - stylelint-config-standard-scss@10.0.0
-      files: "^(rocky\/assets\/css\/|docs\/source\/).*.(css|scss|sass)$"
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.8.0-1
+    hooks:
+      - id: shfmt
+        args: ["-w", "-s", "-i", "4", "-sr"]
 
-- repo: https://github.com/shellcheck-py/shellcheck-py
-  rev: v0.9.0.6
-  hooks:
-  - id: shellcheck
-    args: ["-e", "SC1091"]
-
-- repo: https://github.com/scop/pre-commit-shfmt
-  rev: v3.7.0-4
-  hooks:
-  - id: shfmt
-    args: ["-w", "-s", "-i", "4", "-sr"]
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        additional_dependencies:
+          - prettier@3.2.5 # SEE: https://github.com/pre-commit/pre-commit/issues/3133
+        exclude: |
+          (?x)(
+          \.html$ |
+          \.json$ |
+          \.min\.js$ |
+          ^rocky/assets/css/themes/soft/fonts |
+          ^rocky/assets/vendors
+          )

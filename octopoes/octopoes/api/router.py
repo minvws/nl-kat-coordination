@@ -1,12 +1,15 @@
+import json
 import uuid
 from collections import Counter
 from collections.abc import Generator
 from datetime import datetime
 from logging import getLogger
+from operator import itemgetter
+from typing import Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, Request, status
+from httpx import HTTPError
 from pydantic import AwareDatetime
-from requests import RequestException
 
 from octopoes.api.models import ServiceHealth, ValidatedAffirmation, ValidatedDeclaration, ValidatedObservation
 from octopoes.config.settings import (
@@ -30,8 +33,9 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import type_by_name
 from octopoes.version import __version__
-from octopoes.xtdb.client import XTDBSession
+from octopoes.xtdb.client import Operation, OperationType, XTDBSession
 from octopoes.xtdb.exceptions import XTDBException
+from octopoes.xtdb.query import Aliased
 from octopoes.xtdb.query import Query as XTDBQuery
 
 logger = getLogger(__name__)
@@ -93,7 +97,7 @@ def health(
             version=xtdb_status.version,
             additional=xtdb_status,
         )
-    except RequestException as ex:
+    except HTTPError as ex:
         xtdb_health = ServiceHealth(
             service="xtdb",
             healthy=False,
@@ -138,6 +142,52 @@ def query(
         xtdb_query = xtdb_query.where(object_path.segments[0].source_type, primary_key=str(source))
 
     return octopoes.ooi_repository.query(xtdb_query, valid_time)
+
+
+@router.get("/query-many", tags=["Objects"])
+def query_many(
+    path: str,
+    sources: list[str] = Query(),
+    octopoes: OctopoesService = Depends(octopoes_service),
+    valid_time: datetime = Depends(extract_valid_time),
+):
+    """
+    How does this work and why do we do this?
+
+    We want to fetch all results but be able to tie these back to the source that was used for a result.
+    If we query "Network.hostname" for a list of Networks ids, how do we know which hostname lives on which network?
+    The answer is to add the network id to the "select" statement, so the result is of the form
+
+        [(network_id_1, hostname1), (network_id_2, hostname3), ...]
+
+    Because you can only select variables in Datalog, "network_id_1" needs to be an Alias. Hence `source_alias`.
+    We need to tie that to the Network primary_key and add a where-in clause. The example projected on the code:
+
+    q = XTDBQuery.from_path(object_path)                                    # Adds "where ?Hostname.network = ?Network
+
+    q.find(source_alias).pull(query.result_type)                            # "select ?network_id, ?Hostname
+     .where(object_path.segments[0].source_type, primary_key=source_alias)  # where ?Network.primary_key = ?network_id
+     .where_in(object_path.segments[0].source_type, primary_key=sources)    # and ?Network.primary_key in ["1", ...]"
+    """
+
+    if not sources:
+        return []
+
+    object_path = ObjectPath.parse(path)
+    if not object_path.segments:
+        raise HTTPException(status_code=400, detail="No path components provided.")
+
+    q = XTDBQuery.from_path(object_path)
+    source_alias = Aliased(object_path.segments[0].source_type, field="primary_key")
+
+    q = q.where(object_path.segments[0].source_type, primary_key=source_alias).where_in(
+        object_path.segments[0].source_type, primary_key=sources
+    )
+
+    if q._find_clauses:  # Path contained a target field, so no need to pull the result type
+        return octopoes.ooi_repository.query(q.find(source_alias, index=0), valid_time)
+
+    return octopoes.ooi_repository.query(q.find(source_alias, index=0).pull(q.result_type), valid_time)
 
 
 @router.post("/objects/load_bulk", tags=["Objects"])
@@ -361,10 +411,13 @@ def get_scan_profile_inheritance(
     reference: Reference = Depends(extract_reference),
 ) -> list[InheritanceSection]:
     ooi = octopoes.get_ooi(reference, valid_time)
+    if not ooi.scan_profile:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OOI does not have a scanprofile")
+
     start = InheritanceSection(
         reference=ooi.reference, level=ooi.scan_profile.level, scan_profile_type=ooi.scan_profile.scan_profile_type
     )
-    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED:
+    if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED.value:
         return [start]
     return octopoes.get_scan_profile_inheritance(reference, valid_time, [start])
 
@@ -381,11 +434,11 @@ def list_findings(
 ) -> Paginated[Finding]:
     return octopoes.ooi_repository.list_findings(
         severities,
+        valid_time,
         exclude_muted,
         only_muted,
         offset,
         limit,
-        valid_time,
     )
 
 
@@ -421,3 +474,62 @@ def recalculate_bits(octopoes: OctopoesService = Depends(octopoes_service)) -> i
     octopoes.commit()
 
     return inference_count
+
+
+@router.get("/io/export", tags=["io"])
+def exporter(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> Any:
+    return xtdb_session_.client.export_transactions()
+
+
+def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> dict[str, int]:
+    try:
+        ops: list[dict[str, Any]] = list(map(itemgetter("txOps"), json.loads(data)))
+    except Exception as e:
+        logger.debug("Error parsing objects", exc_info=True)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Error parsing objects") from e
+    if reset:
+        try:
+            xtdb_session_.client.delete_node()
+            xtdb_session_.client.create_node()
+            xtdb_session_.commit()
+        except XTDBException as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error recreating nodes",
+            ) from e
+    for op in ops:
+        try:
+            operations: list[Operation] = [
+                (
+                    OperationType(x[0]),
+                    x[1],
+                    datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
+                )
+                for x in op
+            ]
+            xtdb_session_.client.submit_transaction(operations)
+        except Exception as e:
+            logger.debug("Error importing objects", exc_info=True)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error importing object {op}",
+            ) from e
+    return {"detail": len(ops)}
+
+
+@router.post("/io/import/add", tags=["io"])
+async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    return importer(data, xtdb_session_)
+
+
+@router.post("/io/import/new", tags=["io"])
+async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xtdb_session)) -> dict[str, int]:
+    try:
+        data = await request.body()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
+    return importer(data, xtdb_session_, True)

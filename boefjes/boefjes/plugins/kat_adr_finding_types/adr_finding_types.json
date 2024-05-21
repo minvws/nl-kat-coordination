@@ -1,30 +1,30 @@
 {
-    "API-NONSTANDARD-HTTP": {
-      "description": "Only apply standard HTTP methods",
-      "risk": "Recommendation"
-    },
-    "API-NO-OPENAPI": {
-      "description": "Use OpenAPI Specification for documentation",
-      "risk": "Recommendation"
-    },
-    "API-NO-MAJOR-VERSION-IN-URI": {
-      "description": "Include the major version number in the URI",
-      "risk": "Recommendation"
-    },
-    "API-TRAILING-SLASHES": {
-      "description": "Leave off trailing slashes from URIs",
-      "risk": "Recommendation"
-    },
-    "API-NO-OAS-JSON-STANDARD": {
-      "description": "Publish OAS document at a standard location in JSON-format",
-      "risk": "Recommendation"
-    },
-    "API-NO-SEMANTIC-VERSIONING": {
-      "description": "Adhere to the Semantic Versioning model when releasing API changes",
-      "risk": "Recommendation"
-    },
-    "API-NO-COMPLETE-VERSION-RESPONSE": {
-      "description": "Return the full version number in a response header",
-      "risk": "Recommendation"
-    }
+  "API-NONSTANDARD-HTTP": {
+    "description": "Only apply standard HTTP methods",
+    "risk": "Recommendation"
+  },
+  "API-NO-OPENAPI": {
+    "description": "Use OpenAPI Specification for documentation",
+    "risk": "Recommendation"
+  },
+  "API-NO-MAJOR-VERSION-IN-URI": {
+    "description": "Include the major version number in the URI",
+    "risk": "Recommendation"
+  },
+  "API-TRAILING-SLASHES": {
+    "description": "Leave off trailing slashes from URIs",
+    "risk": "Recommendation"
+  },
+  "API-NO-OAS-JSON-STANDARD": {
+    "description": "Publish OAS document at a standard location in JSON-format",
+    "risk": "Recommendation"
+  },
+  "API-NO-SEMANTIC-VERSIONING": {
+    "description": "Adhere to the Semantic Versioning model when releasing API changes",
+    "risk": "Recommendation"
+  },
+  "API-NO-COMPLETE-VERSION-RESPONSE": {
+    "description": "Return the full version number in a response header",
+    "risk": "Recommendation"
+  }
 }

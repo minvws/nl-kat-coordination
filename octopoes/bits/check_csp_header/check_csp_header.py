@@ -1,6 +1,7 @@
 import ipaddress
 import re
 from collections.abc import Iterator
+from typing import Any
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -9,12 +10,12 @@ from octopoes.models.types import HTTPHeader
 NON_DECIMAL_FILTER = re.compile(r"[^\d.]+")
 
 
-def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, Any]) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "content-security-policy":
         return
 
-    findings: [str] = []
+    findings: list[str] = []
 
     if "http://" in header.value:
         findings.append("Http should not be used in the CSP settings of an HTTP Header.")
@@ -67,6 +68,11 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) ->
                 "'data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
             )
 
+        if policy[0] == "script-src" and "'self'" in policy:
+            findings.append(
+                "'self' for `script-src` can be problematic if you host JSONP, Angular or user uploaded files."
+            )
+
         if policy[0].endswith("-uri") and (
             "unsafe-eval" in policy[2:]
             or "unsafe-hashes" in policy[2:]
@@ -100,10 +106,10 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) ->
 
 def _ip_valid(source: str) -> bool:
     "Check if there are IP's in this source, return False if the address found was to be non global. Ignores non ips"
-    ip = NON_DECIMAL_FILTER.sub("", source)
-    if ip:
+    ip_str = NON_DECIMAL_FILTER.sub("", source)
+    if ip_str:
         try:
-            ip = ipaddress.ip_address(ip)
+            ip = ipaddress.ip_address(ip_str)
             if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_reserved:
                 return False
         except ValueError:
@@ -121,7 +127,7 @@ def _create_kat_finding(header: Reference, kat_id: str, description: str) -> Ite
     )
 
 
-def _source_valid(policy: [str]) -> bool:
+def _source_valid(policy: list[str]) -> bool:
     for value in policy:
         if not (
             re.search(r"\S+\.\S{2,3}([\s]+|$|;|:[0-9]+)", value)

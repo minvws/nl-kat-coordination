@@ -1,48 +1,86 @@
 {% load i18n %}
 
-<div class="horizontal-scroll">
-    <table>
-        <caption class="visually-hidden">{% translate "Mailserver compliance:" %}</caption>
-        <thead>
-            <tr>
-                <th scope="col">{% translate "Check" %}</th>
-                <th scope="col">{% translate "Compliance" %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>SPF</td>
-                <td>{{ data.number_of_spf }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
-            </tr>
-            <tr>
-                <td>DKIM</td>
-                <td>{{ data.number_of_dkim }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
-            </tr>
-            <tr>
-                <td>DMARC</td>
-                <td>{{ data.number_of_dmarc }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-{% if data.finding_types.measures %}
+{% if data.number_of_hostnames > 0 %}
+    {% if generate_report %}
+        <p>
+            {% blocktranslate trimmed %}
+                The mail report provides an overview of the compliance checks associated with
+                e-mail servers. The current compliance check the presence of SPF, DKIM and DMARC
+                records. The table below shows for each of these checks how many of the identified
+                mail servers are compliant, and if applicable a compliance issue description and
+                risk level. The risk level may be different for your specific environment.
+            {% endblocktranslate %}
+        </p>
+    {% endif %}
     <div class="horizontal-scroll">
         <table>
-            <caption class="visually-hidden">{% translate "Findings:" %}</caption>
+            <caption class="visually-hidden">{% translate "Mailserver compliance" %}</caption>
             <thead>
                 <tr>
-                    <th scope="col">{% translate "Compliance issue" %}</th>
-                    <th scope="col">{% translate "Risk level" %}</th>
+                    <th scope="col">{% translate "Check" %}</th>
+                    <th scope="col">{% translate "Compliance" %}</th>
                 </tr>
             </thead>
             <tbody>
-                {% for measure in data.finding_types.values %}
-                    <tr>
-                        <td>{{ measure.description }}</td>
-                        <td>{{ measure.risk_severity }}</td>
-                    </tr>
-                {% endfor %}
+                <tr>
+                    <td>SPF</td>
+                    <td>
+                        {% if data.number_of_spf != data.number_of_hostnames %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_spf }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>DKIM</td>
+                    <td>
+                        {% if data.number_of_dkim != data.number_of_hostnames %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_dkim }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>DMARC</td>
+                    <td>
+                        {% if data.number_of_dmarc != data.number_of_hostnames %}
+                            <span class="icon incomplete"></span>
+                        {% else %}
+                            <span class="icon positive"></span>
+                        {% endif %}
+                        {{ data.number_of_dmarc }}/{{ data.number_of_hostnames }} {% translate "mailservers compliant" %}
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
+    {% if data.finding_types %}
+        <div class="horizontal-scroll">
+            <table>
+                <caption class="visually-hidden">{% translate "Findings" %}</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">{% translate "Compliance issue" %}</th>
+                        <th scope="col">{% translate "Risk level" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for finding_type in data.finding_types %}
+                        <tr>
+                            <td>{{ finding_type.description }}</td>
+                            <td>
+                                <span class="{{ finding_type.risk_severity }}">{{ finding_type.risk_severity|capfirst }}</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+{% else %}
+    <p>{% translate "No mailservers have been found on this system." %}</p>
 {% endif %}

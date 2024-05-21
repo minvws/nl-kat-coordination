@@ -16,7 +16,7 @@ from boefjes.job_models import Boefje, BoefjeMeta
 from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalBoefjeJobRunner
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, force=True)
 
 
 @click.command()

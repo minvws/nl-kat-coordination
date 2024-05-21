@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 
 from octopoes.models import OOI, Reference
+from octopoes.models.exception import TypeNotFound
 from octopoes.models.ooi.certificate import (
     SubjectAlternativeNameHostname,
     SubjectAlternativeNameIP,
@@ -93,9 +94,8 @@ DnsRecordType = (
     | ResolvedHostname
     | NXDOMAIN
 )
-FindingTypeType = (
-    FindingType
-    | ADRFindingType
+ConcreteFindingTypeType = (
+    ADRFindingType
     | KATFindingType
     | CVEFindingType
     | RetireJSFindingType
@@ -103,7 +103,9 @@ FindingTypeType = (
     | CAPECFindingType
     | SnykFindingType
 )
-NetworkType = Network | IPAddress | IPAddressV4 | IPAddressV6 | AutonomousSystem | IPV4NetBlock | IPV6NetBlock | IPPort
+FindingTypeType = FindingType | ConcreteFindingTypeType
+ConcreteNetworkType = Network | IPAddressV4 | IPAddressV6 | AutonomousSystem | IPV4NetBlock | IPV6NetBlock | IPPort
+NetworkType = ConcreteNetworkType | IPAddress
 ServiceType = Service | IPService | TLSCipher
 SoftwareType = Software | SoftwareInstance
 WebType = (
@@ -135,11 +137,11 @@ MonitoringType = Application | Incident
 ConfigType = Config
 ReportsType = ReportData
 
-OOIType = (
+ConcreteOOIType = (
     CertificateType
     | DnsType
     | DnsRecordType
-    | NetworkType
+    | ConcreteNetworkType
     | ServiceType
     | SoftwareType
     | WebType
@@ -151,11 +153,13 @@ OOIType = (
     | EmailSecurityType
     | Finding
     | MutedFinding
-    | FindingTypeType
+    | ConcreteFindingTypeType
     | ConfigType
     | Question
     | ReportsType
 )
+
+OOIType = ConcreteOOIType | NetworkType | FindingTypeType
 
 
 def get_all_types(cls_: type[OOI]) -> Iterator[type[OOI]]:
@@ -203,7 +207,10 @@ def to_concrete(object_types: set[type[OOI]]) -> set[type[OOI]]:
 
 
 def type_by_name(type_name: str):
-    return next(t for t in ALL_TYPES if t.__name__ == type_name)
+    try:
+        return next(t for t in ALL_TYPES if t.__name__ == type_name)
+    except StopIteration:
+        raise TypeNotFound
 
 
 def related_object_type(field) -> type[OOI]:

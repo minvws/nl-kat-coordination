@@ -2,14 +2,12 @@ import logging
 from typing import Any
 
 import prometheus_client
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import RedirectResponse, Response
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, Field, ValidationError
-from starlette.requests import Request
-from starlette.responses import JSONResponse
-from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from bytes.api.metrics import get_registry
 from bytes.auth import TokenResponse, authenticate_token, get_access_token
@@ -38,17 +36,17 @@ def validation_exception_handler(_: Request, exc: RequestValidationError | Valid
         {
             "value": str(exc),
         },
-        HTTP_422_UNPROCESSABLE_ENTITY,
+        status.HTTP_422_UNPROCESSABLE_ENTITY,
     )
 
 
 @router.get("/", include_in_schema=False)
-def health() -> RedirectResponse:
+def root() -> RedirectResponse:
     return RedirectResponse(url="/health")
 
 
 @router.get("/health", response_model=ServiceHealth)
-def root() -> ServiceHealth:
+def health() -> ServiceHealth:
     bytes_health = ServiceHealth(service="bytes", healthy=True, version=__version__)
     return bytes_health
 

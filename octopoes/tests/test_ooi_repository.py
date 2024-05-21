@@ -90,12 +90,12 @@ class OOIRepositoryTest(TestCase):
     @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
     def test_encode_outgoing_segment(self):
         path = Path.parse("MockIPAddressV4.network")
-        self.assertEqual("MockIPAddressV4/network", self.repository.encode_segment(path.segments[0]))
+        self.assertEqual("MockIPAddressV4/network", path.segments[0].encode())
 
     @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
     def test_encode_incoming_segment(self):
         path = Path.parse("MockIPAddressV4.<address [is MockIPPort]")
-        self.assertEqual("MockIPPort/_address", self.repository.encode_segment(path.segments[0]))
+        self.assertEqual("MockIPPort/_address", path.segments[0].encode())
 
     @patch("octopoes.models.types.ALL_TYPES", ALL_OOI_TYPES)
     def test_decode_outgoing_segment(self):

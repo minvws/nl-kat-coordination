@@ -1,8 +1,11 @@
 from datetime import timedelta
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypeAlias
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import AwareDatetime, BaseModel, Field, StringConstraints
+
+from octopoes.models import DeclaredScanProfile, PrimaryKeyToken
+from octopoes.models.types import OOIType
 
 
 class JobException(Exception):
@@ -69,54 +72,33 @@ class ObservationsWithoutInputOOI(JobException):
         )
 
 
-class UnsupportedReturnTypeNormalizer(JobException):
-    def __init__(self, result_type: str):
-        super().__init__(f"The return type '{result_type}' is not supported")
-
-
 class InvalidReturnValueNormalizer(JobException):
-    def __init__(self, validation_msg: str):
-        super().__init__(f"Output dictionary in normalizer was invalid: {validation_msg}")
-
-
-class NormalizerPlainOOI(BaseModel):  # Validation of plain OOIs being returned from Normalizers
-    object_type: str
-    model_config = ConfigDict(populate_by_name=True, extra="allow")
+    pass
 
 
 class NormalizerObservation(BaseModel):
     type: Literal["observation"] = "observation"
     input_ooi: str
-    results: list[NormalizerPlainOOI]
+    results: list[OOIType]
 
 
 class NormalizerDeclaration(BaseModel):
     type: Literal["declaration"] = "declaration"
-    ooi: NormalizerPlainOOI
+    ooi: OOIType
 
 
 class NormalizerAffirmation(BaseModel):
     type: Literal["affirmation"] = "affirmation"
-    ooi: NormalizerPlainOOI
+    ooi: OOIType
 
 
-class NormalizerScanProfile(BaseModel):
-    scan_profile_type: str
-    model_config = ConfigDict(populate_by_name=True, extra="allow")
-
-
-class NormalizerResult(BaseModel):  # Moves all validation logic to Pydantic
-    item: (
-        NormalizerPlainOOI
-        | NormalizerObservation
-        | NormalizerDeclaration
-        | NormalizerAffirmation
-        | NormalizerScanProfile
-    )
-
-
-class NormalizerOutput(BaseModel):
+class NormalizerResults(BaseModel):
     observations: list[NormalizerObservation] = []
     declarations: list[NormalizerDeclaration] = []
     affirmations: list[NormalizerAffirmation] = []
-    scan_profiles: list[NormalizerScanProfile] = []
+    scan_profiles: list[DeclaredScanProfile] = []
+
+
+NormalizerOutput: TypeAlias = OOIType | NormalizerDeclaration | NormalizerAffirmation | DeclaredScanProfile
+SerializedOOIValue: TypeAlias = None | str | int | float | dict[str, str | PrimaryKeyToken] | list["SerializedOOIValue"]
+SerializedOOI: TypeAlias = dict[str, SerializedOOIValue]

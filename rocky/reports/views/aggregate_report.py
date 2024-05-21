@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from datetime import datetime
 from typing import Any
 
 from django.conf import settings
@@ -13,13 +14,17 @@ from tools.view_helpers import url_with_querystring
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.definitions import Report
-from reports.report_types.helpers import (
-    get_ooi_types_from_aggregate_report,
-    get_plugins_for_report_ids,
-    get_report_types_from_aggregate_report,
-)
+from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
 from reports.utils import JSONEncoder, debug_json_keys
-from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
+from reports.views.base import (
+    REPORTS_PRE_SELECTION,
+    ReportBreadcrumbs,
+    ReportOOIView,
+    ReportPluginView,
+    ReportTypeView,
+    get_selection,
+)
+from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
 
@@ -43,7 +48,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Setup scan"),
+                "text": _("Configuration"),
             },
             {
                 "url": reverse("aggregate_report_view", kwargs=kwargs) + selection,
@@ -53,7 +58,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView):
+class LandingAggregateReportView(BreadcrumbsAggregateReportView):
     """
     Landing page to start the 'Aggregate Report' flow.
     """
@@ -65,13 +70,19 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView)
         )
 
 
-class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOIListView, BaseReportView):
+class OOISelectionAggregateReportView(
+    AggregateReportStepsMixin,
+    BreadcrumbsAggregateReportView,
+    ReportOOIView,
+    BaseOOIListView,
+):
     """
     Select Objects for the 'Aggregate Report' flow.
     """
 
     template_name = "aggregate_report/select_oois.html"
-    current_step = 3
+    breadcrumbs_step = 3
+    current_step = 1
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def get_context_data(self, **kwargs):
@@ -81,14 +92,21 @@ class OOISelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseOOILis
         return context
 
 
-class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
+class ReportTypesSelectionAggregateReportView(
+    AggregateReportStepsMixin,
+    BreadcrumbsAggregateReportView,
+    ReportOOIView,
+    ReportTypeView,
+    TemplateView,
+):
     """
     Shows all possible report types from a list of Objects.
     Chooses report types for the 'Aggregate Report' flow.
     """
 
     template_name = "aggregate_report/select_report_types.html"
-    current_step = 4
+    breadcrumbs_step = 4
+    current_step = 2
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -100,6 +118,14 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Ba
         if not self.selected_oois:
             messages.error(self.request, _("Select at least one OOI to proceed."))
         return super().get(request, *args, **kwargs)
+
+    def get_report_types_for_aggregate_report(
+        self, reports_dict: dict[str, set[type[Report]]]
+    ) -> dict[str, list[dict[str, str]]]:
+        report_types = {}
+        for option, reports in reports_dict.items():
+            report_types[option] = self.get_report_types(reports)
+        return report_types
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -114,32 +140,26 @@ class ReportTypesSelectionAggregateReportView(BreadcrumbsAggregateReportView, Ba
         return context
 
 
-class SetupScanAggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
+class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
     """
 
     template_name = "aggregate_report/setup_scan.html"
-    current_step = 5
+    breadcrumbs_step = 5
+    current_step = 3
 
-    def get(self, request, *args, **kwargs):
-        if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
-
-        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("aggregate_report_view", kwargs=kwargs) + get_selection(request))
-
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.report_has_required_plugins():
+            return redirect(self.get_next())
+        if not self.plugins:
+            return redirect(self.get_previous())
+        if self.plugins_enabled():
+            return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
-            get_plugins_for_report_ids(self.selected_report_types)
-        )
-        return context
 
-
-class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, TemplateView):
+class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -150,6 +170,12 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+            )
+
         if "json" in self.request.GET and self.request.GET["json"] == "true":
             aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
 
@@ -178,17 +204,22 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
-        aggregate_report, post_processed_data, report_data, error_oois = aggregate_reports(
-            self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.observed_at
+    def generate_reports_for_oois(
+        self,
+    ) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
+        aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
+            self.octopoes_api_connector,
+            self.get_oois(),
+            self.selected_report_types,
+            self.observed_at,
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
-        if error_oois:
-            oois = ", ".join(set(error_oois))
+        if report_errors:
+            report_types = ", ".join(set(report_errors))
             date = self.observed_at.date()
-            error_message = _("No data could be found for %(oois)s. Object(s) did not exist on %(date)s.") % {
-                "oois": oois,
+            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
+                "report_types": report_types,
                 "date": date,
             }
             messages.add_message(self.request, messages.ERROR, error_message)
@@ -197,6 +228,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["created_at"] = datetime.now()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         aggregate_report, post_processed_data, report_data = self.generate_reports_for_oois()
         context["template"] = aggregate_report.template_path
@@ -212,9 +244,6 @@ class AggregateReportView(BreadcrumbsAggregateReportView, BaseReportView, Templa
             True,
             **dict(json="true", **self.request.GET),
         )
-
-        context["oois"] = self.get_oois()
-        context["plugins"] = self.get_required_optional_plugins(get_plugins_for_report_ids(self.selected_report_types))
         return context
 
 

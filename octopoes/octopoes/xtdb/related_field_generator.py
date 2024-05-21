@@ -6,7 +6,7 @@ class RelatedFieldNode:
         self,
         data_model: Datamodel,
         object_types: set[str],
-        path: tuple[ForeignKey, ...] | None = (),
+        path: tuple[ForeignKey, ...] = (),
     ):
         self.data_model = data_model
         self.object_types = object_types
@@ -89,15 +89,15 @@ class RelatedFieldNode:
 
         # Loop outgoing QueryNodes
         fields = [f"{queried_fields}"]
-        for key, node in self.relations_out.items():
-            cls, attr_name = key
+        for key_out, node in self.relations_out.items():
+            cls, attr_name = key_out
             deeper_fields = node.generate_field(field_set, pk_prefix)
             field_query = f"{{(:{cls}/{attr_name} {{:as {attr_name}}}) {deeper_fields}}}"
             fields.append(field_query)
 
         # Loop incoming QueryNodes
-        for key, node in self.relations_in.items():
-            foreign_cls, attr_name, reverse_name = key
+        for key_in, node in self.relations_in.items():
+            foreign_cls, attr_name, reverse_name = key_in
             deeper_fields = node.generate_field(field_set, pk_prefix)
             field_query = f"{{(:{foreign_cls}/_{attr_name} {{:as {reverse_name}}}) {deeper_fields}}}"
             fields.append(field_query)
@@ -144,9 +144,9 @@ class RelatedFieldNode:
         """
         d = {}
         if self.relations_out:
-            for p, v in self.relations_out.items():
-                d[f"{p[0]}/{p[1]}"] = v.to_dict()
+            for key_out, node in self.relations_out.items():
+                d[f"{key_out[0]}/{key_out[1]}"] = node.to_dict()
         if self.relations_in:
-            for p, v in self.relations_in.items():
-                d[f"{p[0]}/_{p[1]} as {p[0]}/_{p[1]}"] = v.to_dict()
+            for key_in, node in self.relations_in.items():
+                d[f"{key_in[0]}/_{key_in[1]} as {key_in[0]}/_{key_in[1]}"] = node.to_dict()
         return d

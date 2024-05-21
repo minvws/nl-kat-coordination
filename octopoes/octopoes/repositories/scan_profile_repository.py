@@ -3,8 +3,8 @@ from http import HTTPStatus
 from logging import getLogger
 from typing import Any
 
+from httpx import HTTPStatusError
 from pydantic import parse_obj_as
-from requests import HTTPError
 
 from octopoes.events.events import OperationType, ScanProfileDBEvent
 from octopoes.events.manager import EventManager
@@ -82,7 +82,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
         id_ = self.format_id(ooi_reference)
         try:
             return self.deserialize(self.session.client.get_entity(id_, valid_time))
-        except HTTPError as e:
+        except HTTPStatusError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
                 raise ObjectNotFoundException(id_)
             else:
@@ -101,6 +101,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
             reference=new_scan_profile.reference,
             old_data=old_scan_profile,
             new_data=new_scan_profile,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 
@@ -112,6 +113,7 @@ class XTDBScanProfileRepository(ScanProfileRepository):
             reference=scan_profile.reference,
             valid_time=valid_time,
             old_data=scan_profile,
+            client=self.event_manager.client,
         )
         self.session.listen_post_commit(lambda: self.event_manager.publish(event))
 

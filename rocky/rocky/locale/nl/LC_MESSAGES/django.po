@@ -1,18 +1,20 @@
 # Brenno de Winter <brenno@dewinter.com>, 2023.
 # Darwinkel <Darwinkel@users.noreply.github.com>, 2023.
 # jan klopper <jan@underdark.nl>, 2023.
-# LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2023.
+# LibreTranslate <noreply-mt-libretranslate@weblate.org>, 2023, 2024.
 # Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2023.
 # 跨性别 <github@lgbt.sh>, 2023.
 # Madelon Dohmen <maddohmen@hotmail.com>, 2023, 2024.
 # PAUL MICHIEL VAN DER BLONK <blonkm@gmail.com>, 2024.
+# Joost Krapels <joost.krapels@ictinstitute.nl>, 2024.
+# Jeroen Dekkers <jeroen@dekkers.ch>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-19 15:41+0000\n"
-"PO-Revision-Date: 2024-02-21 19:02+0000\n"
-"Last-Translator: PAUL MICHIEL VAN DER BLONK <blonkm@gmail.com>\n"
+"POT-Creation-Date: 2024-03-26 16:12+0000\n"
+"PO-Revision-Date: 2024-03-06 15:01+0000\n"
+"Last-Translator: LibreTranslate <noreply-mt-libretranslate@weblate.org>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/nl/>\n"
 "Language: nl\n"
@@ -262,6 +264,38 @@ msgstr "Plaats het token dat door uw token authenticator app is gegenereerd."
 msgid "Backup token"
 msgstr "Backup token"
 
+#: account/mixins.py
+msgid "Clearance level has been set"
+msgstr "Vrijwaringsniveau is gezet"
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. Indemnification not present at "
+"organization %s."
+msgstr ""
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You were trusted a clearance "
+"level of L%s. Contact your administrator to receive a higher clearance."
+msgstr ""
+"Kan vrijwaringsniveau van %s niet verhogen naar L%s. U bent een "
+"vrijwaringsniveau toevertrouwd van L%s. Neem contact op met uw beheerder om "
+"uw vrijwaringsniveau te verhogen."
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
+"level of L%s. Please accept the clearance level first on your profile page "
+"to proceed."
+msgstr ""
+"Kan vrijwaringsniveau van %s niet verhogen naar L%s. U hebt een "
+"vrijwaringsniveau bevestigd van L%s. Accepteer eerst het vrijwaringsniveau "
+"op uw profiel pagina om verder te gaan."
+
 #: account/models.py
 msgid "The Email must be set"
 msgstr "Het e-mail adres moet worden ingevuld"
@@ -308,7 +342,7 @@ msgstr "startdatum"
 
 #: account/models.py
 msgid "name"
-msgstr ""
+msgstr "naam"
 
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
@@ -558,8 +592,7 @@ msgstr " hoofdletters"
 msgid "Your session has timed out. Please login again."
 msgstr "Uw sessie is verlopen. Gelieve opnieuw in te loggen."
 
-#: account/views/login.py reports/templates/partials/report_header.html
-#: rocky/templates/header.html
+#: account/views/login.py rocky/templates/header.html
 msgid "OpenKAT"
 msgstr "OpenKAT"
 
@@ -591,698 +624,6 @@ msgid ""
 msgstr ""
 "Kon lijst met bevindingen voor organisatie {} niet ophalen, controleer "
 "serverlogboeken voor meer details."
-
-#: fmea/forms.py
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Failure mode"
-msgstr "Faalmodus"
-
-#: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_detail.html
-#: katalogus/templates/boefje_detail.html
-#: katalogus/templates/normalizer_detail.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
-#: rocky/templates/oois/ooi_detail.html
-#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
-msgid "Description"
-msgstr "Omschrijving"
-
-#: fmea/forms.py
-msgid "Frequency Level"
-msgstr "Frequentieniveau"
-
-#: fmea/forms.py
-msgid "Detectability Level"
-msgstr "Detecteerbaarheidsnivo"
-
-#: fmea/forms.py
-msgid "Effect(s)"
-msgstr "Effect(en)"
-
-#: fmea/forms.py
-msgid "Describe in one sentence what type of failure mode you are creating."
-msgstr "Beschrijf in één zin welke type bevinding u wilt maken."
-
-#: fmea/forms.py
-msgid "Describe the failure mode in details."
-msgstr "Omschrijf de bevinding."
-
-#: fmea/forms.py
-msgid ""
-"From 1 to 5, how often does this failure mode occurs. 1: Almost unthinkable "
-"and 5: occurs daily."
-msgstr ""
-"Hoe vaak komt de foutmodus voor, op een schaal van 1 tot 5. 1: Bijna "
-"ondenkbaar en 5: dagelijks."
-
-#: fmea/forms.py
-msgid ""
-"Is this failure mode easy detectable? Give it a score from 1 to 5. 1: always "
-"detectable and 5: almost undetectable."
-msgstr ""
-"Is deze bevinding eenvoudig te detecteren? Geef het een score van 1 tot 5. "
-"1: altijd te detecteren en 5: bijna niet te detecteren."
-
-#: fmea/forms.py
-msgid "Describe the type of failure mode"
-msgstr "Beschrijf het type bevinding"
-
-#: fmea/forms.py
-msgid "explanation-failure-mode"
-msgstr "uitleg-failure-mode"
-
-#: fmea/forms.py
-msgid "Describe in more detail what the failure mode is about."
-msgstr "Beschrijf in meer detail waar het om gaat."
-
-#: fmea/forms.py
-msgid "explanation-description"
-msgstr "uitleg-omschrijving"
-
-#: fmea/forms.py
-msgid "explanation-frequency-level"
-msgstr "uitleg-frequency-level"
-
-#: fmea/forms.py
-msgid "explanation-detectability_level"
-msgstr "uitleg-detectability_level"
-
-#: fmea/forms.py
-msgid "You must at least set a failure mode."
-msgstr "Je moet tenminste een faal modus zetten."
-
-#: fmea/forms.py
-msgid "Choose a frequency level."
-msgstr "Kies een frequentieniveau."
-
-#: fmea/forms.py
-msgid "Choose a detectability level."
-msgstr "Kies een detectieniveau."
-
-#: fmea/forms.py
-msgid "Choose at least one effect."
-msgstr "Kies ten minste één effect."
-
-#: fmea/forms.py
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Affected Department"
-msgstr "Betrokken afdeling"
-
-#: fmea/forms.py
-msgid "Affected Objects"
-msgstr "Betrokken objecten"
-
-#: fmea/forms.py
-msgid "Choose a failure mode which applies to "
-msgstr "Kies een bevinding die van toepassing is op "
-
-#: fmea/forms.py
-msgid "When this failure mode occurs, which department is affected?"
-msgstr "Als de bevinding plaatsvindt, welke afdeling is dan betrokken?"
-
-#: fmea/forms.py
-msgid "Which objects does this failure mode affect when it occurs?"
-msgstr "Welke objecten hebben met de bevinding te maken als het gebeurd?"
-
-#: fmea/forms.py
-msgid "explanation-affected-ooi-type"
-msgstr "uitleg-affected-ooi-type"
-
-#: fmea/forms.py fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Effect"
-msgstr "Effect"
-
-#: fmea/forms.py
-msgid "Severity Level"
-msgstr "Beveiligingsnivo"
-
-#: fmea/forms.py
-msgid "Name a possible effect of any type of failure mode that can occur."
-msgstr "Geef een voorbeeld van een mogelijk effect van de bevinding."
-
-#: fmea/forms.py
-msgid ""
-"Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
-msgstr "Beschrijf de ernst van het effect. 1: niet ernstig en 5: catastrofaal"
-
-#: fmea/forms.py
-msgid "Describe a possible effect for FMEA"
-msgstr "Beschrijf een mogelijk effect voor FMEA"
-
-#: fmea/forms.py
-msgid "explanation-effect"
-msgstr "uitleg-effect"
-
-#: fmea/forms.py
-msgid "explanation-severity-level"
-msgstr "uitleg-severity-level"
-
-#: fmea/forms.py
-msgid "The effect is required."
-msgstr "Het effect is vereist."
-
-#: fmea/forms.py
-msgid "This effect already exists."
-msgstr "Dit effect bestaat al."
-
-#: fmea/forms.py
-msgid "Choose a severity level."
-msgstr "Kies een ernstigheidsniveau."
-
-#: fmea/models.py
-msgid "Finances"
-msgstr "Financiële situatie"
-
-#: fmea/models.py
-msgid "Marketing"
-msgstr "Marketing"
-
-#: fmea/models.py
-msgid "Human Resources"
-msgstr "Personeelszaken"
-
-#: fmea/models.py
-msgid "Research & Development"
-msgstr "Onderzoek & Ontwikkeling"
-
-#: fmea/models.py
-msgid "Administration"
-msgstr "Administratie"
-
-#: fmea/models.py
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/service_health.html rocky/templates/footer.html
-#: rocky/templates/health.html
-msgid "Service"
-msgstr "Dienst"
-
-#: fmea/models.py
-msgid "Level 1: Not Severe"
-msgstr "Niveau 1: Niet ernstig"
-
-#: fmea/models.py
-msgid "Level 2: Harmful"
-msgstr "Niveau 2: Schadelijk"
-
-#: fmea/models.py
-msgid "Level 3: Severe"
-msgstr "Niveau 3: Ernstig"
-
-#: fmea/models.py
-msgid "Level 4: Very Harmful"
-msgstr "Niveau 4: Zeer schadelijk"
-
-#: fmea/models.py
-msgid "Level 5: Catastrophic"
-msgstr "Niveau 5: Katastrofaal"
-
-#: fmea/models.py
-msgid "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
-msgstr ""
-"Niveau 1: Zeer zeldzaam. Incident komt (bijna) nooit voor, bijna ondenkbaar."
-
-#: fmea/models.py
-msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
-msgstr ""
-"Niveau 2: Zeldzaam. Incidenten komen minder dan één keer per jaar (3-5) voor."
-
-#: fmea/models.py
-msgid "Level 3: Occurs. Incidents occur several times a year."
-msgstr ""
-"Niveau 3: Doet zich voor. Incidenten vinden meerdere keren per jaar plaats."
-
-#: fmea/models.py
-msgid "Level 4: Regularly. Incidents occur weekly."
-msgstr "Niveau 4: Regelmatig. Er vinden wekelijks incidenten plaats."
-
-#: fmea/models.py
-msgid "Level 5: Frequent. Incidents occur daily."
-msgstr "Niveau 5: Frequent. Incidenten komen dagelijks voor."
-
-#: fmea/models.py
-msgid ""
-"Level 1: Always Detectable. Incident (almost) never occurs, almost "
-"unthinkable."
-msgstr ""
-"Niveau 1: altijd detecteerbaar. Incident komt (bijna) nooit voor, bijna "
-"ondenkbaar."
-
-#: fmea/models.py
-msgid ""
-"Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
-msgstr ""
-"Niveau 2: Meestal detecteerbaar. Incidenten komen minder dan één keer per "
-"jaar (3-5) voor."
-
-#: fmea/models.py
-msgid "Level 3: Detectable. Failure mode is detectable with effort."
-msgstr "Niveau 3: Detecteerbaar. De foutmodus is met moeite detecteerbaar."
-
-#: fmea/models.py
-msgid "Level 4: Poorly Detectable. Detecting the failure mode is difficult."
-msgstr ""
-"Niveau 4: Slecht detecteerbaar. Het detecteren van de foutmodus is moeilijk."
-
-#: fmea/models.py
-msgid ""
-"Level 5: Almost Undetectable. Failure mode detection is very difficult or "
-"nearly impossible."
-msgstr ""
-"Niveau 5: Bijna niet detecteerbaar. Detectie van foutmodus is erg moeilijk "
-"of bijna onmogelijk."
-
-#: fmea/models.py fmea/templates/fmea/fmea_failure_mode_list.html
-#: fmea/views/view_helpers.py
-msgid "Failure modes"
-msgstr "Faalmodi"
-
-#: fmea/models.py fmea/views/view_helpers.py
-msgid "Failure Mode Affected Objects"
-msgstr "Objecten beinvloed door de foutmodus"
-
-#: fmea/templates/fmea/fmea_department_heatmap.html
-msgid "FMEA Departments Heatmap:"
-msgstr "FMEA Afdelingen Heatmap:"
-
-#: fmea/templates/fmea/fmea_department_heatmap.html
-msgid "No data to build heatmap"
-msgstr "Geen gegevens om heatmap te bouwen"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-msgid "Failure mode affected object table:"
-msgstr "Faal modus getroffen objecten tabel:"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Affected Object"
-msgstr "Betrokken object"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-#: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
-#: fmea/views/fmea_failure_mode_effect.py
-#: katalogus/templates/plugin_settings_list.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
-#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
-msgid "Edit"
-msgstr "Bewerken"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_detail.html
-msgid "Failure mode affected objects cannot be found."
-msgstr "Faal modus getroffen objecten kan niet gevonden worden."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "Define which objects are affected for a failure mode"
-msgstr "Definiëren welke objecten worden beïnvloed voor een foutmodus"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "Failure mode affected objects"
-msgstr "Beïnvloedde objecten"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "Save"
-msgstr "Opslaan"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_4_account_setup_admin.html
-#: onboarding/templates/account/step_5_account_setup_red_teamer.html
-#: onboarding/templates/account/step_6_account_setup_client.html
-#: rocky/templates/forms/json_schema_form.html
-#: rocky/templates/organizations/organization_add.html
-#: rocky/templates/organizations/organization_member_add.html
-#: rocky/templates/organizations/organization_member_add_account_type.html
-#: rocky/templates/partials/elements/ooi_detail_settings.html
-#: rocky/templates/partials/elements/ooi_report_settings.html
-#: rocky/templates/partials/form/indemnification_add_form.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/two_factor/_wizard_actions.html
-msgid "Submit"
-msgstr "Indienen"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "No failure mode yet defined."
-msgstr "Er is nog geen storing gedefinieerd."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-msgid "To add affected objects to a failure mode, first create one."
-msgstr ""
-"Om betrokken objecten toe te voegen aan een foutmodus, maakt u er eerst een "
-"aan."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_form.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Create failure mode"
-msgstr "Maak faal modus"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Failure mode affected objects table:"
-msgstr "Tabel met getroffen objecten:"
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "No failure mode affected objects yet defined."
-msgstr "Er zijn nog geen objecten met een storing gedefinieerd."
-
-#: fmea/templates/fmea/fmea_failure_mode_affected_object_list.html
-msgid "Create failure mode Affected Objects"
-msgstr "Maak aan faal modus getroffen objecten"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Departments failure modes"
-msgstr "Afdeling faalmodi"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Failure modes and affected departments table:"
-msgstr "Faalmodi en geraakte afdelingentabel:"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Failure Mode"
-msgstr "Faal modus"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Affected Departments"
-msgstr "Betrokken afdelingen"
-
-#: fmea/templates/fmea/fmea_failure_mode_departments.html
-msgid "Nothing found."
-msgstr "Geen resultaten."
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Failure mode properties"
-msgstr "Faal modus eigenschappen"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Properties"
-msgstr "Eigenschappen"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Risk class"
-msgstr "Risiconiveau"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Frequency level"
-msgstr "Frequency niveau"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid "Detectability level"
-msgstr "Detecteerbaarheidsniveau"
-
-#: fmea/templates/fmea/fmea_failure_mode_detail.html
-msgid ""
-"\n"
-"                        Effect and severity level\n"
-"                        "
-msgid_plural ""
-"\n"
-"                        Effects and severity levels\n"
-"                      "
-msgstr[0] ""
-"\n"
-"                        Niveau van gevolg en ernstigheid\n"
-"                        "
-msgstr[1] ""
-"\n"
-"                        Niveau van gevolgen en ernstigheid\n"
-"                      "
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Failure mode effect"
-msgstr "Faalmodus effect"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-msgid "Failure mode effect properties"
-msgstr "Faalmodus effect eigenschappen"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_detail.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Severity"
-msgstr "Ernst"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-msgid "FMEA effect and severity"
-msgstr "FMEA-effect en ernst"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_form.html
-msgid "FMEA effect"
-msgstr "FMEA effect"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Failure mode effects table:"
-msgstr "Faalmodus effecten tabel:"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Severity level"
-msgstr "Ernstnivo"
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "No failure mode effect yet defined."
-msgstr "Nog geen faalmodus gedefinieerd."
-
-#: fmea/templates/fmea/fmea_failure_mode_effect_list.html
-msgid "Create a failure mode effect"
-msgstr "Voeg een faalmodus effect toe"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create a new failure mode"
-msgstr "Creëer een nieuwe faalmodus"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "Failure mode and effects"
-msgstr "Foutmodus en gevolgen"
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid "No failure mode effects created."
-msgstr "Geen faalmodus effecten gecreëerd."
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-msgid ""
-"First create failure mode effects which can be added later to a failure mode."
-msgstr ""
-"Maak eerst faalmodus-effecten die later aan een faalmodus kunnen worden "
-"toegevoegd."
-
-#: fmea/templates/fmea/fmea_failure_mode_form.html
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create failure mode effects"
-msgstr "Faalmodus-effecten maken"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Failure mode table:"
-msgstr "Faalmodustabel:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Risk Class"
-msgstr "Risicoklasse"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Details"
-msgstr "Details"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Sluit details"
-msgstr "Details sluiten"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Description:"
-msgstr "Omschrijving:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Frequency level:"
-msgstr "Frequentieniveau:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid "Detectability level:"
-msgstr "Detecteerbaarheidsniveau:"
-
-#: fmea/templates/fmea/fmea_failure_mode_list.html
-msgid ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffect and severity level\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgid_plural ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffects and severity levels\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgstr[0] ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNiveau van gevolg en ernstigheidl\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-msgstr[1] ""
-"\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNiveau van gevolgen en ernstigheid\n"
-"\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Failure mode report"
-msgstr "Foutmodus rapport"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-#: reports/report_types/aggregate_organisation_report/report_design.html
-#: reports/report_types/aggregate_organisation_report/summary.html
-#: reports/report_types/multi_organization_report/summary.html
-#: reports/templates/summary/report_summary.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
-#: rocky/views/ooi_tree.py
-msgid "Summary"
-msgstr "Samenvatting"
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Failure mode: "
-msgstr "Foutmodus: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Severity: "
-msgstr "Ernst: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Detectability: "
-msgstr "Detecteerbaarheid: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Frequency: "
-msgstr "Frequentie: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Effect: "
-msgstr "Effect: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Description: "
-msgstr "Omschrijving: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Affected Departments: "
-msgstr "Getroffen afdelingen: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Affected OOI's: "
-msgstr "Getroffen objecten: "
-
-#: fmea/templates/fmea/fmea_failure_mode_report.html
-msgid "Report cannot be viewed, failure mode not found."
-msgstr "Rapport kan niet worden bekeken, storingsmodus niet gevonden."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "FMEA introduction"
-msgstr "FMEA introductie"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid ""
-"FMEA (failure mode and effective analysis) is a step-by-step approach for "
-"collecting knowledge about possible points of failure in a design, "
-"manufacturing process, product or service."
-msgstr ""
-"FMEA (foutmodus en effectieve analyse) is een stapsgewijze aanpak voor "
-"kennis verzamelen over mogelijke faalpunten in een ontwerp, productieproces, "
-"product of dienst."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid ""
-"Failure mode (FM) refers to the way in which something might break down and "
-"includes potential errors that may occur, especially errors that may affect "
-"a system. Effective analysis (EA) involves deciphering the consequences of "
-"those break downs by making sure that all failures can be detected, "
-"determining how frequently a failure might occur and identifying which "
-"potential failures should be prioritized."
-msgstr ""
-"Failure mode (FM) verwijst naar de manier waarop iets kapot kan gaan en "
-"omvat mogelijke fouten die kunnen optreden, met name fouten die van invloed "
-"kunnen zijn op een systeem. Effectieve analyse (EA) omvat het ontcijferen "
-"van de gevolgen van die storingen door ervoor te zorgen dat alle storingen "
-"kunnen worden opgespoord, bepalen hoe vaak een storing kan optreden en "
-"identificeren welke potentiële mislukkingen moeten prioriteit krijgen."
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "Create affected objects of a failure mode"
-msgstr "Maak getroffen objecten van een foutmodus"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all failure modes"
-msgstr "Bekijk alle foutmodi"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all failure mode effects"
-msgstr "Bekijk alle foutmodus effecten"
-
-#: fmea/templates/fmea/fmea_index.html
-msgid "View all affected objects for a failure modes"
-msgstr "Bekijk alle getroffen objecten voor een foutmodus"
-
-#: fmea/templates/fmea/fmea_index.html fmea/views/fmea_analytics.py
-msgid "Heatmap"
-msgstr "Heatmap"
-
-#: fmea/tools.py
-msgid "--- Select an option ----"
-msgstr "-- Selecteer een optie --"
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Failure mode affected objects successfully created."
-msgstr "Beinvloedde objecten die zijn aangemaakt."
-
-#: fmea/views/fmea_affected_objects.py fmea/views/fmea_failure_mode.py
-#: fmea/views/fmea_failure_mode_effect.py
-msgid "Create"
-msgstr "Creëren"
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Treeobjects successfully added."
-msgstr "Boomobjecten succesvol toegevoegd."
-
-#: fmea/views/fmea_affected_objects.py
-msgid "Please select a department or ooi."
-msgstr "Selecteer een afdeling of ooi/object."
-
-#: fmea/views/fmea_analytics.py onboarding/templates/step_4_report.html
-msgid "Report"
-msgstr "Rapport"
-
-#: fmea/views/fmea_failure_mode.py
-msgid "Failure mode successfully created."
-msgstr "Foutmode succesvol aangemaakt."
-
-#: fmea/views/fmea_failure_mode_effect.py
-msgid "Failure mode effect successfully created."
-msgstr "Foutmode-effect succesvol gemaakt."
-
-#: fmea/views/view_helpers.py rocky/templates/dashboard_redteam.html
-msgid "FMEA"
-msgstr "FMEA"
-
-#: fmea/views/view_helpers.py
-msgid "Failure mode effects"
-msgstr "Foutmode-effecten"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
@@ -1359,6 +700,18 @@ msgstr ""
 #: katalogus/templates/boefje_detail.html
 msgid "Scan level"
 msgstr "Scannivo"
+
+#: katalogus/templates/boefje_detail.html
+#: katalogus/templates/normalizer_detail.html
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/summary/report_asset_overview.html
+#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
+#: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
+msgid "Description"
+msgstr "Omschrijving"
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
@@ -1694,20 +1047,17 @@ msgid "Plugins overview:"
 msgstr "Overzicht plug-ins:"
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin name"
 msgstr "Plug-in naam"
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin type"
 msgstr "Plug-in type"
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin description"
 msgstr "Plug-in beschrijving"
 
@@ -1726,8 +1076,7 @@ msgstr "Alle"
 
 #: katalogus/templates/partials/plugins_navigation.html
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: tools/forms/boefje.py rocky/templates/scan.html
-#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr "Boefjes"
@@ -1854,6 +1203,13 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nee"
 
+#: katalogus/templates/plugin_settings_list.html
+#: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+#: rocky/views/ooi_edit.py rocky/views/organization_edit.py
+msgid "Edit"
+msgstr "Bewerken"
+
 #: katalogus/views/change_clearance_level.py
 msgid "Session has terminated, please select objects again."
 msgstr "Sessie is beëindigd, selecteer objecten opnieuw."
@@ -1877,36 +1233,6 @@ msgid ""
 msgstr ""
 "Het ophalen van informatie voor plug-in {} is mislukt. Controleer de KAT-"
 "alogus-logboeken."
-
-#: katalogus/views/mixins.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                             "
-"Indemnification not present at organization %s."
-msgstr ""
-"Kon vrijwaringsniveau van %s niet verhogen naar L%s.Vrijwaring op "
-"organisatie %s niet aanwezig."
-
-#: katalogus/views/mixins.py onboarding/views.py rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You were trusted a clearance "
-"level of L%s. Contact your administrator to receive a higher clearance."
-msgstr ""
-"Kan vrijwaringsniveau van %s niet verhogen naar L%s. U bent een "
-"vrijwaringsniveau toevertrouwd van L%s. Neem contact op met uw beheerder om "
-"uw vrijwaringsniveau te verhogen."
-
-#: katalogus/views/mixins.py onboarding/views.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level first on your profile page "
-"to proceed."
-msgstr ""
-"Kan vrijwaringsniveau van %s niet verhogen naar L%s. U hebt een "
-"vrijwaringsniveau bevestigd van L%s. Accepteer eerst het vrijwaringsniveau "
-"op uw profiel pagina om verder te gaan."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
@@ -2008,6 +1334,10 @@ msgstr ""
 msgid "explanation-clearance-level"
 msgstr "toelichting-vrijwarings-level"
 
+#: onboarding/forms.py
+msgid "Please enter a valid URL starting with 'http://' or 'https://'."
+msgstr ""
+
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid "Register"
 msgstr "Registreren"
@@ -2090,6 +1420,22 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 msgid "Organization details"
 msgstr "Organisatie details"
+
+#: onboarding/templates/account/step_2a_organization_setup.html
+#: onboarding/templates/account/step_4_account_setup_admin.html
+#: onboarding/templates/account/step_5_account_setup_red_teamer.html
+#: onboarding/templates/account/step_6_account_setup_client.html
+#: rocky/templates/forms/json_schema_form.html
+#: rocky/templates/organizations/organization_add.html
+#: rocky/templates/organizations/organization_member_add.html
+#: rocky/templates/organizations/organization_member_add_account_type.html
+#: rocky/templates/partials/elements/ooi_detail_settings.html
+#: rocky/templates/partials/elements/ooi_report_settings.html
+#: rocky/templates/partials/form/indemnification_add_form.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/two_factor/_wizard_actions.html
+msgid "Submit"
+msgstr "Indienen"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
@@ -2279,7 +1625,7 @@ msgstr "Maak organisatie setup af"
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_4_report.html onboarding/views.py
+#: onboarding/templates/step_4_report.html onboarding/view_helpers.py
 msgid "OpenKAT introduction"
 msgstr "OpenKAT introductie"
 
@@ -2364,6 +1710,7 @@ msgstr "Deze introductie legt uit hoe je een rapport maakt."
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
 msgstr "Sla onboarding over"
@@ -2640,10 +1987,6 @@ msgstr "Hostname"
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "scheme"
 msgstr "schema"
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "DNS Zone"
-msgstr "DNS Zone"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Network"
@@ -2946,9 +2289,16 @@ msgstr ""
 "schakelen."
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: reports/templates/partials/report_setup_scan.html
-msgid "Suggested plugins"
-msgstr "Aangeraden plug-ins"
+msgid "Required and suggested plugins"
+msgstr ""
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+msgid "Enable and start scan"
+msgstr ""
+
+#: onboarding/templates/step_4_report.html
+msgid "Report"
+msgstr "Rapport"
 
 #: onboarding/templates/step_4_report.html
 msgid "Boefjes are scanning"
@@ -3013,30 +2363,33 @@ msgstr "3. Vrijwaring"
 msgid "4: Account setup"
 msgstr "4: Account setup"
 
-#: onboarding/views.py
-msgid ""
-"OpenKAT added the following required object to your object list to complete "
-"your request: {}"
-msgstr ""
-"OpenKAT heeft het volgende vereiste object toegevoegd aan uw objectlijst om "
-"uw verzoek te voltooien: {}"
-
-#: onboarding/views.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                 "
-"Indemnification not present at organization %s."
-msgstr ""
-"Kon vrijwaringsniveau van %s niet verhogen naar L%s. Vrijwaring niet "
-"aanwezig bij organisatie %s."
-
-#: onboarding/views.py
-msgid "Clearance level has been set"
-msgstr "Vrijwaringsniveau is gezet"
-
-#: onboarding/views.py
+#: onboarding/view_helpers.py
 msgid "OpenKAT Setup"
 msgstr "OpenKAT instellingen"
+
+#: onboarding/views.py
+msgid "Fetch the parent DNS zone of a hostname"
+msgstr ""
+
+#: onboarding/views.py
+msgid "Finds subdomains by brute force"
+msgstr ""
+
+#: onboarding/views.py
+msgid "Please select a plugin to proceed."
+msgstr ""
+
+#: onboarding/views.py
+msgid "Please select all required plugins to proceed."
+msgstr ""
+
+#: onboarding/views.py
+msgid "An error occurred while enabling {}. The plugin is not available."
+msgstr ""
+
+#: onboarding/views.py
+msgid "Plugins successfully enabled."
+msgstr ""
 
 #: onboarding/views.py
 #, python-brace-format
@@ -3068,44 +2421,35 @@ msgid "Appendix"
 msgstr "Appendix"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Selected objects"
 msgstr "Geselecteerde objecten"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Currently filtered on"
-msgstr ""
+msgstr "Nu gefilterd op"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Selected Report Types"
 msgstr "Geselecteerde rapporttypes"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
 msgstr "Rapporttype"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
-msgid "Selected Plugins"
-msgstr "Geselecteerde Plug-ins"
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
-msgid "Plugin options"
-msgstr "Plug-in opties"
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
-msgid "Plugin scan level"
-msgstr "Plug-in scanniveau"
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
 msgstr "Serviceversies en Welzijn"
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/service_health.html rocky/templates/footer.html
+#: rocky/templates/health.html
+msgid "Service"
+msgstr "Dienst"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/service_health.html rocky/templates/health.html
@@ -3148,7 +2492,9 @@ msgstr "Geen configuratieobjecten gevonden."
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
 #: reports/report_types/multi_organization_report/asset_overview.html
+#: reports/templates/partials/generate_report_sidemenu.html
 #: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Asset overview"
 msgstr "Asset overzicht"
 
@@ -3228,6 +2574,7 @@ msgid "OpenKAT Aggregate Report"
 msgstr "OpenKAT Geaggregeerd Rapport"
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/templates/partials/report_header.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Export"
 msgstr "Exporteer"
@@ -3243,19 +2590,20 @@ msgid "Download JSON"
 msgstr "Download JSON"
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/templates/partials/report_header.html
 msgid "This is the OpenKAT report for organization"
 msgstr "Dit is het OpenKAT rapport voor organisatie"
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/templates/partials/report_header.html
 msgid "Created with data from"
-msgstr ""
+msgstr "Gemaakt met data van"
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
 msgid "Created on"
-msgstr ""
+msgstr "Gemaakt op"
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/aggregate_organisation_report/report_design.html
@@ -3293,7 +2641,6 @@ msgstr "Er zijn geen aanbevelingen."
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
-#: reports/report_types/safe_connections_report/report.html
 msgid ""
 "In this chapter we check if the connections of all the IP ports of the "
 "system are safe. Safe connections are important to prevent unauthorised "
@@ -3387,6 +2734,14 @@ msgid "Observed at:"
 msgstr "Gezien op:"
 
 #: reports/report_types/aggregate_organisation_report/report_design.html
+#: reports/report_types/aggregate_organisation_report/summary.html
+#: reports/report_types/multi_organization_report/summary.html
+#: rocky/templates/partials/ooi_report_severity_totals.html
+#: rocky/views/ooi_tree.py
+msgid "Summary"
+msgstr "Samenvatting"
+
+#: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/vulnerability_report/report.html
 msgid "vulnerabilities on this system"
 msgstr "kwetsbaarheden op dit systeem"
@@ -3452,12 +2807,14 @@ msgid "Compliance issue"
 msgstr "Compliance-probleem"
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/findings_report/report.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
 #: reports/report_types/rpki_report/report.html
 #: reports/report_types/safe_connections_report/report.html
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Risk level"
@@ -3586,8 +2943,9 @@ msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid ""
-"The table below gives an overview of the DNS records that were found for the "
-"abovementioned DNSZone."
+"The DNS report gives an overview of the DNS records that were found for the "
+"DNSZone. Additionally the security measures table shows whether or not DNS "
+"relating security measures are enabled."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -3610,35 +2968,172 @@ msgstr "Record"
 
 #: reports/report_types/dns_report/report.html
 msgid "TTL"
-msgstr ""
+msgstr "TTL"
 
 #: reports/report_types/dns_report/report.html
 msgid "minutes"
+msgstr "minuten"
+
+#: reports/report_types/dns_report/report.html
+msgid "No records have been found."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Security measures"
 msgstr "Beveiligingsmaatregelen"
 
+#: reports/report_types/dns_report/report.html
+msgid ""
+"The security measures table below shows which DNS relating security measures "
+"are enabled based on the contents of the DNS records."
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+msgid "Other findings found"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+msgid "Other findings found:"
+msgstr "Andere bevindingen gevonden:"
+
+#: reports/report_types/dns_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Severity"
+msgstr "Ernst"
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: rocky/templates/findings/finding_add.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding"
+msgstr "Bevinding"
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Details"
+msgstr "Details"
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Close details"
+msgstr "Sluit details"
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+#: rocky/templates/partials/task_history.html
+#: rocky/templates/tasks/partials/boefje_task_history.html
+#: rocky/templates/tasks/partials/normalizer_task_history.html
+msgid "Open details"
+msgstr "Details openen"
+
+#: reports/report_types/dns_report/report.html
+msgid "Findings information"
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Occurrences"
+msgstr "Voorvallen"
+
 #: reports/report_types/dns_report/report.py
 msgid ""
 "DNS reports focus on domain name system configuration and potential "
 "weaknesses."
 msgstr ""
-"DNS-rapporten geven inzicht in de Domein naam systeem configuratie en "
+"DNS-rapporten geven inzicht in de domeinnaam systeem configuratie en "
 "potentiële zwakheden."
 
-#: reports/report_types/ipv6_report/report.html
-#: reports/report_types/multi_organization_report/ipv6.html
+#: reports/report_types/findings_report/report.html
 msgid ""
-"IPv6 includes improvements in security features compared to IPv4. While IPv4 "
-"can implement security measures, IPv6 was designed with security in mind, "
-"and its adoption can contribute to a more secure internet."
+"The findings report provides an overview of the identified findings on the "
+"scanned systems. For each finding it shows the risk level and the number of "
+"occurrences of the finding. Under the 'Details' section a description, "
+"impact, recommendation and location of the finding can be found. The risk "
+"level may be different for your specific environment."
 msgstr ""
-"IPv6 bevat verbeteringen van beveiligingsfuncties ten opzichte van IPv4. "
-"Terwijl IPv4 beveiligingsmaatregelen kan implementeren, is IPv6 ontworpen "
-"met beveiliging in het achterhoofd en de implementatie ervan kan bijdragen "
-"aan een veiliger internet."
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+#: reports/report_types/web_system_report/report.html
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
+msgstr "Bevindingen"
+
+#: reports/report_types/findings_report/report.html
+msgid "Impact"
+msgstr "Impact"
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/multi_organization_report/recommendations.html
+msgid "Recommendation"
+msgstr "Aanbeveling"
+
+#: reports/report_types/findings_report/report.html
+#: reports/report_types/vulnerability_report/report.py
+msgid "First seen"
+msgstr "Eerst gezien"
+
+#: reports/report_types/findings_report/report.html
+msgid "No findings have been found."
+msgstr "Er zijn geen bevindingen gevonden."
+
+#: reports/report_types/findings_report/report.py
+msgid "Findings Report"
+msgstr "Bevindingenrapport"
+
+#: reports/report_types/findings_report/report.py
+msgid "Shows all the finding types and their occurrences."
+msgstr ""
+
+#: reports/report_types/ipv6_report/report.html
+msgid ""
+"The IPv6 report provides an overview of the current IPv6 status of the "
+"identified system. The table below shows whether the domain is reachable "
+"over IPv6 or not. A green compliance check is shown if this is the case. A "
+"red compliance cross is shown if no IPv6 address was detected."
+msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
 msgid "IPV6 overview:"
@@ -3656,6 +3151,16 @@ msgstr "IPv6 Rapport"
 #: reports/report_types/ipv6_report/report.py
 msgid "Check whether hostnames point to ipv6 addresses."
 msgstr "Check of hostnamen naar IPv6-adressen verwijzen."
+
+#: reports/report_types/mail_report/report.html
+msgid ""
+"The mail report provides an overview of the compliance checks associated "
+"with e-mail servers. The current compliance check the presence of SPF, DKIM "
+"and DMARC records. The table below shows for each of these checks how many "
+"of the identified mail servers are compliant, and if applicable a compliance "
+"issue description and risk level. The risk level may be different for your "
+"specific environment."
+msgstr ""
 
 #: reports/report_types/mail_report/report.html
 msgid "Mailserver compliance:"
@@ -3722,7 +3227,7 @@ msgid "services are compliant"
 msgstr "services zijn compliant"
 
 #: reports/report_types/multi_organization_report/introduction.html
-#: reports/templates/generate_report.html
+#: reports/templates/partials/report_header.html
 msgid "Download report"
 msgstr "Download rapport"
 
@@ -3765,6 +3270,17 @@ msgstr " kritieke kwetsbaarheden zijn geïdentificeerd."
 #: reports/report_types/multi_organization_report/ipv6.html
 msgid "IPv6"
 msgstr "IPv6"
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid ""
+"IPv6 includes improvements in security features compared to IPv4. While IPv4 "
+"can implement security measures, IPv6 was designed with security in mind, "
+"and its adoption can contribute to a more secure internet."
+msgstr ""
+"IPv6 bevat verbeteringen van beveiligingsfuncties ten opzichte van IPv4. "
+"Terwijl IPv4 beveiligingsmaatregelen kan implementeren, is IPv6 ontworpen "
+"met beveiliging in het achterhoofd en de implementatie ervan kan bijdragen "
+"aan een veiliger internet."
 
 #: reports/report_types/multi_organization_report/ipv6.html
 msgid "In total "
@@ -3813,10 +3329,6 @@ msgid "Overview of recommendations"
 msgstr "Overzicht van aanbevelingen"
 
 #: reports/report_types/multi_organization_report/recommendations.html
-msgid "Recommendation"
-msgstr "Aanbeveling"
-
-#: reports/report_types/multi_organization_report/recommendations.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Occurrence"
 msgstr "Voorval"
@@ -3848,6 +3360,18 @@ msgstr "Kwetsbaarheden gegroepeerd per systeem."
 #: reports/report_types/multi_organization_report/vulnerabilities.html
 msgid "total"
 msgstr "totaal"
+
+#: reports/report_types/name_server_report/report.html
+msgid ""
+"The name server report provides an overview of the compliance checks that "
+"were performed against the identified Domain Name Servers (DNS). The "
+"compliance checks verify the presence and validity of DNSSEC and whether no "
+"unnecessary ports were identified to be open. The table below gives an "
+"overview of the available checks including whether the system passed the "
+"performed checks. The risk level and reasoning as to why an issue was "
+"identified are shown too. The risk level may be different for your specific "
+"environment."
+msgstr ""
 
 #: reports/report_types/name_server_report/report.html
 msgid "Name server compliance:"
@@ -3882,15 +3406,12 @@ msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
 msgid ""
-"See an overview of open ports found. <strong>Bold</strong> open ports are "
-"found through direct scans that the organization performs via OpenKAT. Other "
-"open ports were found outside by OpenKAT itself. Scans with the same "
-"hostnames, ports and IPs are merged."
+"The open ports report provides an overview of the open ports identified on a "
+"system. The ports that are marked as <b>Bold</b> were identified by direct "
+"scans performed by OpenKAT (such as nmap). Ports that are not marked in bold "
+"were identified through external services and/or scans (such as Shodan). "
+"Scans with the same hostnames, ports and IPs are merged."
 msgstr ""
-"Bekijk een overzicht van gevonden open poorten. <strong>Vetgedrukte</strong> "
-"open poorten zijn gevonden door directe scans die de organisatie uitvoert "
-"via OpenKAT. Andere open poorten werden door OpenKAT zelf gevonden. Scans "
-"met dezelfde hostnamen, poorten en IP's zijn samengevoegd."
 
 #: reports/report_types/open_ports_report/report.html
 msgid "Overview of open ports found for the scanned assets."
@@ -3918,6 +3439,12 @@ msgid "Find open ports of IP addresses"
 msgstr "Zoek open poorten van IP-adressen"
 
 #: reports/report_types/rpki_report/report.html
+msgid ""
+"The RPKI report shows if an RPKI route announcement was available for the "
+"system and if this announcement is not expired."
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
 msgid "RPKI compliance:"
 msgstr "RPKI compliance:"
 
@@ -3937,6 +3464,11 @@ msgstr "RPKI-record is ongeldig."
 msgid "RPKI record does not exist."
 msgstr "RPKI-record bestaat niet."
 
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+msgid "No IPs have been found on this system."
+msgstr ""
+
 #: reports/report_types/rpki_report/report.py
 msgid "RPKI Report"
 msgstr "RPKI rapport"
@@ -3950,8 +3482,14 @@ msgstr ""
 "ip adressen en gekoppeld zijn en de bijbehorende RPKI status."
 
 #: reports/report_types/safe_connections_report/report.html
-msgid "Safe Connections"
-msgstr "Veilige verbindingen"
+msgid ""
+"The secure connections report provides an overview of the performed checks "
+"with regard to encrypted communication channels such as HTTPS. The table "
+"below gives an overview of the available checks including whether the system "
+"passed the performed checks. The risk level and reasoning as to why an issue "
+"was identified are shown too. The risk level may be different for your "
+"specific environment."
+msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
 msgid "Safe connections compliance:"
@@ -3966,8 +3504,22 @@ msgid "Shows whether the IPService contains safe ciphers."
 msgstr "Laat zien of de IPService veilige versleutelingen gebruikt."
 
 #: reports/report_types/systems_report/report.html
+msgid ""
+"The system report provides an overview of the system types (types of similar "
+"services) that were identified for each system. The following system types "
+"can be identified: DNS servers, Web servers, Mail servers and those "
+"classified as 'Other' servers. Each hostname and/or IP address is given one "
+"or more system types depending on the identified ports and services. The "
+"table below gives an overview of these results."
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
 msgid "Selected assets:"
 msgstr "Geselecteerde assets:"
+
+#: reports/report_types/systems_report/report.html
+msgid "No system types have been identified on this system."
+msgstr ""
 
 #: reports/report_types/systems_report/report.py
 msgid "System Report"
@@ -3976,6 +3528,18 @@ msgstr "Systeemrapport"
 #: reports/report_types/systems_report/report.py
 msgid "Combine IP addresses, hostnames and services into systems."
 msgstr "Combineer IP-adressen, hostnamen en services in systemen."
+
+#: reports/report_types/tls_report/report.html
+msgid ""
+"The TLS report shows which TLS protocols and ciphers were identified on the "
+"host for the provided port."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid ""
+"The table below provides an overview of the identified TLS protocols and "
+"ciphers, including a status suggestion."
+msgstr ""
 
 #: reports/report_types/tls_report/report.html
 msgid "Ciphers:"
@@ -4017,22 +3581,16 @@ msgid "Good"
 msgstr "Goed"
 
 #: reports/report_types/tls_report/report.html
-msgid "No ciphers found for this IPService"
-msgstr "Geen Ciphers gevonden voor deze IPService"
+msgid ""
+"No ciphers were found for this combination of IP address, port and service."
+msgstr ""
 
 #: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr "Bevindingen"
+msgid ""
+"The list below gives an overview of the findings based on the identified TLS "
+"protocols and ciphers. This includes the reasoning why the cipher or "
+"protocol is marked as a finding."
+msgstr ""
 
 #: reports/report_types/tls_report/report.py
 msgid "TLS Report"
@@ -4047,40 +3605,24 @@ msgstr ""
 "transportprotocollen."
 
 #: reports/report_types/vulnerability_report/report.html
+msgid ""
+"The vulnerability report provides an overview of all identified CVE "
+"vulnerabilities that were identified on the selected systems. For each CVE "
+"the table shows the CVE scoring, the number of occurrences, and the CVE "
+"details."
+msgstr ""
+
+#: reports/report_types/vulnerability_report/report.html
 msgid "Vulnerabilities:"
 msgstr "Kwetsbaarheden:"
 
 #: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Occurrences"
-msgstr "Voorvallen"
-
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Close details"
-msgstr "Sluit details"
-
-#: reports/report_types/vulnerability_report/report.html
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/task_history.html
-#: rocky/templates/tasks/partials/boefje_task_history.html
-#: rocky/templates/tasks/partials/normalizer_task_history.html
-msgid "Open details"
-msgstr "Details openen"
-
-#: reports/report_types/vulnerability_report/report.html
 msgid "Advice"
 msgstr "Advies"
+
+#: reports/report_types/vulnerability_report/report.html
+msgid "No vulnerabilities have been found on this system."
+msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Vulnerability Report"
@@ -4098,16 +3640,22 @@ msgid "Source"
 msgstr "Bron"
 
 #: reports/report_types/vulnerability_report/report.py
-msgid "First seen"
-msgstr "Eerst gezien"
-
-#: reports/report_types/vulnerability_report/report.py
 msgid "Last seen"
 msgstr "Laatst gezien"
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Evidence"
 msgstr "Bewijs"
+
+#: reports/report_types/web_system_report/report.html
+msgid ""
+"The web system report provides an overview of various web server checks that "
+"were performed against the scanned system(s). For each performed check the "
+"table below shows whether or not the server is compliant with the checks. A "
+"description of why this compliant check failed is also shown, including an "
+"general risk level. The risk level may be different for your specific "
+"environment."
+msgstr ""
 
 #: reports/report_types/web_system_report/report.html
 msgid "Web system compliance:"
@@ -4161,34 +3709,36 @@ msgstr ""
 
 #: reports/templates/generate_report.html
 #: reports/templates/generate_report_pdf.html
+#: reports/templates/partials/generate_report_sidemenu.html
 msgid "for"
 msgstr "voor"
+
+#: reports/templates/partials/generate_report_sidemenu.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Table of contents"
+msgstr "Inhoudsopgave"
 
 #: reports/templates/partials/main_navigation.html
 msgid "Overview of reports"
 msgstr "Overzicht van rapporten"
 
 #: reports/templates/partials/report_header.html
-msgid "Report for organization"
-msgstr "Rapport voor organisatie"
+msgid "OpenKAT Report"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid ""
+"All selected report types for the selected objects are displayed one below "
+"the other."
+msgstr ""
 
 #: reports/templates/partials/report_introduction.html
 msgid ""
-"Through a systematic examination of the network's infrastructure, the scan "
-"has identified potential security weaknesses and points of exposure. "
-"Additionally, the report offers actionable recommendations and prioritizes "
-"remediation steps to fortify the network's defenses against potential "
-"threats. This invaluable assessment serves as a roadmap for enhancing "
-"network security, ensuring the confidentiality, integrity, and availability "
-"of critical data and resources."
+"This report gives an overview of the current state of security for your "
+"organisation for the selected date. The summary section provides an overview "
+"of the selected systems (objects), plugins and reports. This is followed "
+"with the findings for each report."
 msgstr ""
-"Door een systematisch onderzoek van de infrastructuur van het netwerk, heeft "
-"de scan potentiële beveiligingsrisico's en punten van blootstelling "
-"geïdentificeerd. Het rapport biedt actieve aanbevelingen en prioriteiten om "
-"de verdediging van het netwerk te versterken tegen potentiële bedreigingen. "
-"Deze onmisbare beoordeling dient als een routekaart voor het verbeteren van "
-"netwerkbeveiliging, de vertrouwelijkheid, integriteit, en beschikbaarheid "
-"van kritische data en middelen."
 
 #: reports/templates/partials/report_navigation.html
 msgid "Report Navigation"
@@ -4322,6 +3872,14 @@ msgid "This report type requires the following plugins to be enabled:"
 msgstr "Dit rapport vereist dat de volgende plug-ins ingeschakeld zijn:"
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All required plugins are enabled."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Suggested plugins"
+msgstr "Aangeraden plug-ins"
+
+#: reports/templates/partials/report_setup_scan.html
 msgid ""
 "This report requires at least one of the following plugins to be enabled to "
 "generate the report:"
@@ -4330,14 +3888,23 @@ msgstr ""
 "is om het rapport te genereren:"
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All suggested plugins are enabled"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 #: reports/views/generate_report.py
-#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Generate report"
 msgstr "Rapport Genereren"
 
-#: reports/templates/partials/report_sidemenu.html
-msgid "Table of contents"
-msgstr "Inhoudsopgave"
+#: reports/templates/partials/report_severity_totals.html
+#: reports/templates/partials/report_severity_totals_table.html
+msgid "Findings overview"
+msgstr ""
+
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/partials/ooi_report_severity_totals_table.html
+msgid "Total per severity overview:"
+msgstr "Overzicht totalen per ernst:"
 
 #: reports/templates/partials/report_sidemenu.html
 #: rocky/templates/oois/ooi_page_tabs.html
@@ -4347,6 +3914,11 @@ msgstr "Overzicht"
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
 msgstr "Geselecteerde Objecten"
+
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/selected_plugins.html
+msgid "Selected Plugins"
+msgstr "Geselecteerde Plug-ins"
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Used Config Objects"
@@ -4394,9 +3966,37 @@ msgstr "Alle rapporten die beschikbaar zijn voor uw selectie."
 msgid "Toggle all report types"
 msgstr "Selecteer alle rapporttypes"
 
-#: reports/templates/summary/report_summary.html
-msgid "Selected Plugins for scans"
-msgstr "Geselecteerde plug-ins voor scans"
+#: reports/templates/summary/report_asset_overview.html
+msgid ""
+"The objects listed in the table below were used to generate this report. For "
+"each object in the table it additionally shows the clearance level and "
+"whether or not the object was added by a user ('Declared') or indirectly "
+"identified through another service or system ('Inherited')."
+msgstr ""
+
+#: reports/templates/summary/report_asset_overview.html
+msgid ""
+"The table below shows which reports were chosen to generate this report, "
+"including a report description."
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid ""
+"The table below shows all required or optional plugins for the selected "
+"reports."
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin enabled"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin options"
+msgstr "Plug-in opties"
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin scan level"
+msgstr "Plug-in scanniveau"
 
 #: reports/templates/summary/service_health.html
 msgid "Services:"
@@ -4431,9 +4031,9 @@ msgid "Select at least one report type to proceed."
 msgstr "Selecteer minstens één rapporttype om door te gaan."
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#, python-format
 msgid ""
-"No data could be found for %(oois)s. Object(s) did not exist on %(date)s."
+"No data could be found for %(report_types). Object(s) did not exist on "
+"%(date)s."
 msgstr ""
 
 #: reports/views/base.py
@@ -4442,10 +4042,10 @@ msgid "Report type '%s' does not exist."
 msgstr ""
 
 #: reports/views/generate_report.py
-msgid "This report may not show all the data as some plugins are not enabled."
+msgid ""
+"This report may not show all the data as some required plugins are not "
+"enabled."
 msgstr ""
-"Dit rapport toont misschien niet alle gegevens als sommige plug-ins niet "
-"geactiveerd zijn."
 
 #: reports/views/multi_report.py
 msgid "Multi report"
@@ -4462,13 +4062,6 @@ msgstr "Datum"
 #: tools/forms/base.py
 msgid "The selected date is in the future. Please select a different date."
 msgstr ""
-
-#: tools/forms/boefje.py
-msgid ""
-"Not all required boefjes are selected. Please select all required boefjes."
-msgstr ""
-"Niet alle benodigde boefjes zijn geselecteerd. Selecteer alle benodigde "
-"boefjes."
 
 #: tools/forms/finding_type.py
 msgid "KAT-ID"
@@ -4846,6 +4439,18 @@ msgstr ""
 "minimaal een vrijwaring niveau van L{} nodig om een correcte onboarding uit "
 "te voeren. Bewerk dit lid en wijzig indien nodig het vrijwaringsniveau."
 
+#: rocky/paginator.py
+msgid "That page number is not an integer"
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page number is less than 1"
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page contains no results"
+msgstr ""
+
 #: rocky/scheduler.py
 msgid "Connectivity issues with Mula."
 msgstr "Verbindingsproblemen met Mula."
@@ -5208,13 +4813,6 @@ msgstr "Bevindingstype"
 #: rocky/templates/partials/findings_list_toolbar.html
 msgid "Add finding"
 msgstr "Bevinding toevoegen"
-
-#: rocky/templates/findings/finding_add.html
-#: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding"
-msgstr "Bevinding"
 
 #: rocky/templates/findings/finding_list.html
 msgid "Findings @ "
@@ -6109,8 +5707,8 @@ msgid "graph"
 msgstr "graaf"
 
 #: rocky/templates/partials/explanations.html
-msgid "Clearance level inheritance"
-msgstr "Overerving op vrijwaringsniveau"
+msgid "Clearance level inheritance:"
+msgstr ""
 
 #: rocky/templates/partials/explanations.html
 msgid "OOI"
@@ -6277,6 +5875,10 @@ msgid "Use the button below to add a related object. "
 msgstr "Gebruik de knop hier onder om een gerelateerd object toe te voegen. "
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
+msgid "Generate findings report"
+msgstr ""
+
+#: rocky/templates/partials/ooi_detail_toolbar.html
 msgid "Mute Finding"
 msgstr "Bevinding dempen"
 
@@ -6350,10 +5952,6 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total occurrences"
 msgstr "Totaal aantal voorvallen"
-
-#: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total per severity overview:"
-msgstr "Overzicht totalen per ernst:"
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Unique"
@@ -7272,29 +6870,6 @@ msgid "Recalculated {number_of_bits} bits. Duration: {duration}"
 msgstr "Herberekend {number_of_bits} bits. Duur: {duration}"
 
 #: rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                         "
-"Indemnification not present at organization %s."
-msgstr ""
-"Kon vrijwaringsniveau van %s niet verhogen naar L%s.Vrijwaring niet aanwezig "
-"bij organisatie %s."
-
-#: rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level below to proceed."
-msgstr ""
-"Kan vrijwaringsniveau van %s niet verhogen naar L%s. U hebt een "
-"vrijwaringsniveau bevestigd van L%s. Accepteer het vrijwaringsniveau "
-"onderaan de pagina om verder te gaan."
-
-#: rocky/views/scan_profile.py
-msgid "Choose a valid level"
-msgstr "Kies een geldig niveau"
-
-#: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
 msgstr ""
@@ -7351,12 +6926,597 @@ msgstr "Objecten succesvol toegevoegd."
 
 #: rocky/views/upload_raw.py
 #, python-format
-msgid "Raw file could not be uploaded to Bytes: status code %s"
-msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
+msgid "Raw file could not be uploaded to Bytes: status code %d"
+msgstr ""
+
+#: rocky/views/upload_raw.py
+#, python-format
+msgid "Raw file could not be uploaded to Bytes: %s"
+msgstr ""
 
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Ruw bestand succesvol toegevoegd."
+
+#, python-format
+#~ msgid ""
+#~ "Could not raise clearance level of %s to L%s.                             "
+#~ "Indemnification not present at organization %s."
+#~ msgstr ""
+#~ "Kon vrijwaringsniveau van %s niet verhogen naar L%s.Vrijwaring op "
+#~ "organisatie %s niet aanwezig."
+
+#~ msgid "DNS Zone"
+#~ msgstr "DNS Zone"
+
+#~ msgid ""
+#~ "OpenKAT added the following required object to your object list to "
+#~ "complete your request: {}"
+#~ msgstr ""
+#~ "OpenKAT heeft het volgende vereiste object toegevoegd aan uw objectlijst "
+#~ "om uw verzoek te voltooien: {}"
+
+#, python-format
+#~ msgid ""
+#~ "Could not raise clearance level of %s to L%s.                 "
+#~ "Indemnification not present at organization %s."
+#~ msgstr ""
+#~ "Kon vrijwaringsniveau van %s niet verhogen naar L%s. Vrijwaring niet "
+#~ "aanwezig bij organisatie %s."
+
+#~ msgid ""
+#~ "The table below gives an overview of the DNS records that were found for "
+#~ "the abovementioned DNSZone."
+#~ msgstr ""
+#~ "De tafel hier onder geeft een overzicht van de DNS-gegevens die zijn "
+#~ "gevonden voor de hier boven genoemde DNSZone."
+
+#~ msgid ""
+#~ "See an overview of open ports found. <strong>Bold</strong> open ports are "
+#~ "found through direct scans that the organization performs via OpenKAT. "
+#~ "Other open ports were found outside by OpenKAT itself. Scans with the "
+#~ "same hostnames, ports and IPs are merged."
+#~ msgstr ""
+#~ "Bekijk een overzicht van gevonden open poorten. <strong>Vetgedrukte</"
+#~ "strong> open poorten zijn gevonden door directe scans die de organisatie "
+#~ "uitvoert via OpenKAT. Andere open poorten werden door OpenKAT zelf "
+#~ "gevonden. Scans met dezelfde hostnamen, poorten en IP's zijn samengevoegd."
+
+#~ msgid "Safe Connections"
+#~ msgstr "Veilige verbindingen"
+
+#~ msgid "No ciphers found for this IPService"
+#~ msgstr "Geen Ciphers gevonden voor deze IPService"
+
+#~ msgid "Report for organization"
+#~ msgstr "Rapport voor organisatie"
+
+#~ msgid ""
+#~ "Through a systematic examination of the network's infrastructure, the "
+#~ "scan has identified potential security weaknesses and points of exposure. "
+#~ "Additionally, the report offers actionable recommendations and "
+#~ "prioritizes remediation steps to fortify the network's defenses against "
+#~ "potential threats. This invaluable assessment serves as a roadmap for "
+#~ "enhancing network security, ensuring the confidentiality, integrity, and "
+#~ "availability of critical data and resources."
+#~ msgstr ""
+#~ "Door een systematisch onderzoek van de infrastructuur van het netwerk, "
+#~ "heeft de scan potentiële beveiligingsrisico's en punten van blootstelling "
+#~ "geïdentificeerd. Het rapport biedt actieve aanbevelingen en prioriteiten "
+#~ "om de verdediging van het netwerk te versterken tegen potentiële "
+#~ "bedreigingen. Deze onmisbare beoordeling dient als een routekaart voor "
+#~ "het verbeteren van netwerkbeveiliging, de vertrouwelijkheid, integriteit, "
+#~ "en beschikbaarheid van kritische data en middelen."
+
+#~ msgid "Selected Plugins for scans"
+#~ msgstr "Geselecteerde plug-ins voor scans"
+
+#~ msgid ""
+#~ "This report may not show all the data as some plugins are not enabled."
+#~ msgstr ""
+#~ "Dit rapport toont misschien niet alle gegevens als sommige plug-ins niet "
+#~ "geactiveerd zijn."
+
+#~ msgid ""
+#~ "Not all required boefjes are selected. Please select all required boefjes."
+#~ msgstr ""
+#~ "Niet alle benodigde boefjes zijn geselecteerd. Selecteer alle benodigde "
+#~ "boefjes."
+
+#~ msgid "Clearance level inheritance"
+#~ msgstr "Overerving op vrijwaringsniveau"
+
+#, python-format
+#~ msgid ""
+#~ "Could not raise clearance level of %s to L%s.                         "
+#~ "Indemnification not present at organization %s."
+#~ msgstr ""
+#~ "Kon vrijwaringsniveau van %s niet verhogen naar L%s.Vrijwaring niet "
+#~ "aanwezig bij organisatie %s."
+
+#, python-format
+#~ msgid ""
+#~ "Could not raise clearance level of %s to L%s. You acknowledged a "
+#~ "clearance level of L%s. Please accept the clearance level below to "
+#~ "proceed."
+#~ msgstr ""
+#~ "Kan vrijwaringsniveau van %s niet verhogen naar L%s. U hebt een "
+#~ "vrijwaringsniveau bevestigd van L%s. Accepteer het vrijwaringsniveau "
+#~ "onderaan de pagina om verder te gaan."
+
+#~ msgid "Choose a valid level"
+#~ msgstr "Kies een geldig niveau"
+
+#, python-format
+#~ msgid "Raw file could not be uploaded to Bytes: status code %s"
+#~ msgstr "Het ruw bestand kon niet geupload worden naar Bytes: status code %s"
+
+#~ msgid "Failure mode"
+#~ msgstr "Faalmodus"
+
+#~ msgid "Frequency Level"
+#~ msgstr "Frequentieniveau"
+
+#~ msgid "Detectability Level"
+#~ msgstr "Detecteerbaarheidsnivo"
+
+#~ msgid "Effect(s)"
+#~ msgstr "Effect(en)"
+
+#~ msgid "Describe in one sentence what type of failure mode you are creating."
+#~ msgstr "Beschrijf in één zin welke type bevinding u wilt maken."
+
+#~ msgid "Describe the failure mode in details."
+#~ msgstr "Omschrijf de bevinding."
+
+#~ msgid ""
+#~ "From 1 to 5, how often does this failure mode occurs. 1: Almost "
+#~ "unthinkable and 5: occurs daily."
+#~ msgstr ""
+#~ "Hoe vaak komt de foutmodus voor, op een schaal van 1 tot 5. 1: Bijna "
+#~ "ondenkbaar en 5: dagelijks."
+
+#~ msgid ""
+#~ "Is this failure mode easy detectable? Give it a score from 1 to 5. 1: "
+#~ "always detectable and 5: almost undetectable."
+#~ msgstr ""
+#~ "Is deze bevinding eenvoudig te detecteren? Geef het een score van 1 tot "
+#~ "5. 1: altijd te detecteren en 5: bijna niet te detecteren."
+
+#~ msgid "Describe the type of failure mode"
+#~ msgstr "Beschrijf het type bevinding"
+
+#~ msgid "explanation-failure-mode"
+#~ msgstr "uitleg-failure-mode"
+
+#~ msgid "Describe in more detail what the failure mode is about."
+#~ msgstr "Beschrijf in meer detail waar het om gaat."
+
+#~ msgid "explanation-description"
+#~ msgstr "uitleg-omschrijving"
+
+#~ msgid "explanation-frequency-level"
+#~ msgstr "uitleg-frequency-level"
+
+#~ msgid "explanation-detectability_level"
+#~ msgstr "uitleg-detectability_level"
+
+#~ msgid "You must at least set a failure mode."
+#~ msgstr "Je moet tenminste een faal modus zetten."
+
+#~ msgid "Choose a frequency level."
+#~ msgstr "Kies een frequentieniveau."
+
+#~ msgid "Choose a detectability level."
+#~ msgstr "Kies een detectieniveau."
+
+#~ msgid "Choose at least one effect."
+#~ msgstr "Kies ten minste één effect."
+
+#~ msgid "Affected Department"
+#~ msgstr "Betrokken afdeling"
+
+#~ msgid "Affected Objects"
+#~ msgstr "Betrokken objecten"
+
+#~ msgid "Choose a failure mode which applies to "
+#~ msgstr "Kies een bevinding die van toepassing is op "
+
+#~ msgid "When this failure mode occurs, which department is affected?"
+#~ msgstr "Als de bevinding plaatsvindt, welke afdeling is dan betrokken?"
+
+#~ msgid "Which objects does this failure mode affect when it occurs?"
+#~ msgstr "Welke objecten hebben met de bevinding te maken als het gebeurd?"
+
+#~ msgid "explanation-affected-ooi-type"
+#~ msgstr "uitleg-affected-ooi-type"
+
+#~ msgid "Effect"
+#~ msgstr "Effect"
+
+#~ msgid "Severity Level"
+#~ msgstr "Beveiligingsnivo"
+
+#~ msgid "Name a possible effect of any type of failure mode that can occur."
+#~ msgstr "Geef een voorbeeld van een mogelijk effect van de bevinding."
+
+#~ msgid ""
+#~ "Describe the severity of this effect ex. 1: not severe and 5: catastrophic"
+#~ msgstr ""
+#~ "Beschrijf de ernst van het effect. 1: niet ernstig en 5: catastrofaal"
+
+#~ msgid "Describe a possible effect for FMEA"
+#~ msgstr "Beschrijf een mogelijk effect voor FMEA"
+
+#~ msgid "explanation-effect"
+#~ msgstr "uitleg-effect"
+
+#~ msgid "explanation-severity-level"
+#~ msgstr "uitleg-severity-level"
+
+#~ msgid "The effect is required."
+#~ msgstr "Het effect is vereist."
+
+#~ msgid "This effect already exists."
+#~ msgstr "Dit effect bestaat al."
+
+#~ msgid "Choose a severity level."
+#~ msgstr "Kies een ernstigheidsniveau."
+
+#~ msgid "Finances"
+#~ msgstr "Financiële situatie"
+
+#~ msgid "Marketing"
+#~ msgstr "Marketing"
+
+#~ msgid "Human Resources"
+#~ msgstr "Personeelszaken"
+
+#~ msgid "Research & Development"
+#~ msgstr "Onderzoek & Ontwikkeling"
+
+#~ msgid "Administration"
+#~ msgstr "Administratie"
+
+#~ msgid "Level 1: Not Severe"
+#~ msgstr "Niveau 1: Niet ernstig"
+
+#~ msgid "Level 2: Harmful"
+#~ msgstr "Niveau 2: Schadelijk"
+
+#~ msgid "Level 3: Severe"
+#~ msgstr "Niveau 3: Ernstig"
+
+#~ msgid "Level 4: Very Harmful"
+#~ msgstr "Niveau 4: Zeer schadelijk"
+
+#~ msgid "Level 5: Catastrophic"
+#~ msgstr "Niveau 5: Katastrofaal"
+
+#~ msgid ""
+#~ "Level 1: Very Rare. Incident (almost) never occurs, almost unthinkable."
+#~ msgstr ""
+#~ "Niveau 1: Zeer zeldzaam. Incident komt (bijna) nooit voor, bijna "
+#~ "ondenkbaar."
+
+#~ msgid "Level 2: Rare. Incidents occur less than once a year (3-5)."
+#~ msgstr ""
+#~ "Niveau 2: Zeldzaam. Incidenten komen minder dan één keer per jaar (3-5) "
+#~ "voor."
+
+#~ msgid "Level 3: Occurs. Incidents occur several times a year."
+#~ msgstr ""
+#~ "Niveau 3: Doet zich voor. Incidenten vinden meerdere keren per jaar "
+#~ "plaats."
+
+#~ msgid "Level 4: Regularly. Incidents occur weekly."
+#~ msgstr "Niveau 4: Regelmatig. Er vinden wekelijks incidenten plaats."
+
+#~ msgid "Level 5: Frequent. Incidents occur daily."
+#~ msgstr "Niveau 5: Frequent. Incidenten komen dagelijks voor."
+
+#~ msgid ""
+#~ "Level 1: Always Detectable. Incident (almost) never occurs, almost "
+#~ "unthinkable."
+#~ msgstr ""
+#~ "Niveau 1: altijd detecteerbaar. Incident komt (bijna) nooit voor, bijna "
+#~ "ondenkbaar."
+
+#~ msgid ""
+#~ "Level 2: Usually Detectable. Incidents occur less than once a year (3-5)."
+#~ msgstr ""
+#~ "Niveau 2: Meestal detecteerbaar. Incidenten komen minder dan één keer per "
+#~ "jaar (3-5) voor."
+
+#~ msgid "Level 3: Detectable. Failure mode is detectable with effort."
+#~ msgstr "Niveau 3: Detecteerbaar. De foutmodus is met moeite detecteerbaar."
+
+#~ msgid "Level 4: Poorly Detectable. Detecting the failure mode is difficult."
+#~ msgstr ""
+#~ "Niveau 4: Slecht detecteerbaar. Het detecteren van de foutmodus is "
+#~ "moeilijk."
+
+#~ msgid ""
+#~ "Level 5: Almost Undetectable. Failure mode detection is very difficult or "
+#~ "nearly impossible."
+#~ msgstr ""
+#~ "Niveau 5: Bijna niet detecteerbaar. Detectie van foutmodus is erg "
+#~ "moeilijk of bijna onmogelijk."
+
+#~ msgid "Failure modes"
+#~ msgstr "Faalmodi"
+
+#~ msgid "Failure Mode Affected Objects"
+#~ msgstr "Objecten beinvloed door de foutmodus"
+
+#~ msgid "FMEA Departments Heatmap:"
+#~ msgstr "FMEA Afdelingen Heatmap:"
+
+#~ msgid "No data to build heatmap"
+#~ msgstr "Geen gegevens om heatmap te bouwen"
+
+#~ msgid "Failure mode affected object table:"
+#~ msgstr "Faal modus getroffen objecten tabel:"
+
+#~ msgid "Affected Object"
+#~ msgstr "Betrokken object"
+
+#~ msgid "Failure mode affected objects cannot be found."
+#~ msgstr "Faal modus getroffen objecten kan niet gevonden worden."
+
+#~ msgid "Define which objects are affected for a failure mode"
+#~ msgstr "Definiëren welke objecten worden beïnvloed voor een foutmodus"
+
+#~ msgid "Failure mode affected objects"
+#~ msgstr "Beïnvloedde objecten"
+
+#~ msgid "Save"
+#~ msgstr "Opslaan"
+
+#~ msgid "No failure mode yet defined."
+#~ msgstr "Er is nog geen storing gedefinieerd."
+
+#~ msgid "To add affected objects to a failure mode, first create one."
+#~ msgstr ""
+#~ "Om betrokken objecten toe te voegen aan een foutmodus, maakt u er eerst "
+#~ "een aan."
+
+#~ msgid "Create failure mode"
+#~ msgstr "Maak faal modus"
+
+#~ msgid "Failure mode affected objects table:"
+#~ msgstr "Tabel met getroffen objecten:"
+
+#~ msgid "No failure mode affected objects yet defined."
+#~ msgstr "Er zijn nog geen objecten met een storing gedefinieerd."
+
+#~ msgid "Create failure mode Affected Objects"
+#~ msgstr "Maak aan faal modus getroffen objecten"
+
+#~ msgid "Departments failure modes"
+#~ msgstr "Afdeling faalmodi"
+
+#~ msgid "Failure modes and affected departments table:"
+#~ msgstr "Faalmodi en geraakte afdelingentabel:"
+
+#~ msgid "Failure Mode"
+#~ msgstr "Faal modus"
+
+#~ msgid "Affected Departments"
+#~ msgstr "Betrokken afdelingen"
+
+#~ msgid "Nothing found."
+#~ msgstr "Geen resultaten."
+
+#~ msgid "Failure mode properties"
+#~ msgstr "Faal modus eigenschappen"
+
+#~ msgid "Properties"
+#~ msgstr "Eigenschappen"
+
+#~ msgid "Risk class"
+#~ msgstr "Risiconiveau"
+
+#~ msgid "Frequency level"
+#~ msgstr "Frequency niveau"
+
+#~ msgid "Detectability level"
+#~ msgstr "Detecteerbaarheidsniveau"
+
+#~ msgid ""
+#~ "\n"
+#~ "                        Effect and severity level\n"
+#~ "                        "
+#~ msgid_plural ""
+#~ "\n"
+#~ "                        Effects and severity levels\n"
+#~ "                      "
+#~ msgstr[0] ""
+#~ "\n"
+#~ "                        Niveau van gevolg en ernstigheid\n"
+#~ "                        "
+#~ msgstr[1] ""
+#~ "\n"
+#~ "                        Niveau van gevolgen en ernstigheid\n"
+#~ "                      "
+
+#~ msgid "Failure mode effect"
+#~ msgstr "Faalmodus effect"
+
+#~ msgid "Failure mode effect properties"
+#~ msgstr "Faalmodus effect eigenschappen"
+
+#~ msgid "FMEA effect and severity"
+#~ msgstr "FMEA-effect en ernst"
+
+#~ msgid "FMEA effect"
+#~ msgstr "FMEA effect"
+
+#~ msgid "Failure mode effects table:"
+#~ msgstr "Faalmodus effecten tabel:"
+
+#~ msgid "Severity level"
+#~ msgstr "Ernstnivo"
+
+#~ msgid "No failure mode effect yet defined."
+#~ msgstr "Nog geen faalmodus gedefinieerd."
+
+#~ msgid "Create a failure mode effect"
+#~ msgstr "Voeg een faalmodus effect toe"
+
+#~ msgid "Create a new failure mode"
+#~ msgstr "Creëer een nieuwe faalmodus"
+
+#~ msgid "Failure mode and effects"
+#~ msgstr "Foutmodus en gevolgen"
+
+#~ msgid "No failure mode effects created."
+#~ msgstr "Geen faalmodus effecten gecreëerd."
+
+#~ msgid ""
+#~ "First create failure mode effects which can be added later to a failure "
+#~ "mode."
+#~ msgstr ""
+#~ "Maak eerst faalmodus-effecten die later aan een faalmodus kunnen worden "
+#~ "toegevoegd."
+
+#~ msgid "Create failure mode effects"
+#~ msgstr "Faalmodus-effecten maken"
+
+#~ msgid "Failure mode table:"
+#~ msgstr "Faalmodustabel:"
+
+#~ msgid "Risk Class"
+#~ msgstr "Risicoklasse"
+
+#~ msgid "Sluit details"
+#~ msgstr "Details sluiten"
+
+#~ msgid "Description:"
+#~ msgstr "Omschrijving:"
+
+#~ msgid "Frequency level:"
+#~ msgstr "Frequentieniveau:"
+
+#~ msgid "Detectability level:"
+#~ msgstr "Detecteerbaarheidsniveau:"
+
+#~ msgid ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffect and severity level\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgid_plural ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEffects and severity levels\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgstr[0] ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNiveau van gevolg en ernstigheidl\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+#~ msgstr[1] ""
+#~ "\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tNiveau van gevolgen en ernstigheid\n"
+#~ "\t\t\t\t\t\t\t\t\t\t\t\t\t\t"
+
+#~ msgid "Failure mode report"
+#~ msgstr "Foutmodus rapport"
+
+#~ msgid "Failure mode: "
+#~ msgstr "Foutmodus: "
+
+#~ msgid "Severity: "
+#~ msgstr "Ernst: "
+
+#~ msgid "Detectability: "
+#~ msgstr "Detecteerbaarheid: "
+
+#~ msgid "Frequency: "
+#~ msgstr "Frequentie: "
+
+#~ msgid "Effect: "
+#~ msgstr "Effect: "
+
+#~ msgid "Description: "
+#~ msgstr "Omschrijving: "
+
+#~ msgid "Affected Departments: "
+#~ msgstr "Getroffen afdelingen: "
+
+#~ msgid "Affected OOI's: "
+#~ msgstr "Getroffen objecten: "
+
+#~ msgid "Report cannot be viewed, failure mode not found."
+#~ msgstr "Rapport kan niet worden bekeken, storingsmodus niet gevonden."
+
+#~ msgid "FMEA introduction"
+#~ msgstr "FMEA introductie"
+
+#~ msgid ""
+#~ "FMEA (failure mode and effective analysis) is a step-by-step approach for "
+#~ "collecting knowledge about possible points of failure in a design, "
+#~ "manufacturing process, product or service."
+#~ msgstr ""
+#~ "FMEA (foutmodus en effectieve analyse) is een stapsgewijze aanpak voor "
+#~ "kennis verzamelen over mogelijke faalpunten in een ontwerp, "
+#~ "productieproces, product of dienst."
+
+#~ msgid ""
+#~ "Failure mode (FM) refers to the way in which something might break down "
+#~ "and includes potential errors that may occur, especially errors that may "
+#~ "affect a system. Effective analysis (EA) involves deciphering the "
+#~ "consequences of those break downs by making sure that all failures can be "
+#~ "detected, determining how frequently a failure might occur and "
+#~ "identifying which potential failures should be prioritized."
+#~ msgstr ""
+#~ "Failure mode (FM) verwijst naar de manier waarop iets kapot kan gaan en "
+#~ "omvat mogelijke fouten die kunnen optreden, met name fouten die van "
+#~ "invloed kunnen zijn op een systeem. Effectieve analyse (EA) omvat het "
+#~ "ontcijferen van de gevolgen van die storingen door ervoor te zorgen dat "
+#~ "alle storingen kunnen worden opgespoord, bepalen hoe vaak een storing kan "
+#~ "optreden en identificeren welke potentiële mislukkingen moeten prioriteit "
+#~ "krijgen."
+
+#~ msgid "Create affected objects of a failure mode"
+#~ msgstr "Maak getroffen objecten van een foutmodus"
+
+#~ msgid "View all failure modes"
+#~ msgstr "Bekijk alle foutmodi"
+
+#~ msgid "View all failure mode effects"
+#~ msgstr "Bekijk alle foutmodus effecten"
+
+#~ msgid "View all affected objects for a failure modes"
+#~ msgstr "Bekijk alle getroffen objecten voor een foutmodus"
+
+#~ msgid "Heatmap"
+#~ msgstr "Heatmap"
+
+#~ msgid "--- Select an option ----"
+#~ msgstr "-- Selecteer een optie --"
+
+#~ msgid "Failure mode affected objects successfully created."
+#~ msgstr "Beinvloedde objecten die zijn aangemaakt."
+
+#~ msgid "Create"
+#~ msgstr "Creëren"
+
+#~ msgid "Treeobjects successfully added."
+#~ msgstr "Boomobjecten succesvol toegevoegd."
+
+#~ msgid "Please select a department or ooi."
+#~ msgstr "Selecteer een afdeling of ooi/object."
+
+#~ msgid "Failure mode successfully created."
+#~ msgstr "Foutmode succesvol aangemaakt."
+
+#~ msgid "Failure mode effect successfully created."
+#~ msgstr "Foutmode-effect succesvol gemaakt."
+
+#~ msgid "FMEA"
+#~ msgstr "FMEA"
+
+#~ msgid "Failure mode effects"
+#~ msgstr "Foutmode-effecten"
 
 #, python-format
 #~ msgid ""

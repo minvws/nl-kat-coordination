@@ -4,7 +4,7 @@ from tools.add_ooi_information import get_info, port_info, service_info
 
 
 def test_port_info(mocker):
-    requests_patch = mocker.patch("tools.add_ooi_information.requests")
+    requests_patch = mocker.patch("tools.add_ooi_information.httpx")
     requests_patch.get().text = (Path(__file__).parent / "stubs" / "wiki.html").read_text()
 
     descriptions, source = port_info("80", "TCP")
@@ -23,7 +23,7 @@ def test_port_info(mocker):
 
 
 def test_service_info(mocker):
-    requests_patch = mocker.patch("tools.add_ooi_information.requests")
+    requests_patch = mocker.patch("tools.add_ooi_information.httpx")
     requests_patch.get().text = (Path(__file__).parent / "stubs" / "iana_service.html").read_text()
 
     description, source = service_info("ssh")

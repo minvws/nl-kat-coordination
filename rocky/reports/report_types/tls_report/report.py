@@ -11,7 +11,11 @@ from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
 
-CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
+CIPHER_FINDINGS = [
+    "KAT-RECOMMENDATION-BAD-CIPHER",
+    "KAT-MEDIUM-BAD-CIPHER",
+    "KAT-CRITICAL-BAD-CIPHER",
+]
 TREE_DEPTH = 3
 
 
@@ -22,10 +26,11 @@ class TLSReport(Report):
     plugins = {"required": ["testssl-sh-ciphers"], "optional": []}
     input_ooi_types = {IPService}
     template_path = "tls_report/report.html"
+    label_style = "3-light"
 
     def generate_data(self, input_ooi: str, valid_time: datetime) -> dict[str, Any]:
-        suites = {}
-        findings = []
+        suites: dict = {}
+        findings: list[Finding] = []
         suites_with_findings = []
         ref = Reference.from_str(input_ooi)
         tree = self.octopoes_api_connector.get_tree(
@@ -40,7 +45,7 @@ class TLSReport(Report):
         for protocol, cipher_suites in suites.items():
             for suite in cipher_suites:
                 for finding in findings:
-                    if suite["cipher_suite_name"] in finding.description:
+                    if finding.description and suite["cipher_suite_name"] in finding.description:
                         suites_with_findings.append(suite["cipher_suite_name"])
 
         return {
