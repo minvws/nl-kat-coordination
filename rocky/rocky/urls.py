@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.urls import include, path
@@ -7,6 +8,7 @@ from tools.viewsets import OrganizationViewSet
 from two_factor.urls import urlpatterns as tf_urls
 
 from rocky.views.bytes_raw import BytesRawView
+from rocky.views.components_library import ComponentsLibraryView
 from rocky.views.finding_add import FindingAddView
 from rocky.views.finding_list import FindingListView
 from rocky.views.finding_type_add import FindingTypeAddView
@@ -62,6 +64,7 @@ urlpatterns = [
     ),
 ]
 urlpatterns += i18n_patterns(
+    path("components-library/", ComponentsLibraryView.as_view(), name="components_library"),
     path("", include("account.urls"), name="account"),
     path("admin/", admin.site.urls),
     path("", LandingPageView.as_view(), name="landing_page"),
@@ -197,3 +200,9 @@ urlpatterns += i18n_patterns(
     path("<organization_code>/kat-alogus/", include("katalogus.urls"), name="katalogus"),
     path("<organization_code>/reports/", include("reports.urls"), name="reports"),
 )
+
+
+if settings.DEBUG:
+    urlpatterns += i18n_patterns(
+        path("components-library/", ComponentsLibraryView.as_view(), name="components_library"),
+    )
