@@ -7,9 +7,16 @@ from pydantic import parse_obj_as
 from boefjes.job_handler import serialize_ooi
 from boefjes.plugins.kat_leakix.normalize import run
 from octopoes.models.types import OOIType
-from tests.loading import get_boefje_meta, get_normalizer_meta
 
 TESTS_PATH = "boefjes/plugins/*/tests/normalizer/*test-input*"
+DEFAULT_INPUT_OOI = {
+    "object_type": "HostnameHTTPURL",
+    "network": "Network|internet",
+    "scheme": "https",
+    "port": 443,
+    "path": "/",
+    "netloc": "Hostname|internet|example.com",
+}
 
 
 class NoOutputFileException(Exception):
@@ -39,32 +46,13 @@ def get_test_files(testpath):
         if Path(ooi_data_filename).is_file():
             input_ooi_data = json.loads(get_dummy_data(ooi_data_filename))
         else:
-            input_ooi_data = None
+            input_ooi_data = DEFAULT_INPUT_OOI
         tests.append((input_data, output_data, input_ooi_data))
     return tests
 
 
-def create_boefje_meta(input_ooi=None):
-    if not input_ooi:
-        input_ooi = {
-            "object_type": "HostnameHTTPURL",
-            "network": "Network|internet",
-            "scheme": "https",
-            "port": 443,
-            "path": "/",
-            "netloc": "Hostname|internet|example.com",
-        }
-    input_ooi_object = parse_obj_as(
-        OOIType,
-        input_ooi,
-    )
-    boefje_meta = get_boefje_meta(input_ooi=input_ooi_object.reference)
-    boefje_meta.arguments["input"] = serialize_ooi(input_ooi_object)
-    return boefje_meta
-
-
-def run_normalizer(boefje_meta, inputdata):
-    return [x for x in run(get_normalizer_meta(boefje_meta), inputdata)]
+def run_normalizer(input_ooi, inputdata):
+    return list(run(input_ooi, inputdata))
 
 
 def pytest_generate_tests(metafunc):
@@ -86,7 +74,7 @@ def field_filter(filters, objectlist):
 
 
 def test_input_output(test_input, expected_output, input_ooi_data):
-    results = set(run_normalizer(create_boefje_meta(input_ooi_data), test_input))
+    results = set(run_normalizer(input_ooi_data, test_input))
     extra_in_given = results - expected_output  # this expects the yielded objects to be hasheable.
     extra_in_expected = expected_output - results
     assert not extra_in_given
