@@ -154,10 +154,7 @@ class BaseOOIFormView(SingleOOIMixin, FormView):
         return form
 
     def get_form_kwargs(self):
-        kwargs = {
-            "ooi_class": self.get_ooi_class(),
-            "connector": self.octopoes_api_connector,
-        }
+        kwargs = {"ooi_class": self.get_ooi_class(), "connector": self.octopoes_api_connector}
         kwargs.update(super().get_form_kwargs())
 
         return kwargs

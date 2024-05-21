@@ -9,8 +9,6 @@ class PrivacyStatementView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["breadcrumbs"] = [
-            {"url": reverse("privacy_statement"), "text": _("Privacy Statement")},
-        ]
+        context["breadcrumbs"] = [{"url": reverse("privacy_statement"), "text": _("Privacy Statement")}]
 
         return context

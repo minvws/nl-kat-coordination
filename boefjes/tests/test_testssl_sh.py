@@ -21,12 +21,7 @@ class TestsslSh(TestCase):
     maxDiff = None
 
     def test_cipherless_service(self):
-        oois = list(
-            run(
-                input_ooi,
-                get_dummy_data("inputs/testssl-sh-cipherless.json"),
-            )
-        )
+        oois = list(run(input_ooi, get_dummy_data("inputs/testssl-sh-cipherless.json")))
 
         # noinspection PyTypeChecker
         expected = []
@@ -34,12 +29,7 @@ class TestsslSh(TestCase):
         self.assertEqual(expected, oois)
 
     def test_ciphered_service(self):
-        oois = list(
-            run(
-                input_ooi,
-                get_dummy_data("inputs/testssl-sh-ciphered.json"),
-            )
-        )
+        oois = list(run(input_ooi, get_dummy_data("inputs/testssl-sh-ciphered.json")))
 
         # noinspection PyTypeChecker
         expected_suites = {

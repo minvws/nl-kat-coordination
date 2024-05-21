@@ -26,19 +26,13 @@ def get_repository(repository_id: str, storage: RepositoryStorage = Depends(get_
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def add_repository(
-    repository: Repository,
-    storage: RepositoryStorage = Depends(get_repository_store),
-):
+def add_repository(repository: Repository, storage: RepositoryStorage = Depends(get_repository_store)):
     with storage as store:
         store.create(repository)
 
 
 @router.delete("/{repository_id}")
-def remove_repository(
-    repository_id: str,
-    storage: RepositoryStorage = Depends(get_repository_store),
-):
+def remove_repository(repository_id: str, storage: RepositoryStorage = Depends(get_repository_store)):
     if repository_id == RESERVED_LOCAL_ID:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "LOCAL repository cannot be deleted")
     with storage as store:

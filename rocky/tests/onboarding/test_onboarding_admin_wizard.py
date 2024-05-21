@@ -52,19 +52,13 @@ def test_onboarding_organization_setup(rf, superuser, adminuser, redteamuser, cl
     assert response_superuser.status_code == 200
 
     with pytest.raises(PermissionDenied):
-        OnboardingOrganizationSetupView.as_view()(
-            setup_request(rf.get("step_organization_setup"), adminuser),
-        )
+        OnboardingOrganizationSetupView.as_view()(setup_request(rf.get("step_organization_setup"), adminuser))
 
     with pytest.raises(PermissionDenied):
-        OnboardingOrganizationSetupView.as_view()(
-            setup_request(rf.get("step_organization_setup"), redteamuser),
-        )
+        OnboardingOrganizationSetupView.as_view()(setup_request(rf.get("step_organization_setup"), redteamuser))
 
     with pytest.raises(PermissionDenied):
-        OnboardingOrganizationSetupView.as_view()(
-            setup_request(rf.get("step_organization_setup"), clientuser),
-        )
+        OnboardingOrganizationSetupView.as_view()(setup_request(rf.get("step_organization_setup"), clientuser))
 
 
 def test_onboarding_organization_update(rf, superuser_member, admin_member, redteam_member, client_member):

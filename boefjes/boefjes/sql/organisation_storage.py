@@ -36,11 +36,7 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
         self.session.add(organisation_in_db)
 
     def add_repository(self, organisation_id: str, repository_id: str) -> None:
-        logger.info(
-            "Adding repository to organisation: %s -> %s",
-            organisation_id,
-            repository_id,
-        )
+        logger.info("Adding repository to organisation: %s -> %s", organisation_id, repository_id)
 
         organisation_in_db = self._db_instance_by_id(organisation_id)
         repo_in_db = self._db_repo_instance_by_id(repository_id)
@@ -76,17 +72,11 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
 
     @staticmethod
     def to_organisation_in_db(organisation: Organisation) -> OrganisationInDB:
-        return OrganisationInDB(
-            id=organisation.id,
-            name=organisation.name,
-        )
+        return OrganisationInDB(id=organisation.id, name=organisation.name)
 
     @staticmethod
     def to_organisation(organisation_in_db: OrganisationInDB) -> Organisation:
-        return Organisation(
-            id=organisation_in_db.id,
-            name=organisation_in_db.name,
-        )
+        return Organisation(id=organisation_in_db.id, name=organisation_in_db.name)
 
 
 def create_organisation_storage(session) -> SQLOrganisationStorage:

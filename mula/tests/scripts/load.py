@@ -16,17 +16,10 @@ def run(org_num: int = 1):
     # Create organisations
     orgs: list[dict[str, Any]] = []
     for n in range(0, org_num):
-        org = {
-            "id": f"org-{n}",
-            "name": f"Organisation {n}",
-        }
+        org = {"id": f"org-{n}", "name": f"Organisation {n}"}
         orgs.append(org)
 
-        resp_katalogus = httpx.post(
-            url=f"{KATALOGUS_API}/v1/organisations/",
-            json=org,
-            timeout=30,
-        )
+        resp_katalogus = httpx.post(url=f"{KATALOGUS_API}/v1/organisations/", json=org, timeout=30)
 
         try:
             resp_katalogus.raise_for_status()
@@ -39,10 +32,7 @@ def run(org_num: int = 1):
                 print("Organisation already exists in katalogus", org)
 
         try:
-            httpx.post(
-                url=f"{OCTOPOES_API}/{org.get('id')}/node/",
-                timeout=30,
-            )
+            httpx.post(url=f"{OCTOPOES_API}/{org.get('id')}/node/", timeout=30)
         except httpx.HTTPError:
             print("Error creating organisation ", org)
             raise

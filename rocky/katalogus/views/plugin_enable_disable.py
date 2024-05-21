@@ -40,11 +40,7 @@ class PluginEnableDisableView(SinglePluginView):
             )
             return redirect(
                 reverse(
-                    "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 )
             )
 
@@ -68,9 +64,7 @@ class PluginEnableDisableView(SinglePluginView):
         if self.plugin.can_scan(self.organization_member):
             self.katalogus_client.enable_boefje(self.plugin)
             messages.add_message(
-                self.request,
-                messages.SUCCESS,
-                _("{} '{}' enabled.").format(self.plugin.type.title(), self.plugin.name),
+                self.request, messages.SUCCESS, _("{} '{}' enabled.").format(self.plugin.type.title(), self.plugin.name)
             )
         else:
             member_clearance_level_text = (
@@ -91,8 +85,7 @@ class PluginEnableDisableView(SinglePluginView):
                 self.request,
                 messages.ERROR,
                 _("To enable {} you need at least a clearance level of L{}. " + member_clearance_level_text).format(
-                    self.plugin.name.title(),
-                    self.plugin.scan_level.value,
+                    self.plugin.name.title(), self.plugin.scan_level.value
                 ),
             )
 

@@ -33,26 +33,14 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
         breadcrumbs += [
-            {
-                "url": reverse("generate_report_landing", kwargs=kwargs) + selection,
-                "text": _("Generate report"),
-            },
-            {
-                "url": reverse("generate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select Objects"),
-            },
+            {"url": reverse("generate_report_landing", kwargs=kwargs) + selection, "text": _("Generate report")},
+            {"url": reverse("generate_report_select_oois", kwargs=kwargs) + selection, "text": _("Select Objects")},
             {
                 "url": reverse("generate_report_select_report_types", kwargs=kwargs) + selection,
                 "text": _("Select report types"),
             },
-            {
-                "url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Configuration"),
-            },
-            {
-                "url": reverse("generate_report_view", kwargs=kwargs) + selection,
-                "text": _("View report"),
-            },
+            {"url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection, "text": _("Configuration")},
+            {"url": reverse("generate_report_view", kwargs=kwargs) + selection, "text": _("View report")},
         ]
         return breadcrumbs
 
@@ -70,10 +58,7 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView):
 
 
 class OOISelectionGenerateReportView(
-    GenerateReportStepsMixin,
-    BreadcrumbsGenerateReportView,
-    ReportOOIView,
-    BaseOOIListView,
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportOOIView, BaseOOIListView
 ):
     """
     Select objects for the 'Generate Report' flow.
@@ -92,11 +77,7 @@ class OOISelectionGenerateReportView(
 
 
 class ReportTypesSelectionGenerateReportView(
-    GenerateReportStepsMixin,
-    BreadcrumbsGenerateReportView,
-    ReportOOIView,
-    ReportTypeView,
-    TemplateView,
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportOOIView, ReportTypeView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -120,10 +101,7 @@ class ReportTypesSelectionGenerateReportView(
 
 
 class SetupScanGenerateReportView(
-    GenerateReportStepsMixin,
-    BreadcrumbsGenerateReportView,
-    ReportPluginView,
-    TemplateView,
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
@@ -231,6 +209,4 @@ class GenerateReportPDFView(GenerateReportView, WeasyTemplateResponseMixin):
 
     pdf_filename = "generate_report.pdf"
     pdf_attachment = False
-    pdf_options = {
-        "pdf_variant": "pdf/ua-1",
-    }
+    pdf_options = {"pdf_variant": "pdf/ua-1"}

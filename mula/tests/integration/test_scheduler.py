@@ -39,11 +39,7 @@ class SchedulerTestCase(unittest.TestCase):
             pq_store=self.mock_ctx.datastores.pq_store,
         )
 
-        self.scheduler = mock_scheduler.MockScheduler(
-            ctx=self.mock_ctx,
-            scheduler_id=identifier,
-            queue=queue,
-        )
+        self.scheduler = mock_scheduler.MockScheduler(ctx=self.mock_ctx, scheduler_id=identifier, queue=queue)
 
     def tearDown(self):
         self.scheduler.stop()
@@ -53,10 +49,7 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_push(self):
         """When a task is added to the queue, it should be added to the database"""
         # Arrange
-        p_item = functions.create_p_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         # Act
         self.scheduler.push_item_to_queue(p_item)
@@ -74,10 +67,7 @@ class SchedulerTestCase(unittest.TestCase):
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
         # Arrange
-        p_item = functions.create_p_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
 
         # Act
         self.scheduler.push_item_to_queue(p_item)
@@ -106,10 +96,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.run()
 
         # Arrange: add tasks
-        p_item = functions.create_p_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
         self.scheduler.push_item_to_queue(p_item)
 
         # Assert: task should be on priority queue
@@ -156,10 +143,7 @@ class SchedulerTestCase(unittest.TestCase):
         self.scheduler.run()
 
         # Arrange: add tasks
-        p_item = functions.create_p_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-        )
+        p_item = functions.create_p_item(scheduler_id=self.scheduler.scheduler_id, priority=1)
         self.scheduler.push_item_to_queue(p_item)
 
         # Assert: listeners should be running

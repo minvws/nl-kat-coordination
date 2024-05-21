@@ -21,22 +21,13 @@ if os.environ.get("CI") != "1":
 
 def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="test")
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
     hostnames = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
     task_id = uuid.uuid4()
 
     octopoes_api_connector.save_observation(
         Observation(
-            method="normalizer_id",
-            source=network.reference,
-            task_id=task_id,
-            valid_time=valid_time,
-            result=hostnames,
+            method="normalizer_id", source=network.reference, task_id=task_id, valid_time=valid_time, result=hostnames
         )
     )
 
@@ -71,20 +62,10 @@ def test_bulk_operations(octopoes_api_connector: OctopoesAPIConnector, valid_tim
 def test_history(octopoes_api_connector: OctopoesAPIConnector):
     network = Network(name="test")
     first_seen = datetime(year=2020, month=10, day=10, tzinfo=timezone.utc)  # XTDB only returns a precision of seconds
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=first_seen,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=first_seen))
     octopoes_api_connector.delete(network.reference, datetime(year=2020, month=10, day=11, tzinfo=timezone.utc))
     last_seen = datetime(year=2020, month=10, day=12, tzinfo=timezone.utc)
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=last_seen,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=last_seen))
 
     history = octopoes_api_connector.get_history(network.reference, with_docs=True)
     assert len(history) == 3
@@ -109,12 +90,7 @@ def test_history(octopoes_api_connector: OctopoesAPIConnector):
 
 def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name="test")
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     hostnames: list[OOI] = [Hostname(network=network.reference, name=f"test{i}") for i in range(10)]
 
@@ -160,13 +136,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     )
 
     octopoes_api_connector.save_many_scan_profiles(
-        [
-            DeclaredScanProfile(
-                reference=ooi.reference,
-                level=ScanLevel.L2,
-            )
-            for ooi in all_new_oois + [network]
-        ],
+        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in all_new_oois + [network]],
         valid_time,
     )
 
@@ -214,9 +184,7 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert len(octopoes_api_connector.query(query, valid_time, hostnames[3])) == 0
 
     result = octopoes_api_connector.query_many(
-        query,
-        valid_time,
-        [hostnames[0], hostnames[1], hostnames[2], hostnames[3]],
+        query, valid_time, [hostnames[0], hostnames[1], hostnames[2], hostnames[3]]
     )
     assert len(result) == 3
     assert result[0][0] == hostnames[0].reference

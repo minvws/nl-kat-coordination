@@ -45,11 +45,7 @@ class APITemplateTestCase(unittest.TestCase):
             pq_store=self.mock_ctx.datastores.pq_store,
         )
 
-        self.scheduler = mock_scheduler.MockScheduler(
-            ctx=self.mock_ctx,
-            scheduler_id=self.organisation.id,
-            queue=queue,
-        )
+        self.scheduler = mock_scheduler.MockScheduler(ctx=self.mock_ctx, scheduler_id=self.organisation.id, queue=queue)
 
         # API server and Test Client
         self.server = server.Server(self.mock_ctx, {self.scheduler.scheduler_id: self.scheduler})
@@ -91,10 +87,7 @@ class APITestCase(APITemplateTestCase):
 
         # Try to push to queue
         item = create_p_item_request(0)
-        response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=item.model_dump_json(),
-        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=item.model_dump_json())
         self.assertNotEqual(response.status_code, 201)
         self.assertEqual(0, self.scheduler.queue.qsize())
 
@@ -167,10 +160,7 @@ class APITestCase(APITemplateTestCase):
 
         # Add one task to the queue
         first_item = create_p_item_request(1)
-        response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=first_item.model_dump_json(),
-        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=first_item.model_dump_json())
         self.assertEqual(response.status_code, 201)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
@@ -191,18 +181,12 @@ class APITestCase(APITemplateTestCase):
 
         # Add one task to the queue
         initial_item = create_p_item_request(1)
-        response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=initial_item.model_dump_json(),
-        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=initial_item.model_dump_json())
         self.assertEqual(response.status_code, 201)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Add the same item again through the api
-        response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=initial_item.model_dump_json(),
-        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=initial_item.model_dump_json())
 
         # The queue should still have one item
         self.assertEqual(response.status_code, 409)
@@ -266,10 +250,7 @@ class APITestCase(APITemplateTestCase):
 
         # Add one task to the queue
         initial_item = create_p_item_request(1)
-        response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=initial_item.model_dump_json(),
-        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=initial_item.model_dump_json())
         self.assertEqual(response.status_code, 201)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
@@ -355,10 +336,7 @@ class APITestCase(APITemplateTestCase):
 
         # Add one task to the queue
         initial_item = create_p_item_request(1)
-        response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=initial_item.model_dump_json(),
-        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=initial_item.model_dump_json())
         self.assertEqual(response.status_code, 201)
 
         # Update priority of the item
@@ -378,10 +356,7 @@ class APITestCase(APITemplateTestCase):
     def test_pop_queue(self):
         # Add one task to the queue
         initial_item = create_p_item_request(1)
-        response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=initial_item.model_dump_json(),
-        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=initial_item.model_dump_json())
         initial_item_id = response.json().get("id")
         self.assertEqual(response.status_code, 201)
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -394,10 +369,7 @@ class APITestCase(APITemplateTestCase):
     def test_pop_queue_filters(self):
         # Add one task to the queue
         first_item = create_p_item_request(1, data=functions.TestModel(id="123", name="test"))
-        response = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=first_item.model_dump_json(),
-        )
+        response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=first_item.model_dump_json())
         first_item_id = response.json().get("id")
         self.assertEqual(response.status_code, 201)
         self.assertEqual(1, self.scheduler.queue.qsize())
@@ -449,11 +421,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         # Add one task to the queue
         first_item = create_p_item_request(
             1,
-            data=functions.TestModel(
-                id="123",
-                name="test",
-                child=functions.TestModel(id="123.123", name="test.child"),
-            ),
+            data=functions.TestModel(id="123", name="test", child=functions.TestModel(id="123.123", name="test.child")),
         )
         response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=first_item.model_dump_json())
         initial_item_id = response.json().get("id")
@@ -463,10 +431,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.first_item_api = self.client.get(f"/tasks/{initial_item_id}").json()
 
         # Add second item to the queue
-        second_item = create_p_item_request(
-            1,
-            data=functions.TestModel(id="456", name="test"),
-        )
+        second_item = create_p_item_request(1, data=functions.TestModel(id="456", name="test"))
         response = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=second_item.model_dump_json())
         second_item_id = response.json().get("id")
         self.assertEqual(response.status_code, 201)
@@ -493,10 +458,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         # First add a task
         item = create_p_item_request(1)
 
-        response_post = self.client.post(
-            f"/queues/{self.scheduler.scheduler_id}/push",
-            data=item.model_dump_json(),
-        )
+        response_post = self.client.post(f"/queues/{self.scheduler.scheduler_id}/push", data=item.model_dump_json())
         self.assertEqual(201, response_post.status_code)
         initial_item_id = response_post.json().get("id")
 

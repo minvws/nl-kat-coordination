@@ -52,16 +52,9 @@ class NormalizerScheduler(Scheduler):
             pq_store=ctx.datastores.pq_store,
         )
 
-        super().__init__(
-            ctx=ctx,
-            queue=self.queue,
-            scheduler_id=scheduler_id,
-            callback=callback,
-        )
+        super().__init__(ctx=ctx, queue=self.queue, scheduler_id=scheduler_id, callback=callback)
 
-        self.ranker = rankers.NormalizerRanker(
-            ctx=self.ctx,
-        )
+        self.ranker = rankers.NormalizerRanker(ctx=self.ctx)
 
     def run(self) -> None:
         """The run method is called when the scheduler is started. It will
@@ -152,10 +145,7 @@ class NormalizerScheduler(Scheduler):
         ) as executor:
             for normalizer in normalizers.values():
                 executor.submit(
-                    self.push_task,
-                    normalizer,
-                    latest_raw_data.raw_data,
-                    self.push_tasks_for_received_raw_data.__name__,
+                    self.push_task, normalizer, latest_raw_data.raw_data, self.push_tasks_for_received_raw_data.__name__
                 )
 
     @tracer.start_as_current_span("normalizer_push_task")
@@ -168,10 +158,7 @@ class NormalizerScheduler(Scheduler):
             raw_data: The raw data to create a task for.
             caller: The name of the function that called this function, used for logging.
         """
-        task = NormalizerTask(
-            normalizer=Normalizer(id=normalizer.id),
-            raw_data=raw_data,
-        )
+        task = NormalizerTask(normalizer=Normalizer(id=normalizer.id), raw_data=raw_data)
 
         if not self.is_task_allowed_to_run(normalizer):
             self.logger.debug(
@@ -218,21 +205,12 @@ class NormalizerScheduler(Scheduler):
             )
             return
 
-        score = self.ranker.rank(
-            SimpleNamespace(
-                raw_data=raw_data,
-                task=task,
-            ),
-        )
+        score = self.ranker.rank(SimpleNamespace(raw_data=raw_data, task=task))
 
         # We need to create a PrioritizedItem for this task, to
         # push it to the priority queue.
         p_item = PrioritizedItem(
-            id=task.id,
-            scheduler_id=self.scheduler_id,
-            priority=score,
-            data=task.model_dump(),
-            hash=task.hash,
+            id=task.id, scheduler_id=self.scheduler_id, priority=score, data=task.model_dump(), hash=task.hash
         )
 
         try:
@@ -273,8 +251,7 @@ class NormalizerScheduler(Scheduler):
         """
         try:
             normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                self.organisation.id,
-                mime_type,
+                self.organisation.id, mime_type
             )
         except ExternalServiceError:
             self.logger.warning(
@@ -356,10 +333,7 @@ class NormalizerScheduler(Scheduler):
             raise exc_db
 
         # Is task still running according to the datastore?
-        if task_db is not None and task_db.status not in [
-            TaskStatus.COMPLETED,
-            TaskStatus.FAILED,
-        ]:
+        if task_db is not None and task_db.status not in [TaskStatus.COMPLETED, TaskStatus.FAILED]:
             self.logger.debug(
                 "Task is still running, according to the datastore "
                 "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",

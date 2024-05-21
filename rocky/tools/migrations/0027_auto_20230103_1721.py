@@ -9,19 +9,11 @@ import tools.fields
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("tools", "0026_auto_20221031_1344"),
-    ]
+    dependencies = [("tools", "0026_auto_20221031_1344")]
 
     operations = [
-        migrations.RemoveField(
-            model_name="organization",
-            name="signal_group_id",
-        ),
-        migrations.RemoveField(
-            model_name="organization",
-            name="signal_username",
-        ),
+        migrations.RemoveField(model_name="organization", name="signal_group_id"),
+        migrations.RemoveField(model_name="organization", name="signal_username"),
         migrations.AlterField(
             model_name="organization",
             name="code",
@@ -100,11 +92,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "ordering": ("name",),
-                "abstract": False,
-                "unique_together": {("slug", "parent")},
-            },
+            options={"ordering": ("name",), "abstract": False, "unique_together": {("slug", "parent")}},
             bases=(tagulous.models.models.BaseTagTreeModel, models.Model),
         ),
         migrations.AddField(

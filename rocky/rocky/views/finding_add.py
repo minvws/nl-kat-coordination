@@ -33,9 +33,7 @@ FINDING_TYPES_PREFIXES = {
 }
 
 
-def get_finding_type_from_id(
-    finding_type_id: str,
-) -> FindingType:
+def get_finding_type_from_id(finding_type_id: str) -> FindingType:
     finding_type_id = finding_type_id.upper()
 
     prefix = finding_type_id.upper().split("-")[0]
@@ -67,10 +65,7 @@ class FindingAddView(BaseOOIFormView):
         return context
 
     def get_form_kwargs(self):
-        kwargs = {
-            "connector": self.octopoes_api_connector,
-            "ooi_list": self.get_ooi_options(),
-        }
+        kwargs = {"connector": self.octopoes_api_connector, "ooi_list": self.get_ooi_options()}
         kwargs.update(super().get_form_kwargs())
 
         if "ooi_class" in kwargs:

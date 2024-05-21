@@ -57,12 +57,7 @@ def get_file_from_container(container: docker.models.containers.Container, path:
     try:
         stream, _ = container.get_archive(path)
     except docker.errors.NotFound:
-        logging.warning(
-            "[Masscan] %s not found in container %s %s",
-            path,
-            container.short_id,
-            container.image.tags,
-        )
+        logging.warning("[Masscan] %s not found in container %s %s", path, container.short_id, container.image.tags)
         return None
 
     f = tarfile.open(mode="r|", fileobj=TarStream(stream).reader())
@@ -83,9 +78,7 @@ def run_masscan(target_ip) -> bytes:
     max_rate = os.getenv("MAX_RATE", 100)
     logging.info("Starting container %s to run masscan...", IMAGE)
     res = client.containers.run(
-        image=IMAGE,
-        command=f"-p {port_range} --max-rate {max_rate} -oJ {FILE_PATH} {target_ip}",
-        detach=True,
+        image=IMAGE, command=f"-p {port_range} --max-rate {max_rate} -oJ {FILE_PATH} {target_ip}", detach=True
     )
     res.wait()
     logging.debug(res.logs())

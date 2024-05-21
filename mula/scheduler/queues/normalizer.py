@@ -17,19 +17,10 @@ class NormalizerPriorityQueue(PriorityQueue):
         Returns:
             A string representing the hash.
         """
-        normalizer_id = dict_utils.deep_get(
-            p_item.model_dump(),
-            ["data", "normalizer", "id"],
-        )
+        normalizer_id = dict_utils.deep_get(p_item.model_dump(), ["data", "normalizer", "id"])
 
-        boefje_meta_id = dict_utils.deep_get(
-            p_item.model_dump(),
-            ["data", "raw_data", "boefje_meta", "id"],
-        )
+        boefje_meta_id = dict_utils.deep_get(p_item.model_dump(), ["data", "raw_data", "boefje_meta", "id"])
 
-        organization = dict_utils.deep_get(
-            p_item.model_dump(),
-            ["data", "raw_data", "boefje_meta", "organization"],
-        )
+        organization = dict_utils.deep_get(p_item.model_dump(), ["data", "raw_data", "boefje_meta", "organization"])
 
         return mmh3.hash_bytes(f"{normalizer_id}-{boefje_meta_id}-{organization}").hex()

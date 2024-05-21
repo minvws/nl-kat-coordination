@@ -37,13 +37,7 @@ def test_health(httpx_mock, patch_pika):
         "version": __version__,
         "additional": None,
         "results": [
-            {
-                "healthy": True,
-                "service": "xtdb",
-                "version": "1.24.1",
-                "additional": xtdb_status,
-                "results": [],
-            },
+            {"healthy": True, "service": "xtdb", "version": "1.24.1", "additional": xtdb_status, "results": []}
         ],
     }
     assert response.status_code == 200
@@ -66,7 +60,7 @@ def test_health_no_xtdb_connection(httpx_mock, patch_pika):
                 "version": None,
                 "additional": "Cannot connect to XTDB at. Service possibly down",
                 "results": [],
-            },
+            }
         ],
     }
     assert response.status_code == 200
@@ -131,11 +125,7 @@ def test_count_findings_by_severity(httpx_mock, patch_pika, caplog, valid_time):
             },
             1,
         ],
-        [
-            "KATFindingType|KAT-NO-FINDING-TYPE",
-            None,
-            2,
-        ],
+        ["KATFindingType|KAT-NO-FINDING-TYPE", None, 2],
     ]
 
     httpx_mock.add_response(

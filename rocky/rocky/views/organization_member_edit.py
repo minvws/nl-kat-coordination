@@ -37,9 +37,7 @@ class OrganizationMemberEditView(
 
     def get_success_url(self):
         messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            _("Member %s successfully updated.") % (self.object.user.full_name),
+            self.request, messages.SUCCESS, _("Member %s successfully updated.") % (self.object.user.full_name)
         )
         return reverse("organization_member_list", kwargs={"organization_code": self.organization.code})
 

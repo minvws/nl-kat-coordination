@@ -42,9 +42,7 @@ class OrganizationFindingCountPerSeverity:
 class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, TemplateView):
     template_name = "crisis_room/crisis_room.html"
     connector_form_class = ObservedAtForm
-    breadcrumbs = [
-        {"url": "", "text": "Crisis Room"},
-    ]
+    breadcrumbs = [{"url": "", "text": "Crisis Room"}]
 
     def sort_by_total(
         self, finding_counts: list[OrganizationFindingCountPerSeverity]
@@ -81,16 +79,12 @@ class CrisisRoomView(BreadcrumbsMixin, ConnectorFormMixin, ObservedAtMixin, Temp
         # query each organization's finding type count
         org_finding_counts_per_severity = [
             OrganizationFindingCountPerSeverity(
-                name=org.name,
-                code=org.code,
-                finding_count_per_severity=self.get_finding_type_severity_count(org),
+                name=org.name, code=org.code, finding_count_per_severity=self.get_finding_type_severity_count(org)
             )
             for org in user.organizations
         ]
 
-        context["breadcrumb_list"] = [
-            {"url": reverse("crisis_room"), "text": "CRISIS ROOM"},
-        ]
+        context["breadcrumb_list"] = [{"url": reverse("crisis_room"), "text": "CRISIS ROOM"}]
 
         context["organizations"] = user.organizations
 

@@ -34,11 +34,7 @@ class OrganisationStorageMemory(OrganisationStorage):
 
 
 class RepositoryStorageMemory(RepositoryStorage):
-    def __init__(
-        self,
-        organisation_id: str,
-        defaults: dict[str, Repository] | None = None,
-    ):
+    def __init__(self, organisation_id: str, defaults: dict[str, Repository] | None = None):
         self._data = repositories.setdefault(organisation_id, {}) if defaults is None else defaults
         self._organisation_id = organisation_id
 
@@ -79,11 +75,7 @@ class SettingsStorageMemory(SettingsStorage):
 
 
 class PluginStatesStorageMemory(PluginEnabledStorage):
-    def __init__(
-        self,
-        organisation: str,
-        defaults: dict[str, bool] | None = None,
-    ):
+    def __init__(self, organisation: str, defaults: dict[str, bool] | None = None):
         self._data = plugins_state.setdefault(organisation, {}) if defaults is None else defaults
         self._organisation = organisation
 

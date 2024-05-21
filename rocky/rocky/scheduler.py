@@ -123,11 +123,7 @@ class PaginatedTasksResponse(BaseModel):
 
 
 class LazyTaskList:
-    def __init__(
-        self,
-        scheduler_client: SchedulerClient,
-        **kwargs,
-    ):
+    def __init__(self, scheduler_client: SchedulerClient, **kwargs):
         self.scheduler_client = scheduler_client
         self.kwargs = kwargs
         self._count: int | None = None
@@ -135,10 +131,7 @@ class LazyTaskList:
     @property
     def count(self) -> int:
         if self._count is None:
-            self._count = self.scheduler_client.list_tasks(
-                limit=0,
-                **self.kwargs,
-            ).count
+            self._count = self.scheduler_client.list_tasks(limit=0, **self.kwargs).count
         return self._count
 
     def __len__(self):
@@ -154,11 +147,7 @@ class LazyTaskList:
         else:
             raise TypeError("Invalid slice argument type.")
 
-        res = self.scheduler_client.list_tasks(
-            limit=limit,
-            offset=offset,
-            **self.kwargs,
-        )
+        res = self.scheduler_client.list_tasks(limit=limit, offset=offset, **self.kwargs)
 
         self._count = res.count
         return res.results
@@ -191,10 +180,7 @@ class SchedulerClient:
     def __init__(self, base_uri: str):
         self._client = httpx.Client(base_url=base_uri)
 
-    def list_tasks(
-        self,
-        **kwargs,
-    ) -> PaginatedTasksResponse:
+    def list_tasks(self, **kwargs) -> PaginatedTasksResponse:
         kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
         res = self._client.get("/tasks", params=kwargs)
         return PaginatedTasksResponse.model_validate_json(res.content)

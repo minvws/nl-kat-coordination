@@ -19,9 +19,7 @@ if os.getenv("DOCS"):
 
 
 class BackwardsCompatibleEnvSettings(EnvSettingsSource):
-    backwards_compatibility_mapping = {
-        "LOG_CFG": "OCTOPOES_LOG_CFG",
-    }
+    backwards_compatibility_mapping = {"LOG_CFG": "OCTOPOES_LOG_CFG"}
 
     def __call__(self) -> dict[str, Any]:
         d: dict[str, Any] = {}

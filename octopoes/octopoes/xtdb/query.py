@@ -217,13 +217,7 @@ class Query:
                 raise InvalidField(f"value '{value}' for abstract class fields should be a string or an OOI Type")
 
             if isinstance(value, Aliased) or issubclass(value, OOI):
-                self._add_or_statement_for_abstract_types(
-                    ref,
-                    field_name,
-                    self._get_object_alias(
-                        value,
-                    ),
-                )
+                self._add_or_statement_for_abstract_types(ref, field_name, self._get_object_alias(value))
                 return
 
         if isinstance(value, str):
@@ -266,12 +260,7 @@ class Query:
 
         self._where_clauses.append(self._assert_type(ref, ooi_type))
         self._where_clauses.append(
-            self._relationship(
-                self._get_object_alias(ref),
-                ooi_type.get_object_type(),
-                field_name,
-                to_alias,
-            )
+            self._relationship(self._get_object_alias(ref), ooi_type.get_object_type(), field_name, to_alias)
         )
 
     def _add_or_statement_for_abstract_types(self, ref: Ref, field_name: str, to_alias: str) -> None:
@@ -280,10 +269,7 @@ class Query:
         self._where_clauses.append(self._assert_type(ref, ooi_type))
         self._where_clauses.append(
             self._or_statement_for_abstract_types(
-                self._get_object_alias(ref),
-                ooi_type.strict_subclasses(),
-                field_name,
-                to_alias,
+                self._get_object_alias(ref), ooi_type.strict_subclasses(), field_name, to_alias
             )
         )
 

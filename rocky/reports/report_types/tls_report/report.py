@@ -11,11 +11,7 @@ from reports.report_types.definitions import Report
 
 logger = getLogger(__name__)
 
-CIPHER_FINDINGS = [
-    "KAT-RECOMMENDATION-BAD-CIPHER",
-    "KAT-MEDIUM-BAD-CIPHER",
-    "KAT-CRITICAL-BAD-CIPHER",
-]
+CIPHER_FINDINGS = ["KAT-RECOMMENDATION-BAD-CIPHER", "KAT-MEDIUM-BAD-CIPHER", "KAT-CRITICAL-BAD-CIPHER"]
 TREE_DEPTH = 3
 
 

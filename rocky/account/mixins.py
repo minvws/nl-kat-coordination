@@ -130,8 +130,7 @@ class OrganizationView(View):
     def raise_clearance_level(self, ooi_reference: Reference, level: int) -> bool:
         self.verify_raise_clearance_level(level)
         self.octopoes_api_connector.save_scan_profile(
-            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level)),
-            datetime.now(timezone.utc),
+            DeclaredScanProfile(reference=ooi_reference, level=ScanLevel(level)), datetime.now(timezone.utc)
         )
 
         return True
@@ -154,11 +153,7 @@ class OrganizationView(View):
             messages.error(
                 self.request,
                 _("Could not raise clearance level of %s to L%s. Indemnification not present at organization %s.")
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization.name,
-                ),
+                % (ooi.reference.human_readable, level, self.organization.name),
             )
 
         except TrustedClearanceLevelTooLowException:
@@ -169,11 +164,7 @@ class OrganizationView(View):
                     "You were trusted a clearance level of L%s. "
                     "Contact your administrator to receive a higher clearance."
                 )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
+                % (ooi.reference.human_readable, level, self.organization_member.acknowledged_clearance_level),
             )
         except AcknowledgedClearanceLevelTooLowException:
             messages.error(
@@ -183,11 +174,7 @@ class OrganizationView(View):
                     "You acknowledged a clearance level of L%s. "
                     "Please accept the clearance level first on your profile page to proceed."
                 )
-                % (
-                    ooi.reference.human_readable,
-                    level,
-                    self.organization_member.acknowledged_clearance_level,
-                ),
+                % (ooi.reference.human_readable, level, self.organization_member.acknowledged_clearance_level),
             )
         return False
 

@@ -28,19 +28,13 @@ class PathTest(TestCase):
     def test_path_outoing_relation(self):
         path = Path.parse("MockResolvedHostname.hostname")
         self.assertCountEqual(
-            [
-                Segment(MockResolvedHostname, Direction.OUTGOING, "hostname", MockHostname),
-            ],
-            path.segments,
+            [Segment(MockResolvedHostname, Direction.OUTGOING, "hostname", MockHostname)], path.segments
         )
 
     def test_path_incoming_relation(self):
         path = Path.parse("MockHostname.<hostname [is MockResolvedHostname]")
         self.assertCountEqual(
-            [
-                Segment(MockHostname, Direction.INCOMING, "hostname", MockResolvedHostname),
-            ],
-            path.segments,
+            [Segment(MockHostname, Direction.INCOMING, "hostname", MockResolvedHostname)], path.segments
         )
 
     def test_path_deeper(self):
@@ -66,33 +60,22 @@ class PathTest(TestCase):
     def test_path_reverse(self):
         path = Path.parse("MockIPAddress.<address [is MockIPPort]")
         reversed_path = path.reverse()
-        self.assertEqual(
-            Segment(MockIPPort, Direction.OUTGOING, "address", MockIPAddress),
-            reversed_path.segments[0],
-        )
+        self.assertEqual(Segment(MockIPPort, Direction.OUTGOING, "address", MockIPAddress), reversed_path.segments[0])
 
     def test_path_reverse_deep(self):
         path = Path.parse("MockDNSCNAMERecord.target_hostname.<hostname[is MockResolvedHostname].address")
         reversed_path = path.reverse()
 
         self.assertEqual(
-            Segment(
-                MockIPAddress,
-                Direction.INCOMING,
-                "address",
-                MockResolvedHostname,
-            ),
-            reversed_path.segments[0],
+            Segment(MockIPAddress, Direction.INCOMING, "address", MockResolvedHostname), reversed_path.segments[0]
         )
 
         self.assertEqual(
-            Segment(MockResolvedHostname, Direction.OUTGOING, "hostname", MockHostname),
-            reversed_path.segments[1],
+            Segment(MockResolvedHostname, Direction.OUTGOING, "hostname", MockHostname), reversed_path.segments[1]
         )
 
         self.assertEqual(
-            Segment(MockHostname, Direction.INCOMING, "target_hostname", MockDNSCNAMERecord),
-            reversed_path.segments[2],
+            Segment(MockHostname, Direction.INCOMING, "target_hostname", MockDNSCNAMERecord), reversed_path.segments[2]
         )
 
         self.assertEqual(

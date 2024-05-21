@@ -29,26 +29,14 @@ class BreadcrumbsMultiReportView(ReportBreadcrumbs):
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
         breadcrumbs += [
-            {
-                "url": reverse("multi_report_landing", kwargs=kwargs) + selection,
-                "text": _("Multi report"),
-            },
-            {
-                "url": reverse("multi_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select OOIs"),
-            },
+            {"url": reverse("multi_report_landing", kwargs=kwargs) + selection, "text": _("Multi report")},
+            {"url": reverse("multi_report_select_oois", kwargs=kwargs) + selection, "text": _("Select OOIs")},
             {
                 "url": reverse("multi_report_select_report_types", kwargs=kwargs) + selection,
                 "text": _("Select report types"),
             },
-            {
-                "url": reverse("multi_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Configuration"),
-            },
-            {
-                "url": reverse("multi_report_view", kwargs=kwargs) + selection,
-                "text": _("View report"),
-            },
+            {"url": reverse("multi_report_setup_scan", kwargs=kwargs) + selection, "text": _("Configuration")},
+            {"url": reverse("multi_report_view", kwargs=kwargs) + selection, "text": _("View report")},
         ]
         return breadcrumbs
 
@@ -82,11 +70,7 @@ class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportV
 
 
 class ReportTypesSelectionMultiReportView(
-    MultiReportStepsMixin,
-    BreadcrumbsMultiReportView,
-    ReportOOIView,
-    ReportTypeView,
-    TemplateView,
+    MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportOOIView, ReportTypeView, TemplateView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -146,9 +130,7 @@ class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView, TemplateView
         context["template"] = MultiOrganizationReport.template_path
         context["report_data"] = report_data
         context["report_download_url"] = url_with_querystring(
-            reverse("multi_report_pdf", kwargs={"organization_code": self.organization.code}),
-            True,
-            **self.request.GET,
+            reverse("multi_report_pdf", kwargs={"organization_code": self.organization.code}), True, **self.request.GET
         )
         return context
 
@@ -158,6 +140,4 @@ class MultiReportPDFView(MultiReportView, WeasyTemplateResponseMixin):
 
     pdf_filename = "multi_report.pdf"
     pdf_attachment = False
-    pdf_options = {
-        "pdf_variant": "pdf/ua-1",
-    }
+    pdf_options = {"pdf_variant": "pdf/ua-1"}

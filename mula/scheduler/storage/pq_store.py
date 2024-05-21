@@ -111,11 +111,7 @@ class PriorityQueueStore:
             return count
 
     @retry()
-    def get_items(
-        self,
-        scheduler_id: str,
-        filters: FilterRequest | None,
-    ) -> tuple[list[models.PrioritizedItem], int]:
+    def get_items(self, scheduler_id: str, filters: FilterRequest | None) -> tuple[list[models.PrioritizedItem], int]:
         with self.dbconn.session.begin() as session:
             query = session.query(models.PrioritizedItemDB).filter(
                 models.PrioritizedItemDB.scheduler_id == scheduler_id

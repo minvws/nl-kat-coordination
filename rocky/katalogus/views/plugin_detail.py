@@ -114,10 +114,7 @@ class NormalizerDetailView(PluginDetailView):
             {
                 "url": reverse(
                     "normalizer_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id},
                 ),
                 "text": self.plugin.name,
             },
@@ -153,11 +150,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
             },
             {
                 "url": reverse(
-                    "boefje_detail",
-                    kwargs={
-                        "organization_code": self.organization.code,
-                        "plugin_id": self.plugin.id,
-                    },
+                    "boefje_detail", kwargs={"organization_code": self.organization.code, "plugin_id": self.plugin.id}
                 ),
                 "text": self.plugin.name,
             },
@@ -189,10 +182,7 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
             oois_without_clearance_level = oois["oois_without_clearance"]
 
             if oois_with_clearance_level:
-                self.run_boefje_for_oois(
-                    boefje=boefje,
-                    oois=oois_with_clearance_level,
-                )
+                self.run_boefje_for_oois(boefje=boefje, oois=oois_with_clearance_level)
 
             if oois_without_clearance_level:
                 if not self.organization_member.has_perm("tools.can_set_clearance_level"):
@@ -242,7 +232,4 @@ class BoefjeDetailView(BoefjeMixin, PluginDetailView):
                 oois_with_clearance.append(ooi_object)
             else:
                 oois_without_clearance.append(ooi_object.primary_key)
-        return {
-            "oois_with_clearance": oois_with_clearance,
-            "oois_without_clearance": oois_without_clearance,
-        }
+        return {"oois_with_clearance": oois_with_clearance, "oois_without_clearance": oois_without_clearance}

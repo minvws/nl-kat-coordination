@@ -25,10 +25,7 @@ class PriorityQueueTestCase(unittest.TestCase):
 
         # Priority Queue
         self.pq = mock_queue.MockPriorityQueue(
-            pq_id="test",
-            maxsize=10,
-            item_type=functions.TestModel,
-            pq_store=self.pq_store,
+            pq_id="test", maxsize=10, item_type=functions.TestModel, pq_store=self.pq_store
         )
 
         self._check_queue_empty()

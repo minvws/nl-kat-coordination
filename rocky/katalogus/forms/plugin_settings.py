@@ -9,9 +9,7 @@ MAX_SETTINGS_VALUE_LENGTH = 128
 class PluginSchemaForm(forms.Form):
     """This Form takes a plugin schema and turn all settings of schema into form fields."""
 
-    error_messages = {
-        "required": _("This field is required."),
-    }
+    error_messages = {"required": _("This field is required.")}
 
     def __init__(self, plugin_schema: dict, values: dict, *args, **kwargs):
         super().__init__(*args, **kwargs)

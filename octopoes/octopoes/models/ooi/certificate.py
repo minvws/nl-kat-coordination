@@ -37,9 +37,7 @@ class X509Certificate(OOI):
     def expired(self):
         return datetime.now() > datetime.fromisoformat(self.valid_until)
 
-    _reverse_relation_names = {
-        "signed_by": "signed_certificates",
-    }
+    _reverse_relation_names = {"signed_by": "signed_certificates"}
 
     @classmethod
     def format_reference_human_readable(cls, reference: Reference) -> str:

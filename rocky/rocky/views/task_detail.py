@@ -32,10 +32,7 @@ class BoefjeTaskDetailView(BoefjeMixin, TaskDetailView):
         context = super().get_context_data(**kwargs)
 
         context["breadcrumbs"] = [
-            {
-                "url": reverse("task_list", kwargs={"organization_code": self.organization.code}),
-                "text": _("Tasks"),
-            },
+            {"url": reverse("task_list", kwargs={"organization_code": self.organization.code}), "text": _("Tasks")},
             {
                 "url": reverse(
                     "boefje_task_view",

@@ -7,9 +7,7 @@ from reports.report_types.definitions import Report
 
 class OOITypeMultiCheckboxForReportForm(BaseRockyForm):
     ooi_type = forms.MultipleChoiceField(
-        label=_("Filter by OOI types"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
+        label=_("Filter by OOI types"), required=False, widget=forms.CheckboxSelectMultiple
     )
 
     def __init__(self, ooi_types: list[str], *args, **kwargs):
@@ -19,9 +17,7 @@ class OOITypeMultiCheckboxForReportForm(BaseRockyForm):
 
 class ReportTypeMultiselectForm(BaseRockyForm):
     report_type = forms.MultipleChoiceField(
-        label=_("Report types"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple,
+        label=_("Report types"), required=False, widget=forms.CheckboxSelectMultiple
     )
 
     def __init__(self, report_types: set[Report], *args, **kwargs):

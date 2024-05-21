@@ -135,7 +135,7 @@ class OrganizationDetailBreadcrumbsMixin(BreadcrumbsMixin):
             {
                 "url": reverse("organization_settings", kwargs={"organization_code": self.organization.code}),
                 "text": _("Settings"),
-            },
+            }
         ]
 
         return breadcrumbs
@@ -149,7 +149,7 @@ class OrganizationMemberBreadcrumbsMixin(BreadcrumbsMixin):
             {
                 "url": reverse("organization_member_list", kwargs={"organization_code": self.organization.code}),
                 "text": _("Members"),
-            },
+            }
         ]
 
         return breadcrumbs
@@ -209,10 +209,7 @@ def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) 
         return
 
     try:
-        new_p_item = PrioritizedItem(
-            data=task.p_item.data,
-            priority=1,
-        )
+        new_p_item = PrioritizedItem(data=task.p_item.data, priority=1)
 
         schedule_task(request, organization_code, new_p_item)
     except SchedulerError as error:

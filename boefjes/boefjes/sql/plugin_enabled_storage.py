@@ -80,10 +80,7 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
 
         if instance is None:
             raise PluginNotFound(plugin_id, repository_id, organisation_id) from ObjectNotFoundException(
-                PluginStateInDB,
-                plugin_id=plugin_id,
-                organisation_id=organisation_id,
-                repository_id=repository_id,
+                PluginStateInDB, plugin_id=plugin_id, organisation_id=organisation_id, repository_id=repository_id
             )
 
         return instance
@@ -106,16 +103,11 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
             )
 
         return PluginStateInDB(
-            plugin_id=plugin_id,
-            enabled=enabled,
-            organisation_pk=organisation.pk,
-            repository_pk=repository.pk,
+            plugin_id=plugin_id, enabled=enabled, organisation_pk=organisation.pk, repository_pk=repository.pk
         )
 
 
-def create_plugin_enabled_storage(
-    session: Session | None = None,
-) -> SQLPluginEnabledStorage:
+def create_plugin_enabled_storage(session: Session | None = None) -> SQLPluginEnabledStorage:
     if not session:
         session = sessionmaker(bind=get_engine())()
 

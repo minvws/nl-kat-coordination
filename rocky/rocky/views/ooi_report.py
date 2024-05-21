@@ -43,10 +43,7 @@ class OOIReportView(BaseOOIDetailView):
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if self.observed_at > convert_date_to_datetime(datetime.now(timezone.utc)):
-            messages.error(
-                request,
-                _("You can't generate a report for an OOI on a date in the future."),
-            )
+            messages.error(request, _("You can't generate a report for an OOI on a date in the future."))
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -143,9 +140,7 @@ class FindingReportPDFView(SeveritiesMixin, OctopoesView):
             return redirect(reverse("finding_list", kwargs={"organization_code": self.organization.code}))
 
         return FileResponse(
-            report,
-            as_attachment=True,
-            filename=ReportsService.organization_report_file_name(self.organization.code),
+            report, as_attachment=True, filename=ReportsService.organization_report_file_name(self.organization.code)
         )
 
 
@@ -194,15 +189,7 @@ class Report(OrganizationView):
 class DNSReport(Report):
     boefjes_required = {"dns-records", "dns-zone"}
     boefjes_optional = {"dns-sec"}
-    allowed_ooi_types = [
-        DNSARecord,
-        DNSAAAARecord,
-        DNSMXRecord,
-        DNSNSRecord,
-        DNSSOARecord,
-        DNSCAARecord,
-        Hostname,
-    ]
+    allowed_ooi_types = [DNSARecord, DNSAAAARecord, DNSMXRecord, DNSNSRecord, DNSSOARecord, DNSCAARecord, Hostname]
     allowed_finding_types = [
         "KAT-WEBSERVER-NO-IPV6",
         "KAT-NAMESERVER-NO-IPV6",

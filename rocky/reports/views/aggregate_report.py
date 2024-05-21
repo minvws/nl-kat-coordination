@@ -34,26 +34,14 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
         kwargs = self.get_kwargs()
         selection = get_selection(self.request)
         breadcrumbs += [
-            {
-                "url": reverse("aggregate_report_landing", kwargs=kwargs) + selection,
-                "text": _("Aggregate report"),
-            },
-            {
-                "url": reverse("aggregate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select Objects"),
-            },
+            {"url": reverse("aggregate_report_landing", kwargs=kwargs) + selection, "text": _("Aggregate report")},
+            {"url": reverse("aggregate_report_select_oois", kwargs=kwargs) + selection, "text": _("Select Objects")},
             {
                 "url": reverse("aggregate_report_select_report_types", kwargs=kwargs) + selection,
                 "text": _("Select report types"),
             },
-            {
-                "url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection,
-                "text": _("Configuration"),
-            },
-            {
-                "url": reverse("aggregate_report_view", kwargs=kwargs) + selection,
-                "text": _("View report"),
-            },
+            {"url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection, "text": _("Configuration")},
+            {"url": reverse("aggregate_report_view", kwargs=kwargs) + selection, "text": _("View report")},
         ]
         return breadcrumbs
 
@@ -71,10 +59,7 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView):
 
 
 class OOISelectionAggregateReportView(
-    AggregateReportStepsMixin,
-    BreadcrumbsAggregateReportView,
-    ReportOOIView,
-    BaseOOIListView,
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportOOIView, BaseOOIListView
 ):
     """
     Select Objects for the 'Aggregate Report' flow.
@@ -93,11 +78,7 @@ class OOISelectionAggregateReportView(
 
 
 class ReportTypesSelectionAggregateReportView(
-    AggregateReportStepsMixin,
-    BreadcrumbsAggregateReportView,
-    ReportOOIView,
-    ReportTypeView,
-    TemplateView,
+    AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportOOIView, ReportTypeView, TemplateView
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -183,10 +164,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
                 "organization_code": self.organization.code,
                 "organization_name": self.organization.name,
                 "organization_tags": list(self.organization.tags.all()),
-                "data": {
-                    "report_data": report_data,
-                    "post_processed_data": post_processed_data,
-                },
+                "data": {"report_data": report_data, "post_processed_data": post_processed_data},
             }
 
             try:
@@ -204,14 +182,9 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
 
         return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(
-        self,
-    ) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
+    def generate_reports_for_oois(self) -> tuple[AggregateOrganisationReport, Any, dict[Any, dict[Any, Any]]]:
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
-            self.octopoes_api_connector,
-            self.get_oois(),
-            self.selected_report_types,
-            self.observed_at,
+            self.octopoes_api_connector, self.get_oois(), self.selected_report_types, self.observed_at
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
@@ -252,6 +225,4 @@ class AggregateReportPDFView(AggregateReportView, WeasyTemplateResponseMixin):
 
     pdf_filename = "aggregate_report.pdf"
     pdf_attachment = False
-    pdf_options = {
-        "pdf_variant": "pdf/ua-1",
-    }
+    pdf_options = {"pdf_variant": "pdf/ua-1"}

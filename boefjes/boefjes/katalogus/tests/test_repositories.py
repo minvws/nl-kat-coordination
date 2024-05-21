@@ -16,9 +16,7 @@ class TestRepositories(TestCase):
 
         _mocked_repositories = {"test": Repository(id="test", name="Test", base_url="http://localhost:8080")}
 
-        def _mocked_get_repository_store(
-            organisation_id: str,
-        ):
+        def _mocked_get_repository_store(organisation_id: str):
             return RepositoryStorageMemory(organisation_id, _mocked_repositories)
 
         app.dependency_overrides[get_repository_store] = _mocked_get_repository_store

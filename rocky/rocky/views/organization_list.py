@@ -5,10 +5,7 @@ from tools.models import Organization
 from tools.view_helpers import OrganizationBreadcrumbsMixin
 
 
-class OrganizationListView(
-    OrganizationBreadcrumbsMixin,
-    ListView,
-):
+class OrganizationListView(OrganizationBreadcrumbsMixin, ListView):
     template_name = "organizations/organization_list.html"
 
     def get_queryset(self) -> list[Organization]:

@@ -36,15 +36,7 @@ class Bytes(HTTPService):
 
     name = "bytes"
 
-    def __init__(
-        self,
-        host: str,
-        source: str,
-        user: str,
-        password: str,
-        timeout: int,
-        pool_connections: int,
-    ):
+    def __init__(self, host: str, source: str, user: str, password: str, timeout: int, pool_connections: int):
         """Initialize the Bytes service.
 
         Args:
@@ -54,10 +46,7 @@ class Bytes(HTTPService):
             password: A string representing the password.
             timeout: An integer representing the timeout.
         """
-        self.credentials: dict[str, str] = {
-            "username": user,
-            "password": password,
-        }
+        self.credentials: dict[str, str] = {"username": user, "password": password}
 
         self.lock: threading.Lock = threading.Lock()
 
@@ -73,10 +62,7 @@ class Bytes(HTTPService):
 
     def get_token(self) -> str:
         url = f"{self.host}/token"
-        response = self.post(
-            url=url,
-            payload=self.credentials,
-        )
+        response = self.post(url=url, payload=self.credentials)
 
         self._verify_response(response)
 
@@ -108,14 +94,7 @@ class Bytes(HTTPService):
     @exception_handler
     def get_last_run_boefje_by_organisation_id(self, organization_id: str) -> BoefjeMeta | None:
         url = f"{self.host}/bytes/boefje_meta"
-        response = self.get(
-            url=url,
-            params={
-                "organization": organization_id,
-                "limit": 1,
-                "descending": "true",
-            },
-        )
+        response = self.get(url=url, params={"organization": organization_id, "limit": 1, "descending": "true"})
 
         self._verify_response(response)
 

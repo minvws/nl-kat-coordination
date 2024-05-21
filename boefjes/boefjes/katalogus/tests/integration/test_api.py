@@ -40,13 +40,7 @@ class TestAPI(TestCase):
         self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
 
         with self.repository_storage as store:
-            store.create(
-                Repository(
-                    id="LOCAL",
-                    name="Test",
-                    base_url="http://test.url",
-                )
-            )
+            store.create(Repository(id="LOCAL", name="Test", base_url="http://test.url"))
 
         self.org = Organisation(id="test", name="Test Organisation")
 

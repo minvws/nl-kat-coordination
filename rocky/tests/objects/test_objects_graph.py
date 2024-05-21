@@ -11,11 +11,7 @@ TREE_DATA = {
         "children": {"ooi": [{"reference": "Network|testnetwork", "children": {}}]},
     },
     "store": {
-        "Network|testnetwork": {
-            "object_type": "Network",
-            "primary_key": "Network|testnetwork",
-            "name": "testnetwork",
-        },
+        "Network|testnetwork": {"object_type": "Network", "primary_key": "Network|testnetwork", "name": "testnetwork"},
         "Finding|Network|testnetwork|KAT-000": {
             "object_type": "Finding",
             "primary_key": "Finding|Network|testnetwork|KAT-000",

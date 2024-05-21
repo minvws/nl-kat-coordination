@@ -36,7 +36,5 @@ class AccountView(OrganizationView, TemplateView, OOIClearanceMixin):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["breadcrumbs"] = [
-            {"url": "", "text": _("Account details")},
-        ]
+        context["breadcrumbs"] = [{"url": "", "text": _("Account details")}]
         return context

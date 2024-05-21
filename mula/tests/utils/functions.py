@@ -24,29 +24,16 @@ class TestModel(pydantic.BaseModel):
 
 def create_p_item_request(priority: int, data: TestModel | None = None) -> models.PrioritizedItemRequest:
     if data is None:
-        data = TestModel(
-            id=uuid.uuid4().hex,
-            name=uuid.uuid4().hex,
-        )
+        data = TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
-    return models.PrioritizedItemRequest(
-        priority=priority,
-        data=data.model_dump(),
-    )
+    return models.PrioritizedItemRequest(priority=priority, data=data.model_dump())
 
 
 def create_p_item(scheduler_id: str, priority: int, data: TestModel | None = None) -> models.PrioritizedItem:
     if data is None:
-        data = TestModel(
-            id=uuid.uuid4().hex,
-            name=uuid.uuid4().hex,
-        )
+        data = TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex)
 
-    return models.PrioritizedItem(
-        scheduler_id=scheduler_id,
-        priority=priority,
-        data=data.model_dump(),
-    )
+    return models.PrioritizedItem(scheduler_id=scheduler_id, priority=priority, data=data.model_dump())
 
 
 def create_task(p_item: models.PrioritizedItem) -> models.Task:

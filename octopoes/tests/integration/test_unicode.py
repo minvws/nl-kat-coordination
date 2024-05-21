@@ -20,12 +20,7 @@ NAMES = ["🐱", "★.com", "🐈"]
 
 def test_unicode_network(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name=NAMES[0])
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     time.sleep(1)
 
@@ -37,12 +32,7 @@ def test_unicode_network(octopoes_api_connector: OctopoesAPIConnector, valid_tim
 
 def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
     network = Network(name=NAMES[0])
-    octopoes_api_connector.save_declaration(
-        Declaration(
-            ooi=network,
-            valid_time=valid_time,
-        )
-    )
+    octopoes_api_connector.save_declaration(Declaration(ooi=network, valid_time=valid_time))
 
     with pytest.raises(ValueError):
         Hostname(network=network.reference, name="%@.com")
@@ -52,11 +42,7 @@ def test_unicode_hostname(octopoes_api_connector: OctopoesAPIConnector, valid_ti
 
     octopoes_api_connector.save_observation(
         Observation(
-            method=NAMES[2],
-            source=network.reference,
-            task_id=task_id,
-            valid_time=valid_time,
-            result=[hostname],
+            method=NAMES[2], source=network.reference, task_id=task_id, valid_time=valid_time, result=[hostname]
         )
     )
 

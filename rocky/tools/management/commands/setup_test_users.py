@@ -32,11 +32,7 @@ def add_superuser(email: str, password: str):
 
 
 def add_test_user(email: str, password: str, group_name: str | None = None):
-    user_kwargs: dict[str, str | bool] = {
-        "email": email,
-        "password": password,
-        "full_name": "End-to-end user",
-    }
+    user_kwargs: dict[str, str | bool] = {"email": email, "password": password, "full_name": "End-to-end user"}
 
     add_user(user_kwargs, group_name)
 
@@ -79,10 +75,7 @@ def add_user(user_kwargs: dict[str, str | bool], group_name: str | None = None):
 
     organization, created = Organization.objects.get_or_create(code="_dev")
 
-    organizationmember, created = OrganizationMember.objects.get_or_create(
-        user=user,
-        organization=organization,
-    )
+    organizationmember, created = OrganizationMember.objects.get_or_create(user=user, organization=organization)
 
     if created:
         organizationmember.status = OrganizationMember.STATUSES.ACTIVE

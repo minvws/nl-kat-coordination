@@ -105,10 +105,7 @@ def handle_ip(event, network_reference, as_ooi_reference):
 
     if as_ooi_reference and len(netblock_range) == 2:
         yield block_type(
-            network=network_reference,
-            start_ip=ip_ooi.reference,
-            mask=netblock_range[1],
-            announced_by=as_ooi_reference,
+            network=network_reference, start_ip=ip_ooi.reference, mask=netblock_range[1], announced_by=as_ooi_reference
         )
 
     # Store port

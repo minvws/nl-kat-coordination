@@ -89,11 +89,7 @@ class BoefjeMixin(OctopoesView):
         task = PrioritizedItem(priority=1, data=boefje_task)
         schedule_task(self.request, self.organization.code, task)
 
-    def run_boefje_for_oois(
-        self,
-        boefje: KATalogusBoefje,
-        oois: list[OOI],
-    ) -> None:
+    def run_boefje_for_oois(self, boefje: KATalogusBoefje, oois: list[OOI]) -> None:
         if not oois and not boefje.consumes:
             self.run_boefje(boefje, None)
 

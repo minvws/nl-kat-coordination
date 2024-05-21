@@ -21,10 +21,7 @@ class BytesRawView(OrganizationView):
             raw_metas = self.bytes_client.get_raw_metas(boefje_meta_id, self.organization.code)
             raws = {raw_meta["id"]: self.bytes_client.get_raw(raw_meta["id"]) for raw_meta in raw_metas}
 
-            return FileResponse(
-                zip_data(raws, raw_metas),
-                filename=f"{boefje_meta_id}.zip",
-            )
+            return FileResponse(zip_data(raws, raw_metas), filename=f"{boefje_meta_id}.zip")
         except Http404 as e:
             msg = _("Getting raw data failed.")
             logger.error(msg)

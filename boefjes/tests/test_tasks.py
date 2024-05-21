@@ -20,29 +20,11 @@ from tests.loading import get_dummy_data
 class TaskTest(TestCase):
     def setUp(self) -> None:
         self.boefjes = [
+            Boefje(id="test-boefje-1", repository_id="", consumes={"SomeOOI"}, produces=["test-boef-1", "test/text"]),
+            Boefje(id="test-boefje-2", repository_id="", consumes={"SomeOOI"}, produces=["test-boef-2", "test/text"]),
+            Boefje(id="test-boefje-3", repository_id="", consumes={"SomeOOI"}, produces=["test-boef-3", "test/plain"]),
             Boefje(
-                id="test-boefje-1",
-                repository_id="",
-                consumes={"SomeOOI"},
-                produces=["test-boef-1", "test/text"],
-            ),
-            Boefje(
-                id="test-boefje-2",
-                repository_id="",
-                consumes={"SomeOOI"},
-                produces=["test-boef-2", "test/text"],
-            ),
-            Boefje(
-                id="test-boefje-3",
-                repository_id="",
-                consumes={"SomeOOI"},
-                produces=["test-boef-3", "test/plain"],
-            ),
-            Boefje(
-                id="test-boefje-4",
-                repository_id="",
-                consumes={"SomeOOI"},
-                produces=["test-boef-4", "test/and-simple"],
+                id="test-boefje-4", repository_id="", consumes={"SomeOOI"}, produces=["test-boef-4", "test/and-simple"]
             ),
         ]
         self.normalizers = [
@@ -52,21 +34,10 @@ class TaskTest(TestCase):
                 consumes=["test-boef-3", "test/text"],
                 produces=["SomeOOI", "OtherOOI"],
             ),
-            Normalizer(
-                id="test-normalizer-2",
-                repository_id="",
-                consumes=["test/text"],
-                produces=["SomeOtherOOI"],
-            ),
+            Normalizer(id="test-normalizer-2", repository_id="", consumes=["test/text"], produces=["SomeOtherOOI"]),
         ]
         self.bits = [
-            Bit(
-                id="test-bit-1",
-                repository_id="",
-                consumes="SomeOOI",
-                produces=["SomeOOI"],
-                parameters=[],
-            ),
+            Bit(id="test-bit-1", repository_id="", consumes="SomeOOI", produces=["SomeOOI"], parameters=[]),
             Bit(
                 id="test-bit-2",
                 repository_id="",
@@ -119,10 +90,7 @@ class TaskTest(TestCase):
         assert raw_call_args[0][0] == UUID("0dca59db-b339-47c4-bcc9-896fc18e2386")
         assert "Traceback (most recent call last)" in raw_call_args[0][1]
         assert "JobRuntimeError: Boefje failed" in raw_call_args[0][1]
-        assert raw_call_args[0][2] == {
-            "error/boefje",
-            "boefje/dummy_boefje_runtime_exception",
-        }
+        assert raw_call_args[0][2] == {"error/boefje", "boefje/dummy_boefje_runtime_exception"}
 
     def test_exception_raised_unsupported_return_type_normalizer(self):
         meta = NormalizerMeta.model_validate_json(get_dummy_data("dns-normalize.json"))

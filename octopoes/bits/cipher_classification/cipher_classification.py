@@ -85,9 +85,7 @@ def run(input_ooi: TLSCipher, additional_oois, config) -> Iterator[OOI]:
         return
 
     if highest_severity in SEVERITY_TO_ID:
-        ft = KATFindingType(
-            id=SEVERITY_TO_ID[highest_severity],
-        )
+        ft = KATFindingType(id=SEVERITY_TO_ID[highest_severity])
         yield ft
         yield Finding(
             finding_type=ft.reference,

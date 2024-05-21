@@ -33,11 +33,7 @@ class RepositoryInDB(SQL_BASE):
 class SettingsInDB(SQL_BASE):
     __tablename__ = "settings"
     __table_args__ = (
-        UniqueConstraint(
-            "organisation_pk",
-            "plugin_id",
-            name="unique_settings_per_organisation_per_plugin",
-        ),
+        UniqueConstraint("organisation_pk", "plugin_id", name="unique_settings_per_organisation_per_plugin"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -51,12 +47,7 @@ class SettingsInDB(SQL_BASE):
 class PluginStateInDB(SQL_BASE):
     __tablename__ = "plugin_state"
     __table_args__ = (
-        UniqueConstraint(
-            "plugin_id",
-            "organisation_pk",
-            "repository_pk",
-            name="unique_plugin_per_repo_per_org",
-        ),
+        UniqueConstraint("plugin_id", "organisation_pk", "repository_pk", name="unique_plugin_per_repo_per_org"),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)

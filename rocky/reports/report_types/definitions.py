@@ -59,8 +59,7 @@ class Report(BaseReport):
 
     @staticmethod
     def group_by_source(
-        query_result: list[tuple[str, OOIType]],
-        check: Callable[[OOIType], bool] | None = None,
+        query_result: list[tuple[str, OOIType]], check: Callable[[OOIType], bool] | None = None
     ) -> dict[str, list[OOIType]]:
         """Transform a query-many result from [(ref1, obj1), (ref1, obj2), ...] into {ref1: [obj1, obj2], ...}"""
 
@@ -77,8 +76,7 @@ class Report(BaseReport):
 
     @staticmethod
     def group_finding_types_by_source(
-        query_result: list[tuple[str, OOIType]],
-        keep_ids: list[str] | None = None,
+        query_result: list[tuple[str, OOIType]], keep_ids: list[str] | None = None
     ) -> dict[str, list[OOIType]]:
         if keep_ids:
             return Report.group_by_source(query_result, lambda x: x.id in keep_ids)

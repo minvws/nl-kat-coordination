@@ -81,10 +81,7 @@ class OOIRelatedObjectAddView(OOIRelatedObjectManager, TemplateView):
     def split_ooi_type_choice(self, ooi_type_choice) -> dict[str, str]:
         ooi_type = ooi_type_choice.split("|", 1)
 
-        return {
-            "ooi_type": ooi_type[0],
-            "ooi_relation": ooi_type[1] if len(ooi_type) > 1 else None,
-        }
+        return {"ooi_type": ooi_type[0], "ooi_relation": ooi_type[1] if len(ooi_type) > 1 else None}
 
     def ooi_add_url(self, ooi: OOI, ooi_type: str, ooi_relation: str = "ooi_id") -> str:
         """
@@ -138,12 +135,7 @@ class OOIRelatedObjectAddView(OOIRelatedObjectManager, TemplateView):
             if relation == "ooi":
                 text = ooi_type
 
-            input_values.append(
-                {
-                    "text": text,
-                    "value": value,
-                }
-            )
+            input_values.append({"text": text, "value": value})
 
         return input_values
 

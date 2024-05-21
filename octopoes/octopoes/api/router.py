@@ -86,30 +86,16 @@ def octopoes_service(
 
 # Endpoints
 @router.get("/health")
-def health(
-    xtdb_session_: XTDBSession = Depends(xtdb_session),
-) -> ServiceHealth:
+def health(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> ServiceHealth:
     try:
         xtdb_status = xtdb_session_.client.status()
-        xtdb_health = ServiceHealth(
-            service="xtdb",
-            healthy=True,
-            version=xtdb_status.version,
-            additional=xtdb_status,
-        )
+        xtdb_health = ServiceHealth(service="xtdb", healthy=True, version=xtdb_status.version, additional=xtdb_status)
     except HTTPError as ex:
         xtdb_health = ServiceHealth(
-            service="xtdb",
-            healthy=False,
-            additional="Cannot connect to XTDB at. Service possibly down",
+            service="xtdb", healthy=False, additional="Cannot connect to XTDB at. Service possibly down"
         )
         logger.exception(ex)
-    return ServiceHealth(
-        service="octopoes",
-        healthy=xtdb_health.healthy,
-        version=__version__,
-        results=[xtdb_health],
-    )
+    return ServiceHealth(service="octopoes", healthy=xtdb_health.healthy, version=__version__, results=[xtdb_health])
 
 
 # OOI-related endpoints
@@ -270,12 +256,7 @@ def get_tree(
     reference: Reference = Depends(extract_reference),
     depth: int = 1,
 ) -> ReferenceTree:
-    return octopoes.get_ooi_tree(
-        reference,
-        valid_time,
-        types,
-        depth,
-    )
+    return octopoes.get_ooi_tree(reference, valid_time, types, depth)
 
 
 @router.get("/origins", tags=["Origins"])
@@ -288,11 +269,7 @@ def list_origins(
     origin_type: OriginType | None = Query(None),
 ) -> list[Origin]:
     return octopoes.origin_repository.list_origins(
-        valid_time,
-        task_id=task_id,
-        source=source,
-        result=result,
-        origin_type=origin_type,
+        valid_time, task_id=task_id, source=source, result=result, origin_type=origin_type
     )
 
 
@@ -306,10 +283,7 @@ def list_origin_parameters(
 
 
 @router.post("/observations", tags=["Origins"])
-def save_observation(
-    observation: ValidatedObservation,
-    octopoes: OctopoesService = Depends(octopoes_service),
-) -> None:
+def save_observation(observation: ValidatedObservation, octopoes: OctopoesService = Depends(octopoes_service)) -> None:
     origin = Origin(
         origin_type=OriginType.OBSERVATION,
         method=observation.method,
@@ -322,10 +296,7 @@ def save_observation(
 
 
 @router.post("/declarations", tags=["Origins"])
-def save_declaration(
-    declaration: ValidatedDeclaration,
-    octopoes: OctopoesService = Depends(octopoes_service),
-) -> None:
+def save_declaration(declaration: ValidatedDeclaration, octopoes: OctopoesService = Depends(octopoes_service)) -> None:
     origin = Origin(
         origin_type=OriginType.DECLARATION,
         method=declaration.method if declaration.method else "manual",
@@ -338,10 +309,7 @@ def save_declaration(
 
 
 @router.post("/affirmations", tags=["Origins"])
-def save_affirmation(
-    affirmation: ValidatedAffirmation,
-    octopoes: OctopoesService = Depends(octopoes_service),
-) -> None:
+def save_affirmation(affirmation: ValidatedAffirmation, octopoes: OctopoesService = Depends(octopoes_service)) -> None:
     origin = Origin(
         origin_type=OriginType.AFFIRMATION,
         method=affirmation.method if affirmation.method else "hydration",
@@ -397,8 +365,7 @@ def save_many(
 
 @router.get("/scan_profiles/recalculate", tags=["Scan Profiles"])
 def recalculate_scan_profiles(
-    octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_valid_time),
+    octopoes: OctopoesService = Depends(octopoes_service), valid_time: datetime = Depends(extract_valid_time)
 ) -> None:
     octopoes.recalculate_scan_profiles(valid_time)
     octopoes.commit()
@@ -432,20 +399,12 @@ def list_findings(
     valid_time: datetime = Depends(extract_valid_time),
     severities: set[RiskLevelSeverity] = Query(DEFAULT_SEVERITY_FILTER),
 ) -> Paginated[Finding]:
-    return octopoes.ooi_repository.list_findings(
-        severities,
-        valid_time,
-        exclude_muted,
-        only_muted,
-        offset,
-        limit,
-    )
+    return octopoes.ooi_repository.list_findings(severities, valid_time, exclude_muted, only_muted, offset, limit)
 
 
 @router.get("/findings/count_by_severity", tags=["Findings"])
 def get_finding_type_count(
-    octopoes: OctopoesService = Depends(octopoes_service),
-    valid_time: datetime = Depends(extract_valid_time),
+    octopoes: OctopoesService = Depends(octopoes_service), valid_time: datetime = Depends(extract_valid_time)
 ) -> Counter:
     return octopoes.ooi_repository.count_findings_by_severity(valid_time)
 
@@ -494,25 +453,18 @@ def importer(data: bytes, xtdb_session_: XTDBSession, reset: bool = False) -> di
             xtdb_session_.commit()
         except XTDBException as e:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Error recreating nodes",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error recreating nodes"
             ) from e
     for op in ops:
         try:
             operations: list[Operation] = [
-                (
-                    OperationType(x[0]),
-                    x[1],
-                    datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ"),
-                )
-                for x in op
+                (OperationType(x[0]), x[1], datetime.strptime(x[2], "%Y-%m-%dT%H:%M:%SZ")) for x in op
             ]
             xtdb_session_.client.submit_transaction(operations)
         except Exception as e:
             logger.debug("Error importing objects", exc_info=True)
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Error importing object {op}",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error importing object {op}"
             ) from e
     return {"detail": len(ops)}
 
