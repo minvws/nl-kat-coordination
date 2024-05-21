@@ -9,16 +9,15 @@ from pathlib import Path
 
 import click
 
-from boefjes.config import settings
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+from boefjes.config import settings
 from boefjes.job_handler import NormalizerHandler, bytes_api_client
 from boefjes.job_models import Normalizer, NormalizerMeta
 from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalNormalizerJobRunner
 
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, force=True)
 
 
 @click.command()

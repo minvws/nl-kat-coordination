@@ -69,4 +69,7 @@ RUN export SECRET_KEY="secret" BYTES_API="http://bytes:8000" BYTES_PASSWORD="pas
 
 USER rocky
 
+# Workaround for https://github.com/emmett-framework/granian/issues/287
+ENV GRANIAN_HTTP=1
+
 CMD ["granian", "--interface", "wsgi", "rocky.wsgi:application", "--host", "0.0.0.0"]
