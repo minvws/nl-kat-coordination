@@ -7,8 +7,8 @@ With the Reports functionality you can create reports with a specific focus.
 There are 3 different kinds of reports available. These are:
 
 - **Normal report:** selecting one or more reports will show the contents of each report below each other. These reports can be exported as PDF.
-- **Aggregate report:** selecting one or more reports will show aggregation of the data for each selected reports. This means that certain results from boefjes are aggregated together and can be used to get a general overview of the current compliance status of the scanned objects. These reports can be exported as PDF and JSON.
-- **Multi report:** allow you to compare an organisation with another organisation based on the organisation tags. This is only possible for aggregate reports. The report is very similar to the data within the aggregate report, but then consists of data across multiple organisations. 
+- **Aggregate report:** selecting one or more reports will show aggregation of the data for each selected report. This means that certain results from boefjes are aggregated together and can be used to get a general overview of the current compliance status of the scanned objects. These reports can be exported as PDF and JSON.
+- **Multi report:** allow you to compare an organisation with another organisation based on the organisation tags. This is only possible for aggregate reports. The report is very similar to the data within the aggregate report, but then consists of data across multiple organisations. These reports can be exported as PDF.
 
 The table below gives an overview of which 12 reports are available. It also describes which Object is required in the selection process and whether the report is available as normal and/or as aggregate report.
 
@@ -29,7 +29,7 @@ The table below gives an overview of which 12 reports are available. It also des
      - **Any**
      - Normal
    * - IPv6
-     - Check whether hostnames point to ipv6 addresses.
+     - Check whether hostnames point to IPv6 addresses.
      - Hostname
      - Normal + aggregate
    * - Mail
@@ -45,7 +45,7 @@ The table below gives an overview of which 12 reports are available. It also des
      - Hostname
      - Normal + aggregate
    * - RPKI
-     - Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows the ip addresses and whether they are covered by a valid RPKI ROA.
+     - Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows the IP addresses and whether they are covered by a valid RPKI ROA.
      - Hostname
      - Normal + aggregate
    * - Safe connections
@@ -130,15 +130,15 @@ The table below gives an overview of the elements that can be found in each repo
      - The report shows per system type how many of the identified IPs/systems are compliant with the DNS checks. If in-compliant systems are identified, a compliance issue description is provided with the corresponding risk level.
      - Overview on the compliance status of various DNS checks across all systems.
    * - Findings
-     - Shows an overview table with the number of findings and occurrences per risk level (Critical, high, medium, low, recommendation), followed by a list of all findings. Each finding can be opened to view more details, such as a description of the finding, the possible impact, a general recommendation and the hosts where this finding was identified. 
+     - Shows an overview table with the number of findings and occurrences per risk level (critical, high, medium, low, recommendation), followed by a list of all findings. Each finding can be opened to view more details, such as a description of the finding, the possible impact, a general recommendation and the hosts where this finding was identified. 
      - Gives an overview of all findings (KAT, CVE and/or custom findings). 
      - Overview on the vulnerabilities checks across all systems.
    * - IPv6
      - Shows if IPv6 was detected on the scanned system.
-     - The report shows per host name if an IPv6 address was detected.
+     - The report shows per hostname if an IPv6 address was detected.
      - Overview on the IPv6 status categorised per system type.
    * - Mail
-     - The table gives an overview of some security configurations that are recommended to be implemented to ensure authenticated e-mails are sent on behalf of the hostname. The compliance checks look at the presence of SPF, DKIM and DMARC, which are used to prevent spammers from sending unwanted e-mails.. Each check will show whether or not the system is compliant with this security configuration. If a lack of compliance is identified, the table below will show what compliance issue was identified with what risk.
+     - The table gives an overview of some security configurations that are recommended to be implemented to ensure authenticated e-mails are sent on behalf of the hostname. The compliance checks look at the presence of SPF, DKIM and DMARC, which are used to prevent spammers from sending unwanted e-mails. Each check will show whether or not the system is compliant with this security configuration. If a lack of compliance is identified, the table below will show what compliance issue was identified with what risk.
      - The report shows per system type how many of the identified IPs/systems are compliant with the e-mail checks. If in-compliant systems are identified, a compliance issue description is provided with the corresponding risk level.
      - Overview on the compliance status of various e-mail checks across all systems.
    * - Name server
@@ -164,7 +164,7 @@ The table below gives an overview of the elements that can be found in each repo
    * - TLS
      - The table shows which TLS protocol versions and TLS ciphers were identified on the system, including the status of the identified data. This means that if outdated protocols (such as SSL3) are identified, the table will show a recommendation such as ‘Phase out’.
      - The aggregate findings of the TLS report can be found under the safe connections checks.
-     - This data is aggregated unden the safe connections checks. 
+     - This data is aggregated under the safe connections checks. 
    * - Vulnerability
      - The table gives an overview of the identified CVE's on the system.
      - The table gives an overview of the identified CVE's on the system.
@@ -181,7 +181,7 @@ On the Reports page you can generate new reports and get an overview of all gene
 
 Plugins
 =======
-Each report has both required and suggested plugins that are to show data in the report. These plugins are shown in the report flow. You can still generate reports if not all required plugins are enabled, however a warning a message is shown and the generated report will show that not all required plugins were enabled at the time of generation.
+Each report has both required and suggested plugins that are used to show data in the report. These plugins are shown in the report flow. You can still generate reports if not all required plugins are enabled, however a warning a message is shown and the generated report will show that not all required plugins were enabled at the time of generation.
 
 
 Downloading and/or exporting a report
