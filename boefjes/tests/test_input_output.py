@@ -37,7 +37,7 @@ def get_test_files(pluginspath, normalizerpath, testpath):
             for input_filename in Path(normalizer.parent).glob(testpath):
                 input_data = get_dummy_data(input_filename)
                 output_filename = str(input_filename).replace("input", "output")
-        
+
                 if Path(output_filename).with_suffix(".json").is_file():
                     output_data = json.loads(get_dummy_data(output_filename))
                 elif Path(output_filename).with_suffix(".py").is_file():
@@ -45,7 +45,7 @@ def get_test_files(pluginspath, normalizerpath, testpath):
                     output_data = getattr(output_module, "output")
                 else:
                     raise NoOutputFileException(f"no output file located for {input_filename}")
-        
+
                 ooi_data_filename = input_filename.replace("input", "ooi")
                 if Path(ooi_data_filename).is_file():
                     input_ooi_data = json.loads(get_dummy_data(ooi_data_filename))
