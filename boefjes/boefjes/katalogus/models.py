@@ -2,15 +2,7 @@ import datetime
 from enum import Enum
 from typing import Literal
 
-from pydantic import AnyHttpUrl, BaseModel, Field
-
-RESERVED_LOCAL_ID = "LOCAL"
-
-
-class Repository(BaseModel):
-    id: str
-    name: str
-    base_url: AnyHttpUrl
+from pydantic import BaseModel, Field
 
 
 class Organisation(BaseModel):
@@ -20,7 +12,6 @@ class Organisation(BaseModel):
 
 class Plugin(BaseModel):
     id: str
-    repository_id: str = RESERVED_LOCAL_ID
     name: str | None = None
     version: str | None = None
     authors: list[str] | None = None
