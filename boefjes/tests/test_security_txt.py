@@ -80,7 +80,6 @@ class SecurityTXTTest(TestCase):
         self.assertEqual(expected, oois)
 
     def test_security_txt_legacy_only(self):
-
         oois = list(
             run(
                 input_ooi,
