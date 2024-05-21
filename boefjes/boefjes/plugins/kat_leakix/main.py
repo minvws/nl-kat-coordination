@@ -11,7 +11,7 @@ from boefjes.job_models import BoefjeMeta
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     pk = boefje_meta.input_ooi
     if not pk:
-        raise Exception("Leakix boefje requires an input OOI")
+        raise Exception("LeakIX boefje requires an input OOI")
 
     results = []
     if re.match(pk, "IPAddressV4|.*") or re.match(pk, "IPAddressV6|.*"):
