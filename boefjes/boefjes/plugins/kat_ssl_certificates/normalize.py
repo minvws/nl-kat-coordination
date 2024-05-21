@@ -9,8 +9,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
 from dateutil.parser import parse
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.certificate import (
     AlgorithmType,
     SubjectAlternativeName,
@@ -34,23 +34,21 @@ def find_between(s: str, first: str, last: str) -> str:
         return ""
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     # only get the first part of certificates
     contents = find_between(raw.decode(), "Certificate chain", "Certificate chain")
 
     if not contents:
         return
 
-    input_ooi = normalizer_meta.raw_data.boefje_meta.input_ooi
+    pk = input_ooi["primary_key"]
 
     # extract all certificates
-    certificates, certificate_subject_alternative_names, hostnames = read_certificates(
-        contents, Reference.from_str(input_ooi)
-    )
+    certificates, certificate_subject_alternative_names, hostnames = read_certificates(contents, Reference.from_str(pk))
 
     # connect server certificate to website
     if certificates:
-        tokenized = Reference.from_str(input_ooi).tokenized
+        tokenized = Reference.from_str(pk).tokenized
         addr = ipaddress.ip_address(tokenized.ip_service.ip_port.address.address)
         network = Network(name=tokenized.ip_service.ip_port.address.network.name)
         if isinstance(addr, ipaddress.IPv4Address):

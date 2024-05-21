@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from boefjes.job_models import NormalizerMeta
 from boefjes.plugins.kat_security_txt_downloader.normalize import run
 from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
@@ -10,16 +9,30 @@ from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.types import Finding, KATFindingType
 from tests.loading import get_dummy_data
 
+input_ooi = {
+    "object_type": "Website",
+    "scan_profile": "scan_profile_type='declared' "
+    "reference=Reference('Website|internet|192.0.2.0|tcp|443|https|internet|example.com') level=<ScanLevel.L2: 2>",
+    "primary_key": "Website|internet|192.0.2.0|tcp|443|https|internet|example.com",
+    "ip_service": {
+        "ip_port": {
+            "address": {"network": {"name": "internet"}, "address": "192.0.2.0"},
+            "protocol": "tcp",
+            "port": "443",
+        },
+        "service": {"name": "https"},
+    },
+    "hostname": {"network": {"name": "internet"}, "name": "example.com"},
+    "certificate": "None",
+}
 
 class SecurityTXTTest(TestCase):
     maxDiff = None
 
     def test_security_txt_same_website(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("security-txt-normalizer.json"))
-
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/security_txt_result_same_website.json"),
             )
         )
@@ -39,11 +52,9 @@ class SecurityTXTTest(TestCase):
         self.assertEqual(expected, oois)
 
     def test_security_txt_different_website(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("security-txt-normalizer.json"))
-
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/security_txt_result_different_website.json"),
             )
         )

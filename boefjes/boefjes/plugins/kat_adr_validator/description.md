@@ -4,5 +4,4 @@ Boefje to validate if an API conforms to the Dutch API Design Rules](https://pub
 
 Source project: https://gitlab.com/commonground/don/adr-validator
 
-
 **Cat name**: Malcolm X

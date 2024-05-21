@@ -3,8 +3,8 @@ import json
 from collections.abc import Iterable
 from urllib.parse import urlparse
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
 from octopoes.models.ooi.service import IPService, Service
@@ -12,11 +12,9 @@ from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.types import Finding, KATFindingType
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.raw_data.boefje_meta
-    website_original = Reference.from_str(boefje_meta.input_ooi)
-    input_ = boefje_meta.arguments["input"]
+    website_original = Reference.from_str(input_ooi["primary_key"])
     valid_results = {}
 
     for path, details in results.items():
@@ -26,19 +24,19 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         valid_results[path] = details
 
         url_original = URL(
-            raw=f'{input_["ip_service"]["service"]["name"]}://{input_["hostname"]["name"]}/{path}',
-            network=Network(name=input_["hostname"]["network"]["name"]).reference,
+            raw=f'{input_ooi["ip_service"]["service"]["name"]}://{input_ooi["hostname"]["name"]}/{path}',
+            network=Network(name=input_ooi["hostname"]["network"]["name"]).reference,
         )
         yield url_original
-        url = URL(raw=details["url"], network=Network(name=input_["hostname"]["network"]["name"]).reference)
+        url = URL(raw=details["url"], network=Network(name=input_ooi["hostname"]["network"]["name"]).reference)
         yield url
 
         url_parts = urlparse(details["url"])
         # we need to check if the website of the response is the same as the input website
         if (
-            url_parts.scheme == input_["ip_service"]["service"]["name"]
-            and url_parts.netloc == input_["hostname"]["name"]
-            and details["ip"] == input_["ip_service"]["ip_port"]["address"]["address"]
+            url_parts.scheme == input_ooi["ip_service"]["service"]["name"]
+            and url_parts.netloc == input_ooi["hostname"]["name"]
+            and details["ip"] == input_ooi["ip_service"]["ip_port"]["address"]["address"]
         ):
             security_txt = SecurityTXT(
                 website=website_original, url=url.reference, security_txt=details["content"], redirects_to=None
@@ -47,17 +45,17 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         # otherwise we need to create a new website complete with hostname and ip
         else:
             hostname = Hostname(
-                name=url_parts.netloc, network=Network(name=input_["hostname"]["network"]["name"]).reference
+                name=url_parts.netloc, network=Network(name=input_ooi["hostname"]["network"]["name"]).reference
             )
             yield hostname
             addr = ipaddress.ip_address(details["ip"])
             if addr.version == 6:
                 ip_address = IPAddressV6(
-                    address=details["ip"], network=Network(name=input_["hostname"]["network"]["name"]).reference
+                    address=details["ip"], network=Network(name=input_ooi["hostname"]["network"]["name"]).reference
                 )
             else:
                 ip_address = IPAddressV4(
-                    address=details["ip"], network=Network(name=input_["hostname"]["network"]["name"]).reference
+                    address=details["ip"], network=Network(name=input_ooi["hostname"]["network"]["name"]).reference
                 )
             yield ip_address
             # check scheme for service and ipport

@@ -4,6 +4,7 @@ from collections.abc import Iterable, Iterator
 from pathlib import Path
 from typing import Literal
 
+from fastapi import Query
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 from sqlalchemy.orm import Session
@@ -18,7 +19,7 @@ from boefjes.katalogus.storage.interfaces import (
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
-from boefjes.katalogus.types import LIMIT, FilterParameters, PaginationParameters
+from boefjes.katalogus.types import FilterParameters, PaginationParameters
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
 from boefjes.sql.repository_storage import create_repository_storage
@@ -72,6 +73,19 @@ class PluginService:
                 return plugin
 
         raise KeyError(f"Plugin {plugin_id} not found for {organisation_id}")
+
+    def by_plugin_ids(self, plugin_ids: list[str], organisation_id: str) -> list[PluginType]:
+        all_plugins = self.get_all(organisation_id)
+        plugin_map: dict[str, PluginType] = {plugin.id: plugin for plugin in all_plugins}
+
+        found_plugins = []
+        for plugin_id in plugin_ids:
+            if plugin_id in plugin_map:
+                found_plugins.append(plugin_map[plugin_id])
+            else:
+                raise KeyError(f"Plugin {plugin_id} not found for {organisation_id}")
+
+        return found_plugins
 
     def get_all_settings(self, organisation_id: str, plugin_id: str):
         return self.settings_storage.get_all(organisation_id, plugin_id)
@@ -205,13 +219,14 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
     yield from session_managed_iterator(closure)
 
 
-def get_pagination_parameters(offset: int = 0, limit: int | None = LIMIT) -> PaginationParameters:
+def get_pagination_parameters(offset: int = 0, limit: int | None = None) -> PaginationParameters:
     return PaginationParameters(offset=offset, limit=limit)
 
 
 def get_plugins_filter_parameters(
     q: str | None = None,
+    ids: list[str] | None = Query(None),
     plugin_type: Literal["boefje", "normalizer", "bit"] | None = None,
     state: bool | None = None,
 ) -> FilterParameters:
-    return FilterParameters(q=q, type=plugin_type, state=state)
+    return FilterParameters(q=q, ids=ids, type=plugin_type, state=state)
