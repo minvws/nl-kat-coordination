@@ -4,7 +4,7 @@ from pathlib import Path
 
 PLUGINS_PATH = "boefjes/plugins/*"
 NORMALIZER_PATH = "**/normalize.py"
-TESTS_PATH = "tests/*test-input*"
+TESTS_PATH = "tests/*-input*"
 DEFAULT_INPUT_OOI = {
     "object_type": "HostnameHTTPURL",
     "network": "Network|internet",
