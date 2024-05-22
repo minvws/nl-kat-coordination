@@ -14,6 +14,7 @@ from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
+from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_by_id, get_report_types_for_oois
 from reports.views.base import (
@@ -207,7 +208,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
         # if its not a single report, we need a parent
         if number_of_reports > 1:
             parent_report_ooi = self.save_report(
-                data={}, report_type=None, input_ooi=None, parent=None, has_parent=False
+                data={}, report_type=ConcatenatedReport, input_ooi=None, parent=None, has_parent=False
             )
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():

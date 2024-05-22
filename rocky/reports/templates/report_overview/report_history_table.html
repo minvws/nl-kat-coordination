@@ -19,7 +19,7 @@
                 <td>{{ report.0.date_generated }}</td>
                 <td>
                     <a href="{% url "view_report" organization.code %}?report_id={{ report.0.reference }}&observed_at={{ report.0.observed_at|date:"Y-m-d H:i:s:u" }}"
-                       title="{% translate "Shows report detail" %}">{{ report.0.report_type|report_name_by_id }}</a>
+                       title="{% translate "Shows report detail" %}">{{ report.0.name }}</a>
                 </td>
                 <td>
                     {% if report.0.input_ooi %}

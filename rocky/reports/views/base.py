@@ -305,7 +305,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         observed_at = self.get_observed_at()
 
         report_ooi = ReportOOI(
-            name="test_name",
+            name=str(report_type.name) if report_type else None,
             report_type=str(report_type.id) if report_type else None,
             template=report_type.template_path if report_type else None,
             report_id=uuid4(),
