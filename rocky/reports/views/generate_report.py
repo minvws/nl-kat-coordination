@@ -194,14 +194,13 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
                 continue
 
             for ooi, data in results.items():
-                ooi_human_readable = Reference.from_str(ooi).human_readable
                 if report_type.id not in report_data:
                     report_data[report_type.id] = {}
 
                 report_data[report_type.id][ooi] = {
                     "data": data,
                     "template": report_type.template_path,
-                    "ooi_human_readable": ooi_human_readable,
+                    "report_name": report_type.name,
                 }
                 number_of_reports += 1
 

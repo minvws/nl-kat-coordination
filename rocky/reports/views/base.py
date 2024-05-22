@@ -393,12 +393,10 @@ class ViewReportView(OOIFilterView, TemplateView):
                     Reference.from_str(self.report_ooi.input_ooi), valid_time=self.observed_at
                 )
             ]
-            human_readable = self.report_ooi.input_ooi.human_readable
 
         else:
             # TODO: get the input oois from the underlying reports
             input_oois = []
-            human_readable = ""
 
         self.bytes_client.login()
         report_data: dict = {}
@@ -437,7 +435,6 @@ class ViewReportView(OOIFilterView, TemplateView):
                     self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
                 ),
                 "template": self.report_ooi.template,
-                "ooi_human_readable": human_readable,
                 "report_name": get_report_by_id(self.report_ooi.report_type).name,
             }
             context["report_data"] = report_data
