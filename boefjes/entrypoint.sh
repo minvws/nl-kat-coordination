@@ -14,7 +14,6 @@ fi
 # they can also be run when overruling the default cmd
 if [ "$DATABASE_MIGRATION" = "1" ] || [[ $DATABASE_MIGRATION == "true" ]]; then
     python -m alembic --config /app/boefjes/boefjes/alembic.ini upgrade head
-    python -m boefjes.seed
 fi
 
 if [ "$1" = "katalogus" ]; then

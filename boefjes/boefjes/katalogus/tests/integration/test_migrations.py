@@ -33,7 +33,7 @@ class TestRepositories(TestCase):
         query = f"INSERT INTO setting (key, value, organisation_pk, plugin_id) values {','.join(map(str, entries))}"  # noqa: S608
         self.engine.execute(text(query))
 
-        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
+        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
 
         settings_storage = SQLSettingsStorage(session, encrypter)
         assert settings_storage.get_all("dev1", "test-plugin1") == {"key1": "val1", "key3": "val3"}
@@ -52,7 +52,7 @@ class TestRepositories(TestCase):
 
     def tearDown(self) -> None:
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
-        SQL_BASE.metadata.drop_all(self.engine)
+        SQL_BASE.metadata.drop_all(self.engine, checkfirst=False)
 
     @staticmethod
     def _collect_entries(encrypter: NaclBoxMiddleware):

@@ -41,7 +41,7 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
             .filter(PluginStateInDB.enabled)
         )
 
-        return query.all()
+        return [x.plugin_id for x in query.all()]
 
     def update_or_create_by_id(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
         try:
