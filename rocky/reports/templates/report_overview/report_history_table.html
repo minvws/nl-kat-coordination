@@ -18,7 +18,7 @@
             <tr>
                 <td>{{ report.0.date_generated }}</td>
                 <td>
-                    <a href="{% url "view_report" organization.code %}?report_id={{ report.0.reference }}&observed_at={{ report.observed_at|date:"Y-m-d" }}"
+                    <a href="{% url "view_report" organization.code %}?report_id={{ report.0.reference }}&observed_at={{ report.0.observed_at|date:"Y-m-d H:i:s:u" }}"
                        title="{% translate "Shows report detail" %}">{{ report.0.report_type|report_name_by_id }}</a>
                 </td>
                 <td>
@@ -58,7 +58,7 @@
                                         <td>{{ child.input_ooi|human_readable }}</td>
                                         <td>{{ child.input_ooi.object_type }}</td>
                                         <td>
-                                            <a href="{% url "view_report" organization.code %}?report_id={{ child.reference }}&observed_at={{ child.observed_at|date:"Y-m-d" }}"
+                                            <a href="{% url "view_report" organization.code %}?report_id={{ child.reference }}&observed_at={{ child.observed_at|date:"Y-m-d H:i:s:u" }}"
                                                title="{% translate "Shows report details" %}">{{ child.report_type|report_name_by_id }}</a>
                                         </td>
                                     </tr>

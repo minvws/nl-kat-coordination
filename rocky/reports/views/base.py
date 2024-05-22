@@ -302,6 +302,8 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             raw=ReportDataDict(data).model_dump_json(), manual_mime_types={"openkat/report"}
         )
 
+        observed_at = self.get_observed_at()
+
         report_ooi = ReportOOI(
             name="test_name",
             report_type=str(report_type.id) if report_type else None,
@@ -313,7 +315,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             data_raw_id=report_data_raw_id,
             date_generated=datetime.now(timezone.utc),
             input_ooi=input_ooi,
-            observed_at=self.observed_at,
+            observed_at=observed_at,
             parent_report=parent,
             has_parent=has_parent,
         )
@@ -322,10 +324,13 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             api_connector=self.octopoes_api_connector,
             bytes_client=self.bytes_client,
             ooi=report_ooi,
-            observed_at=self.observed_at,
+            observed_at=observed_at,
         )
 
         return report_ooi
+
+    def get_observed_at(self):
+        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
