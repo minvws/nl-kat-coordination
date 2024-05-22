@@ -96,7 +96,21 @@ docker compose --env-file .env-prod -f docker-compose.release-example.yml exec r
 ```
 
 ## IPv6 support
-In order to perform scans against IPv6 addresses you need to manually enabled IPv6 support in Dockerized setups. See the [Docker documentation](https://docs.docker.com/config/daemon/ipv6/) on how to do this.
+In order to perform scans against IPv6 addresses you need to manually enable IPv6 support in Dockerized setups. Add the following snippet to the file `/etc/docker/daemon.json`. If this file doesn't exist yet, you can create it and save it with the following configuration:
+
+```
+{
+  "experimental": true,
+  "ip6tables": true
+}
+```
+
+Restart the Docker daemon for your changes to take effect.
+
+```
+$ sudo systemctl restart docker
+```
+By default OpenKAT has an IPv6 subnet configured. This configuration (step 4 and onwards from the official Docker documentation as listed below) can be found in the `docker-compose.yml` file. For more information on IPv6 support within Docker look at the [Docker documentation](https://docs.docker.com/config/daemon/ipv6/).
 
 
 ## Container commands
