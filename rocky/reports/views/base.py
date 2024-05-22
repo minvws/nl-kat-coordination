@@ -298,12 +298,11 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         input_ooi: Reference | None,
         parent: Reference | None,
         has_parent: bool,
+        observed_at: datetime,
     ) -> ReportOOI:
         report_data_raw_id = self.bytes_client.upload_raw(
             raw=ReportDataDict(data).model_dump_json(), manual_mime_types={"openkat/report"}
         )
-
-        observed_at = self.get_observed_at()
 
         report_ooi = ReportOOI(
             name=str(report_type.name) if report_type else None,
@@ -329,9 +328,6 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         )
 
         return report_ooi
-
-    def get_observed_at(self):
-        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

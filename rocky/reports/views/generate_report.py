@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -205,10 +205,17 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
                 }
                 number_of_reports += 1
 
+        observed_at = self.get_observed_at()
+
         # if its not a single report, we need a parent
         if number_of_reports > 1:
             parent_report_ooi = self.save_report(
-                data={}, report_type=ConcatenatedReport, input_ooi=None, parent=None, has_parent=False
+                data={},
+                report_type=ConcatenatedReport,
+                input_ooi=None,
+                parent=None,
+                has_parent=False,
+                observed_at=observed_at,
             )
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
@@ -218,6 +225,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
                         input_ooi=Reference.from_str(ooi),
                         parent=parent_report_ooi.reference,
                         has_parent=True,
+                        observed_at=observed_at,
                     )
         # if its a single report we can just save it as complete
         else:
@@ -230,6 +238,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
                 input_ooi=Reference.from_str(ooi),
                 parent=None,
                 has_parent=False,
+                observed_at=observed_at,
             )
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if error_reports:
@@ -242,6 +251,9 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
             messages.error(self.request, error_message)
 
         return report_data
+
+    def get_observed_at(self):
+        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
