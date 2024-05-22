@@ -2,89 +2,72 @@
 {% load ooi_extra %}
 {% load report_extra %}
 
-<section>
-    <div>
-        <h2>{% translate "Report history" %}</h2>
-        <p>
-            {% blocktranslate trimmed %}
-                An overview of all your generated reports.
-            {% endblocktranslate %}
-        </p>
-        <form method="get"
-              action="{{ next }}"
-              class="inline layout-wide checkboxes_required">
-            {% include "report_overview/report_history_form.html" %}
-
-            <p class="de-emphasized">
-                {% blocktranslate with length=reports|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
-            </p>
-            <table>
-                <caption class="visually-hidden">{% translate "Reports:" %}</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">{% translate "Report type" %}</th>
-                        <th scope="col">{% translate "Objects" %}</th>
-                        <th scope="col">{% translate "Reference date" %}</th>
-                        <th scope="col">{% translate "Creation date" %}</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for report in reports %}
-                        <tr>
-                            <td>
-                                <a href="{% url "view_report" organization.code %}?report_id={{ report.0.reference }}&observed_at={{ report.observed_at|date:"Y-m-d" }}"
-                                   title="{% translate "Shows report detail" %}">{{ report.0.report_type|report_name_by_id }}</a>
-                            </td>
-                            <td>
-                                {% if report.0.input_ooi %}{{ report.0.input_ooi|human_readable }}{% endif %}
-                            </td>
-                            <td>{{ report.0.observed_at }}</td>
-                            <td>{{ report.0.date_generated }}</td>
-                            <td>
-                                {% if report.1 %}
-                                    <button type="button"
-                                            class="expando-button icon ti-chevron-down"
-                                            data-icon-open-class="icon ti-chevron-down"
-                                            data-icon-close-class="icon ti-chevron-up"
-                                            data-close-label="Close details"
-                                            aria-expanded="false"></button>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% if report.1 %}
-                            <tr class="expando-row">
-                                <td colspan="7">
-                                    <table>
-                                        <h5>{% translate "Selected Input Objects" %}</h5>
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">{% translate "Object name" %}</th>
-                                                <th scope="col">{% translate "Object type" %}</th>
-                                                <th scope="col">{% translate "Report type" %}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for child in report.1 %}
-                                                <tr>
-                                                    <td>{{ child.input_ooi|human_readable }}</td>
-                                                    <td>{{ child.input_ooi.object_type }}</td>
-                                                    <td>
-                                                        <a href="{% url "view_report" organization.code %}?report_id={{ child.reference }}&observed_at={{ child.observed_at|date:"Y-m-d" }}"
-                                                           title="{% translate "Shows report details" %}">{{ child.report_type|report_name_by_id }}</a>
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </form>
-        {% include "partials/list_paginator.html" %}
-
-    </div>
-</section>
+<table>
+    <caption class="visually-hidden">{% translate "Reports:" %}</caption>
+    <thead>
+        <tr>
+            <th scope="col">{% translate "Creation date" %}</th>
+            <th scope="col">{% translate "Report type" %}</th>
+            <th scope="col">{% translate "Objects" %}</th>
+            <th scope="col">{% translate "Reference date" %}</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+            <tr>
+                <td>{{ report.0.date_generated }}</td>
+                <td>
+                    <a href="{% url "view_report" organization.code %}?report_id={{ report.0.reference }}&observed_at={{ report.observed_at|date:"Y-m-d" }}"
+                       title="{% translate "Shows report detail" %}">{{ report.0.report_type|report_name_by_id }}</a>
+                </td>
+                <td>
+                    {% if report.0.input_ooi %}
+                        {{ report.0.input_ooi|human_readable }}
+                    {% else %}
+                        <i>{% translate "See details" %}</i>
+                    {% endif %}
+                </td>
+                <td>{{ report.0.observed_at }}</td>
+                <td>
+                    {% if report.1 %}
+                        <button type="button"
+                                class="expando-button icon ti-chevron-down"
+                                data-icon-open-class="icon ti-chevron-down"
+                                data-icon-close-class="icon ti-chevron-up"
+                                data-close-label="Close details"
+                                aria-expanded="false"></button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% if report.1 %}
+                <tr class="expando-row">
+                    <td colspan="7">
+                        <table>
+                            <h5>{% translate "Selected Input Objects" %}</h5>
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% translate "Object name" %}</th>
+                                    <th scope="col">{% translate "Object type" %}</th>
+                                    <th scope="col">{% translate "Report type" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for child in report.1 %}
+                                    <tr>
+                                        <td>{{ child.input_ooi|human_readable }}</td>
+                                        <td>{{ child.input_ooi.object_type }}</td>
+                                        <td>
+                                            <a href="{% url "view_report" organization.code %}?report_id={{ child.reference }}&observed_at={{ child.observed_at|date:"Y-m-d" }}"
+                                               title="{% translate "Shows report details" %}">{{ child.report_type|report_name_by_id }}</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
