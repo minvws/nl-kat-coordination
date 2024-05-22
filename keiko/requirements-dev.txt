@@ -417,9 +417,9 @@ pytest==8.2.1 ; python_version >= "3.10" and python_version < "4.0" \
 python-dotenv==1.0.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca \
     --hash=sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a
-requests==2.32.1 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:21ac9465cdf8c1650fe1ecde8a71669a93d4e6f147550483a2967d08396a56a5 \
-    --hash=sha256:eb97e87e64c79e64e5b8ac75cee9dd1f97f49e289b083ee6be96268930725685
+requests==2.32.2 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:dd951ff5ecf3e3b3aa26b40703ba77495dab41da839ae72ef3c8e5d8e2433289 \
+    --hash=sha256:fc06670dd0ed212426dfeb94fc1b983d917c4f9847c863f313c9dfaaffb7c23c
 rich-click==1.7.3 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:bc4163d4e2a3361e21c4d72d300eca6eb8896dfc978667923cb1d4937b8769a3 \
     --hash=sha256:bced1594c497dc007ab49508ff198bb437c576d01291c13a61658999066481f4
