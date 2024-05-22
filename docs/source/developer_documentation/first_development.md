@@ -19,7 +19,6 @@ We will be making a boefje, a whisker, a bit, a new model and a report type whic
 
 2. Inside this folder we need to have the following files:
    - \_\_init\_\_.py
-   - boefje.Dockerfile
    - boefje.json
    - cover.jpg
    - description.md
@@ -29,30 +28,6 @@ We will be making a boefje, a whisker, a bit, a new model and a report type whic
 ### \_\_init\_\_.py
 
 This file stays empty and is required for Python.
-
-### boefje.Dockerfile
-
-Inside this file, we describe the docker container that this boefje will run in. Here we can install external packages that might be needed for the boefje.
-
-For this example, we will create a minimal docker file. :
-
-```
-FROM python:3.11-slim
-
-WORKDIR /app
-RUN apt-get update && pip install httpx
-
-ARG BOEFJE_PATH=./boefjes/plugins/kat_hello_katty
-ENV PYTHONPATH=/app:$BOEFJE_PATH
-
-COPY ./images/oci_adapter.py ./
-COPY $BOEFJE_PATH $BOEFJE_PATH
-
-ENTRYPOINT ["/usr/local/bin/python", "-m", "oci_adapter"]
-
-```
-
-After creating the Docker file we will have to add the path to this docker file to the boefje's Makefile, we will do this later on this page.
 
 ### boefje.json
 
@@ -128,7 +103,7 @@ This is an example of a schema.json file:
 - **description**: A description of the boefje explaining in short what it can do. This will both be displayed inside the KAT-alogus and on the boefje's page.
 - **properties**: This contains a list of objects which each will show the KAT-alogus what inputs are requested from the user. This can range from requesting for an API-key to extra commands the boefje should run.
   Inside the boefje.json file, we specified 2 environment variables that will be used by this boefje. + **MESSAGE**: For this property we ask the user to send us a string which this boefje will use to create some raw data. + **NUMBER**: For this property we ask the user to send us an integer between 1 and 9.
-- **required**: In here we need to give a list of the objects' names that the user has to provide to run our boefje. For this example we will only require the user to give us the MESSAGE variable. We do this by adding "MESSAGE" to the _required_ list.
+- **required**: In here we need to give a list of the objects' names that the user has to provide to run our boefje. For this example, we will only require the user to give us the MESSAGE variable. We do this by adding "MESSAGE" to the _required_ list.
 
 ### main.py
 
@@ -169,15 +144,15 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     ]
 ```
 
-The most important part is the return value we send back. :
-The final task of creating a boefje is adding the docker file to the boefjes' Make file. This file is located in boefjes/Makefile.
-Inside the _images_ rule. We have to add our boefje's docker file. This is as simple as adding a single line. Here is what that would look like.
+The most important part is the return value we send back :
+The final task of creating a boefje is specifying what DockerFile our boefje should use. We can do this inside the file located in boefjes/Makefile.
+Inside the _images_ rule. We have to specify that we want to use _base.Dockerfile_ since our boefje does not require any special packages to run. This is as simple as adding a single line. Here is what that would look like in our case:
 
 **BEFORE**
 
 ```
 images:  # Build the images for the containerized boefjes
-	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-sec .
+	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t openkat/nmap  .
 ```
 
 **AFTER**
@@ -185,7 +160,7 @@ images:  # Build the images for the containerized boefjes
 ```
 images:  # Build the images for the containerized boefjes
 	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t openkat/nmap  .
-	docker build -f ./boefjes/plugins/kat_hello_katty/boefje.Dockerfile -t openkat/hello-katty  .
+	docker build -f images/base.Dockerfile -t openkat/hello-katty --build-arg BOEFJE_PATH=./boefjes/plugins/kat_hello_katty .
 ```
 
 This was the creation of our first boefje. If we run openKAT now we should be able to see this boefje sitting in the KAT-alogus. Let’s try it out!
@@ -194,7 +169,7 @@ This was the creation of our first boefje. If we run openKAT now we should be ab
 
 First, we run `make kat`. After that successfully finishes. You can run `grep 'DJANGO_SUPERUSER_PASSWORD' .env` to get the password for the super user. The login e-mail is "superuser@localhost".
 
-After logging in, openKAT will guide you through their first time setup.
+After logging in, openKAT will guide you through their first-time setup.
 
 1. Click the "Let's get started" button.
 2. Input the name of your company (or just any name since this is a test run)
