@@ -430,6 +430,10 @@ class ViewReportView(OOIFilterView, TemplateView):
             context["report_types"] = [
                 report.class_attributes() for report in [get_report_by_id(report.report_type) for report in children]
             ]
+            input_oois = list(
+                {self.octopoes_api_connector.get(child.input_ooi, valid_time=self.observed_at) for child in children}
+            )
+
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             # its an aggregate report
             context["post_processed_data"] = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
@@ -441,6 +445,9 @@ class ViewReportView(OOIFilterView, TemplateView):
             context["report_types"] = [
                 report.class_attributes() for report in [get_report_by_id(report.report_type) for report in children]
             ]
+            input_oois = list(
+                {self.octopoes_api_connector.get(child.input_ooi, valid_time=self.observed_at) for child in children}
+            )
         else:
             # its a single report
             report_data[self.report_ooi.report_type] = {}
