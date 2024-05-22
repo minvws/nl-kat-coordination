@@ -23,6 +23,7 @@ from tools.view_helpers import BreadcrumbsMixin
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report, ReportType
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from rocky.views.mixins import OOIList
@@ -306,7 +307,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
         report_ooi = ReportOOI(
             name=str(report_type.name) if report_type else None,
-            report_type=str(report_type.id) if report_type else None,
+            report_type=str(report_type.id) if report_type and report_type is not ConcatenatedReport else None,
             template=report_type.template_path if report_type else None,
             report_id=uuid4(),
             organization_code=self.organization.code,
