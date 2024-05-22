@@ -57,7 +57,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             yield as_ooi
 
         if event["ip"]:
-            for ooi in list(handle_ip(event, network_reference, as_ooi.reference)):
+            for ooi in list(handle_ip(event, network_reference, as_ooi.reference if as_ooi else None)):
                 yield ooi
             # we only need the last ooi's reference
             event_ooi_reference = ooi.reference
