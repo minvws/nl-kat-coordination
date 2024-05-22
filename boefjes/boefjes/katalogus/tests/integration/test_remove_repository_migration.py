@@ -3,7 +3,6 @@ from unittest import TestCase, skipIf
 
 import alembic.config
 from sqlalchemy import text
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
@@ -23,36 +22,53 @@ class TestRemoveRepositories(TestCase):
         # Set state to revision 197672984df0
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
 
-    def test_fail_on_non_unique(self):
         session = sessionmaker(bind=self.engine)()
 
         with SQLOrganisationStorage(session, settings) as storage:
             storage.create(Organisation(id="dev1", name="Test 1 "))
             storage.create(Organisation(id="dev2", name="Test 2 "))
 
-        entries = [(x, f"repo-{x}", f"Repository {x}", f"https://repo{x}.com/") for x in range(5)]
+        entries = [(1, "LOCAL", "Repository Local", "https://local.com/")]
         query = f"INSERT INTO repository (pk, id, name, base_url) values {','.join(map(str, entries))}"  # noqa: S608
         self.engine.execute(text(query))
 
-        entries = [(1, "test_plugin_id", True, 1, 1), (2, "test_plugin_id", True, 1, 2)]  # New unique constraint fails
+        entries = [(1, "test_plugin_id", True, 1, 1)]  # New unique constraint fails
+        query = (
+            f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk, repository_pk)"
+            f"values {','.join(map(str, entries))}"
+        )  # noqa: S608
+
+        self.engine.execute(text(query))
+
+        entries = [(1, 1)]
+        query = (
+            f"INSERT INTO organisation_repository (repository_pk, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
+        )
+        self.engine.execute(text(query))
+        session.close()
+
+    def test_fail_on_non_unique(self):
+        session = sessionmaker(bind=self.engine)()
+
+        entries = [(2, "test", "test", "https://test.co/")]  # Another non-local repository
+        query = f"INSERT INTO repository (pk, id, name, base_url) values {','.join(map(str, entries))}"  # noqa: S608
+        self.engine.execute(text(query))
+
+        entries = [(2, "test_plugin_id", True, 1, 2)]  # New unique constraint fails
         query = (
             f"INSERT INTO plugin_state (id, plugin_id, enabled, organisation_pk, repository_pk)"
             f"values {','.join(map(str, entries))}"
         )  # noqa: S608
         self.engine.execute(text(query))
 
-        entries = [(repo_id, 1) for repo_id in range(5)] + [(1, 2)]
-        query = (
-            f"INSERT INTO organisation_repository (repository_pk, organisation_pk) values {','.join(map(str, entries))}"  # noqa: S608
-        )
-        self.engine.execute(text(query))
-
-        with self.assertRaises(IntegrityError) as ctx:
+        with self.assertRaises(Exception) as ctx:
             alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "7c88b9cd96aa"])
 
-        assert 'could not create unique index "unique_plugin_id_per_org"' in str(ctx.exception)
+        assert "remove plugin_states that refer to nonlocal repositories first" in str(ctx.exception)
 
         self.engine.execute(text("DELETE FROM plugin_state WHERE id = 2"))  # Fix unique constraint fails
+        self.engine.execute(text("DELETE FROM repository WHERE pk = 2"))  # Fix unique constraint fails
+
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "7c88b9cd96aa"])
 
         with SQLPluginEnabledStorage(session, settings) as storage:
@@ -60,6 +76,13 @@ class TestRemoveRepositories(TestCase):
             assert storage.get_all_enabled("dev1") == ["test_plugin_id"]
             assert storage.get_all_enabled("dev2") == []
 
+        session.close()
+
+    def test_downgrade(self):
+        session = sessionmaker(bind=self.engine)()
+
+        self.engine.execute(text("DELETE FROM plugin_state WHERE id = 2"))  # Fix unique constraint fails
+        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "7c88b9cd96aa"])
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "-1"])
 
         # Same checks plus check if a repository exists
