@@ -97,7 +97,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                 messages.ERROR,
                 _("Could not raise clearance levels to L%s. Indemnification not present at organization %s.")
                 % (
-                    level,
+                    level.value,
                     self.organization.name,
                 ),
             )
@@ -112,7 +112,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                     "Contact your administrator to receive a higher clearance."
                 )
                 % (
-                    level,
+                    level.value,
                     self.organization_member.trusted_clearance_level,
                 ),
             )
@@ -127,7 +127,7 @@ class OOIListView(BaseOOIListView, OctopoesView):
                     "Please accept the clearance level below to proceed."
                 )
                 % (
-                    level,
+                    level.value,
                     self.organization_member.acknowledged_clearance_level,
                 ),
             )

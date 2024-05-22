@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from account.mixins import OrganizationView
@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from katalogus.client import get_katalogus
 from tools.forms.ooi import OOIReportSettingsForm

@@ -14,8 +14,8 @@ from tools.view_helpers import OrganizationMemberBreadcrumbsMixin
 
 
 class BLOCK_STATUSES(models.TextChoices):
-    BLOCKED = _("Blocked"), "blocked"
-    UNBLOCKED = _("Not blocked"), "unblocked"
+    BLOCKED = "blocked", _("Blocked")
+    UNBLOCKED = "unblocked", _("Not blocked")
 
 
 class PageActions(Enum):
