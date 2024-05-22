@@ -14,4 +14,4 @@ def report_name_by_id(report_id: str):
 
 @register.filter
 def sum_attribute(checks, attribute):
-    return sum(check[attribute] for check in checks)
+    return sum(getattr(check, attribute) for check in checks if hasattr(check, attribute))
