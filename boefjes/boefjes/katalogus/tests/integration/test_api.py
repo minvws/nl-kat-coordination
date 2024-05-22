@@ -1,8 +1,7 @@
 import os
-import time
 from unittest import TestCase, skipIf
 
-from sqlalchemy.exc import OperationalError
+import alembic.config
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
@@ -19,20 +18,9 @@ from boefjes.sql.setting_storage import SQLSettingsStorage
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
 class TestAPI(TestCase):
     def setUp(self) -> None:
-        self.engine = get_engine()
+        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 
-        # Some retries to handle db startup time in tests
-        for i in range(3):
-            try:
-                SQL_BASE.metadata.create_all(self.engine)
-                break
-            except OperationalError as e:
-                if i == 2:
-                    raise e
-
-                time.sleep(1)
-
-        session = sessionmaker(bind=self.engine)()
+        session = sessionmaker(bind=get_engine())()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
         self.settings_storage = SQLSettingsStorage(session, IdentityMiddleware())
         self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
