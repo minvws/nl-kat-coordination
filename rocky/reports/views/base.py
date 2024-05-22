@@ -388,7 +388,7 @@ class ViewReportView(OOIFilterView, TemplateView):
             ]
 
     def get_context_data(self, **kwargs):
-        # TODO: add missing context fields
+        # TODO: add config and plugins
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
 
@@ -400,7 +400,6 @@ class ViewReportView(OOIFilterView, TemplateView):
             ]
 
         else:
-            # TODO: get the input oois from the underlying reports
             input_oois = []
 
         self.bytes_client.login()
