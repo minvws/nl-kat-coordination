@@ -443,4 +443,7 @@ class ViewReportView(OOIFilterView, TemplateView):
         context["selected_oois"] = input_oois
         context["oois"] = input_oois
         context["template"] = self.report_ooi.template
+        context["report_types"] = [
+            report.class_attributes() for report in [get_report_by_id(report_id) for report_id in report_data]
+        ]
         return context
