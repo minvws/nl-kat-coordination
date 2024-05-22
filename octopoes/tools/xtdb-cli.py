@@ -34,13 +34,10 @@ logger = logging.getLogger(__name__)
 @click.option("-v", "--verbosity", count=True, help="Increase the verbosity level")
 @click.pass_context
 def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
-    if verbosity == 1:
-        logging.basicConfig(level=logging.WARN)
-    elif verbosity == 2:
-        logging.basicConfig(level=logging.INFO)
-    elif verbosity == 3:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
+    verbosities = [logging.WARN, logging.INFO, logging.DEBUG]
+    try:
+        logging.basicConfig(level=verbosities[verbosity-1])
+    except IndexError:
         raise click.UsageError("Invalid verbosity level (use -v, -vv, or -vvv)")
 
     client = XTDBClient(url, node, timeout)
