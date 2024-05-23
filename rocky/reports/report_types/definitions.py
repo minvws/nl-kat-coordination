@@ -107,14 +107,9 @@ class Report(BaseReport):
 
         return hostnames_by_input_ooi
 
-    def to_human_readable_hostnames(
-        self,
-        input_oois: Iterable[str],
-        valid_time: datetime,
-        extra_indicator: str = ", ...",
-        open_indicator: str = "(",
-        close_indicator: str = ")",
-        hostnames_by_input_ooi: dict | None = None,
+    @staticmethod
+    def hostnames_to_human_readable(
+        hostnames_by_input_ooi: dict,
     ) -> dict[str, str]:
         """Converts input_oois to human readable hostname strings.
 
@@ -122,18 +117,14 @@ class Report(BaseReport):
         of shortest related hostname and indication on more hostnames present,
         grouped by input ooi.
         """
-        if hostnames_by_input_ooi is None:
-            hostnames_by_input_ooi = self.to_hostnames(input_oois, valid_time)
-        human_readable = {}
-        for input_ooi, hostnames in hostnames_by_input_ooi.items():
-            hostname_str = ""
-            if hostnames:
-                hostnames = [h.human_readable for h in hostnames]
-                add_str = extra_indicator if len(hostnames) > 1 else ""
-                hostname_str = open_indicator + min(hostnames, key=len) + add_str + close_indicator
-            human_readable[input_ooi] = hostname_str
-
-        return human_readable
+        return {
+            input_ooi: (
+                f'({min([h.human_readable for h in hostnames], key=len)}{", ..." if len(hostnames) > 1 else ""})'
+                if hostnames
+                else ""
+            )
+            for input_ooi, hostnames in hostnames_by_input_ooi.items()
+        }
 
     def to_ips(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
         """
