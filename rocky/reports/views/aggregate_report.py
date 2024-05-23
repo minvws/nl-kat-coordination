@@ -107,6 +107,7 @@ class ReportTypesSelectionAggregateReportView(
     template_name = "aggregate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
+    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

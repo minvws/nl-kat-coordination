@@ -26,7 +26,7 @@
                 {% endblocktranslate %}
             </h2>
             {% if 'all' in selected_oois %}
-                <p>{% translate "You have selected all objects in previous step." %}</p>
+                <p>{% blocktranslate %}You have selected {{ total_oois }} objects in previous step.{% endblocktranslate %}</p>
             {% else %}
                 {% include "summary/ooi_selection.html" %}
 

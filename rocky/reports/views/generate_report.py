@@ -106,6 +106,7 @@ class ReportTypesSelectionGenerateReportView(
     template_name = "generate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
+    ooi_types = get_ooi_types_with_report()
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
@@ -115,10 +116,8 @@ class ReportTypesSelectionGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        oois_pk = self.selected_oois
-        if "all" in self.selected_oois:
-            oois_pk = [ooi.primary_key for ooi in self.oois]
-        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(oois_pk))
+        context["total_oois"] = len(self.oois_pk)
+        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.oois_pk))
         return context
 
 
@@ -155,6 +154,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
     breadcrumbs_step = 6
     current_step = 6
     report_types: Sequence[type[Report]]
+    ooi_types = get_ooi_types_with_report()
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
@@ -169,7 +169,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
 
-        for ooi in self.selected_oois:
+        for ooi in self.oois:
             ooi_type = Reference.from_str(ooi).class_
 
             if ooi_type not in by_type:

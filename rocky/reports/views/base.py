@@ -113,7 +113,7 @@ class BaseSelectionView(OrganizationView):
         return context
 
 
-class ReportOOIView(BaseSelectionView, OOIFilterView):
+class ReportOOIView(OOIFilterView, BaseSelectionView):
     """
     This class will show a list of OOIs with filters and handles OOIs selections.
     Needs BaseSelectionView to get selected oois.
@@ -122,6 +122,13 @@ class ReportOOIView(BaseSelectionView, OOIFilterView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.oois = self.get_oois()
+        self.oois_pk = self.get_oois_pk()
+
+    def get_oois_pk(self) -> list[str]:
+        oois_pk = self.selected_oois
+        if "all" in self.selected_oois:
+            oois_pk = [ooi.primary_key for ooi in self.oois]
+        return oois_pk
 
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
@@ -152,6 +159,7 @@ class ReportOOIView(BaseSelectionView, OOIFilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.oois
+        context["total_oois"] = len(self.oois_pk)
         return context
 
 
