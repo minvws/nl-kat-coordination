@@ -20,7 +20,7 @@ from .queue import PrioritizedItem
 from .raw_data import RawData
 
 
-class TaskStatus(str, enum.Enum):
+class TaskStatus(enum.Enum):
     # Task has been created but not yet queued
     PENDING = "pending"
 
@@ -45,7 +45,7 @@ class TaskStatus(str, enum.Enum):
 
 
 class Task(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
     id: uuid.UUID
 
@@ -60,12 +60,6 @@ class Task(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    @validator("status", pre=True)
-    def parse_status(cls, v):
-        if isinstance(v, str):
-            return TaskStatus(v)
-        return v
 
     def __repr__(self):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"

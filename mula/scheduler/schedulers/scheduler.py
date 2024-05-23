@@ -105,6 +105,7 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
+        breakpoint()
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
             self.ctx.datastores.task_store.update_task(task)
@@ -366,7 +367,11 @@ class Scheduler(abc.ABC):
         tasks that were on the queue will be set to CANCELLED.
         """
         if not self.is_enabled():
-            self.logger.warning("Scheduler already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+            self.logger.warning(
+                "Scheduler already disabled: %s",
+                self.scheduler_id,
+                scheduler_id=self.scheduler_id,
+            )
             return
 
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
@@ -383,9 +388,13 @@ class Scheduler(abc.ABC):
             status=models.TaskStatus.QUEUED,
         )
         task_ids = [task.id for task in tasks]
-        self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
+        self.ctx.datastores.task_store.cancel_tasks(
+            scheduler_id=self.scheduler_id, task_ids=task_ids
+        )
 
-        self.logger.info("Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
 
     def enable(self) -> None:
         """Enable the scheduler.
@@ -396,14 +405,18 @@ class Scheduler(abc.ABC):
             self.logger.debug("Scheduler is already enabled")
             return
 
-        self.logger.info("Enabling scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Enabling scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
         self.enabled = True
 
         self.stop_event_threads.clear()
 
         self.run()
 
-        self.logger.info("Enabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Enabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
 
     def is_enabled(self) -> bool:
         """Check if the scheduler is enabled.
@@ -419,7 +432,9 @@ class Scheduler(abc.ABC):
         Args:
             callback: Whether to call the callback function.
         """
-        self.logger.info("Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
 
         # First, stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
@@ -430,7 +445,9 @@ class Scheduler(abc.ABC):
         if self.callback and callback:
             self.callback(self.scheduler_id)  # type: ignore [call-arg]
 
-        self.logger.info("Stopped scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Stopped scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
 
     def stop_listeners(self) -> None:
         """Stop the listeners."""

@@ -468,6 +468,7 @@ class Server:
                 detail="no data to patch",
             )
 
+        breakpoint()
         try:
             updated_task = task_db.model_copy(update=patch_data)
         except Exception as exc:
@@ -481,6 +482,7 @@ class Server:
         try:
             self.ctx.datastores.task_store.update_task(updated_task)
         except Exception as exc:
+            breakpoint()
             self.logger.error(exc)
             raise fastapi.HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
