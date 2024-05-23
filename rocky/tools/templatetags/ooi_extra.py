@@ -86,3 +86,8 @@ def pretty_json(obj: dict):
 @register.filter
 def human_readable(reference_string: str):
     return Reference.from_str(reference_string).human_readable
+
+
+@register.filter
+def ooi_type(reference_string: str):
+    return Reference.from_str(reference_string).class_

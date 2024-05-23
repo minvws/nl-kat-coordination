@@ -23,6 +23,7 @@ from tools.view_helpers import BreadcrumbsMixin
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report, ReportType
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from rocky.views.mixins import OOIList
@@ -297,14 +298,15 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         input_ooi: Reference | None,
         parent: Reference | None,
         has_parent: bool,
+        observed_at: datetime,
     ) -> ReportOOI:
         report_data_raw_id = self.bytes_client.upload_raw(
             raw=ReportDataDict(data).model_dump_json(), manual_mime_types={"openkat/report"}
         )
 
         report_ooi = ReportOOI(
-            name="test_name",
-            report_type=str(report_type.id) if report_type else None,
+            name=str(report_type.name) if report_type else None,
+            report_type=str(report_type.id) if report_type and report_type is not ConcatenatedReport else None,
             template=report_type.template_path if report_type else None,
             report_id=uuid4(),
             organization_code=self.organization.code,
@@ -313,7 +315,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             data_raw_id=report_data_raw_id,
             date_generated=datetime.now(timezone.utc),
             input_ooi=input_ooi,
-            observed_at=self.observed_at,
+            observed_at=observed_at,
             parent_report=parent,
             has_parent=has_parent,
         )
@@ -322,7 +324,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             api_connector=self.octopoes_api_connector,
             bytes_client=self.bytes_client,
             ooi=report_ooi,
-            observed_at=self.observed_at,
+            observed_at=observed_at,
         )
 
         return report_ooi
@@ -383,7 +385,7 @@ class ViewReportView(OOIFilterView, TemplateView):
             ]
 
     def get_context_data(self, **kwargs):
-        # TODO: add missing context fields
+        # TODO: add config and plugins
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
 
@@ -395,7 +397,6 @@ class ViewReportView(OOIFilterView, TemplateView):
             ]
 
         else:
-            # TODO: get the input oois from the underlying reports
             input_oois = []
 
         self.bytes_client.login()
@@ -422,10 +423,26 @@ class ViewReportView(OOIFilterView, TemplateView):
                     "report_name": get_report_by_id(report.report_type).name,
                 }
             context["report_data"] = report_data
+            context["report_types"] = [
+                report.class_attributes() for report in [get_report_by_id(report.report_type) for report in children]
+            ]
+            input_oois = list(
+                {self.octopoes_api_connector.get(child.input_ooi, valid_time=self.observed_at) for child in children}
+            )
+
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             # its an aggregate report
             context["post_processed_data"] = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
                 self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
+            )
+            children = self.octopoes_api_connector.query(
+                "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
+            )
+            context["report_types"] = [
+                report.class_attributes() for report in [get_report_by_id(report.report_type) for report in children]
+            ]
+            input_oois = list(
+                {self.octopoes_api_connector.get(child.input_ooi, valid_time=self.observed_at) for child in children}
             )
         else:
             # its a single report
@@ -438,6 +455,7 @@ class ViewReportView(OOIFilterView, TemplateView):
                 "report_name": get_report_by_id(self.report_ooi.report_type).name,
             }
             context["report_data"] = report_data
+            context["report_types"] = [get_report_by_id(self.report_ooi.report_type).class_attributes()]
 
         context["created_at"] = self.report_ooi.date_generated
         context["selected_oois"] = input_oois

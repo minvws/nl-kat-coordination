@@ -1,5 +1,6 @@
 from octopoes.models import OOI, Reference
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
+from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, MultiReport, Report
 from reports.report_types.dns_report.report import DNSReport
 from reports.report_types.findings_report.report import FindingsReport
@@ -33,6 +34,8 @@ AGGREGATE_REPORTS = [AggregateOrganisationReport]
 
 MULTI_REPORTS = [MultiOrganizationReport]
 
+CONCATENATED_REPORTS = [ConcatenatedReport]
+
 
 def get_ooi_types_with_report() -> set[type[OOI]]:
     """
@@ -61,7 +64,7 @@ def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport] | type[
     """
     Get report type by id
     """
-    for report in REPORTS + MULTI_REPORTS + AGGREGATE_REPORTS:
+    for report in REPORTS + MULTI_REPORTS + AGGREGATE_REPORTS + CONCATENATED_REPORTS:
         if report.id == report_id:
             return report
     raise ValueError(f"Report with id {report_id} not found")
