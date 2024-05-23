@@ -130,6 +130,11 @@ class ReportOOIView(OOIFilterView, BaseSelectionView):
             oois_pk = [ooi.primary_key for ooi in self.oois]
         return oois_pk
 
+    def get_total_objects(self):
+        if not self.selected_oois:
+            return len(self.object_list)
+        return len(self.oois_pk)
+
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
             return self.octopoes_api_connector.list_objects(
@@ -159,7 +164,7 @@ class ReportOOIView(OOIFilterView, BaseSelectionView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.oois
-        context["total_oois"] = len(self.oois_pk)
+        context["total_oois"] = self.get_total_objects()
         return context
 
 
