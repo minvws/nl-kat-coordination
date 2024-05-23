@@ -116,7 +116,7 @@ class ReportTypesSelectionGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["total_oois"] = len(self.oois_pk)
+
         context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.oois_pk))
         return context
 
@@ -169,7 +169,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
 
-        for ooi in self.oois:
+        for ooi in self.get_oois_pk():
             ooi_type = Reference.from_str(ooi).class_
 
             if ooi_type not in by_type:
