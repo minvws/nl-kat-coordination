@@ -9,14 +9,13 @@ from jsonschema.validators import validate
 from sqlalchemy.orm import Session
 
 from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
-from boefjes.katalogus.models import PluginType
+from boefjes.katalogus.models import FilterParameters, PaginationParameters, PluginType
 from boefjes.katalogus.storage.interfaces import (
     NotFound,
     PluginEnabledStorage,
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
-from boefjes.katalogus.types import FilterParameters, PaginationParameters
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
 from boefjes.sql.setting_storage import create_setting_storage

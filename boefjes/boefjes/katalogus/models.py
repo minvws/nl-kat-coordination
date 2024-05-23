@@ -57,3 +57,15 @@ PluginType = Boefje | Normalizer | Bit
 class EncryptionMiddleware(Enum):
     IDENTITY = "IDENTITY"
     NACL_SEALBOX = "NACL_SEALBOX"
+
+
+class PaginationParameters(BaseModel):
+    offset: int = 0
+    limit: int | None = None
+
+
+class FilterParameters(BaseModel):
+    q: str | None = None
+    type: Literal["boefje", "normalizer", "bit"] | None = None
+    state: bool | None = None
+    scan_level: int = 0

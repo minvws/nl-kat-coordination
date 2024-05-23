@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 from boefjes.config import settings
-from boefjes.katalogus.api import app
+from boefjes.katalogus.api.root import app
 from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
 from boefjes.katalogus.models import Organisation
 from boefjes.sql.db import SQL_BASE, get_engine

@@ -2,9 +2,9 @@ from unittest import TestCase
 
 from fastapi.testclient import TestClient
 
-from boefjes.katalogus.api import app
+from boefjes.katalogus.api.organisations import check_organisation_exists
+from boefjes.katalogus.api.root import app
 from boefjes.katalogus.dependencies.plugins import get_plugin_service
-from boefjes.katalogus.routers.organisations import check_organisation_exists
 from boefjes.katalogus.tests.test_plugin_service import mock_plugin_service
 
 

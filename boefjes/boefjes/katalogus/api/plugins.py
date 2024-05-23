@@ -4,15 +4,14 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
 from httpx import HTTPStatusError
 
+from boefjes.katalogus.api.organisations import check_organisation_exists
 from boefjes.katalogus.dependencies.plugins import (
     PluginService,
     get_pagination_parameters,
     get_plugin_service,
     get_plugins_filter_parameters,
 )
-from boefjes.katalogus.models import PluginType
-from boefjes.katalogus.routers.organisations import check_organisation_exists
-from boefjes.katalogus.types import FilterParameters, PaginationParameters
+from boefjes.katalogus.models import FilterParameters, PaginationParameters, PluginType
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",

@@ -3,7 +3,7 @@ import logging
 
 from sqlalchemy.orm import Session
 
-from boefjes.katalogus.dependencies.context import get_context
+from boefjes.config import settings
 from boefjes.katalogus.dependencies.encryption import EncryptMiddleware, IdentityMiddleware, NaclBoxMiddleware
 from boefjes.katalogus.models import EncryptionMiddleware
 from boefjes.katalogus.storage.interfaces import SettingsNotFound, SettingsStorage
@@ -73,11 +73,7 @@ def create_setting_storage(session) -> SettingsStorage:
 
 
 def create_encrypter():
-    encrypter: EncryptMiddleware = IdentityMiddleware()
-    if get_context().env.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
-        encrypter = NaclBoxMiddleware(
-            get_context().env.katalogus_private_key_b64,
-            get_context().env.katalogus_public_key_b64,
-        )
+    if settings.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
+        return NaclBoxMiddleware(settings.katalogus_private_key_b64, settings.katalogus_public_key_b64)
 
-    return encrypter
+    return IdentityMiddleware()

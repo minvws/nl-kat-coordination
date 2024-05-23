@@ -7,6 +7,8 @@ from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, Postgr
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
+from boefjes.katalogus.models import EncryptionMiddleware
+
 BASE_DIR: Path = Path(__file__).parent.resolve()
 
 # Set base dir to something generic when compiling environment docs
@@ -107,6 +109,19 @@ class Settings(BaseSettings):
     )
     bytes_password: str = Field(
         ..., examples=["secret"], description="Bytes JWT login password", validation_alias="BYTES_PASSWORD"
+    )
+
+    encryption_middleware: EncryptionMiddleware = Field(
+        EncryptionMiddleware.IDENTITY,
+        description="Toggle used to configure the encryption strategy",
+        examples=["IDENTITY", "NACL_SEALBOX"],
+    )
+
+    katalogus_private_key_b64: str = Field(
+        "", description="Base64 encoded private key used for asymmetric encryption of settings"
+    )
+    katalogus_public_key_b64: str = Field(
+        "", description="Base64 encoded public key used for asymmetric encryption of settings"
     )
 
     span_export_grpc_endpoint: AnyHttpUrl | None = Field(
