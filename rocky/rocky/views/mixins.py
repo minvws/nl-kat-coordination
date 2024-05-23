@@ -292,9 +292,22 @@ class ReportList:
                 offset=offset,
                 limit=limit,
             ).items
+            self.hydrate_report_list(reports)
             return reports
 
         raise NotImplementedError("ReportList only supports slicing")
+
+    def hydrate_report_list(self, reports: list[Report]):
+        per_ooi_report_types = {}
+        collected = []
+        for report in reports:
+            report_types = []
+
+            for child_report in report[1]:
+                report_types.append(child_report.report_type)
+                per_ooi_report_types[child_report.input_ooi] = report_types
+            collected.append(per_ooi_report_types)
+        return collected
 
 
 class ConnectorFormMixin:
