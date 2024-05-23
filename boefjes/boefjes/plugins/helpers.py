@@ -2,9 +2,10 @@ import io
 import logging
 import os
 import tarfile
-from collections.abc import ByteString, Generator
+from collections.abc import Generator
 
 import docker
+from typing_extensions import Buffer
 
 
 class TarStream(io.RawIOBase):
@@ -30,13 +31,14 @@ class TarStream(io.RawIOBase):
         """Returns whether the generator stream is (still) readable."""
         return self.able_to_read
 
-    def readinto(self, memory_view: ByteString) -> int:
+    def readinto(self, buffer: Buffer) -> int:
         """Read the generator. Returns 0 when done. Output is stored in memory_view."""
         try:
             chunk = self.bytes_left or next(self.stream)
         except StopIteration:
             self.able_to_read = False
             return 0
+        memory_view = memoryview(buffer)
         view_len = len(memory_view)
         output, self.bytes_left = chunk[:view_len], chunk[view_len:]
         outlen = len(output)
@@ -59,5 +61,13 @@ def get_file_from_container(container: docker.models.containers.Container, path:
 
     f = tarfile.open(mode="r|", fileobj=TarStream(stream).reader())
     tarobject = f.next()
-    if tarobject.name == os.path.basename(path):
-        return f.extractfile(tarobject).read()
+    if not tarobject or tarobject.name != os.path.basename(path):
+        logging.warning("%s not found in tarfile from container %s %s", path, container.short_id, container.image.tags)
+        return None
+
+    extracted_file = f.extractfile(tarobject)
+    if not extracted_file:
+        logging.warning("%s not found in tarfile from container %s %s", path, container.short_id, container.image.tags)
+        return None
+
+    return extracted_file.read()

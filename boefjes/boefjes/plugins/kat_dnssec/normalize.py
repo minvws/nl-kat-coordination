@@ -11,7 +11,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     ooi_ref = Reference.from_str(input_ooi["primary_key"])
 
-    possible_errors: [str] = [
+    possible_errors: list[str] = [
         "Bogus DNSSEC signature",
         "DNSSEC signature not incepted yet",
         "Unknown cryptographic algorithm",
