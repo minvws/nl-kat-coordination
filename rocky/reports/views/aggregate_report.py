@@ -1,6 +1,6 @@
 import logging
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from django.conf import settings
@@ -233,11 +233,19 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
             }
             messages.add_message(self.request, messages.ERROR, error_message)
 
+        observed_at = self.get_observed_at()
+
         # first we create the parent report
         parent_report_ooi = self.save_report(
-            data=post_processed_data, report_type=aggregate_report, input_ooi=None, parent=None, has_parent=False
+            data=post_processed_data,
+            report_type=aggregate_report,
+            input_ooi=None,
+            parent=None,
+            has_parent=False,
+            observed_at=observed_at,
         )
 
+        # then we save the child reports
         for ooi, types in report_data.items():
             for report_type, data in types.items():
                 self.save_report(
@@ -246,9 +254,13 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
                     input_ooi=Reference.from_str(ooi),
                     parent=parent_report_ooi.reference,
                     has_parent=True,
+                    observed_at=observed_at,
                 )
 
         return aggregate_report, post_processed_data, report_data
+
+    def get_observed_at(self):
+        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
