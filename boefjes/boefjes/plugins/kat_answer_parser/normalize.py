@@ -1,30 +1,17 @@
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerOutput
 from octopoes.models.ooi.config import Config
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    mime_types = [mime_type["value"] for mime_type in normalizer_meta.raw_data.mime_types]
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
+    data = json.loads(raw)
 
-    if "/bit/port-classification-ip" in mime_types:
-        if isinstance(raw, bytes):
-            raw = raw.decode()
+    bit_id = data["schema"].removeprefix("/bit/")
 
-        yield Config(
-            ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
-            bit_id="port-classification-ip",
-            config=json.loads(raw),
-        )
-
-    if "/bit/disallowed-csp-hostnames" in mime_types:
-        if isinstance(raw, bytes):
-            raw = raw.decode()
-
-        yield Config(
-            ooi=normalizer_meta.raw_data.boefje_meta.input_ooi,
-            bit_id="disallowed-csp-hostnames",
-            config=json.loads(raw),
-        )
+    yield Config(
+        ooi=input_ooi["primary_key"],
+        bit_id=bit_id,
+        config=data["answer"],
+    )

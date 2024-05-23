@@ -3,29 +3,61 @@
 
 <section>
     <div>
-        <h1>{% translate "Setup" %}</h1>
+        <h1>{% translate "Configuration" %}</h1>
         <p class="emphasized">{% translate "Set up the required plugins for this report." %}</p>
         {% if selected_oois and selected_report_types %}
             <a href="{{ previous }}" class="button ghost">
                 <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
             </a>
-            <h2>{% translate "Set up scan" %}</h2>
+            <h2>{% translate "Plugins" %}</h2>
             <p>
                 <strong>{% translate "KAT will be able to generate a full report when all the required and suggested boefjes are enabled." %}</strong>
             </p>
             <p>
-                {% translate "If you choose not to give a plugin permission to run, the data that plugin would collect or produce will be left out of the report which will then be generated based on the available data collected by the enabled plugins." %}
+                {% blocktranslate trimmed %}
+                    If you choose not to enable a plugin, the data that plugin would
+                    collect or produce will be left out of the report which will then be generated
+                    based on the available data collected by the enabled plugins.
+                {% endblocktranslate %}
             </p>
+            <p>
+                {% blocktranslate trimmed %}
+                    Some plugins are mandatory as they are crucial for a report type.
+                    Reports that don't have their requirements met will be skipped.
+                {% endblocktranslate %}
+            </p>
+            <p class="warning"
+               role="group"
+               aria-label="{% translate "scan level warning" %}">
+                <span>{% translate "Warning! Before you proceed read the following points:" %}</span>
+                {% blocktranslate trimmed %}
+                    OpenKAT is designed to scan all known objects on a regular basis using the enabled plugins and set clearance levels. This means that scans will run automatically.
+                    Be patient; plugins may take some time before they have collected all their data.
+                    Enabling them just before report generation will likely result in inaccurate reports, as plugins have not finished collecting data.
+                {% endblocktranslate %}
+            </p>
+            {% include "partials/plugin_overview_table.html" %}
+
             <h3>{% translate "Required plugins" %}</h3>
             <p>{% translate "This report type requires the following plugins to be enabled:" %}</p>
             {% if all_plugins_enabled.required %}
                 <p>{% translate "Good job! All required plugins are enabled." %}</p>
             {% else %}
-                <div class="column-4 tiles plugins images-cover">
-                    {% for required_plugin in plugins.required %}
-                        {% include "partials/plugin_tile.html" with plugin=required_plugin %}
+                <div class="required-plugin-container">
+                    <div class="toolbar">
+                        <div class="checkbox">
+                            <input type="checkbox"
+                                   class="display-toggle"
+                                   id="checkbox-for-enabled-required-plugins">
+                            <label for="checkbox-for-enabled-required-plugins">{% translate "Show enabled plugins" %}</label>
+                        </div>
+                    </div>
+                    <div class="column-4 tiles plugins images-cover">
+                        {% for required_plugin in plugins.required|dictsort:"enabled" %}
+                            {% include "partials/plugin_tile.html" with plugin=required_plugin show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
 
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 </div>
             {% endif %}
             <h3>{% translate "Suggested plugins" %}</h3>
@@ -35,13 +67,29 @@
             {% if all_plugins_enabled.optional %}
                 <p>{% translate "Good job! All suggested plugins are enabled" %}</p>
             {% else %}
-                <div class="column-4 tiles plugins images-cover">
-                    {% for optional_plugin in plugins.optional %}
-                        {% if optional_plugin not in plugins.required %}
-                            {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" %}
+                <div class="optional-plugin-container hide-overflow">
+                    <div class="toolbar">
+                        <div class="checkbox">
+                            <input type="checkbox"
+                                   class="display-toggle"
+                                   id="checkbox-for-enabled-optional-plugins">
+                            <label for="checkbox-for-enabled-optional-plugins">{% translate "Show enabled plugins" %}</label>
+                        </div>
+                    </div>
+                    <div class="column-4 tiles plugins images-cover">
+                        {% for optional_plugin in plugins.optional|dictsort:"enabled" %}
+                            {% if optional_plugin not in plugins.required %}
+                                {% include "partials/plugin_tile.html" with plugin=optional_plugin form_id="generate_report" show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
 
-                        {% endif %}
-                    {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="toolbar">
+                        <button class="button ghost"
+                                id="more-suggested-plugins"
+                                data-hide-text="{% translate "Hide suggested plugins" %}"
+                                data-show-text="{% translate "Show more suggested plugins" %}"></button>
+                    </div>
                 </div>
             {% endif %}
             <form id="generate_report" class="inline" method="get" action="{{ next }}">

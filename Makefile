@@ -13,11 +13,11 @@ export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
 define build-settings-doc
-	echo "# $(4)" > docs/source/technical_design/environment_settings/$(3).md
+	echo "# $(4)" > docs/source/installation_and_deployment/environment_settings/$(3).md
 	DOCS=True PYTHONPATH=./$(1) settings-doc generate \
 	-f markdown -m $(2) \
 	--templates docs/settings-doc-templates \
-	>> docs/source/technical_design/environment_settings/$(3).md
+	>> docs/source/installation_and_deployment/environment_settings/$(3).md
 endef
 
 
@@ -32,7 +32,7 @@ kat: env-if-empty build up
 	@echo "run 'grep 'DJANGO_SUPERUSER_PASSWORD' .env' to find it."
 	@echo
 	@echo "WARNING: This is a development environment, do not use in production!"
-	@echo "See https://docs.openkat.nl/technical_design/install.html for production"
+	@echo "See https://docs.openkat.nl/installation_and_deployment/install.html for production"
 	@echo "installation instructions."
 
 # Remove containers, update using git pull and bring up containers
@@ -113,7 +113,9 @@ docs:
 	$(call build-settings-doc,boefjes,boefjes.config,boefjes,Boefjes)
 	$(call build-settings-doc,bytes,bytes.config,bytes,Bytes)
 	$(call build-settings-doc,mula/scheduler,config.settings,mula,Mula)
-	sphinx-build -b html docs/source docs/_build
+
+	PYTHONPATH=$(PYTHONPATH):boefjes/:bytes/:keiko/:mula/:octopoes/ sphinx-build -b html docs/source docs/_build
+
 
 poetry-dependencies:
 	files=$$(find . -name pyproject.toml -maxdepth 2); \

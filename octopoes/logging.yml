@@ -3,8 +3,8 @@ disable_existing_loggers: 0
 
 formatters:
   default:
-    format: '%(asctime)s [%(process)d] [%(levelname)s] [%(module)s] %(message)s'
-    datefmt: '[%Y-%m-%d %H:%M:%S %z]'
+    format: "%(asctime)s [%(process)d] [%(levelname)s] [%(module)s] %(message)s"
+    datefmt: "[%Y-%m-%d %H:%M:%S %z]"
 
 handlers:
   console:
@@ -14,10 +14,14 @@ handlers:
     stream: ext://sys.stdout
 
 root:
-    level: WARN
-    handlers: [console]
+  level: WARN
+  handlers: [console]
 
 loggers:
+  httpx:
+    level: WARN
+    propagate: 0
+    handlers: [console]
   uvicorn:
     level: INFO
     propagate: 0

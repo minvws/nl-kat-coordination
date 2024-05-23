@@ -18,6 +18,7 @@ import random
 import socket
 import sys
 import time
+from typing import Any
 
 import dns.exception
 import dns.name
@@ -41,7 +42,7 @@ def print_subdomain_result(url, ip, nearby=None):
 
 
 def unvisited_closure():
-    visited = set()
+    visited: set = set()
 
     def inner(l):  # noqa: E741
         nonlocal visited
@@ -58,22 +59,8 @@ def find_subdomain_list_file(filename):
     filename_path = os.path.join(os.path.dirname(__file__), "lists", filename)
     if os.path.exists(filename_path):
         return os.path.abspath(filename_path)
-
-    try:
-        import pkg_resources
-    except ImportError:
+    else:
         return filename
-
-    # If the relative check failed then attempt to find the list file
-    # in the pip package directory. This will typically happen on pip package
-    # installs
-    package_filename_path = os.path.join("lists", filename)
-    try:
-        full_package_path = pkg_resources.resource_filename("kat_fierce", package_filename_path)
-    except ImportError:
-        return filename
-
-    return full_package_path
 
 
 def head_request(url, timeout=2):
@@ -267,7 +254,7 @@ def update_resolver_nameservers(resolver, nameservers, nameserver_filename):
 
 
 def fierce(**kwargs):
-    output = {}
+    output: dict[str, Any] = {}
     resolver = dns.resolver.Resolver()
 
     resolver = update_resolver_nameservers(resolver, kwargs["dns_servers"], kwargs["dns_file"])
@@ -307,7 +294,7 @@ def fierce(**kwargs):
     if zone:
         return
 
-    random_subdomain = str(random.randint(1e10, 1e11))  # noqa DUO102, non-cryptographic random use
+    random_subdomain = str(random.randint(10_000_000_000, 100_000_000_000))  # noqa DUO102, non-cryptographic random use
     random_domain = concatenate_subdomains(domain, [random_subdomain])
     wildcard = query(resolver, random_domain, record_type="A", tcp=kwargs["tcp"])
     wildcard_ips = {rr.address for rr in wildcard.rrset} if wildcard else set()

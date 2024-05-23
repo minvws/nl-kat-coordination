@@ -3,10 +3,10 @@ name: Octopoes Create container image
 on:
   push:
     branches:
-      - 'main'
-      - 'release-*'
+      - "main"
+      - "release-*"
     tags:
-      - '*'
+      - "*"
     paths:
       - octopoes/**
       - .github/workflows/octopoes_container_image.yml

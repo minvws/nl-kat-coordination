@@ -47,4 +47,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     finally:
         container.remove()
 
+    if not output:
+        raise Exception("Couldn't get tmp/output.json from testsll container")
+
     return [(set(), output)]

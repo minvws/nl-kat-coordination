@@ -2,8 +2,7 @@ import json
 import logging
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerAffirmation, NormalizerOutput
 from octopoes.models.ooi.findings import CVEFindingType, RiskLevelSeverity
 
 logger = logging.getLogger(__name__)
@@ -25,8 +24,8 @@ def get_risk_level(severity_score):
     return None
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    cve_finding_type_id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
+    cve_finding_type_id = input_ooi["id"]
     data = json.loads(raw)
 
     descriptions = data["cve"]["descriptions"]
@@ -52,13 +51,12 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             risk_score = cvss[0]["cvssData"]["baseScore"]
         risk_severity = get_risk_level(risk_score)
 
-    yield {
-        "type": "affirmation",
-        "ooi": CVEFindingType(
+    yield NormalizerAffirmation(
+        ooi=CVEFindingType(
             id=cve_finding_type_id,
             description=english_description["value"],
             source=f"https://cve.circl.lu/cve/{cve_finding_type_id}",
             risk_severity=risk_severity,
             risk_score=risk_score,
-        ).dict(),
-    }
+        )
+    )
