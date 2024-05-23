@@ -37,8 +37,8 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     for address_item in follow_path_in_dict(path=IP_ADDRESS_LIST_PATH, path_dict=results):
         interface = ip_interface(follow_path_in_dict(path=IP_ADDRESS_ITEM_PATH, path_dict=address_item))
-        address, mask = interface.with_prefixlen.split("/")
-        mask = int(mask)
+        address, mask_str = interface.with_prefixlen.split("/")
+        mask = int(mask_str)
 
         # Decide whether we yield IPv4 or IPv6.
         if isinstance(interface, IPv4Interface):
