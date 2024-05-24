@@ -14,7 +14,6 @@ https://summoning.team/blog/vmware-vrealize-network-insight-ssh-key-rce-cve-2023
 
 """
 
-import logging
 import os
 
 from boefjes.job_models import BoefjeMeta
@@ -24,8 +23,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
     input_ = boefje_meta.arguments["input"]  # input is IPService
     ip_port = input_["ip_port"]
     if input_["service"]["name"] != "ssh":
-        logging.info("Not an ssh service")
-        return
+        return [({"info/boefje"}, "Skipping because service is not an ssh service")]
 
     ip = ip_port["address"]["address"]
     port = ip_port["port"]
@@ -50,15 +48,14 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, str | bytes]]:
                 "2>/dev/null",
             ]
             try:
-                ssh_command = " ".join(ssh_command)
-                coutput = os.system(ssh_command)  # noqa: S605
+                coutput = os.system(" ".join(ssh_command))  # noqa: S605
                 if coutput not in (0, 32512):  # 0 = it worked, 32512 = `exit` does not exists but we did connect
                     continue
                 return [
                     (
                         set(),
                         "\n".join(
-                            (coutput, f"{key_file} is allowed access to vRealize Network Insight on {ip}:{port}")
+                            (str(coutput), f"{key_file} is allowed access to vRealize Network Insight on {ip}:{port}")
                         ),
                     )
                 ]
