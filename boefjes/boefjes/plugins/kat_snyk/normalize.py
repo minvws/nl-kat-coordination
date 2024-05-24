@@ -2,22 +2,20 @@ import json
 import logging
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
+from boefjes.job_models import NormalizerOutput
 from boefjes.plugins.kat_snyk import check_version
-from octopoes.models import OOI, Reference
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, SnykFindingType
 
 logger = logging.getLogger(__name__)
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    boefje_meta = normalizer_meta.raw_data.boefje_meta
 
-    pk_ooi = Reference.from_str(boefje_meta.input_ooi)
-    input_ = boefje_meta.arguments["input"]["software"]
-    software_name = input_["name"]
-    software_version = input_["version"]
+    pk_ooi = Reference.from_str(input_ooi["primary_key"])
+    software_name = input_ooi["software"]["name"]
+    software_version = input_ooi["software"]["version"]
 
     if not results["table_versions"] and not results["table_vulnerabilities"] and not results["cve_vulnerabilities"]:
         logger.warning("Couldn't find software %s in the SNYK vulnerability database", software_name)

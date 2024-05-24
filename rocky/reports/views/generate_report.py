@@ -1,5 +1,6 @@
 from collections.abc import Sequence
-from typing import Any, Literal, cast
+from datetime import datetime
+from typing import Any
 
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
@@ -13,13 +14,15 @@ from tools.view_helpers import url_with_querystring
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from reports.report_types.definitions import Report
-from reports.report_types.helpers import (
-    REPORTS,
-    get_ooi_types_with_report,
-    get_plugins_for_report_ids,
-    get_report_types_for_oois,
+from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_types_for_oois
+from reports.views.base import (
+    REPORTS_PRE_SELECTION,
+    ReportBreadcrumbs,
+    ReportOOIView,
+    ReportPluginView,
+    ReportTypeView,
+    get_selection,
 )
-from reports.views.base import REPORTS_PRE_SELECTION, BaseReportView, ReportBreadcrumbs, get_selection
 from reports.views.view_helpers import GenerateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
 
@@ -54,7 +57,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
         return breadcrumbs
 
 
-class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
+class LandingGenerateReportView(BreadcrumbsGenerateReportView):
     """
     Landing page to start the 'Generate Report' flow.
     """
@@ -67,7 +70,10 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView, BaseReportView):
 
 
 class OOISelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, BaseOOIListView
+    GenerateReportStepsMixin,
+    BreadcrumbsGenerateReportView,
+    ReportOOIView,
+    BaseOOIListView,
 ):
     """
     Select objects for the 'Generate Report' flow.
@@ -86,7 +92,11 @@ class OOISelectionGenerateReportView(
 
 
 class ReportTypesSelectionGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
+    GenerateReportStepsMixin,
+    BreadcrumbsGenerateReportView,
+    ReportOOIView,
+    ReportTypeView,
+    TemplateView,
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -99,21 +109,21 @@ class ReportTypesSelectionGenerateReportView(
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
-            error_message = _("Select at least one OOI to proceed.")
-            messages.add_message(self.request, messages.ERROR, error_message)
+            messages.error(self.request, _("Select at least one OOI to proceed."))
+            return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
-        context["available_report_types"] = self.get_report_types_for_generate_report(
-            get_report_types_for_oois(self.selected_oois)
-        )
+        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.selected_oois))
         return context
 
 
 class SetupScanGenerateReportView(
-    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, BaseReportView, TemplateView
+    GenerateReportStepsMixin,
+    BreadcrumbsGenerateReportView,
+    ReportPluginView,
+    TemplateView,
 ):
     """
     Show required and optional plugins to start scans to generate OOIs to include in report.
@@ -124,69 +134,31 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            error_message = _("Select at least one report type to proceed.")
-            messages.add_message(self.request, messages.ERROR, error_message)
-
-        if self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]:
-            return redirect(reverse("generate_report_view", kwargs=kwargs) + get_selection(request))
-
+        if not self.report_has_required_plugins():
+            return redirect(self.get_next())
+        if not self.plugins:
+            return redirect(self.get_previous())
+        if self.plugins_enabled():
+            return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
 
-    def get_plugin_data(self):
-        report_types: dict[str, Any] = {}
-        total_enabled_plugins = {"required": 0, "optional": 0}
-        total_available_plugins = {"required": 0, "optional": 0}
 
-        for report_type in self.report_types:
-            for plugin_type in ["required", "optional"]:
-                # Mypy doesn't infer this automatically https://github.com/python/mypy/issues/9168
-                plugin_type = cast(Literal["required", "optional"], plugin_type)
-                number_of_enabled = sum(
-                    1 if plugin.enabled and plugin.id in report_type.plugins[plugin_type] else 0
-                    for plugin in self.plugins[plugin_type]
-                )
-
-                number_of_available = len(report_type.plugins[plugin_type])
-                total_enabled_plugins[plugin_type] += number_of_enabled
-                total_available_plugins[plugin_type] += number_of_available
-
-                if report_type.name not in report_types:
-                    report_types[report_type.name] = {}
-
-                report_types[report_type.name][f"number_of_enabled_{plugin_type}"] = number_of_enabled
-                report_types[report_type.name][f"number_of_available_{plugin_type}"] = number_of_available
-
-        plugin_data = {
-            "total_enabled_plugins": total_enabled_plugins,
-            "total_available_plugins": total_available_plugins,
-            "report_types": report_types,
-        }
-
-        return plugin_data
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["plugins"], context["all_plugins_enabled"] = self.get_required_optional_plugins(
-            get_plugins_for_report_ids(self.selected_report_types)
-        )
-        context["plugin_data"] = self.get_plugin_data()
-        return context
-
-
-class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, TemplateView):
+class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
     """
     Shows the report generated from OOIS and report types.
     """
 
     template_name = "generate_report.html"
+    breadcrumbs_step = 6
     current_step = 6
     report_types: Sequence[type[Report]]
 
-    def get(self, request, *args, **kwargs):
-        if not self.all_plugins_enabled["required"]:
-            warning_message = _("This report may not show all the data as some required plugins are not enabled.")
-            messages.add_message(self.request, messages.WARNING, warning_message)
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+            )
         return super().get(request, *args, **kwargs)
 
     def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, Any]]]:
@@ -237,12 +209,13 @@ class GenerateReportView(BreadcrumbsGenerateReportView, BaseReportView, Template
                 "report_types": report_types,
                 "date": date,
             }
-            messages.add_message(self.request, messages.ERROR, error_message)
+            messages.error(self.request, error_message)
 
         return report_data
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["created_at"] = datetime.now()
         context["report_data"] = self.generate_reports_for_oois()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(

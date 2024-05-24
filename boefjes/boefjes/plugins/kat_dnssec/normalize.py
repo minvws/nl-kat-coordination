@@ -1,19 +1,17 @@
 import json
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     result = json.loads(raw)
 
-    boefje_meta = normalizer_meta.raw_data.boefje_meta
-    pk = boefje_meta.input_ooi
-    ooi_ref = Reference.from_str(pk)
+    ooi_ref = Reference.from_str(input_ooi["primary_key"])
 
-    possible_errors: [str] = [
+    possible_errors: list[str] = [
         "Bogus DNSSEC signature",
         "DNSSEC signature not incepted yet",
         "Unknown cryptographic algorithm",
