@@ -6,5 +6,3 @@ BYTES_API=http://localhost:8002
 STATIC_ROOT=/usr/share/kat-rocky/static
 GRANIAN_WORKERS=2
 GRANIAN_THREADS=4
-# Workaround for https://github.com/emmett-framework/granian/issues/287
-GRANIAN_HTTP=1
