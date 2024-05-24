@@ -10,6 +10,8 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     ooi_ref = Reference.from_str(input_ooi["primary_key"])
 
+    # We are looking for the last line that isn't a comment (doesn't start with
+    # ";"), so we reverse the output lines before looping over them.
     for result_line in reversed(result.splitlines()):
         if not result_line.startswith(";"):
             break
