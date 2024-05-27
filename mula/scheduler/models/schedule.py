@@ -18,8 +18,7 @@ from .errors import ValidationError
 from .task import Task
 
 
-# TODO: determine naming Schema, Definition, Manifest, Specification, Schedule, Config
-class TaskSchema(BaseModel):
+class Schedule(BaseModel):
     model_config = ConfigDict(from_attributes=True, validate_assignment=True)
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -53,8 +52,8 @@ class TaskSchema(BaseModel):
             raise ValueError(f"Invalid cron expression: {value}") from exc
 
 
-class TaskSchemaDB(Base):
-    __tablename__ = "schemas"
+class ScheduleDB(Base):
+    __tablename__ = "schedules"
 
     id = Column(GUID, primary_key=True)
 
@@ -69,7 +68,7 @@ class TaskSchemaDB(Base):
     schedule = Column(String, nullable=True)
 
     # TODO: cascade
-    tasks = relationship("TaskDB", back_populates="schema")
+    tasks = relationship("TaskDB", back_populates="schedule")
 
     deadline_at = Column(
         DateTime(timezone=True),

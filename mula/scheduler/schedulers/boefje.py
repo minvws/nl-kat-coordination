@@ -274,7 +274,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-            schemas, _ = self.ctx.datastores.schema_store.get_schemas(
+            schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
                 filters=filters.FilterRequest(
                     filters=[
                         filters.Filter(
@@ -288,7 +288,7 @@ class BoefjeScheduler(Scheduler):
             )
         except Exception as exc_db:
             self.logger.error(
-                "Could not get schemas for rescheduling %s",
+                "Could not get schedules for rescheduling %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
                 organisation_id=self.organisation.id,
@@ -296,9 +296,9 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
-        if not schemas:
+        if not schedules:
             self.logger.debug(
-                "No schemas tasks found for scheduler: %s",
+                "No schedules tasks found for scheduler: %s",
                 self.scheduler_id,
                 scheduler_id=self.scheduler_id,
                 organisation_id=self.organisation.id,
@@ -306,8 +306,8 @@ class BoefjeScheduler(Scheduler):
             return
 
         with futures.ThreadPoolExecutor() as executor:
-            for schema in schemas:
-                boefje_task = BoefjeTask.parse_obj(schema.data)
+            for schedule in schedules:
+                boefje_task = BoefjeTask.parse_obj(schedule.data)
 
                 # Boefje still exists?
                 boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
@@ -321,8 +321,8 @@ class BoefjeScheduler(Scheduler):
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                     )
-                    schema.enabled = False
-                    self.ctx.datastores.schema_store.update_schema(schema)
+                    schedule.enabled = False
+                    self.ctx.datastores.schedule_store.update_schedule(schedule)
                     continue
 
                 # Boefje still enabled?
@@ -333,8 +333,8 @@ class BoefjeScheduler(Scheduler):
                         organisation_id=self.organisation.id,
                         scheduler_id=self.scheduler_id,
                     )
-                    schema.enabled = False
-                    self.ctx.datastores.schema_store.update_schema(schema)
+                    schedule.enabled = False
+                    self.ctx.datastores.schedule_store.update_schedule(schedule)
                     continue
 
                 # We check if the task has an input_ooi, since it is possible
@@ -350,8 +350,8 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        schema.enabled = False
-                        self.ctx.datastores.schema_store.update_schema(schema)
+                        schedule.enabled = False
+                        self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
                     # Boefje still consuming ooi?
@@ -363,8 +363,8 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        schema.enabled = False
-                        self.ctx.datastores.schema_store.update_schema(schema)
+                        schedule.enabled = False
+                        self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
                     # Boefje allowed to scan ooi?
@@ -376,8 +376,8 @@ class BoefjeScheduler(Scheduler):
                             organisation_id=self.organisation.id,
                             scheduler_id=self.scheduler_id,
                         )
-                        schema.enabled = False
-                        self.ctx.datastores.schema_store.update_schema(schema)
+                        schedule.enabled = False
+                        self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
                 executor.submit(
@@ -714,13 +714,13 @@ class BoefjeScheduler(Scheduler):
             )
         )
 
-        # TODO: check the correct attributes, schema
+        # TODO: check the correct attributes, schedule
         task = Task(
             scheduler_id=self.scheduler_id,
             priority=score,
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),
-            # schema_id=
+            # schedule_id=
         )
 
         try:
@@ -753,19 +753,40 @@ class BoefjeScheduler(Scheduler):
 
         # TODO: check exception handling here
         try:
-            schema = self.ctx.datastores.schema_store.get_schema_by_hash(task.hash)
-            if schema is None:
+            # FIXME: task.schedule instead of get
+            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(task.hash)
+            if schedule is None:
+                # TODO: naive cron schedule determination, should be improved
+                # with a random jitter approach to avoid scheduling tasks
+                # during office hours
+                now = datetime.now(timezone.utc)
+                cron_expression = self.evaluate_schedule(task)
+                schedule_db = self.ctx.datastores.schedule_store.create_schedule(
+                    models.Schedule(
+                        scheduler_id=self.scheduler_id,
+                        hash=task.hash,
+                        schedule=cron_expression,
+                        deadline_at=cron.next_run(cron_expression),
+                        created_at=now,
+                        modified_at=now,
+                    )
+                )
+
+                task.schedule_id = schedule_db.id
+                self.ctx.datastores.task_store.update_task(task)
+
                 return
 
-            next_deadline = self.calculate_deadline(task)
-            if next_deadline is None:
-                return  # TODO:
+            if schedule.enabled is False:
+                # TODO: logging
+                return
 
-            schema.deadline_at = next_deadline
-            self.ctx.datastores.schema_store.update_schema(schema)
+            cron_expression = self.evaluate_schedule(task)
+            schedule.deadline_at = cron.next_run(cron_expression)
+            self.ctx.datastores.schedule_store.update_schedule(schedule)
         except Exception as exc:
             self.logger.error(
-                "Could not update schema with deadline",
+                "Could not update schedule with deadline",
                 task_id=task.id,
                 task_hash=task.hash,
                 organisation_id=self.organisation.id,
@@ -892,22 +913,20 @@ class BoefjeScheduler(Scheduler):
 
         return boefjes
 
-    def calculate_deadline(self, task: models.Task) -> datetime | None:
-        """Calculate the deadline for a task.
+    # TODO: test this
+    def evaluate_schedule(self, task: models.Task) -> str:
+        """Evaluate the schedule for a task.
 
         Args:
-            task: The task to calculate the deadline for.
+            task: The task to evaluate the schedule for.
 
         Returns:
-            The calculated deadline for the task.
+            A cron expression for the task, or None if no schedule could be
+
         """
-        # Do we have a schedule?
-        if task.schedule is not None and task.schedule != "":
-            try:
-                next_run = cron.next_run(task.schedule)
-            except Exception as exc:
-                raise ValueError(f"Invalid cron expression: {task.schedule}") from exc
-            return next_run
+        if task.schedule:
+            # TODO: implement more advanced schedule evaluation
+            return task.schedule
 
         # We at least delay a job by the grace period
         minimum = self.ctx.config.pq_grace_period
@@ -922,4 +941,5 @@ class BoefjeScheduler(Scheduler):
         adjusted_time = deadline + jitter_offset
         adjusted_time = max(adjusted_time, deadline)
 
-        return datetime.now(timezone.utc) + timedelta(seconds=minimum)
+        # TODO: check and test this
+        return f"{adjusted_time.minute} {adjusted_time.hour} * * *"

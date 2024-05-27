@@ -51,8 +51,7 @@ class Task(BaseModel):
 
     scheduler_id: str
 
-    schema_id: uuid.UUID | None = None
-    # schema: TaskSchema ## FIXME: naming conflict with pydantic .schema()
+    schedule_id: uuid.UUID | None = None
 
     priority: int | None = 0
 
@@ -73,8 +72,8 @@ class TaskDB(Base):
 
     scheduler_id = Column(String, nullable=False)
 
-    schema_id = Column(GUID, ForeignKey("schemas.id", ondelete="SET NULL"), nullable=True)
-    schema = relationship("TaskSchemaDB", back_populates="tasks")
+    schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
+    schedule = relationship("SchedueDB", back_populates="tasks")
 
     hash = Column(String(32), index=True)
 

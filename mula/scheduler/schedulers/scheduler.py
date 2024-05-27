@@ -10,7 +10,7 @@ import structlog
 from opentelemetry import trace
 
 from scheduler import connectors, context, models, queues, rankers, storage, utils
-from scheduler.utils import thread
+from scheduler.utils import cron, thread
 
 tracer = trace.get_tracer(__name__)
 
@@ -261,7 +261,7 @@ class Scheduler(abc.ABC):
 
         self.post_push(item)
 
-    def post_push(self, item: models.Task) -> None:
+    def post_push(self, task: models.Task) -> None:
         """When a boefje task is being added to the queue. We
         persist a task to the datastore with the status QUEUED.
 
@@ -270,22 +270,47 @@ class Scheduler(abc.ABC):
         """
         self.last_activity = datetime.now(timezone.utc)
 
-        # Create TaskSchema
-        #
-        # Do we have a schema for this task?
-        schema_db = self.ctx.datastores.schema_store.get_schema_by_hash(item.hash)
-        if schema_db is None:
-            schema_db = self.ctx.datastores.schema_store.create_schema(
-                models.TaskSchema(
-                    scheduler_id=self.scheduler_id,
-                    deadline_at=datetime.now(timezone.utc) + timedelta(seconds=self.ctx.config.pq_grace_period),
-                    created_at=datetime.now(timezone.utc),
-                    modified_at=datetime.now(timezone.utc),
+        # TODO: check exception handling here
+        try:
+            # FIXME: task.schedule instead of get
+            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(task.hash)
+            if schedule is None:
+                # TODO: naive cron schedule determination, should be improved
+                # with a random jitter approach to avoid scheduling tasks
+                # during office hours
+                now = datetime.now(timezone.utc)
+                cron_expression = self.evaluate_schedule(task)
+                schedule_db = self.ctx.datastores.schedule_store.create_schedule(
+                    models.Schedule(
+                        scheduler_id=self.scheduler_id,
+                        hash=task.hash,
+                        schedule=cron_expression,
+                        deadline_at=cron.next_run(cron_expression),
+                        created_at=now,
+                        modified_at=now,
+                    )
                 )
-            )
 
-        item.schema_id = schema_db.id
-        self.ctx.datastores.task_store.update_task(item)
+                task.schedule_id = schedule_db.id
+                self.ctx.datastores.task_store.update_task(task)
+                return
+
+            if schedule.enabled is False:
+                # TODO: logging
+                return
+
+            cron_expression = self.evaluate_schedule(task)
+            schedule.deadline_at = cron.next_run(cron_expression)
+            self.ctx.datastores.schedule_store.update_schedule(schedule)
+        except Exception as exc:
+            self.logger.error(
+                "Could not update schedule with deadline",
+                task_id=task.id,
+                task_hash=task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                exc_info=exc,
+            )
 
     def pop_item_from_queue(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
         """Pop an item from the queue.
@@ -353,10 +378,7 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
-    # TODO: not sure if it needs to be an abstract method, don't know if every
-    # scheduler will need to calculate the deadline, and will use a schema
-    # @abc.abstractmethod
-    def calculate_deadline(self, task: models.Task) -> datetime | None:
+    def evaluate_schedule(self, task: models.Task) -> str:
         raise NotImplementedError
 
     def enable(self) -> None:
