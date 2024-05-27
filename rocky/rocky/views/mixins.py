@@ -281,7 +281,7 @@ class ReportList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key: int | slice) -> list[Report]:
+    def __getitem__(self, key: int | slice) -> list[dict[str, Report | dict[OOI, list[Report]]]]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = self.HARD_LIMIT
@@ -292,22 +292,33 @@ class ReportList:
                 offset=offset,
                 limit=limit,
             ).items
-            self.hydrate_report_list(reports)
-            return reports
+
+            return self.hydrate_report_list(reports)
 
         raise NotImplementedError("ReportList only supports slicing")
 
-    def hydrate_report_list(self, reports: list[Report]):
-        per_ooi_report_types = {}
-        collected = []
-        for report in reports:
-            report_types = []
+    @staticmethod
+    def hydrate_report_list(reports: list[Report]) -> list[dict[str, Report | dict[OOI, list[Report]]]]:
+        hydrated_reports = []
 
-            for child_report in report[1]:
-                report_types.append(child_report.report_type)
-                per_ooi_report_types[child_report.input_ooi] = report_types
-            collected.append(per_ooi_report_types)
-        return collected
+        for report in reports:
+            ordered_children_reports = []
+            per_ooi_child_reports = {}
+            hydrated_report = {"parent_report": "", "children_reports": {}}
+
+            parent_report, children_reports = report
+
+            if not parent_report.has_parent:
+                for child_report in children_reports:
+                    if str(child_report.parent_report) == str(parent_report):
+                        ordered_children_reports.append(child_report)
+                        per_ooi_child_reports[child_report.input_ooi] = ordered_children_reports
+                        hydrated_report["children_reports"] = per_ooi_child_reports
+
+            hydrated_report["parent_report"] = parent_report
+            hydrated_reports.append(hydrated_report)
+
+        return hydrated_reports
 
 
 class ConnectorFormMixin:
