@@ -1,4 +1,3 @@
-import json
 from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerOutput
@@ -7,18 +6,18 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 
 
 def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
-    result = json.loads(raw)
+    result = raw.decode()
 
     ooi_ref = Reference.from_str(input_ooi["primary_key"])
 
-    possible_errors: list[str] = [
-        "Bogus DNSSEC signature",
-        "DNSSEC signature not incepted yet",
-        "Unknown cryptographic algorithm",
-        "DNSSEC signature has expired",
-    ]
+    # We are looking for the last line that isn't a comment (doesn't start with
+    # ";"), so we reverse the output lines before looping over them.
+    for result_line in reversed(result.splitlines()):
+        if not result_line.startswith(";"):
+            break
 
-    if "No trusted keys found in tree" in result and "No DNSSEC public key(s)" in result:
+    # [S] self sig OK; [B] bogus; [T] trusted; [U] unsigned
+    if result_line.startswith("[U]"):
         ft = KATFindingType(id="KAT-NO-DNSSEC")
         finding = Finding(
             finding_type=ft.reference,
@@ -27,8 +26,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         )
         yield ft
         yield finding
-
-    if "No trusted keys found in tree" in result and [error for error in possible_errors if error in result]:
+    elif result_line.startswith("[S]") or result_line.startswith("[B]"):
         ft = KATFindingType(id="KAT-INVALID-DNSSEC")
         finding = Finding(
             finding_type=ft.reference,
@@ -37,3 +35,5 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         )
         yield ft
         yield finding
+    elif not result_line.startswith("[T]"):
+        raise ValueError(f"Could not parse drill output: {result_line}")
