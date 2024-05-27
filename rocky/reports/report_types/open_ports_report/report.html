@@ -26,7 +26,7 @@
             <tbody>
                 {% for ip, detailed_data in data.items %}
                     <tr>
-                        <td>{{ ip.tokenized.address }}</td>
+                        <td>{{ ip }}</td>
                         {# djLint formatting adds spaces before the comma. #}
                         {# djlint:off #}
                         <td>

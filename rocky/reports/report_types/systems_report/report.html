@@ -30,7 +30,7 @@
                         <td>
                             {% if ip_services.hostnames %}
                                 {% for hostname in ip_services.hostnames %}
-                                    {{ hostname.human_readable }}
+                                    {{ hostname|human_readable }}
                                     {% if not forloop.last %},{% endif %}
                                 {% endfor %}
                             {% else %}
