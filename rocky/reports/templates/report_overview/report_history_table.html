@@ -28,7 +28,7 @@
                         <i>{% translate "See details" %}</i>
                     {% endif %}
                 </td>
-                <td>{{ report.parent_report.observed_at }}</td>
+                <td>{{ report.parent_report.observed_at|date:"Y-m-d" }}</td>
                 <td>
                     {% if report.children_reports %}
                         <button type="button"
