@@ -1,6 +1,6 @@
----
-# Hello katty
----
+# Development example
+
+We will be making a boefje, a normalizer, a bit, a new OOI-model and a report type which will check the database for an IPAddressV4 or IPAddressV6 OOI and create a simple Greeting object that contains a string provided by the user with an IPAddressV4 or IPAddressV6 OOI.
 
 ## Glossary
 
@@ -10,8 +10,6 @@
 | Plugin     | A plugin that works in its docker container that looks for a certain type of OOI and then executes code (potentially scanning outside sources/APIs) when that OOI is found. This code will then return byte data that will be used by normalizers to create new OOIs. |
 | Normalizer | A plugin that listens to specified boefjes', and creates new OOIs from the data that they find. This is often called a whisker.                                                                                                                                       |
 | Bit        | A plugin that waits for specified OOIs and creates more OOIs from these.                                                                                                                                                                                              |
-
-We will be making a boefje, a whisker, a bit, a new model and a report type which will check the database for an IPAddressV4 or IPAddressV6 OOI and create a simple Greeting object that contains a string provided by the user with an IPAddressV4 or IPAddressV6 OOI.
 
 ## Creating a boefje
 
@@ -59,13 +57,7 @@ This file has to be an image of the developer's cat. This image will be used as 
 
 ### description.md
 
-.
-
-.
-
-.
-
-.
+This file contains a description of the boefje to explain to the user what this boefje does. For this example we can leave this empty.
 
 ### schema.json
 
@@ -73,28 +65,26 @@ This JSON is used as the basis for a form for the user. When the user enables th
 
 This is an example of a schema.json file:
 
-```
+```json
 {
-    "title": "Arguments",
-    "type": "object",
-    "properties": {
-        "MESSAGE": {
-            "title": "Input text to give to the boefje",
-            "type": "string",
-            "description": "Some text so the boefje has some information to work with. Normally you could feed this an API key or a username"
-        },
-        "NUMBER": {
-            "title": "Amount of cats to add",
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9,
-            "default": 0,
-            "description": "A number between 1 and 9. To show how many cats you want to add to the greeting"
-        }
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "MESSAGE": {
+      "title": "Input text to give to the boefje",
+      "type": "string",
+      "description": "Some text so the boefje has some information to work with. Normally you could feed this an API key or a username"
     },
-    "required": [
-        "MESSAGE"
-    ]
+    "NUMBER": {
+      "title": "Amount of cats to add",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9,
+      "default": 0,
+      "description": "A number between 0 and 9. To show how many cats you want to add to the greeting"
+    }
+  },
+  "required": ["MESSAGE"]
 }
 ```
 
@@ -102,8 +92,10 @@ This is an example of a schema.json file:
 - **type**: This should always contain a string containing 'object'
 - **description**: A description of the boefje explaining in short what it can do. This will both be displayed inside the KAT-alogus and on the boefje's page.
 - **properties**: This contains a list of objects which each will show the KAT-alogus what inputs are requested from the user. This can range from requesting for an API-key to extra commands the boefje should run.
-  Inside the boefje.json file, we specified 2 environment variables that will be used by this boefje. + **MESSAGE**: For this property we ask the user to send us a string which this boefje will use to create some raw data. + **NUMBER**: For this property we ask the user to send us an integer between 1 and 9.
-- **required**: In here we need to give a list of the objects' names that the user has to provide to run our boefje. For this example, we will only require the user to give us the MESSAGE variable. We do this by adding "MESSAGE" to the _required_ list.
+  Inside the boefje.json file, we specified 2 environment variables that will be used by this boefje.
+  - **MESSAGE**: For this property we ask the user to send us a string which this boefje will use to create some raw data.
+  - **NUMBER**: For this property we ask the user to send us an integer between 1 and 9.
+- **required**: In here we need to give a list of the objects' names that the user has to provide to run our boefje. For this example, we will only require the user to give us the MESSAGE variable. We do this by adding _"MESSAGE"_ to the _required_ list.
 
 ### main.py
 
@@ -112,12 +104,12 @@ This function will run whenever a new OOI gets created with one of the types men
 
 Here is the example we will be using.
 
-```
+```python
 import json
 from os import getenv
 
 def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
-    """Function that gets run to give raw data for the normalizers that read from """
+    """Function that gets run to give a raw file for the normalizers to read from"""
     address = boefje_meta["arguments"]["input"]["address"]
     MESSAGE = getenv("MESSAGE", "ERROR")
     NUMBER = getenv("NUMBER", "0")
@@ -167,7 +159,7 @@ This was the creation of our first boefje. If we run openKAT now we should be ab
 
 ### Testing the boefje
 
-First, we run `make kat`. After that successfully finishes. You can run `grep 'DJANGO_SUPERUSER_PASSWORD' .env` to get the password for the super user. The login e-mail is "superuser@localhost".
+First, we run `make kat`. After that successfully finishes. You can run `grep 'DJANGO_SUPERUSER_PASSWORD' .env` to get the password for the super user. The login e-mail is _superuser@localhost_.
 
 After logging in, openKAT will guide you through their first-time setup.
 
@@ -184,21 +176,21 @@ We recommend that you at least once go through the onboarding process before dev
 8. Now we want to enable our boefje, for this we will need to go to the KAT-alogus (from the top nav bar) and look for our boefje and enable it.
 9. If you followed the steps correctly, you should see two text inputs being requested from you. In the first one, you can put in any text that you want to be part of the boefje's greeting. As you might remember the second input is asking for an integer between 1 and 9 (you can see the description of the text inputs by pressing the question mark to the right of the text input.)
 10. After having made your choice you can press the "Add settings and enable boefje" button.
-11. Now it should say that the boefje has been enabled, but if we go to the Tasks page (from the top nav-bar) we see that the boefje is currently not doing anything. This is because our boefje will only run if a valid IPAddressV4 or IPAddressV6 OOI is available. Let's create one of those by using existing boefjes and whiskers.
+11. Now it should say that the boefje has been enabled, but if we go to the Tasks page (from the top nav-bar) we see that the boefje is currently not doing anything. This is because our boefje will only run if a valid IPAddressV4 or IPAddressV6 OOI is available. Let's create one of those by using existing boefjes and normalizers.
 
-If you do not want to go through the trouble of seeing existing boefjes and whiskers to work you can go to Objects > Add new object > Object type: _IPAddressV4_ > Insert an IPv4 address and choose as network _Network|internet_ and then skip to step 19.
+If you do not want to go through the trouble of seeing existing boefjes and normalizers to work you can go to Objects > Add new object > Object type: _IPAddressV4_ > Insert an IPv4 address and choose as network _Network|internet_ and then skip to step 19.
 
 12. Enable the "DnsRecords" boefje. This boefje takes in a hostname and makes a DNS-record from it.
 13. Let's add a URL OOI. Go to Objects (from the top nav-bat) and on the right you will see an "Add" button. After pressing this button press the "Add object" button.
 14. As an object type we will choose URL.
 15. As a network for the URL we will select the internet ("Network|internet") and now we have to give it a website URL. For this example, we can use "https://mispo.es/" and then press the "add url" button.
 16. If we now go to the Tasks tab, we will see that still no boefjes are being run. This is because our URL has too low of a clearance level. Go to the tab Objects and select the "mispo.es" OOI by pressing the checkbox in front of it. Then you can change the clearance level on the bottom of the page. To be able to get an IPAddressV4 OOI from this object, we will need to give it a clearance level of L1 or higher. For this example let's set it to L2.
-17. After doing this we can go to the Tasks tab and see that boefjes have started running on our provided OOI. Now the "DnsRecords" boefje will make raw data (of type "boefje/dns-records") and the "Dns Normalize" normalizer will obtain an IPAddressV4 or IPAddressV6 from this (you can see the normalizers task by going to the tab Tasks and then switching from Boefjes to the Normalizers tab.)
+17. After doing this we can go to the Tasks tab and see that boefjes have started running on our provided OOI. Now the "DnsRecords" boefje will make a raw file (of type "boefje/dns-records") and the "Dns Normalize" normalizer will obtain an IPAddressV4 or IPAddressV6 from this (you can see the normalizers task by going to the tab Tasks and then switching from Boefjes to the Normalizers tab.)
 18. If we now go to the Objects tab. We can see that a lot more OOIs have been added. And also among other things, we can see IPAddressV4s being added. This means our boefje should run too.
 19. After IPAddressV4 or IPAddressV6 OOIs have been added. Our boefje should immediately be queued to run from it. We can see this by going into the Tasks tab again. If you see a boefje called "Hello Katty" being run with a completed status then congratulations! Your first boefje has officially run!
 20. We can now open the task with the arrow button on the right and if we then press the "Download meta and raw data" it will install a zip file with 2 files inside.
-    - **raw meta file**: The json file contains meta data that our boefje has received. The _boefje_meta_ object has been given to our _run_ method as a parameter.
-    - **return file**: the other file without extension contains the information our boefje has returned. In our case it should contain a json as a single line string. You can open this file with any text editor to check it out. This data will be available for the normalizers (whiskers) that consume raw data with the type _boefje/hello-katty_.
+    - **meta file**: The json file contains meta data that our boefje has received. The _boefje_meta_ object has been given to our _run_ method as a parameter.
+    - **raw file**: The other file without extension contains the information our boefje has returned. In our case it should contain a json as a single line string. You can open this file with any text editor to check it out. This data will be available for the normalizers that consume raw data with the type _boefje/hello-katty_.
 
 Now that we have a way to generate the data for normalizers, we need to create a new type of OOI that the normalizer should generate from this raw data. So let's do that!
 
@@ -211,7 +203,7 @@ Now that we have a way to generate the data for normalizers, we need to create a
 
 This is how our _Greeting.py_ should look like now:
 
-```
+```python
 from __future__ import annotations
 
 from octopoes.models.ooi.network import IPAddress
@@ -224,7 +216,7 @@ class Greeting(OOI):
 
 But openKAT also requires each OOI model to have properties called _object_type_ and _\_natural_key_attrs_. _object_type_ has to be of type _Literal\[<model_name>]_ containing the model's name. And _\_natural_key_attrs_ is used to create the primary key for the database. It has to contain a list of strings that contain names of the unique attributes of our model. This is an example of how our _Greeting.py_ could look like:
 
-```
+```python
 from __future__ import annotations
 
 from typing import Literal
@@ -242,7 +234,7 @@ class Greeting(OOI):
 
 The final part we want to change is the address field. Instead of having a field _address_ that contains information about the address. We can store a reference to an existing address. And we know this address exists since this model will only be created when our boefje runs and our boefje only runs when an IPAddressV4 or IPAddressV6 OOI gets added. We can make our address a reference by changing the code in the following way.
 
-```
+```python
 from __future__ import annotations
 
 from typing import Literal
@@ -263,7 +255,7 @@ As you can see, the _ReferenceField_ function takes in 3 parameters. The first o
 
 Now that our model is finished we need to add it to the lists of existing OOIs. We can do this by going to _octopoes/octopoes/models/types.py_ and importing our Model by saying:
 
-```
+```python
 from octopoes.models.ooi.greeting import Greeting
 ```
 
@@ -283,44 +275,27 @@ To create a normalizer we are going to need 2 more files. These files can both b
 
 This is a JSON file that contains information about our normalizer. The object inside should have 3 attributes:
 
-- **id**: The string _id_ of the normalizer. For this, we will use the boefje's id with "-normalize" concatenated to it.
+- **id**: The string _id_ of the normalizer. For this, we will use the boefje's id with _"-normalize"_ concatenated to it.
 - **consumes**: This is a list where we can specify which boefje's data the normalizer can use. The list is made out of the boefjes' ids. This normalizer will only use the raw data from our boefje, so we will make a list containing our boefje's id prefixed with _boefje/_.
-- **produces**: This is also a list of strings where we can specify what OOIs our normalizer can produce. In our boefje's raw data, we can extract 3 kinds of OOIs. The IPAddressV4, IPAddressV6 and Greeting OOI. But when you want to create an IPAddress OOI, then you have to give it a reference to its network. Because we have to get the Network OOI anyway, we will also produce it in our normalizer.
+- **produces**: This is also a list of strings where we can specify what OOIs our normalizer can produce. In our boefje's raw data, we can extract 3 kinds of OOIs. The _IPAddressV4_, _IPAddressV6_ and _Greeting_ OOI. But when you want to create an _IPAddress_ OOI, then you have to give it a reference to its network. Because we have to get the Network OOI anyway, we will also produce it in our normalizer.
 
 Here is an example of how our _normalizer.json_ can look like:
 
-```
+```json
 {
-    "id": "hello-katty-normalize",
-    "consumes": [
-        "boefje/hello-katty"
-    ],
-    "produces": [
-        "IPAddressV6",
-        "IPAddressV4",
-        "Network"
-        "Greeting"
-    ]
+  "id": "hello-katty-normalize",
+  "consumes": ["boefje/hello-katty"],
+  "produces": ["IPAddressV6", "IPAddressV4", "Network", "Greeting"]
 }
 ```
 
 ### normalize.py
 
-This file is where the normalizer's meowgic happens. This file also has a run function that takes in information about the boefje and the raw data the boefje has provided. This run method returns an Iterable that contains OOIs. The first step we should take is to decode the raw data that we have received from our boefje and load the JSON string as a dictionary. Then we can create IPAddress OOIs. We do not know whether we should make an IPAddressV4 or IPAddressV6 because our boefje will run on both of them. We can check whether the address attribute is an IPAddressV4 or IPAddressV6 by using the following function:
-
-```
-def is_ipv4(string: str) -> bool:
-    try:
-        IPv4Network(string)
-        return True
-    except (AddressValueError, NetmaskValueError, ValueError) as e:
-```
-
-Using this we can determine whether our address is an IPAddressV4 or IPAddressV6. But creating an IPAddress requires specifying what network that IPAddress lies on (in our example that is the internet.) We can get this by using _normalizer_meta_ also provided in our run function. This dictionary is similar to the JSON you have seen when downloading the results of our boefje's task. Inside this dictionary, we can get information on the IPAddress that has triggered our boefje. And pull the reference.
+This file is where the normalizer's meowgic happens. This file also has a run function that takes in information about the boefje and the raw data the boefje has provided. This run method returns an Iterable that contains OOIs. The first step we should take is to decode the raw data that we have received from our boefje and load the JSON string as a dictionary. Then we can create IPAddress OOIs. We do not know whether we should make an IPAddressV4 or IPAddressV6 So we will have to check what kind of IPAddress we have and yield the correct one. Creating an IPAddress requires specifying what network that IPAddress lies on (in our example that is the internet.) We can get this by using _normalizer_meta_ also provided in our run function. This dictionary is similar to the JSON you have seen when downloading the results of our boefje's task. Inside this dictionary, we can get information on the IPAddress that has triggered our boefje. And pull the reference.
 
 Lastly, we will create our unique OOI. This is as simple as creating an object of the _Greeting_ class we have made and yielding it. This is what our file could look like:
 
-```
+```python
 import json
 from collections.abc import Iterable
 from ipaddress import AddressValueError, IPv4Network, NetmaskValueError
@@ -383,7 +358,7 @@ Inside this file, we write information about our bit. Here we give information s
 
 This is what our _bit.py_ would look like:
 
-```
+```python
 from bits.definitions import BitDefinition, BitParameterDefinition
 from octopoes.models.ooi.greeting import Greeting
 
@@ -417,7 +392,7 @@ For our case, we will make a simple Finding that will signal to the user that a 
 
 In our code, we will first create the type of finding and then we will create the finding and give more information about the current finding inside the description. This is what our file could look like:
 
-```
+```python
 from collections.abc import Iterator
 
 from octopoes.models import OOI
@@ -487,7 +462,7 @@ We also have to overwrite some attributes of the class to give information about
 
 With that, we now have to return a dictionary that contains information to be used for our HTML report. Let's keep it simple and only return our OOI. This is what our file could look like:
 
-```
+```python
 from datetime import datetime
 from logging import getLogger
 from typing import Any
