@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta:__legacy__"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-requests = "^2.31.0"
+requests = "^2.32.1"
 pydantic = "^2.4.2"
 fastapi = "^0.109.1"
 uvicorn = "^0.26.0"
