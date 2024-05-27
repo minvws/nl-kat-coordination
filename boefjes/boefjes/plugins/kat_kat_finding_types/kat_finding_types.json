@@ -473,11 +473,5 @@
     "risk": "medium",
     "impact": "Disallowed domains are domains that are for example 'world writable', this opens up the possibility for an atacker to host malicious files on a csp whitelisted domain.",
     "recommendation": "Remove the offending hostname from the CSP header."
-  },
-  "KAT-GREETING": {
-    "description": "A greeting object has been found.",
-    "risk": "recommendation",
-    "impact": "This has no impact except for the fact that it uses space in the database.",
-    "recommendation": "Ignore this finding, it is only for learning purposes."
   }
 }

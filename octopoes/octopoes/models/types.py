@@ -46,7 +46,6 @@ from octopoes.models.ooi.findings import (
     RetireJSFindingType,
     SnykFindingType,
 )
-from octopoes.models.ooi.greeting import Greeting
 from octopoes.models.ooi.monitoring import Application, Incident
 from octopoes.models.ooi.network import (
     AutonomousSystem,
@@ -158,7 +157,6 @@ ConcreteOOIType = (
     | ConfigType
     | Question
     | ReportsType
-    | Greeting
 )
 
 OOIType = ConcreteOOIType | NetworkType | FindingTypeType
