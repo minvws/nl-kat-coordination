@@ -177,15 +177,15 @@ Create two organisations and make sure both organisations have data. For this tu
 
 #. In `CAT` generate an ‘Aggregate Report’ and export this to JSON format. Repeat this step for `DOG`.
 
-#. Create a third organisation called ‘BIRD’.
+#. Create a third organisation called `BIRD`.
 
-#. In BIRD, go to Objects > Add > ‘Upload raw file’.
+#. In `BIRD`, go to Objects > Add > ‘Upload raw file’.
 
-#. Upload both raw files (from CAT and DOG) using the mime-type openkat/report-data’.
+#. Upload both raw files (from `CAT` and `DOG`) using the mime-type openkat/report-data’. (the mime-type will be auto-prefilled if you navigate to the upload page from the report normalizer.
 
 #. Click on ‘Reports’ and click on ‘Multi Report’.
 
-#. Select the report data of the organisations CAT and DOG and follow the report flow steps to generate the report. If you do not see your uploaded reports please make sure you have cleared the filter first.
+#. Select the report data of the organisations `CAT` and `DOG` and follow the report flow steps to generate the report. If you do not see your uploaded reports please make sure you have cleared the filter first.
 
 
 
