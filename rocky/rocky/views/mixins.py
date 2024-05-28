@@ -2,6 +2,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
+from operator import attrgetter
 
 from account.mixins import OrganizationView
 from django.contrib import messages
@@ -312,7 +313,9 @@ class ReportList:
                 for child_report in children_reports:
                     if str(child_report.parent_report) == str(parent_report):
                         ordered_children_reports.append(child_report)
-                        per_ooi_child_reports[child_report.input_ooi] = ordered_children_reports
+                        per_ooi_child_reports[child_report.input_ooi] = sorted(
+                            ordered_children_reports, key=attrgetter("name")
+                        )
                         hydrated_report["children_reports"] = per_ooi_child_reports
 
             hydrated_report["parent_report"] = parent_report

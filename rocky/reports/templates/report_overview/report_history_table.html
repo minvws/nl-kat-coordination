@@ -10,7 +10,7 @@
             <th scope="col">{% translate "Report type" %}</th>
             <th scope="col">{% translate "Objects" %}</th>
             <th scope="col">{% translate "Reference date" %}</th>
-            <th scope="col"></th>
+            <th scope="col">{% translate "Details" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -49,7 +49,7 @@
                                 <tr>
                                     <th scope="col">{% translate "Object name" %}</th>
                                     <th scope="col">{% translate "Object type" %}</th>
-                                    <th scope="col">{% translate "Children reports details" %}</th>
+                                    <th scope="col">{% translate "Details" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -67,7 +67,7 @@
                                         </td>
                                     </tr>
                                     <tr class="expando-row">
-                                        <td colspan="3">
+                                        <td colspan="4">
                                             <table>
                                                 <thead>
                                                     <tr>
@@ -80,14 +80,14 @@
                                                             <td>
                                                                 <a href="{% url "view_report" organization.code %}?report_id={{ child_report.reference }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
                                                                    title="{% translate "Shows report details" %}">{{ child_report.name }}</a>
-                                                            {% endfor %}
-                                                        </td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </td>
