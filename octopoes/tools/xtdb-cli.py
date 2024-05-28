@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
     verbosities = [logging.WARN, logging.INFO, logging.DEBUG]
     try:
-        logging.basicConfig(level=verbosities[verbosity-1])
+        logging.basicConfig(level=verbosities[verbosity - 1])
     except IndexError:
         raise click.UsageError("Invalid verbosity level (use -v, -vv, or -vvv)")
 
