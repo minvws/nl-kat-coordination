@@ -134,6 +134,7 @@ class ReportTypesSelectionAggregateReportView(
         context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
             self.available_report_types["optional"]
         )
+        context["total_oois"] = self.get_total_objects()
         return context
 
 
@@ -231,6 +232,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
         context["template"] = aggregate_report.template_path
         context["post_processed_data"] = post_processed_data
         context["report_data"] = report_data
+        context["total_oois"] = self.get_total_objects()
         context["report_download_pdf_url"] = url_with_querystring(
             reverse(
                 "aggregate_report_pdf",

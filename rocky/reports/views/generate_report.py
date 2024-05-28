@@ -116,8 +116,8 @@ class ReportTypesSelectionGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.oois_pk))
+        context["total_oois"] = self.get_total_objects()
         return context
 
 
@@ -219,6 +219,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
+        context["total_oois"] = self.get_total_objects()
         context["report_data"] = self.generate_reports_for_oois()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(

@@ -104,12 +104,7 @@
     </div>
 </section>
 <form id="select_all_objects_form" class="inline" method="get">
-    {% if "all" in selected_oois %}
-        {% include "forms/report_form_fields.html" with selected_oois=None %}
+    {% include "forms/report_form_fields.html" with selected_oois=None %}
 
-    {% else %}
-        {% include "forms/report_form_fields.html" with selected_oois=None %}
-
-        <input type="hidden" name="ooi" value="all">
-    {% endif %}
+    {% if "all" not in selected_oois %}<input type="hidden" name="ooi" value="all">{% endif %}
 </form>

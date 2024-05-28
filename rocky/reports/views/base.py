@@ -131,9 +131,9 @@ class ReportOOIView(OOIFilterView, BaseSelectionView):
         return oois_pk
 
     def get_total_objects(self):
-        if not self.selected_oois:
-            return len(self.object_list)
-        return len(self.oois_pk)
+        if "all" in self.selected_oois:
+            return len(self.oois_pk)
+        return len(self.selected_oois)
 
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
@@ -164,7 +164,6 @@ class ReportOOIView(OOIFilterView, BaseSelectionView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["oois"] = self.oois
-        context["total_oois"] = self.get_total_objects()
         return context
 
 
