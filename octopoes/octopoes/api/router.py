@@ -412,15 +412,10 @@ def get_scan_profile_inheritance(
 ) -> list[InheritanceSection]:
     ooi = octopoes.get_ooi(reference, valid_time)
     if not ooi.scan_profile:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="OOI does not have a scanprofile",
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="OOI does not have a scanprofile")
 
     start = InheritanceSection(
-        reference=ooi.reference,
-        level=ooi.scan_profile.level,
-        scan_profile_type=ooi.scan_profile.scan_profile_type,
+        reference=ooi.reference, level=ooi.scan_profile.level, scan_profile_type=ooi.scan_profile.scan_profile_type
     )
     if ooi.scan_profile.scan_profile_type == ScanProfileType.DECLARED.value:
         return [start]
@@ -461,10 +456,7 @@ def create_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
         xtdb_session_.client.create_node()
         xtdb_session_.commit()
     except XTDBException as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Creating node failed",
-        ) from e
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Creating node failed") from e
 
 
 @router.delete("/node", tags=["Node"])
@@ -473,10 +465,7 @@ def delete_node(xtdb_session_: XTDBSession = Depends(xtdb_session)) -> None:
         xtdb_session_.client.delete_node()
         xtdb_session_.commit()
     except XTDBException as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Deleting node failed",
-        ) from e
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Deleting node failed") from e
 
 
 @router.post("/bits/recalculate", tags=["Bits"])
@@ -533,10 +522,7 @@ async def importer_add(request: Request, xtdb_session_: XTDBSession = Depends(xt
     try:
         data = await request.body()
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error receiving objects",
-        ) from e
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     return importer(data, xtdb_session_)
 
 
@@ -545,8 +531,5 @@ async def importer_new(request: Request, xtdb_session_: XTDBSession = Depends(xt
     try:
         data = await request.body()
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error receiving objects",
-        ) from e
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error receiving objects") from e
     return importer(data, xtdb_session_, True)
