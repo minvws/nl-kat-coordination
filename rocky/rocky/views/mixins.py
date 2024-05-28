@@ -314,11 +314,11 @@ class ReportList:
 
             if not parent_report.has_parent:
                 for ooi in child_report_oois:
-                    ordered_children_reports = []
+                    hydrated_children_reports = []
                     for child_report in children_reports:
                         if str(child_report.parent_report) == str(parent_report) and ooi == child_report.input_ooi:
-                            ordered_children_reports.append(child_report)
-                    per_ooi_child_reports[ooi] = sorted(ordered_children_reports, key=attrgetter("name"))
+                            hydrated_children_reports.append(child_report)
+                    per_ooi_child_reports[ooi] = sorted(hydrated_children_reports, key=attrgetter("name"))
                 hydrated_report["children_reports"] = per_ooi_child_reports
 
             hydrated_report["parent_report"] = parent_report
