@@ -751,49 +751,6 @@ class BoefjeScheduler(Scheduler):
             caller=caller,
         )
 
-        # TODO: check exception handling here
-        try:
-            # FIXME: task.schedule instead of get
-            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(task.hash)
-            if schedule is None:
-                # TODO: naive cron schedule determination, should be improved
-                # with a random jitter approach to avoid scheduling tasks
-                # during office hours
-                now = datetime.now(timezone.utc)
-                cron_expression = self.evaluate_schedule(task)
-                schedule_db = self.ctx.datastores.schedule_store.create_schedule(
-                    models.Schedule(
-                        scheduler_id=self.scheduler_id,
-                        hash=task.hash,
-                        schedule=cron_expression,
-                        deadline_at=cron.next_run(cron_expression),
-                        created_at=now,
-                        modified_at=now,
-                    )
-                )
-
-                task.schedule_id = schedule_db.id
-                self.ctx.datastores.task_store.update_task(task)
-
-                return
-
-            if schedule.enabled is False:
-                # TODO: logging
-                return
-
-            cron_expression = self.evaluate_schedule(task)
-            schedule.deadline_at = cron.next_run(cron_expression)
-            self.ctx.datastores.schedule_store.update_schedule(schedule)
-        except Exception as exc:
-            self.logger.error(
-                "Could not update schedule with deadline",
-                task_id=task.id,
-                task_hash=task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc,
-            )
-
     @tracer.start_as_current_span("boefje_has_grace_period_passed")
     def has_grace_period_passed(self, task: BoefjeTask) -> bool:
         """Check if the grace period has passed for a task in both the
