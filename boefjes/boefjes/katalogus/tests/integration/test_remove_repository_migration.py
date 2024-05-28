@@ -19,7 +19,7 @@ class TestRemoveRepositories(TestCase):
 
         # To reset autoincrement ids
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "base"])
-        # Set state to revision 197672984df0
+        # Set state to revision cd34fdfafdaf
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
 
         session = sessionmaker(bind=self.engine)()
