@@ -220,7 +220,12 @@ class TaskStoreTestCase(unittest.TestCase):
         first_p_item = functions.create_p_item(
             self.organisation.id,
             0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"]),
+            functions.TestModel(
+                id=uuid.uuid4().hex,
+                name=uuid.uuid4().hex,
+                count=1,
+                categories=["test-a", "test-b"],
+            ),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
@@ -228,7 +233,12 @@ class TaskStoreTestCase(unittest.TestCase):
         second_p_item = functions.create_p_item(
             self.organisation.id,
             0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"]),
+            functions.TestModel(
+                id=uuid.uuid4().hex,
+                name=uuid.uuid4().hex,
+                count=2,
+                categories=["test-a"],
+            ),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -236,7 +246,12 @@ class TaskStoreTestCase(unittest.TestCase):
         third_p_item = functions.create_p_item(
             self.organisation.id,
             0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"]),
+            functions.TestModel(
+                id=uuid.uuid4().hex,
+                name=uuid.uuid4().hex,
+                count=3,
+                categories=["test-b"],
+            ),
         )
         third_task = functions.create_task(third_p_item)
         self.mock_ctx.datastores.task_store.create_task(third_task)
@@ -415,13 +430,17 @@ class TaskStoreTestCase(unittest.TestCase):
     def test_get_tasks_filter_json_gt(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -468,13 +487,17 @@ class TaskStoreTestCase(unittest.TestCase):
     def test_get_tasks_filter_json_gte(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -523,13 +546,17 @@ class TaskStoreTestCase(unittest.TestCase):
     def test_get_tasks_filter_json_lt(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -576,13 +603,17 @@ class TaskStoreTestCase(unittest.TestCase):
     def test_get_tasks_filter_json_lte(self):
         # Arrange
         first_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2)
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
 
         second_p_item = functions.create_p_item(
-            self.organisation.id, 0, functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1)
+            self.organisation.id,
+            0,
+            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -760,7 +791,10 @@ class TaskStoreTestCase(unittest.TestCase):
                     column="p_item",
                     field="data__name",
                     operator="in",
-                    value=[first_p_item.data.get("name"), second_p_item.data.get("name")],
+                    value=[
+                        first_p_item.data.get("name"),
+                        second_p_item.data.get("name"),
+                    ],
                 )
             ],
         )
@@ -866,7 +900,12 @@ class TaskStoreTestCase(unittest.TestCase):
         first_p_item = functions.create_p_item(
             self.organisation.id,
             0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=1, categories=["test-a", "test-b"]),
+            functions.TestModel(
+                id=uuid.uuid4().hex,
+                name=uuid.uuid4().hex,
+                count=1,
+                categories=["test-a", "test-b"],
+            ),
         )
         first_task = functions.create_task(first_p_item)
         self.mock_ctx.datastores.task_store.create_task(first_task)
@@ -874,7 +913,12 @@ class TaskStoreTestCase(unittest.TestCase):
         second_p_item = functions.create_p_item(
             self.organisation.id,
             0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=2, categories=["test-a"]),
+            functions.TestModel(
+                id=uuid.uuid4().hex,
+                name=uuid.uuid4().hex,
+                count=2,
+                categories=["test-a"],
+            ),
         )
         second_task = functions.create_task(second_p_item)
         self.mock_ctx.datastores.task_store.create_task(second_task)
@@ -882,7 +926,12 @@ class TaskStoreTestCase(unittest.TestCase):
         third_p_item = functions.create_p_item(
             self.organisation.id,
             0,
-            functions.TestModel(id=uuid.uuid4().hex, name=uuid.uuid4().hex, count=3, categories=["test-b"]),
+            functions.TestModel(
+                id=uuid.uuid4().hex,
+                name=uuid.uuid4().hex,
+                count=3,
+                categories=["test-b"],
+            ),
         )
         third_task = functions.create_task(third_p_item)
         self.mock_ctx.datastores.task_store.create_task(third_task)
@@ -929,5 +978,5 @@ class TaskStoreTestCase(unittest.TestCase):
         )
 
         # Act
-        with self.assertRaises(ValueError):
+        with self.assertRaises(storage.errors.StorageError):
             tasks, count = self.mock_ctx.datastores.task_store.get_tasks(filters=f_req)

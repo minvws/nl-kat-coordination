@@ -25,18 +25,18 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         scheme=tokenized_weburl["scheme"],
         path=tokenized_weburl["path"],
     )
-    raw_respsone, body = raw.split(b"\n\n", 1)
+    raw_respsone, raw_body = raw.split(b"\n\n", 1)
     response_object = json.loads(raw_respsone)
     url = response_object["response"]["url"]
 
     headers = response_object["response"]["headers"]
-    body = body.decode(response_object.get("encoding") or "utf-8", "replace")
+    body = raw_body.decode(response_object.get("encoding") or "utf-8", "replace")
 
     wappalyzer = Wappalyzer.latest()
     web_page = WebPage(url, body, headers)
     results = wappalyzer.analyze_with_versions_and_categories(web_page)
 
     for name, data in results.items():
-        software = Software(name=name, version=data["versions"].pop(0))
+        software = Software(name=name, version=data["versions"].pop(0) if data["versions"] else None)
         software_instance = SoftwareInstance(ooi=web_url.reference, software=software.reference)
         yield from [software, software_instance]

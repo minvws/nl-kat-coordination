@@ -9,6 +9,7 @@
   - [ ] Objects and Findings are created properly
   - [ ] Tasks are created and completed properly
 - [ ] I confirmed that the PR's advertised `feature` or `hotfix` works as intended.
+- [ ] I checked the logs for errors and/or warnings and made issues where necessary
 
 ### What works:
 
