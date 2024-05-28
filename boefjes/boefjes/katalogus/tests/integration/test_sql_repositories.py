@@ -1,3 +1,4 @@
+import datetime
 import os
 from unittest import TestCase, skipIf
 
@@ -5,11 +6,18 @@ import alembic.config
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
-from boefjes.katalogus.models import Boefje, Organisation
-from boefjes.katalogus.storage.interfaces import OrganisationNotFound, PluginNotFound, SettingsNotFound, StorageError
+from boefjes.katalogus.models import Boefje, Normalizer, Organisation
+from boefjes.katalogus.storage.interfaces import (
+    OrganisationNotFound,
+    PluginNotFound,
+    PluginStateNotFound,
+    SettingsNotFound,
+    StorageError,
+)
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
+from boefjes.sql.plugin_storage import SQLPluginStorage
 from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
 
 
@@ -22,6 +30,7 @@ class TestRepositories(TestCase):
         self.organisation_storage = SQLOrganisationStorage(session, settings)
         self.settings_storage = SQLSettingsStorage(session, create_encrypter())
         self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
+        self.plugin_storage = SQLPluginStorage(session, settings)
 
     def tearDown(self) -> None:
         session = sessionmaker(bind=get_engine())()
@@ -50,15 +59,6 @@ class TestRepositories(TestCase):
 
         with self.assertRaises(OrganisationNotFound):
             storage.get_by_id(organisation_id)
-
-    def test_organisations(self):
-        org = Organisation(id="org1", name="Test")
-
-        with self.organisation_storage as storage:
-            storage.create(org)
-
-        returned_org = storage.get_by_id(org.id)
-        self.assertEqual(org, returned_org)
 
     def test_settings_storage(self):
         organisation_id = "test"
@@ -152,11 +152,109 @@ class TestRepositories(TestCase):
         returned_state = plugin_state_storage.get_by_id(plugin.id, org.id)
         self.assertFalse(returned_state)
 
-        with self.assertRaises(PluginNotFound):
+        with self.assertRaises(PluginStateNotFound):
             plugin_state_storage.get_by_id("wrong", org.id)
 
-        with self.assertRaises(PluginNotFound):
+        with self.assertRaises(PluginStateNotFound):
             plugin_state_storage.get_by_id("wrong", org.id)
 
-        with self.assertRaises(PluginNotFound):
+        with self.assertRaises(PluginStateNotFound):
             plugin_state_storage.get_by_id(plugin.id, "wrong")
+
+    def test_bare_boefje_storage(self):
+        boefje = Boefje(id="test_boefje", name="Test")
+
+        with self.plugin_storage as storage:
+            storage.create_boefje(boefje)
+
+        returned_boefje = storage.boefje_by_id(boefje.id)
+        self.assertEqual(boefje, returned_boefje)
+
+        all_plugins = storage.get_all()
+        self.assertEqual(all_plugins, [boefje])
+
+        with self.plugin_storage as storage:
+            storage.delete_boefje_by_id(boefje.id)
+
+        with self.assertRaises(PluginNotFound):
+            storage.boefje_by_id(boefje.id)
+
+    def test_rich_boefje_storage(self):
+        boefje = Boefje(
+            id="test_boefje",
+            name="Test",
+            version="v1.09",
+            created=datetime.datetime(2010, 10, 10, 10, 10, 10, tzinfo=datetime.UTC),
+            description="My Boefje",
+            environment_keys=["api_key", "TOKEN"],
+            scan_level=4,
+            consumes=["Internet"],
+            produces=[
+                "image/png",
+                "application/zip+json",
+                "application/har+json",
+                "application/json",
+                "application/localstorage+json",
+            ],
+            oci_image="ghcr.io/test/image:123",
+            oci_arguments=["host", "-n", "123123123123123123123"],
+        )
+
+        with self.plugin_storage as storage:
+            storage.create_boefje(boefje)
+
+        returned_boefje = storage.boefje_by_id(boefje.id)
+        self.assertEqual(boefje, returned_boefje)
+
+    def test_bare_normalizer_storage(self):
+        normalizer = Normalizer(id="test_boefje", name="Test")
+
+        with self.plugin_storage as storage:
+            storage.create_normalizer(normalizer)
+
+        returned_normalizer = storage.normalizer_by_id(normalizer.id)
+        self.assertEqual(normalizer, returned_normalizer)
+
+        all_plugins = storage.get_all()
+        self.assertEqual(all_plugins, [normalizer])
+
+        with self.plugin_storage as storage:
+            storage.delete_normalizer_by_id(normalizer.id)
+
+        with self.assertRaises(PluginNotFound):
+            storage.normalizer_by_id(normalizer.id)
+
+    def test_rich_normalizer_storage(self):
+        normalizer = Normalizer(
+            id="test_normalizer",
+            name="Test",
+            version="v1.19",
+            created=datetime.datetime(2010, 10, 10, 10, 10, 10, tzinfo=datetime.UTC),
+            description="My Normalizer",
+            environment_keys=["api_key", "TOKEN"],
+            scan_level=4,
+            consumes=["Internet"],
+            produces=[
+                "image/png",
+                "application/zip+json",
+                "application/har+json",
+                "application/json",
+                "application/localstorage+json",
+            ],
+        )
+
+        with self.plugin_storage as storage:
+            storage.create_normalizer(normalizer)
+
+        returned_normalizer = storage.normalizer_by_id(normalizer.id)
+        self.assertEqual(normalizer, returned_normalizer)
+
+    def test_plugin_storage(self):
+        boefje = Boefje(id="test_boefje", name="Test")
+        normalizer = Normalizer(id="test_boefje", name="Test")
+
+        with self.plugin_storage as storage:
+            storage.create_boefje(boefje)
+            storage.create_normalizer(normalizer)
+
+        self.assertEqual(storage.get_all(), [boefje, normalizer])

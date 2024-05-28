@@ -8,7 +8,7 @@ from starlette.testclient import TestClient
 from boefjes.config import settings
 from boefjes.katalogus.api.root import app
 from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
-from boefjes.katalogus.models import Organisation
+from boefjes.katalogus.models import Boefje, Organisation
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
@@ -46,6 +46,30 @@ class TestAPI(TestCase):
         data = response.json()
 
         self.assertEqual("dns-records", data["id"])
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/")
+        self.assertEqual(len(response.json()), 93)
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?plugin_type=boefje")
+        self.assertEqual(len(response.json()), 41)
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?limit=10")
+        self.assertEqual(len(response.json()), 10)
+
+        boefje = Boefje(id="test_plugin", name="My test boefje")
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=boefje")
+        self.assertEqual(len(response.json()), 42)
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_plugin")
+
+        boefje_dict = boefje.dict()
+        boefje_dict["consumes"] = list(boefje_dict["consumes"])
+        boefje_dict["produces"] = list(boefje_dict["produces"])
+
+        self.assertEqual(response.json(), boefje_dict)
 
     def test_basic_settings_api(self):
         plug = "dns-records"

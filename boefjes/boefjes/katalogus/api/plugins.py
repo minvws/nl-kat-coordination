@@ -12,6 +12,8 @@ from boefjes.katalogus.dependencies.plugins import (
     get_plugins_filter_parameters,
 )
 from boefjes.katalogus.models import FilterParameters, PaginationParameters, PluginType
+from boefjes.katalogus.storage.interfaces import PluginStorage
+from boefjes.sql.plugin_storage import get_plugin_storage
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",
@@ -78,6 +80,16 @@ def get_plugin(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
     except HTTPStatusError as ex:
         raise HTTPException(ex.response.status_code)
+
+
+@router.post("/plugins", status_code=status.HTTP_201_CREATED)
+def add_plugin(plugin: PluginType, storage: PluginStorage = Depends(get_plugin_storage)):
+    with storage as store:
+        if plugin.type == "boefje":
+            return store.create_boefje(plugin)
+
+        if plugin.type == "normalizer":
+            return store.create_normalizer(plugin)
 
 
 @router.patch("/plugins/{plugin_id}")

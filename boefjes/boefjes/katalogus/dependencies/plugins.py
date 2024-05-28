@@ -13,11 +13,13 @@ from boefjes.katalogus.models import FilterParameters, PaginationParameters, Plu
 from boefjes.katalogus.storage.interfaces import (
     NotFound,
     PluginEnabledStorage,
+    PluginStorage,
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
+from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.sql.setting_storage import create_setting_storage
 
 logger = logging.getLogger(__name__)
@@ -26,10 +28,12 @@ logger = logging.getLogger(__name__)
 class PluginService:
     def __init__(
         self,
+        plugin_storage: PluginStorage,
         plugin_enabled_store: PluginEnabledStorage,
         settings_storage: SettingsStorage,
         local_repo: LocalPluginRepository,
     ):
+        self.plugin_storage = plugin_storage
         self.plugin_enabled_store = plugin_enabled_store
         self.settings_storage = settings_storage
         self.local_repo = local_repo
@@ -43,7 +47,8 @@ class PluginService:
         self.plugin_enabled_store.__exit__(exc_type, exc_val, exc_tb)
 
     def get_all(self, organisation_id: str) -> list[PluginType]:
-        return [self._set_plugin_enabled(plugin, organisation_id) for plugin in self.local_repo.get_all()]
+        all_plugins = self.local_repo.get_all() + self.plugin_storage.get_all()
+        return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins]
 
     def by_plugin_id(self, plugin_id: str, organisation_id: str) -> PluginType:
         all_plugins = self.get_all(organisation_id)
@@ -135,6 +140,7 @@ class PluginService:
 def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
     def closure(session: Session):
         return PluginService(
+            create_plugin_storage(session),
             create_plugin_enabled_storage(session),
             create_setting_storage(session),
             get_local_repository(),

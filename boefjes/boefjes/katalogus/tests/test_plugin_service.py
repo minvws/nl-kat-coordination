@@ -4,7 +4,7 @@ from boefjes.config import BASE_DIR
 from boefjes.katalogus.dependencies.plugins import PluginService
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.katalogus.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.katalogus.storage.memory import PluginStatesStorageMemory, SettingsStorageMemory
+from boefjes.katalogus.storage.memory import PluginStatesStorageMemory, PluginStorageMemory, SettingsStorageMemory
 
 
 def mock_plugin_service(organisation_id: str) -> PluginService:
@@ -14,6 +14,7 @@ def mock_plugin_service(organisation_id: str) -> PluginService:
     test_boefjes_dir = BASE_DIR / "katalogus" / "tests" / "boefjes_test_dir"
 
     return PluginService(
+        PluginStorageMemory(),
         PluginStatesStorageMemory(organisation_id),
         storage,
         LocalPluginRepository(test_boefjes_dir),

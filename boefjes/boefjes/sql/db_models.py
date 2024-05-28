@@ -1,10 +1,12 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint, func, types
+from enum import Enum
+
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint, types
 from sqlalchemy.orm import relationship
 
 from boefjes.sql.db import SQL_BASE
 
 
-class ScanLevel(types.Enum):
+class ScanLevel(Enum):
     L0 = 0
     L1 = 1
     L2 = 2
@@ -61,11 +63,12 @@ class BoefjeInDB(SQL_BASE):
 
     id = Column(types.Integer, primary_key=True, autoincrement=True)
     plugin_id = Column(types.String(length=64), nullable=False, unique=True)
-    created = Column(types.DateTime(timezone=True), nullable=False, server_default=func.now())
+    created = Column(types.DateTime(timezone=True), nullable=True)
 
     # Metadata
-    description = Column(types.Text, nullable=False)
-    scan_level = Column(ScanLevel, nullable=False, default=ScanLevel.L4)
+    name = Column(String(length=64), nullable=False)
+    description = Column(types.Text, nullable=True)
+    scan_level = Column(types.Enum(*[str(x.value) for x in ScanLevel], name="scan_level"), nullable=False, default="4")
 
     # Job specifications
     consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
@@ -83,11 +86,11 @@ class NormalizerInDB(SQL_BASE):
 
     id = Column(types.Integer, primary_key=True, autoincrement=True)
     plugin_id = Column(types.String(length=64), nullable=False, unique=True)
-    created = Column(types.DateTime(timezone=True), nullable=False, server_default=func.now())
+    created = Column(types.DateTime(timezone=True), nullable=True)
 
     # Metadata
-    description = Column(types.Text, nullable=False)
-    scan_level = Column(ScanLevel, nullable=False, default=ScanLevel.L4)
+    name = Column(String(length=64), nullable=False)
+    description = Column(types.Text, nullable=True)
 
     # Job specifications
     consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
