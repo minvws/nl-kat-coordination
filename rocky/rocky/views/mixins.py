@@ -303,20 +303,23 @@ class ReportList:
         hydrated_reports = []
 
         for report in reports:
-            ordered_children_reports = []
+            child_report_oois = set()
             per_ooi_child_reports = {}
             hydrated_report = {"parent_report": "", "children_reports": {}}
 
             parent_report, children_reports = report
 
+            for child_report in children_reports:
+                child_report_oois.add(child_report.input_ooi)
+
             if not parent_report.has_parent:
-                for child_report in children_reports:
-                    if str(child_report.parent_report) == str(parent_report):
-                        ordered_children_reports.append(child_report)
-                        per_ooi_child_reports[child_report.input_ooi] = sorted(
-                            ordered_children_reports, key=attrgetter("name")
-                        )
-                        hydrated_report["children_reports"] = per_ooi_child_reports
+                for ooi in child_report_oois:
+                    ordered_children_reports = []
+                    for child_report in children_reports:
+                        if str(child_report.parent_report) == str(parent_report) and ooi == child_report.input_ooi:
+                            ordered_children_reports.append(child_report)
+                    per_ooi_child_reports[ooi] = sorted(ordered_children_reports, key=attrgetter("name"))
+                hydrated_report["children_reports"] = per_ooi_child_reports
 
             hydrated_report["parent_report"] = parent_report
             hydrated_reports.append(hydrated_report)
