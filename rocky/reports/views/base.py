@@ -97,8 +97,14 @@ class BaseSelectionView(OrganizationView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.selected_oois = sorted(set(request.GET.getlist("ooi", [])))
+        self.selected_oois = self.check_oois_selection(sorted(set(request.GET.getlist("ooi", []))))
         self.selected_report_types = request.GET.getlist("report_type", [])
+
+    def check_oois_selection(self, selected_oois: list[str]) -> list[str]:
+        """all in selection overrides the rest of the selection."""
+        if "all" in selected_oois and len(selected_oois) > 1:
+            selected_oois = ["all"]
+        return selected_oois
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -107,11 +113,27 @@ class BaseSelectionView(OrganizationView):
         return context
 
 
-class ReportOOIView(BaseSelectionView, OOIFilterView):
+class ReportOOIView(OOIFilterView, BaseSelectionView):
     """
     This class will show a list of OOIs with filters and handles OOIs selections.
     Needs BaseSelectionView to get selected oois.
     """
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.oois = self.get_oois()
+        self.oois_pk = self.get_oois_pk()
+
+    def get_oois_pk(self) -> list[str]:
+        oois_pk = self.selected_oois
+        if "all" in self.selected_oois:
+            oois_pk = [ooi.primary_key for ooi in self.oois]
+        return oois_pk
+
+    def get_total_objects(self):
+        if "all" in self.selected_oois:
+            return len(self.oois_pk)
+        return len(self.selected_oois)
 
     def get_oois(self) -> list[OOI]:
         if "all" in self.selected_oois:
@@ -141,7 +163,7 @@ class ReportOOIView(BaseSelectionView, OOIFilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.get_oois()
+        context["oois"] = self.oois
         return context
 
 
