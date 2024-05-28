@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-16 07:24+0000\n"
-"PO-Revision-Date: 2024-05-27 19:22+0000\n"
-"Last-Translator: jan klopper <jan@underdark.nl>\n"
+"PO-Revision-Date: 2024-05-28 08:49+0000\n"
+"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/nl/>\n"
 "Language: nl\n"
@@ -2997,7 +2997,7 @@ msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid "Records found"
-msgstr "Records gevonden"
+msgstr "Gevonden records"
 
 #: reports/report_types/dns_report/report.html
 msgid ""
@@ -3316,7 +3316,7 @@ msgstr "Deze sector bevat"
 
 #: reports/report_types/multi_organization_report/introduction.html
 msgid "Scanned organizations."
-msgstr "gescande organisaties."
+msgstr "Gescande organisaties."
 
 #: reports/report_types/multi_organization_report/introduction.html
 msgid "Of these organizations"
@@ -3525,8 +3525,8 @@ msgid ""
 "The RPKI report shows if an RPKI route announcement was available for the "
 "system and if this announcement is not expired."
 msgstr ""
-"Het RPKI rapport toont aan dat een RPKI-aankondiging beschikbaar was voor "
-"het systeem en als deze aankondiging niet verlopen is."
+"Het RPKI rapport toont aan dat een RPKI route-announcement beschikbaar was "
+"voor het systeem en als deze aankondiging niet verlopen is."
 
 #: reports/report_types/rpki_report/report.html
 msgid "RPKI compliance"
@@ -4033,7 +4033,7 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Warning! Before you proceed read the following points:"
-msgstr "Waarschuwing! Lees de volgende punten voordat u door gaat:"
+msgstr "Waarschuwing! Lees de volgende punten voordat u doorgaat:"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
@@ -4204,7 +4204,7 @@ msgstr ""
 
 #: reports/views/aggregate_report.py
 msgid "Aggregate report"
-msgstr "Geaggregeerd rapport"
+msgstr "Aggregeer rapport"
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid "Select Objects"
@@ -4234,8 +4234,8 @@ msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
 "%(date)s."
 msgstr ""
-"Er zijn geen gegevens gevonden worden voor %(report_types). Object(en) "
-"bestaan niet op %(date)s."
+"Er zijn geen gegevens gevonden voor %(report_types). Object(en) bestaan niet "
+"op %(date)s."
 
 #: reports/views/base.py
 #, python-format
@@ -4845,7 +4845,7 @@ msgid ""
 msgstr ""
 "Het verwijderen van %(object_name)s '%(escaped_object)s' in de automatische "
 "verwijdering van gerelateerde objecten, uw account heeft echter niet de "
-"rechten om de volgende object-types te verwijderen"
+"rechten om de volgende objecttypes te verwijderen"
 
 #: rocky/templates/admin/delete_confirmation.html
 #, python-format
@@ -4854,7 +4854,7 @@ msgid ""
 "following protected related objects"
 msgstr ""
 "Het verwijderen van %(object_name)s '%(escaped_object)s' heeft tot gevolg "
-"dat de volgende gerelateerde objecten ook verwijderend worden"
+"dat de volgende gerelateerde objecten ook worden verwijderd"
 
 #: rocky/templates/admin/delete_confirmation.html
 #, python-format
@@ -4862,7 +4862,7 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted"
 msgstr ""
-"Weet u zeker dat u %(object_name)s \"%(escaped_object)s\" wilt verwijderen? "
+"Weet u zeker dat u %(object_name)s ‘%(escaped_object)s’ wilt verwijderen? "
 "Alle volgende gerelateerde objecten worden ook verwijderd"
 
 #: rocky/templates/admin/delete_confirmation.html
@@ -4887,7 +4887,7 @@ msgid ""
 "types of objects"
 msgstr ""
 "Het verwijderen van het geselecteerde object %(objects_name)s heeft tot "
-"gevolg dat de gerelateerde objecten ook verwijderd worden, maar uw account "
+"gevolg dat de gerelateerde objecten ook worden verwijderd, maar uw account "
 "heeft geen toestemming om de volgende objecten te verwijderen"
 
 #: rocky/templates/admin/delete_selected_confirmation.html
@@ -4897,7 +4897,7 @@ msgid ""
 "protected related objects"
 msgstr ""
 "Het verwijderen van %(objects_name)s heeft tot gevolg dat de volgende "
-"beschermde gerelateerde objecten ook verwijderend worden"
+"beschermde gerelateerde objecten ook worden verwijderend"
 
 #: rocky/templates/admin/delete_selected_confirmation.html
 #, python-format
