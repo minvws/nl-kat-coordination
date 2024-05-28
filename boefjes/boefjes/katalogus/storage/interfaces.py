@@ -84,6 +84,12 @@ class PluginStorage(ABC):
     def create_normalizer(self, normalizer: Normalizer) -> None:
         raise NotImplementedError
 
+    def update_boefje(self, boefje_id: str, data: dict) -> None:
+        raise NotImplementedError
+
+    def update_normalizer(self, normalizer_id: str, data: dict) -> None:
+        raise NotImplementedError
+
     def delete_boefje_by_id(self, boefje_id: str) -> None:
         raise NotImplementedError
 

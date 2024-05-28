@@ -40,11 +40,27 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
         boefje_in_db = self.to_boefje_in_db(boefje)
         self.session.add(boefje_in_db)
 
+    def update_boefje(self, boefje_id: str, data: dict) -> None:
+        instance = self._db_boefje_instance_by_id(boefje_id)
+
+        for key, value in data.items():
+            setattr(instance, key, value)
+
+        self.session.add(instance)
+
     def create_normalizer(self, normalizer: Normalizer) -> None:
         logger.info("Saving plugin: %s", normalizer.json())
 
         normalizer_in_db = self.to_normalizer_in_db(normalizer)
         self.session.add(normalizer_in_db)
+
+    def update_normalizer(self, normalizer_id: str, data: dict) -> None:
+        instance = self._db_normalizer_instance_by_id(normalizer_id)
+
+        for key, value in data.items():
+            setattr(instance, key, value)
+
+        self.session.add(instance)
 
     def delete_boefje_by_id(self, boefje_id: str) -> None:
         instance = self._db_boefje_instance_by_id(boefje_id)

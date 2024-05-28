@@ -63,16 +63,16 @@ class PluginService:
         return self.settings_storage.get_all(organisation_id, plugin_id)
 
     def clone_settings_to_organisation(self, from_organisation: str, to_organisation: str):
-        # One requirement is that we also do not keep previously enabled boefjes enabled of they are not copied.
+        # One requirement is that only boefjes enabled in the from_organisation end up being enabled for the target.
         for plugin_id in self.plugin_enabled_store.get_all_enabled(to_organisation):
-            self.update_by_id(plugin_id, to_organisation, enabled=False)
+            self.set_enabled_by_id(plugin_id, to_organisation, enabled=False)
 
         for plugin in self.get_all(from_organisation):
             if all_settings := self.get_all_settings(from_organisation, plugin.id):
                 self.upsert_settings(all_settings, to_organisation, plugin.id)
 
         for plugin_id in self.plugin_enabled_store.get_all_enabled(from_organisation):
-            self.update_by_id(plugin_id, to_organisation, enabled=True)
+            self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
 
     def upsert_settings(self, values: dict, organisation_id: str, plugin_id: str):
         self._assert_settings_match_schema(values, organisation_id, plugin_id)
@@ -87,7 +87,7 @@ class PluginService:
         except SettingsNotConformingToSchema:
             logger.warning("Making sure %s is disabled for %s because settings are deleted", plugin_id, organisation_id)
 
-            self.update_by_id(plugin_id, organisation_id, False)
+            self.set_enabled_by_id(plugin_id, organisation_id, False)
 
     def schema(self, plugin_id: str) -> dict | None:
         return self.local_repo.schema(plugin_id)
@@ -110,7 +110,7 @@ class PluginService:
             logger.error("Plugin not found: %s", plugin_id)
             return ""
 
-    def update_by_id(self, plugin_id: str, organisation_id: str, enabled: bool):
+    def set_enabled_by_id(self, plugin_id: str, organisation_id: str, enabled: bool):
         if enabled:
             all_settings = self.settings_storage.get_all(organisation_id, plugin_id)
             self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)

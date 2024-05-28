@@ -170,6 +170,10 @@ class TestRepositories(TestCase):
         returned_boefje = storage.boefje_by_id(boefje.id)
         self.assertEqual(boefje, returned_boefje)
 
+        storage.update_boefje(boefje.id, {"description": "4"})
+        self.assertEqual(storage.boefje_by_id(boefje.id).description, "4")
+        boefje.description = "4"
+
         all_plugins = storage.get_all()
         self.assertEqual(all_plugins, [boefje])
 
@@ -214,6 +218,10 @@ class TestRepositories(TestCase):
 
         returned_normalizer = storage.normalizer_by_id(normalizer.id)
         self.assertEqual(normalizer, returned_normalizer)
+
+        storage.update_normalizer(normalizer.id, {"version": "v4"})
+        self.assertEqual(storage.normalizer_by_id(normalizer.id).version, "v4")
+        normalizer.version = "v4"
 
         all_plugins = storage.get_all()
         self.assertEqual(all_plugins, [normalizer])

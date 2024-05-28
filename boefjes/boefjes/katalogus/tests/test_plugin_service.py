@@ -49,7 +49,7 @@ class TestPluginsService(TestCase):
         self.assertTrue(plugin.enabled)
 
     def test_update_by_id(self):
-        self.service.update_by_id("kat_test_normalize", self.organisation, False)
+        self.service.set_enabled_by_id("kat_test_normalize", self.organisation, False)
         plugin = self.service.by_plugin_id("kat_test_normalize", self.organisation)
         self.assertFalse(plugin.enabled)
 
@@ -57,7 +57,7 @@ class TestPluginsService(TestCase):
         plugin_id = "kat_test"
 
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
-            self.service.update_by_id(plugin_id, self.organisation, True)
+            self.service.set_enabled_by_id(plugin_id, self.organisation, True)
 
         msg = (
             "Settings for organisation test and plugin kat_test are not conform the plugin schema: 'api_key' is a "
@@ -66,12 +66,12 @@ class TestPluginsService(TestCase):
         self.assertEqual(ctx.exception.message, msg)
 
         self.service.settings_storage.upsert({"api_key": 128 * "a"}, self.organisation, plugin_id)
-        self.service.update_by_id(plugin_id, self.organisation, True)
+        self.service.set_enabled_by_id(plugin_id, self.organisation, True)
 
         value = 129 * "a"
         self.service.settings_storage.upsert({"api_key": 129 * "a"}, self.organisation, plugin_id)
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
-            self.service.update_by_id(plugin_id, self.organisation, True)
+            self.service.set_enabled_by_id(plugin_id, self.organisation, True)
 
         msg = (
             f"Settings for organisation test and plugin kat_test are not conform the plugin schema: "
@@ -98,7 +98,7 @@ class TestPluginsService(TestCase):
         plugin_id = "kat_test"
 
         self.service.settings_storage.upsert({"api_key": 128 * "a"}, self.organisation, plugin_id)
-        self.service.update_by_id(plugin_id, self.organisation, True)
+        self.service.set_enabled_by_id(plugin_id, self.organisation, True)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertTrue(plugin.enabled)
@@ -114,17 +114,17 @@ class TestPluginsService(TestCase):
         self.service.settings_storage.upsert({"api_key": "24"}, self.organisation, plugin_id)
 
         with self.assertRaises(SettingsNotConformingToSchema) as ctx:
-            self.service.update_by_id(plugin_id, self.organisation, True)
+            self.service.set_enabled_by_id(plugin_id, self.organisation, True)
 
         self.assertIn("'24' is not of type 'integer'", ctx.exception.message)
 
         self.service.settings_storage.upsert({"api_key": 24}, self.organisation, plugin_id)
 
-        self.service.update_by_id(plugin_id, self.organisation, True)
+        self.service.set_enabled_by_id(plugin_id, self.organisation, True)
 
         plugin = self.service.by_plugin_id(plugin_id, self.organisation)
         self.assertTrue(plugin.enabled)
-        self.service.update_by_id(plugin_id, self.organisation, False)
+        self.service.set_enabled_by_id(plugin_id, self.organisation, False)
 
     def test_clone_one_setting(self):
         new_org_id = "org2"
@@ -132,8 +132,8 @@ class TestPluginsService(TestCase):
         self.service.settings_storage.upsert({"api_key": "24"}, self.organisation, plugin_id)
         assert self.service.get_all_settings(self.organisation, plugin_id) == {"api_key": "24"}
 
-        self.service.update_by_id(plugin_id, self.organisation, True)
-        self.service.update_by_id("kat_test_normalize", new_org_id, True)
+        self.service.set_enabled_by_id(plugin_id, self.organisation, True)
+        self.service.set_enabled_by_id("kat_test_normalize", new_org_id, True)
 
         assert "api_key" not in self.service.get_all_settings(new_org_id, plugin_id)
 

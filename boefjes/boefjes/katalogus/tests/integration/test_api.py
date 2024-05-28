@@ -8,7 +8,7 @@ from starlette.testclient import TestClient
 from boefjes.config import settings
 from boefjes.katalogus.api.root import app
 from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
-from boefjes.katalogus.models import Boefje, Organisation
+from boefjes.katalogus.models import Boefje, Normalizer, Organisation
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
@@ -39,7 +39,7 @@ class TestAPI(TestCase):
         session.commit()
         session.close()
 
-    def test_plugin_api(self):
+    def test_get_local_plugin(self):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
 
         self.assertEqual(response.status_code, 200)
@@ -47,6 +47,7 @@ class TestAPI(TestCase):
 
         self.assertEqual("dns-records", data["id"])
 
+    def test_filter_plugins(self):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/")
         self.assertEqual(len(response.json()), 93)
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?plugin_type=boefje")
@@ -55,21 +56,60 @@ class TestAPI(TestCase):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?limit=10")
         self.assertEqual(len(response.json()), 10)
 
+    def test_add_boefje(self):
         boefje = Boefje(id="test_plugin", name="My test boefje")
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
-
         self.assertEqual(response.status_code, 201)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=boefje")
         self.assertEqual(len(response.json()), 42)
 
-        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_plugin")
-
         boefje_dict = boefje.dict()
         boefje_dict["consumes"] = list(boefje_dict["consumes"])
         boefje_dict["produces"] = list(boefje_dict["produces"])
 
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_plugin")
         self.assertEqual(response.json(), boefje_dict)
+
+        response = self.client.delete(f"/v1/organisations/{self.org.id}/boefjes/test_plugin")
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_plugin")
+        self.assertEqual(response.status_code, 404)
+
+    def test_add_normalizer(self):
+        normalizer = Normalizer(id="test_normalizer", name="My test normalizer")
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        self.assertEqual(response.status_code, 201)
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=normalizer")
+        self.assertEqual(len(response.json()), 53)
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_normalizer")
+        self.assertEqual(response.json(), normalizer.dict())
+
+        response = self.client.delete(f"/v1/organisations/{self.org.id}/normalizers/test_normalizer")
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_normalizer")
+        self.assertEqual(response.status_code, 404)
+
+    def test_update_plugins(self):
+        normalizer = Normalizer(id="norm_id", name="My test normalizer")
+        boefje = Boefje(id="test_plugin", name="My test boefje", description="123")
+
+        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+
+        response = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"description": "4"})
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}")
+        self.assertEqual(response.json()["description"], "4")
+
+        response = self.client.patch(
+            f"/v1/organisations/{self.org.id}/normalizers/{normalizer.id}", json={"version": "v1.2"}
+        )
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{normalizer.id}")
+        self.assertEqual(response.json()["version"], "v1.2")
 
     def test_basic_settings_api(self):
         plug = "dns-records"

@@ -1,8 +1,10 @@
+import datetime
 from functools import partial
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
 from httpx import HTTPStatusError
+from pydantic import BaseModel, Field
 
 from boefjes.katalogus.api.organisations import check_organisation_exists
 from boefjes.katalogus.dependencies.plugins import (
@@ -101,9 +103,66 @@ def update_plugin_state(
 ):
     try:
         with plugin_service as p:
-            p.update_by_id(plugin_id, organisation_id, enabled)
+            p.set_enabled_by_id(plugin_id, organisation_id, enabled)
     except HTTPStatusError as ex:
         raise HTTPException(ex.response.status_code)
+
+
+class PatchBoefje(BaseModel):
+    id: str | None = None
+    name: str | None = None
+    version: str | None = None
+    created: datetime.datetime | None = None
+    description: str | None = None
+    environment_keys: list[str] = Field(default_factory=list)
+    scan_level: int = 1
+    consumes: set[str] = Field(default_factory=set)
+    produces: set[str] = Field(default_factory=set)
+    oci_image: str | None = None
+    oci_arguments: list[str] = Field(default_factory=list)
+
+
+@router.patch("/boefjes/{boefje_id}")
+def update_boefje(
+    boefje_id: str,
+    boefje: PatchBoefje,
+    plugin_storage: PluginStorage = Depends(get_plugin_storage),
+):
+    with plugin_storage as p:
+        p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
+
+
+@router.delete("/boefjes/{boefje_id}")
+def delete_boefje(boefje_id: str, plugin_storage: PluginStorage = Depends(get_plugin_storage)):
+    with plugin_storage as p:
+        p.delete_boefje_by_id(boefje_id)
+
+
+class PatchNormalizer(BaseModel):
+    id: str | None = None
+    name: str | None = None
+    version: str | None = None
+    created: datetime.datetime | None = None
+    description: str | None = None
+    environment_keys: list[str] = Field(default_factory=list)
+    consumes: list[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
+    produces: list[str] = Field(default_factory=list)  # oois
+
+
+@router.patch("/normalizers/{normalizer_id}")
+def update_normalizer(
+    normalizer_id: str,
+    normalizer: PatchNormalizer,
+    plugin_storage: PluginStorage = Depends(get_plugin_storage),
+):
+    with plugin_storage as p:
+        p.update_normalizer(normalizer_id, normalizer.model_dump(exclude_unset=True))
+
+
+@router.delete("/normalizers/{normalizer_id}")
+def delete_normalizer(normalizer_id: str, plugin_storage: PluginStorage = Depends(get_plugin_storage)):
+    with plugin_storage as p:
+        p.delete_normalizer_by_id(normalizer_id)
 
 
 @router.get("/plugins/{plugin_id}/schema.json", include_in_schema=False)
