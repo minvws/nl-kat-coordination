@@ -1,0 +1,20 @@
+name: Integrate with SonarCloud
+
+on:
+    workflow_dispatch:
+    push:
+      branches: [ main ]
+      tags: [ v* ]
+    pull_request:
+
+
+jobs:
+  sonar_cloud:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SonarCloud
+        if: always()
+        uses: SonarSource/sonarcloud-github-action@v2.2.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
