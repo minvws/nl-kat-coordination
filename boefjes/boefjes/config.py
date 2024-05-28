@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
+from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint, Base64Str
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
@@ -117,10 +117,10 @@ class Settings(BaseSettings):
         examples=["IDENTITY", "NACL_SEALBOX"],
     )
 
-    katalogus_private_key_b64: str = Field(
+    katalogus_private_key_b64: Base64Str = Field(
         "", description="Base64 encoded private key used for asymmetric encryption of settings"
     )
-    katalogus_public_key_b64: str = Field(
+    katalogus_public_key_b64: Base64Str = Field(
         "", description="Base64 encoded public key used for asymmetric encryption of settings"
     )
 
