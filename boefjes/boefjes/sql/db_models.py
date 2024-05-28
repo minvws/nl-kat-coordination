@@ -1,7 +1,15 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint, func, types
 from sqlalchemy.orm import relationship
 
 from boefjes.sql.db import SQL_BASE
+
+
+class ScanLevel(types.Enum):
+    L0 = 0
+    L1 = 1
+    L2 = 2
+    L3 = 3
+    L4 = 4
 
 
 class OrganisationInDB(SQL_BASE):
@@ -46,3 +54,43 @@ class PluginStateInDB(SQL_BASE):
 
     organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
     organisation = relationship("OrganisationInDB")
+
+
+class BoefjeInDB(SQL_BASE):
+    __tablename__ = "boefje"
+
+    id = Column(types.Integer, primary_key=True, autoincrement=True)
+    plugin_id = Column(types.String(length=64), nullable=False, unique=True)
+    created = Column(types.DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    # Metadata
+    description = Column(types.Text, nullable=False)
+    scan_level = Column(ScanLevel, nullable=False, default=ScanLevel.L4)
+
+    # Job specifications
+    consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+    produces = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+    environment_keys = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+
+    # Image specifications
+    oci_image = Column(types.String(length=256), nullable=True)
+    oci_arguments = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+    version = Column(types.String(length=16), nullable=True)
+
+
+class NormalizerInDB(SQL_BASE):
+    __tablename__ = "normalizer"
+
+    id = Column(types.Integer, primary_key=True, autoincrement=True)
+    plugin_id = Column(types.String(length=64), nullable=False, unique=True)
+    created = Column(types.DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    # Metadata
+    description = Column(types.Text, nullable=False)
+    scan_level = Column(ScanLevel, nullable=False, default=ScanLevel.L4)
+
+    # Job specifications
+    consumes = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+    produces = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+    environment_keys = Column(types.ARRAY(types.String(length=128)), default=lambda: [], nullable=False)
+    version = Column(types.String(length=16), nullable=True)
