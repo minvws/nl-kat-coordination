@@ -96,18 +96,17 @@ class TestAPI(TestCase):
         normalizer = Normalizer(id="norm_id", name="My test normalizer")
         boefje = Boefje(id="test_plugin", name="My test boefje", description="123")
 
-        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
         self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+        self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"description": "4"})
+        self.client.patch(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}", json={"enabled": True})
 
-        response = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/{boefje.id}", json={"description": "4"})
-        self.assertEqual(response.status_code, 200)
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}")
         self.assertEqual(response.json()["description"], "4")
+        self.assertEqual(response.json()["enabled"], True)
 
-        response = self.client.patch(
-            f"/v1/organisations/{self.org.id}/normalizers/{normalizer.id}", json={"version": "v1.2"}
-        )
-        self.assertEqual(response.status_code, 200)
+        self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        self.client.patch(f"/v1/organisations/{self.org.id}/normalizers/{normalizer.id}", json={"version": "v1.2"})
+
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{normalizer.id}")
         self.assertEqual(response.json()["version"], "v1.2")
 

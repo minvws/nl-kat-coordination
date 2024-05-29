@@ -3,7 +3,6 @@ from functools import partial
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
-from httpx import HTTPStatusError
 from pydantic import BaseModel, Field
 
 from boefjes.katalogus.api.organisations import check_organisation_exists
@@ -80,8 +79,6 @@ def get_plugin(
             return p.by_plugin_id(plugin_id, organisation_id)
     except KeyError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
 
 
 @router.post("/plugins", status_code=status.HTTP_201_CREATED)
@@ -101,14 +98,16 @@ def update_plugin_state(
     enabled: bool = Body(False, embed=True),
     plugin_service: PluginService = Depends(get_plugin_service),
 ):
-    try:
-        with plugin_service as p:
-            p.set_enabled_by_id(plugin_id, organisation_id, enabled)
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
+    with plugin_service as p:
+        p.set_enabled_by_id(plugin_id, organisation_id, enabled)
 
 
 class PatchBoefje(BaseModel):
+    """
+    For patching, we need all fields to be optional, hence we overwrite the definition here.
+    Also see https://fastapi.tiangolo.com/tutorial/body-updates/ as a reference.
+    """
+
     id: str | None = None
     name: str | None = None
     version: str | None = None
@@ -139,6 +138,11 @@ def delete_boefje(boefje_id: str, plugin_storage: PluginStorage = Depends(get_pl
 
 
 class PatchNormalizer(BaseModel):
+    """
+    For patching, we need all fields to be optional, hence we overwrite the definition here.
+    Also see https://fastapi.tiangolo.com/tutorial/body-updates/ as a reference.
+    """
+
     id: str | None = None
     name: str | None = None
     version: str | None = None
@@ -166,15 +170,8 @@ def delete_normalizer(normalizer_id: str, plugin_storage: PluginStorage = Depend
 
 
 @router.get("/plugins/{plugin_id}/schema.json", include_in_schema=False)
-def get_plugin_schema(
-    plugin_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
-) -> JSONResponse:
-    try:
-        with plugin_service as p:
-            return JSONResponse(p.schema(plugin_id))
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
+def get_plugin_schema(plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)) -> JSONResponse:
+    return JSONResponse(plugin_service.schema(plugin_id))
 
 
 @router.get("/plugins/{plugin_id}/cover.jpg", include_in_schema=False)
@@ -182,11 +179,7 @@ def get_plugin_cover(
     plugin_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> FileResponse:
-    try:
-        with plugin_service as p:
-            return FileResponse(p.cover(plugin_id))
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
+    return FileResponse(plugin_service.cover(plugin_id))
 
 
 @router.get("/plugins/{plugin_id}/description.md", include_in_schema=False)
@@ -195,18 +188,10 @@ def get_plugin_description(
     organisation_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> Response:
-    try:
-        with plugin_service as p:
-            return Response(p.description(plugin_id, organisation_id))
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
+    return Response(plugin_service.description(plugin_id, organisation_id))
 
 
-@router.post("/settings/clone/{to_organisation_id}")
-def clone_organisation_settings(
-    organisation_id: str,
-    to_organisation_id: str,
-    storage: PluginService = Depends(get_plugin_service),
-):
+@router.post("/settings/clone/{to_org_id}")
+def clone_organisation_settings(from_org_id: str, to_org_id: str, storage: PluginService = Depends(get_plugin_service)):
     with storage as store:
-        store.clone_settings_to_organisation(organisation_id, to_organisation_id)
+        store.clone_settings_to_organisation(from_org_id, to_org_id)
