@@ -446,7 +446,7 @@ class ViewReportView(OOIFilterView, TemplateView):
                 }
             context["report_data"] = report_data
             context["report_types"] = [
-                report.class_attributes() for report in [get_report_by_id(report.report_type) for report in children]
+                report.class_attributes() for report in {get_report_by_id(report.report_type) for report in children}
             ]
             input_oois = list(
                 {self.octopoes_api_connector.get(child.input_ooi, valid_time=self.observed_at) for child in children}
@@ -461,7 +461,7 @@ class ViewReportView(OOIFilterView, TemplateView):
                 "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
             )
             context["report_types"] = [
-                report.class_attributes() for report in [get_report_by_id(report.report_type) for report in children]
+                report.class_attributes() for report in {get_report_by_id(report.report_type) for report in children}
             ]
             input_oois = list(
                 {self.octopoes_api_connector.get(child.input_ooi, valid_time=self.observed_at) for child in children}
