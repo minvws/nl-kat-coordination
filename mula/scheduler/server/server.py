@@ -106,7 +106,7 @@ class Server:
         )
 
         self.api.add_api_route(
-            path="/schedulers/{item_type}",
+            path="/schedulers/by_type/{item_type}",
             endpoint=self.get_schedulers_by_type,
             methods=["GET"],
             response_model=list[models.Scheduler],

@@ -295,7 +295,7 @@ class SchedulerClient:
         """Return all task stats for specific task type (e.g. 'boefje')."""
         all_stats = [
             self._get_task_stats(scheduler_id=scheduler.get("id"))
-            for scheduler in self._get(f"/schedulers/{task_type}")
+            for scheduler in self._get(f"/schedulers/by_type/{task_type}")
         ]
         return SchedulerClient._merge_stat_dicts(dicts=all_stats)
 
