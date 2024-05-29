@@ -12,9 +12,11 @@ def sum_attribute(checks, attribute):
 
 @register.filter
 def get_report_type_name(report_type_id: str):
-    return get_report_by_id(report_type_id).name
+    if report_type_id:
+        return get_report_by_id(report_type_id).name
 
 
 @register.filter
 def get_report_type_label_style(report_type_id: str):
-    return get_report_by_id(report_type_id).label_style
+    if report_type_id:
+        return get_report_by_id(report_type_id).label_style
