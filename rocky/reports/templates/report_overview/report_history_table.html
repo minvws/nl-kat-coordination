@@ -19,7 +19,7 @@
             <tr>
                 <td>
                     <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                       title="{% translate "Shows report detail" %}">{{ report.parent_report.report_id }}</a>
+                       title="{% translate "Shows report detail" %}">{{ report.parent_report.reference }}</a>
                 </td>
                 <td>
                     <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
@@ -31,7 +31,7 @@
                         {{ report.children_reports|length }}
                     {% endif %}
                 </td>
-                <td>{{ report.parent_report.observed_at|date:"Y-m-d" }}</td>
+                <td>{{ report.parent_report.observed_at|date }}</td>
                 <td>{{ report.parent_report.date_generated }}</td>
                 <td>
                     {% if report.children_reports %}
