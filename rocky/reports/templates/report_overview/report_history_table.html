@@ -53,6 +53,7 @@
                                 <tr>
                                     <th scope="col">{% translate "Object name" %}</th>
                                     <th scope="col">{% translate "Object type" %}</th>
+                                    <th scope="col">{% translate "Clearance level" %}</th>
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
@@ -63,6 +64,14 @@
                                             <a href="{% ooi_url "ooi_detail" ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
                                         </td>
                                         <td>{{ ooi|ooi_type }}</td>
+                                        <td>
+                                            <ul class="level-indicator l{{ ooi|clearance_level }}">
+                                                <li></li>
+                                                <li></li>
+                                                <li></li>
+                                                <li></li>
+                                            </ul>
+                                        </td>
                                         <td>
                                             <button type="button"
                                                     class="expando-button icon ti-chevron-down"
