@@ -28,45 +28,44 @@ class OOIDetailView(
     task_filter_form = OOIDetailTaskFilterForm
 
     def post(self, request, *args, **kwargs):
-        self.set_clearance_level()
-        self.question_ooi_answered()
-        self.start_boefje_scan()
+        if self.action == self.CHANGE_CLEARANCE_LEVEL:
+            self.set_clearance_level()
+        if self.action == self.SUBMIT_ANSWER:
+            self.answer_ooi_questions()
+        if self.action == self.START_SCAN:
+            self.start_boefje_scan()
         return super().post(request, *args, **kwargs)
 
     def set_clearance_level(self) -> None:
-        if self.action == self.CHANGE_CLEARANCE_LEVEL:
-            if not self.indemnification_present:
-                self.indemnification_error()
+        if not self.indemnification_present:
+            self.indemnification_error()
+        else:
+            clearance_level = int(self.request.POST.get("level"))
+            self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
 
-            else:
-                clearance_level = int(self.request.POST.get("level"))
-                self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages
+    def answer_ooi_questions(self) -> None:
+        if not isinstance(self.ooi, Question):
+            messages.error(self.request, _("Only Question OOIs can be answered."))
+            return
 
-    def question_ooi_answered(self) -> None:
-        if self.action == self.SUBMIT_ANSWER:
-            if not isinstance(self.ooi, Question):
-                messages.error(self.request, _("Only Question OOIs can be answered."))
-                return
+        schema_answer = self.request.POST.get("schema", "")
+        parsed_schema_answer = json.loads(schema_answer)
+        validator = Draft202012Validator(json.loads(self.ooi.json_schema))
 
-            schema_answer = self.request.POST.get("schema", "")
-            parsed_schema_answer = json.loads(schema_answer)
-            validator = Draft202012Validator(json.loads(self.ooi.json_schema))
+        if not validator.is_valid(parsed_schema_answer):
+            for error in validator.iter_errors(parsed_schema_answer):
+                messages.error(self.request, error.message)
+            return
 
-            if not validator.is_valid(parsed_schema_answer):
-                for error in validator.iter_errors(parsed_schema_answer):
-                    messages.error(self.request, error.message)
-                return
-
-            self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
-            messages.success(self.request, _("Question has been answered."))
+        self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
+        messages.success(self.request, _("Question has been answered."))
 
     def start_boefje_scan(self) -> None:
-        if self.action == self.START_SCAN:
-            boefje_id = self.request.POST.get("boefje_id")
-            boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
-            ooi_id = self.request.GET.get("ooi_id")
-            ooi = self.get_single_ooi(pk=ooi_id)
-            self.run_boefje(boefje, ooi)
+        boefje_id = self.request.POST.get("boefje_id")
+        boefje = get_katalogus(self.organization.code).get_plugin(boefje_id)
+        ooi_id = self.request.GET.get("ooi_id")
+        ooi = self.get_single_ooi(pk=ooi_id)
+        self.run_boefje(boefje, ooi)
 
     def get_task_filters(self) -> dict[str, str | datetime | None]:
         filters = super().get_task_filters()
@@ -108,6 +107,7 @@ class OOIDetailView(
             inference_origin_params.append((inference, inference_params_per_inference[inference.origin.id]))
 
         context["declarations"] = declarations
+
         context["observations"] = observations
         context["inferences"] = inferences
         context["inference_origin_params"] = inference_origin_params
