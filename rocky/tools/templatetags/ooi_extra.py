@@ -89,5 +89,10 @@ def human_readable(reference_string: str):
 
 
 @register.filter
+def clearance_level(ooi: OOI):
+    return ooi.scan_profile.level
+
+
+@register.filter
 def ooi_type(reference_string: str):
     return Reference.from_str(reference_string).class_
