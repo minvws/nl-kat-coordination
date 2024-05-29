@@ -21,7 +21,10 @@
                     <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
                        title="{% translate "Shows report detail" %}">{{ report.parent_report.report_id }}</a>
                 </td>
-                <td>{{ report.parent_report.name }}</td>
+                <td>
+                    <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
+                </td>
+                |
                 <td class="number">
                     {% if report.parent_report.input_ooi %}
                         1
@@ -83,7 +86,7 @@
                                                         <tr>
                                                             <td>
                                                                 <a href="{% url "view_report" organization.code %}?report_id={{ child_report.reference }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                                                   title="{% translate "Shows report details" %}">{{ child_report.name }}</a>
+                                                                   title="{% translate "Shows report details" %}"><span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.name }}</span></a>
                                                             </td>
                                                         </tr>
                                                     {% endfor %}

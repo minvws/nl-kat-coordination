@@ -259,6 +259,11 @@ class FindingList:
         raise NotImplementedError("FindingList only supports slicing")
 
 
+class HydratedReport:
+    parent_report: Report
+    children_reports: dict[OOI, list[Report]] | None
+
+
 class ReportList:
     HARD_LIMIT = 99_999_999
 
@@ -282,7 +287,7 @@ class ReportList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key: int | slice) -> list[dict[str, Report | dict[OOI, list[Report]]]]:
+    def __getitem__(self, key: int | slice) -> list[HydratedReport]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = self.HARD_LIMIT
@@ -299,13 +304,13 @@ class ReportList:
         raise NotImplementedError("ReportList only supports slicing")
 
     @staticmethod
-    def hydrate_report_list(reports: list[Report]) -> list[dict[str, Report | dict[OOI, list[Report]]]]:
-        hydrated_reports = []
+    def hydrate_report_list(reports: list[Report]) -> list[HydratedReport]:
+        hydrated_reports: list[HydratedReport] = []
 
         for report in reports:
-            child_report_oois = set()
-            per_ooi_child_reports = {}
-            hydrated_report = {"parent_report": "", "children_reports": {}}
+            child_report_oois: set = set()
+            per_ooi_child_reports: dict[OOI, list[Report]] = {}
+            hydrated_report: HydratedReport = HydratedReport()
 
             parent_report, children_reports = report
 
@@ -319,9 +324,9 @@ class ReportList:
                         if str(child_report.parent_report) == str(parent_report) and ooi == child_report.input_ooi:
                             hydrated_children_reports.append(child_report)
                     per_ooi_child_reports[ooi] = sorted(hydrated_children_reports, key=attrgetter("name"))
-                hydrated_report["children_reports"] = per_ooi_child_reports
 
-            hydrated_report["parent_report"] = parent_report
+                hydrated_report.children_reports = per_ooi_child_reports
+            hydrated_report.parent_report = parent_report
             hydrated_reports.append(hydrated_report)
 
         return hydrated_reports
