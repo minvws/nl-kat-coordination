@@ -162,7 +162,7 @@ class TestRepositories(TestCase):
             plugin_state_storage.get_by_id(plugin.id, "wrong")
 
     def test_bare_boefje_storage(self):
-        boefje = Boefje(id="test_boefje", name="Test")
+        boefje = Boefje(id="test_boefje", name="Test", static=False)
 
         with self.plugin_storage as storage:
             storage.create_boefje(boefje)
@@ -202,6 +202,7 @@ class TestRepositories(TestCase):
             ],
             oci_image="ghcr.io/test/image:123",
             oci_arguments=["host", "-n", "123123123123123123123"],
+            static=False,
         )
 
         with self.plugin_storage as storage:
@@ -211,7 +212,7 @@ class TestRepositories(TestCase):
         self.assertEqual(boefje, returned_boefje)
 
     def test_bare_normalizer_storage(self):
-        normalizer = Normalizer(id="test_boefje", name="Test")
+        normalizer = Normalizer(id="test_boefje", name="Test", static=False)
 
         with self.plugin_storage as storage:
             storage.create_normalizer(normalizer)
@@ -249,6 +250,7 @@ class TestRepositories(TestCase):
                 "application/json",
                 "application/localstorage+json",
             ],
+            static=False,
         )
 
         with self.plugin_storage as storage:
@@ -258,8 +260,8 @@ class TestRepositories(TestCase):
         self.assertEqual(normalizer, returned_normalizer)
 
     def test_plugin_storage(self):
-        boefje = Boefje(id="test_boefje", name="Test")
-        normalizer = Normalizer(id="test_boefje", name="Test")
+        boefje = Boefje(id="test_boefje", name="Test", static=False)
+        normalizer = Normalizer(id="test_boefje", name="Test", static=False)
 
         with self.plugin_storage as storage:
             storage.create_boefje(boefje)

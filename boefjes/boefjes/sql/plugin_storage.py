@@ -132,6 +132,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             oci_image=boefje_in_db.oci_image,
             oci_arguments=boefje_in_db.oci_arguments,
             version=boefje_in_db.version,
+            static=False,
         )
 
     @staticmethod
@@ -146,6 +147,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             produces=normalizer_in_db.produces,
             environment_keys=normalizer_in_db.environment_keys,
             version=normalizer_in_db.version,
+            static=False,
         )
 
 

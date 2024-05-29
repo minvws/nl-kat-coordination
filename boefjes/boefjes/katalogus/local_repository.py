@@ -43,7 +43,7 @@ class LocalPluginRepository:
         if plugin_id in normalizers:
             return normalizers[plugin_id].normalizer
 
-        raise Exception(f"Can't find plugin {plugin_id}")
+        raise KeyError(f"Can't find plugin {plugin_id}")
 
     def schema(self, id_: str) -> dict | None:
         boefjes = self.resolve_boefjes()

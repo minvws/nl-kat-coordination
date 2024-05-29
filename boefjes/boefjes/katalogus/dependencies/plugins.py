@@ -13,6 +13,7 @@ from boefjes.katalogus.models import FilterParameters, PaginationParameters, Plu
 from boefjes.katalogus.storage.interfaces import (
     NotFound,
     PluginEnabledStorage,
+    PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
     SettingsStorage,
@@ -40,15 +41,29 @@ class PluginService:
 
     def __enter__(self):
         self.plugin_enabled_store.__enter__()
+        self.plugin_storage.__enter__()
+        self.settings_storage.__enter__()
 
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.plugin_enabled_store.__exit__(exc_type, exc_val, exc_tb)
+        self.plugin_storage.__exit__(exc_type, exc_val, exc_tb)
+        self.settings_storage.__exit__(exc_type, exc_val, exc_tb)
 
     def get_all(self, organisation_id: str) -> list[PluginType]:
-        all_plugins = self.local_repo.get_all() + self.plugin_storage.get_all()
-        return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins]
+        all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
+
+        for plugin in self.plugin_storage.get_all():
+            if plugin.id in all_plugins:
+                editable_fields = {"name", "description", "scan_level", "oci_image", "oci_arguments"}
+                all_plugins[plugin.id] = all_plugins[plugin.id].copy(
+                    update=plugin.dict(include=editable_fields), exclude=editable_fields
+                )
+            else:
+                all_plugins[plugin.id] = plugin
+
+        return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
 
     def by_plugin_id(self, plugin_id: str, organisation_id: str) -> PluginType:
         all_plugins = self.get_all(organisation_id)
@@ -78,6 +93,34 @@ class PluginService:
         self._assert_settings_match_schema(values, organisation_id, plugin_id)
 
         return self.settings_storage.upsert(values, organisation_id, plugin_id)
+
+    def update_boefje(self, boefje_id: str, data: dict) -> None:
+        """If it concerns a local boefje, make sure there is a database entry first"""
+
+        try:
+            plugin = self.local_repo.by_id(boefje_id)  # if we fail, it is non-local, so we can perform the update
+
+            try:
+                self.plugin_storage.boefje_by_id(boefje_id)
+            except PluginNotFound:
+                self.plugin_storage.create_boefje(plugin)  # If there is no database entry, we create one
+        finally:
+            self.plugin_storage.update_boefje(boefje_id, data)  # Perform the update
+            return
+
+    def update_normalizer(self, normalizer_id: str, data: dict) -> None:
+        """If it concerns a local normalizer, make sure there is a database entry first"""
+
+        try:
+            plugin = self.local_repo.by_id(normalizer_id)  # if we fail it is non-local, so we can perform the update
+
+            try:
+                self.plugin_storage.normalizer_by_id(normalizer_id)
+            except PluginNotFound:
+                self.plugin_storage.create_normalizer(plugin)  # If there is no database entry, we create one
+        finally:
+            self.plugin_storage.update_normalizer(normalizer_id, data)  # Perform the update
+            return
 
     def delete_settings(self, organisation_id: str, plugin_id: str):
         self.settings_storage.delete(organisation_id, plugin_id)

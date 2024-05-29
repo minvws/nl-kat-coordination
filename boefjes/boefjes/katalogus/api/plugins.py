@@ -125,9 +125,9 @@ class PatchBoefje(BaseModel):
 def update_boefje(
     boefje_id: str,
     boefje: PatchBoefje,
-    plugin_storage: PluginStorage = Depends(get_plugin_storage),
+    plugin_service: PluginService = Depends(get_plugin_service),
 ):
-    with plugin_storage as p:
+    with plugin_service as p:
         p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
 
 
@@ -157,9 +157,9 @@ class PatchNormalizer(BaseModel):
 def update_normalizer(
     normalizer_id: str,
     normalizer: PatchNormalizer,
-    plugin_storage: PluginStorage = Depends(get_plugin_storage),
+    plugin_service: PluginService = Depends(get_plugin_service),
 ):
-    with plugin_storage as p:
+    with plugin_service as p:
         p.update_normalizer(normalizer_id, normalizer.model_dump(exclude_unset=True))
 
 
@@ -191,7 +191,7 @@ def get_plugin_description(
     return Response(plugin_service.description(plugin_id, organisation_id))
 
 
-@router.post("/settings/clone/{to_org_id}")
-def clone_organisation_settings(from_org_id: str, to_org_id: str, storage: PluginService = Depends(get_plugin_service)):
+@router.post("/settings/clone/{to_org}")
+def clone_settings(organisation_id: str, to_org: str, storage: PluginService = Depends(get_plugin_service)):
     with storage as store:
-        store.clone_settings_to_organisation(from_org_id, to_org_id)
+        store.clone_settings_to_organisation(organisation_id, to_org)
