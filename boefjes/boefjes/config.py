@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Any
 
-from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint, Base64Str
+from pydantic import AmqpDsn, AnyHttpUrl, Field, FilePath, IPvAnyAddress, PostgresDsn, conint
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource, SettingsConfigDict
 from pydantic_settings.sources import EnvSettingsSource
 
@@ -23,6 +23,9 @@ class BackwardsCompatibleEnvSettings(EnvSettingsSource):
         "BOEFJE_API": "BOEFJES_API",
         "BOEFJE_DOCKER_NETWORK": "BOEFJES_DOCKER_NETWORK",
         "LOG_CFG": "BOEFJES_LOG_CFG",
+        "ENCRYPTION_MIDDLEWARE": "BOEFJES_ENCRYPTION_MIDDLEWARE",
+        "KATALOGUS_PRIVATE_KEY_B64": "BOEFJES_KATALOGUS_PRIVATE_KEY",
+        "KATALOGUS_PUBLIC_KEY_B64": "BOEFJES_KATALOGUS_PUBLIC_KEY",
     }
 
     def __call__(self) -> dict[str, Any]:
@@ -117,10 +120,10 @@ class Settings(BaseSettings):
         examples=["IDENTITY", "NACL_SEALBOX"],
     )
 
-    katalogus_private_key_b64: Base64Str = Field(
+    katalogus_private_key: str = Field(
         "", description="Base64 encoded private key used for asymmetric encryption of settings"
     )
-    katalogus_public_key_b64: Base64Str = Field(
+    katalogus_public_key: str = Field(
         "", description="Base64 encoded public key used for asymmetric encryption of settings"
     )
 
