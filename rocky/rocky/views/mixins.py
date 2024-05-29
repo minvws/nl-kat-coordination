@@ -318,7 +318,7 @@ class ReportList:
 
             if not parent_report.has_parent:
                 for ooi in child_report_oois:
-                    hydrated_children_reports = []
+                    hydrated_children_reports: list[Report] = []
                     for child_report in children_reports:
                         if (
                             str(child_report.parent_report) == str(parent_report)

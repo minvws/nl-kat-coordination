@@ -174,7 +174,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
         by_type: dict[str, list[str]] = {}
 
         number_of_reports = 0
-        for ooi in self.selected_oois:
+        for ooi in self.get_oois_pk():
             ooi_type = Reference.from_str(ooi).class_
 
             if ooi_type not in by_type:

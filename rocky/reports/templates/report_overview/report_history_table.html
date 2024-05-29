@@ -61,11 +61,11 @@
                                 {% for ooi, child_reports in report.children_reports.items %}
                                     <tr>
                                         <td>
-                                            <a href="{% ooi_url "ooi_detail" ooi organization.code query=ooi.mandatory_fields %}">{{ ooi|human_readable }}</a>
+                                            <a href="{% ooi_url "ooi_detail" ooi organization.code query=ooi.mandatory_fields %}">{{ ooi.human_readable }}</a>
                                         </td>
-                                        <td>{{ ooi|ooi_type }}</td>
+                                        <td>{{ ooi.ooi_type }}</td>
                                         <td>
-                                            <ul class="level-indicator l{{ ooi|clearance_level }}">
+                                            <ul class="level-indicator l{{ ooi.scan_profile.level }}">
                                                 <li></li>
                                                 <li></li>
                                                 <li></li>

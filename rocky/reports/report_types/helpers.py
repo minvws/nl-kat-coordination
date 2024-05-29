@@ -64,6 +64,8 @@ def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport] | type[
     """
     Get report type by id
     """
+    if report_id is None:
+        return ConcatenatedReport
     for report in REPORTS + MULTI_REPORTS + AGGREGATE_REPORTS + CONCATENATED_REPORTS:
         if report.id == report_id:
             return report
