@@ -314,9 +314,7 @@ class ReportList:
             parent_report, children_reports = report
 
             for child_report in children_reports:
-                child_report_oois.add(child_report.input_ooi)
-
-            child_report_oois = {self.octopoes_connector.get(ooi_ref, self.valid_time) for ooi_ref in child_report_oois}
+                child_report_oois.add(self.octopoes_connector.get(child_report.input_ooi, self.valid_time))
 
             if not parent_report.has_parent:
                 for ooi in child_report_oois:
