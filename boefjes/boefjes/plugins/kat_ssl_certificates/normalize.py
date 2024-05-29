@@ -119,7 +119,6 @@ def read_certificates(
             subject_alternative_names = []
         valid_from = cert.not_valid_before.isoformat()
         valid_until = cert.not_valid_after.isoformat()
-        pk_algorithm = ""
         pk_size = cert.public_key().key_size
         logging.info("Parsing certificate of type %s", type(cert.public_key()))
         if isinstance(

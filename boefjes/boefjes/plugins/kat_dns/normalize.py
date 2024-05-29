@@ -4,7 +4,6 @@ from collections.abc import Iterable
 from ipaddress import IPv4Address, IPv6Address
 
 from dns.message import Message, from_text
-from dns.rdata import Rdata
 from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
 from dns.rdtypes.ANY.MX import MX
@@ -74,8 +73,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     for response in responses:
         for rrset in response.answer:
             for rr in rrset:
-                rr: Rdata
-
                 record_hostname = register_hostname(str(rrset.name))
                 default_args = {
                     "hostname": record_hostname.reference,
@@ -183,7 +180,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     if dmarc_results not in ["NXDOMAIN", "Timeout"]:
         for rrset in from_text(dmarc_results).answer:
             for rr in rrset:
-                rr: Rdata
                 if isinstance(rr, TXT):
                     yield DMARCTXTRecord(
                         hostname=input_hostname.reference,
