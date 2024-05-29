@@ -10,11 +10,14 @@ buttons.forEach((button) => {
     .closest("tr")
     .getAttribute("data-task-id")
     .replace(/-/g, "");
+  const organization =
+    organization_code ||
+    button.closest("tr").getAttribute("data-organization-code");
   const json_url =
     "/" +
     language +
     "/" +
-    organization_code +
+    organization +
     "/tasks/normalizers/" +
     encodeURI(task_id);
 
@@ -78,7 +81,7 @@ buttons.forEach((button) => {
             "/" +
             language +
             "/" +
-            escapeHTMLEntities(encodeURIComponent(organization_code));
+            escapeHTMLEntities(encodeURIComponent(organization));
           let object_list = "";
 
           // Build HTML snippet for every yielded object.

@@ -106,6 +106,15 @@ class Server:
         )
 
         self.api.add_api_route(
+            path="/schedulers/{item_type}",
+            endpoint=self.get_schedulers_by_type,
+            methods=["GET"],
+            response_model=list[models.Scheduler],
+            status_code=status.HTTP_200_OK,
+            description="List all schedulers of a specific type.",
+        )
+
+        self.api.add_api_route(
             path="/schedulers/{scheduler_id}",
             endpoint=self.get_scheduler,
             methods=["GET"],
@@ -235,6 +244,9 @@ class Server:
 
     def get_schedulers(self) -> Any:
         return [models.Scheduler(**s.dict()) for s in self.schedulers.values()]
+
+    def get_schedulers_by_type(self, item_type: str) -> Any:
+        return [models.Scheduler(**s.dict()) for s in self.schedulers.values() if s.queue.item_type.type == item_type]
 
     def get_scheduler(self, scheduler_id: str) -> Any:
         s = self.schedulers.get(scheduler_id)
