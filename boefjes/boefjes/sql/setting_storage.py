@@ -74,6 +74,6 @@ def create_setting_storage(session) -> SettingsStorage:
 
 def create_encrypter():
     if settings.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
-        return NaclBoxMiddleware(settings.katalogus_private_key_b64, settings.katalogus_public_key_b64)
+        return NaclBoxMiddleware(settings.katalogus_private_key, settings.katalogus_public_key)
 
     return IdentityMiddleware()
