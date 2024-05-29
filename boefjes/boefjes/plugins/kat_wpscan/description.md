@@ -13,7 +13,7 @@ results.
 
 WPScan outputs the following OOIs:
 
-|OOI type|Description|
-|---|---|
-|CveFindingType|Known vulnerability of WordPress or WordPress plugins on the input Url|
-|Finding|Finding|
+| OOI type       | Description                                                            |
+| -------------- | ---------------------------------------------------------------------- |
+| CveFindingType | Known vulnerability of WordPress or WordPress plugins on the input Url |
+| Finding        | Finding                                                                |

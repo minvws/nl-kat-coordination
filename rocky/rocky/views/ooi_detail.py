@@ -94,7 +94,8 @@ class OOIDetailView(
 
                     return self.get(self.request, status_code=422, *self.args, **self.kwargs)
 
-                self.bytes_client.upload_raw(schema_answer, {"answer", f"{self.ooi.schema_id}"}, self.ooi.ooi)
+                raw = json.dumps({"schema": self.ooi.schema_id, "answer": parsed_schema_answer}).encode()
+                self.bytes_client.upload_raw(raw, {"answer"}, self.ooi.ooi)
                 messages.add_message(self.request, messages.SUCCESS, "Question has been answered.")
                 return self.get(self.request, status_code=201, *self.args, **self.kwargs)
 

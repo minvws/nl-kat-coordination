@@ -13,7 +13,7 @@ ONBOARDING_PERMISSIONS = (
 DNS_REPORT_LEAST_CLEARANCE_LEVEL = 1
 
 
-class KatIntroductionStepsMixin(StepsMixin):
+class IntroductionStepsMixin(StepsMixin):
     organization: Organization
 
     def build_steps(self):
@@ -42,7 +42,7 @@ class KatIntroductionStepsMixin(StepsMixin):
         return steps
 
 
-class KatIntroductionRegistrationStepsMixin(StepsMixin):
+class IntroductionRegistrationStepsMixin(StepsMixin):
     organization: Organization
 
     def build_steps(self):
@@ -61,7 +61,7 @@ class KatIntroductionRegistrationStepsMixin(StepsMixin):
         return steps
 
 
-class KatIntroductionAdminStepsMixin(StepsMixin):
+class IntroductionAdminStepsMixin(StepsMixin):
     organization: Organization
 
     def build_steps(self):

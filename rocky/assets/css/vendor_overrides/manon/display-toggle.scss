@@ -1,0 +1,15 @@
+.toolbar:has(.checkbox > .display-toggle) + .plugins .plugin-is-enabled {
+  display: none;
+}
+
+.toolbar:has(.checkbox > .display-toggle:checked)
+  + .plugins
+  .plugin-is-enabled {
+  display: flex;
+}
+
+// // If overflow limit is active, overflow items should always be hidden.
+// // !important is used to make sure we override the show/hide toggle of the .display-toggle checkbox above.
+.hide-overflow div:nth-of-type(1n + 5) {
+  display: none !important;
+}
