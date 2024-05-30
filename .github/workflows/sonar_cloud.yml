@@ -1,4 +1,4 @@
-name: Integrate with SonarCloud
+name: SonarCloud
 
 on:
     workflow_dispatch:
@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+  
       - name: SonarCloud
         if: always()
         uses: SonarSource/sonarcloud-github-action@v2.2.0
