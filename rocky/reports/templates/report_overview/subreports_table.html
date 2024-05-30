@@ -17,7 +17,7 @@
         {% for subreport in subreports %}
             <tr>
                 <td>
-                    <a href="{% url "view_report" organization.code %}?report_id={{ subreport.reference }}&observed_at={{ subreport.observed_at|date:"Y-m-d H:i:s:u" }}"
+                    <a href="{% url "view_report" organization.code %}?report_id={{ subreport.reference }}"
                        title="{% translate "Shows report details" %}">{{ subreport.reference }}</a>
                 </td>
                 <td>

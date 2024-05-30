@@ -18,7 +18,7 @@
         {% for report in reports %}
             <tr>
                 <td>
-                    <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                    <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}"
                        title="{% translate "Shows parent report details" %}">{{ report.parent_report.reference }}</a>
                 </td>
                 <td>
@@ -95,7 +95,7 @@
                                             <a href="{% ooi_url 'ooi_detail' child_report.input_ooi organization.code %}">{{ child_report.input_ooi|human_readable }}</a>
                                         </td>
                                         <td>
-                                            <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                            <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}"
                                                title="{% translate "Shows sub report details" %}">{{ child_report }}</a>
                                         </td>
                                     </tr>
