@@ -62,16 +62,21 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     paginator = RockyPaginator
     template_name = "report_overview/subreports.html"
 
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.report_id = self.request.GET.get("report_id", None)
+
     def get_queryset(self) -> ReportList:
         return ReportList(
             self.octopoes_api_connector,
             valid_time=self.observed_at,
-            parent_report_id=self.request.GET.get("report_id", None),
+            parent_report_id=self.report_id,
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_oois"] = len(self.object_list)
+        context["parent_report_id"] = self.report_id
         return context
 
 

@@ -279,8 +279,14 @@ class ReportList:
         self._count = None
         self.parent_report_id = parent_report_id
 
+        self.subreports = None
+        if self.parent_report_id and self.parent_report_id is not None:
+            self.subreports = self.get_subreports(self.parent_report_id)
+
     @cached_property
     def count(self) -> int:
+        if self.subreports is not None:
+            return len(self.subreports)
         return self.octopoes_connector.list_reports(
             valid_time=self.valid_time,
             limit=0,
@@ -300,9 +306,8 @@ class ReportList:
                 offset=offset,
                 limit=limit,
             ).items
-
-            if self.parent_report_id and self.parent_report_id is not None:
-                return self.get_subreports(self.parent_report_id)
+            if self.subreports is not None:
+                return self.subreports[offset : offset + limit]
 
             return self.hydrate_report_list(reports)
 
