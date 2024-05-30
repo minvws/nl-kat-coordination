@@ -114,7 +114,11 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
-    def post_pop(self, p_item: models.PrioritizedItem) -> None:
+    def post_pop(self, p_items: list[models.PrioritizedItem]) -> None:
+        for p_item in p_items:
+            self._post_pop(p_item)
+
+    def _post_pop(self, p_item: models.PrioritizedItem) -> None:
         """When a boefje task is being removed from the queue. We
         persist a task to the datastore with the status RUNNING
 
@@ -143,9 +147,9 @@ class Scheduler(abc.ABC):
         self.last_activity = datetime.now(timezone.utc)
 
     @tracer.start_as_current_span("scheduler_pop_item_from_queue")
-    def pop_item_from_queue(
-        self, filters: storage.filters.FilterRequest | None = None
-    ) -> models.PrioritizedItem | None:
+    def pop_items_from_queue(
+        self, many: bool = False, filters: storage.filters.FilterRequest | None = None
+    ) -> list[models.PrioritizedItem]:
         """Pop an item from the queue.
 
         Args:
@@ -165,24 +169,23 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
-            p_item = self.queue.pop(filters)
+            p_items = self.queue.pop(many, filters)
         except queues.QueueEmptyError as exc:
             raise exc
 
-        if p_item is not None:
+        if p_items is not None:
             self.logger.debug(
-                "Popped item %s from queue %s with priority %s",
-                p_item.id,
+                "Popped item(s) %s from queue %s with priority %s",
+                [p_item.id for p_item in p_items],
                 self.queue.pq_id,
-                p_item.priority,
-                p_item_id=p_item.id,
+                [p_item.priority for p_item in p_items],
                 queue_id=self.queue.pq_id,
                 scheduler_id=self.scheduler_id,
             )
 
-            self.post_pop(p_item)
+            self.post_pop(p_items)
 
-        return p_item
+        return p_items
 
     @tracer.start_as_current_span("scheduler_push_item_to_queue")
     def push_item_to_queue(self, p_item: models.PrioritizedItem) -> None:
@@ -366,7 +369,11 @@ class Scheduler(abc.ABC):
         tasks that were on the queue will be set to CANCELLED.
         """
         if not self.is_enabled():
-            self.logger.warning("Scheduler already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+            self.logger.warning(
+                "Scheduler already disabled: %s",
+                self.scheduler_id,
+                scheduler_id=self.scheduler_id,
+            )
             return
 
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
