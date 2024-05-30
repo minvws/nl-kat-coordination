@@ -8,7 +8,7 @@
         <tr>
             <th scope="col">{% translate "Report ID" %}</th>
             <th scope="col">{% translate "Report type" %}</th>
-            <th scope="col">{% translate "Objects" %}</th>
+            <th scope="col">{% translate "Input Objects" %}</th>
             <th scope="col">{% translate "Reference date" %}</th>
             <th scope="col">{% translate "Creation date" %}</th>
             <th scope="col"></th>
@@ -24,9 +24,9 @@
                 <td>
                     <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
                 </td>
-                <td class="number">
+                <td>
                     {% if report.parent_report.input_ooi %}
-                        1
+                        <a href="{% ooi_url "ooi_detail" ooi organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_ooi|human_readable }}</a>
                     {% else %}
                         {{ report.total_children_reports }}
                     {% endif %}
@@ -91,7 +91,7 @@
                                         <td>
                                             <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
                                         </td>
-                                        <td>{{ child_report.input_ooi }}</td>
+                                        <td>{{ child_report.input_ooi|human_readable }}</td>
                                         <td>{{ child_report }}</td>
                                     </tr>
                                 {% endfor %}
