@@ -20,7 +20,7 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
         breadcrumbs += [
             {
                 "url": reverse("report_history", kwargs=kwargs) + selection,
-                "text": _("Report history"),
+                "text": _("Reports history"),
             },
             {
                 "url": reverse("subreports", kwargs=kwargs) + selection,
@@ -36,6 +36,7 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
 
     paginate_by = 10
+    breadcrumbs_step = 2
     context_object_name = "reports"
     paginator = RockyPaginator
     template_name = "report_overview/report_overview.html"
@@ -58,6 +59,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     """
 
     paginate_by = 20
+    breadcrumbs_step = 3
     context_object_name = "subreports"
     paginator = RockyPaginator
     template_name = "report_overview/subreports.html"

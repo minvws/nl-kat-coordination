@@ -385,7 +385,7 @@ def recursive_dict():
 
 class ViewReportView(OOIFilterView, TemplateView):
     """
-    This will display reports using report id from report history.
+    This will display reports using report_id from reports history.
     Will fetch Report OOI and recreate report with data saved in bytes.
     """
 
