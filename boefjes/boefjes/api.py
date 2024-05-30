@@ -6,8 +6,8 @@ from enum import Enum
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, Response
+from httpx import HTTPError, HTTPStatusError
 from pydantic import BaseModel, ConfigDict, Field
-from requests import HTTPError
 from uvicorn import Config, Server
 
 from boefjes.clients.bytes_client import BytesAPIClient
@@ -73,7 +73,7 @@ def get_scheduler_client():
 
 def get_bytes_client():
     return BytesAPIClient(
-        settings.bytes_api,
+        str(settings.bytes_api),
         username=settings.bytes_username,
         password=settings.bytes_password,
     )
@@ -140,7 +140,7 @@ def get_task(task_id, scheduler_client):
     try:
         task = scheduler_client.get_task(task_id)
     except HTTPError as e:
-        if e.response.status_code == 404:
+        if isinstance(e, HTTPStatusError) and e.response.status_code == 404:
             raise HTTPException(status_code=404, detail="Task not found")
         else:
             logger.exception("Failed to get task from scheduler")
@@ -156,7 +156,8 @@ def create_boefje_meta(task, local_repository):
 
     organization = task.p_item.data.organization
     input_ooi = task.p_item.data.input_ooi
-    arguments = {}
+    arguments = {"oci_arguments": boefje_resource.oci_arguments}
+
     if input_ooi:
         reference = Reference.from_str(input_ooi)
         try:

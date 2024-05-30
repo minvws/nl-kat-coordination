@@ -1,10 +1,12 @@
 {% load i18n %}
 
-<h2>{% translate "Records found" %}</h2>
+<h3>{% translate "Records found" %}</h3>
 {% if data.records %}
     <p>
         {% blocktranslate trimmed %}
-            The table below gives an overview of the DNS records that were found for the abovementioned DNSZone.
+            The DNS report gives an overview of the DNS records that were found
+            for the DNSZone. Additionally the security measures table shows whether
+            or not DNS relating security measures are enabled.
         {% endblocktranslate %}
     </p>
     <div class="horizontal-scroll">
@@ -19,7 +21,7 @@
                 A, AAAA, CAA, CNAME, NS, MX, PTR, SOA, SRV, TXT.
             </p>
             <div class="nota-bene">
-                <span>{% translate "All existing DNS record types can be found here" %}:
+                <span>{% translate "All existing DNS record types can be found here:" %}
                     <a class="nota-bene"
                        href="https://en.wikipedia.org/wiki/List_of_DNS_record_types"
                        target="_blank"
@@ -39,7 +41,7 @@
                     <tr>
                         <td>{{ ooi.type }}</td>
                         <td>{{ ooi.name }}</td>
-                        <td>{{ ooi.ttl }} {% translate "minutes" %}</td>
+                        <td class="nowrap">{{ ooi.ttl }} {% translate "minutes" %}</td>
                         <td>{{ ooi.content }}</td>
                     </tr>
                 {% endfor %}
@@ -49,7 +51,13 @@
 {% else %}
     <p>{% translate "No records have been found." %}</p>
 {% endif %}
-<h2>{% translate "Security measures" %}</h2>
+<h3>{% translate "Security measures" %}</h3>
+<p>
+    {% blocktranslate trimmed %}
+        The security measures table below shows which DNS relating security
+        measures are enabled based on the contents of the DNS records.
+    {% endblocktranslate %}
+</p>
 <div class="horizontal-scroll">
     <div class="column-3">
         <table>
@@ -116,10 +124,10 @@
     </div>
 </div>
 {% if data.finding_types %}
-    <h2>{% translate "Other findings found" %}</h2>
+    <h3>{% translate "Other findings found" %}</h3>
     <div class="horizontal-scroll">
         <table>
-            <caption class="visually-hidden">{% translate "Other findings found:" %}</caption>
+            <caption class="visually-hidden">{% translate "Other findings found" %}</caption>
             <thead>
                 <tr>
                     <th scope="col">{% translate "Severity" %}</th>
@@ -131,7 +139,7 @@
                 {% for info in data.finding_types %}
                     <tr>
                         <td>
-                            <span class="{{ info.finding_type.risk_severity }}">{{ info.finding_type.risk_severity }}</span>
+                            <span class="{{ info.finding_type.risk_severity }}">{{ info.finding_type.risk_severity|capfirst }}</span>
                         </td>
                         <td>{{ info.finding_type }}</td>
                         <td class="actions">

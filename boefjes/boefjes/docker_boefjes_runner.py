@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 import docker
 from docker.errors import APIError, ContainerError, ImageNotFound
-from requests import HTTPError
+from httpx import HTTPError
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.clients.scheduler_client import SchedulerAPIClient, TaskStatus
@@ -51,18 +51,20 @@ class DockerBoefjesRunner:
                 network=settings.docker_network,
             )
 
-            # save container log (stderr) to bytes
-            self.bytes_api_client.login()
-            self.bytes_api_client.save_raw(task_id, container_logs, stderr_mime_types)
+            task = self.scheduler_client.get_task(task_id)
 
             # if status is still running the container didn't call the output API endpoint, so set to status to failed
-            task = self.scheduler_client.get_task(task_id)
             if task.status == TaskStatus.RUNNING:
+                self.boefje_meta.ended_at = datetime.now(timezone.utc)
+                self.bytes_api_client.save_boefje_meta(self.boefje_meta)  # The task didn't create a boefje_meta object
+                self.bytes_api_client.save_raw(task_id, container_logs, stderr_mime_types.union({"error/boefje"}))
                 self.scheduler_client.patch_task(task_id, TaskStatus.FAILED)
+
                 # have to raise exception to prevent _start_working function from setting status to completed
                 raise RuntimeError("Boefje did not call output API endpoint")
         except ContainerError as e:
             logger.exception("Container error")
+
             # save container log (stderr) to bytes
             self.bytes_api_client.login()
             self.boefje_meta.ended_at = datetime.now(timezone.utc)

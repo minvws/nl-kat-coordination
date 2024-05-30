@@ -2,15 +2,15 @@ import json
 import logging
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.findings import CVEFindingType, Finding
 from octopoes.models.ooi.network import IPPort, PortState, Protocol
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
-    ooi = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
+    ooi = Reference.from_str(input_ooi["primary_key"])
 
     if not results:
         logging.info("No Shodan results available for normalization.")
@@ -30,7 +30,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             yield ip_port
 
             if "vulns" in scan:
-                for cve, _ in scan["vulns"].items():
+                for cve in scan["vulns"].values():
                     ft = CVEFindingType(id=cve)
                     f = Finding(finding_type=ft.reference, ooi=ip_port.reference)
                     yield ft

@@ -1,23 +1,29 @@
 import json
 from unittest import TestCase, mock
 
-from boefjes.job_models import BoefjeMeta, NormalizerMeta
+from boefjes.job_models import BoefjeMeta
 from boefjes.plugins.kat_snyk.main import run as run_boefje
 from boefjes.plugins.kat_snyk.normalize import run
 from octopoes.models.ooi.findings import SnykFindingType
 from octopoes.models.types import CVEFindingType, Finding, Software
 from tests.loading import get_dummy_data
 
+input_ooi = {
+    "primary_key": "Software|lodash|1.1.0|",
+    "software": {
+        "name": "lodash",
+        "version": "1.1.0",
+    },
+}
+
 
 class SnykTest(TestCase):
     maxDiff = None
 
     def test_snyk_no_findings(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("snyk-normalizer.json"))
-
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/snyk-result-no-findings.json"),
             )
         )
@@ -28,11 +34,9 @@ class SnykTest(TestCase):
         self.assertCountEqual(expected, oois)
 
     def test_snyk_findings(self):
-        meta = NormalizerMeta.model_validate_json(get_dummy_data("snyk-normalizer.json"))
-
         oois = list(
             run(
-                meta,
+                input_ooi,
                 get_dummy_data("inputs/snyk-result-findings.json"),
             )
         )

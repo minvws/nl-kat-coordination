@@ -26,8 +26,8 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          python-version: "3.10"
+          cache: "pip"
 
       - name: Prep Install requirements
         run: sudo apt install gettext -y
@@ -38,7 +38,7 @@ jobs:
       - name: Prep Configure git
         run: git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
 
-    # Octopoes
+      # Octopoes
       - name: Octopoes Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -75,7 +75,7 @@ jobs:
       - name: Octopoes Cleanup
         run: sudo rm -rfv /var/www/html/
 
-  # Rocky
+      # Rocky
       - name: Rocky Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -129,7 +129,7 @@ jobs:
         run: tar -cvzf ${{ env.PKGDIR }}/rocky_${{ env.RELEASE_VERSION }}.tar.gz --exclude node_modules --exclude rocky_venv* --exclude=.git* --exclude .parcel-cache --exclude Dockerfile .
         working-directory: ./rocky
 
-  # Bytes
+      # Bytes
       - name: Bytes Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -150,7 +150,7 @@ jobs:
       - name: Bytes Create bytes venv package
         run: tar -zcvf ${{ env.PKGDIR }}/bytes_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
 
-  # Mula / Scheduler
+      # Mula / Scheduler
       - name: Mula Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -162,7 +162,7 @@ jobs:
         run: python3.10 -m venv /var/www/html/.venv
 
       - name: Create scheduler release archive
-        run: tar -cvzf ${{ env.PKGDIR }}/scheduler_${{ env.RELEASE_VERSION }}.tar.gz --exclude=./.git* --exclude=Makefile --exclude=Dockerfile --exclude=base.yml --exclude=requirements* --exclude=tests .
+        run: tar -cvzf ${{ env.PKGDIR }}/scheduler_${{ env.RELEASE_VERSION }}.tar.gz --exclude=./.git* --exclude=Makefile --exclude=Dockerfile --exclude=requirements* --exclude=tests .
         working-directory: ./mula
 
       - name: Create virtual env
@@ -175,7 +175,7 @@ jobs:
       - name: Create venv archive
         run: tar -zcvf ${{ env.PKGDIR }}/scheduler_venv_${{ env.RELEASE_VERSION }}.tar.gz -C /var/www/html/ .venv
 
-  # Boefjes
+      # Boefjes
       - name: Boefjes Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -187,7 +187,7 @@ jobs:
         run: python3.10 -m venv /var/www/html/.venv
 
       - name: Install requirements
-        run: source .venv/bin/activate; pip install --upgrade pip; find . -name requirements.txt | xargs -L 1 pip install -r; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
+        run: source .venv/bin/activate; pip install --upgrade pip; grep -v git+https:// requirements.txt | pip install -r /dev/stdin ; grep git+https:// requirements.txt | pip install -r /dev/stdin; pip install ${{ github.workspace }}/octopoes/dist/octopoes*.whl
         working-directory: /var/www/html
 
       - name: Create archive
@@ -197,7 +197,7 @@ jobs:
         run: tar -cvzf ${{ env.PKGDIR }}/boefjes_${{ env.RELEASE_VERSION }}.tar.gz .
         working-directory: ./boefjes
 
-  # Keiko
+      # Keiko
       - name: Keiko Create /var/lib/html
         run: sudo rm -rfv /var/lib/html; sudo mkdir -p /var/www/html ; sudo chown `id -u`:`id -g` /var/www/html
 
@@ -219,7 +219,7 @@ jobs:
         run: tar -cvzf ${{ env.PKGDIR }}/katkeiko_${{ env.RELEASE_VERSION }}.tar.gz .
         working-directory: ./keiko
 
-  # Common / Uploads
+      # Common / Uploads
       - name: Octopoes Upload whl package
         uses: actions/upload-artifact@v4
         with:

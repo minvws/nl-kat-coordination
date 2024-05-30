@@ -1,0 +1,10 @@
+{
+  "id": "kat_wappalyzer_normalize",
+  "consumes": [
+    "openkat-http/response"
+  ],
+  "produces": [
+    "Software",
+    "SoftwareInstance"
+  ]
+}

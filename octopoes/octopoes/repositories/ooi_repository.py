@@ -4,12 +4,11 @@ import json
 import logging
 from collections import Counter
 from datetime import datetime
-from http import HTTPStatus
 from typing import Any, cast
 
 from bits.definitions import BitDefinition
+from httpx import HTTPStatusError, codes
 from pydantic import RootModel, TypeAdapter
-from requests import HTTPError
 
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
@@ -225,8 +224,8 @@ class XTDBOOIRepository(OOIRepository):
     def get(self, reference: Reference, valid_time: datetime) -> OOI:
         try:
             res = self.session.client.get_entity(str(reference), valid_time)
-        except HTTPError as e:
-            if e.response.status_code == HTTPStatus.NOT_FOUND:
+        except HTTPStatusError as e:
+            if e.response.status_code == codes.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
             raise
@@ -254,8 +253,8 @@ class XTDBOOIRepository(OOIRepository):
                 limit=limit,
                 indices=indices,
             )
-        except HTTPError as e:
-            if e.response.status_code == HTTPStatus.NOT_FOUND:
+        except HTTPStatusError as e:
+            if e.response.status_code == codes.NOT_FOUND:
                 raise ObjectNotFoundException(str(reference))
 
             raise
@@ -444,13 +443,6 @@ class XTDBOOIRepository(OOIRepository):
         return reference_nodes
 
     @classmethod
-    def encode_segment(cls, segment: Segment) -> str:
-        if segment.direction == Direction.OUTGOING:
-            return f"{segment.source_type.get_object_type()}/{segment.property_name}"
-        else:
-            return f"{segment.target_type.get_object_type()}/_{segment.property_name}"
-
-    @classmethod
     def decode_segment(cls, encoded_segment: str) -> Segment:
         source_type_name, property_name = encoded_segment.split("/")
         relation_owner_type = type_by_name(source_type_name)
@@ -470,7 +462,7 @@ class XTDBOOIRepository(OOIRepository):
         if paths is None:
             paths = get_paths_to_neighours(reference.class_type)
 
-        encoded_segments = [cls.encode_segment(path.segments[0]) for path in sorted(paths)]
+        encoded_segments = [path.segments[0].encode() for path in sorted(paths)]
         segment_query_sections = [f"{{:{s} [*]}}" for s in encoded_segments]
 
         query = """{{
@@ -485,15 +477,13 @@ class XTDBOOIRepository(OOIRepository):
                         :where [[?e :xt/id _xt_id]]
                     }}
                     :in-args [["{reference}"]]
-                }}""".format(
-            reference=reference, related_fields=" ".join(segment_query_sections)
-        )
+                }}""".format(reference=reference, related_fields=" ".join(segment_query_sections))
 
         return query
 
     @classmethod
     def construct_neighbour_query_multi(cls, references: set[Reference], paths: set[Path]) -> str:
-        encoded_segments = [cls.encode_segment(path.segments[0]) for path in sorted(paths)]
+        encoded_segments = [path.segments[0].encode() for path in sorted(paths)]
         segment_query_sections = [f"{{:{s} [*]}}" for s in encoded_segments]
 
         query = """{{

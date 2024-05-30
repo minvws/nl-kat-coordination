@@ -1,9 +1,7 @@
-version: "3.9"
-
 services:
   rabbitmq:
     restart: unless-stopped
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
@@ -17,7 +15,7 @@ services:
 
   postgres:
     restart: unless-stopped
-    image: postgres:15
+    image: docker.io/library/postgres:15
     shm_size: 256MB
     ports:
       - "127.0.0.1:5432:5432"
@@ -110,7 +108,7 @@ services:
       - .env-defaults
       - .env
     environment:
-      - BOEFJE_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
+      - BOEFJES_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
 
   normalizer:
     restart: unless-stopped
@@ -236,7 +234,7 @@ services:
     profiles:
       - monitoring
     restart: unless-stopped
-    image: jaegertracing/all-in-one:1.48
+    image: docker.io/jaegertracing/all-in-one:1.48
     environment:
       COLLECTOR_ZIPKIN_HOST_PORT: 9411
       COLLECTOR_OTLP_ENABLED: "true"
@@ -253,7 +251,7 @@ services:
     profiles:
       - monitoring
     restart: unless-stopped
-    image: prom/prometheus:v2.50.1
+    image: docker.io/prom/prometheus:v2.50.1
     ports:
       - "127.0.0.1:9090:9090"
     volumes:

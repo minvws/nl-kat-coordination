@@ -1,4 +1,5 @@
 """Boefje script for getting dns records"""
+
 import json
 import logging
 import re
@@ -8,23 +9,38 @@ import dns.resolver
 from dns.name import Name
 from dns.resolver import Answer
 
-from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 
 logger = logging.getLogger(__name__)
-DEFAULT_RECORD_TYPES = {"A", "AAAA", "CAA", "CERT", "RP", "SRV", "TXT", "MX", "NS", "CNAME", "DNAME", "SOA"}
+DEFAULT_RECORD_TYPES = {
+    "A",
+    "AAAA",
+    "CAA",
+    "CERT",
+    "RP",
+    "SRV",
+    "TXT",
+    "MX",
+    "NS",
+    "CNAME",
+    "DNAME",
+    "SOA",
+}
 
 
 class ZoneNotFoundException(Exception):
     pass
 
 
-def get_record_types() -> list[str]:
+def get_record_types() -> set[str]:
     requested_record_types = getenv("RECORD_TYPES", "")
     if not requested_record_types:
         return DEFAULT_RECORD_TYPES
-    requested_record_types = list(map(lambda x: re.sub(r"[^A-Za-z]", "", x), requested_record_types.upper().split(",")))
-    return list(set(requested_record_types).intersection(DEFAULT_RECORD_TYPES))
+    parsed_requested_record_types = map(
+        lambda x: re.sub(r"[^A-Za-z]", "", x),
+        requested_record_types.upper().split(","),
+    )
+    return set(parsed_requested_record_types).intersection(DEFAULT_RECORD_TYPES)
 
 
 def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
@@ -32,7 +48,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 
     requested_dns_name = dns.name.from_text(hostname)
     resolver = dns.resolver.Resolver()
-    nameserver = getenv("REMOTE_NS", str(settings.remote_ns))
+    nameserver = getenv("REMOTE_NS", "1.1.1.1")
     resolver.nameservers = [nameserver]
 
     record_types = get_record_types()

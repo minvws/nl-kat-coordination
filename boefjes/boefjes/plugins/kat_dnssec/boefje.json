@@ -1,9 +1,10 @@
 {
-    "id": "dns-sec",
-    "name": "Dnssec",
-    "description": "Validates DNSSec of a hostname",
-    "consumes": [
-        "Hostname"
-    ],
-    "scan_level": 1
+  "id": "dns-sec",
+  "name": "Dnssec",
+  "description": "Validates DNSSec of a hostname",
+  "consumes": [
+    "Hostname"
+  ],
+  "scan_level": 1,
+  "oci_image": "openkat/dns-sec"
 }

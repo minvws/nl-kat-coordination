@@ -7,7 +7,9 @@
   "organization": "_dev",
   "input_ooi": "Hostname|internet|www.example.nl",
   "arguments": {
-    "input": {"name": "www.example.nl"}
+    "input": {
+      "name": "www.example.nl"
+    }
   },
   "dispatches": [
     {

@@ -1,7 +1,7 @@
 {
   "id": "876dbc9c-6274-4168-88bf-bd234b021568",
   "organization": "_dev",
-  "input_ooi":"URL|internet|127.0.0.1|tcp|443|http|internet|test.test.test|/",
+  "input_ooi": "URL|internet|127.0.0.1|tcp|443|http|internet|test.test.test|/",
   "arguments": {
     "url": "https://test.test.test/"
   },
