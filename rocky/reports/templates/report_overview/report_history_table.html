@@ -19,7 +19,7 @@
             <tr>
                 <td>
                     <a href="{% url "view_report" organization.code %}?report_id={{ report.parent_report.reference }}&observed_at={{ report.parent_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                       title="{% translate "Shows report detail" %}">{{ report.parent_report.reference }}</a>
+                       title="{% translate "Shows parent report details" %}">{{ report.parent_report.reference }}</a>
                 </td>
                 <td>
                     <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
@@ -28,7 +28,7 @@
                     {% if report.parent_report.input_ooi %}
                         <a href="{% ooi_url "ooi_detail" report.parent_report.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_ooi|human_readable }}</a>
                     {% else %}
-                        {{ report.total_children_reports }}
+                        {{ report.total_objects }}
                     {% endif %}
                 </td>
                 <td>{{ report.parent_report.observed_at|date }}</td>
@@ -91,15 +91,21 @@
                                         <td>
                                             <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
                                         </td>
-                                        <td>{{ child_report.input_ooi|human_readable }}</td>
-                                        <td>{{ child_report }}</td>
+                                        <td>
+                                            <a href="{% ooi_url 'ooi_detail' child_report.input_ooi organization.code %}">{{ child_report.input_ooi|human_readable }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
+                                               title="{% translate "Shows sub report details" %}">{{ child_report }}</a>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                         <div class="button-container">
                             {% if report.total_children_reports > 5 %}
-                                <a href="" class="button">{% translate "View all sub reports" %}</a>
+                                <a href="{% url "subreports" organization.code %}?report_id={{ report.parent_report.reference }}"
+                                   class="button">{% translate "View all sub reports" %}</a>
                             {% endif %}
                         </div>
                     </td>

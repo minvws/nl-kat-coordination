@@ -263,6 +263,7 @@ class HydratedReport:
     parent_report: Report
     children_reports: list[Report] | None
     total_children_reports: int
+    total_objects: int
     report_type_summary: dict[str, int]
 
 
@@ -288,7 +289,7 @@ class ReportList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key: int | slice) -> list[HydratedReport]:
+    def __getitem__(self, key: int | slice) -> list[HydratedReport | Report]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = self.HARD_LIMIT
@@ -301,21 +302,25 @@ class ReportList:
             ).items
 
             if self.parent_report_id and self.parent_report_id is not None:
-                return self.get_subreports(self.parent_report_id, reports)
+                return self.get_subreports(self.parent_report_id)
 
             return self.hydrate_report_list(reports)
 
         raise NotImplementedError("ReportList only supports slicing")
 
-    def get_subreports(self, report_id, reports: list[Report]) -> list[Report]:
+    def get_subreports(self, report_id: str) -> list[Report]:
+        reports = reports = self.octopoes_connector.list_reports(
+            valid_time=self.valid_time,
+        ).items
+
         subreports: list[Report] = []
 
-        for report in reports:
+        for report in reports[:]:
             _, children_reports = report
 
-        for child_report in children_reports:
-            if str(child_report.parent_report) == report_id:
-                subreports.append(child_report)
+            for child_report in children_reports:
+                if str(child_report.parent_report) == report_id:
+                    subreports.append(child_report)
 
         return subreports
 
@@ -328,6 +333,7 @@ class ReportList:
             parent_report, children_reports = report
 
             hydrated_report.total_children_reports = len(children_reports)
+            hydrated_report.total_objects = self.get_total_objects(children_reports)
             hydrated_report.report_type_summary = self.report_type_summary(children_reports)
 
             if not parent_report.has_parent:
@@ -344,6 +350,13 @@ class ReportList:
             hydrated_reports.append(hydrated_report)
 
         return hydrated_reports
+
+    @staticmethod
+    def get_total_objects(reports: list[Report]) -> int:
+        input_objects: set = set()
+        for report in reports:
+            input_objects.add(report.input_ooi)
+        return len(input_objects)
 
     @staticmethod
     def report_type_summary(reports: list[Report]) -> dict[str, int]:
