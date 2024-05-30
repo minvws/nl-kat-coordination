@@ -150,26 +150,26 @@ def sync(ctx: click.Context, timeout: int | None):
 
 @cli.command
 @click.option("--timeout", type=int)
-@click.argument("txid", type=int)
+@click.argument("tx-id", type=int)
 @click.pass_context
-def await_tx(ctx: click.Context, txid: int, timeout: int | None):
+def await_tx(ctx: click.Context, tx_id: int, timeout: int | None):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(json.dumps(client.await_tx(txid, timeout)))
+    click.echo(json.dumps(client.await_tx(tx_id, timeout)))
 
 
 @cli.command
 @click.option("--timeout", type=int)
-@click.argument("txtime", type=click.DateTime())
+@click.argument("tx-time", type=click.DateTime())
 @click.pass_context
 def await_tx_time(
     ctx: click.Context,
-    txtime: datetime.datetime,
+    tx_time: datetime.datetime,
     timeout: int | None,
 ):
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(json.dumps(client.await_tx_time(txtime, timeout)))
+    click.echo(json.dumps(client.await_tx_time(tx_time, timeout)))
 
 
 @cli.command
@@ -200,12 +200,12 @@ def submit_tx(ctx: click.Context, txs):
 
 
 @cli.command
-@click.argument("txid", type=int)
+@click.argument("tx_id", type=int)
 @click.pass_context
-def tx_committed(ctx: click.Context, txid: int) -> None:
+def tx_committed(ctx: click.Context, tx_id: int) -> None:
     client: XTDBClient = ctx.obj["client"]
 
-    click.echo(json.dumps(client.tx_committed(txid)))
+    click.echo(json.dumps(client.tx_committed(tx_id)))
 
 
 @cli.command
