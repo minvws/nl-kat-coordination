@@ -1,0 +1,36 @@
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+<div class="modal-wrapper">
+    {{ trigger }}
+    <dialog class="modal {{ size }}"
+            aria-modal="true"
+            role="dialog"
+            data-size=""
+            data-actions=""
+            data-closing-backdrop=""
+            id="{{ dialogid }}">
+        <div class="content-wrapper">
+            <section class="header">
+                <h2>{{ header }}</h2>
+                <button class="icon-only ti-x close-modal-button"
+                        aria-label="{% translate "Close modal" %}"></button>
+            </section>
+            <section class="content">
+                {{ content }}
+            </section>
+            <section class="footer">
+                <div class="toolbar">
+                    <button>Actie uitvoeren</button>
+                    <button class="ghost close-modal-button">Annuleren</button>
+                </div>
+            </section>
+        </div>
+    </dialog>
+</div>
+{% block html_at_end_body %}
+    {% compress js %}
+        <script src="{% static "js/dialogToggler.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
+    {% endcompress %}
+{% endblock html_at_end_body %}

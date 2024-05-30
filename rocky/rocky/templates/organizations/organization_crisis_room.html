@@ -9,6 +9,55 @@
     <main id="main-content">
         <section>
             <div>
+                <h2>================================</h2>
+                {% translate "Lorem ipsum" as header %}
+                {% blocktranslate asvar content with first_name="bar" %}
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                {% endblocktranslate %}
+                {% blocktranslate asvar trigger with button_text="Button 1" dialogid="id1" %}
+                  <button class="modal-trigger" data-target="{{dialogid}}">{{ button_text }}</button>
+                {% endblocktranslate %}
+                {% include "partials/modal.html" with dialogid="id1" size="dialog-small" %}
+
+                {% translate "Dolor sit amet" as header %}
+                {% blocktranslate asvar content with first_name="Foo" %}
+                  <p>Bla bla {{ first_name }}</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                  <p>Bla bla {{ first_name }}</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                  <p>Bla bla {{ first_name }}</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+                  <p>Dolor {{ first_name }} sit amet!</p>
+
+                {% endblocktranslate %}
+                {% blocktranslate asvar trigger with button_text="Button 2" dialogid="id2" %}
+                  <button class="modal-trigger" data-target="{{dialogid}}">{{ button_text }}</button>
+                {% endblocktranslate %}
+                {% include "partials/modal.html" with dialogid="id2" size="dialog-medium" %}
+
+                {% translate "Helleaux World" as header %}
+                {% blocktranslate asvar content with first_name="Foobar" %}
+                  <p>Bla bla bla bla bla bla, {{ first_name }}</p>
+                {% endblocktranslate %}
+                {% blocktranslate asvar trigger with button_text="Knopje" dialogid="id3" %}
+                  <button class="modal-trigger" data-target="{{dialogid}}">{{ button_text }}</button>
+                {% endblocktranslate %}
+                {% include "partials/modal.html" with dialogid="id3" size="dialog-large" %}
+
+                {% comment %} <ModalComponent>
+                  <headerslot>
+                    Dit is de header
+                  </headerslot>
+                  <contentslot>
+                    Hier komt de content
+                  </contentslot>
+                </ModalComponent> {% endcomment %}
+                <h2>================================</h2>
                 <h1>{% translate "Crisis room:" %} {{ organization.name }}</h1>
                 {% if not indemnification_present %}
                     <p class="warning"
