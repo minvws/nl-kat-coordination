@@ -67,5 +67,6 @@ class PaginationParameters(BaseModel):
 class FilterParameters(BaseModel):
     q: str | None = None
     type: Literal["boefje", "normalizer", "bit"] | None = None
+    ids: list[str] | None = None
     state: bool | None = None
     scan_level: int = 0

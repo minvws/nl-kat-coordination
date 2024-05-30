@@ -63,6 +63,7 @@ class LocalPluginRepository:
         boefjes = self.resolve_boefjes()
         normalizers = self.resolve_normalizers()
         default_cover_path = self.default_cover_path()
+        plugin: BoefjeResource | NormalizerResource
 
         if plugin_id in boefjes:
             plugin = boefjes[plugin_id]

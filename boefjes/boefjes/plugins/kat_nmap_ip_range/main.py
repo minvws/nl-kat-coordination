@@ -65,7 +65,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     if not top_ports_tcp and not top_ports_udp:
         raise ValueError("At least one TOP_PORTS argument should be non-zero")
 
-    results = []
+    results: list[tuple[set, bytes | str]] = []
     if top_ports_tcp:
         results.append(
             (set(), run_nmap(build_nmap_arguments(ip_range=ip_range, top_ports=top_ports_tcp, protocol_str="S")))
