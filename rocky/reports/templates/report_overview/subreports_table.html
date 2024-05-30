@@ -2,31 +2,32 @@
 {% load ooi_extra %}
 {% load report_extra %}
 
-{{ report }}
 <table>
     <caption class="visually-hidden">{% translate "Subreports:" %}</caption>
     <thead>
         <tr>
+            <th scope="col">{% translate "Report ID" %}</th>
             <th scope="col">{% translate "Report type" %}</th>
             <th scope="col">{% translate "Input Object" %}</th>
             <th scope="col">{% translate "Reference date" %}</th>
             <th scope="col">{% translate "Creation date" %}</th>
-            <th scope="col"></th>
         </tr>
     </thead>
     <tbody>
-        {% for ooi, child_reports in report.children_reports.items %}
+        {% for subreport in subreports %}
             <tr>
                 <td>
-                    <a href="{% url "view_report" organization.code %}?report_id={{ child_report.reference }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                       title="{% translate "Shows report details" %}"><span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.name }}</span></a>
+                    <a href="{% url "view_report" organization.code %}?report_id={{ subreport.reference }}&observed_at={{ subreport.observed_at|date:"Y-m-d H:i:s:u" }}"
+                       title="{% translate "Shows report details" %}">{{ subreport.reference }}</a>
                 </td>
-                <td>{{ ooi.ooi_type }}</td>
-                <td>{{ report.parent_report.observed_at|date }}</td>
-                <td>{{ report.parent_report.date_generated }}</td>
                 <td>
-                    <a href="{% ooi_url "ooi_detail" ooi organization.code query=ooi.mandatory_fields %}">{{ ooi.human_readable }}</a>
+                    <span class="label tags-color-{{ subreport.report_type|get_report_type_label_style }}">{{ subreport.name }}</span>
                 </td>
+                <td>
+                    <a href="{% ooi_url "ooi_detail" subreport.input_ooi organization.code %}">{{ subreport.input_ooi|human_readable }}</a>
+                </td>
+                <td>{{ subreport.observed_at|date }}</td>
+                <td>{{ subreport.date_generated }}</td>
             </tr>
         {% endfor %}
     </tbody>
