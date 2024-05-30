@@ -108,7 +108,7 @@ services:
       - .env-defaults
       - .env
     environment:
-      - BOEFJE_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
+      - BOEFJES_DOCKER_NETWORK=${COMPOSE_PROJECT_NAME:-nl-kat-coordination}_default
 
   normalizer:
     restart: unless-stopped
@@ -183,7 +183,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
+    command: uvicorn boefjes.katalogus.api.root:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/boefjes/boefjes/katalogus
     volumes:
       - ./boefjes:/app/boefjes
       - ./octopoes/octopoes:/app/boefjes/octopoes

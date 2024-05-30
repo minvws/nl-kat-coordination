@@ -2,27 +2,30 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # jan klopper <jan@underdark.nl>, 2023.
+# Wim Benes <fryskefirefox@gmail.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-05 12:26+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"POT-Creation-Date: 2024-05-23 15:00+0000\n"
+"PO-Revision-Date: 2024-05-29 09:09+0000\n"
+"Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
+"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/fy/>\n"
 "Language: fy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6-dev\n"
 
 #: account/admin.py
 msgid "Permissions"
-msgstr ""
+msgstr "Machtigingen"
 
 #: account/admin.py
 msgid "Important dates"
-msgstr ""
+msgstr "Wichtige datums"
 
 #: account/forms/account_setup.py katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
@@ -32,97 +35,97 @@ msgstr ""
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/templates/partials/ooi_detail_related_object.html
 msgid "Name"
-msgstr ""
+msgstr "Namme"
 
 #: account/forms/account_setup.py
 msgid "The name that will be used in order to communicate."
-msgstr ""
+msgstr "De namme dy’t brûkt wurdt om te kommunisearjen."
 
 #: account/forms/account_setup.py
 msgid "Please provide username"
-msgstr ""
+msgstr "Fier in brûkersnamme yn"
 
 #: account/forms/account_setup.py
 msgid "Email"
-msgstr ""
+msgstr "E-mailadres"
 
 #: account/forms/account_setup.py
 msgid "Enter an email address."
-msgstr ""
+msgstr "Fier in e-mailadres yn."
 
 #: account/forms/account_setup.py
 msgid "Password"
-msgstr ""
+msgstr "Wachtwurd"
 
 #: account/forms/account_setup.py
 msgid "Choose a super secret password"
-msgstr ""
+msgstr "Kies in supergeheim wachtwurd"
 
 #: account/forms/account_setup.py
 msgid "Choose another email."
-msgstr ""
+msgstr "Kies in oar e-mailadres."
 
 #: account/forms/account_setup.py tools/forms/settings.py
 msgid "--- Please select one of the available options ----"
-msgstr ""
+msgstr "--- Selektearje ien fan de beskikbere opsjes ---"
 
 #: account/forms/account_setup.py
 msgid "Account Type"
-msgstr ""
+msgstr "Accounttype"
 
 #: account/forms/account_setup.py
 msgid "Every member of OpenKAT must be part of an account type."
-msgstr ""
+msgstr "Elke brûker fan OpenKAT moat part wêze fan in accounttype."
 
 #: account/forms/account_setup.py
 msgid "Please select an account type to proceed."
-msgstr ""
+msgstr "Selektearje in accounttype om troch te gean."
 
 #: account/forms/account_setup.py
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Trusted clearance level"
-msgstr ""
+msgstr "Fertroud frijwaringsnivo"
 
 #: account/forms/account_setup.py
 msgid "Select a clearance level you trust this member with."
-msgstr ""
+msgstr "Selektearje in frijwaringsnivo dat jo oan dit lid tafertrouwe."
 
 #: account/forms/account_setup.py onboarding/forms.py tools/forms/ooi.py
 msgid "Please select a clearance level to proceed."
-msgstr ""
+msgstr "Kies in frijwaringsnivo om troch te gean."
 
 #: account/forms/account_setup.py
 msgid "The name of the organization."
-msgstr ""
+msgstr "De organisaasjenamme."
 
 #: account/forms/account_setup.py
 msgid "explanation-organization-name"
-msgstr ""
+msgstr "útlis-organisaasje-namme"
 
 #: account/forms/account_setup.py
 #, python-brace-format
 msgid "A unique code of {code_length} characters."
-msgstr ""
+msgstr "In unike koade fan {code_length} tekens."
 
 #: account/forms/account_setup.py
 msgid "explanation-organization-code"
-msgstr ""
+msgstr "útlis-organisaasje-koade"
 
 #: account/forms/account_setup.py
 msgid "Organization name is required to proceed."
-msgstr ""
+msgstr "De namme fan de organisaasje is fereaske om troch te gean."
 
 #: account/forms/account_setup.py
 msgid "Choose another organization."
-msgstr ""
+msgstr "Kies in oare organisaasje."
 
 #: account/forms/account_setup.py
 msgid "Organization code is required to proceed."
-msgstr ""
+msgstr "Organisaasjekoade is fereaske om troch te gean."
 
 #: account/forms/account_setup.py
 msgid "Choose another code for your organization."
-msgstr ""
+msgstr "Kies in oare koade foar jo organisaasje."
 
 #: account/forms/account_setup.py
 msgid ""
@@ -130,6 +133,9 @@ msgid ""
 "have permission to scan these assets. I am aware of the implications a scan "
 "with a higher scan level brings on my systems."
 msgstr ""
+"Ik ferklearje dat OpenKAT de assets fan myn organisaasje scanne mei en dat "
+"ik tastimming haw om dizze assets te scannen. Ik bin my bewust fan de "
+"ymplikaasjes dy’t in scan mei in heger scannivo op myn systemen hat."
 
 #: account/forms/account_setup.py
 msgid ""
@@ -137,196 +143,240 @@ msgid ""
 "organization. I have the experience and knowledge to know what the "
 "consequences might be and can be held responsible for them."
 msgstr ""
+"Ik ferklearje dat ik foech haw om dizze frijwarring binnen myn organisaasje "
+"ôf te jaan. Ik haw de ûnderfining en de kennis om te witten wat de gefolgen "
+"wêze kinne en kin dêrfoar ferantwurdlik hâlden wurde."
 
 #: account/forms/account_setup.py
 msgid "Trusted to change Clearance Levels."
-msgstr ""
+msgstr "Fertroud om frijwarringsnivo te wizigjen."
 
 #: account/forms/account_setup.py
 msgid "Acknowledged to change Clearance Levels."
-msgstr ""
+msgstr "Hat tastimming om frijwarringsnivo te wizigjen."
 
 #: account/forms/account_setup.py
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/views/organization_member_list.py
 msgid "Blocked"
-msgstr ""
+msgstr "Blokkearre"
 
 #: account/forms/account_setup.py
 msgid ""
 "Set the members status to blocked, so they don't have access to the "
 "organization anymore."
 msgstr ""
+"Stel de status fan de leden yn op blokkearre, sadat se gjin tagong mear "
+"hawwe ta de organisaasje."
 
 #: account/forms/account_setup.py
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Accepted clearance level"
-msgstr ""
+msgstr "Akseptearre frijwarringsnivo"
 
 #: account/forms/account_setup.py
 msgid "Enter tags separated by comma."
-msgstr ""
+msgstr "Fier troch komma’s skieden labels yn."
 
 #: account/forms/account_setup.py
 msgid "The two password fields didn’t match."
-msgstr ""
+msgstr "De twa wachtwurdfjilden kamen net oerien."
 
 #: account/forms/account_setup.py
 msgid "New password"
-msgstr ""
+msgstr "Nij wachtwurd"
 
 #: account/forms/account_setup.py
 msgid "Enter a new password"
-msgstr ""
+msgstr "Fier in nij wachtwurd yn"
 
 #: account/forms/account_setup.py
 msgid "New password confirmation"
-msgstr ""
+msgstr "Befêstiging nij wachtwurd"
 
 #: account/forms/account_setup.py
 msgid "Repeat the new password"
-msgstr ""
+msgstr "Werhelje it nije wachtwurd"
 
 #: account/forms/account_setup.py
 msgid "Confirm the new password"
-msgstr ""
+msgstr "Befêstigje it nije wachtwurd"
 
 #: account/forms/login.py
 msgid "Please enter a correct email address and password."
-msgstr ""
+msgstr "Fier in jildich e-mailadres en wachtwurd yn."
 
 #: account/forms/login.py
 msgid "This account is inactive."
-msgstr ""
+msgstr "Dizze account is net aktyf."
 
 #: account/forms/login.py
 msgid "Insert the email you registered with or got at OpenKAT installation."
 msgstr ""
+"Fier it e-mailadres yn wêrmei’t jo jo registrearre hawwe of dat jo krigen "
+"hawwe by de ynstallaasje fan OpenKAT."
 
 #: account/forms/organization.py
 msgid "Organization is required."
-msgstr ""
+msgstr "Organisaasje is fereaske."
 
 #: account/forms/organization.py tools/view_helpers.py
 #: rocky/templates/dashboard_redteam.html
 #: rocky/templates/organizations/organization_list.html
 #: rocky/views/organization_add.py
 msgid "Organizations"
-msgstr ""
+msgstr "Organisaasjes"
 
 #: account/forms/organization.py
 msgid "The organization from which to clone settings."
-msgstr ""
+msgstr "De organisaasje wêrfan de ynstellingen ‘cloned’ waarden."
 
 #: account/forms/password_reset.py
 msgid "Email address"
-msgstr ""
+msgstr "E-mailadres"
 
 #: account/forms/password_reset.py
 msgid "A reset link will be sent to this email"
 msgstr ""
+"Der sil in keppeling nei dit e-mailadres stjoerd wurde foar opnij ynstellen"
 
 #: account/forms/password_reset.py
 msgid "The email address connected to your OpenKAT-account"
-msgstr ""
+msgstr "It e-mailadres ferbûn oan jo OpenKAT-account"
 
 #: account/forms/token.py
 msgid ""
 "Insert the token generated by the authenticator app to setup the two factor "
 "authentication."
 msgstr ""
+"Fier it token yn dat troch de autentikator-app generearre is om de "
+"twafaktorautentikaasje yn te stellen."
 
 #: account/forms/token.py
 msgid "Insert the token generated by your token authenticator app."
-msgstr ""
+msgstr "Pleats it token dat troch jo tokenautentikator-app generearre is."
 
 #: account/forms/token.py
 msgid "Backup token"
+msgstr "Back-uptoken"
+
+#: account/mixins.py
+msgid "Clearance level has been set"
+msgstr "Frijwarringsnivo is ynsteld"
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. Indemnification not present at "
+"organization %s."
 msgstr ""
+"Koe frijwarringsnivo fan %s net ferheegje nei L%s. Frijwarring net oanwêzich "
+"by organisaasje %s."
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You were trusted a clearance "
+"level of L%s. Contact your administrator to receive a higher clearance."
+msgstr ""
+"Kin frijwarringsnivo fan %s net ferheegje nei L%s. Jo binne in "
+"frijwarringsnivo tafertroud fan L%s. Nim kontakt op mei jo behearder om jo "
+"frijwarringsnivo te ferheegjen."
+
+#: account/mixins.py
+#, python-format
+msgid ""
+"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
+"level of L%s. Please accept the clearance level first on your profile page "
+"to proceed."
+msgstr ""
+"Kin frijwarringsnivo fan %s net ferheegje nei L%s. Jo hawwe in "
+"frijwarringsnivo befêstige fan L%s. Akseptearje earst it frijwarringsnivo op "
+"jo profylside om troch te gean."
 
 #: account/models.py
 msgid "The Email must be set"
-msgstr ""
+msgstr "It e-mailadres moat ynfolle wurde"
 
 #: account/models.py
 msgid "Superuser must have is_staff=True."
-msgstr ""
+msgstr "Superuser moat is_staff=True hawwe."
 
 #: account/models.py
 msgid "Superuser must have is_superuser=True."
-msgstr ""
+msgstr "Superuser moat is_superuser=True hawwe."
 
 #: account/models.py
 msgid "full name"
-msgstr ""
+msgstr "foar- en efternamme"
 
 #: account/models.py
 msgid "email"
-msgstr ""
+msgstr "e-mailadres"
 
 #: account/models.py
 msgid "staff status"
-msgstr ""
+msgstr "funksje of status"
 
 #: account/models.py
 msgid "Designates whether the user can log into this admin site."
-msgstr ""
+msgstr "Jout oan oft de brûker oanmelde kin op dizze behearderswebsite."
 
 #: account/models.py tools/models.py
 msgid "active"
-msgstr ""
+msgstr "aktyf"
 
 #: account/models.py
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
+"Bepaalt oft dizze brûker behannele wurde moat as aktyf. Deselektearje dit yn "
+"stee fan it fuortsmiten fan brûkers."
 
 #: account/models.py
 msgid "date joined"
-msgstr ""
+msgstr "startdatum"
 
 #: account/models.py
 msgid "name"
-msgstr ""
+msgstr "namme"
 
 #: account/templates/account_detail.html account/views/account.py
 msgid "Account details"
-msgstr ""
+msgstr "Accountgegevens"
 
 #: account/templates/account_detail.html account/templates/password_reset.html
 #: account/views/password_reset.py
 msgid "Reset password"
-msgstr ""
+msgstr "Wachtwurd opnij ynstelle"
 
 #: account/templates/account_detail.html
 msgid "Full name"
-msgstr ""
+msgstr "Foar- en efternamme"
 
 #: account/templates/account_detail.html
 msgid "E-mail address"
-msgstr ""
+msgstr "E-mailadres"
 
 #: account/templates/account_detail.html
 msgid "Member type"
-msgstr ""
+msgstr "Soarte fan lid"
 
 #: account/templates/account_detail.html
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/organizations/organization_member_list.html
-#: rocky/templates/organizations/organization_settings.html
 msgid "Organization"
-msgstr ""
+msgstr "Organisaasje"
 
 #: account/templates/account_detail.html
-msgid "Permission to set OOI clearance levels "
-msgstr ""
+msgid "Permission to set OOI clearance levels"
+msgstr "Tastimming om frijwarringsnivo’s fan OOI yn te stellen"
 
 #: account/templates/account_detail.html
 msgid "OOI clearance"
-msgstr ""
+msgstr "OOI-frijwarringsnivo"
 
 #: account/templates/account_detail.html
 msgid ""
@@ -337,20 +387,28 @@ msgid ""
 "necessary clearance level.\n"
 "                        "
 msgstr ""
+"\n"
+"                            Jo hawwe gjin frijwarring om objekten te scannen."
+"<br>\n"
+"               Nim kontakt op mei de behearder om jo it nedige "
+"frijwarringsnivo te jaan.\n"
+"                        "
 
 #: account/templates/account_detail.html
-msgid "You have currently accepted clearance up to level "
-msgstr ""
+msgid "You have currently accepted clearance up to level"
+msgstr "Jo hawwe op dit stuit frijwarring akseptearre ta nivo"
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI Clearance"
-msgstr ""
+msgstr "Utlis OOI-frijwarring"
 
 #: account/templates/account_detail.html
 msgid ""
 "You can withdraw this at anytime you like, but know that you won't be able "
 "to change clearance levels anymore when you do."
 msgstr ""
+"Jo kinne dit op elk momint ynlûke, mar wit dat jo it frijwarringsnivo net "
+"mear wizigje kinne as jo dat dogge."
 
 #: account/templates/account_detail.html
 #, python-format
@@ -359,10 +417,13 @@ msgid ""
 "                            Withdraw L%(acl)s clearance and responsibility\n"
 "                    "
 msgstr ""
+"\n"
+"                            L%(acl)s frijwarringsnivo ynlûke\n"
+"                    "
 
 #: account/templates/account_detail.html
 msgid "Explanation OOI clearance"
-msgstr ""
+msgstr "Utlis OOI-frijwarringsnivo"
 
 #: account/templates/account_detail.html
 #, python-format
@@ -372,6 +433,10 @@ msgid ""
 "permission. Remember: <strong>with great power comes great responsibility.</"
 "strong>"
 msgstr ""
+"Jo krije frijwarring foar nivo L%(tcl)s fan jo behearder. Eardat jo OOI-"
+"frijwarringsnivo’s wizigje kinne oant dit nivo, moatte jo dizze tastimming "
+"akseptearje. Unthâld: <strong>mei grutte macht komt grutte ferantwurdlikheid."
+"</strong>"
 
 #: account/templates/account_detail.html
 #, python-format
@@ -380,42 +445,47 @@ msgid ""
 "                        Accept level L%(tcl)s clearance and responsibility\n"
 "                    "
 msgstr ""
+"\n"
+"                        Frijwarringsnivo L%(tcl)s akseptearje\n"
+"                    "
 
 #: account/templates/password_reset.html
 msgid "Use the form below to reset your password."
-msgstr ""
+msgstr "Brûk it ûndersteande formulier om jo wachtwurd opnij yn te stellen."
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
 msgid "Send"
-msgstr ""
+msgstr "Ferstjoere"
 
 #: account/templates/password_reset.html
 #: account/templates/password_reset_confirm.html
 msgid "Back"
-msgstr ""
+msgstr "Tebek"
 
 #: account/templates/password_reset_confirm.html
 msgid "Confirm reset password"
-msgstr ""
+msgstr "Befêstigje it opnij ynstellen fan jo wachtwurd"
 
 #: account/templates/password_reset_confirm.html
 msgid "Use the form below to confirm resetting your password"
-msgstr ""
+msgstr "Brûk ûndersteand formulier om it wachtwurd opnij yn te stellen"
 
 #: account/templates/password_reset_confirm.html
 msgid "Confirm password"
-msgstr ""
+msgstr "Wachtwurd befêstigje"
 
 #: account/templates/password_reset_confirm.html
 msgid "The link is invalid"
-msgstr ""
+msgstr "De keppeling is net jildich"
 
 #: account/templates/password_reset_confirm.html
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"De keppeling om it wachtwurd opnij yn te stellen wie net korrekt, miskien is "
+"dizze al brûkt. Probearje nochris it wachtwurd yn te stellen."
 
 #: account/templates/password_reset_email.html
 #, python-format
@@ -423,55 +493,59 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Jo ûntfange dit e-mailberjocht, omdat der in fersyk dien is om it wachtwurd "
+"foar jo profyl op %(site_name)s te werstellen."
 
 #: account/templates/password_reset_email.html
 #: account/templates/registration_email.html
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Gean nei de folgjende side en kies in nij wachtwurd:"
 
 #: account/templates/password_reset_email.html
 #: account/templates/registration_email.html
 msgid "Sincerely,"
-msgstr ""
+msgstr "Mei hege achting,"
 
 #: account/templates/password_reset_email.html
 #: account/templates/registration_email.html
 msgid "The OpenKAT team"
-msgstr ""
+msgstr "It OpenKAT-team"
 
 #: account/templates/password_reset_subject.txt
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr ""
+msgstr "Wachtwurd opnij ynstelle op %(site_name)s"
 
 #: account/templates/recover_email.html account/views/recover_email.py
 msgid "Recover email address"
-msgstr ""
+msgstr "E-mailadres werstelle"
 
 #: account/templates/recover_email.html
 msgid "Information on how to recover your connected email address"
-msgstr ""
+msgstr "Ynformaasje oer hoe’t jo jo ferbûne e-mailadres werstelle kinne"
 
 #: account/templates/recover_email.html
 msgid "Forgotten email address?"
-msgstr ""
+msgstr "E-mailadres ferjitten?"
 
 #: account/templates/recover_email.html
 msgid ""
-"If you don’t remember the email address connected to your account, contact: "
+"If you don’t remember the email address connected to your account, contact:"
 msgstr ""
+"As jo it oan jo account keppele e-mailadres net mear witte, nim dan kontakt "
+"op mei:"
 
 #: account/templates/recover_email.html
 msgid "Please contact the system administrator."
-msgstr ""
+msgstr "Nim kontakt op mei de systeembehearder."
 
 #: account/templates/recover_email.html
 msgid "Back to login"
-msgstr ""
+msgstr "Werom nei oanmelden"
 
 #: account/templates/recover_email.html
 msgid "Back to Home"
-msgstr ""
+msgstr "Werom nei startside"
 
 #: account/templates/registration_email.html
 #, python-format
@@ -479,111 +553,128 @@ msgid ""
 "Welcome to OpenKAT. You're receiving this email because you have been added "
 "to organization \"%(organization)s\" at %(site_name)s."
 msgstr ""
+"Wolkom by OpenKAT. Jo ûntfange dit e-mailberjocht, omdat jo tafoege binne "
+"oan de organisaasje ‘%(organization)s’ op %(site_name)s."
 
 #: account/templates/registration_subject.txt
 #, python-format
 msgid "Verify OpenKAT account on %(site_name)s"
-msgstr ""
+msgstr "Ferifiearje OpenKAT-account op %(site_name)s"
 
 #: account/validators.py
 msgid "Your password must contain at least the following:"
-msgstr ""
+msgstr "Jo wachtwurd moat op syn minst it folgjende befetsje:"
 
 #: account/validators.py
 msgid " characters"
-msgstr ""
+msgstr " karakters"
 
 #: account/validators.py
 msgid " digits"
-msgstr ""
+msgstr " sifers"
 
 #: account/validators.py
 msgid " letters"
-msgstr ""
+msgstr " letters"
 
 #: account/validators.py
 msgid " special characters such as: "
-msgstr ""
+msgstr " spesjale tekens, lykas: "
 
 #: account/validators.py
 msgid " lower case letters"
-msgstr ""
+msgstr " lytse letters"
 
 #: account/validators.py
 msgid " upper case letters"
-msgstr ""
+msgstr " haadletters"
 
 #: account/views/login.py
 msgid "Your session has timed out. Please login again."
-msgstr ""
+msgstr "Jo sesje is ferrûn. Meld jo opnij oan."
 
-#: account/views/login.py reports/templates/partials/report_header.html
-#: rocky/templates/header.html
+#: account/views/login.py rocky/templates/header.html
 msgid "OpenKAT"
-msgstr ""
+msgstr "OpenKAT"
 
 #: account/views/login.py account/views/password_reset.py
 #: account/views/recover_email.py rocky/templates/partials/secondary-menu.html
 #: rocky/templates/two_factor/core/login.html
 msgid "Login"
-msgstr ""
+msgstr "Oanmelde"
 
 #: account/views/login.py
 msgid "Two factor authentication"
-msgstr ""
+msgstr "Twastapsferifikaasje"
 
 #: account/views/password_reset.py
 msgid "We couldn't send a password reset link. Contact "
-msgstr ""
+msgstr "Wy koene gjin keppeling foar wachtwurdwerstel ferstjoere. Kontakt "
 
 #: account/views/password_reset.py
 msgid ""
 "We couldn't send a password reset link. Contact your system administrator."
 msgstr ""
+"Wy koene gjin wachtwurdwerstelkeppeling stjoere. Nim kontakt op mei jo "
+"systeembehearder."
 
 #: crisis_room/views.py
 msgid ""
 "Failed to get list of findings for organization {}, check server logs for "
 "more details."
 msgstr ""
+"Koe list mei befiningen foar organisaasje {} net ophelje, kontrolearje "
+"serverlochboeken foar mear details."
+
+#: katalogus/client.py
+msgid ""
+"The KATalogus has an unexpected error. Check the logs for further details."
+msgstr ""
+"De KATalogus hat in ûnferwachte flater oprûn. Kontrolearje de lochboeken "
+"foar mear details."
+
+#: katalogus/client.py
+msgid "A HTTP error occurred. Check logs for more info."
+msgstr ""
+"Der is in HTTP-flater bard. Kontrolearje de lochboeken foar mear ynformaasje."
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
-msgstr ""
+msgstr "Alles toane"
 
 #: katalogus/forms/katalogus_filter.py
 #: reports/report_types/dns_report/report.html
 msgid "Enabled"
-msgstr ""
+msgstr "Ynskeakele"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Disabled"
-msgstr ""
+msgstr "Utskeakele"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Enabled-Disabled"
-msgstr ""
+msgstr "Ynskeakele-Utskeakele"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Disabled-Enabled"
-msgstr ""
+msgstr "Utskeakele-Ynskeakele"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Filter options"
-msgstr ""
+msgstr "Filteropsjes"
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Sorting options"
-msgstr ""
+msgstr "Sortearopsjes"
 
 #: katalogus/forms/plugin_settings.py
 msgid "This field is required."
-msgstr ""
+msgstr "Dit fjild is ferplichte."
 
 #: katalogus/templates/about_plugins.html
 #: katalogus/templates/partials/plugins_navigation.html
 msgid "About plugins"
-msgstr ""
+msgstr "Oer ynstekkers"
 
 #: katalogus/templates/about_plugins.html katalogus/templates/katalogus.html
 msgid ""
@@ -591,28 +682,37 @@ msgid ""
 "and strengths and may be able to work with other plugins to gain even more "
 "insights."
 msgstr ""
+"Ynstekkers sammelje gegevens, objekten en ynsichten. Elke ynstekker hat syn "
+"eigen fokusgebiet en sterke punten en kin mooglik gearwurkje mei oare "
+"ynstekkers om noch mear ynsichten te krijen."
 
 #: katalogus/templates/about_plugins.html katalogus/templates/boefjes.html
 msgid ""
 "Boefjes gather factual information, such as by calling an external scanning "
 "tool like nmap or using a database like shodan."
 msgstr ""
+"Boefkes sammelje feitlike ynformaasje, bygelyks troch in eksterne scantool, "
+"lykas Nmap te brûken of it gebrûk fan in database, lykas Shodan."
 
 #: katalogus/templates/about_plugins.html katalogus/templates/normalizers.html
 msgid ""
 "Normalizers analyze the information and turn it into objects for the data "
 "model in Octopoes."
 msgstr ""
+"Normalizers analysearje de ynformaasje en sette dizze om yn objekten foar it "
+"datamodel yn Oktopoes."
 
 #: katalogus/templates/about_plugins.html
 msgid ""
 "Bits are business rules that look for insight within the current dataset and "
 "search for specific insight and draw conclusions."
 msgstr ""
+"Bits binne bedriuwsrigels dy’t sykje nei ynsichten binnen de aktuele "
+"gegevensset. Se sykje nei spesifike ynsichten en lûke dêr konklúzjes út."
 
 #: katalogus/templates/boefje_detail.html
 msgid "Scan level"
-msgstr ""
+msgstr "Scannivo"
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
@@ -620,47 +720,48 @@ msgstr ""
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
 #: reports/report_types/vulnerability_report/report.html
-#: reports/templates/summary/report_summary.html tools/forms/finding_type.py
-#: rocky/templates/oois/ooi_detail.html
+#: reports/templates/summary/report_asset_overview.html
+#: tools/forms/finding_type.py rocky/templates/oois/ooi_detail.html
 #: rocky/templates/oois/ooi_detail_findings_list.html rocky/templates/scan.html
 msgid "Description"
-msgstr ""
+msgstr "Omskriuwing"
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
 msgid "Consumes"
-msgstr ""
+msgstr "Konsumearret"
 
 #: katalogus/templates/boefje_detail.html
 #, python-format
 msgid "%(plugin_name)s is able to scan the following object types:"
-msgstr ""
+msgstr "%(plugin_name)s is yn steat om d folgjende objekttypen te scannen:"
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
 #, python-format
 msgid "%(plugin_name)s does not need any input objects."
-msgstr ""
+msgstr "%(plugin_name)s hat gjin ynfierobjekten nedich."
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
 msgid "Produces"
-msgstr ""
+msgstr "Produsearret"
 
 #: katalogus/templates/boefje_detail.html
 #: katalogus/templates/normalizer_detail.html
 #, python-format
 msgid "%(plugin_name)s can produce the following output:"
-msgstr ""
+msgstr "%(plugin_name)s kin it folgjende produsearje:"
 
 #: katalogus/templates/boefjes.html katalogus/templates/normalizers.html
 msgid "available"
-msgstr ""
+msgstr "beskikber"
 
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/partials/objects_to_scan.html
+#: reports/templates/partials/report_setup_scan.html
 msgid "scan level warning"
-msgstr ""
+msgstr "Warskôging frijwarringsnivo"
 
 #: katalogus/templates/change_clearance_level.html
 #, python-format
@@ -668,10 +769,12 @@ msgid ""
 "%(plugin_name)s will only scan objects with a corresponding clearance level "
 "of <strong>L%(scan_level)s</strong> or higher."
 msgstr ""
+"%(plugin_name)s kin allinnich objekten scanne mei in oerienkommend "
+"frijwarringsnivo fan <strong>L%(scan_level)s</strong> of heger."
 
 #: katalogus/templates/change_clearance_level.html
 msgid "Scan object"
-msgstr ""
+msgstr "Objekt scanne"
 
 #: katalogus/templates/change_clearance_level.html
 #, python-format
@@ -680,35 +783,37 @@ msgid ""
 "be advised that by continuing you will declare a level %(scan_level)s on "
 "these objects."
 msgstr ""
+"De folgjende objekten hawwe gjin frijwarringsnivo fan %(scan_level)s, wês "
+"wis dat, wannear’t jo trochgean, jo in frijwarring nei nivo %(scan_level)s "
+"foar dizze objekten ynstelle."
 
 #: katalogus/templates/change_clearance_level.html
 msgid "Selected objects:"
-msgstr ""
+msgstr "Selektearre objekten:"
 
 #: katalogus/templates/change_clearance_level.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
 #: rocky/templates/partials/task_history.html
 msgid "Object"
-msgstr ""
+msgstr "Objekt"
 
 #: katalogus/templates/change_clearance_level.html onboarding/forms.py
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/explanations.html
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Clearance level"
-msgstr ""
+msgstr "Frijwarringsnivo"
 
 #: katalogus/templates/change_clearance_level.html
 msgid "Are you sure you want to scan anyways?"
-msgstr ""
+msgstr "Binne jo wis dat jo dochs trochgean wolle mei scannen?"
 
 #: katalogus/templates/change_clearance_level.html
 #: rocky/templates/oois/ooi_detail.html
 msgid "Scan"
-msgstr ""
+msgstr "Scanne"
 
 #: katalogus/templates/change_clearance_level.html
 #: katalogus/templates/confirmation_clone_settings.html
@@ -719,12 +824,12 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_edit.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Cancel"
-msgstr ""
+msgstr "Annulearje"
 
 #: katalogus/templates/clone_settings.html
 #: katalogus/templates/confirmation_clone_settings.html
 msgid "Clone settings"
-msgstr ""
+msgstr "Ynstellingen klone"
 
 #: katalogus/templates/clone_settings.html
 #, python-format
@@ -736,14 +841,20 @@ msgid ""
 "disabled plugins.\n"
 "      "
 msgstr ""
+"\n"
+"        Brûk ûndersteand formulier om de ynstellingen fan "
+"<i>%(current_organization)s</i> te klonen nei de selektearre organisaasje.\n"
+"        Dit omfettet sawol de KAT-alogus-ynstellingen, as ynskeakele en "
+"útskeakele ynstekkers.\n"
+"      "
 
 #: katalogus/templates/confirmation_clone_settings.html
 msgid "Clone"
-msgstr ""
+msgstr "Klone"
 
 #: katalogus/templates/katalogus.html
 msgid "All plugins"
-msgstr ""
+msgstr "Alle ynstekkers"
 
 #: katalogus/templates/katalogus.html
 msgid ""
@@ -755,82 +866,90 @@ msgid_plural ""
 "                            Plugins available\n"
 "                        "
 msgstr[0] ""
+"\n"
+"                            Ynstekker beskikber\n"
+"                        "
 msgstr[1] ""
+"\n"
+"                            Ynstekkers beskikber\n"
+"                        "
 
 #: katalogus/templates/katalogus_settings.html
 msgid "KAT-alogus Settings"
-msgstr ""
+msgstr "KAT-alogus-ynstellingen"
 
 #: katalogus/templates/katalogus_settings.html
 msgid ""
 "There are currently no settings defined. Add settings at plugin detail page."
 msgstr ""
+"Der binne op dit stuit gjin ynstellingen. Foegje ynstellingen ta by de "
+"ynstekkerdetailside."
 
 #: katalogus/templates/katalogus_settings.html
 #: reports/templates/partials/report_setup_scan.html
 #: reports/templates/partials/report_types_selection.html
 #: rocky/templates/two_factor/core/otp_required.html
 msgid "Go back"
-msgstr ""
+msgstr "Gean werom"
 
 #: katalogus/templates/katalogus_settings.html
 msgid "This is an overview of the latest settings of all plugins."
-msgstr ""
+msgstr "Dit is in oersjoch fan de lêste ynstellingen fan alle ynstekkers."
 
 #: katalogus/templates/katalogus_settings.html
 msgid "Latest plugin settings:"
-msgstr ""
+msgstr "Lêste ynstekkerynstellingen:"
 
 #: katalogus/templates/katalogus_settings.html
 #: rocky/templates/partials/task_history.html
 msgid "Plugin"
-msgstr ""
+msgstr "Ynstekker"
 
 #: katalogus/templates/katalogus_settings.html
 #: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/oois/ooi_delete.html
 msgid "Value"
-msgstr ""
+msgstr "Wearde"
 
 #: katalogus/templates/normalizer_detail.html
 #, python-format
 msgid "%(plugin_name)s is able to process the following mime types:"
-msgstr ""
+msgstr "%(plugin_name)s is yn steat de folgjende mime-typen te ferwurkjen:"
 
 #: katalogus/templates/partials/boefje_tile.html
 msgid "Scan level:"
-msgstr ""
+msgstr "Frijwarringsnivo:"
 
 #: katalogus/templates/partials/boefje_tile.html
-msgid "Publisher"
-msgstr ""
+msgid "Publisher:"
+msgstr "Utjouwer:"
 
 #: katalogus/templates/partials/boefje_tile.html
 #: katalogus/templates/partials/plugin_tile.html
 #: katalogus/templates/partials/plugins.html
 msgid "See details"
-msgstr ""
+msgstr "Details besjen"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "Enable"
-msgstr ""
+msgstr "Ynskeakelje"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 #: rocky/templates/two_factor/profile/disable.html
 msgid "Disable"
-msgstr ""
+msgstr "Utskeakelje"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
-msgid "You don't have permission to enable "
-msgstr ""
+msgid "You don't have permission to enable"
+msgstr "Jo hawwe gjin tastimming om yn te skeakeljen"
 
 #: katalogus/templates/partials/katalogus_filter.html
 msgid "Filter plugins"
-msgstr ""
+msgstr "Ynstekkers filterje"
 
 #: katalogus/templates/partials/katalogus_filter.html
 msgid "Clear filter"
-msgstr ""
+msgstr "Filters wiskje"
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/views/change_clearance_level.py katalogus/views/katalogus.py
@@ -840,11 +959,11 @@ msgstr ""
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 msgid "KAT-alogus"
-msgstr ""
+msgstr "KAT-alogus"
 
 #: katalogus/templates/partials/katalogus_header.html
 msgid "An overview of all available plugins."
-msgstr ""
+msgstr "In oersjoch fan alle beskikbere ynstekkers."
 
 #: katalogus/templates/partials/katalogus_header.html
 #: katalogus/templates/plugin_settings_list.html
@@ -852,22 +971,22 @@ msgstr ""
 #: rocky/templates/header.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Settings"
-msgstr ""
+msgstr "Ynstellingen"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Gridview"
-msgstr ""
+msgstr "Rasterwerjefte"
 
 #: katalogus/templates/partials/katalogus_toolbar.html
 msgid "Tableview"
-msgstr ""
+msgstr "Tabelwerjefte"
 
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Object list"
-msgstr ""
+msgstr "Objektelist"
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
@@ -878,15 +997,27 @@ msgid ""
 "<strong>L%(scan_level)s</strong>. Use the filter to show OOI's with a lower "
 "clearance level."
 msgstr ""
+"Dit Boefke scant allinnich objekten mei in oerienkomstich frijwarringsnivo "
+"fan <strong>(%(scan_level)s)</strong> of heger. Der is gjin frijwarring foar "
+"dit Boefke om in OOI mei in leger scannivo te scannen "
+"as<strong>L%(scan_level)s</strong>. Brûk it filter om OOI’s mei in legere "
+"frijwarringsnivo te toanen."
+
+#: katalogus/templates/partials/objects_to_scan.html
+msgid "Warning scan level:"
+msgstr "Warskôging scannivo:"
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid ""
-"<span>Warning scan level:</span> Scanning OOI's with a lower clearance level "
-"will result in OpenKAT increasing the clearance level on that OOI, not only "
-"for this scan but from now on out, until it manually gets set to something "
-"else again. This means that all other enabled Boefjes will use this higher "
-"clearance level aswel."
+"Scanning OOI's with a lower clearance level will result in OpenKAT "
+"increasing the clearance level on that OOI, not only for this scan but from "
+"now on out, until it manually gets set to something else again. This means "
+"that all other enabled Boefjes will use this higher clearance level aswel."
 msgstr ""
+"OOI’s mei in leger frijwarringsnivo scanne, sil resultearje yn it ferheegjen "
+"fan it frijwarringsnivo op dy OOI, net allinnich foar dizze scan, mar fan no "
+"ôf, oant it hânmjittich wer nei wat oars ynsteld wurdt. Dit betsjut dat alle "
+"oare ynskeakele Boefjes dit hegere frijwarringsnivo brûke sille."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
@@ -895,6 +1026,9 @@ msgid ""
 "Add objects with a complying clearance level, or alter the clearance level "
 "of existing objects."
 msgstr ""
+"Jo hawwe op dit stuit gjin objekten dy’t foldogge oan it scannivo fan "
+"%(name)s. Foegje objekten ta mei in foldwaand frijwarringsnivo, of wizigje "
+"it frijwarringsnivo fan besteande objekten."
 
 #: katalogus/templates/partials/objects_to_scan.html
 #, python-format
@@ -902,71 +1036,72 @@ msgid ""
 "You currently don't have scannable objects for %(name)s. Add objects to use "
 "this Boefje. This Boefje is able to scan objects of the following types:"
 msgstr ""
+"Jo hawwe op dit stuit gjin scanbare objekten foar %(name)s. Foegje objekten "
+"ta om dit Boefje te brûken. Dit Boefje kin objekten scanne fan de folgjende "
+"typen:"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "The form could not be initialized."
-msgstr ""
+msgstr "It formulier kin net ophelle wurde."
 
 #: katalogus/templates/partials/plugin_settings_required.html
 msgid "Required settings"
-msgstr ""
+msgstr "Ferplichte ynstellingen"
 
 #: katalogus/templates/partials/plugin_settings_required.html
 #: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Add"
-msgstr ""
+msgstr "Tafoegje"
+
+#: katalogus/templates/partials/plugin_tile.html
+msgid "Required for:"
+msgstr "Fereaske foar:"
 
 #: katalogus/templates/partials/plugins.html
 msgid "Plugins overview:"
-msgstr ""
+msgstr "Oersjoch ynstekkers:"
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin name"
-msgstr ""
+msgstr "Ynstekkernamme"
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin type"
-msgstr ""
+msgstr "Ynstekkertype"
 
 #: katalogus/templates/partials/plugins.html
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin description"
-msgstr ""
+msgstr "Ynstekkerbeskriuwing"
 
 #: katalogus/templates/partials/plugins.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Actions"
-msgstr ""
+msgstr "Aksjes"
 
 #: katalogus/templates/partials/plugins_navigation.html
 msgid "Plugins Navigation"
-msgstr ""
+msgstr "Ynstekkersnavigaasje"
 
 #: katalogus/templates/partials/plugins_navigation.html
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: tools/forms/boefje.py rocky/templates/scan.html
 #: rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
-msgstr ""
+msgstr "Boefkes"
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/tasks/normalizers.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Normalizers"
-msgstr ""
+msgstr "Normalizers"
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -978,7 +1113,13 @@ msgid_plural ""
 "            Add settings\n"
 "          "
 msgstr[0] ""
+"\n"
+"            Ynstelling tafoegje\n"
+"          "
 msgstr[1] ""
+"\n"
+"            Ynstellingen tafoegje\n"
+"          "
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -990,7 +1131,13 @@ msgid_plural ""
 "            Settings\n"
 "          "
 msgstr[0] ""
+"\n"
+"            Ynstelling\n"
+"          "
 msgstr[1] ""
+"\n"
+"            Ynstellingen\n"
+"          "
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -1002,7 +1149,13 @@ msgid_plural ""
 "                  Add settings and enable boefje\n"
 "                "
 msgstr[0] ""
+"\n"
+"                  Ynstelling tafoegje en Boefje ynskeakelje\n"
+"                "
 msgstr[1] ""
+"\n"
+"                  Ynstellingen tafoegje en Boefje ynskeakelje\n"
+"                "
 
 #: katalogus/templates/plugin_settings_add.html
 msgid ""
@@ -1014,201 +1167,205 @@ msgid_plural ""
 "                Add settings\n"
 "              "
 msgstr[0] ""
+"\n"
+"                Ynstelling tafoegje\n"
+"              "
 msgstr[1] ""
+"\n"
+"                Ynstellingen tafoegje\n"
+"              "
 
 #: katalogus/templates/plugin_settings_delete.html
 msgid "Delete settings"
-msgstr ""
+msgstr "Ynstellingen fuortsmite"
 
 #: katalogus/templates/plugin_settings_delete.html
 #, python-format
 msgid ""
 "Are you sure you want to delete all settings for the plugin %(plugin_name)s?"
 msgstr ""
+"Binne jo wis dat jo de ynstellingen foar de ynstekker %(plugin_name)s "
+"fuortsmite wolle?"
 
 #: katalogus/templates/plugin_settings_delete.html
 #: katalogus/templates/plugin_settings_list.html
 #: katalogus/views/plugin_settings_delete.py
 #: rocky/templates/admin/delete_confirmation.html rocky/views/ooi_delete.py
 msgid "Delete"
-msgstr ""
+msgstr "Fuortsmite"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid " Details"
-msgstr ""
+msgstr " Details"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Overview of settings:"
-msgstr ""
+msgstr "Oersjoch fan ynstellingen:"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Required"
-msgstr ""
+msgstr "Ferplichte"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Action"
-msgstr ""
+msgstr "Aksje"
 
 #: katalogus/templates/plugin_settings_list.html
 msgid "Unset"
-msgstr ""
+msgstr "Net ynfolle"
 
 #: katalogus/templates/plugin_settings_list.html
 #: reports/report_types/dns_report/report.html
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: katalogus/templates/plugin_settings_list.html
 #: reports/report_types/dns_report/report.html
 msgid "No"
-msgstr ""
+msgstr "Nee"
 
 #: katalogus/templates/plugin_settings_list.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/organizations/organization_settings.html
 #: rocky/views/ooi_edit.py rocky/views/organization_edit.py
 msgid "Edit"
-msgstr ""
+msgstr "Bewurkje"
 
 #: katalogus/views/change_clearance_level.py
 msgid "Session has terminated, please select objects again."
-msgstr ""
+msgstr "Sesje is beëinige, selektearje objekten opnij."
 
 #: katalogus/views/change_clearance_level.py
 msgid "Change clearance level"
-msgstr ""
+msgstr "Frijwarringsnivo wizigje"
 
 #: katalogus/views/katalogus_settings.py
 msgid "Settings from {} to {} successfully cloned."
-msgstr ""
+msgstr "Ynstellingen mei sukses fan {} nei {} út kloand."
 
 #: katalogus/views/katalogus_settings.py
 #: katalogus/views/plugin_settings_list.py
 msgid "Failed getting settings for boefje {}"
-msgstr ""
+msgstr "Kin ynstellingen foar Boefje {} net ophelje"
 
 #: katalogus/views/mixins.py
 msgid ""
 "Getting information for plugin {} failed. Please check the KATalogus logs."
 msgstr ""
-
-#: katalogus/views/mixins.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                             "
-"Indemnification not present at organization %s."
-msgstr ""
-
-#: katalogus/views/mixins.py onboarding/views.py rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You were trusted a clearance "
-"level of L%s. Contact your administrator to receive a higher clearance."
-msgstr ""
-
-#: katalogus/views/mixins.py onboarding/views.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level first on your profile page "
-"to proceed."
-msgstr ""
+"It opheljen fan ynformaasje foar ynstekker {} is mislearre. Kontrolearje de "
+"KAT-alogus-lochboeken."
 
 #: katalogus/views/plugin_detail.py
 msgid ""
 "Some selected OOIs needs an increase of clearance level to perform scans. "
 "You do not have the permission to change clearance level."
 msgstr ""
+"Guon selektearre OOI’s fereaskje in heger frijwarringsnivo om scans út te "
+"fieren. Jo binne net machtige om it frijwarringsnivo te wizigjen."
 
 #: katalogus/views/plugin_detail.py
 msgid "Please select an OOI to start scan."
-msgstr ""
+msgstr "Selektearje in OOI om de scan te starten."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "{} '{}' disabled."
-msgstr ""
+msgstr "{} ‘{}’ útskeakele."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "Failed fetching settings for {}. Is the Katalogus up?"
-msgstr ""
+msgstr "Opheljen fan ynstellingen {} mislearre. Is de Katalogus aktyf?"
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "Before enabling, please set the required settings for '{}'."
-msgstr ""
+msgstr "Stel foar it ynskeakeljen de fereaske ynstellingen yn foar ‘{}’."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "{} '{}' enabled."
-msgstr ""
+msgstr "{} ‘{}’ ynskeakele."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid ""
 "Your clearance level is not set. Go to your profile page to see your "
 "clearance or contact the administrator to set a clearance level."
 msgstr ""
+"Jo frijwarringsnivo is net ynsteld. Gean nei jo profylside om jo frijwarring "
+"te kontrolearjen of nim kontakt op mei de behearder om in frijwarringsnivo "
+"yn te stellen."
 
 #: katalogus/views/plugin_enable_disable.py
 msgid "To enable {} you need at least a clearance level of L{}. "
 msgstr ""
+"Om {} yn te skeakeljen hawwe jo minimaal ien frijwarringsnivo fan L{} "
+"nedich. "
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Trying to add settings to boefje without schema"
-msgstr ""
+msgstr "Probearje ynstellingen ta te foegjen oan Boefje sûnder skema"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "No changes to the settings added: no form data present"
 msgstr ""
+"Gjin wizigingen oan de ynstellingen tafoege: gjin formuliergegevens oanwêzich"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Added settings for '{}'"
-msgstr ""
+msgstr "Tafoege ynstellingen foar ‘{}’"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Failed adding settings"
-msgstr ""
+msgstr "Ynstellingen tafoegje mislearre"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Enabling {} failed"
-msgstr ""
+msgstr "It ynskeakeljen fan {} is mislearre"
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Boefje '{}' enabled."
-msgstr ""
+msgstr "Boefje ‘{}’ ynskeakele."
 
 #: katalogus/views/plugin_settings_add.py
 msgid "Add settings"
-msgstr ""
+msgstr "Ynstellingen tafoegje"
 
 #: katalogus/views/plugin_settings_delete.py
 msgid "Settings for plugin {} successfully deleted."
-msgstr ""
+msgstr "Ynstellingen foar ynstekker {} mei sukses fuortsmiten."
 
 #: katalogus/views/plugin_settings_delete.py
 msgid "Plugin {} has no settings."
-msgstr ""
+msgstr "Ynstekker {} hat gjin ynstellingen."
 
 #: katalogus/views/plugin_settings_delete.py
 msgid ""
 "Failed deleting Settings for plugin {}. Check the Katalogus logs for more "
 "info."
 msgstr ""
+"Fuortsmiten fan ynstellingen foar ynstekker {} mislearre. Kontrolearje de "
+"Katalogus-lochboeken foar mear ynformaasje."
 
 #: onboarding/forms.py tools/forms/ooi.py
 msgid ""
 "Boefjes that has a scan level below or equal to the clearance level, is "
 "permitted to scan an object."
 msgstr ""
+"Boefje dy’t in scannivo hat ûnder of lyk oan it frijwarringsnivo, mei in "
+"objekt scanne."
 
 #: onboarding/forms.py tools/forms/ooi.py
 msgid "explanation-clearance-level"
-msgstr ""
+msgstr "taljochting-frijwarrings-nivo"
+
+#: onboarding/forms.py
+msgid "Please enter a valid URL starting with 'http://' or 'https://'."
+msgstr "Fier in jildige URL yn begjinnend mei ‘http://’ of ‘https://’."
 
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid "Register"
-msgstr ""
+msgstr "Registrearje"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid "Create a new account for your organization"
-msgstr ""
+msgstr "Meitsje in account oan foar jo organisaasje"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid ""
@@ -1218,16 +1375,22 @@ msgid ""
 "user account that is connected to an already existing organization within "
 "OpenKAT you can ask the admin to create an account for you."
 msgstr ""
+"Alle brûkersaccounts binne ûnderdiel fan in organisaasje. Dus as jo nij "
+"binne en jo organisaasje is ek nij yn OpenKAT, kinne jo jo hjir registrearje "
+"om in OpenKAT-account oan te meitsjen ynklusyf in beheardersaccount foar jo. "
+"As jo in brûkersaccount wolle dat ferbûn is mei in al besteande organisaasje "
+"binnen OpenKAT, kinne jo de behearder freegje in account foar jo oan te "
+"meitsjen."
 
 #: onboarding/templates/account/step_1_registration_intro.html
 #: onboarding/templates/step_1_introduction.html
 msgid "Let's get started"
-msgstr ""
+msgstr "Begjin hjir"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 #: onboarding/templates/step_1_introduction.html
 msgid "How does OpenKAT work"
-msgstr ""
+msgstr "Hoe wurket OpenKAT"
 
 #: onboarding/templates/account/step_1_registration_intro.html
 msgid ""
@@ -1238,6 +1401,12 @@ msgid ""
 "you to through the process. During this introduction you will be guided "
 "through the steps to create a report."
 msgstr ""
+"OpenKAT kin ynsjoch jaan yn befeiligingsrisiko’s op jo online objekten. "
+"Bygelyks jo websites, mailservers of online data. OpenKAT brûkt scans om de "
+"risikogebieten te finen en te beoardielen en rapportearret dizze oan jo "
+"werom. As brûker beslisse jo hokker ynsjoch jo winske en OpenKAT begeliedt "
+"jo troch it proses. Wylst dizze yntroduksje wurde jo troch de stappen laad "
+"om in rapport te meitsjen."
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
@@ -1248,13 +1417,13 @@ msgstr ""
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "OpenKAT setup"
-msgstr ""
+msgstr "OpenKAT-ynstellingen"
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 msgid "Organization setup"
-msgstr ""
+msgstr "Organisaasje-ynstellingen"
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 msgid ""
@@ -1262,13 +1431,16 @@ msgid ""
 "within the organization page within OpenKAT when necessary. Adding a new "
 "organization requires a new database."
 msgstr ""
+"Fier de folgjende organisaasjegegevens yn. Dizze gegevens kinne bewurke "
+"wurde wannear nedich binnen de organisaasjeside binnen OpenKAT. In nije "
+"organisaasje tafoegje hat in nije database nedich."
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Organization details"
-msgstr ""
+msgstr "Organisaasjedetails"
 
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
@@ -1284,7 +1456,7 @@ msgstr ""
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/two_factor/_wizard_actions.html
 msgid "Submit"
-msgstr ""
+msgstr "Yntsjinje"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
@@ -1292,37 +1464,39 @@ msgid ""
 "Please enter the following organization details. These details can be edited "
 "within the organization page within OpenKAT when necessary."
 msgstr ""
+"Fier de folgjende organisaasegegevens yn. Dizze gegevens kinne bewurke wurde "
+"wannear nedich binnen de organisatieside binnen OpenKAT."
 
 #: onboarding/templates/account/step_2a_organization_update.html
 msgid "Submit changes"
-msgstr ""
+msgstr "Wizigingen bewarje"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Continue"
-msgstr ""
+msgstr "Trochgean"
 
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 msgid "Indemnification setup"
-msgstr ""
+msgstr "Frijwarring opstelle"
 
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 msgid "Indemnification on the organization is already present."
-msgstr ""
+msgstr "Frijwarringsnivo op de organisaasje is al oanwêzich."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Account setup"
-msgstr ""
+msgstr "Account ynstelle"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Accounts"
-msgstr ""
+msgstr "Accounts"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Organization setup with separate accounts:"
-msgstr ""
+msgstr "Organisaasje ynstelle mei aparte accounts:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1332,10 +1506,15 @@ msgid ""
 "can choose to create the separate accounts during this introduction or when "
 "you’re ready from the OpenKAT users page."
 msgstr ""
+"Binnen OpenKAT is it mooglik om aparte brûkersaccounts oan te meitsjen mei "
+"de spesifike rollen. Elk mei harren eigen funksjonaliteiten en rjochten. Dit "
+"is handich as meardere minsken mei deselde OpenKAT-ynstellingen wurkjen "
+"gean. Jo kinne der foar kieze om de aparte accounts oan te meitsjen wylst "
+"dizze yntroduksje of wannear’t jo klear binne fan de OpenKAT-brûkersside út."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Single account setup:"
-msgstr ""
+msgstr "Inkeld account ynstelle:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1457,7 +1636,7 @@ msgstr ""
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: onboarding/templates/step_4_report.html onboarding/views.py
+#: onboarding/templates/step_4_report.html onboarding/view_helpers.py
 msgid "OpenKAT introduction"
 msgstr ""
 
@@ -1526,6 +1705,7 @@ msgstr ""
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
 msgstr ""
@@ -1534,8 +1714,7 @@ msgstr ""
 msgid "Choose a report - Introduction"
 msgstr ""
 
-#: onboarding/templates/step_2a_choose_report_info.html
-#: reports/templates/partials/main_navigation.html reports/views/base.py
+#: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
 #: rocky/templates/header.html
 msgid "Reports"
 msgstr ""
@@ -1630,8 +1809,6 @@ msgstr ""
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-#: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
 msgid "Setup scan"
 msgstr ""
 
@@ -1730,7 +1907,6 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
-#: reports/report_types/findings_report/report.html
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
@@ -1750,10 +1926,6 @@ msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "scheme"
-msgstr ""
-
-#: onboarding/templates/step_3c_setup_scan_ooi_detail.html
-msgid "DNS Zone"
 msgstr ""
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
@@ -1891,6 +2063,10 @@ msgid ""
 "responsibility\n"
 "                        "
 msgstr ""
+"\n"
+"                            Frijwarringsnivo L%(tcl)s en ferantwurdlikheid "
+"akseptearje\n"
+"                        "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -1940,10 +2116,19 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
+#: rocky/templates/scan.html
+msgid "Boefjes:"
+msgstr "Boefkes:"
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
 "Scan objects for data. Each boefje has a scan intensity score to prevent "
 "invasive scanning on objects where you don’t have the clearance to do so."
 msgstr ""
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+msgid "Normalizers:"
+msgstr "Normalizers:"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -1951,8 +2136,7 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: reports/report_types/tls_report/report.html
-msgid "Bits"
+msgid "Bits:"
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
@@ -1974,8 +2158,11 @@ msgid "Let’s setup your scan by enabling the plugins of your choice below."
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: reports/templates/partials/report_setup_scan.html
-msgid "Suggested plugins"
+msgid "Required and suggested plugins"
+msgstr ""
+
+#: onboarding/templates/step_3g_setup_scan_select_plugins.html
+msgid "Enable and start scan"
 msgstr ""
 
 #: onboarding/templates/step_4_report.html
@@ -2039,25 +2226,32 @@ msgstr ""
 msgid "4: Account setup"
 msgstr ""
 
-#: onboarding/views.py
-msgid ""
-"OpenKAT added the following required object to your object list to complete "
-"your request: {}"
-msgstr ""
-
-#: onboarding/views.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                 "
-"Indemnification not present at organization %s."
-msgstr ""
-
-#: onboarding/views.py
-msgid "Clearance level has been set"
-msgstr ""
-
-#: onboarding/views.py
+#: onboarding/view_helpers.py
 msgid "OpenKAT Setup"
+msgstr "OpenKAT ynstelle"
+
+#: onboarding/views.py
+msgid "Fetch the parent DNS zone of a hostname"
+msgstr ""
+
+#: onboarding/views.py
+msgid "Finds subdomains by brute force"
+msgstr ""
+
+#: onboarding/views.py
+msgid "Please select a plugin to proceed."
+msgstr ""
+
+#: onboarding/views.py
+msgid "Please select all required plugins to proceed."
+msgstr ""
+
+#: onboarding/views.py
+msgid "An error occurred while enabling {}. The plugin is not available."
+msgstr ""
+
+#: onboarding/views.py
+msgid "Plugins successfully enabled."
 msgstr ""
 
 #: onboarding/views.py
@@ -2090,9 +2284,9 @@ msgid "Appendix"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Selected objects"
-msgstr ""
+msgstr "Selektearre objekten"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Currently filtered on"
@@ -2100,28 +2294,14 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Selected Report Types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
+#: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Report type"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/partials/report_sidemenu.html
-msgid "Selected Plugins"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
-msgid "Plugin options"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_summary.html
-msgid "Plugin scan level"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2176,7 +2356,9 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/asset_overview.html
 #: reports/report_types/multi_organization_report/asset_overview.html
+#: reports/templates/partials/generate_report_sidemenu.html
 #: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/report_asset_overview.html
 msgid "Asset overview"
 msgstr ""
 
@@ -2211,7 +2393,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
-msgid "Basic security status:"
+msgid "Basic security status"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/basic_security.html
@@ -2248,6 +2430,7 @@ msgid "OpenKAT Aggregate Report"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/templates/partials/report_header.html
 #: rocky/templates/partials/ooi_list_toolbar.html
 msgid "Export"
 msgstr ""
@@ -2263,18 +2446,19 @@ msgid "Download JSON"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
+#: reports/templates/partials/report_header.html
 msgid "This is the OpenKAT report for organization"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Created with data from"
+msgid "Created with data from:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
 #: reports/report_types/multi_organization_report/introduction.html
 #: reports/templates/partials/report_header.html
-msgid "Created on"
+msgid "Created on:"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/introduction.html
@@ -2313,7 +2497,6 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/report.html
 #: reports/report_types/multi_organization_report/basic_security_details.html
-#: reports/report_types/safe_connections_report/report.html
 msgid ""
 "In this chapter we check if the connections of all the IP ports of the "
 "system are safe. Safe connections are important to prevent unauthorised "
@@ -2395,7 +2578,6 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/report_design.html
 #: reports/report_types/aggregate_organisation_report/summary.html
 #: reports/report_types/multi_organization_report/summary.html
-#: reports/templates/summary/report_summary.html
 #: rocky/templates/partials/ooi_report_severity_totals.html
 #: rocky/views/ooi_tree.py
 msgid "Summary"
@@ -2421,7 +2603,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
-msgid "Check overview:"
+msgid "Check overview"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
@@ -2449,10 +2631,28 @@ msgid "IPs are compliant"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/safe_connections_report/report.html
+#: reports/report_types/vulnerability_report/report.html
+msgid "Host:"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/system_specific.html
+#: reports/report_types/findings_report/report.html
 #: reports/report_types/mail_report/report.html
 #: reports/report_types/name_server_report/report.html
+#: reports/report_types/tls_report/report.html
+#: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
-msgid "Findings:"
+#: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/oois/ooi_detail_findings_overview.html
+#: rocky/templates/oois/ooi_page_tabs.html
+#: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/views/finding_list.py rocky/views/finding_type_add.py
+#: rocky/views/ooi_view.py
+msgid "Findings"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/system_specific.html
@@ -2557,8 +2757,9 @@ msgstr ""
 
 #: reports/report_types/dns_report/report.html
 msgid ""
-"The table below gives an overview of the DNS records that were found for the "
-"abovementioned DNSZone."
+"The DNS report gives an overview of the DNS records that were found for the "
+"DNSZone. Additionally the security measures table shows whether or not DNS "
+"relating security measures are enabled."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -2572,7 +2773,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "All existing DNS record types can be found here"
+msgid "All existing DNS record types can be found here:"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -2588,16 +2789,22 @@ msgid "minutes"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
+msgid "No records have been found."
+msgstr ""
+
+#: reports/report_types/dns_report/report.html
 msgid "Security measures"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
-msgid "Other findings found"
+msgid ""
+"The security measures table below shows which DNS relating security measures "
+"are enabled based on the contents of the DNS records."
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
-msgid "Other findings found:"
+msgid "Other findings found"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
@@ -2611,6 +2818,7 @@ msgid "Severity"
 msgstr ""
 
 #: reports/report_types/dns_report/report.html
+#: reports/report_types/findings_report/report.html
 #: rocky/templates/findings/finding_add.html
 #: rocky/templates/findings/finding_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
@@ -2629,7 +2837,7 @@ msgstr ""
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
@@ -2677,22 +2885,12 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
-#: reports/report_types/tls_report/report.html
-#: reports/report_types/vulnerability_report/report.html
-#: reports/report_types/web_system_report/report.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_detail_findings_overview.html
-#: rocky/templates/oois/ooi_page_tabs.html
-#: rocky/templates/partials/ooi_report_findings_block.html
-#: rocky/views/finding_list.py rocky/views/finding_type_add.py
-#: rocky/views/ooi_view.py
-msgid "Findings"
-msgstr ""
-
-#: reports/report_types/findings_report/report.html
-msgid "FindingType"
+msgid ""
+"The findings report provides an overview of the identified findings on the "
+"scanned systems. For each finding it shows the risk level and the number of "
+"occurrences of the finding. Under the 'Details' section a description, "
+"impact, recommendation and location of the finding can be found. The risk "
+"level may be different for your specific environment."
 msgstr ""
 
 #: reports/report_types/findings_report/report.html
@@ -2722,15 +2920,15 @@ msgid "Shows all the finding types and their occurrences."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
-#: reports/report_types/multi_organization_report/ipv6.html
 msgid ""
-"IPv6 includes improvements in security features compared to IPv4. While IPv4 "
-"can implement security measures, IPv6 was designed with security in mind, "
-"and its adoption can contribute to a more secure internet."
+"The IPv6 report provides an overview of the current IPv6 status of the "
+"identified system. The table below shows whether the domain is reachable "
+"over IPv6 or not. A green compliance check is shown if this is the case. A "
+"grey compliance cross is shown if no IPv6 address was detected."
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview:"
+msgid "IPV6 overview"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -2747,11 +2945,25 @@ msgid "Check whether hostnames point to ipv6 addresses."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
-msgid "Mailserver compliance:"
+msgid ""
+"The mail report provides an overview of the compliance checks associated "
+"with e-mail servers. The current compliance check the presence of SPF, DKIM "
+"and DMARC records. The table below shows for each of these checks how many "
+"of the identified mail servers are compliant, and if applicable a compliance "
+"issue description and risk level. The risk level may be different for your "
+"specific environment."
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid "Mailserver compliance"
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
 msgid "mailservers compliant"
+msgstr ""
+
+#: reports/report_types/mail_report/report.html
+msgid "No mailservers have been found on this system."
 msgstr ""
 
 #: reports/report_types/mail_report/report.py
@@ -2811,7 +3023,7 @@ msgid "services are compliant"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
-#: reports/templates/generate_report.html
+#: reports/templates/partials/report_header.html
 msgid "Download report"
 msgstr ""
 
@@ -2820,7 +3032,7 @@ msgid "This is the OpenKAT Sector rapport."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
-msgid "Created with date from"
+msgid "Created with date from:"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/introduction.html
@@ -2853,6 +3065,13 @@ msgstr ""
 
 #: reports/report_types/multi_organization_report/ipv6.html
 msgid "IPv6"
+msgstr ""
+
+#: reports/report_types/multi_organization_report/ipv6.html
+msgid ""
+"IPv6 includes improvements in security features compared to IPv4. While IPv4 "
+"can implement security measures, IPv6 was designed with security in mind, "
+"and its adoption can contribute to a more secure internet."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/ipv6.html
@@ -2892,6 +3111,7 @@ msgid "Occurrences (IP addressees)"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
+#: reports/templates/summary/service_health.html
 msgid "Services"
 msgstr ""
 
@@ -2923,7 +3143,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
-msgid "Vulnerabilities grouped per system."
+msgid "Vulnerabilities grouped per system"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/vulnerabilities.html
@@ -2931,7 +3151,19 @@ msgid "total"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
-msgid "Name server compliance:"
+msgid ""
+"The name server report provides an overview of the compliance checks that "
+"were performed against the identified Domain Name Servers (DNS). The "
+"compliance checks verify the presence and validity of DNSSEC and whether no "
+"unnecessary ports were identified to be open. The table below gives an "
+"overview of the available checks including whether the system passed the "
+"performed checks. The risk level and reasoning as to why an issue was "
+"identified are shown too. The risk level may be different for your specific "
+"environment."
+msgstr ""
+
+#: reports/report_types/name_server_report/report.html
+msgid "Name server compliance"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.html
@@ -2951,8 +3183,12 @@ msgstr ""
 msgid "No unnecessary ports open"
 msgstr ""
 
+#: reports/report_types/name_server_report/report.html
+msgid "No nameservers have been found on this system."
+msgstr ""
+
 #: reports/report_types/name_server_report/report.py
-msgid "Name server Report"
+msgid "Name Server Report"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.py
@@ -2961,14 +3197,15 @@ msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
 msgid ""
-"See an overview of open ports found. <strong>Bold</strong> open ports are "
-"found through direct scans that the organization performs via OpenKAT. Other "
-"open ports were found outside by OpenKAT itself. Scans with the same "
-"hostnames, ports and IPs are merged."
+"The open ports report provides an overview of the open ports identified on a "
+"system. The ports that are marked as <b>bold</b> were identified by direct "
+"scans performed by OpenKAT (such as nmap). Ports that are not marked in bold "
+"were identified through external services and/or scans (such as Shodan). "
+"Scans with the same hostnames, ports and IPs are merged."
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
-msgid "Overview of open ports found for the scanned assets."
+msgid "Overview of open ports found for the scanned assets"
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
@@ -2993,7 +3230,13 @@ msgid "Find open ports of IP addresses"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
-msgid "RPKI compliance:"
+msgid ""
+"The RPKI report shows if an RPKI route announcement was available for the "
+"system and if this announcement is not expired."
+msgstr ""
+
+#: reports/report_types/rpki_report/report.html
+msgid "RPKI compliance"
 msgstr ""
 
 #: reports/report_types/rpki_report/report.html
@@ -3012,6 +3255,11 @@ msgstr ""
 msgid "RPKI record does not exist."
 msgstr ""
 
+#: reports/report_types/rpki_report/report.html
+#: reports/report_types/safe_connections_report/report.html
+msgid "No IPs have been found on this system."
+msgstr ""
+
 #: reports/report_types/rpki_report/report.py
 msgid "RPKI Report"
 msgstr ""
@@ -3023,11 +3271,17 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
-msgid "Safe Connections"
+msgid ""
+"The secure connections report provides an overview of the performed checks "
+"with regard to encrypted communication channels such as HTTPS. The table "
+"below gives an overview of the available checks including whether the system "
+"passed the performed checks. The risk level and reasoning as to why an issue "
+"was identified are shown too. The risk level may be different for your "
+"specific environment."
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
-msgid "Safe connections compliance:"
+msgid "Safe connections compliance"
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.py
@@ -3039,7 +3293,21 @@ msgid "Shows whether the IPService contains safe ciphers."
 msgstr ""
 
 #: reports/report_types/systems_report/report.html
-msgid "Selected assets:"
+msgid ""
+"The system report provides an overview of the system types (types of similar "
+"services) that were identified for each system. The following system types "
+"can be identified: DNS servers, Web servers, Mail servers and those "
+"classified as 'Other' servers. Each hostname and/or IP address is given one "
+"or more system types depending on the identified ports and services. The "
+"table below gives an overview of these results."
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "Selected assets"
+msgstr ""
+
+#: reports/report_types/systems_report/report.html
+msgid "No system types have been identified on this system."
 msgstr ""
 
 #: reports/report_types/systems_report/report.py
@@ -3051,10 +3319,23 @@ msgid "Combine IP addresses, hostnames and services into systems."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
-msgid "Ciphers:"
+msgid ""
+"The TLS report shows which TLS protocols and ciphers were identified on the "
+"host for the provided port."
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
+msgid ""
+"The table below provides an overview of the identified TLS protocols and "
+"ciphers, including a status suggestion."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Ciphers"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+#: reports/templates/partials/plugin_overview_table.html
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
@@ -3069,6 +3350,10 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 msgid "Encryption Algorithm"
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid "Bits"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
@@ -3090,7 +3375,15 @@ msgid "Good"
 msgstr ""
 
 #: reports/report_types/tls_report/report.html
-msgid "No ciphers found for this IPService"
+msgid ""
+"No ciphers were found for this combination of IP address, port and service."
+msgstr ""
+
+#: reports/report_types/tls_report/report.html
+msgid ""
+"The list below gives an overview of the findings based on the identified TLS "
+"protocols and ciphers. This includes the reasoning why the cipher or "
+"protocol is marked as a finding."
 msgstr ""
 
 #: reports/report_types/tls_report/report.py
@@ -3104,7 +3397,11 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-msgid "Vulnerabilities:"
+msgid ""
+"The vulnerability report provides an overview of all identified CVE "
+"vulnerabilities that were identified on the selected systems. For each CVE "
+"the table shows the CVE scoring, the number of occurrences, and the CVE "
+"details."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
@@ -3112,7 +3409,7 @@ msgid "Advice"
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
-msgid "No findings have been found on this system."
+msgid "No vulnerabilities have been found on this system."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.py
@@ -3139,7 +3436,17 @@ msgid "Evidence"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
-msgid "Web system compliance:"
+msgid ""
+"The web system report provides an overview of various web server checks that "
+"were performed against the scanned system(s). For each performed check the "
+"table below shows whether or not the server is compliant with the checks. A "
+"description of why this compliant check failed is also shown, including an "
+"general risk level. The risk level may be different for your specific "
+"environment."
+msgstr ""
+
+#: reports/report_types/web_system_report/report.html
+msgid "Web system compliance"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.html
@@ -3178,6 +3485,10 @@ msgstr ""
 msgid "Certificate is not expiring soon"
 msgstr ""
 
+#: reports/report_types/web_system_report/report.html
+msgid "No webservers have been found on this system."
+msgstr ""
+
 #: reports/report_types/web_system_report/report.py
 msgid "Web System Report"
 msgstr ""
@@ -3188,26 +3499,69 @@ msgstr ""
 
 #: reports/templates/generate_report.html
 #: reports/templates/generate_report_pdf.html
+#: reports/templates/partials/generate_report_sidemenu.html
 msgid "for"
 msgstr ""
 
+#: reports/templates/partials/generate_report_sidemenu.html
+#: reports/templates/partials/report_sidemenu.html
+msgid "Table of contents"
+msgstr ""
+
 #: reports/templates/partials/main_navigation.html
-msgid "Overview of reports"
+msgid "Generate a report"
+msgstr ""
+
+#: reports/templates/partials/main_navigation.html
+msgid ""
+"To generate a report you can start by selecting report types or by selecting "
+"objects."
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/partials/report_sidemenu.html
+#: rocky/templates/oois/ooi_page_tabs.html
+msgid "Overview"
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+msgid "Plugin overview table"
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/partials/report_setup_scan.html
+msgid "Required plugins"
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+#: reports/templates/partials/report_setup_scan.html
+msgid "Suggested plugins"
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+msgid "Action required"
+msgstr ""
+
+#: reports/templates/partials/plugin_overview_table.html
+msgid "Ready"
 msgstr ""
 
 #: reports/templates/partials/report_header.html
-msgid "Report for organization"
+msgid "OpenKAT Report"
+msgstr ""
+
+#: reports/templates/partials/report_header.html
+msgid ""
+"All selected report types for the selected objects are displayed one below "
+"the other."
 msgstr ""
 
 #: reports/templates/partials/report_introduction.html
 msgid ""
-"Through a systematic examination of the network's infrastructure, the scan "
-"has identified potential security weaknesses and points of exposure. "
-"Additionally, the report offers actionable recommendations and prioritizes "
-"remediation steps to fortify the network's defenses against potential "
-"threats. This invaluable assessment serves as a roadmap for enhancing "
-"network security, ensuring the confidentiality, integrity, and availability "
-"of critical data and resources."
+"This report gives an overview of the current state of security for your "
+"organisation for the selected date. The summary section provides an overview "
+"of the selected systems (objects), plugins and reports. This is followed "
+"with the findings for each report."
 msgstr ""
 
 #: reports/templates/partials/report_navigation.html
@@ -3227,8 +3581,9 @@ msgid "Multi Report"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select object"
-msgid_plural "Select objects"
+#, python-format
+msgid "Select object (%(total_oois)s)"
+msgid_plural "Select objects (%(total_oois)s)"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3249,12 +3604,6 @@ msgid "Currently filtered on:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
 msgid "No objects found."
 msgstr ""
 
@@ -3263,27 +3612,35 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "explanation select all"
+msgid "objects selected"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Explanation 'Continue with all OOIs'"
+msgid "Deselect all objects"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #, python-format
-msgid ""
-"This option will select all OOIs (+ current filters) for %(organization)s "
-"organization."
-msgstr ""
+msgid "Select all %(total_oois)s object"
+msgid_plural "Select all %(total_oois)s objects"
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Continue with all OOIs"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-#: reports/templates/summary/ooi_selection.html
-msgid "Objects:"
+#: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
+#: tools/view_helpers.py rocky/templates/admin/delete_confirmation.html
+#: rocky/templates/admin/delete_selected_confirmation.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/header.html rocky/templates/indemnification_present.html
+#: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
+#: rocky/views/upload_csv.py rocky/views/upload_raw.py
+msgid "Objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
@@ -3297,8 +3654,9 @@ msgid "Continue with selection"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-#: rocky/views/organization_add.py
-msgid "Setup"
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+#: reports/views/multi_report.py
+msgid "Configuration"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3311,7 +3669,7 @@ msgid "Change selection"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Set up scan"
+msgid "Plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3322,17 +3680,41 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
-"If you choose not to give a plugin permission to run, the data that plugin "
-"would collect or produce will be left out of the report which will then be "
-"generated based on the available data collected by the enabled plugins."
+"If you choose not to enable a plugin, the data that plugin would collect or "
+"produce will be left out of the report which will then be generated based on "
+"the available data collected by the enabled plugins."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
-msgid "Required plugins"
+msgid ""
+"Some plugins are mandatory as they are crucial for a report type. Reports "
+"that don't have their requirements met will be skipped."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Warning! Before you proceed read the following points:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid ""
+"OpenKAT is designed to scan all known objects on a regular basis using the "
+"enabled plugins and set clearance levels. This means that scans will run "
+"automatically. Be patient; plugins may take some time before they have "
+"collected all their data. Enabling them just before report generation will "
+"likely result in inaccurate reports, as plugins have not finished collecting "
+"data."
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "This report type requires the following plugins to be enabled:"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All required plugins are enabled."
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Show enabled plugins"
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
@@ -3342,34 +3724,39 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
+msgid "Good job! All suggested plugins are enabled"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Hide suggested plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
+msgid "Show more suggested plugins"
+msgstr ""
+
+#: reports/templates/partials/report_setup_scan.html
 #: reports/views/generate_report.py
 msgid "Generate report"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals.html
+#: reports/templates/partials/report_severity_totals_table.html
 msgid "Findings overview"
 msgstr ""
 
 #: reports/templates/partials/report_severity_totals_table.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
-msgid "Total per severity overview:"
-msgstr ""
-
-#: reports/templates/partials/report_severity_totals_table.html
-msgid "FindingTypes"
-msgstr ""
-
-#: reports/templates/partials/report_sidemenu.html
-msgid "Table of contents"
-msgstr ""
-
-#: reports/templates/partials/report_sidemenu.html
-#: rocky/templates/oois/ooi_page_tabs.html
-msgid "Overview"
+msgid "Total per severity overview"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
+msgstr "Selektearre objekten"
+
+#: reports/templates/partials/report_sidemenu.html
+#: reports/templates/summary/selected_plugins.html
+msgid "Selected Plugins"
 msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
@@ -3391,14 +3778,18 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "Selected object"
-msgid_plural "Selected objects"
+#, python-format
+msgid "Selected object (%(total_oois)s)"
+msgid_plural "Selected objects (%(total_oois)s)"
 msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "You have selected all objects in previous step."
-msgstr ""
+#, python-format
+msgid "You have selected %(total_oois)s object in previous step."
+msgid_plural "You have selected %(total_oois)s objects in previous step."
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
@@ -3412,12 +3803,42 @@ msgstr ""
 msgid "Toggle all report types"
 msgstr ""
 
-#: reports/templates/summary/report_summary.html
-msgid "Selected Plugins for scans"
+#: reports/templates/summary/report_asset_overview.html
+msgid ""
+"The objects listed in the table below were used to generate this report. For "
+"each object in the table it additionally shows the clearance level and "
+"whether or not the object was added by a user ('Declared') or indirectly "
+"identified through another service or system ('Inherited')."
 msgstr ""
 
-#: reports/templates/summary/service_health.html
-msgid "Services:"
+#: reports/templates/summary/report_asset_overview.html
+msgid ""
+"The table below shows which reports were chosen to generate this report, "
+"including a report description."
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid ""
+"The table below shows all required or optional plugins for the selected "
+"reports."
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin enabled"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin options"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid "Plugin scan level"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
+msgid ""
+"There are no required or optional plugins needed for the selected report "
+"types."
 msgstr ""
 
 #: reports/views/aggregate_report.py
@@ -3444,7 +3865,6 @@ msgid "Select at least one OOI to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-#: reports/views/multi_report.py
 msgid "Select at least one report type to proceed."
 msgstr ""
 
@@ -3459,10 +3879,6 @@ msgstr ""
 msgid "Report type '%s' does not exist."
 msgstr ""
 
-#: reports/views/generate_report.py
-msgid "This report may not show all the data as some plugins are not enabled."
-msgstr ""
-
 #: reports/views/multi_report.py
 msgid "Multi report"
 msgstr ""
@@ -3471,17 +3887,24 @@ msgstr ""
 msgid "Select OOIs"
 msgstr ""
 
+#: reports/views/view_helpers.py
+msgid "1: Select objects"
+msgstr ""
+
+#: reports/views/view_helpers.py
+msgid "2: Choose report types"
+msgstr ""
+
+#: reports/views/view_helpers.py
+msgid "3: Configuration"
+msgstr ""
+
 #: tools/forms/base.py
 msgid "Date"
 msgstr ""
 
 #: tools/forms/base.py
 msgid "The selected date is in the future. Please select a different date."
-msgstr ""
-
-#: tools/forms/boefje.py
-msgid ""
-"Not all required boefjes are selected. Please select all required boefjes."
 msgstr ""
 
 #: tools/forms/finding_type.py
@@ -3625,19 +4048,9 @@ msgstr ""
 msgid "Filter types"
 msgstr ""
 
-#: tools/forms/ooi.py tools/view_helpers.py
-#: rocky/templates/admin/delete_confirmation.html
-#: rocky/templates/admin/delete_selected_confirmation.html
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-#: rocky/templates/header.html rocky/templates/indemnification_present.html
-#: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
-#: rocky/views/upload_csv.py rocky/views/upload_raw.py
-msgid "Objects"
-msgstr ""
-
 #: tools/forms/ooi.py
 msgid "Clearance Level"
-msgstr ""
+msgstr "Frijwarringsnivo"
 
 #: tools/forms/ooi.py
 msgid "Show objects that don't meet the Boefjes scan level."
@@ -3702,7 +4115,6 @@ msgid "quickfix"
 msgstr ""
 
 #: tools/forms/settings.py
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared"
 msgstr ""
 
@@ -3711,7 +4123,6 @@ msgid "Inherited"
 msgstr ""
 
 #: tools/forms/settings.py
-#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Empty"
 msgstr ""
 
@@ -3840,6 +4251,18 @@ msgid ""
 "You have trusted this member with a clearance level of L{}. This member "
 "needs at least a clearance level of L{} in order to do a proper onboarding. "
 "Edit this member and change the clearance level if necessary."
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page number is not an integer"
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page number is less than 1"
+msgstr ""
+
+#: rocky/paginator.py
+msgid "That page contains no results"
 msgstr ""
 
 #: rocky/scheduler.py
@@ -4032,21 +4455,21 @@ msgstr ""
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
 "related objects, but your account doesn't have permission to delete the "
-"following types of objects:"
+"following types of objects"
 msgstr ""
 
 #: rocky/templates/admin/delete_confirmation.html
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
-"following protected related objects:"
+"following protected related objects"
 msgstr ""
 
 #: rocky/templates/admin/delete_confirmation.html
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
-"All of the following related items will be deleted:"
+"All of the following related items will be deleted"
 msgstr ""
 
 #: rocky/templates/admin/delete_confirmation.html
@@ -4068,21 +4491,21 @@ msgstr ""
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
 "objects, but your account doesn't have permission to delete the following "
-"types of objects:"
+"types of objects"
 msgstr ""
 
 #: rocky/templates/admin/delete_selected_confirmation.html
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
-"protected related objects:"
+"protected related objects"
 msgstr ""
 
 #: rocky/templates/admin/delete_selected_confirmation.html
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
-"following objects and their related items will be deleted:"
+"following objects and their related items will be deleted"
 msgstr ""
 
 #: rocky/templates/admin/popup_response.html
@@ -4160,11 +4583,19 @@ msgstr ""
 #: rocky/templates/dashboard_redteam.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Warning"
+msgid "Warning:"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
 msgid "Organization code missing"
+msgstr ""
+
+#: rocky/templates/finding_type_add.html
+msgid "Add finding type:"
+msgstr ""
+
+#: rocky/templates/finding_type_add.html
+msgid "Finding Type"
 msgstr ""
 
 #: rocky/templates/finding_type_add.html
@@ -4173,15 +4604,8 @@ msgstr ""
 msgid "Add finding type"
 msgstr ""
 
-#: rocky/templates/finding_type_add.html
-msgid "Finding Type"
-msgstr ""
-
 #: rocky/templates/findings/finding_add.html
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/oois/ooi_findings.html
-#: rocky/templates/partials/findings_list_toolbar.html
-msgid "Add finding"
+msgid "Add finding:"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4233,6 +4657,7 @@ msgid "Show details for %(finding)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
 msgid "Finding type:"
 msgstr ""
 
@@ -4243,6 +4668,7 @@ msgid "Show details for %(finding_type)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
 msgid "OOI type:"
 msgstr ""
 
@@ -4253,6 +4679,7 @@ msgid "Show %(ooi_type)s objects"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
 msgid "Source OOI:"
 msgstr ""
 
@@ -4270,7 +4697,7 @@ msgid "Mute findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Reason"
+msgid "Reason:"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4299,7 +4726,7 @@ msgstr ""
 
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
-msgstr ""
+msgstr "Dit fjild is ferplichte"
 
 #: rocky/templates/graph-d3.html
 msgid ""
@@ -4319,9 +4746,7 @@ msgstr ""
 msgid "OpenKAT logo, go to the homepage of OpenKAT"
 msgstr ""
 
-#: rocky/templates/header.html
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/views/finding_list.py
+#: rocky/templates/header.html rocky/views/finding_list.py
 msgid "Crisis room"
 msgstr ""
 
@@ -4436,7 +4861,7 @@ msgstr ""
 
 #: rocky/templates/oois/error.html
 msgid "Object List"
-msgstr ""
+msgstr "Objektelist"
 
 #: rocky/templates/oois/error.html
 msgid "An error occurred. Please contact a system administrator."
@@ -4517,7 +4942,6 @@ msgid "There are no boefjes enabled to scan an OOI of type"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
-#: rocky/templates/partials/ooi_report_severity_totals.html
 msgid "See"
 msgstr ""
 
@@ -4565,7 +4989,13 @@ msgid "Add object"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
-msgid "Overview of findings for "
+#: rocky/templates/oois/ooi_findings.html
+#: rocky/templates/partials/findings_list_toolbar.html
+msgid "Add finding"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail_findings_list.html
+msgid "Overview of findings for"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -4651,11 +5081,15 @@ msgid "Delete object(s)"
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
-msgid "Mute finding"
+msgid "Mute finding:"
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
 msgid "Give a reason below why you want to mute this finding."
+msgstr ""
+
+#: rocky/templates/oois/ooi_mute_finding.html
+msgid "Mute finding"
 msgstr ""
 
 #: rocky/templates/oois/ooi_mute_finding.html
@@ -4758,6 +5192,10 @@ msgid "Object tree"
 msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
+msgid "Crisis room:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "indemnification warning"
 msgstr ""
@@ -4783,19 +5221,6 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Top 10 most severe Findings"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-#: rocky/templates/partials/ooi_report_findings_block_table.html
-msgid "Finding type"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "OOI type"
-msgstr ""
-
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Source OOI"
 msgstr ""
 
 #: rocky/templates/organizations/organization_edit.html
@@ -4849,6 +5274,11 @@ msgid "Save member"
 msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
+#: rocky/templates/organizations/organization_settings.html
+msgid "Organization:"
+msgstr "Organisaasje:"
+
+#: rocky/templates/organizations/organization_member_list.html
 #, python-format
 msgid ""
 "\n"
@@ -4890,7 +5320,7 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Active"
-msgstr ""
+msgstr "Aktyf"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "New"
@@ -5010,7 +5440,7 @@ msgid "graph"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
-msgid "Clearance level inheritance"
+msgid "Clearance level inheritance:"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
@@ -5037,7 +5467,7 @@ msgstr ""
 #: rocky/templates/partials/form/field_input_checkbox.html
 #: rocky/templates/partials/form/field_input_radio.html
 msgid "This field is required"
-msgstr ""
+msgstr "Dit fjild is ferplichte"
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Not set"
@@ -5060,7 +5490,7 @@ msgstr ""
 #: rocky/templates/partials/form/field_input_errors.html
 #: rocky/templates/partials/form/form_errors.html
 #: rocky/templates/partials/notifications_block.html
-msgid "Error"
+msgid "Error:"
 msgstr ""
 
 #: rocky/templates/partials/form/field_input_help_text.html
@@ -5080,11 +5510,11 @@ msgstr ""
 #: rocky/templates/partials/form/field_input_help_text.html
 #: rocky/templates/partials/notifications_block.html
 #: rocky/templates/two_factor/core/login.html
-msgid "Explanation"
+msgid "Explanation:"
 msgstr ""
 
 #: rocky/templates/partials/form/indemnification_add_form.html
-msgid "Here, an indemnification can be given on behalf of your organization"
+msgid "Here, an indemnification can be given on behalf of your organization:"
 msgstr ""
 
 #: rocky/templates/partials/form/indemnification_add_form.html
@@ -5159,7 +5589,7 @@ msgid "confirmation"
 msgstr ""
 
 #: rocky/templates/partials/notifications_block.html
-msgid "Confirmation"
+msgid "Confirmation:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
@@ -5167,11 +5597,11 @@ msgid "Related objects"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
-msgid "No related objects added to "
+msgid "No related objects added to"
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_related_object.html
-msgid "Use the button below to add a related object. "
+msgid "Use the button below to add a related object."
 msgstr ""
 
 #: rocky/templates/partials/ooi_detail_toolbar.html
@@ -5229,6 +5659,10 @@ msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
+msgid "Finding type"
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Open finding details"
 msgstr ""
 
@@ -5246,6 +5680,10 @@ msgstr ""
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
 msgid "Total occurrences"
+msgstr ""
+
+#: rocky/templates/partials/ooi_report_severity_totals.html
+msgid "See:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_severity_totals_table.html
@@ -5289,7 +5727,7 @@ msgid "All organizations"
 msgstr ""
 
 #: rocky/templates/partials/page-meta.html
-msgid "Logged in as"
+msgid "Logged in as:"
 msgstr ""
 
 #: rocky/templates/partials/pagination.html
@@ -5412,6 +5850,14 @@ msgid "Boefjes overview:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Clearance level:"
+msgstr "Frijwarringsnivo:"
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Declared:"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
 #, python-format
 msgid ""
 "\n"
@@ -5435,6 +5881,10 @@ msgid "Set clearance level to inherit"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Empty:"
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid ""
 "\n"
 "                This object has a clearance level of \"L0\". This means that "
@@ -5444,6 +5894,10 @@ msgid ""
 "with\n"
 "                corresponding scan levels.\n"
 "            "
+msgstr ""
+
+#: rocky/templates/scan_profiles/scan_profile_detail.html
+msgid "Set clearance level:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
@@ -5868,6 +6322,9 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"Kin frijwarringsnivo net ferheegje nei L%s. Jo binne in frijwarringsnivo "
+"tafertroud fan L%s. Nim kontakt op mei jo behearder om jo frijwarringsnivo "
+"te ferheegjen."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -5961,10 +6418,14 @@ msgstr ""
 
 #: rocky/views/ooi_view.py
 msgid "Clearance level: "
-msgstr ""
+msgstr "Frijwarringsnivo: "
 
 #: rocky/views/ooi_view.py
 msgid "Clearance type: "
+msgstr ""
+
+#: rocky/views/organization_add.py
+msgid "Setup"
 msgstr ""
 
 #: rocky/views/organization_add.py
@@ -6075,24 +6536,6 @@ msgid "Recalculated {number_of_bits} bits. Duration: {duration}"
 msgstr ""
 
 #: rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s.                         "
-"Indemnification not present at organization %s."
-msgstr ""
-
-#: rocky/views/scan_profile.py
-#, python-format
-msgid ""
-"Could not raise clearance level of %s to L%s. You acknowledged a clearance "
-"level of L%s. Please accept the clearance level below to proceed."
-msgstr ""
-
-#: rocky/views/scan_profile.py
-msgid "Choose a valid level"
-msgstr ""
-
-#: rocky/views/scan_profile.py
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
 msgstr ""
@@ -6140,9 +6583,38 @@ msgstr ""
 
 #: rocky/views/upload_raw.py
 #, python-format
-msgid "Raw file could not be uploaded to Bytes: status code %s"
+msgid "Raw file could not be uploaded to Bytes: status code %d"
+msgstr ""
+
+#: rocky/views/upload_raw.py
+#, python-format
+msgid "Raw file could not be uploaded to Bytes: %s"
 msgstr ""
 
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr ""
+
+#~ msgid "Selected object"
+#~ msgid_plural "Selected objects"
+#~ msgstr[0] "Selektearre objekt"
+#~ msgstr[1] "Selektearre objekten"
+
+#~ msgid "Permission to set OOI clearance levels "
+#~ msgstr "Tastimming om frijwarringsnivo’s fan OOI yn te stellen "
+
+#~ msgid "You have currently accepted clearance up to level "
+#~ msgstr "Jo hawwe op dit stuit frijwarring akseptearre oant nivo "
+
+#~ msgid ""
+#~ "If you don’t remember the email address connected to your account, "
+#~ "contact: "
+#~ msgstr ""
+#~ "As jo it oan jo account keppele e-mailadres net mear witte, nim dan "
+#~ "kontakt op mei: "
+
+#~ msgid "Publisher"
+#~ msgstr "Utjouwer"
+
+#~ msgid "You don't have permission to enable "
+#~ msgstr "Jo hoege gjin tastimming om yn te skeakeljen. "
