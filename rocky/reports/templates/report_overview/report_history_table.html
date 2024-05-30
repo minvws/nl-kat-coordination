@@ -6,7 +6,7 @@
     <caption class="visually-hidden">{% translate "Reports:" %}</caption>
     <thead>
         <tr>
-            <th scope="col">{% translate "Name" %}</th>
+            <th scope="col">{% translate "Report ID" %}</th>
             <th scope="col">{% translate "Report type" %}</th>
             <th scope="col">{% translate "Objects" %}</th>
             <th scope="col">{% translate "Reference date" %}</th>
@@ -28,7 +28,7 @@
                     {% if report.parent_report.input_ooi %}
                         1
                     {% else %}
-                        {{ report.children_reports|length }}
+                        {{ report.total_children_reports }}
                     {% endif %}
                 </td>
                 <td>{{ report.parent_report.observed_at|date }}</td>
@@ -48,63 +48,60 @@
                 <tr class="expando-row">
                     <td colspan="7">
                         <table>
-                            <h5>{% translate "Selected Input Objects" %}</h5>
+                            <h5>{% translate "Report types" %}</h5>
+                            <p>
+                                {% blocktranslate count counter=report.total_children_reports %}
+                                    This report consist of {{counter}} sub report with the following report type and object.
+                                {% plural %}
+                                    This report consist of {{counter}} sub reports with the following report types and objects.
+                                {% endblocktranslate %}
+                            </p>
                             <thead>
                                 <tr>
-                                    <th scope="col">{% translate "Object name" %}</th>
-                                    <th scope="col">{% translate "Object type" %}</th>
-                                    <th scope="col">{% translate "Clearance level" %}</th>
-                                    <th scope="col"></th>
+                                    <th scope="col">{% translate "Report type" %}</th>
+                                    <th scope="col">{% translate "Objects" %}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for ooi, child_reports in report.children_reports.items %}
+                                {% for report_type, total_objects in report.report_type_summary.items %}
                                     <tr>
                                         <td>
-                                            <a href="{% ooi_url "ooi_detail" ooi organization.code query=ooi.mandatory_fields %}">{{ ooi.human_readable }}</a>
+                                            <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
                                         </td>
-                                        <td>{{ ooi.ooi_type }}</td>
-                                        <td>
-                                            <ul class="level-indicator l{{ ooi.scan_profile.level }}">
-                                                <li></li>
-                                                <li></li>
-                                                <li></li>
-                                                <li></li>
-                                            </ul>
-                                        </td>
-                                        <td>
-                                            <button type="button"
-                                                    class="expando-button icon ti-chevron-down"
-                                                    data-icon-open-class="icon ti-chevron-down"
-                                                    data-icon-close-class="icon ti-chevron-up"
-                                                    data-close-label="{% translate "Close children report details" %}"
-                                                    aria-expanded="false"></button>
-                                        </td>
-                                    </tr>
-                                    <tr class="expando-row">
-                                        <td colspan="4">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">{% translate "Report type" %}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for child_report in child_reports %}
-                                                        <tr>
-                                                            <td>
-                                                                <a href="{% url "view_report" organization.code %}?report_id={{ child_report.reference }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                                                   title="{% translate "Shows report details" %}"><span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.name }}</span></a>
-                                                            </td>
-                                                        </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </td>
+                                        <td>{{ total_objects }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
+                        <table>
+                            <h5>
+                                {% translate "Sub reports" %}
+                                ({{ report.children_reports|length }}/{{ report.total_children_reports }})
+                            </h5>
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% translate "Report type" %}</th>
+                                    <th scope="col">{% translate "Object" %}</th>
+                                    <th scope="col">{% translate "Report ID" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for child_report in report.children_reports %}
+                                    <tr>
+                                        <td>
+                                            <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
+                                        </td>
+                                        <td>{{ child_report.input_ooi }}</td>
+                                        <td>{{ child_report }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="button-container">
+                            {% if report.total_children_reports > 5 %}
+                                <a href="" class="button">{% translate "View all sub reports" %}</a>
+                            {% endif %}
+                        </div>
                     </td>
                 </tr>
             {% endif %}

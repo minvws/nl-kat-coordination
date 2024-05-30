@@ -261,7 +261,9 @@ class FindingList:
 
 class HydratedReport:
     parent_report: Report
-    children_reports: dict[OOI, list[Report]] | None
+    children_reports: list[Report] | None
+    total_children_reports: int
+    report_type_summary: dict[str, int]
 
 
 class ReportList:
@@ -307,32 +309,48 @@ class ReportList:
         hydrated_reports: list[HydratedReport] = []
 
         for report in reports:
-            child_report_oois: set = set()
-            per_ooi_child_reports: dict[OOI, list[Report]] = {}
             hydrated_report: HydratedReport = HydratedReport()
 
             parent_report, children_reports = report
 
-            for child_report in children_reports:
-                child_report_oois.add(self.octopoes_connector.get(child_report.input_ooi, self.valid_time))
+            hydrated_report.total_children_reports = len(children_reports)
+            hydrated_report.report_type_summary = self.report_type_summary(children_reports)
 
             if not parent_report.has_parent:
-                for ooi in child_report_oois:
-                    hydrated_children_reports: list[Report] = []
-                    for child_report in children_reports:
-                        if (
-                            str(child_report.parent_report) == str(parent_report)
-                            and ooi.primary_key == child_report.input_ooi
-                        ):
-                            hydrated_children_reports.append(child_report)
+                hydrated_children_reports: list[Report] = []
+                for child_report in children_reports:
+                    if str(child_report.parent_report) == str(parent_report):
+                        hydrated_children_reports.append(child_report)
+                    if len(hydrated_children_reports) >= 5:  # We want to show only 5 children reports
+                        break
 
-                    per_ooi_child_reports[ooi] = sorted(hydrated_children_reports, key=attrgetter("name"))
+                hydrated_report.children_reports = sorted(hydrated_children_reports, key=attrgetter("name"))
 
-                hydrated_report.children_reports = per_ooi_child_reports
             hydrated_report.parent_report = parent_report
             hydrated_reports.append(hydrated_report)
 
         return hydrated_reports
+
+    @staticmethod
+    def report_type_summary(reports: list[Report]) -> dict[str, int]:
+        """
+        Calculates per report type how many objects it consumed.
+        """
+        report_types = set()
+        summary = {}
+
+        for report in reports:
+            report_types.add(report.report_type)
+
+        for report_type in report_types:
+            objects = []
+            for report in reports:
+                if report_type == report.report_type:
+                    objects.append(report.input_ooi)
+
+            summary[report_type] = len(objects)
+
+        return summary
 
 
 class ConnectorFormMixin:
