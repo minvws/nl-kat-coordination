@@ -13,11 +13,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-16 07:24+0000\n"
-"PO-Revision-Date: 2024-05-28 08:49+0000\n"
+"POT-Creation-Date: 2024-05-23 15:00+0000\n"
+"PO-Revision-Date: 2024-05-29 09:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/nl/>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -643,8 +643,7 @@ msgstr ""
 #: katalogus/client.py
 msgid "A HTTP error occurred. Check logs for more info."
 msgstr ""
-"Er heeft zich een HTTP voorgedaan . Controleer logboeken voor meer "
-"informatie."
+"Er is een HTTP-fout opgetreden. Controleer de logboeken voor meer informatie."
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
@@ -951,7 +950,7 @@ msgstr "Uitschakelen"
 
 #: katalogus/templates/partials/enable_disable_plugin.html
 msgid "You don't have permission to enable"
-msgstr "U heeft geen toestemming om in te schakelen"
+msgstr "U hebt geen toestemming om in te schakelen"
 
 #: katalogus/templates/partials/katalogus_filter.html
 msgid "Filter plugins"
@@ -1015,7 +1014,7 @@ msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid "Warning scan level:"
-msgstr "Waarschuwing scan-niveau:"
+msgstr "Waarschuwing scanniveau:"
 
 #: katalogus/templates/partials/objects_to_scan.html
 msgid ""
@@ -2483,7 +2482,7 @@ msgstr "Rapporttype"
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
-msgstr "Service-versies en systeem-gezondheid"
+msgstr "Serviceversies en gezondheid"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/service_health.html rocky/templates/footer.html
@@ -3054,7 +3053,7 @@ msgid ""
 "The security measures table below shows which DNS relating security measures "
 "are enabled based on the contents of the DNS records."
 msgstr ""
-"De volgende beveiligingstabel toont aan welke DNS gerelateerde "
+"De volgende beveiligingstabel toont aan welke DNS-gerelateerde "
 "veiligheidsmaatregelen zijn geactiveerd volgens de inhoud van de DNS-"
 "gegevens."
 
@@ -3151,11 +3150,10 @@ msgid ""
 "level may be different for your specific environment."
 msgstr ""
 "De bevindingen geven een overzicht van de geïdentificeerde bevindingen op de "
-"gescande systemen. Voor elke vondst wordt het risico-niveau en het aantal "
-"gebeurtenissen van de vondst getoond. Onder de 'Details' sectie staat een "
-"beschrijving, impact, aanbeveling en locatie van de bevinding kunnen "
-"gevonden worden. Het risiconiveau is wellicht anders voor jouw specifieke "
-"omgeving."
+"gescande systemen. Voor elke bevinding wordt het risiconiveau en het aantal "
+"gebeurtenissen van de bevinding getoond. Onder de sectie ‘Details’ staat een "
+"beschrijving, impact, aanbeveling en locatie van de bevinding. Het "
+"risiconiveau is wellicht anders voor uw specifieke omgeving."
 
 #: reports/report_types/findings_report/report.html
 msgid "Impact"
@@ -3190,11 +3188,11 @@ msgid ""
 "over IPv6 or not. A green compliance check is shown if this is the case. A "
 "grey compliance cross is shown if no IPv6 address was detected."
 msgstr ""
-"Het IPV6 rapport geeft een overzicht van de huidige IPV6 status van het "
+"Het IPV6-rapport geeft een overzicht van de huidige IPV6-status van het "
 "geïdentificeerde systeem. De volgende tabel laat zien of het domein "
-"bereikbaar is over IPV6 of niet. Een groen icoon wordt getoond als dit het "
-"geval is. Een grijs compliance kruis wordt aangetoond als er geen IPV6 adres "
-"is gevonden."
+"bereikbaar is via IPV6 of niet. Een groen icoon wordt getoond als dit het "
+"geval is. Een grijs compliancekruis wordt getoond als er geen IPV6-adres is "
+"gevonden."
 
 #: reports/report_types/ipv6_report/report.html
 msgid "IPV6 overview"
@@ -3222,12 +3220,12 @@ msgid ""
 "issue description and risk level. The risk level may be different for your "
 "specific environment."
 msgstr ""
-"Het postrapport geeft een overzicht van de compliance cheques geassocieerd "
-"met e-mail servers. De huidige samenwerking controleert de aanwezigheid van "
-"SPF, DKIM en DMARC dossiers. De tafel beneden toont aan hoeveel van de "
-"geïdentificeerde postservers meelevend zijn, en als het toepassen aan een "
-"compliance kwestie beschrijving en risico niveau. Het risiconiveau is "
-"misschien anders voor je specifieke omgeving."
+"Het mailrapport geeft een overzicht van de compliancecontroles geassocieerd "
+"met e-mailservers. De huidige samenwerking controleert de aanwezigheid van "
+"SPF-, DKIM- en DMARC-dossiers. De tabel hieronder toont aan hoeveel van de "
+"geïdentificeerde mailservers compliant zijn, en wanneer van toepassing, een "
+"complianceprobleembeschrijving en risiconiveau. Het risiconiveau is "
+"misschien anders voor uw specifieke omgeving."
 
 #: reports/report_types/mail_report/report.html
 msgid "Mailserver compliance"
@@ -3444,6 +3442,14 @@ msgid ""
 "identified are shown too. The risk level may be different for your specific "
 "environment."
 msgstr ""
+"De nameserver geeft een overzicht van de compliancecontroles die werden "
+"uitgevoerd tegen de geïdentificeerde Domain Name Servers (DNS). De "
+"compliancecontroles bevestigen de aanwezigheid en geldigheid van DNSSEC en "
+"of er geen onnodige openstaande poorten zijn geïdentificeerd. De tabel "
+"hieronder geeft een overzicht van de beschikbare controles inclusief of het "
+"systeem de uitgevoerde controles heeft doorstaan. Het risiconiveau en "
+"redenen waarom er een probleem is geïdentificeerd worden ook getoond. Het "
+"risiconiveau is misschien anders voor uw specifieke omgeving."
 
 #: reports/report_types/name_server_report/report.html
 msgid "Name server compliance"
@@ -3488,12 +3494,12 @@ msgid ""
 "were identified through external services and/or scans (such as Shodan). "
 "Scans with the same hostnames, ports and IPs are merged."
 msgstr ""
-"Het open-poorten rapport geeft een overzicht van de open poorten die zijn "
+"Het open-poortenrapport geeft een overzicht van de open poorten die zijn "
 "geïdentificeerd op een systeem. De poorten die <b>vetgedrukt</b> zijn "
 "gemarkeerd werden geïdentificeerd door directe scans uitgevoerd door OpenKAT "
-"(zoals nmap). Poorten die niet gemarkeerd zijn, zijn geïdentificeerd door "
-"externe diensten en/of scans (zoals Shodan). Scans met dezelfde hostnames, "
-"poorten en IP's zijn samengevoegd."
+"(zoals nmap). Poorten die niet zijn gemarkeerd, zijn geïdentificeerd door "
+"externe diensten en/of scans (zoals Shodan). Scans met dezelfde hostnamen, "
+"poorten en IP’s zijn samengevoegd."
 
 #: reports/report_types/open_ports_report/report.html
 msgid "Overview of open ports found for the scanned assets"
@@ -3525,8 +3531,8 @@ msgid ""
 "The RPKI report shows if an RPKI route announcement was available for the "
 "system and if this announcement is not expired."
 msgstr ""
-"Het RPKI rapport toont aan dat een RPKI route-announcement beschikbaar was "
-"voor het systeem en als deze aankondiging niet verlopen is."
+"Het RPKI-rapport toont aan dat een RPKI-route-announcement beschikbaar was "
+"voor het systeem en of deze aankondiging niet is verlopen."
 
 #: reports/report_types/rpki_report/report.html
 msgid "RPKI compliance"
@@ -3574,6 +3580,12 @@ msgid ""
 "was identified are shown too. The risk level may be different for your "
 "specific environment."
 msgstr ""
+"Het rapport beveiligde verbindingen geeft een overzicht van de uitgevoerde "
+"controles met betrekking tot versleutelde communicatiekanalen zoals HTTPS. "
+"De tabel hieronder geeft een overzicht van de beschikbare controles "
+"inclusief of het systeem de uitgevoerde controles heeft doorstaan. Het "
+"risiconiveau en redenen waarom er een probleem is geïdentificeerd worden ook "
+"getoond. Het risiconiveau is misschien anders voor uw specifieke omgeving."
 
 #: reports/report_types/safe_connections_report/report.html
 msgid "Safe connections compliance"
@@ -3596,6 +3608,12 @@ msgid ""
 "or more system types depending on the identified ports and services. The "
 "table below gives an overview of these results."
 msgstr ""
+"Het systeemrapport geeft een overzicht van de systeemtypes die werden "
+"geïdentificeerd voor elk systeem. De volgende systemen kunnen worden "
+"geïdentificeerd: DNS-servers, webservers, mailservers en die geclassificeerd "
+"als ‘Overige’ servers. Elke hostname en/of IP-adres wordt een of meer "
+"systeemtypes gegeven, afhankelijk van de geïdentificeerde poorten en "
+"diensten. De tabel hieronder geeft een overzicht van deze resultaten."
 
 #: reports/report_types/systems_report/report.html
 msgid "Selected assets"
@@ -3618,7 +3636,7 @@ msgid ""
 "The TLS report shows which TLS protocols and ciphers were identified on the "
 "host for the provided port."
 msgstr ""
-"Het TLS rapport toont welke TLS protocollen en versleutelingen werden "
+"Het TLS-rapport toont welke TLS-protocollen en -versleutelingen werden "
 "geïdentificeerd op de gekozen host en poort."
 
 #: reports/report_types/tls_report/report.html
@@ -3626,8 +3644,8 @@ msgid ""
 "The table below provides an overview of the identified TLS protocols and "
 "ciphers, including a status suggestion."
 msgstr ""
-"Onderstaande tabel geeft een overzicht van de geïdentificeerde TLS "
-"protocollen en versleutelingen, waaronder een status suggestie."
+"Onderstaande tabel geeft een overzicht van de geïdentificeerde TLS-"
+"protocollen en -versleutelingen, waaronder een statussuggestie."
 
 #: reports/report_types/tls_report/report.html
 msgid "Ciphers"
@@ -3687,8 +3705,9 @@ msgid ""
 "protocol is marked as a finding."
 msgstr ""
 "Onderstaande lijst toont een overzicht van de bevindingen op basis van de "
-"geïdentificeerde TLS protocollen en versleutelingen. Dit bevat de redenering "
-"waarom de versleuteling of protocol gemarkeerd is als een bevinding."
+"geïdentificeerde TLS-protocollen en -versleutelingen. Dit bevat de "
+"redenering waarom de versleuteling of protocol gemarkeerd is als een "
+"bevinding."
 
 #: reports/report_types/tls_report/report.py
 msgid "TLS Report"
@@ -3709,9 +3728,9 @@ msgid ""
 "the table shows the CVE scoring, the number of occurrences, and the CVE "
 "details."
 msgstr ""
-"Het kwetsbaarheidsrapport geeft een overzicht van alle geïdentificeerde CVE "
+"Het kwetsbaarhedenrapport geeft een overzicht van alle geïdentificeerde CVE-"
 "kwetsbaarheden die werden geïdentificeerd op de geselecteerde systemen. Voor "
-"elke CVE wordt de CVE score, het aantal gebeurtenissen en de CVE-details "
+"elke CVE wordt de CVE-score, het aantal gebeurtenissen en de CVE-details "
 "getoond."
 
 #: reports/report_types/vulnerability_report/report.html
@@ -3754,12 +3773,12 @@ msgid ""
 "general risk level. The risk level may be different for your specific "
 "environment."
 msgstr ""
-"Het websysteem-rapport geeft een overzicht van verschillende webserver "
-"checks die werden uitgevoerd op het gescande systeem. Voor elke uitgevoerde "
-"controle toont onderstaande tabel of de server voldoet aan de controles. Een "
-"beschrijving van de falende controles wordt ook getoond, inclusief een "
-"algemeen risiconiveau. Het risiconiveau is misschien anders voor jouw "
-"specifieke omgeving."
+"Het websysteemrapport geeft een overzicht van verschillende "
+"webservercontroles die werden uitgevoerd op het gescande systeem. Voor elke "
+"uitgevoerde controle toont onderstaande tabel, of de server voldoet aan de "
+"controles. Een beschrijving van de falende controles wordt ook getoond, "
+"inclusief een algemeen risiconiveau. Het risiconiveau is misschien anders "
+"voor uw specifieke omgeving."
 
 #: reports/report_types/web_system_report/report.html
 msgid "Web system compliance"
@@ -3835,7 +3854,7 @@ msgid ""
 "To generate a report you can start by selecting report types or by selecting "
 "objects."
 msgstr ""
-"Om een rapport te genereren begin je met het selecteren van de gewenste "
+"Om een rapport te genereren begint u met het selecteren van de gewenste "
 "rapporten of objecten."
 
 #: reports/templates/partials/plugin_overview_table.html
@@ -3887,7 +3906,7 @@ msgid ""
 msgstr ""
 "Dit rapport geeft een overzicht van de huidige staat van veiligheid voor uw "
 "organisatie voor de gekozen datum. De samenvatting geeft een overzicht van "
-"de geselecteerde systemen, plugins en rapporten. Dit wordt gevolgd door de "
+"de geselecteerde systemen, plug-ins en rapporten. Dit wordt gevolgd door de "
 "bevindingen voor elk rapport."
 
 #: reports/templates/partials/report_navigation.html
@@ -3907,10 +3926,11 @@ msgid "Multi Report"
 msgstr "Multi-rapport"
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select object"
-msgid_plural "Select objects"
-msgstr[0] "Selecteer object"
-msgstr[1] "Selecteer objecten"
+#, python-format
+msgid "Select object (%(total_oois)s)"
+msgid_plural "Select objects (%(total_oois)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Select which objects you want to include in your report."
@@ -3929,12 +3949,6 @@ msgid "Currently filtered on:"
 msgstr "Momenteel gefilterd op:"
 
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
-msgstr "%(length)s van %(total)s objecten getoond"
-
-#: reports/templates/partials/report_ooi_list.html
 msgid "No objects found."
 msgstr "Geen objecten gevonden."
 
@@ -3943,25 +3957,25 @@ msgid "Go to the object page"
 msgstr "Ga naar de objectpagina"
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "explanation select all"
-msgstr "uitleg alles selecteren"
+msgid "objects selected"
+msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Explanation 'Continue with all OOIs:'"
-msgstr "Verklaring ‘Doorgaan met alle OOI’s:’"
+msgid "Deselect all objects"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
+msgstr "%(length)s van %(total)s objecten getoond"
 
 #: reports/templates/partials/report_ooi_list.html
 #, python-format
-msgid ""
-"This option will select all OOIs (+ current filters) for %(organization)s "
-"organization."
-msgstr ""
-"Deze optie zal alle OOI’s (+ huidige filters) voor %(organization)s "
-"organisaties selecteren."
-
-#: reports/templates/partials/report_ooi_list.html
-msgid "Continue with all OOIs"
-msgstr "Doorgaan met alle OOI’s"
+msgid "Select all %(total_oois)s object"
+msgid_plural "Select all %(total_oois)s objects"
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
@@ -4017,10 +4031,10 @@ msgid ""
 "produce will be left out of the report which will then be generated based on "
 "the available data collected by the enabled plugins."
 msgstr ""
-"Als je ervoor kiest om plugin niet in te schakelen, zullen de gegevens die "
-"plugin zou verzamelen en produceert niet opgenomen in het rapport, het "
-"rapport zal worden gegenereerd op basis van de beschikbare data verzameld "
-"door de wel inschakelde plugins."
+"Als u ervoor kiest om een plug-in niet in te schakelen, zullen de gegevens "
+"die de plug-in zou verzamelen en produceren, niet worden opgenomen in het "
+"rapport. Het rapport zal worden gegenereerd op basis van de beschikbare "
+"gegevens verzameld door de plug-ins die wel zijn ingeschakeld."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
@@ -4045,12 +4059,12 @@ msgid ""
 "data."
 msgstr ""
 "Openkat is ontworpen om alle bekende objecten te scannen op een regelmatige "
-"basis met behulp van de ingeschakelde plugins en vrijwaringsniveaus. Dit "
+"basis met behulp van de ingeschakelde plug-ins en vrijwaringsniveaus. Dit "
 "betekent dat de scans automatisch worden uitgevoerd. Wees geduldig, het kan "
-"even duren voordat alle plugins al hun gegevens hebben verzameld. Plugins "
+"even duren voordat alle plug-ins al hun gegevens hebben verzameld. Plug-ins "
 "inschakelen vlak voordat u een rapport genereert zal waarschijnlijk "
-"resulteren in onnauwkeurige rapporten gezien plugins dan wellicht nog niet "
-"klaar met het verzamelen van gegevens."
+"resulteren in onnauwkeurige rapporten, aangezien plug-ins dan wellicht nog "
+"niet klaar zijn met het verzamelen van gegevens."
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "This report type requires the following plugins to be enabled:"
@@ -4133,14 +4147,18 @@ msgstr ""
 "helpen organisaties vast te stellen waar beveiliging kan worden verbeterd."
 
 #: reports/templates/partials/report_types_selection.html
-msgid "Selected object"
-msgid_plural "Selected objects"
-msgstr[0] "Geselecteerd object"
-msgstr[1] "Geselecteerde objecten"
+#, python-format
+msgid "Selected object (%(total_oois)s)"
+msgid_plural "Selected objects (%(total_oois)s)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "You have selected all objects in previous step."
-msgstr "U hebt alle objecten in de vorige stap geselecteerd."
+#, python-format
+msgid "You have selected %(total_oois)s object in previous step."
+msgid_plural "You have selected %(total_oois)s objects in previous step."
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
@@ -5660,10 +5678,10 @@ msgid ""
 msgstr ""
 "\n"
 "                            <strong>Waarschuwing:</strong>\n"
-"                            Er is geen vrijwaring ingesteld voor deze "
-"organisatie.\n"
+"                            Er is geen vrijwaring voor deze organisatie "
+"ingesteld.\n"
 "                            Ga naar de <a "
-"href=\"%(organization_settings)s\">pagina met organisatie-instellingen</a> "
+"href=\"%(organization_settings)s\">-pagina met organisatie-instellingen</a> "
 "om die toe te voegen.\n"
 "                        "
 
@@ -5710,7 +5728,7 @@ msgstr "Details lid"
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
 msgid "Member account type setup"
-msgstr "Accounttypelid opzetten"
+msgstr "Accounttype lid instellen"
 
 #: rocky/templates/organizations/organization_member_add_account_type.html
 msgid "Choose an account type for this new member."
@@ -5755,7 +5773,7 @@ msgstr "Handmatig"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Upload a CSV"
-msgstr "Upload een CSV"
+msgstr "CSV uploaden"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Member overview:"
@@ -5787,15 +5805,15 @@ msgstr "Nieuw"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Upload a csv file with members for organisation"
-msgstr "Upload een csv-bestand met leden voor uw organisatie"
+msgstr "Upload een CSV-bestand met leden voor uw organisatie"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "Download the template"
-msgstr "Download het sjabloon"
+msgstr "Sjabloon downloaden"
 
 #: rocky/templates/organizations/organization_member_upload.html
 msgid "or create a csv file with the following criteria"
-msgstr "of maak een csv-bestand met de volgende criteria"
+msgstr "of maak een CSV-bestand met de volgende criteria"
 
 #: rocky/templates/organizations/organization_member_upload.html
 #: rocky/templates/upload_csv.html
@@ -5865,7 +5883,7 @@ msgstr "Kinderen"
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
 msgid "Show details for %(object_id)s, with %(child_count)s children."
-msgstr "Details van %(object_id)s, met %(child_count)s children tonen."
+msgstr "Details van %(object_id)s, met %(child_count)s kinderen tonen."
 
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
 #, python-format
@@ -6095,7 +6113,7 @@ msgstr "Een overzicht van"
 
 #: rocky/templates/partials/ooi_head.html
 msgid "object type"
-msgstr "Objecttype"
+msgstr "objecttype"
 
 #: rocky/templates/partials/ooi_head.html
 msgid ""
@@ -6205,7 +6223,7 @@ msgstr "Alle organisaties"
 
 #: rocky/templates/partials/page-meta.html
 msgid "Logged in as:"
-msgstr "Ingelogd als:"
+msgstr "Aangemeld als:"
 
 #: rocky/templates/partials/pagination.html
 msgid "first"
@@ -6269,7 +6287,7 @@ msgstr "Status selecteren"
 
 #: rocky/templates/partials/task_history.html
 msgid "Success"
-msgstr "Gelukt"
+msgstr "Geslaagd"
 
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/stats.html
@@ -6308,7 +6326,7 @@ msgstr "Opgeleverde objecten"
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Download meta and raw data"
-msgstr "Meta- en ruwe gegevens downloaden"
+msgstr "Meta- en raw-gegevens downloaden"
 
 #: rocky/templates/partials/task_history.html
 #: rocky/templates/tasks/partials/boefje_task_history.html
@@ -6473,7 +6491,7 @@ msgstr "Alle tijden in UTC, blokken van 1 uur."
 
 #: rocky/templates/tasks/partials/stats.html
 msgid "Timeslot"
-msgstr "Tijd-periode"
+msgstr "Tijdsperiode"
 
 #: rocky/templates/tasks/partials/stats.html
 #: rocky/templates/tasks/partials/task_filter.html
@@ -6505,7 +6523,7 @@ msgstr "Geannuleerd"
 
 #: rocky/templates/tasks/partials/stats.html
 msgid "Could not load stats, Scheduler error."
-msgstr "Kon geen statistieken laden, Scheduler fout."
+msgstr "Kon geen statistieken laden, Scheduler-fout."
 
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "List of tasks"
@@ -6547,7 +6565,7 @@ msgstr "Print deze tokens en bewaar ze op een veilige plek."
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid "You don't have any backup codes yet."
-msgstr "U heeft nog geen back-upcodes."
+msgstr "U hebt nog geen back-upcodes."
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid "Generate Tokens"
@@ -6564,19 +6582,19 @@ msgstr "U bent aangemeld."
 
 #: rocky/templates/two_factor/core/login.html
 msgid "Two factor authentication is enabled for your account."
-msgstr "Tweestapsverificatie is ingeschakeld voor uw account."
+msgstr "Twee-stapsverificatie is ingeschakeld voor uw account."
 
 #: rocky/templates/two_factor/core/login.html
 msgid ""
 "Two factor authentication is not enabled for your account. Enable it to "
 "continue."
 msgstr ""
-"Tweestapsverificatie is niet ingeschakeld voor uw account. Schakel in om "
+"Twee-stapsverificatie is niet ingeschakeld voor uw account. Schakel in om "
 "door te gaan."
 
 #: rocky/templates/two_factor/core/login.html
 msgid "Setup two factor authentication"
-msgstr "Tweestapsverificatie instellen"
+msgstr "Twee-stapsverificatie instellen"
 
 #: rocky/templates/two_factor/core/login.html
 msgid "Credentials"
@@ -6610,8 +6628,8 @@ msgid ""
 "authentication for security reasons. You need to enable these security "
 "features in order to access this page."
 msgstr ""
-"De pagina die u hebt opgevraagd is alleen beschikbaar met "
-"tweestapsverificatie. Schakel dit in om toegang te krijgen tot deze pagina."
+"De pagina die u hebt opgevraagd is alleen beschikbaar met twee-"
+"stapsverificatie. Schakel dit in om toegang te krijgen tot deze pagina."
 
 #: rocky/templates/two_factor/core/otp_required.html
 #: rocky/templates/two_factor/profile/profile.html
@@ -6619,19 +6637,19 @@ msgid ""
 "Two-factor authentication is not enabled for your account. Enable two-factor "
 "authentication for enhanced account security."
 msgstr ""
-"Tweestapsverificatie is niet ingeschakeld voor uw account. Schakel "
-"tweestapsverificatie in voor betere accountbeveiliging."
+"Twee-stapsverificatie is niet ingeschakeld voor uw account. Schakel twee-"
+"stapsverificatie in voor betere accountbeveiliging."
 
 #: rocky/templates/two_factor/core/otp_required.html
 #: rocky/templates/two_factor/core/setup.html
 #: rocky/templates/two_factor/core/setup_complete.html
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Enable Two-Factor Authentication"
-msgstr "Tweestapsverificatie inschakelen"
+msgstr "Twee-stapsverificatie inschakelen"
 
 #: rocky/templates/two_factor/core/phone_register.html
 msgid "Add Backup Phone"
-msgstr "Back-uptelefoon toevoegen"
+msgstr "Back-uptelefoonnummer toevoegen"
 
 #: rocky/templates/two_factor/core/phone_register.html
 msgid ""
@@ -6655,8 +6673,8 @@ msgid ""
 "code below or use the setup key. For example, use GoogleAuthenticator. Then, "
 "enter the token generated by the app."
 msgstr ""
-"Scan de QR-code met uw applicatie voor tweestapsverificatie. Voer vervolgens "
-"het token in dat door de app is gegenereerd."
+"Scan de QR-code met uw applicatie voor twee-stapsverificatie. Voer "
+"vervolgens het token in dat door de app is gegenereerd."
 
 #: rocky/templates/two_factor/core/setup.html
 msgid "QR code"
@@ -6674,13 +6692,13 @@ msgid ""
 "authenticator app."
 msgstr ""
 "De geheime sleutel is een weergave van 32 tekens van de QR-code. Er zijn er "
-"2 opties om de tweestapsverificatie in te stellen. U kunt de QR-code "
+"2 opties om de twee-stapsverificatie in te stellen. U kunt de QR-code "
 "hierboven scannen of u kunt deze sleutel invoegen met behulp van de geheime "
 "sleuteloptie van de authenticatie-app."
 
 #: rocky/templates/two_factor/core/setup_complete.html
 msgid "Congratulations, you've successfully enabled two-factor authentication."
-msgstr "Gefeliciteerd, u hebt tweestapsverficatie ingeschakeld."
+msgstr "Gefeliciteerd, u hebt twee-stapsverficatie ingeschakeld."
 
 #: rocky/templates/two_factor/core/setup_complete.html
 msgid "Start using OpenKAT"
@@ -6691,8 +6709,8 @@ msgid ""
 "However, it might happen that you don't have access to your primary token "
 "device. To enable account recovery, add a phone number."
 msgstr ""
-"Het kan gebeuren dat u geen toegang hebt tot uw applicatie voor "
-"tweestapssverificatie. Voeg een telefoonnummer toe om accountherstel in te "
+"Het kan gebeuren dat u geen toegang hebt tot uw applicatie voor twee-"
+"stapssverificatie. Voeg een telefoonnummer toe om accountherstel in te "
 "schakelen."
 
 #: rocky/templates/two_factor/core/setup_complete.html
@@ -6702,14 +6720,14 @@ msgstr "Telefoonnummer toevoegen"
 
 #: rocky/templates/two_factor/profile/disable.html
 msgid "Disable Two-factor Authentication"
-msgstr "Tweestapsverificatie uitschakelen"
+msgstr "Twee-stapsverificatie uitschakelen"
 
 #: rocky/templates/two_factor/profile/disable.html
 msgid ""
 "You are about to disable two-factor authentication. This weakens your "
 "account security, are you sure?"
 msgstr ""
-"U staat op het punt tweestapsverificatie uit te schakelen. Dit verzwakt uw "
+"U staat op het punt twee-stapsverificatie uit te schakelen. Dit verzwakt uw "
 "accountbeveiliging, weet u het zeker?"
 
 #: rocky/templates/two_factor/profile/profile.html
@@ -6766,15 +6784,15 @@ msgstr "Codes tonen"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Disable Two-Factor Authentication"
-msgstr "Tweestapsverificatie uitschakelen"
+msgstr "Twee-stapsverificatie uitschakelen"
 
 #: rocky/templates/two_factor/profile/profile.html
 msgid ""
 "However we strongly discourage you to do so, you can also disable two-factor "
 "authentication for your account."
 msgstr ""
-"We raden u echter ten zeerste af om dit te doen, u kunt ook "
-"tweestapsverificatie voor uw account uitschakelen."
+"We raden u echter ten zeerste af om dit te doen, u kunt ook twee-"
+"stapsverificatie voor uw account uitschakelen."
 
 #: rocky/templates/two_factor/twilio/sms_message.html
 #, python-format
@@ -6848,7 +6866,7 @@ msgstr "Geen OOI’s geselecteerd."
 
 #: rocky/views/ooi_list.py
 msgid "Unknown action."
-msgstr "Ongeldige actie."
+msgstr "Onbekende actie."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -7029,7 +7047,7 @@ msgstr "Lid toevoegen"
 
 #: rocky/views/organization_member_add.py
 msgid "The csv file is missing required columns"
-msgstr "Het csv-bestand mist vereiste kolommen"
+msgstr "Het CSV-bestand mist vereiste kolommen"
 
 #: rocky/views/organization_member_add.py
 #, python-brace-format
@@ -7048,11 +7066,11 @@ msgstr "Ongeldig e-mailadres: ‘{email}’"
 
 #: rocky/views/organization_member_add.py
 msgid "Successfully processed users from csv."
-msgstr "Met succes verwerkte gebruikers uit csv."
+msgstr "Met succes verwerkte gebruikers uit CSV."
 
 #: rocky/views/organization_member_add.py
 msgid "Error parsing the csv file. Please verify its contents."
-msgstr "Fout bij het ontleden van het csv-bestand. Controleer de inhoud."
+msgstr "Fout bij het ontleden van het CSV-bestand. Controleer de inhoud."
 
 #: rocky/views/organization_member_edit.py
 #, python-format
@@ -7068,7 +7086,7 @@ msgid ""
 "the same level as trusted clearance level."
 msgstr ""
 "Het bijgewerkte vertrouwde vrijwaringsniveau van L%s is lager dan dat van "
-"het lid erkend vrijwaringsniveau van L%s. Dit lid heeft alleen toestemming "
+"het lid erkende vrijwaringsniveau van L%s. Dit lid heeft alleen toestemming "
 "voor niveau L%s. Om deze reden is het erkende vrijwaringsniveau ingesteld op "
 "hetzelfde niveau als vertrouwd vrijwaringsniveau."
 
@@ -7077,8 +7095,8 @@ msgid ""
 "You have trusted this member with a higher trusted level than member "
 "acknowledged. Member must first accept this level to use it."
 msgstr ""
-"U hebt dit lid vertrouwd met een hoger vrijwaringsniveau dan dit lid erkend "
-"heeft. Het lid moet dit niveau eerst accepteren om het te gebruiken."
+"U hebt dit lid vertrouwd met een hoger vrijwaringsniveau dan dit lid heeft "
+"erkend. Het lid moet dit niveau eerst accepteren om het te gebruiken."
 
 #: rocky/views/organization_member_list.py
 msgid "Not blocked"
@@ -7103,7 +7121,7 @@ msgstr "{number_of_bits} bits herberekend. Duur: {duration}"
 #, python-brace-format
 msgid "Can not reset scan level. Scan level of {ooi_name} not declared"
 msgstr ""
-"Kan het scanniveau niet verwijderen. Er is scanniveau van {ooi_name} "
+"Kan het scanniveau niet opnieuw instellen. Scanniveau van {ooi_name} is niet "
 "gedeclareerd"
 
 #: rocky/views/scan_profile.py
@@ -7120,7 +7138,7 @@ msgid ""
 "with http:// or https://, optionally a second column 'network' is supported "
 msgstr ""
 "Voor het type URL-object is een kolom ‘raw’ met URL-waarden vereist, "
-"beginnend met http:// of https://; optioneel wordt een tweede kolom "
+"beginnend met http:// of https://. Optioneel wordt een tweede kolom "
 "‘network’ ondersteund. "
 
 #: rocky/views/upload_csv.py
@@ -7145,9 +7163,9 @@ msgid ""
 "values 0, 1, 2, 3, and 4 for the corresponding clearance level (other values "
 "are ignored) "
 msgstr ""
-"Vrijwaringsniveaus kunnen gecontroleerd worden door een column 'clearance' "
-"op te nemen met numerieke waarden 0, 1, 2, 3, en 4 voor het gewenste niveau ("
-"Andere waarden worden genegeerd) "
+"Vrijwaringsniveaus kunnen gecontroleerd worden door een column ‘clearance’ "
+"op te nemen met numerieke waarden 0, 1, 2, 3, en 4 voor het gewenste niveau "
+"(andere waarden worden genegeerd) "
 
 #: rocky/views/upload_csv.py
 msgid "Object(s) could not be created for row number(s): "
@@ -7160,7 +7178,7 @@ msgstr "Objecten met succes toegevoegd."
 #: rocky/views/upload_raw.py
 #, python-format
 msgid "Raw file could not be uploaded to Bytes: status code %d"
-msgstr "Raw-bestand kan niet worden geüpload naar Bytes: statuscode %d"
+msgstr "Raw-bestand kan niet naar Bytes worden geüpload: statuscode %d"
 
 #: rocky/views/upload_raw.py
 #, python-format
@@ -7170,6 +7188,36 @@ msgstr "Raw-bestand kan niet naar Bytes worden geüpload: %s"
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr "Raw-bestand met succes toegevoegd."
+
+#~ msgid "Select object"
+#~ msgid_plural "Select objects"
+#~ msgstr[0] "Selecteer object"
+#~ msgstr[1] "Selecteer objecten"
+
+#~ msgid "explanation select all"
+#~ msgstr "uitleg alles selecteren"
+
+#~ msgid "Explanation 'Continue with all OOIs:'"
+#~ msgstr "Verklaring ‘Doorgaan met alle OOI’s:’"
+
+#, python-format
+#~ msgid ""
+#~ "This option will select all OOIs (+ current filters) for %(organization)s "
+#~ "organization."
+#~ msgstr ""
+#~ "Deze optie zal alle OOI’s (+ huidige filters) voor %(organization)s "
+#~ "organisaties selecteren."
+
+#~ msgid "Continue with all OOIs"
+#~ msgstr "Doorgaan met alle OOI’s"
+
+#~ msgid "Selected object"
+#~ msgid_plural "Selected objects"
+#~ msgstr[0] "Geselecteerd object"
+#~ msgstr[1] "Geselecteerde objecten"
+
+#~ msgid "You have selected all objects in previous step."
+#~ msgstr "U hebt alle objecten in de vorige stap geselecteerd."
 
 #~ msgid ""
 #~ "If you choose not to give a plugin permission to run, the data that "
