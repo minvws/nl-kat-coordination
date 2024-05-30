@@ -14,10 +14,10 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-23 15:00+0000\n"
-"PO-Revision-Date: 2024-05-29 09:09+0000\n"
+"PO-Revision-Date: 2024-05-30 15:15+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
-"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/nl/>\n"
+"Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/nl/>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1581,7 +1581,7 @@ msgstr "Red teamer"
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "A red teamer account can run scans and generate reports."
-msgstr "Een Red teameraccount kan scans starten en rapporten aanmaken."
+msgstr "Een Red Teamer-account kan scans starten en rapporten aanmaken."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_6_account_setup_client.html
@@ -1598,7 +1598,7 @@ msgid ""
 "function. This introduction will guide you through the setup of both. After "
 "that you can choose to add a client account as well."
 msgstr ""
-"Elke organisatie heeft een admin en een Red teamer nodig. Deze introductie "
+"Elke organisatie heeft een admin en een Red Teamer nodig. Deze introductie "
 "helpt met het aanmaken van deze accounts."
 
 #: onboarding/templates/account/step_3_account_user_type.html
@@ -1853,7 +1853,7 @@ msgstr ""
 "Binnen OpenKAT kunt u rapporten bekijken voor elk van uw huidige objecten. "
 "Voor specifieke rapporten kunt u een van de beschikbare rapporttypes kiezen "
 "en een rapport genereren. Zoals een pentest, een DNS-rapport of een "
-"mailrapport."
+"Mailrapport."
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "For this tutorial we suggest a DNS-report to get you started."
@@ -2347,8 +2347,10 @@ msgid ""
 "objects found. For the current scan we expect boefjes to take about 3 "
 "minutes."
 msgstr ""
-"De Boefjes verzamelen gegevens. Dit duurt voor deze scan naar verwachting "
-"ongeveer 3 minuten."
+"De ingeschakelde boefjes verzamelen de gegevens die nodig zijn om het DNS-"
+"rapport te genereren. Dit kan enige tijd duren, afhankelijk van het type "
+"scans en het aantal gevonden objecten. Dit duurt voor deze scan naar "
+"verwachting ongeveer 3 minuten."
 
 #: onboarding/templates/step_4_report.html
 msgid ""
@@ -3149,11 +3151,12 @@ msgid ""
 "impact, recommendation and location of the finding can be found. The risk "
 "level may be different for your specific environment."
 msgstr ""
-"De bevindingen geven een overzicht van de geïdentificeerde bevindingen op de "
-"gescande systemen. Voor elke bevinding wordt het risiconiveau en het aantal "
-"gebeurtenissen van de bevinding getoond. Onder de sectie ‘Details’ staat een "
-"beschrijving, impact, aanbeveling en locatie van de bevinding. Het "
-"risiconiveau is wellicht anders voor uw specifieke omgeving."
+"Het Bevindingenrapport geeft een overzicht van de geïdentificeerde "
+"bevindingen op de gescande systemen. Voor elke bevinding wordt het "
+"risiconiveau en het aantal gebeurtenissen van de bevinding getoond. Onder de "
+"sectie ‘Details’ staat een beschrijving, impact, aanbeveling en locatie van "
+"de bevinding. Het risiconiveau is wellicht anders voor uw specifieke "
+"omgeving."
 
 #: reports/report_types/findings_report/report.html
 msgid "Impact"
@@ -3188,10 +3191,10 @@ msgid ""
 "over IPv6 or not. A green compliance check is shown if this is the case. A "
 "grey compliance cross is shown if no IPv6 address was detected."
 msgstr ""
-"Het IPV6-rapport geeft een overzicht van de huidige IPV6-status van het "
+"Het IPv6-rapport geeft een overzicht van de huidige IPv6-status van het "
 "geïdentificeerde systeem. De volgende tabel laat zien of het domein "
-"bereikbaar is via IPV6 of niet. Een groen icoon wordt getoond als dit het "
-"geval is. Een grijs compliancekruis wordt getoond als er geen IPV6-adres is "
+"bereikbaar is via IPv6 of niet. Een groen icoon wordt getoond als dit het "
+"geval is. Een grijs compliancekruis wordt getoond als er geen IPv6-adres is "
 "gevonden."
 
 #: reports/report_types/ipv6_report/report.html
@@ -3220,12 +3223,12 @@ msgid ""
 "issue description and risk level. The risk level may be different for your "
 "specific environment."
 msgstr ""
-"Het mailrapport geeft een overzicht van de compliancecontroles geassocieerd "
-"met e-mailservers. De huidige samenwerking controleert de aanwezigheid van "
-"SPF-, DKIM- en DMARC-dossiers. De tabel hieronder toont aan hoeveel van de "
-"geïdentificeerde mailservers compliant zijn, en wanneer van toepassing, een "
-"complianceprobleembeschrijving en risiconiveau. Het risiconiveau is "
-"misschien anders voor uw specifieke omgeving."
+"Het Mailrapport geeft een overzicht van de compliancecontroles geassocieerd "
+"met e-mailservers. De huidige compliancecontroles controleren de "
+"aanwezigheid van SPF-, DKIM- en DMARC-dossiers. De tabel hieronder toont "
+"hoeveel van de geïdentificeerde mailservers compliant zijn, en indien van "
+"toepassing, een beschrijving van het complianceprobleem en risiconiveau. Het "
+"risiconiveau kan verschillen voor uw specifieke omgeving."
 
 #: reports/report_types/mail_report/report.html
 msgid "Mailserver compliance"
@@ -3241,12 +3244,12 @@ msgstr "Er zijn geen mailservers op dit systeem gevonden."
 
 #: reports/report_types/mail_report/report.py
 msgid "Mail Report"
-msgstr "Mail-rapport"
+msgstr "Mailrapport"
 
 #: reports/report_types/mail_report/report.py
 msgid ""
 "System specific mail report that focusses on IP addresses and hostnames."
-msgstr "Systeemspecifiek mail-rapport dat focust op IP-adressen en hostnames."
+msgstr "Systeemspecifiek Mailrapport dat focust op IP-adressen en hostnames."
 
 #: reports/report_types/multi_organization_report/asset_overview.html
 msgid "Overview of included assets"
@@ -3405,7 +3408,7 @@ msgstr "Voorval"
 
 #: reports/report_types/multi_organization_report/report.py
 msgid "Multi Organization Report"
-msgstr "Multi-organisatierapport"
+msgstr "Multi-Organisatierapport"
 
 #: reports/report_types/multi_organization_report/summary.html
 msgid "Best scoring security check"
@@ -3442,8 +3445,8 @@ msgid ""
 "identified are shown too. The risk level may be different for your specific "
 "environment."
 msgstr ""
-"De nameserver geeft een overzicht van de compliancecontroles die werden "
-"uitgevoerd tegen de geïdentificeerde Domain Name Servers (DNS). De "
+"Het Name Server-rapport geeft een overzicht van de compliancecontroles die "
+"werden uitgevoerd tegen de geïdentificeerde Domain Name Servers (DNS). De "
 "compliancecontroles bevestigen de aanwezigheid en geldigheid van DNSSEC en "
 "of er geen onnodige openstaande poorten zijn geïdentificeerd. De tabel "
 "hieronder geeft een overzicht van de beschikbare controles inclusief of het "
@@ -3478,12 +3481,12 @@ msgstr "Er zijn geen nameservers op dit systeem gevonden."
 
 #: reports/report_types/name_server_report/report.py
 msgid "Name Server Report"
-msgstr "Rapport nameserver"
+msgstr "Name Server-rapport"
 
 #: reports/report_types/name_server_report/report.py
 msgid "Name server report checks name servers on basic security standards."
 msgstr ""
-"Nameserverrapport controleert de basisbeveiligingsmaatregelen van "
+"Name Server-rapport controleert de basisbeveiligingsmaatregelen van "
 "nameservers."
 
 #: reports/report_types/open_ports_report/report.html
@@ -3494,7 +3497,7 @@ msgid ""
 "were identified through external services and/or scans (such as Shodan). "
 "Scans with the same hostnames, ports and IPs are merged."
 msgstr ""
-"Het open-poortenrapport geeft een overzicht van de open poorten die zijn "
+"Het Open Poorten-rapport geeft een overzicht van de open poorten die zijn "
 "geïdentificeerd op een systeem. De poorten die <b>vetgedrukt</b> zijn "
 "gemarkeerd werden geïdentificeerd door directe scans uitgevoerd door OpenKAT "
 "(zoals nmap). Poorten die niet zijn gemarkeerd, zijn geïdentificeerd door "
@@ -3520,7 +3523,7 @@ msgstr "Directe scan"
 
 #: reports/report_types/open_ports_report/report.py
 msgid "Open Ports Report"
-msgstr "Open-poorten-rapport"
+msgstr "Open Poorten-rapport"
 
 #: reports/report_types/open_ports_report/report.py
 msgid "Find open ports of IP addresses"
@@ -3593,7 +3596,7 @@ msgstr "Compliance veilige verbindingen"
 
 #: reports/report_types/safe_connections_report/report.py
 msgid "Safe Connections Report"
-msgstr "Rapport veilige verbindingen"
+msgstr "Veilige Verbindingen-rapport"
 
 #: reports/report_types/safe_connections_report/report.py
 msgid "Shows whether the IPService contains safe ciphers."
@@ -3608,7 +3611,7 @@ msgid ""
 "or more system types depending on the identified ports and services. The "
 "table below gives an overview of these results."
 msgstr ""
-"Het systeemrapport geeft een overzicht van de systeemtypes die werden "
+"Het Systeemrapport geeft een overzicht van de systeemtypes die werden "
 "geïdentificeerd voor elk systeem. De volgende systemen kunnen worden "
 "geïdentificeerd: DNS-servers, webservers, mailservers en die geclassificeerd "
 "als ‘Overige’ servers. Elke hostname en/of IP-adres wordt een of meer "
@@ -3728,7 +3731,7 @@ msgid ""
 "the table shows the CVE scoring, the number of occurrences, and the CVE "
 "details."
 msgstr ""
-"Het kwetsbaarhedenrapport geeft een overzicht van alle geïdentificeerde CVE-"
+"Het Kwetsbaarhedenrapport geeft een overzicht van alle geïdentificeerde CVE-"
 "kwetsbaarheden die werden geïdentificeerd op de geselecteerde systemen. Voor "
 "elke CVE wordt de CVE-score, het aantal gebeurtenissen en de CVE-details "
 "getoond."
@@ -3743,7 +3746,7 @@ msgstr "Er zijn geen kwetsbaarheden op dit systeem gevonden."
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Vulnerability Report"
-msgstr "Rapport kwetsbaarheden"
+msgstr "Kwetsbaarhedenrapport"
 
 #: reports/report_types/vulnerability_report/report.py
 msgid "Vulnerabilities found are grouped for each system."
@@ -3773,7 +3776,7 @@ msgid ""
 "general risk level. The risk level may be different for your specific "
 "environment."
 msgstr ""
-"Het websysteemrapport geeft een overzicht van verschillende "
+"Het Web System-rapport geeft een overzicht van verschillende "
 "webservercontroles die werden uitgevoerd op het gescande systeem. Voor elke "
 "uitgevoerde controle toont onderstaande tabel, of de server voldoet aan de "
 "controles. Een beschrijving van de falende controles wordt ook getoond, "
@@ -3826,12 +3829,12 @@ msgstr "Er zijn geen webservers op dit systeem gevonden."
 
 #: reports/report_types/web_system_report/report.py
 msgid "Web System Report"
-msgstr "Rapport websysteem"
+msgstr "Web System-rapport"
 
 #: reports/report_types/web_system_report/report.py
 msgid "Web system reports check web systems on basic security standards."
 msgstr ""
-"Websysteem-rapport controleert websystemen tegen "
+"Web System-rapport controleert websystemen tegen "
 "basisbeveiligingsstandaarden."
 
 #: reports/templates/generate_report.html
@@ -3929,8 +3932,8 @@ msgstr "Multi-rapport"
 #, python-format
 msgid "Select object (%(total_oois)s)"
 msgid_plural "Select objects (%(total_oois)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Selecteer object (%(total_oois)s)"
+msgstr[1] "Selecteer objecten (%(total_oois)s)"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Select which objects you want to include in your report."
@@ -3958,11 +3961,11 @@ msgstr "Ga naar de objectpagina"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "objects selected"
-msgstr ""
+msgstr "objecten geselecteerd"
 
 #: reports/templates/partials/report_ooi_list.html
 msgid "Deselect all objects"
-msgstr ""
+msgstr "Alle objecten deselecteren"
 
 #: reports/templates/partials/report_ooi_list.html
 #: rocky/templates/oois/ooi_list.html
@@ -3974,8 +3977,8 @@ msgstr "%(length)s van %(total)s objecten getoond"
 #, python-format
 msgid "Select all %(total_oois)s object"
 msgid_plural "Select all %(total_oois)s objects"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Selecteer %(total_oois)s object"
+msgstr[1] "Selecteer alle %(total_oois)s objecten"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
@@ -4058,7 +4061,7 @@ msgid ""
 "likely result in inaccurate reports, as plugins have not finished collecting "
 "data."
 msgstr ""
-"Openkat is ontworpen om alle bekende objecten te scannen op een regelmatige "
+"OpenKAT is ontworpen om alle bekende objecten te scannen op een regelmatige "
 "basis met behulp van de ingeschakelde plug-ins en vrijwaringsniveaus. Dit "
 "betekent dat de scans automatisch worden uitgevoerd. Wees geduldig, het kan "
 "even duren voordat alle plug-ins al hun gegevens hebben verzameld. Plug-ins "
@@ -4150,15 +4153,15 @@ msgstr ""
 #, python-format
 msgid "Selected object (%(total_oois)s)"
 msgid_plural "Selected objects (%(total_oois)s)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Geselecteerde object (%(total_oois)s)"
+msgstr[1] "Geselecteerde objecten (%(total_oois)s)"
 
 #: reports/templates/partials/report_types_selection.html
 #, python-format
 msgid "You have selected %(total_oois)s object in previous step."
 msgid_plural "You have selected %(total_oois)s objects in previous step."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "U hebt in de vorige stap %(total_oois)s object geselecteerd."
+msgstr[1] "U hebt in de vorige stap %(total_oois)s objecten geselecteerd."
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
@@ -6966,7 +6969,7 @@ msgstr "Een rapport kan niet voor een toekomstig tijdstip worden aangemaakt."
 
 #: rocky/views/ooi_report.py
 msgid "Findings report"
-msgstr "Rapport bevindingen"
+msgstr "Bevindingenrapport"
 
 #: rocky/views/ooi_report.py
 msgid "Generating report failed. See Keiko logs for more information."
