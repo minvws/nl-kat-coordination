@@ -1,0 +1,12 @@
+{% load i18n %}
+
+<div>
+    <div class="horizontal-view toolbar">
+        <a class="button ghost"
+           href="{% url 'report_history' organization.code %}">{% translate "Back to Reports History" %}</a>
+    </div>
+    <div>
+        <h1>{% translate "Subreports" %}</h1>
+        <p class="emphasized">{% translate "An overview of all underlying reports of {}" %}</p>
+    </div>
+</div>
