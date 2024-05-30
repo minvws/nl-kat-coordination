@@ -22,6 +22,10 @@ class BreadcrumbsReportOverviewView(ReportBreadcrumbs):
                 "url": reverse("report_history", kwargs=kwargs) + selection,
                 "text": _("Report history"),
             },
+            {
+                "url": reverse("subreports", kwargs=kwargs) + selection,
+                "text": _("Subreports"),
+            },
         ]
         return breadcrumbs
 
@@ -34,12 +38,35 @@ class ReportHistoryView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
     paginate_by = 10
     context_object_name = "reports"
     paginator = RockyPaginator
-    template_name = "report_overview.html"
+    template_name = "report_overview/report_overview.html"
 
     def get_queryset(self) -> ReportList:
         return ReportList(
             self.octopoes_api_connector,
             valid_time=self.observed_at,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["total_oois"] = len(self.object_list)
+        return context
+
+
+class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
+    """
+    Shows all the subreports that belong to the selected parent report.
+    """
+
+    paginate_by = 20
+    context_object_name = "subreports"
+    paginator = RockyPaginator
+    template_name = "report_overview/subreports.html"
+
+    def get_queryset(self) -> ReportList:
+        return ReportList(
+            self.octopoes_api_connector,
+            valid_time=self.observed_at,
+            parent_report_id=self.request.GET.get("report_id", None),
         )
 
     def get_context_data(self, **kwargs):

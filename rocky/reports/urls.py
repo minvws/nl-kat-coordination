@@ -25,12 +25,13 @@ from reports.views.multi_report import (
     ReportTypesSelectionMultiReportView,
     SetupScanMultiReportView,
 )
-from reports.views.report_overview import ReportHistoryView
+from reports.views.report_overview import ReportHistoryView, SubreportView
 
 # Report overview urls
 urlpatterns = [
     path("", ReportsLandingView.as_view(), name="reports"),
     path("report-history/", ReportHistoryView.as_view(), name="report_history"),
+    path("report-history/subreports", SubreportView.as_view(), name="subreports"),
 ]
 
 

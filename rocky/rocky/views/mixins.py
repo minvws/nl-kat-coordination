@@ -270,14 +270,13 @@ class ReportList:
     HARD_LIMIT = 99_999_999
 
     def __init__(
-        self,
-        octopoes_connector: OctopoesAPIConnector,
-        valid_time: datetime,
+        self, octopoes_connector: OctopoesAPIConnector, valid_time: datetime, parent_report_id: str | None = None
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
         self.ordered = True
         self._count = None
+        self.parent_report_id = parent_report_id
 
     @cached_property
     def count(self) -> int:
@@ -301,9 +300,24 @@ class ReportList:
                 limit=limit,
             ).items
 
+            if self.parent_report_id and self.parent_report_id is not None:
+                return self.get_subreports(self.parent_report_id, reports)
+
             return self.hydrate_report_list(reports)
 
         raise NotImplementedError("ReportList only supports slicing")
+
+    def get_subreports(self, report_id, reports: list[Report]) -> list[Report]:
+        subreports: list[Report] = []
+
+        for report in reports:
+            _, children_reports = report
+
+        for child_report in children_reports:
+            if str(child_report.parent_report) == report_id:
+                subreports.append(child_report)
+
+        return subreports
 
     def hydrate_report_list(self, reports: list[Report]) -> list[HydratedReport]:
         hydrated_reports: list[HydratedReport] = []

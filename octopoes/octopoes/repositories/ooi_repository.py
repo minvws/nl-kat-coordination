@@ -138,6 +138,9 @@ class OOIRepository(Repository):
     def list_reports(self, valid_time, offset, limit) -> Paginated[Report]:
         raise NotImplementedError
 
+    def get_report(self, report_id) -> Report:
+        raise NotImplementedError
+
     def get_bit_configs(self, source: OOI, bit_definition: BitDefinition, valid_time: datetime) -> list[Config]:
         raise NotImplementedError
 

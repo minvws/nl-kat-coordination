@@ -255,6 +255,14 @@ class OctopoesAPIConnector:
 
         return TypeAdapter(Paginated[tuple[Report, list[Report | None]]]).validate_json(res.content)
 
+    def get_report(
+        self,
+        report_id: str,
+    ) -> Report:
+        res = self.session.get(f"/{self.client}/reports/{report_id}")
+
+        return TypeAdapter(Report).validate_json(res.content)
+
     def load_objects_bulk(self, references: set[Reference], valid_time):
         params = {
             "valid_time": valid_time,

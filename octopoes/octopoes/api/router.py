@@ -458,6 +458,14 @@ def list_reports(
     return res
 
 
+@router.get("/reports/{report_id}", tags=["Reports"])
+def get_report(
+    report_id: str,
+    octopoes: OctopoesService = Depends(octopoes_service),
+):
+    return octopoes.ooi_repository.get_report(report_id)
+
+
 @router.get("/findings/count_by_severity", tags=["Findings"])
 def get_finding_type_count(
     octopoes: OctopoesService = Depends(octopoes_service),
