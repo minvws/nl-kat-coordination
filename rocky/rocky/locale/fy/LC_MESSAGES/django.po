@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-16 07:24+0000\n"
-"PO-Revision-Date: 2024-05-16 10:02+0000\n"
+"POT-Creation-Date: 2024-05-23 15:00+0000\n"
+"PO-Revision-Date: 2024-05-29 09:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
 "coordination/fy/>\n"
@@ -630,10 +630,13 @@ msgstr ""
 msgid ""
 "The KATalogus has an unexpected error. Check the logs for further details."
 msgstr ""
+"De KATalogus hat in ûnferwachte flater oprûn. Kontrolearje de lochboeken "
+"foar mear details."
 
 #: katalogus/client.py
 msgid "A HTTP error occurred. Check logs for more info."
 msgstr ""
+"Der is in HTTP-flater bard. Kontrolearje de lochboeken foar mear ynformaasje."
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
@@ -1461,37 +1464,39 @@ msgid ""
 "Please enter the following organization details. These details can be edited "
 "within the organization page within OpenKAT when necessary."
 msgstr ""
+"Fier de folgjende organisaasegegevens yn. Dizze gegevens kinne bewurke wurde "
+"wannear nedich binnen de organisatieside binnen OpenKAT."
 
 #: onboarding/templates/account/step_2a_organization_update.html
 msgid "Submit changes"
-msgstr ""
+msgstr "Wizigingen bewarje"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Continue"
-msgstr ""
+msgstr "Trochgean"
 
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 msgid "Indemnification setup"
-msgstr ""
+msgstr "Frijwarring opstelle"
 
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 msgid "Indemnification on the organization is already present."
-msgstr ""
+msgstr "Frijwarringsnivo op de organisaasje is al oanwêzich."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Account setup"
-msgstr ""
+msgstr "Account ynstelle"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Accounts"
-msgstr ""
+msgstr "Accounts"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Organization setup with separate accounts:"
-msgstr ""
+msgstr "Organisaasje ynstelle mei aparte accounts:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1501,10 +1506,15 @@ msgid ""
 "can choose to create the separate accounts during this introduction or when "
 "you’re ready from the OpenKAT users page."
 msgstr ""
+"Binnen OpenKAT is it mooglik om aparte brûkersaccounts oan te meitsjen mei "
+"de spesifike rollen. Elk mei harren eigen funksjonaliteiten en rjochten. Dit "
+"is handich as meardere minsken mei deselde OpenKAT-ynstellingen wurkjen "
+"gean. Jo kinne der foar kieze om de aparte accounts oan te meitsjen wylst "
+"dizze yntroduksje of wannear’t jo klear binne fan de OpenKAT-brûkersside út."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Single account setup:"
-msgstr ""
+msgstr "Inkeld account ynstelle:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -2053,6 +2063,10 @@ msgid ""
 "responsibility\n"
 "                        "
 msgstr ""
+"\n"
+"                            Frijwarringsnivo L%(tcl)s en ferantwurdlikheid "
+"akseptearje\n"
+"                        "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -2104,7 +2118,7 @@ msgstr ""
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/scan.html
 msgid "Boefjes:"
-msgstr ""
+msgstr "Boefkes:"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2114,7 +2128,7 @@ msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Normalizers:"
-msgstr ""
+msgstr "Normalizers:"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2214,7 +2228,7 @@ msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "OpenKAT Setup"
-msgstr ""
+msgstr "OpenKAT ynstelle"
 
 #: onboarding/views.py
 msgid "Fetch the parent DNS zone of a hostname"
@@ -2272,7 +2286,7 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Selected objects"
-msgstr ""
+msgstr "Selektearre objekten"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Currently filtered on"
@@ -2823,7 +2837,7 @@ msgstr ""
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
@@ -3567,8 +3581,9 @@ msgid "Multi Report"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select object"
-msgid_plural "Select objects"
+#, python-format
+msgid "Select object (%(total_oois)s)"
+msgid_plural "Select objects (%(total_oois)s)"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3589,12 +3604,6 @@ msgid "Currently filtered on:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
 msgid "No objects found."
 msgstr ""
 
@@ -3603,23 +3612,25 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "explanation select all"
+msgid "objects selected"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Explanation 'Continue with all OOIs:'"
+msgid "Deselect all objects"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #, python-format
-msgid ""
-"This option will select all OOIs (+ current filters) for %(organization)s "
-"organization."
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-msgid "Continue with all OOIs"
-msgstr ""
+msgid "Select all %(total_oois)s object"
+msgid_plural "Select all %(total_oois)s objects"
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
@@ -3741,7 +3752,7 @@ msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
-msgstr ""
+msgstr "Selektearre objekten"
 
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/selected_plugins.html
@@ -3767,14 +3778,18 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "Selected object"
-msgid_plural "Selected objects"
+#, python-format
+msgid "Selected object (%(total_oois)s)"
+msgid_plural "Selected objects (%(total_oois)s)"
 msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "You have selected all objects in previous step."
-msgstr ""
+#, python-format
+msgid "You have selected %(total_oois)s object in previous step."
+msgid_plural "You have selected %(total_oois)s objects in previous step."
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
@@ -4035,7 +4050,7 @@ msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Clearance Level"
-msgstr ""
+msgstr "Frijwarringsnivo"
 
 #: tools/forms/ooi.py
 msgid "Show objects that don't meet the Boefjes scan level."
@@ -4711,7 +4726,7 @@ msgstr ""
 
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
-msgstr ""
+msgstr "Dit fjild is ferplichte"
 
 #: rocky/templates/graph-d3.html
 msgid ""
@@ -4846,7 +4861,7 @@ msgstr ""
 
 #: rocky/templates/oois/error.html
 msgid "Object List"
-msgstr ""
+msgstr "Objektelist"
 
 #: rocky/templates/oois/error.html
 msgid "An error occurred. Please contact a system administrator."
@@ -5261,7 +5276,7 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Organization:"
-msgstr ""
+msgstr "Organisaasje:"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
@@ -5305,7 +5320,7 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Active"
-msgstr ""
+msgstr "Aktyf"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "New"
@@ -5452,7 +5467,7 @@ msgstr ""
 #: rocky/templates/partials/form/field_input_checkbox.html
 #: rocky/templates/partials/form/field_input_radio.html
 msgid "This field is required"
-msgstr ""
+msgstr "Dit fjild is ferplichte"
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Not set"
@@ -5836,7 +5851,7 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Clearance level:"
-msgstr ""
+msgstr "Frijwarringsnivo:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared:"
@@ -6307,6 +6322,9 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"Kin frijwarringsnivo net ferheegje nei L%s. Jo binne in frijwarringsnivo "
+"tafertroud fan L%s. Nim kontakt op mei jo behearder om jo frijwarringsnivo "
+"te ferheegjen."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -6400,7 +6418,7 @@ msgstr ""
 
 #: rocky/views/ooi_view.py
 msgid "Clearance level: "
-msgstr ""
+msgstr "Frijwarringsnivo: "
 
 #: rocky/views/ooi_view.py
 msgid "Clearance type: "
@@ -6576,6 +6594,11 @@ msgstr ""
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr ""
+
+#~ msgid "Selected object"
+#~ msgid_plural "Selected objects"
+#~ msgstr[0] "Selektearre objekt"
+#~ msgstr[1] "Selektearre objekten"
 
 #~ msgid "Permission to set OOI clearance levels "
 #~ msgstr "Tastimming om frijwarringsnivo’s fan OOI yn te stellen "
