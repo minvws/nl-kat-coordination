@@ -480,6 +480,7 @@ class ViewReportView(OOIFilterView, TemplateView):
             context["report_types"] = [get_report_by_id(self.report_ooi.report_type).class_attributes()]
 
         context["created_at"] = self.report_ooi.date_generated
+        context["total_oois"] = len(input_oois)
         context["selected_oois"] = input_oois
         context["oois"] = input_oois
         context["template"] = self.report_ooi.template
