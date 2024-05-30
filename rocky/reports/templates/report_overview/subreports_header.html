@@ -6,8 +6,7 @@
            href="{% url 'report_history' organization.code %}">{% translate "Back to Reports History" %}</a>
     </div>
     <div>
-        {{ parent_report_id }}
         <h1>{% translate "Subreports" %}</h1>
-        <p class="emphasized">{% translate "An overview of all underlying reports of " %}</p>
+        <p class="emphasized">{% translate "An overview of all underlying reports of" %} {{ parent_report_id }}</p>
     </div>
 </div>
