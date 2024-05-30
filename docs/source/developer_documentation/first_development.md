@@ -17,12 +17,15 @@ Inside `boefjes/boefjes/plugins/` create a new folder with a name starting with 
 
 Inside this folder we need to have the following files:
 
-- `__init__.py`
-- `boefje.json`
-- `cover.jpg`
-- `description.md`
-- `main.py`
-- `schema.json`
+```shell
+$ tree boefjes/boefjes/plugins/
+├── __init__.py
+├── boefje.json
+├── cover.jpg
+├── description.md
+├── main.py
+└── schema.json
+```
 
 ### `__init__.py`
 
@@ -264,10 +267,19 @@ After this. OpenKAT has all the information needed for our model. Next, we will 
 
 A normalizer takes as input raw data (a single string or a list of bytes) and produces OOIs from this. If you followed the steps correctly, we should have both the raw data (from our boefje) and the model for the OOI we want to produce.
 
-To create a normalizer we are going to need 2 more files. These files can both be created inside the same directory as our boefje (`boefjes/boefjes/plugins/kat_hello_katty/`):
+To create a normalizer we are going to need 2 more files (`normalizer.json` and `normalize.py`). These files can both be created inside the same directory as our boefje (`boefjes/boefjes/plugins/kat_hello_katty/`) This is what our example should look like:
 
-- `normalizer.json`
-- `normalize.py`
+```shell
+$ tree boefjes/boefjes/plugins/
+├── __init__.py
+├── boefje.json
+├── cover.jpg
+├── description.md
+├── main.py
+├── schema.json
+├── normalizer.json
+└── normalize.py
+```
 
 ### `normalizer.json`
 
@@ -340,11 +352,14 @@ That is it for the normalizer, our next step is to look for our Greeting OOI and
 
 Next, we want to look for our Greeting OOI and generate a finding from this once it has been added. Since findings are also an OOI, that means we want to generate OOIs from OOIs. This is the job for a bit. A bit consumes OOIs and generates other OOIs from it.
 
-To start creating a bit create a folder inside `octopoes/bits/` called `check_greeting`. This folder will contain the information about our bit. Inside this folder we need to have the following files:
+To start creating a bit create a folder inside `octopoes/bits/` called `check_greeting`. This folder will contain the information about our bit. This is what our folder should look like:
 
-- `__init__.py`
-- `bit.py`
-- `check_greeting.py`
+```shell
+$ tree octopoes/bits/check_greeting
+├── __init__.py
+├── bit.py
+└── check_greeting.py
+```
 
 ### `__init__.py`
 
@@ -435,11 +450,14 @@ If you go into the Reports tab you should be able to see our URL where we set ou
 
 When you press this, the only option you will see is to go back since there is no report type for our Greeting OOI yet. Let's create one!
 
-First, we will once again make a new folder inside `rocky/reports/report_types` called `greetings_report`. And inside of here, we will create 3 more files:
+First, we will once again make a new folder inside `rocky/reports/report_types` called `greetings_report`. And inside of here, we will create 3 more files, this is what our folder should look like:
 
-- `__init__.py`
-- `report.py`
-- `report.html`
+```shell
+$ tree rocky/reports/report_types/greetings_report
+├── __init__.py
+├── report.py
+└── report.html
+```
 
 ### `__init__.py`
 
