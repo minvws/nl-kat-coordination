@@ -26,7 +26,7 @@
                 </td>
                 <td>
                     {% if report.parent_report.input_ooi %}
-                        <a href="{% ooi_url "ooi_detail" ooi organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_ooi|human_readable }}</a>
+                        <a href="{% ooi_url "ooi_detail" report.parent_report.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_ooi|human_readable }}</a>
                     {% else %}
                         {{ report.total_objects }}
                     {% endif %}
