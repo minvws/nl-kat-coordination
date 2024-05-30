@@ -1,7 +1,6 @@
 [
   {
     "id": "kat_adr_finding_types_normalize",
-    "repository_id": "LOCAL",
     "name": "Adr Finding Types Normalize",
     "version": null,
     "authors": null,
@@ -21,7 +20,6 @@
   },
   {
     "id": "adr-validator",
-    "repository_id": "LOCAL",
     "name": null,
     "version": null,
     "authors": null,
@@ -44,7 +42,6 @@
   },
   {
     "id": "kat_answer_parser",
-    "repository_id": "LOCAL",
     "name": null,
     "version": null,
     "authors": null,
@@ -64,7 +61,6 @@
   },
   {
     "id": "kat_binaryedge_containers",
-    "repository_id": "LOCAL",
     "name": null,
     "version": null,
     "authors": null,
@@ -91,7 +87,6 @@
   },
   {
     "id": "kat_binaryedge_databases",
-    "repository_id": "LOCAL",
     "name": null,
     "version": null,
     "authors": null,

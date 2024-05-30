@@ -43,21 +43,7 @@ docker compose --env-file .env-prod -f docker-compose.release-example.yml up -d
 
 The container image run the necessary database migration commands in the
 entrypoint if DATABASE_MIGRATION is set. You manually need to run setup commands
-in the katalogus and rocky containers to initialize everything. In the katalogus
-container we need to create an organisation, we can do this by running the
-following in the katalogus container:
-
-```shell
-python3 -m boefjes.seed
-```
-
-With docker compose you would run this as:
-
-```shell
-docker compose --env-file .env-prod -f docker-compose.release-example.yml exec katalogus python3 -m boefjes.seed
-```
-
-In the rocky container we first need to import the OOI database seed:
+in the rocky container to initialize everything. In the rocky container we first need to import the OOI database seed:
 
 ```shell
 python3 manage.py loaddata OOI_database_seed.json
