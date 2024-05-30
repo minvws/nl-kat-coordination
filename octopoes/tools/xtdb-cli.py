@@ -200,7 +200,7 @@ def submit_tx(ctx: click.Context, txs):
 
 
 @cli.command
-@click.argument("tx_id", type=int)
+@click.argument("tx-id", type=int)
 @click.pass_context
 def tx_committed(ctx: click.Context, tx_id: int) -> None:
     client: XTDBClient = ctx.obj["client"]
