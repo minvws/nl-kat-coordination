@@ -127,7 +127,10 @@ class PriorityQueueStore:
             count = query.count()
             items_orm = query.all()
 
-            return ([models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm], count)
+            return (
+                [models.PrioritizedItem.model_validate(item_orm) for item_orm in items_orm],
+                count,
+            )
 
     @retry()
     def get_item_by_hash(self, scheduler_id: str, item_hash: str) -> models.PrioritizedItem | None:

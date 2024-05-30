@@ -1,7 +1,6 @@
 from collections.abc import Iterable
 
 from dns.message import Message, from_text
-from dns.rdata import Rdata
 from dns.rdtypes.ANY.SOA import SOA
 
 from boefjes.job_models import NormalizerOutput
@@ -27,8 +26,6 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
     for rrset in message.answer:
         for rr in rrset:
-            rr: Rdata
-
             if isinstance(rr, SOA):
                 parent_zone_hostname = Hostname(network=internet.reference, name=str(rrset.name).rstrip("."))
                 parent_zone = DNSZone(hostname=parent_zone_hostname.reference)
