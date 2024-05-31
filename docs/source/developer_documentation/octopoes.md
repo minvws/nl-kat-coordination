@@ -608,13 +608,13 @@ $ docker compose exec octopoes_api ./tools/run_bit.py ORGANIZATION_CODE BIT_ID O
 Example usage:
 
 ```shell
-$ docker compose exec octopoes_api ./tools/run_bit.py cynalytics dns-resolving "DNSARecord|internet|mispo.es|134.209.85.72"
+$ docker compose exec octopoes_api ./tools/run_bit.py comp dns-resolving "DNSARecord|internet|mispo.es|314.15.926.53."
 ```
 
 ## Tests
 
 The unit tests `octopoes/tests` are run using
 
-```bash
-python -m unittest discover octopoes/tests
+```shell
+$ python -m unittest discover octopoes/tests
 ```
