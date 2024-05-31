@@ -1,4 +1,4 @@
-### Testing the boefje
+# Testing the boefje
 
 First, we run `make kat`. After that successfully finishes. You can run `grep 'DJANGO_SUPERUSER_PASSWORD' .env` to get the password for the super user. The login e-mail is `superuser@localhost`.
 

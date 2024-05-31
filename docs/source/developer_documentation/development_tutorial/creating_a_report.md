@@ -1,4 +1,4 @@
-## Creating a report
+# Creating a report
 
 If you go into the Reports tab you should be able to see our URL where we set our clearance level to L2 under the header _Select objects_. This is because by default OpenKAT only displays OOIs in this list with a clearance level of L2 and higher. We can fix this by pressing the _Show filter options_ button and then checking the L1 checkbox and checking the _Inherited_ box as well (since the clearance level of our OOI got inherited) to include our Greeting OOIs in this list as well. After pressing the _Set filters_ button we should be able to see our Greeting OOI in the list as well. When you do, you can check one of our Greeting OOIs and at the bottom press the _Continue with selection_ button.
 
@@ -13,11 +13,11 @@ $ tree rocky/reports/report_types/greetings_report
 └── report.html
 ```
 
-### `__init__.py`
+## `__init__.py`
 
 This file stays empty.
 
-### `report.py`
+## `report.py`
 
 Inside this file, we will parse the data from the findings into our html. This file has to contain a class inheriting from `reports.report_types.definitions.Report` and requires a method that will generate data for our `report.html`. For this example, we will use the `generate_data` function which has a reference to our OOI.
 
@@ -58,7 +58,7 @@ class GreetingsReport(Report):
         return {"input_ooi": input_ooi}
 ```
 
-### `report.html`
+## `report.html`
 
 Inside this file, we create a template of how our report should look like. This HTML file makes use of the [Django template language](https://docs.djangoproject.com/en/5.0/ref/templates/language/#the-django-template-language). In our example we will make a very simple, bare-bones page that displays our information. The return value of `GreetingReport`'s `generate_data` is contained in a variable called `data`, this is where we can get our information from. This is what our file could look like:
 

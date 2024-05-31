@@ -24,7 +24,6 @@ Glossary
    :caption: Contents
    :maxdepth: 1
 
-   temp
    creating_a_boefje
    testing_the_boefje
    creating_a_new_model

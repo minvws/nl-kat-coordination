@@ -1,4 +1,4 @@
-## Creating a normalizer
+# Creating a normalizer
 
 A normalizer takes as input raw data (a single string or a list of bytes) and produces OOIs from this. If you followed the steps correctly, we should have both the raw data (from our boefje) and the model for the OOI we want to produce.
 
@@ -16,7 +16,7 @@ $ tree boefjes/boefjes/plugins/
 └── normalize.py
 ```
 
-### `normalizer.json`
+## `normalizer.json`
 
 This is a JSON file that contains information about our normalizer. The object inside should have 3 attributes:
 
@@ -34,7 +34,7 @@ Here is an example of how our `normalizer.json` can look like:
 }
 ```
 
-### `normalize.py`
+## `normalize.py`
 
 This file is where the normalizer's meowgic happens. This file also has a run function that takes in information about the boefje and the raw data the boefje has provided. This run method returns an Iterable that contains OOIs. The first step we should take is to decode the raw data that we have received from our boefje and load the JSON string as a dictionary. Then we can create IPAddress OOIs. We do not know whether we should make an IPAddressV4 or IPAddressV6 So we will have to check what kind of IPAddress we have and yield the correct one. Creating an IPAddress requires specifying what network that IPAddress lies on (in our example that is the internet.) We can get this by using `normalizer_meta` also provided in our run function. This dictionary is similar to the JSON you have seen when downloading the results of our boefje's task. Inside this dictionary, we can get information on the IPAddress that has triggered our boefje. And pull the reference.
 

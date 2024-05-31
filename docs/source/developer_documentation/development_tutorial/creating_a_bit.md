@@ -1,4 +1,4 @@
-## Creating a bit
+# Creating a bit
 
 Next, we want to look for our Greeting OOI and generate a finding from this once it has been added. Since findings are also an OOI, that means we want to generate OOIs from OOIs. This is the job for a bit. A bit consumes OOIs and generates other OOIs from it.
 
@@ -11,11 +11,11 @@ $ tree octopoes/bits/check_greeting
 └── check_greeting.py
 ```
 
-### `__init__.py`
+## `__init__.py`
 
 This file stays empty.
 
-### `bit.py`
+## `bit.py`
 
 Inside this file, we write information about our bit. Here we give information such as the id of our bit, what OOI our bit should look out for, other OOIs that our bit requires (which are related to the OOI the bit is looking out for such as the IpAddress contained inside our Greeting OOI) and the path to the module that runs the bit (in our example this will be `bits.check_greeting.check_greeting`.)
 
@@ -35,7 +35,7 @@ BIT = BitDefinition(
 
 You can see inside `parameters` that we have given it a new object. This object gives us access to OOIs that are related to the OOI referenced in `consumes`. In our example, we do not have a solid reason to do this.
 
-### `check_greeting.py`
+## `check_greeting.py`
 
 This is the file where the bit's meowgic happens. This file has to contain a run method which accepts the following:
 

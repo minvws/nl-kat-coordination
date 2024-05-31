@@ -1,4 +1,4 @@
-## Creating a new model
+# Creating a new model
 
 1. Inside `octopoes/octopoes/models/ooi/` create a file called `greeting.py`. This file will contain the model for our Greeting OOI.
 2. Inside this file we will create a class Greeting which will inherit from the OOI class. Inside this class, we can specify attributes that this model will maintain. For this example, we will add :
