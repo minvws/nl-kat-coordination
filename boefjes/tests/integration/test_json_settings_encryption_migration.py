@@ -10,7 +10,7 @@ from boefjes.dependencies.encryption import NaclBoxMiddleware
 from boefjes.models import Organisation
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
+from boefjes.sql.setting_storage import create_encrypter
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -39,10 +39,15 @@ class TestJsonSecretsMigration(TestCase):
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
 
         all_settings = list(self.engine.execute(text("select * from settings")).fetchall())
-        self.assertSetEqual(set([(encrypter.decode(x[1]), x[2], x[3]) for x in all_settings]),
-                            {('{"key2": "val2"}', "dns-records", 2), ('{"key5": "val5", "key7": "val7"}', "nmap", 1),
-                             ('{"key4": "val4", "key6": "val6"}', "nmap", 2),
-                             ('{"key1": "val1", "key3": "val3"}', "dns-records", 1)})
+        self.assertSetEqual(
+            {(encrypter.decode(x[1]), x[2], x[3]) for x in all_settings},
+            {
+                ('{"key2": "val2"}', "dns-records", 2),
+                ('{"key5": "val5", "key7": "val7"}', "nmap", 1),
+                ('{"key4": "val4", "key6": "val6"}', "nmap", 2),
+                ('{"key1": "val1", "key3": "val3"}', "dns-records", 1),
+            },
+        )
 
         session.close()
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "-1"])

@@ -104,7 +104,9 @@ class TestAPI(TestCase):
         self.assertEqual(response.json()["description"], "4")
         self.assertEqual(response.json()["enabled"], True)
 
-        res = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"id": "4", "version": "s"})
+        res = self.client.patch(
+            f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"id": "4", "version": "s"}
+        )
         self.assertEqual(res.status_code, 200)
         res = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"name": "Overwrite name"})
         self.assertEqual(res.status_code, 200)

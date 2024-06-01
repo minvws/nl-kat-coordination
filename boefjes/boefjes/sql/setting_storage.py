@@ -9,7 +9,7 @@ from boefjes.models import EncryptionMiddleware
 from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.db_models import BoefjeConfigInDB, BoefjeInDB, OrganisationInDB
 from boefjes.sql.session import SessionMixin
-from boefjes.storage.interfaces import SettingsNotFound, SettingsStorage, OrganisationNotFound, PluginNotFound
+from boefjes.storage.interfaces import OrganisationNotFound, PluginNotFound, SettingsNotFound, SettingsStorage
 
 logger = logging.getLogger(__name__)
 

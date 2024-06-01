@@ -110,7 +110,7 @@ class PluginService:
         return self.settings_storage.upsert(values, organisation_id, plugin_id)
 
     def upsert_boefje(self, boefje_id: str, data: dict) -> None:
-        """ Update and/or insert a boefje. If it concerns a local boefje, make sure there is a database entry first"""
+        """Update and/or insert a boefje. If it concerns a local boefje, make sure there is a database entry first"""
 
         try:
             plugin = self.local_repo.by_id(boefje_id)  # if we fail, it is non-local, so we can perform the update

@@ -8,7 +8,7 @@ Create Date: 2024-05-31 10:45:16.474714
 
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.orm import create_session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from boefjes.local_repository import get_local_repository
 from boefjes.sql.plugin_storage import create_plugin_storage
@@ -45,11 +45,11 @@ def upgrade() -> None:
             if plugin_id not in local_plugins:
                 raise ValueError(f"Invalid plugin id found: {plugin_id}")
 
-            if local_plugins[plugin_id].type == "boefje":
-                storage.create_boefje(local_plugins[plugin_id])  # type: ignore
+            # Since settings are boefje-only at this moment
+            if local_plugins[plugin_id].type != "boefje":
+                raise ValueError(f"Settings for normalizer or bit found: {plugin_id}. Remove these entries first.")
 
-            if local_plugins[plugin_id].type == "normalizer":
-                storage.create_normalizer(local_plugins[plugin_id])  # type: ignore
+            storage.create_boefje(local_plugins[plugin_id])  # type: ignore
 
     with connection.begin():
         connection.execute("""
