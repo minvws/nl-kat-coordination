@@ -124,7 +124,9 @@ class PluginService:
             return
 
     def upsert_normalizer(self, normalizer_id: str, data: dict) -> None:
-        """Update and/or insert a normalizer. If it concerns a local normalizer, make sure there is a database entry first"""
+        """
+        Update and/or insert a normalizer. If it concerns a local normalizer, make sure there is a database entry first
+        """
 
         try:
             plugin = self.local_repo.by_id(normalizer_id)  # if we fail it is non-local, so we can perform the update

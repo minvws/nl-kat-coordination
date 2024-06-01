@@ -74,6 +74,22 @@ class TestSettingsToBoefjeConfig(TestCase):
 
         session.close()
 
+    def test_downgrade(self):
+        # No need to also create a Boefje entry, the seeded settings and migrations take care of that and
+        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "f9de6eb7824b"])
+        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "-1"])
+
+        encrypter = create_encrypter()
+        all_settings = list(self.engine.execute(text("select * from settings")).fetchall())
+        self.assertSetEqual(
+            {(encrypter.decode(x[1]), x[2], x[3]) for x in all_settings},
+            {
+                ('{"key1": "val1"}', "dns-records", 1),
+                ('{"key1": "val1", "key2": "val2"}', "dns-records", 2),
+                ('{"key2": "val2", "key3": "val3"}', "nmap", 1),
+            },
+        )
+
     def tearDown(self) -> None:
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 

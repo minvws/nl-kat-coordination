@@ -40,7 +40,17 @@ def upgrade() -> None:
     session = sessionmaker(bind=connection)()
 
     with create_plugin_storage(session) as storage:
-        for plugin_id_output in op.get_bind().execute("SELECT DISTINCT plugin_id FROM settings").fetchall():
+        # Get unique plugin_ids from the settings table for boefjes that do not exist yet in the database
+        for plugin_id_output in (
+            op.get_bind()
+            .execute(
+                """
+            SELECT DISTINCT s.plugin_id FROM settings s left join boefje b on b.plugin_id = s.plugin_id
+                where b.plugin_id IS NULL
+            """
+            )
+            .fetchall()
+        ):
             plugin_id = plugin_id_output[0]
             if plugin_id not in local_plugins:
                 raise ValueError(f"Invalid plugin id found: {plugin_id}")
@@ -81,7 +91,7 @@ def downgrade() -> None:
     with connection.begin():
         connection.execute("""
             INSERT INTO settings (values, plugin_id, organisation_pk)
-            SELECT bc.settings, b.id, bc.organisation_pk from boefje_config bc
+            SELECT bc.settings, b.plugin_id, bc.organisation_pk from boefje_config bc
             join boefje b on bc.boefje_id = b.id
         """)
 
