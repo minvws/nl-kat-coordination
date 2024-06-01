@@ -114,7 +114,6 @@ class PatchBoefje(BaseModel):
     Also see https://fastapi.tiangolo.com/tutorial/body-updates/ as a reference.
     """
 
-    id: str | None = None
     name: str | None = None
     version: str | None = None
     created: datetime.datetime | None = None
@@ -149,7 +148,6 @@ class PatchNormalizer(BaseModel):
     Also see https://fastapi.tiangolo.com/tutorial/body-updates/ as a reference.
     """
 
-    id: str | None = None
     name: str | None = None
     version: str | None = None
     created: datetime.datetime | None = None
