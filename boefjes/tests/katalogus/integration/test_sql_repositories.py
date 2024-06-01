@@ -6,19 +6,19 @@ import alembic.config
 from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
-from boefjes.katalogus.models import Boefje, Normalizer, Organisation
-from boefjes.katalogus.storage.interfaces import (
+from boefjes.models import Boefje, Normalizer, Organisation
+from boefjes.sql.db import SQL_BASE, get_engine
+from boefjes.sql.organisation_storage import SQLOrganisationStorage
+from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
+from boefjes.sql.plugin_storage import SQLPluginStorage
+from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
+from boefjes.storage.interfaces import (
     OrganisationNotFound,
     PluginNotFound,
     PluginStateNotFound,
     SettingsNotFound,
     StorageError,
 )
-from boefjes.sql.db import SQL_BASE, get_engine
-from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
-from boefjes.sql.plugin_storage import SQLPluginStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -64,6 +64,9 @@ class TestRepositories(TestCase):
         organisation_id = "test"
         plugin_id = 64 * "a"
 
+        with self.plugin_storage as storage:
+            storage.create_boefje(Boefje(id=plugin_id, name="Test"))
+
         org = Organisation(id=organisation_id, name="Test")
         with self.organisation_storage as storage:
             storage.create(org)
@@ -96,6 +99,9 @@ class TestRepositories(TestCase):
     def test_settings_storage_values_field_limits(self):
         organisation_id = "test"
         plugin_id = 64 * "a"
+
+        with self.plugin_storage as storage:
+            storage.create_boefje(Boefje(id=plugin_id, name="Test"))
 
         org = Organisation(id=organisation_id, name="Test")
         with self.organisation_storage as storage:

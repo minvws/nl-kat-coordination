@@ -1,17 +1,17 @@
 from unittest import TestCase
 
 from boefjes.config import BASE_DIR
-from boefjes.katalogus.dependencies.plugins import PluginService
-from boefjes.katalogus.local_repository import LocalPluginRepository
-from boefjes.katalogus.storage.interfaces import SettingsNotConformingToSchema
-from boefjes.katalogus.storage.memory import PluginStatesStorageMemory, PluginStorageMemory, SettingsStorageMemory
+from boefjes.dependencies.plugins import PluginService
+from boefjes.local_repository import LocalPluginRepository
+from boefjes.storage.interfaces import SettingsNotConformingToSchema
+from boefjes.storage.memory import PluginStatesStorageMemory, PluginStorageMemory, SettingsStorageMemory
 
 
 def mock_plugin_service(organisation_id: str) -> PluginService:
     storage = SettingsStorageMemory()
     storage.upsert({"DUMMY_VAR": "123"}, "test", "test_plugin")
 
-    test_boefjes_dir = BASE_DIR / "katalogus" / "tests" / "boefjes_test_dir"
+    test_boefjes_dir = BASE_DIR.parent / "tests" / "katalogus" / "boefjes_test_dir"
 
     return PluginService(
         PluginStorageMemory(),

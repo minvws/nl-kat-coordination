@@ -22,21 +22,22 @@ class OrganisationInDB(SQL_BASE):
     name = Column(String(length=64), nullable=False)
 
 
-class SettingsInDB(SQL_BASE):
-    __tablename__ = "settings"
+class BoefjeConfigInDB(SQL_BASE):
+    __tablename__ = "boefje_config"
     __table_args__ = (
         UniqueConstraint(
             "organisation_pk",
-            "plugin_id",
-            name="unique_settings_per_organisation_per_plugin",
+            "boefje_id",
+            name="unique_boefje_config_per_organisation_per_boefje",
         ),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    values = Column(String(length=512), nullable=False)
-    plugin_id = Column(String(length=64), nullable=False)
-    organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
+    settings = Column(String(length=512), nullable=False)
+    enabled = Column(Boolean, nullable=False, default=False)
+    boefje_id = Column(Integer, ForeignKey("boefje.id", ondelete="CASCADE"), nullable=False)
 
+    organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
     organisation = relationship("OrganisationInDB")
 
 

@@ -5,7 +5,7 @@ services:
       dockerfile: boefjes/Dockerfile
       args:
         - ENVIRONMENT=dev
-    command: sh -c 'python -m pytest -v boefjes/katalogus/tests/integration'
+    command: sh -c 'python -m pytest -v tests/katalogus/integration'
     depends_on:
       - ci_katalogus-db
     env_file:

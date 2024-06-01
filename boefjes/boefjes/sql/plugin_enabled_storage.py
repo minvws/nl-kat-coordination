@@ -3,10 +3,10 @@ import logging
 from sqlalchemy.orm import Session, sessionmaker
 
 from boefjes.config import Settings, settings
-from boefjes.katalogus.storage.interfaces import OrganisationNotFound, PluginEnabledStorage, PluginStateNotFound
 from boefjes.sql.db import ObjectNotFoundException, get_engine
 from boefjes.sql.db_models import OrganisationInDB, PluginStateInDB
 from boefjes.sql.session import SessionMixin
+from boefjes.storage.interfaces import OrganisationNotFound, PluginEnabledStorage, PluginStateNotFound
 
 logger = logging.getLogger(__name__)
 

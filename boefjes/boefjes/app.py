@@ -17,8 +17,8 @@ from boefjes.clients.scheduler_client import (
 )
 from boefjes.config import Settings
 from boefjes.job_handler import BoefjeHandler, NormalizerHandler, bytes_api_client
-from boefjes.katalogus.local_repository import get_local_repository
 from boefjes.local import LocalBoefjeJobRunner, LocalNormalizerJobRunner
+from boefjes.local_repository import get_local_repository
 from boefjes.runtime_interfaces import Handler, WorkerManager
 
 logger = logging.getLogger(__name__)

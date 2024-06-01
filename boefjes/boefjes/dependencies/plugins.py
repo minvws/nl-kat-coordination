@@ -9,9 +9,13 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 from sqlalchemy.orm import Session
 
-from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
-from boefjes.katalogus.models import FilterParameters, PaginationParameters, PluginType
-from boefjes.katalogus.storage.interfaces import (
+from boefjes.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.models import FilterParameters, PaginationParameters, PluginType
+from boefjes.sql.db import session_managed_iterator
+from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
+from boefjes.sql.plugin_storage import create_plugin_storage
+from boefjes.sql.setting_storage import create_setting_storage
+from boefjes.storage.interfaces import (
     NotFound,
     PluginEnabledStorage,
     PluginNotFound,
@@ -19,10 +23,6 @@ from boefjes.katalogus.storage.interfaces import (
     SettingsNotConformingToSchema,
     SettingsStorage,
 )
-from boefjes.sql.db import session_managed_iterator
-from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
-from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.sql.setting_storage import create_setting_storage
 
 logger = logging.getLogger(__name__)
 
@@ -105,11 +105,12 @@ class PluginService:
 
     def upsert_settings(self, values: dict, organisation_id: str, plugin_id: str):
         self._assert_settings_match_schema(values, organisation_id, plugin_id)
+        self.upsert_boefje(plugin_id, {})  # Settings are a boefje-only feature, so we do this naively
 
         return self.settings_storage.upsert(values, organisation_id, plugin_id)
 
-    def update_boefje(self, boefje_id: str, data: dict) -> None:
-        """If it concerns a local boefje, make sure there is a database entry first"""
+    def upsert_boefje(self, boefje_id: str, data: dict) -> None:
+        """ Update and/or insert a boefje. If it concerns a local boefje, make sure there is a database entry first"""
 
         try:
             plugin = self.local_repo.by_id(boefje_id)  # if we fail, it is non-local, so we can perform the update
@@ -122,8 +123,8 @@ class PluginService:
             self.plugin_storage.update_boefje(boefje_id, data)  # Perform the update
             return
 
-    def update_normalizer(self, normalizer_id: str, data: dict) -> None:
-        """If it concerns a local normalizer, make sure there is a database entry first"""
+    def upsert_normalizer(self, normalizer_id: str, data: dict) -> None:
+        """Update and/or insert a normalizer. If it concerns a local normalizer, make sure there is a database entry first"""
 
         try:
             plugin = self.local_repo.by_id(normalizer_id)  # if we fail it is non-local, so we can perform the update

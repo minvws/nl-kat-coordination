@@ -6,9 +6,9 @@ from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 from boefjes.config import settings
-from boefjes.katalogus.api.root import app
-from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
-from boefjes.katalogus.models import Boefje, Normalizer, Organisation
+from boefjes.dependencies.encryption import IdentityMiddleware
+from boefjes.katalogus.root import app
+from boefjes.models import Boefje, Normalizer, Organisation
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
@@ -104,10 +104,10 @@ class TestAPI(TestCase):
         self.assertEqual(response.json()["description"], "4")
         self.assertEqual(response.json()["enabled"], True)
 
-        r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"id": "4", "version": "s"})
-        self.assertEqual(r.status_code, 200)
-        r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"name": "Overwrite name"})
-        self.assertEqual(r.status_code, 200)
+        res = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"id": "4", "version": "s"})
+        self.assertEqual(res.status_code, 200)
+        res = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"name": "Overwrite name"})
+        self.assertEqual(res.status_code, 200)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
         self.assertEqual(response.json()["name"], "Overwrite name")

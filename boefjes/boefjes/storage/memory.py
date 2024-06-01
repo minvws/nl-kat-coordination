@@ -1,10 +1,5 @@
-from boefjes.katalogus.models import Boefje, Normalizer, Organisation, PluginType
-from boefjes.katalogus.storage.interfaces import (
-    OrganisationStorage,
-    PluginEnabledStorage,
-    PluginStorage,
-    SettingsStorage,
-)
+from boefjes.models import Boefje, Normalizer, Organisation, PluginType
+from boefjes.storage.interfaces import OrganisationStorage, PluginEnabledStorage, PluginStorage, SettingsStorage
 
 # key = organisation id; value = organisation
 organisations: dict[str, Organisation] = {}

@@ -15,10 +15,10 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from pydantic import BaseModel, Field
 
 from boefjes.config import settings
-from boefjes.katalogus.api import organisations, plugins
-from boefjes.katalogus.api import settings as settings_router
-from boefjes.katalogus.storage.interfaces import StorageError
+from boefjes.katalogus import organisations, plugins
+from boefjes.katalogus import settings as settings_router
 from boefjes.katalogus.version import __version__
+from boefjes.storage.interfaces import StorageError
 
 with settings.log_cfg.open() as f:
     logging.config.dictConfig(json.load(f))

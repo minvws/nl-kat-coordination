@@ -1,6 +1,6 @@
 from abc import ABC
 
-from boefjes.katalogus.models import Boefje, Normalizer, Organisation, PluginType
+from boefjes.models import Boefje, Normalizer, Organisation, PluginType
 
 
 class StorageError(Exception):
