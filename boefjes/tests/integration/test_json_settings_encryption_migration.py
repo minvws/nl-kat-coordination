@@ -8,9 +8,9 @@ from sqlalchemy.orm import sessionmaker
 from boefjes.config import settings
 from boefjes.dependencies.encryption import NaclBoxMiddleware
 from boefjes.models import Organisation
+from boefjes.sql.config_storage import create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.setting_storage import create_encrypter
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")

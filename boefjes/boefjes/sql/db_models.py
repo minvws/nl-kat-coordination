@@ -33,27 +33,27 @@ class BoefjeConfigInDB(SQL_BASE):
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    settings = Column(String(length=512), nullable=False)
-    enabled = Column(Boolean, nullable=False, default=False)
+    settings = Column(String(length=512), nullable=False, server_default="{}")
+    enabled = Column(Boolean, nullable=False, server_default="false")
     boefje_id = Column(Integer, ForeignKey("boefje.id", ondelete="CASCADE"), nullable=False)
 
     organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
     organisation = relationship("OrganisationInDB")
 
 
-class PluginStateInDB(SQL_BASE):
-    __tablename__ = "plugin_state"
+class NormalizerConfigInDB(SQL_BASE):
+    __tablename__ = "normalizer_config"
     __table_args__ = (
         UniqueConstraint(
-            "plugin_id",
             "organisation_pk",
-            name="unique_plugin_id_per_org",
+            "normalizer_id",
+            name="unique_normalizer_config_per_organisation_per_normalizer",
         ),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    plugin_id = Column(String(length=64), nullable=False)
-    enabled = Column(Boolean, nullable=False)
+    enabled = Column(Boolean, nullable=False, server_default="false")
+    normalizer_id = Column(Integer, ForeignKey("normalizer.id", ondelete="CASCADE"), nullable=False)
 
     organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
     organisation = relationship("OrganisationInDB")

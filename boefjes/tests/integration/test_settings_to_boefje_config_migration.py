@@ -7,10 +7,10 @@ from sqlalchemy.orm import sessionmaker
 
 from boefjes.config import settings
 from boefjes.models import Organisation
+from boefjes.sql.config_storage import SQLConfigStorage, create_encrypter
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_storage import SQLPluginStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -68,9 +68,9 @@ class TestSettingsToBoefjeConfig(TestCase):
 
         assert SQLPluginStorage(session, settings).boefje_by_id("dns-records").id == "dns-records"
 
-        settings_storage = SQLSettingsStorage(session, encrypter)
-        assert settings_storage.get_all("dev1", "dns-records") == {"key1": "val1"}
-        assert settings_storage.get_all("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
+        settings_storage = SQLConfigStorage(session, encrypter)
+        assert settings_storage.get_all_settings("dev1", "dns-records") == {"key1": "val1"}
+        assert settings_storage.get_all_settings("dev2", "dns-records") == {"key1": "val1", "key2": "val2"}
 
         session.close()
 

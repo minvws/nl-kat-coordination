@@ -9,10 +9,9 @@ from boefjes.config import settings
 from boefjes.dependencies.encryption import IdentityMiddleware
 from boefjes.katalogus.root import app
 from boefjes.models import Boefje, Normalizer, Organisation
+from boefjes.sql.config_storage import SQLConfigStorage
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
-from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
-from boefjes.sql.setting_storage import SQLSettingsStorage
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
@@ -22,8 +21,7 @@ class TestAPI(TestCase):
 
         session = sessionmaker(bind=get_engine())()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
-        self.settings_storage = SQLSettingsStorage(session, IdentityMiddleware())
-        self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
+        self.settings_storage = SQLConfigStorage(session, IdentityMiddleware())
 
         self.org = Organisation(id="test", name="Test Organisation")
         self.client = TestClient(app)

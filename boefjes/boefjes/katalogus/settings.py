@@ -24,11 +24,11 @@ def list_settings(
 def upsert_settings(
     organisation_id: str,
     plugin_id: str,
-    values: dict,
+    settings: dict,
     plugin_service: PluginService = Depends(get_plugin_service),
 ):
     with plugin_service as p:
-        p.upsert_settings(values, organisation_id, plugin_id)
+        p.upsert_settings(settings, organisation_id, plugin_id)
 
 
 @router.delete("")

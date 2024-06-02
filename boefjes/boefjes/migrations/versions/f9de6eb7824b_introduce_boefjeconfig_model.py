@@ -25,14 +25,27 @@ def upgrade() -> None:
     op.create_table(
         "boefje_config",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("settings", sa.String(length=512), nullable=False),
-        sa.Column("enabled", sa.Boolean(), nullable=False, default=False),
+        sa.Column("settings", sa.String(length=512), nullable=False, server_default="{}"),
+        sa.Column("enabled", sa.Boolean(), nullable=False, server_default="false"),
         sa.Column("boefje_id", sa.Integer(), nullable=False),
         sa.Column("organisation_pk", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(["boefje_id"], ["boefje.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["organisation_pk"], ["organisation.pk"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("organisation_pk", "boefje_id", name="unique_boefje_config_per_organisation_per_boefje"),
+    )
+    op.create_table(
+        "normalizer_config",
+        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
+        sa.Column("enabled", sa.Boolean(), server_default="false", nullable=False),
+        sa.Column("normalizer_id", sa.Integer(), nullable=False),
+        sa.Column("organisation_pk", sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(["normalizer_id"], ["normalizer.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["organisation_pk"], ["organisation.pk"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint(
+            "organisation_pk", "normalizer_id", name="unique_normalizer_config_per_organisation_per_normalizer"
+        ),
     )
 
     local_plugins = {plugin.id: plugin for plugin in get_local_repository().get_all()}
@@ -41,16 +54,11 @@ def upgrade() -> None:
 
     with create_plugin_storage(session) as storage:
         # Get unique plugin_ids from the settings table for boefjes that do not exist yet in the database
-        for plugin_id_output in (
-            op.get_bind()
-            .execute(
-                """
-            SELECT DISTINCT s.plugin_id FROM settings s left join boefje b on b.plugin_id = s.plugin_id
-                where b.plugin_id IS NULL
-            """
-            )
-            .fetchall()
-        ):
+        query = """
+        SELECT DISTINCT s.plugin_id FROM settings s left join boefje b on b.plugin_id = s.plugin_id
+            where b.plugin_id IS NULL
+        """
+        for plugin_id_output in op.get_bind().execute(query).fetchall():
             plugin_id = plugin_id_output[0]
             if plugin_id not in local_plugins:
                 raise ValueError(f"Invalid plugin id found: {plugin_id}")
@@ -61,14 +69,59 @@ def upgrade() -> None:
 
             storage.create_boefje(local_plugins[plugin_id])  # type: ignore
 
+        query = """
+        SELECT DISTINCT p.plugin_id FROM plugin_state p left join boefje b on b.plugin_id = p.plugin_id
+            where b.plugin_id IS NULL
+        """
+
+        for plugin_id_output in op.get_bind().execute(query).fetchall():
+            plugin_id = plugin_id_output[0]
+            if plugin_id not in local_plugins:
+                raise ValueError(f"Invalid plugin id found: {plugin_id}")
+
+            if local_plugins[plugin_id].type == "boefje":
+                storage.create_boefje(local_plugins[plugin_id])  # type: ignore
+
+        query = """
+        SELECT DISTINCT p.plugin_id FROM plugin_state p left join normalizer n on n.plugin_id = p.plugin_id
+            where n.plugin_id IS NULL
+        """
+
+        for plugin_id_output in op.get_bind().execute(query).fetchall():
+            plugin_id = plugin_id_output[0]
+            if plugin_id not in local_plugins:
+                raise ValueError(f"Invalid plugin id found: {plugin_id}")
+
+            if local_plugins[plugin_id].type == "normalizer":
+                storage.create_normalizer(local_plugins[plugin_id])  # type: ignore
+
     with connection.begin():
         connection.execute("""
-            INSERT INTO boefje_config (settings, boefje_id, enabled, organisation_pk)
-            SELECT s.values, b.id, false, s.organisation_pk from settings s
+            INSERT INTO boefje_config (settings, boefje_id, organisation_pk)
+            SELECT s.values, b.id, s.organisation_pk from settings s
             join boefje b on s.plugin_id = b.plugin_id
         """)
 
+    with connection.begin():
+        connection.execute("""
+            INSERT INTO boefje_config (settings, boefje_id, organisation_pk)
+            SELECT p.enabled, b.id, p.organisation_pk FROM plugin_state p
+            JOIN boefje b ON p.plugin_id = b.plugin_id
+            LEFT JOIN boefje_config bc ON bc.boefje_id = b.id WHERE bc.boefje_id IS NULL
+        """)
+        connection.execute("""
+            UPDATE boefje_config bc SET enabled = p.enabled from plugin_state p
+            JOIN boefje b ON p.plugin_id = b.plugin_id
+            where b.id = bc.boefje_id and p.organisation_pk = bc.organisation_pk
+        """)
+        connection.execute("""
+            UPDATE normalizer_config nc SET enabled = p.enabled from plugin_state p
+            JOIN normalizer n ON p.plugin_id = n.plugin_id
+            where n.id = nc.normalizer_id and p.organisation_pk = nc.organisation_pk
+        """)
+
     op.drop_table("settings")
+    op.drop_table("plugin_state")
     # ### end Alembic commands ###
 
 
@@ -86,6 +139,18 @@ def downgrade() -> None:
         sa.PrimaryKeyConstraint("id", name="settings_pkey"),
         sa.UniqueConstraint("organisation_pk", "plugin_id", name="unique_settings_per_organisation_per_plugin"),
     )
+    op.create_table(
+        "plugin_state",
+        sa.Column("id", sa.INTEGER(), autoincrement=True, nullable=False),
+        sa.Column("plugin_id", sa.VARCHAR(length=64), autoincrement=False, nullable=False),
+        sa.Column("enabled", sa.BOOLEAN(), autoincrement=False, nullable=False),
+        sa.Column("organisation_pk", sa.INTEGER(), autoincrement=False, nullable=False),
+        sa.ForeignKeyConstraint(
+            ["organisation_pk"], ["organisation.pk"], name="plugin_state_organisation_pk_fkey", ondelete="CASCADE"
+        ),
+        sa.PrimaryKeyConstraint("id", name="plugin_state_pkey"),
+        sa.UniqueConstraint("plugin_id", "organisation_pk", name="unique_plugin_id_per_org"),
+    )
 
     connection = op.get_bind()
     with connection.begin():
@@ -95,5 +160,21 @@ def downgrade() -> None:
             join boefje b on bc.boefje_id = b.id
         """)
 
+    with connection.begin():
+        connection.execute("""
+            INSERT INTO plugin_state (enabled, plugin_id, organisation_pk)
+            SELECT bc.enabled, b.plugin_id, bc.organisation_pk from boefje_config bc
+            join boefje b on bc.boefje_id = b.id
+        """)
+
+    with connection.begin():
+        connection.execute("""
+            INSERT INTO plugin_state (enabled, plugin_id, organisation_pk)
+            SELECT nc.enabled, n.plugin_id, nc.organisation_pk from normalizer_config nc
+            join normalizer n on nc.normalizer_id = n.id
+        """)
+
     op.drop_table("boefje_config")
+    op.drop_table("normalizer_config")
+
     # ### end Alembic commands ###

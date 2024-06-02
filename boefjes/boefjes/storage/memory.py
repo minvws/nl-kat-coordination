@@ -1,5 +1,5 @@
 from boefjes.models import Boefje, Normalizer, Organisation, PluginType
-from boefjes.storage.interfaces import OrganisationStorage, PluginEnabledStorage, PluginStorage, SettingsStorage
+from boefjes.storage.interfaces import ConfigStorage, OrganisationStorage, PluginNotFound, PluginStorage
 
 # key = organisation id; value = organisation
 organisations: dict[str, Organisation] = {}
@@ -34,9 +34,15 @@ class PluginStorageMemory(PluginStorage):
         return list(self._boefjes.values()) + list(self._normalizers.values())
 
     def boefje_by_id(self, boefje_id: str) -> Boefje:
+        if boefje_id not in self._boefjes:
+            raise PluginNotFound(boefje_id)
+
         return self._boefjes[boefje_id]
 
     def normalizer_by_id(self, normalizer_id: str) -> Normalizer:
+        if normalizer_id not in self._normalizers:
+            raise PluginNotFound(normalizer_id)
+
         return self._normalizers[normalizer_id]
 
     def create_boefje(self, boefje: Boefje) -> None:
@@ -45,6 +51,30 @@ class PluginStorageMemory(PluginStorage):
     def create_normalizer(self, normalizer: Normalizer) -> None:
         self._normalizers[normalizer.id] = normalizer
 
+    def update_boefje(self, boefje_id: str, data: dict) -> None:
+        if not data:
+            return
+
+        if boefje_id not in self._boefjes:
+            raise PluginNotFound(boefje_id)
+
+        boefje = self._boefjes[boefje_id]
+
+        for key, value in data.items():
+            setattr(boefje, key, value)
+
+    def update_normalizer(self, normalizer_id: str, data: dict) -> None:
+        if not data:
+            return
+
+        if normalizer_id not in self._normalizers:
+            raise PluginNotFound(normalizer_id)
+
+        normalizer = self._normalizers[normalizer_id]
+
+        for key, value in data.items():
+            setattr(normalizer, key, value)
+
     def delete_boefje_by_id(self, boefje_id: str) -> None:
         del self._boefjes[boefje_id]
 
@@ -52,50 +82,49 @@ class PluginStorageMemory(PluginStorage):
         del self._normalizers[normalizer_id]
 
 
-class SettingsStorageMemory(SettingsStorage):
+class ConfigStorageMemory(ConfigStorage):
     def __init__(self):
         self._data = {}
+        self._enabled = {}
 
-    def get_all(self, organisation_id: str, plugin_id: str) -> dict[str, str]:
+    def get_all_settings(self, organisation_id: str, plugin_id: str) -> dict[str, str]:
         if organisation_id not in self._data:
             return {}
 
         return self._data[organisation_id].get(plugin_id, {})
 
-    def upsert(self, values: dict, organisation_id: str, plugin_id: str) -> None:
+    def upsert(
+        self, organisation_id: str, plugin_id: str, settings: dict | None = None, enabled: bool | None = None
+    ) -> None:
         if organisation_id not in self._data:
             self._data[organisation_id] = {}
+
+        if organisation_id not in self._enabled:
+            self._enabled[organisation_id] = {}
 
         if plugin_id not in self._data[organisation_id]:
             self._data[organisation_id][plugin_id] = {}
 
-        self._data[organisation_id][plugin_id] = values
+        if settings is not None:
+            self._data[organisation_id][plugin_id] = settings
+
+        if enabled is not None:
+            self._enabled[organisation_id][plugin_id] = enabled
+
+        return
 
     def delete(self, organisation_id: str, plugin_id: str) -> None:
         del self._data[organisation_id][plugin_id]
 
+    def is_enabled_by_id(self, plugin_id: str, organisation_id: str) -> bool:
+        if organisation_id not in self._enabled or plugin_id not in self._enabled[organisation_id]:
+            raise PluginNotFound(plugin_id)
 
-class PluginStatesStorageMemory(PluginEnabledStorage):
-    def __init__(
-        self,
-        organisation: str,
-        defaults: dict[str, bool] | None = None,
-    ):
-        self._data = plugins_state.setdefault(organisation, {}) if defaults is None else defaults
-        self._organisation = organisation
+        return self._enabled[organisation_id][plugin_id]
 
-    def get_by_id(self, plugin_id: str, organisation_id: str) -> bool:
-        return self._data[f"{organisation_id}.{plugin_id}"]
-
-    def get_all_enabled(self, organisation_id: str) -> list[str]:
+    def get_enabled_boefjes(self, organisation_id: str) -> list[str]:
         return [
-            key.split(".", maxsplit=1)[1]
-            for key, value in self._data.items()
-            if value and key.split(".", maxsplit=1)[0] == organisation_id
+            plugin_id
+            for plugin_id, enabled in self._enabled.get(organisation_id, {}).items()
+            if enabled and "norm" not in plugin_id
         ]
-
-    def create(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
-        self._data[f"{organisation_id}.{plugin_id}"] = enabled
-
-    def update_or_create_by_id(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
-        self._data[f"{organisation_id}.{plugin_id}"] = enabled

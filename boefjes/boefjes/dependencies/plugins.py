@@ -11,17 +11,15 @@ from sqlalchemy.orm import Session
 
 from boefjes.local_repository import LocalPluginRepository, get_local_repository
 from boefjes.models import FilterParameters, PaginationParameters, PluginType
+from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import session_managed_iterator
-from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
 from boefjes.sql.plugin_storage import create_plugin_storage
-from boefjes.sql.setting_storage import create_setting_storage
 from boefjes.storage.interfaces import (
+    ConfigStorage,
     NotFound,
-    PluginEnabledStorage,
     PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
-    SettingsStorage,
 )
 
 logger = logging.getLogger(__name__)
@@ -31,26 +29,22 @@ class PluginService:
     def __init__(
         self,
         plugin_storage: PluginStorage,
-        plugin_enabled_store: PluginEnabledStorage,
-        settings_storage: SettingsStorage,
+        config_storage: ConfigStorage,
         local_repo: LocalPluginRepository,
     ):
         self.plugin_storage = plugin_storage
-        self.plugin_enabled_store = plugin_enabled_store
-        self.settings_storage = settings_storage
+        self.config_storage = config_storage
         self.local_repo = local_repo
 
     def __enter__(self):
-        self.plugin_enabled_store.__enter__()
         self.plugin_storage.__enter__()
-        self.settings_storage.__enter__()
+        self.config_storage.__enter__()
 
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.plugin_enabled_store.__exit__(exc_type, exc_val, exc_tb)
         self.plugin_storage.__exit__(exc_type, exc_val, exc_tb)
-        self.settings_storage.__exit__(exc_type, exc_val, exc_tb)
+        self.config_storage.__exit__(exc_type, exc_val, exc_tb)
 
     def get_all(self, organisation_id: str) -> list[PluginType]:
         all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
@@ -89,25 +83,25 @@ class PluginService:
         return found_plugins
 
     def get_all_settings(self, organisation_id: str, plugin_id: str):
-        return self.settings_storage.get_all(organisation_id, plugin_id)
+        return self.config_storage.get_all_settings(organisation_id, plugin_id)
 
     def clone_settings_to_organisation(self, from_organisation: str, to_organisation: str):
         # One requirement is that only boefjes enabled in the from_organisation end up being enabled for the target.
-        for plugin_id in self.plugin_enabled_store.get_all_enabled(to_organisation):
+        for plugin_id in self.config_storage.get_enabled_boefjes(to_organisation):
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=False)
 
         for plugin in self.get_all(from_organisation):
             if all_settings := self.get_all_settings(from_organisation, plugin.id):
                 self.upsert_settings(all_settings, to_organisation, plugin.id)
 
-        for plugin_id in self.plugin_enabled_store.get_all_enabled(from_organisation):
+        for plugin_id in self.config_storage.get_enabled_boefjes(from_organisation):
             self.set_enabled_by_id(plugin_id, to_organisation, enabled=True)
 
-    def upsert_settings(self, values: dict, organisation_id: str, plugin_id: str):
-        self._assert_settings_match_schema(values, organisation_id, plugin_id)
+    def upsert_settings(self, settings: dict, organisation_id: str, plugin_id: str):
+        self._assert_settings_match_schema(settings, organisation_id, plugin_id)
         self.upsert_boefje(plugin_id, {})  # Settings are a boefje-only feature, so we do this naively
 
-        return self.settings_storage.upsert(values, organisation_id, plugin_id)
+        return self.config_storage.upsert(organisation_id, plugin_id, settings=settings)
 
     def upsert_boefje(self, boefje_id: str, data: dict) -> None:
         """Update and/or insert a boefje. If it concerns a local boefje, make sure there is a database entry first"""
@@ -115,13 +109,17 @@ class PluginService:
         try:
             plugin = self.local_repo.by_id(boefje_id)  # if we fail, it is non-local, so we can perform the update
 
+            if plugin.type != "boefje":
+                raise PluginNotFound(boefje_id)
+
             try:
                 self.plugin_storage.boefje_by_id(boefje_id)
             except PluginNotFound:
                 self.plugin_storage.create_boefje(plugin)  # If there is no database entry, we create one
-        finally:
-            self.plugin_storage.update_boefje(boefje_id, data)  # Perform the update
-            return
+        except KeyError:
+            pass
+
+        self.plugin_storage.update_boefje(boefje_id, data)  # Perform the update
 
     def upsert_normalizer(self, normalizer_id: str, data: dict) -> None:
         """
@@ -131,16 +129,20 @@ class PluginService:
         try:
             plugin = self.local_repo.by_id(normalizer_id)  # if we fail it is non-local, so we can perform the update
 
+            if plugin.type != "normalizer":
+                raise PluginNotFound(normalizer_id)
+
             try:
                 self.plugin_storage.normalizer_by_id(normalizer_id)
             except PluginNotFound:
                 self.plugin_storage.create_normalizer(plugin)  # If there is no database entry, we create one
-        finally:
-            self.plugin_storage.update_normalizer(normalizer_id, data)  # Perform the update
-            return
+        except KeyError:
+            pass
+
+        self.plugin_storage.update_normalizer(normalizer_id, data)  # Perform the update
 
     def delete_settings(self, organisation_id: str, plugin_id: str):
-        self.settings_storage.delete(organisation_id, plugin_id)
+        self.config_storage.delete(organisation_id, plugin_id)
 
         try:
             self._assert_settings_match_schema({}, organisation_id, plugin_id)
@@ -172,14 +174,15 @@ class PluginService:
 
     def set_enabled_by_id(self, plugin_id: str, organisation_id: str, enabled: bool):
         if enabled:
-            all_settings = self.settings_storage.get_all(organisation_id, plugin_id)
+            all_settings = self.get_all_settings(organisation_id, plugin_id)
             self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)
 
-        self.plugin_enabled_store.update_or_create_by_id(
-            plugin_id,
-            enabled,
-            organisation_id,
-        )
+        try:
+            self.upsert_boefje(plugin_id, {})
+        except PluginNotFound:
+            self.upsert_normalizer(plugin_id, {})
+
+        self.config_storage.upsert(organisation_id, plugin_id, enabled=enabled)
 
     def _assert_settings_match_schema(self, all_settings: dict, organisation_id: str, plugin_id: str):
         schema = self.schema(plugin_id)
@@ -192,7 +195,7 @@ class PluginService:
 
     def _set_plugin_enabled(self, plugin: PluginType, organisation_id: str) -> PluginType:
         with contextlib.suppress(KeyError, NotFound):
-            plugin.enabled = self.plugin_enabled_store.get_by_id(plugin.id, organisation_id)
+            plugin.enabled = self.config_storage.is_enabled_by_id(plugin.id, organisation_id)
 
         return plugin
 
@@ -201,8 +204,7 @@ def get_plugin_service(organisation_id: str) -> Iterator[PluginService]:
     def closure(session: Session):
         return PluginService(
             create_plugin_storage(session),
-            create_plugin_enabled_storage(session),
-            create_setting_storage(session),
+            create_config_storage(session),
             get_local_repository(),
         )
 

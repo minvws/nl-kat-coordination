@@ -5,12 +5,23 @@ from fastapi.testclient import TestClient
 from boefjes.dependencies.plugins import get_plugin_service
 from boefjes.katalogus.organisations import check_organisation_exists
 from boefjes.katalogus.root import app
+from boefjes.storage.interfaces import OrganisationNotFound
 from tests.katalogus.test_plugin_service import mock_plugin_service
 
 
 class TestPlugins(TestCase):
     def setUp(self) -> None:
-        app.dependency_overrides[get_plugin_service] = mock_plugin_service
+        services = {
+            "test-org": mock_plugin_service("test-org"),
+        }
+
+        def get_service(organisation_id: str):
+            if organisation_id in services:
+                return services.get(organisation_id)
+
+            raise OrganisationNotFound(organisation_id)
+
+        app.dependency_overrides[get_plugin_service] = get_service
         app.dependency_overrides[check_organisation_exists] = lambda: None
 
         self.client = TestClient(app)
@@ -104,7 +115,7 @@ class TestPlugins(TestCase):
 
     def test_patching_enabled_state(self):
         res = self.client.patch(
-            "/v1/organisations/test-org/plugins/test-boefje-1",
+            "/v1/organisations/test-org/plugins/kat_test_normalize",
             json={"enabled": False},
         )
         self.assertEqual(200, res.status_code)
@@ -116,7 +127,7 @@ class TestPlugins(TestCase):
                 "kat_test": False,
                 "kat_test_4": False,
                 "kat_test_2": False,
-                "kat_test_normalize": True,
+                "kat_test_normalize": False,
                 "kat_test_normalize_2": True,
             },
             {plugin["id"]: plugin["enabled"] for plugin in res.json()},
@@ -124,21 +135,8 @@ class TestPlugins(TestCase):
 
     def test_patching_enabled_state_non_existing_org(self):
         res = self.client.patch(
-            "/v1/organisations/non-existing-org/plugins/test-boefje-1",
+            "/v1/organisations/non-existing-org/plugins/kat_test_normalize",
             json={"enabled": False},
         )
 
-        self.assertEqual(200, res.status_code)
-
-        res = self.client.get("/v1/organisations/non-existing-org/plugins")
-        self.assertEqual(200, res.status_code)
-        self.assertEqual(
-            {
-                "kat_test": False,
-                "kat_test_2": False,
-                "kat_test_4": False,
-                "kat_test_normalize": True,
-                "kat_test_normalize_2": True,
-            },
-            {plugin["id"]: plugin["enabled"] for plugin in res.json()},
-        )
+        self.assertEqual(404, res.status_code)
