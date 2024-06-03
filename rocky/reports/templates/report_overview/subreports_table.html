@@ -26,8 +26,8 @@
                 <td>
                     <a href="{% ooi_url "ooi_detail" subreport.input_ooi organization.code %}">{{ subreport.input_ooi|human_readable }}</a>
                 </td>
-                <td>{{ subreport.observed_at|date }}</td>
-                <td>{{ subreport.date_generated }}</td>
+                <td class="nowrap">{{ subreport.observed_at|date }}</td>
+                <td class="nowrap">{{ subreport.date_generated }}</td>
             </tr>
         {% endfor %}
     </tbody>

@@ -43,8 +43,8 @@
                             {{ report.total_objects }}
                         {% endif %}
                     </td>
-                    <td>{{ report.parent_report.observed_at|date }}</td>
-                    <td>{{ report.parent_report.date_generated }}</td>
+                    <td class="nowrap">{{ report.parent_report.observed_at|date }}</td>
+                    <td class="nowrap">{{ report.parent_report.date_generated }}</td>
                     <td>
                         {% if report.children_reports %}
                             <button type="button"
