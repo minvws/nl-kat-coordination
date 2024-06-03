@@ -13,6 +13,6 @@ Censys expects an IpAddress or Hostname as input.
 
 Censys currently outputs the following OOIs:
 
-|OOI type|Description|
-|---|---|
-|IpPort|Open IpPort found on input OOI|
+| OOI type | Description                    |
+| -------- | ------------------------------ |
+| IpPort   | Open IpPort found on input OOI |

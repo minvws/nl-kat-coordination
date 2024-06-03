@@ -2,10 +2,9 @@ import ipaddress
 import json
 import re
 from collections.abc import Iterable
-from collections.abc import Iterable as Iterable_
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType
 from octopoes.models.ooi.network import (
@@ -36,11 +35,10 @@ SEVERITY_LEAKSTAGE_MAPPING = {
 }
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable_[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
 
-    boefje_meta = normalizer_meta.raw_data.boefje_meta
-    pk_ooi = Reference.from_str(boefje_meta.input_ooi)
+    pk_ooi = Reference.from_str(input_ooi["primary_key"])
     network_reference = Network(name="internet").reference
 
     for event in results:
@@ -59,7 +57,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable_[OOI]:
             yield as_ooi
 
         if event["ip"]:
-            for ooi in list(handle_ip(event, network_reference, as_ooi.reference)):
+            for ooi in list(handle_ip(event, network_reference, as_ooi.reference if as_ooi else None)):
                 yield ooi
             # we only need the last ooi's reference
             event_ooi_reference = ooi.reference

@@ -2,15 +2,7 @@ import datetime
 from enum import Enum
 from typing import Literal
 
-from pydantic import AnyHttpUrl, BaseModel, Field
-
-RESERVED_LOCAL_ID = "LOCAL"
-
-
-class Repository(BaseModel):
-    id: str
-    name: str
-    base_url: AnyHttpUrl
+from pydantic import BaseModel, Field
 
 
 class Organisation(BaseModel):
@@ -20,7 +12,6 @@ class Organisation(BaseModel):
 
 class Plugin(BaseModel):
     id: str
-    repository_id: str = RESERVED_LOCAL_ID
     name: str | None = None
     version: str | None = None
     authors: list[str] | None = None
@@ -66,3 +57,16 @@ PluginType = Boefje | Normalizer | Bit
 class EncryptionMiddleware(Enum):
     IDENTITY = "IDENTITY"
     NACL_SEALBOX = "NACL_SEALBOX"
+
+
+class PaginationParameters(BaseModel):
+    offset: int = 0
+    limit: int | None = None
+
+
+class FilterParameters(BaseModel):
+    q: str | None = None
+    type: Literal["boefje", "normalizer", "bit"] | None = None
+    ids: list[str] | None = None
+    state: bool | None = None
+    scan_level: int = 0

@@ -45,7 +45,7 @@ services:
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 4
 
@@ -75,7 +75,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0
+    command: uvicorn boefjes.katalogus.api.root:app --host 0.0.0.0
     ports:
       - "127.0.0.1:8003:8000"
     env_file:
