@@ -27,7 +27,7 @@
                             {% if forloop.counter0 < 2 %}
                                 <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
                             {% endif %}
-                            {% if forloop.counter0 == 3 %}
+                            {% if forloop.counter0 == 2 %}
                                 <span class="label tags-color-grey-2">+ {{ report.report_type_summary|length|add:"-2" }}</span>
                             {% endif %}
                         {% endfor %}
