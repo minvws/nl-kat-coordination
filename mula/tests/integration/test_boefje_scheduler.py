@@ -1332,8 +1332,6 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
     def test_push_tasks_for_new_boefjes_empty_consumes_no_ooi(self):
         # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
         boefje = PluginFactory(scan_level=0, consumes=[])
 
         # Mocks
