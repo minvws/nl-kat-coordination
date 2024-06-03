@@ -215,9 +215,7 @@ class BoefjeScheduler(Scheduler):
         boefjes can run on, and create tasks for it."""
         new_boefjes = None
         try:
-            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(
-                self.organisation.id
-            )
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
         except ExternalServiceError:
             self.logger.error(
                 "Failed to get new boefjes for organisation: %s from katalogus",
@@ -249,12 +247,10 @@ class BoefjeScheduler(Scheduler):
 
             oois_by_object_type: list[OOI] = []
             try:
-                oois_by_object_type = (
-                    self.ctx.services.octopoes.get_objects_by_object_types(
-                        self.organisation.id,
-                        boefje.consumes,
-                        list(range(boefje.scan_level, 5)),
-                    )
+                oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
+                    self.organisation.id,
+                    boefje.consumes,
+                    list(range(boefje.scan_level, 5)),
                 )
             except ExternalServiceError as exc:
                 self.logger.error(
@@ -483,8 +479,7 @@ class BoefjeScheduler(Scheduler):
             and (
                 task_db.modified_at is not None
                 and task_db.modified_at
-                > datetime.now(timezone.utc)
-                - timedelta(seconds=self.ctx.config.pq_grace_period)
+                > datetime.now(timezone.utc) - timedelta(seconds=self.ctx.config.pq_grace_period)
             )
         ):
             self.logger.error(
@@ -497,11 +492,7 @@ class BoefjeScheduler(Scheduler):
             )
             raise RuntimeError("Task has been finished, but no results found in bytes")
 
-        if (
-            task_bytes is not None
-            and task_bytes.ended_at is None
-            and task_bytes.started_at is not None
-        ):
+        if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
             self.logger.debug(
                 "Task is still running, according to bytes",
                 task_id=task_bytes.id,
@@ -542,8 +533,7 @@ class BoefjeScheduler(Scheduler):
             and (
                 task_db.modified_at is not None
                 and datetime.now(timezone.utc)
-                > task_db.modified_at
-                + timedelta(seconds=self.ctx.config.pq_grace_period)
+                > task_db.modified_at + timedelta(seconds=self.ctx.config.pq_grace_period)
             )
         ):
             return True
@@ -615,9 +605,7 @@ class BoefjeScheduler(Scheduler):
                 )
 
                 # Update task in datastore to be failed
-                task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(
-                    task.hash
-                )
+                task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
                 task_db.status = TaskStatus.FAILED
                 self.ctx.datastores.task_store.update_task(task_db)
         except Exception as exc_stalled:
@@ -752,9 +740,9 @@ class BoefjeScheduler(Scheduler):
             raise exc_db
 
         # Has grace period passed according to datastore?
-        if task_db is not None and datetime.now(
-            timezone.utc
-        ) - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_grace_period):
+        if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timedelta(
+            seconds=self.ctx.config.pq_grace_period
+        ):
             self.logger.debug(
                 "Task has not passed grace period, according to the datastore",
                 task_id=task_db.id,
@@ -784,8 +772,7 @@ class BoefjeScheduler(Scheduler):
         if (
             task_bytes is not None
             and task_bytes.ended_at is not None
-            and datetime.now(timezone.utc) - task_bytes.ended_at
-            < timedelta(seconds=self.ctx.config.pq_grace_period)
+            and datetime.now(timezone.utc) - task_bytes.ended_at < timedelta(seconds=self.ctx.config.pq_grace_period)
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to bytes",
