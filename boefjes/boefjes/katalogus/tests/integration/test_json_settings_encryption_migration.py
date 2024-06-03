@@ -14,10 +14,13 @@ from boefjes.sql.setting_storage import SQLSettingsStorage, create_encrypter
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
-class TestRepositories(TestCase):
+class TestJsonSecretsMigration(TestCase):
     def setUp(self) -> None:
         self.engine = get_engine()
-        SQL_BASE.metadata.drop_all(self.engine)
+
+        # To reset autoincrement ids
+        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "downgrade", "base"])
+        # Set state to revision 197672984df0
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "197672984df0"])
 
     def test_setting_to_settings_json(self):
@@ -33,7 +36,7 @@ class TestRepositories(TestCase):
         query = f"INSERT INTO setting (key, value, organisation_pk, plugin_id) values {','.join(map(str, entries))}"  # noqa: S608
         self.engine.execute(text(query))
 
-        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
+        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "cd34fdfafdaf"])
 
         settings_storage = SQLSettingsStorage(session, encrypter)
         assert settings_storage.get_all("dev1", "test-plugin1") == {"key1": "val1", "key3": "val3"}
@@ -52,7 +55,14 @@ class TestRepositories(TestCase):
 
     def tearDown(self) -> None:
         alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
-        SQL_BASE.metadata.drop_all(self.engine)
+
+        session = sessionmaker(bind=get_engine())()
+
+        for table in SQL_BASE.metadata.tables:
+            session.execute(f"DELETE FROM {table} CASCADE")  # noqa: S608
+
+        session.commit()
+        session.close()
 
     @staticmethod
     def _collect_entries(encrypter: NaclBoxMiddleware):
