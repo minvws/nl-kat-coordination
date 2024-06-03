@@ -1,55 +1,31 @@
 import os
-import time
 from unittest import TestCase, skipIf
 
-from sqlalchemy.exc import OperationalError
+import alembic.config
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
 
 from boefjes.config import settings
-from boefjes.katalogus.api import app
+from boefjes.katalogus.api.root import app
 from boefjes.katalogus.dependencies.encryption import IdentityMiddleware
-from boefjes.katalogus.models import Organisation, Repository
+from boefjes.katalogus.models import Organisation
 from boefjes.sql.db import SQL_BASE, get_engine
 from boefjes.sql.organisation_storage import SQLOrganisationStorage
 from boefjes.sql.plugin_enabled_storage import SQLPluginEnabledStorage
-from boefjes.sql.repository_storage import SQLRepositoryStorage
 from boefjes.sql.setting_storage import SQLSettingsStorage
 
 
 @skipIf(os.environ.get("CI") != "1", "Needs a CI database.")
 class TestAPI(TestCase):
     def setUp(self) -> None:
-        self.engine = get_engine()
+        alembic.config.main(argv=["--config", "/app/boefjes/boefjes/alembic.ini", "upgrade", "head"])
 
-        # Some retries to handle db startup time in tests
-        for i in range(3):
-            try:
-                SQL_BASE.metadata.create_all(self.engine)
-                break
-            except OperationalError as e:
-                if i == 2:
-                    raise e
-
-                time.sleep(1)
-
-        session = sessionmaker(bind=self.engine)()
+        session = sessionmaker(bind=get_engine())()
         self.organisation_storage = SQLOrganisationStorage(session, settings)
-        self.repository_storage = SQLRepositoryStorage(session, settings)
         self.settings_storage = SQLSettingsStorage(session, IdentityMiddleware())
         self.plugin_state_storage = SQLPluginEnabledStorage(session, settings)
 
-        with self.repository_storage as store:
-            store.create(
-                Repository(
-                    id="LOCAL",
-                    name="Test",
-                    base_url="http://test.url",
-                )
-            )
-
         self.org = Organisation(id="test", name="Test Organisation")
-
         self.client = TestClient(app)
         response = self.client.post("/v1/organisations/", content=self.org.json())
         self.assertEqual(response.status_code, 201)
@@ -70,7 +46,6 @@ class TestAPI(TestCase):
         data = response.json()
 
         self.assertEqual("dns-records", data["id"])
-        self.assertEqual("LOCAL", data["repository_id"])
 
     def test_basic_settings_api(self):
         plug = "dns-records"
@@ -95,7 +70,7 @@ class TestAPI(TestCase):
             f"/v1/organisations/{self.org.id}/{plug}/settings",
             json={"test_key": "test value", "test_key_2": "test value 2"},
         )
-        self.client.patch(f"/v1/organisations/{self.org.id}/repositories/LOCAL/plugins/{plug}", json={"enabled": True})
+        self.client.patch(f"/v1/organisations/{self.org.id}/plugins/{plug}", json={"enabled": True})
 
         assert self.client.get(f"/v1/organisations/{self.org.id}/{plug}/settings").json() == {
             "test_key": "test value",
@@ -114,7 +89,7 @@ class TestAPI(TestCase):
         assert self.client.get(f"/v1/organisations/{new_org_id}/plugins/{plug}").json()["enabled"] is False
 
         # Enable two boefjes that should get disabled by the cloning
-        self.client.patch(f"/v1/organisations/{new_org_id}/repositories/LOCAL/plugins/nmap", json={"enabled": True})
+        self.client.patch(f"/v1/organisations/{new_org_id}/plugins/nmap", json={"enabled": True})
         assert self.client.get(f"/v1/organisations/{new_org_id}/plugins/nmap").json()["enabled"] is True
 
         # Call the clone endpoint
