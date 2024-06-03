@@ -13,7 +13,7 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 from octopoes.models.ooi.web import URL
 from octopoes.models.types import OOIType
 
-OOI_TYPES = {
+OOI_TYPES: dict[str, dict] = {
     "Hostname": {"type": Hostname},
     "URL": {"type": URL},
     "Network": {"type": Network, "default": "internet", "argument": "name"},
@@ -109,7 +109,7 @@ def get_ooi_from_csv(
     return ooi_type(**kwargs), extra_declarations
 
 
-def get_or_create_reference(ooi_type_name: str, value: str, reference_cache):
+def get_or_create_reference(ooi_type_name: str, value: str | None, reference_cache):
     ooi_type_name = next(filter(lambda x: x.casefold() == ooi_type_name.casefold(), OOI_TYPES.keys()))
 
     # get from cache

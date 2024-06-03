@@ -1,14 +1,7 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table, UniqueConstraint
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from boefjes.sql.db import SQL_BASE
-
-organisation_repo_association_table = Table(
-    "organisation_repository",
-    SQL_BASE.metadata,
-    Column("organisation_pk", ForeignKey("organisation.pk"), nullable=False),
-    Column("repository_pk", ForeignKey("repository.pk"), nullable=False),
-)
 
 
 class OrganisationInDB(SQL_BASE):
@@ -17,17 +10,6 @@ class OrganisationInDB(SQL_BASE):
     pk = Column(Integer, primary_key=True, autoincrement=True)
     id = Column(String(length=32), unique=True, nullable=False)
     name = Column(String(length=64), nullable=False)
-
-    repositories = relationship("RepositoryInDB", secondary=organisation_repo_association_table)
-
-
-class RepositoryInDB(SQL_BASE):
-    __tablename__ = "repository"
-
-    pk = Column(Integer, primary_key=True, autoincrement=True)
-    id = Column(String(length=32), unique=True, nullable=False)
-    name = Column(String(length=64), nullable=False)
-    base_url = Column(String(length=128), nullable=False)
 
 
 class SettingsInDB(SQL_BASE):
@@ -54,16 +36,13 @@ class PluginStateInDB(SQL_BASE):
         UniqueConstraint(
             "plugin_id",
             "organisation_pk",
-            "repository_pk",
-            name="unique_plugin_per_repo_per_org",
+            name="unique_plugin_id_per_org",
         ),
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     plugin_id = Column(String(length=64), nullable=False)
     enabled = Column(Boolean, nullable=False)
-    organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
-    repository_pk = Column(Integer, ForeignKey("repository.pk", ondelete="CASCADE"), nullable=False)
 
+    organisation_pk = Column(Integer, ForeignKey("organisation.pk", ondelete="CASCADE"), nullable=False)
     organisation = relationship("OrganisationInDB")
-    repository = relationship("RepositoryInDB")
