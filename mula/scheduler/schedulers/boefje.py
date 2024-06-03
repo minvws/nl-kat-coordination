@@ -234,6 +234,13 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
+        self.logger.debug(
+            "Received new boefjes",
+            boefjes=[boefje.name for boefje in new_boefjes],
+            organisation_id=self.organisation.id,
+            scheduler_id=self.scheduler_id,
+        )
+
         for boefje in new_boefjes:
             if not boefje.consumes:
                 self.logger.debug(
