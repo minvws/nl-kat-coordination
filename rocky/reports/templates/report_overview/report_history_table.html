@@ -22,7 +22,18 @@
                        title="{% translate "Shows parent report details" %}">{{ report.parent_report.reference }}</a>
                 </td>
                 <td>
-                    <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
+                    {% if report.parent_report.report_type is concatenated_report or report.parent_report.report_type is None %}
+                        {% for report_type, total_objects in report.report_type_summary.items %}
+                            {% if forloop.counter0 < 2 %}
+                                <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
+                            {% endif %}
+                            {% if forloop.counter0 == 3 %}
+                                <span class="label tags-color-grey-2">+ {{ report.report_type_summary|length|add:"-2" }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <span class="label tags-color-{{ report.parent_report.report_type|get_report_type_label_style }}">{{ report.parent_report.report_type|get_report_type_name }}</span>
+                    {% endif %}
                 </td>
                 <td>
                     {% if report.parent_report.input_ooi %}
