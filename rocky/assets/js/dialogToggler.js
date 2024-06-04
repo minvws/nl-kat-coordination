@@ -3,9 +3,9 @@ import { onDomReady } from "./imports/utils.js";
 onDomReady(initDialogs);
 
 export function initDialogs() {
-  let modals = document.querySelectorAll(".modal-wrapper");
+  let modal_components = document.querySelectorAll(".modal-wrapper");
 
-  modals.forEach((modal) => {
+  modal_components.forEach((modal) => {
     modal
       .querySelector("button.modal-trigger")
       .addEventListener("click", (event) => {
@@ -15,17 +15,15 @@ export function initDialogs() {
         modal.querySelector(target).showModal();
       });
 
-    let close_buttons = modal.querySelectorAll(".close-modal-button");
+    let dialog_element = modal.querySelector("dialog");
 
-    close_buttons.forEach((close_button) => {
-      close_button.addEventListener("click", (event) => {
-        modal.querySelector("dialog").close();
-      });
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key.toLowerCase() === "escape") {
-        modal.querySelector("dialog").close();
+    dialog_element.addEventListener("click", (event) => {
+      // event.target.nodeName === 'DIALOG' is needed to check if the ::backdrop is clicked.
+      if (
+        event.target.nodeName === "DIALOG" ||
+        event.target.classList.contains("close-modal-button")
+      ) {
+        dialog_element.close();
       }
     });
   });
