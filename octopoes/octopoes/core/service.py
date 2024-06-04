@@ -50,7 +50,11 @@ BIT_CACHE: dict[int, list[OOI]] = {}
 
 
 def bit_cache_key(*args) -> int:
-    return hash(pickle.dumps(args))
+    try:
+        return hash(pickle.dumps(args))
+    except pickle.PicklingError:
+        logger.warning("Unable to pickle %s", args)
+        return -len(BIT_CACHE)
 
 
 def find_relation_in_tree(relation: str, tree: ReferenceTree) -> list[OOI]:
