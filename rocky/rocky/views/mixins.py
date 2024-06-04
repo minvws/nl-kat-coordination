@@ -314,18 +314,18 @@ class ReportList:
         raise NotImplementedError("ReportList only supports slicing")
 
     def get_subreports(self, report_id: str) -> list[Report]:
-        reports = reports = self.octopoes_connector.list_reports(
-            valid_time=self.valid_time,
-        ).items
+        """
+        Get child reports with parent id.
+        """
+        # TODO: is better to use query over query_many as we use one parent id.
+        # query will only return 50 items as we do not have pagination (offset and limit)
+        # yet implemented for query requests. We use query_many to get more then 50 items at once.
 
-        subreports: list[Report] = []
-
-        for report in reports[:]:
-            _, children_reports = report
-
-            for child_report in children_reports:
-                if str(child_report.parent_report) == report_id:
-                    subreports.append(child_report)
+        subreports = self.octopoes_connector.query_many(
+            "Report.<parent_report [is Report]",
+            self.valid_time,
+            [report_id],
+        )
 
         return subreports
 
