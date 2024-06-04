@@ -19,7 +19,6 @@ logger = getLogger(__name__)
 
 class Plugin(BaseModel):
     id: str
-    repository_id: str
     name: str
     version: str | None = None
     authors: str | None = None
@@ -162,13 +161,13 @@ class KATalogusClientV1:
         return self.get_plugins(plugin_type="boefje")
 
     def enable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, True, plugin.repository_id)
+        self._patch_boefje_state(plugin.id, True)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
         self.enable_boefje(self.get_plugin(boefje_id))
 
     def disable_boefje(self, plugin: Plugin) -> None:
-        self._patch_boefje_state(plugin.id, False, plugin.repository_id)
+        self._patch_boefje_state(plugin.id, False)
 
     def get_enabled_boefjes(self) -> list[Plugin]:
         return [plugin for plugin in self.get_boefjes() if plugin.enabled]
@@ -176,9 +175,9 @@ class KATalogusClientV1:
     def get_enabled_normalizers(self) -> list[Plugin]:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
-    def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
+    def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
         response = self.session.patch(
-            f"{self.organization_uri}/repositories/{repository_id}/plugins/{boefje_id}",
+            f"{self.organization_uri}/plugins/{boefje_id}",
             json={"enabled": enabled},
         )
         response.raise_for_status()
@@ -208,7 +207,6 @@ def parse_boefje(boefje: dict) -> Boefje:
 
     return Boefje(
         id=boefje["id"],
-        repository_id=boefje["repository_id"],
         name=boefje.get("name") or boefje["id"],
         description=boefje["description"],
         enabled=boefje["enabled"],
@@ -234,7 +232,6 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
 
     return Normalizer(
         id=normalizer["id"],
-        repository_id=normalizer["repository_id"],
         name=name,
         description=normalizer["description"],
         enabled=normalizer["enabled"],
