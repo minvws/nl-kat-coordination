@@ -209,9 +209,9 @@ class OctopoesService:
                 config = configs[-1].config
 
         key = bit_cache_key(bit_definition, source, parameters, config)
-        if key not in BIT_CACHE:
-            BIT_CACHE[key] = BitRunner(bit_definition).run(source, parameters, config=config)
         try:
+            if key not in BIT_CACHE:
+                BIT_CACHE[key] = BitRunner(bit_definition).run(source, parameters, config=config)
             self.save_origin(
                 origin,
                 BIT_CACHE[key],
