@@ -1,4 +1,5 @@
 import json
+import pickle
 from collections import Counter
 from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
@@ -45,6 +46,11 @@ from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 logger = getLogger(__name__)
 settings = Settings()
+BIT_CACHE: dict[int, list[OOI]] = {}
+
+
+def bit_cache_key(*args) -> int:
+    return hash(pickle.dumps(args))
 
 
 def find_relation_in_tree(relation: str, tree: ReferenceTree) -> list[OOI]:
@@ -190,7 +196,7 @@ class OctopoesService:
         source = self.ooi_repository.get(origin.source, valid_time)
 
         parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
-        parameters = self.ooi_repository.load_bulk({x.reference for x in parameters_references}, valid_time)
+        parameters = self.ooi_repository.get_bulk({x.reference for x in parameters_references}, valid_time)
 
         config = {}
         if bit_definition.config_ooi_relation_path is not None:
@@ -198,13 +204,17 @@ class OctopoesService:
             if len(configs) != 0:
                 config = configs[-1].config
 
+        key = bit_cache_key(bit_definition, source, parameters, config)
+        if key not in BIT_CACHE:
+            BIT_CACHE[key] = BitRunner(bit_definition).run(source, parameters, config=config)
         try:
-            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
+            self.save_origin(
+                origin,
+                BIT_CACHE[key],
+                valid_time,
+            )
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
-            return
-
-        self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int):
@@ -584,11 +594,12 @@ class OctopoesService:
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
             # loop over all oois that are consumed by the bit
-            for ooi in self.ooi_repository.list_oois(
-                {bit_definition.consumes}, limit=20000, valid_time=valid_time
-            ).items:
+            for ooi in self.ooi_repository.get_oois(
+                {bit_definition.consumes},
+                valid_time=valid_time,
+            ):
                 if not isinstance(ooi, bit_definition.consumes):
-                    logger.exception("Wut?")
+                    logger.exception("Requested OOI type not met")
 
                 # insert, if not exists
                 bit_instance = Origin(

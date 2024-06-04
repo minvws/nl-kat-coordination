@@ -78,6 +78,9 @@ class OOIRepository(Repository):
     def load_bulk(self, references: set[Reference], valid_time: datetime) -> dict[str, OOI]:
         raise NotImplementedError
 
+    def get_bulk(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
+        raise NotImplementedError
+
     def get_neighbours(
         self, reference: Reference, valid_time: datetime, paths: set[Path] | None = None
     ) -> dict[Path, list[OOI]]:
@@ -266,6 +269,10 @@ class XTDBOOIRepository(OOIRepository):
         oois = [self.deserialize(x[0]) for x in res]
         return {ooi.primary_key: ooi for ooi in oois}
 
+    def get_bulk(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
+        query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: list(map(str, references))})
+        return [self.deserialize(x[0]) for x in self.session.client.query(query, valid_time)]
+
     def list_oois(
         self,
         types: set[type[OOI]],
@@ -328,6 +335,26 @@ class XTDBOOIRepository(OOIRepository):
             count=count,
             items=oois,
         )
+
+    def get_oois(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+    ) -> list[OOI]:
+        types = to_concrete(types)
+        data_query = """
+                {{
+                    :query {{
+                        :find [(pull ?e [*])]
+                        :in [[_object_type ...]]
+                        :where [[?e :object_type _object_type]]
+                    }}
+                    :in-args [[{object_types}]]
+                }}
+        """.format(
+            object_types=" ".join(map(lambda t: str_val(t.get_object_type()), types)),
+        )
+        return [self.deserialize(x[0]) for x in self.session.client.query(data_query, valid_time)]
 
     def list_random(
         self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
