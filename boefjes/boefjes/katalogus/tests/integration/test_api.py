@@ -56,10 +56,24 @@ class TestAPI(TestCase):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins?limit=10")
         self.assertEqual(len(response.json()), 10)
 
+    def test_cannot_add_plugin_reserved_id(self):
+        boefje = Boefje(id="dns-records", name="My test boefje", static=False)
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json(), {"message": "Plugin id 'dns-records' is already used"})
+
+        normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer", static=False)
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json(), {"message": "Plugin id 'kat_nmap_normalize' is already used"})
+
     def test_add_boefje(self):
         boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
         self.assertEqual(response.status_code, 201)
+
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", json={"a": "b"})
+        self.assertEqual(response.status_code, 422)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/?plugin_type=boefje")
         self.assertEqual(len(response.json()), 42)
@@ -71,8 +85,13 @@ class TestAPI(TestCase):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_plugin")
         self.assertEqual(response.json(), boefje_dict)
 
+    def test_delete_boefje(self):
+        boefje = Boefje(id="test_plugin", name="My test boefje", static=False)
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
+        self.assertEqual(response.status_code, 201)
+
         response = self.client.delete(f"/v1/organisations/{self.org.id}/boefjes/test_plugin")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_plugin")
         self.assertEqual(response.status_code, 404)
 
@@ -87,8 +106,13 @@ class TestAPI(TestCase):
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_normalizer")
         self.assertEqual(response.json(), normalizer.dict())
 
+    def test_delete_normalizer(self):
+        normalizer = Normalizer(id="test_normalizer", name="My test normalizer", static=False)
+        response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
+        self.assertEqual(response.status_code, 201)
+
         response = self.client.delete(f"/v1/organisations/{self.org.id}/normalizers/test_normalizer")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/test_normalizer")
         self.assertEqual(response.status_code, 404)
 
@@ -102,16 +126,16 @@ class TestAPI(TestCase):
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{boefje.id}")
         self.assertEqual(response.json()["description"], "4")
-        self.assertEqual(response.json()["enabled"], True)
+        self.assertTrue(response.json()["enabled"])
 
         r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"id": "4", "version": "s"})
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, 404)
         r = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"name": "Overwrite name"})
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.status_code, 404)
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
-        self.assertEqual(response.json()["name"], "Overwrite name")
-        self.assertEqual(response.json()["version"], None)
+        self.assertEqual(response.json()["name"], "DnsRecords")
+        self.assertIsNone(response.json()["version"])
         self.assertEqual(response.json()["id"], "dns-records")
 
         self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())

@@ -44,8 +44,8 @@ class Normalizer(Plugin):
 class Bit(Plugin):
     type: Literal["bit"] = "bit"
     consumes: str
-    produces: list[str] = Field(default_factory=list)
-    parameters: list[str] = Field(default_factory=list)  # ooi.relation-name
+    produces: list[str]
+    parameters: list[str]  # ooi.relation-name
     enabled: bool = True
 
 

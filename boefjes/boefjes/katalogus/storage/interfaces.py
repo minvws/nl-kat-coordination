@@ -37,6 +37,11 @@ class PluginStateNotFound(NotFound):
         super().__init__(f"State for plugin with id '{plugin_id}' not found for organisation '{organisation_id}'")
 
 
+class ExistingPluginId(StorageError):
+    def __init__(self, plugin_id: str):
+        super().__init__(f"Plugin id '{plugin_id}' is already used")
+
+
 class SettingsNotFound(NotFound):
     def __init__(self, organisation_id: str, plugin_id: str):
         super().__init__(f"Setting not found for organisation '{organisation_id}' and plugin '{plugin_id}'")
