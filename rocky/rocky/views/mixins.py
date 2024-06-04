@@ -367,19 +367,12 @@ class ReportList:
         """
         Calculates per report type how many objects it consumed.
         """
-        report_types = set()
-        summary = {}
 
-        for report in reports:
-            report_types.add(report.report_type)
+        summary: dict[str, int] = {}
+        report_types: set[str] = {report.report_type for report in reports}
 
         for report_type in report_types:
-            objects = []
-            for report in reports:
-                if report_type == report.report_type:
-                    objects.append(report.input_ooi)
-
-            summary[report_type] = len(objects)
+            summary[report_type] = len({report.input_ooi for report in reports if report_type == report.report_type})
 
         return summary
 
