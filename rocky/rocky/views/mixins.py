@@ -301,13 +301,15 @@ class ReportList:
             limit = self.HARD_LIMIT
             if key.stop:
                 limit = key.stop - offset
+
+            if self.subreports is not None:
+                return self.subreports[offset : offset + limit]
+
             reports = self.octopoes_connector.list_reports(
                 valid_time=self.valid_time,
                 offset=offset,
                 limit=limit,
             ).items
-            if self.subreports is not None:
-                return self.subreports[offset : offset + limit]
 
             return self.hydrate_report_list(reports)
 
