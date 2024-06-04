@@ -97,6 +97,13 @@ class OOIRepository(Repository):
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
+    def get_oois(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+    ) -> list[OOI]:
+        raise NotImplementedError
+
     def list_random(
         self, valid_time: datetime, amount: int = 1, scan_levels: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER
     ) -> list[OOI]:
