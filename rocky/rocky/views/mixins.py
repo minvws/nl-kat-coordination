@@ -358,10 +358,7 @@ class ReportList:
 
     @staticmethod
     def get_total_objects(reports: list[Report]) -> int:
-        input_objects: set = set()
-        for report in reports:
-            input_objects.add(report.input_ooi)
-        return len(input_objects)
+        return len({report.input_ooi for report in reports})
 
     @staticmethod
     def report_type_summary(reports: list[Report]) -> dict[str, int]:
