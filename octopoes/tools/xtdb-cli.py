@@ -153,7 +153,7 @@ def attribute_stats(ctx: click.Context):
 
 
 @cli.command(
-    help="""Wait until the Kafka consumer’s lag is back to 0 (i.e. when it no longer has
+    help="""Wait until the consumer’s lag is back to 0 (i.e. when it no longer has
     pending transactions to write). Returns the transaction time of the most recent transaction."""
 )
 @click.option("--timeout", type=int, help="Specified in milliseconds (integer)")
