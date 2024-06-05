@@ -1,5 +1,4 @@
 import json
-import pickle
 from collections import Counter
 from collections.abc import Callable, ValuesView
 from datetime import datetime, timezone
@@ -50,11 +49,7 @@ BIT_CACHE: dict[int, list[OOI]] = {}
 
 
 def bit_cache_key(*args) -> int:
-    try:
-        return hash(pickle.dumps(args))
-    except pickle.PicklingError:
-        logger.warning("Unable to pickle %s", args)
-        return -len(BIT_CACHE)
+    return hash(str(args))
 
 
 def find_relation_in_tree(relation: str, tree: ReferenceTree) -> list[OOI]:
