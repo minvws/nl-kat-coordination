@@ -191,7 +191,6 @@ def test_ooi_detail_start_scan(
 
     mock_katalogus().get_plugin.return_value = Boefje(
         id="nmap",
-        repository_id="",
         name="",
         description="",
         enabled=True,

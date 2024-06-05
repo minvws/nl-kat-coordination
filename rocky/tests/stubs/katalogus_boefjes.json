@@ -1,7 +1,6 @@
 [
   {
     "id": "binaryedge",
-    "repository_id": "LOCAL",
     "name": "BinaryEdge",
     "version": null,
     "authors": null,
@@ -32,7 +31,6 @@
   },
   {
     "id": "ssl-certificates",
-    "repository_id": "LOCAL",
     "name": "SSLCertificates",
     "version": null,
     "authors": null,
@@ -53,7 +51,6 @@
   },
   {
     "id": "ssl-version",
-    "repository_id": "LOCAL",
     "name": "SSLScan",
     "version": null,
     "authors": null,
@@ -75,7 +72,6 @@
   },
   {
     "id": "wp-scan",
-    "repository_id": "LOCAL",
     "name": "WPScantest",
     "version": null,
     "authors": null,
@@ -99,7 +95,6 @@
   },
   {
     "id": "kat_binaryedge_containers",
-    "repository_id": "LOCAL",
     "name": "test_binary_edge_normalizer",
     "version": null,
     "authors": null,

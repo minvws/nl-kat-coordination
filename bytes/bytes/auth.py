@@ -1,9 +1,10 @@
 import logging
 from datetime import datetime, timedelta, timezone
 
+import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
+from jwt import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from starlette import status
@@ -56,7 +57,7 @@ def authenticate_token(token: str = Depends(oauth2_scheme)) -> str:
             raise credentials_exception
 
         return str(username)
-    except JWTError as error:
+    except InvalidTokenError as error:
         raise credentials_exception from error
 
 

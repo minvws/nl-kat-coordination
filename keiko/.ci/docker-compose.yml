@@ -7,7 +7,7 @@ services:
       args:
         - ENVIRONMENT=dev
     ports:
-        - "29005:8000"
+      - "29005:8000"
     volumes:
       - keiko-reports:/reports
 

@@ -8,20 +8,18 @@ from typing import Any, cast
 
 import httpx
 from httpx import HTTPError
-from pydantic.tools import parse_obj_as
 
 from boefjes.clients.bytes_client import BytesAPIClient
 from boefjes.config import settings
 from boefjes.docker_boefjes_runner import DockerBoefjesRunner
-from boefjes.job_models import BoefjeMeta, NormalizerMeta, NormalizerPlainOOI, NormalizerScanProfile
+from boefjes.job_models import BoefjeMeta, NormalizerMeta, SerializedOOI, SerializedOOIValue
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.plugins.models import _default_mime_types
 from boefjes.runtime_interfaces import BoefjeJobRunner, Handler, NormalizerJobRunner
 from octopoes.api.models import Affirmation, Declaration, Observation
 from octopoes.connector.octopoes import OctopoesAPIConnector
-from octopoes.models import OOI, Reference, ScanProfile
+from octopoes.models import OOI, Reference, ScanLevel
 from octopoes.models.exception import ObjectNotFoundException
-from octopoes.models.types import OOIType
 
 MIMETYPE_MIN_LENGTH = 5  # two chars before, and 2 chars after the slash ought to be reasonable
 
@@ -34,7 +32,7 @@ bytes_api_client = BytesAPIClient(
 )
 
 
-def _serialize_value(value: Any, required: bool) -> Any:
+def _serialize_value(value: Any, required: bool) -> SerializedOOIValue:
     if isinstance(value, list):
         return [_serialize_value(item, required) for item in value]
     if isinstance(value, Reference):
@@ -53,7 +51,7 @@ def _serialize_value(value: Any, required: bool) -> Any:
         return str(value)
 
 
-def serialize_ooi(ooi: OOI):
+def serialize_ooi(ooi: OOI) -> SerializedOOI:
     serialized_oois = {}
     for key, value in ooi:
         if key not in ooi.model_fields:
@@ -139,11 +137,11 @@ class BoefjeHandler(Handler):
 
         boefje_meta.started_at = datetime.now(timezone.utc)
 
-        boefje_results = None
+        boefje_results: list[tuple[set, bytes | str]]
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
-        except Exception:
+        except:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
 
@@ -201,9 +199,8 @@ class NormalizerHandler(Handler):
             logger.info("Obtained results %s", str(results))
 
             for observation in results.observations:
-                parsed_oois = [self._parse_ooi(result) for result in observation.results]
-                for parsed_ooi in parsed_oois:
-                    if parsed_ooi.primary_key == observation.input_ooi:
+                for ooi in observation.results:
+                    if ooi.primary_key == observation.input_ooi:
                         logger.warning(
                             'Normalizer "%s" returned input [%s]', normalizer_meta.normalizer.id, observation.input_ooi
                         )
@@ -214,9 +211,7 @@ class NormalizerHandler(Handler):
                         source=reference,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
-                        result=[
-                            parsed_ooi for parsed_ooi in parsed_oois if parsed_ooi.primary_key != observation.input_ooi
-                        ],
+                        result=[ooi for ooi in observation.results if ooi.primary_key != observation.input_ooi],
                     )
                 )
 
@@ -224,7 +219,7 @@ class NormalizerHandler(Handler):
                 connector.save_declaration(
                     Declaration(
                         method=normalizer_meta.normalizer.id,
-                        ooi=self._parse_ooi(declaration.ooi),
+                        ooi=declaration.ooi,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )
@@ -234,7 +229,7 @@ class NormalizerHandler(Handler):
                 connector.save_affirmation(
                     Affirmation(
                         method=normalizer_meta.normalizer.id,
-                        ooi=self._parse_ooi(affirmation.ooi),
+                        ooi=affirmation.ooi,
                         task_id=normalizer_meta.id,
                         valid_time=normalizer_meta.raw_data.boefje_meta.ended_at,
                     )
@@ -242,7 +237,9 @@ class NormalizerHandler(Handler):
 
             corrected_scan_profiles = []
             for profile in results.scan_profiles:
-                profile.level = min(profile.level, self.whitelist.get(normalizer_meta.normalizer.id, profile.level))
+                profile.level = ScanLevel(
+                    min(profile.level, self.whitelist.get(normalizer_meta.normalizer.id, profile.level))
+                )
                 corrected_scan_profiles.append(profile)
 
             validated_scan_profiles = [
@@ -252,7 +249,7 @@ class NormalizerHandler(Handler):
             ]
             if validated_scan_profiles:
                 connector.save_many_scan_profiles(
-                    [self._parse_scan_profile(scan_profile) for scan_profile in results.scan_profiles],
+                    results.scan_profiles,
                     # Mypy doesn't seem to be able to figure out that ended_at is a datetime
                     valid_time=cast(datetime, normalizer_meta.raw_data.boefje_meta.ended_at),
                 )
@@ -261,14 +258,6 @@ class NormalizerHandler(Handler):
             self.bytes_client.save_normalizer_meta(normalizer_meta)
 
         logger.info("Done with normalizer %s[%s]", normalizer_meta.normalizer.id, normalizer_meta.id)
-
-    @staticmethod
-    def _parse_ooi(result: NormalizerPlainOOI):
-        return parse_obj_as(OOIType, result.model_dump())
-
-    @staticmethod
-    def _parse_scan_profile(result: NormalizerScanProfile):
-        return parse_obj_as(ScanProfile, result.model_dump())
 
 
 class InvalidWhitelist(Exception):
