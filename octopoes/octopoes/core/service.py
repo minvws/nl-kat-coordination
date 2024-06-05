@@ -45,7 +45,27 @@ from octopoes.repositories.scan_profile_repository import ScanProfileRepository
 
 logger = getLogger(__name__)
 settings = Settings()
-BIT_CACHE: dict[int, list[OOI]] = {}
+
+
+class BitCache:
+    def __init__(self):
+        self.bit_cache: dict[int, tuple[list[OOI], datetime]] = {}
+
+    def __getitem__(self, key: int):
+        return self.bit_cache[key][0]
+
+    def push(self, key: int, data: list[OOI], t: datetime = datetime.now()) -> None:
+        self.bit_cache[key] = (data, t)
+
+    def haskey(self, key: int, dt: int) -> bool:
+        if key in self.bit_cache:
+            et = (datetime.now() - self.bit_cache[key][1]).total_seconds()
+            if et <= dt:
+                return True
+        return False
+
+
+BIT_CACHE: BitCache = BitCache()
 
 
 def bit_cache_key(*args) -> int:
@@ -205,13 +225,9 @@ class OctopoesService:
 
         key = bit_cache_key(bit_definition, source, parameters, config)
         try:
-            if key not in BIT_CACHE:
-                BIT_CACHE[key] = BitRunner(bit_definition).run(source, parameters, config=config)
-            self.save_origin(
-                origin,
-                BIT_CACHE[key],
-                valid_time,
-            )
+            if not BIT_CACHE.haskey(key, bit_definition.cache_lifetime):
+                BIT_CACHE.push(key, BitRunner(bit_definition).run(source, parameters, config=config))
+            self.save_origin(origin, BIT_CACHE[key], valid_time)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
 
