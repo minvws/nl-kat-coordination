@@ -1,0 +1,14 @@
+/* Example component */
+
+.example-component {
+  width: 100%;
+
+  .fifty-fifty {
+    align-items: stretch;
+  }
+
+  .component {
+    border: 1px solid var(--colors-grey-4);
+    border-radius: 0.5rem;
+  }
+}
