@@ -1,4 +1,4 @@
-import { onDomReady } from "./imports/utils.js";
+import { onDomReady } from "../js/imports/utils.js";
 
 onDomReady(initDialogs);
 

@@ -3,34 +3,29 @@
 {% load compress %}
 
 <div class="modal-wrapper">
-    {{ trigger }}
+    {% slot "trigger" %}
+        <button class="modal-trigger" data-target="{{ dialogid }}">Open modal {{ dialogid }}</button>
+    {% endslot %}
+
     <dialog class="modal {{ size }}"
             aria-modal="true"
             role="dialog"
-            data-size=""
-            data-actions=""
-            data-closing-backdrop=""
             id="{{ dialogid }}">
         <div class="content-wrapper">
             <section class="header">
-                <h2>{{ header }}</h2>
+                <h2>{% slot "header" %}{% endslot %}</h2>
                 <button class="icon-only ti-x close-modal-button"
                         aria-label="{% translate "Close modal" %}"></button>
             </section>
             <section class="content">
-                {{ content }}
+              {% slot "content" %}{% endslot %}
             </section>
             <section class="footer">
                 <div class="toolbar">
-                    <button>Actie uitvoeren</button>
-                    <button class="ghost close-modal-button">Annuleren</button>
+                    <button>{% slot "cta_button" %}{% translate "Confirm" %}{% endslot %}</button>
+                    <button class="ghost close-modal-button">{% slot "secondary_button" %} {% translate "Cancel" %} {% endslot %}</button>
                 </div>
             </section>
         </div>
     </dialog>
 </div>
-{% block html_at_end_body %}
-    {% compress js %}
-        <script src="{% static "js/dialogToggler.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-    {% endcompress %}
-{% endblock html_at_end_body %}
