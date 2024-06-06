@@ -5,8 +5,9 @@ from datetime import datetime, timezone
 from logging import getLogger
 from typing import overload
 
-from bits.definitions import get_bit_definitions
+from bits.definitions import BitDefinition, get_bit_definitions
 from bits.runner import BitRunner
+from pydantic import JsonValue, TypeAdapter
 
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
@@ -49,27 +50,36 @@ settings = Settings()
 
 class BitCache:
     def __init__(self):
-        self.bit_cache: dict[int, tuple[list[OOI], datetime]] = {}
+        self.bit_cache: dict[BitDefinition, dict[int, tuple[list[OOI], datetime]]] = {}
 
-    def __getitem__(self, key: int):
-        return self.bit_cache[key][0]
+    def _purge(self, bit: BitDefinition):
+        self.bit_cache[bit] = {
+            key: data for key, data in self.bit_cache[bit].items() if datetime.now() - data[1] <= bit.cache_lifetime
+        }
 
-    def push(self, key: int, data: list[OOI], t: datetime = datetime.now()) -> None:
-        self.bit_cache[key] = (data, t)
+    def _bit_cache_key(self, source: OOI, parameters: list[OOI], config: dict[str, JsonValue]) -> int:
+        try:
+            serialized_ooi = str(TypeAdapter(list[OOI]).dump_json(parameters))
+            return hash(source.model_dump_json() + serialized_ooi + json.dumps(config))
+        except Exception:
+            return hash(datetime.now())
 
-    def haskey(self, key: int, dt: int) -> bool:
-        if key in self.bit_cache:
-            et = (datetime.now() - self.bit_cache[key][1]).total_seconds()
-            if et <= dt:
-                return True
-        return False
+    def get_bit(
+        self, bit: BitDefinition, source: OOI, parameters: list[OOI], config: dict[str, JsonValue]
+    ) -> list[OOI]:
+        key = self._bit_cache_key(source, parameters, config)
+        if bit not in self.bit_cache:
+            data = BitRunner(bit).run(source, parameters, config=config)
+            self.bit_cache[bit] = {key: (data, datetime.now())}
+        else:
+            self._purge(bit)
+            if key not in self.bit_cache[bit]:
+                data = BitRunner(bit).run(source, parameters, config=config)
+                self.bit_cache[bit][key] = (data, datetime.now())
+        return self.bit_cache[bit][key][0]
 
 
 BIT_CACHE: BitCache = BitCache()
-
-
-def bit_cache_key(*args) -> int:
-    return hash(str(args))
 
 
 def find_relation_in_tree(relation: str, tree: ReferenceTree) -> list[OOI]:
@@ -223,11 +233,9 @@ class OctopoesService:
             if len(configs) != 0:
                 config = configs[-1].config
 
-        key = bit_cache_key(bit_definition, source, parameters, config)
         try:
-            if not BIT_CACHE.haskey(key, bit_definition.cache_lifetime):
-                BIT_CACHE.push(key, BitRunner(bit_definition).run(source, parameters, config=config))
-            self.save_origin(origin, BIT_CACHE[key], valid_time)
+            oois = BIT_CACHE.get_bit(bit_definition, source, parameters, config)
+            self.save_origin(origin, oois, valid_time)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
 
