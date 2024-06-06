@@ -54,7 +54,7 @@ class SchedulerView(OctopoesView):
 
     def get_task_list(self) -> LazyTaskList | list[Any]:
         try:
-            return LazyTaskList(self.scheduler_client, **self.get_task_filters())
+            return self.scheduler_client.get_lazy_task_list(**self.get_task_filters())
         except SchedulerError as error:
             messages.error(self.request, error.message)
         return []
