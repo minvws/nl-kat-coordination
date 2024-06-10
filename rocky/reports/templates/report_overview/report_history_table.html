@@ -39,6 +39,8 @@
                     <td>
                         {% if report.parent_report.input_ooi %}
                             <a href="{% ooi_url "ooi_detail" report.parent_report.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_ooi|human_readable }}</a>
+                        {% elif report.total_objects == 1 %}
+                            <a href="{% ooi_url 'ooi_detail' report.children_reports.0.input_ooi organization.code %}">{{ report.children_reports.0.input_ooi|human_readable }}</a>
                         {% else %}
                             {{ report.total_objects }}
                         {% endif %}
@@ -64,9 +66,9 @@
                                 <h5>{% translate "Report types" %}</h5>
                                 <p>
                                     {% blocktranslate count counter=report.total_children_reports %}
-                                    This report consist of {{counter}} sub report with the following report type and object.
+                                    This report consist of {{counter}} subreport with the following report type and object.
                                 {% plural %}
-                                    This report consist of {{counter}} sub reports with the following report types and objects.
+                                    This report consist of {{counter}} subreports with the following report types and objects.
                                 {% endblocktranslate %}
                                 </p>
                                 <thead>
@@ -88,7 +90,7 @@
                             </table>
                             <table>
                                 <h5>
-                                    {% translate "Sub reports" %}
+                                    {% translate "Subreports" %}
                                     ({{ report.children_reports|length }}/{{ report.total_children_reports }})
                                 </h5>
                                 <thead>
@@ -109,7 +111,7 @@
                                             </td>
                                             <td>
                                                 <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
-                                                   title="{% translate "Shows sub report details" %}">{{ child_report }}</a>
+                                                   title="{% translate "Shows subreport details" %}">{{ child_report }}</a>
                                             </td>
                                         </tr>
                                     {% endfor %}
