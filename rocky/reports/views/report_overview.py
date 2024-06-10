@@ -3,7 +3,6 @@ import logging
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
-from django_weasyprint import WeasyTemplateResponseMixin
 
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
@@ -66,7 +65,7 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_id = self.request.GET.get("report_id", None)
+        self.report_id = self.request.GET.get("report_id")
 
     def get_queryset(self) -> ReportList:
         return ReportList(
@@ -80,13 +79,3 @@ class SubreportView(BreadcrumbsReportOverviewView, OctopoesView, ListView):
         context["total_oois"] = len(self.object_list)
         context["parent_report_id"] = self.report_id
         return context
-
-
-class ReportHistoryPDFView(ReportHistoryView, WeasyTemplateResponseMixin):
-    template_name = "report_history_pdf.html"
-
-    pdf_filename = "report_history.pdf"
-    pdf_attachment = False
-    pdf_options = {
-        "pdf_variant": "pdf/ua-1",
-    }

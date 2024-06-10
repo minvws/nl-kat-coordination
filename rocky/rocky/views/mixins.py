@@ -1,4 +1,6 @@
+import itertools
 import logging
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
@@ -295,7 +297,7 @@ class ReportList:
     def __len__(self):
         return self.count
 
-    def __getitem__(self, key: int | slice) -> list[HydratedReport | Report]:
+    def __getitem__(self, key: int | slice) -> Sequence[HydratedReport | tuple[str, Report]]:
         if isinstance(key, slice):
             offset = key.start or 0
             limit = self.HARD_LIMIT
@@ -315,7 +317,7 @@ class ReportList:
 
         raise NotImplementedError("ReportList only supports slicing")
 
-    def get_subreports(self, report_id: str) -> list[Report]:
+    def get_subreports(self, report_id: str) -> list[tuple[str, Report]]:
         """
         Get child reports with parent id.
         """
@@ -340,7 +342,7 @@ class ReportList:
             parent_report, children_reports = report
 
             hydrated_report.total_children_reports = len(children_reports)
-            hydrated_report.total_objects = self.get_total_objects(children_reports)
+            hydrated_report.total_objects = len(parent_report.input_oois)
             hydrated_report.report_type_summary = self.report_type_summary(children_reports)
 
             if not parent_report.has_parent:
@@ -359,10 +361,6 @@ class ReportList:
         return hydrated_reports
 
     @staticmethod
-    def get_total_objects(reports: list[Report]) -> int:
-        return len({report.input_ooi for report in reports})
-
-    @staticmethod
     def report_type_summary(reports: list[Report]) -> dict[str, int]:
         """
         Calculates per report type how many objects it consumed.
@@ -372,7 +370,13 @@ class ReportList:
         report_types: set[str] = {report.report_type for report in reports}
 
         for report_type in report_types:
-            summary[report_type] = len({report.input_ooi for report in reports if report_type == report.report_type})
+            summary[report_type] = len(
+                {
+                    itertools.chain.from_iterable(
+                        [report.input_oois for report in reports if report_type == report.report_type]
+                    )
+                }
+            )
 
         return summary
 

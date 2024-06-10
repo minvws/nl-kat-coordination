@@ -1,3 +1,4 @@
+import json
 from collections import defaultdict
 from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
@@ -7,26 +8,28 @@ from typing import Any, Literal, cast
 from uuid import uuid4
 
 from account.mixins import OrganizationView
+from django.conf import settings
 from django.contrib import messages
 from django.forms import Form
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
+from django_weasyprint import WeasyTemplateResponseMixin
 from katalogus.client import KATalogusError, Plugin, get_katalogus
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
-from tools.view_helpers import BreadcrumbsMixin
+from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.concatenated_report.report import ConcatenatedReport
-from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report, ReportType
+from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
-from rocky.views.mixins import OOIList
+from reports.utils import JSONEncoder, debug_json_keys
+from rocky.views.mixins import ObservedAtMixin, OOIList
 from rocky.views.ooi_view import OOIFilterView
 
 REPORTS_PRE_SELECTION = {
@@ -183,10 +186,12 @@ class ReportTypeView(BaseSelectionView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_types: Sequence[type[Report] | type[MultiReport]] = self.get_report_types_from_choice()
+        self.report_types: Sequence[type[Report] | type[MultiReport] | type[AggregateReport]] = (
+            self.get_report_types_from_choice()
+        )
         self.report_ids = [report.id for report in self.report_types]
 
-    def get_report_types_from_choice(self) -> list[type[Report] | type[MultiReport]]:
+    def get_report_types_from_choice(self) -> list[type[Report] | type[MultiReport] | type[AggregateReport]]:
         report_types = []
         for report_type in self.selected_report_types:
             try:
@@ -316,27 +321,27 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
     def save_report(
         self,
         data: dict,
-        report_type: ReportType | None,
-        input_ooi: Reference | None,
+        report_type: type[Report] | type[MultiReport] | type[AggregateReport],
+        input_oois: list[str],
         parent: Reference | None,
         has_parent: bool,
         observed_at: datetime,
     ) -> ReportOOI:
         report_data_raw_id = self.bytes_client.upload_raw(
-            raw=ReportDataDict(data).model_dump_json(), manual_mime_types={"openkat/report"}
+            raw=ReportDataDict(data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
         )
 
         report_ooi = ReportOOI(
-            name=str(report_type.name) if report_type else None,
-            report_type=str(report_type.id) if report_type and report_type is not ConcatenatedReport else None,
-            template=report_type.template_path if report_type else None,
+            name=str(report_type.name),
+            report_type=str(report_type.id),
+            template=report_type.template_path,
             report_id=uuid4(),
             organization_code=self.organization.code,
             organization_name=self.organization.name,
             organization_tags=list(self.organization.tags.all()),
             data_raw_id=report_data_raw_id,
             date_generated=datetime.now(timezone.utc),
-            input_ooi=input_ooi,
+            input_oois=input_oois,
             observed_at=observed_at,
             parent_report=parent,
             has_parent=has_parent,
@@ -383,7 +388,7 @@ def recursive_dict():
     return defaultdict(recursive_dict)
 
 
-class ViewReportView(OOIFilterView, TemplateView):
+class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     """
     This will display reports using report_id from reports history.
     Will fetch Report OOI and recreate report with data saved in bytes.
@@ -391,10 +396,39 @@ class ViewReportView(OOIFilterView, TemplateView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.report_id = request.GET.get("report_id", "")
+        self.report_id = request.GET.get("report_id")
         self.report_ooi = self.octopoes_api_connector.get(
             Reference.from_str(f"{self.report_id}"), valid_time=self.observed_at
         )
+
+    def get(self, request, *args, **kwargs):
+        if "json" in self.request.GET and self.request.GET["json"] == "true":
+            self.bytes_client.login()
+            data = json.loads(self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id))
+
+            response = {
+                "organization_code": self.organization.code,
+                "organization_name": self.organization.name,
+                "organization_tags": list(self.organization.tags.all()),
+                "data": {
+                    "report_data": {},
+                    "post_processed_data": data,
+                },
+            }
+
+            try:
+                response = JsonResponse(response, encoder=JSONEncoder)
+            except TypeError:
+                # We can't use translated strings as keys in JSON. This
+                # debugging code makes it easy to spot where the problem is.
+                if settings.DEBUG:
+                    debug_json_keys(data, [])
+                raise
+            else:
+                response["Content-Disposition"] = f"attachment; filename=report-{self.organization.code}.json"
+                return response
+
+        return super().get(request, *args, **kwargs)
 
     def get_template_names(self):
         if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
@@ -410,16 +444,6 @@ class ViewReportView(OOIFilterView, TemplateView):
         # TODO: add config and plugins
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
-
-        if self.report_ooi.input_ooi:
-            input_oois = [
-                self.octopoes_api_connector.get(
-                    Reference.from_str(self.report_ooi.input_ooi), valid_time=self.observed_at
-                )
-            ]
-
-        else:
-            input_oois = []
 
         self.bytes_client.login()
         report_data: dict = {}
@@ -448,9 +472,12 @@ class ViewReportView(OOIFilterView, TemplateView):
             context["report_types"] = [
                 report.class_attributes() for report in {get_report_by_id(report.report_type) for report in children}
             ]
-            input_oois = list(
-                {self.octopoes_api_connector.get(child.input_ooi, valid_time=self.observed_at) for child in children}
-            )
+            input_ooi_set = set()
+            for child in children:
+                for ooi in child.input_oois:
+                    input_ooi_set.add(ooi)
+
+            input_oois = [self.octopoes_api_connector.get(ooi, valid_time=self.observed_at) for ooi in input_ooi_set]
 
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
             # its an aggregate report
@@ -463,13 +490,16 @@ class ViewReportView(OOIFilterView, TemplateView):
             context["report_types"] = [
                 report.class_attributes() for report in {get_report_by_id(report.report_type) for report in children}
             ]
-            input_oois = list(
-                {self.octopoes_api_connector.get(child.input_ooi, valid_time=self.observed_at) for child in children}
-            )
+            input_ooi_set = set()
+            for child in children:
+                for ooi in child.input_oois:
+                    input_ooi_set.add(ooi)
+
+            input_oois = [self.octopoes_api_connector.get(ooi, valid_time=self.observed_at) for ooi in input_ooi_set]
         else:
             # its a single report
             report_data[self.report_ooi.report_type] = {}
-            report_data[self.report_ooi.report_type][self.report_ooi.input_ooi] = {
+            report_data[self.report_ooi.report_type][self.report_ooi.input_oois[0]] = {
                 "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
                     self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
                 ),
@@ -479,9 +509,50 @@ class ViewReportView(OOIFilterView, TemplateView):
             context["report_data"] = report_data
             context["report_types"] = [get_report_by_id(self.report_ooi.report_type).class_attributes()]
 
+            input_oois = [
+                self.octopoes_api_connector.get(
+                    Reference.from_str(self.report_ooi.input_oois[0]), valid_time=self.observed_at
+                )
+            ]
+
         context["created_at"] = self.report_ooi.date_generated
         context["total_oois"] = len(input_oois)
         context["selected_oois"] = input_oois
         context["oois"] = input_oois
         context["template"] = self.report_ooi.template
+        context["report_download_pdf_url"] = url_with_querystring(
+            reverse(
+                "view_report_pdf",
+                kwargs={"organization_code": self.organization.code},
+            ),
+            True,
+            **self.request.GET,
+        )
+        context["report_download_json_url"] = url_with_querystring(
+            reverse(
+                "view_report",
+                kwargs={"organization_code": self.organization.code},
+            ),
+            True,
+            **dict(json="true", **self.request.GET),
+        )
+
         return context
+
+
+class ViewReportPDFView(ViewReportView, WeasyTemplateResponseMixin):
+    pdf_filename = "report.pdf"
+    pdf_attachment = False
+    pdf_options = {
+        "pdf_variant": "pdf/ua-1",
+    }
+
+    def get_template_names(self):
+        if self.report_ooi.report_type and issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
+            return [
+                "aggregate_report_pdf.html",
+            ]
+        else:
+            return [
+                "generate_report_pdf.html",
+            ]

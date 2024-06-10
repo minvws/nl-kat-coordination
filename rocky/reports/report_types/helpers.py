@@ -72,7 +72,7 @@ def get_report_by_id(report_id: str) -> type[Report] | type[MultiReport] | type[
     raise ValueError(f"Report with id {report_id} not found")
 
 
-def get_reports(report_ids: list[str]) -> list[type[Report] | type[MultiReport]]:
+def get_reports(report_ids: list[str]) -> list[type[Report] | type[MultiReport] | type[AggregateReport]]:
     return [get_report_by_id(report_id) for report_id in report_ids]
 
 

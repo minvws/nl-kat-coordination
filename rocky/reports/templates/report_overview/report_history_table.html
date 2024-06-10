@@ -37,8 +37,8 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if report.parent_report.input_ooi %}
-                            <a href="{% ooi_url "ooi_detail" report.parent_report.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_ooi|human_readable }}</a>
+                        {% if report.parent_report.input_oois|length == 1 %}
+                            <a href="{% ooi_url "ooi_detail" report.parent_report.input_ooi organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_oois.0 }}</a>
                         {% else %}
                             {{ report.total_objects }}
                         {% endif %}
@@ -105,7 +105,7 @@
                                                 <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
                                             </td>
                                             <td>
-                                                <a href="{% ooi_url 'ooi_detail' child_report.input_ooi organization.code %}">{{ child_report.input_ooi|human_readable }}</a>
+                                                <a href="{% ooi_url 'ooi_detail' child_report.input_ooi organization.code %}">{{ child_report.input_oois.0 }}</a>
                                             </td>
                                             <td>
                                                 <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"

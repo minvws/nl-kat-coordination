@@ -735,8 +735,8 @@ class XTDBOOIRepository(OOIRepository):
             items=[x[0] for x in self.query(finding_query, valid_time)],
         )
 
-    def simplify_keys(self, data):
-        new_data = {}
+    def simplify_keys(self, data: dict[str, Any]) -> dict[str, Any]:
+        new_data: dict[str, Any] = {}
         for key, value in data.items():
             if isinstance(value, list):
                 new_data[key.split("/")[-1]] = [
@@ -775,8 +775,6 @@ class XTDBOOIRepository(OOIRepository):
             .offset(offset)
         )
 
-        results = self.session.client.query(query)
-
         results = [
             (
                 self.simplify_keys(x[0]),
@@ -784,7 +782,7 @@ class XTDBOOIRepository(OOIRepository):
                 if "Report/_parent_report" in x[0]
                 else [],
             )
-            for x in results
+            for x in self.session.client.query(query)
         ]
 
         return Paginated(
