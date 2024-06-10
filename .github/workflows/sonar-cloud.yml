@@ -7,10 +7,10 @@ on:
     branches: [main]
     types: [completed]
 
-  # push:
-  #   branches: [main]
-  #   tags: ["releases-*"]
-  # pull_request:
+  push:
+    branches: [main]
+    tags: ["releases-*"]
+  pull_request:
 
 jobs:
   sonar_cloud:
@@ -28,7 +28,6 @@ jobs:
           name: mypy-coverage
 
       - name: SonarCloud
-        if: always()
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
