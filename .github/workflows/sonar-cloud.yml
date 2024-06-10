@@ -6,10 +6,10 @@ on:
     workflows: ["Pre-commit checks"]
     types: [completed]
 
-  push:
-    branches: [main]
-    tags: [v*]
-  pull_request:
+  # push:
+  #   branches: [main]
+  #   tags: [v*]
+  # pull_request:
 
 jobs:
   sonar_cloud:
@@ -23,6 +23,8 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
+        with:
+          name: mypy-coverage
 
       - name: SonarCloud
         if: always()
