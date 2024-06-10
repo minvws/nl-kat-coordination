@@ -105,6 +105,7 @@ class ReportTypesSelectionMultiReportView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["available_report_types"] = self.get_report_types({MultiOrganizationReport})
+        context["total_oois"] = self.get_total_objects()
         return context
 
 
@@ -141,6 +142,7 @@ class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView, TemplateView
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
+        context["total_oois"] = self.get_total_objects()
         context["report_types"] = [MultiOrganizationReport]
         report_data = self.multi_reports_for_oois()
         context["template"] = MultiOrganizationReport.template_path

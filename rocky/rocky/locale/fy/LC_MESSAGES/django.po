@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # jan klopper <jan@underdark.nl>, 2023.
 # Wim Benes <fryskefirefox@gmail.com>, 2024.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-16 07:24+0000\n"
-"PO-Revision-Date: 2024-05-16 10:02+0000\n"
+"POT-Creation-Date: 2024-05-23 15:00+0000\n"
+"PO-Revision-Date: 2024-06-08 13:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
-"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/fy/>\n"
+"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/fy/>\n"
 "Language: fy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -630,10 +631,13 @@ msgstr ""
 msgid ""
 "The KATalogus has an unexpected error. Check the logs for further details."
 msgstr ""
+"De KATalogus hat in ûnferwachte flater oprûn. Kontrolearje de lochboeken "
+"foar mear details."
 
 #: katalogus/client.py
 msgid "A HTTP error occurred. Check logs for more info."
 msgstr ""
+"Der is in HTTP-flater bard. Kontrolearje de lochboeken foar mear ynformaasje."
 
 #: katalogus/forms/katalogus_filter.py
 msgid "Show all"
@@ -1461,37 +1465,39 @@ msgid ""
 "Please enter the following organization details. These details can be edited "
 "within the organization page within OpenKAT when necessary."
 msgstr ""
+"Fier de folgjende organisaasegegevens yn. Dizze gegevens kinne bewurke wurde "
+"wannear nedich binnen de organisatieside binnen OpenKAT."
 
 #: onboarding/templates/account/step_2a_organization_update.html
 msgid "Submit changes"
-msgstr ""
+msgstr "Wizigingen bewarje"
 
 #: onboarding/templates/account/step_2a_organization_update.html
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "Continue"
-msgstr ""
+msgstr "Trochgean"
 
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 msgid "Indemnification setup"
-msgstr ""
+msgstr "Frijwarring opstelle"
 
 #: onboarding/templates/account/step_2b_indemnification_setup.html
 msgid "Indemnification on the organization is already present."
-msgstr ""
+msgstr "Frijwarringsnivo op de organisaasje is al oanwêzich."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Account setup"
-msgstr ""
+msgstr "Account ynstelle"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Accounts"
-msgstr ""
+msgstr "Accounts"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Organization setup with separate accounts:"
-msgstr ""
+msgstr "Organisaasje ynstelle mei aparte accounts:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1501,10 +1507,15 @@ msgid ""
 "can choose to create the separate accounts during this introduction or when "
 "you’re ready from the OpenKAT users page."
 msgstr ""
+"Binnen OpenKAT is it mooglik om aparte brûkersaccounts oan te meitsjen mei "
+"de spesifike rollen. Elk mei harren eigen funksjonaliteiten en rjochten. Dit "
+"is handich as meardere minsken mei deselde OpenKAT-ynstellingen wurkjen "
+"gean. Jo kinne der foar kieze om de aparte accounts oan te meitsjen wylst "
+"dizze yntroduksje of wannear’t jo klear binne fan de OpenKAT-brûkersside út."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Single account setup:"
-msgstr ""
+msgstr "Inkeld account ynstelle:"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid ""
@@ -1514,29 +1525,35 @@ msgid ""
 "account. You can always add additional user accounts If you’re team expands "
 "in the future."
 msgstr ""
+"It is ek in opsje om OpenKAT te draaien fan in account fan ien brûker út. "
+"Dat is handich as jo de iennige brûker binne. Jo hawwe dan tagong ta de "
+"funksjonaliteit fan de ferskate rollen fan jo account út. Jo kinne altyd "
+"ekstra brûkersaccounts tafoegje as jo team yn de takomst útwreidet."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Create separate accounts"
-msgstr ""
+msgstr "Meardere accounts oanmeitsje"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Continue with this account, onboard me!"
-msgstr ""
+msgstr "Gean troch mei allinnich dizze account. Onboard my!"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Users"
-msgstr ""
+msgstr "Brûkers"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
 "Within OpenKAT there are three types of user accounts. Each has its own "
 "functions."
 msgstr ""
+"Binnen OpenKAT binne der trije soarten brûkersaccounts. Elk hat syn eigen "
+"funksjes."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
@@ -1544,25 +1561,26 @@ msgid ""
 "Each organization must have an admin. The admin can create and manage user "
 "accounts as well as organization details."
 msgstr ""
+"De admin kin brûkers oanmeitsje, beheare en organisaasjegegevens wizigje."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer"
-msgstr ""
+msgstr "Red Teamer"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "A red teamer account can run scans and generate reports."
-msgstr ""
+msgstr "In Red Teamer-account kin scans starte en rapporten oanmeitsje."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account"
-msgstr ""
+msgstr "Brûkersaccount"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "A client account can access reports."
-msgstr ""
+msgstr "In brûker kin rapporten ynsjen."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
@@ -1570,55 +1588,59 @@ msgid ""
 "function. This introduction will guide you through the setup of both. After "
 "that you can choose to add a client account as well."
 msgstr ""
+"Elke organisaasje hat in admin en in Red Teamer nedich. Dizze yntroduksje "
+"helpt mei it oanmeitsjen fan dizze accounts."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Let's add accounts"
-msgstr ""
+msgstr "Accounts tafoegje"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin account setup"
-msgstr ""
+msgstr "Admin-account ynstelle"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin details"
-msgstr ""
+msgstr "Admindetails"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Skip this step"
-msgstr ""
+msgstr "Oerslaan"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Go back to previous step"
-msgstr ""
+msgstr "Gean werom nei de foarige stap"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer account setup"
-msgstr ""
+msgstr "Red Teamer-account ynstelle"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer details"
-msgstr ""
+msgstr "Red Teamerdetails"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account setup (optional)"
-msgstr ""
+msgstr "Brûkersaccount ynstelle (opsjoneel)"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid ""
 "A client account can access reports. Adding a client account to the "
 "organization is optional."
 msgstr ""
+"In brûkersaccount kin rapporten ynsjen. In brûkersaccount oan de "
+"organisaasje tafoegje is opsjoneel."
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "User details"
-msgstr ""
+msgstr "Brûkersdetails"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Finish organization setup"
-msgstr ""
+msgstr "Organisaasje ynstelle foltôgje"
 
 #: onboarding/templates/dns_report.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -1628,12 +1650,12 @@ msgstr ""
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: onboarding/templates/step_4_report.html onboarding/view_helpers.py
 msgid "OpenKAT introduction"
-msgstr ""
+msgstr "Yntroduksje OpenKAT"
 
 #: onboarding/templates/dns_report.html
 #: reports/report_types/dns_report/report.py
 msgid "DNS Report"
-msgstr ""
+msgstr "DNS-rapport"
 
 #: onboarding/templates/dns_report.html
 #, python-format
@@ -1642,15 +1664,18 @@ msgid ""
 "finding for more detailed information about the issue, its origin, severity "
 "and possible solutions."
 msgstr ""
+"Dit binne de befiningen fan in OpenKAT-analyze (%(observed_at)s). Klik op in "
+"befining foar mear detaillearre ynformaasje oer it probleem, de oarsprong, "
+"earnst en mooglike oplossingen."
 
 #: onboarding/templates/dns_report.html
 msgid "DNS Tree"
-msgstr ""
+msgstr "DNS-beam"
 
 #: onboarding/templates/step_1_introduction.html
 #: rocky/templates/landing_page.html
 msgid "Welcome to OpenKAT"
-msgstr ""
+msgstr "Wolkom by OpenKAT"
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -1658,12 +1683,17 @@ msgid ""
 "Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
 "and Sport to make your and our world a safer place."
 msgstr ""
+"OpenKAT is de ‘Kwetsberheden Analyze Tool’. In iepen boarneprojekt "
+"ûntwikkele troch it Ministerie van Volksgezondheid, Welzijn en Sport om jo "
+"en ús wrâld feiliger te meitsjen."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "OpenKAT is able to give insight into security risks on your online objects. "
 "For example, your websites, mailservers or online data."
 msgstr ""
+"OpenKAT kin ynsjoch jaan yn befeiligingsrisiko’s op jo online objekten. "
+"Bygelyks jo websites, mailservers of online data."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -1673,18 +1703,26 @@ msgid ""
 "you would like to monitor or scan and which insight you would like to "
 "receive."
 msgstr ""
+"OpenKAT brûkt ynstekkers om de risikogebieten te finen en te beoardielen en "
+"rapportearret dizze oan jo. Elke ynstekker hat syn eigen feardichheden, "
+"lykas it scannen, normalisearjen of analysearjen fan gegevens. As brûker "
+"beslisse jo hokker gebieden jo monitoarje of scanne wolle en hokker ynsjoch "
+"jo ûntfange wolle."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "Within OpenKAT you can view the insights as well as all the data OpenKAT has "
 "found. You can choose to browse through the data or view reports."
 msgstr ""
+"Binnen OpenKAT kinne jo sawol de ynsichten as alle gegevens dy’t OpenKAT fûn "
+"hat besjen. Jo kinne derfoar kieze troch de gegevens te blêdzjen of "
+"rapporten te besjen."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "During this introduction you will be guided through the steps to create a "
 "report."
-msgstr ""
+msgstr "Dizze yntroduksje leit út hoe’t jo in rapport meitsje."
 
 #: onboarding/templates/step_1_introduction.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -1698,16 +1736,16 @@ msgstr ""
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
-msgstr ""
+msgstr "Onboarding oerslaan"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Choose a report - Introduction"
-msgstr ""
+msgstr "Kies in rapport – Yntroduksje"
 
 #: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
 #: rocky/templates/header.html
 msgid "Reports"
-msgstr ""
+msgstr "Rapporten"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1716,11 +1754,16 @@ msgid ""
 "vulnerable to. Each report gives a high overview of the state of the object "
 "as well as detailed information on what OpenKAT found and possible solutions."
 msgstr ""
+"Rapporten binnen OpenKAT befetsje in oersjoch fan de scande objekten, de "
+"dêryn fûne problemen en bekende befeiligingsrisiko’s wêrfoar it objekt "
+"kwetsber wêze kin. Elk rapport jout in heech oersjoch fan de tastân fan it "
+"objekt en detaillearre ynformaasje oer wat OpenKAT fûn hat en mooglike "
+"oplossingen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 #: reports/report_types/dns_report/report.html
 msgid "Data"
-msgstr ""
+msgstr "Gegevens"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1729,10 +1772,15 @@ msgid ""
 "manage the plugins within your account which let's OpenKAT know which "
 "plugins to run and on which objects or areas."
 msgstr ""
+"OpenKAT kin scanne en analysearje mei help fan ynstekkers. Elke ynstekker "
+"hat syn eigen unike feardichheden en sammelet spesifike gegevens of jout "
+"spesifike ynsichten. Jo beheare de ynstekkers binnen jo account, wêrtroch "
+"OpenKAT wit hokker ynstekkers útfierd wurde moatte en op hokker objekten of "
+"gebieden."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Generating a report"
-msgstr ""
+msgstr "Rapport generearje"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1741,6 +1789,11 @@ msgid ""
 "needs, as well as asks for permission to run plugins that you haven’t "
 "enabled yet but are needed to collect or analyze the data."
 msgstr ""
+"Wannear’t jo in rapporttype kieze, sil OpenKAT jo begeliede by de "
+"ynstallaasje. OpenKAT stelt de nedige fragen op basis fan de ynfier dy’t it "
+"rapport nedich hat, en freget om tastimming om ynstekkers te brûken dy’t jo "
+"noch net ynskeakele hawwe, mar dy’t nedich binne om de gegevens te sammeljen "
+"of te analysearjen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1751,7 +1804,7 @@ msgstr ""
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Permission"
-msgstr ""
+msgstr "Tastimming"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -2053,6 +2106,10 @@ msgid ""
 "responsibility\n"
 "                        "
 msgstr ""
+"\n"
+"                            Frijwarringsnivo L%(tcl)s en ferantwurdlikheid "
+"akseptearje\n"
+"                        "
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -2104,7 +2161,7 @@ msgstr ""
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/scan.html
 msgid "Boefjes:"
-msgstr ""
+msgstr "Boefkes:"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2114,7 +2171,7 @@ msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid "Normalizers:"
-msgstr ""
+msgstr "Normalizers:"
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 msgid ""
@@ -2202,7 +2259,7 @@ msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "2: Organization setup"
-msgstr ""
+msgstr "2: Organisaasjes"
 
 #: onboarding/view_helpers.py
 msgid "3: Indemnification"
@@ -2210,11 +2267,11 @@ msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "4: Account setup"
-msgstr ""
+msgstr "4: Account ynstelle"
 
 #: onboarding/view_helpers.py
 msgid "OpenKAT Setup"
-msgstr ""
+msgstr "OpenKAT ynstelle"
 
 #: onboarding/views.py
 msgid "Fetch the parent DNS zone of a hostname"
@@ -2272,7 +2329,7 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Selected objects"
-msgstr ""
+msgstr "Selektearre objekten"
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Currently filtered on"
@@ -2823,7 +2880,7 @@ msgstr ""
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Details"
-msgstr ""
+msgstr "Details"
 
 #: reports/report_types/dns_report/report.html
 #: reports/report_types/findings_report/report.html
@@ -3567,8 +3624,9 @@ msgid "Multi Report"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select object"
-msgid_plural "Select objects"
+#, python-format
+msgid "Select object (%(total_oois)s)"
+msgid_plural "Select objects (%(total_oois)s)"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3589,12 +3647,6 @@ msgid "Currently filtered on:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
 msgid "No objects found."
 msgstr ""
 
@@ -3603,23 +3655,25 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "explanation select all"
+msgid "objects selected"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Explanation 'Continue with all OOIs:'"
+msgid "Deselect all objects"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #, python-format
-msgid ""
-"This option will select all OOIs (+ current filters) for %(organization)s "
-"organization."
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-msgid "Continue with all OOIs"
-msgstr ""
+msgid "Select all %(total_oois)s object"
+msgid_plural "Select all %(total_oois)s objects"
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
@@ -3630,7 +3684,7 @@ msgstr ""
 #: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
 #: rocky/views/upload_csv.py rocky/views/upload_raw.py
 msgid "Objects"
-msgstr ""
+msgstr "Objekten"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
@@ -3659,7 +3713,7 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Plugins"
-msgstr ""
+msgstr "Ynstekkers"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
@@ -3741,7 +3795,7 @@ msgstr ""
 
 #: reports/templates/partials/report_sidemenu.html
 msgid "Selected Objects"
-msgstr ""
+msgstr "Selektearre objekten"
 
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/selected_plugins.html
@@ -3767,14 +3821,18 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "Selected object"
-msgid_plural "Selected objects"
+#, python-format
+msgid "Selected object (%(total_oois)s)"
+msgid_plural "Selected objects (%(total_oois)s)"
 msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "You have selected all objects in previous step."
-msgstr ""
+#, python-format
+msgid "You have selected %(total_oois)s object in previous step."
+msgid_plural "You have selected %(total_oois)s objects in previous step."
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Available report types"
@@ -3832,7 +3890,7 @@ msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid "Select Objects"
-msgstr ""
+msgstr "Selektearje objekten"
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
@@ -4035,7 +4093,7 @@ msgstr ""
 
 #: tools/forms/ooi.py
 msgid "Clearance Level"
-msgstr ""
+msgstr "Frijwarringsnivo"
 
 #: tools/forms/ooi.py
 msgid "Show objects that don't meet the Boefjes scan level."
@@ -4194,7 +4252,7 @@ msgstr ""
 
 #: tools/models.py
 msgid "The name of the organisation"
-msgstr ""
+msgstr "De namme fan de organisaasje"
 
 #: tools/models.py
 msgid ""
@@ -4364,7 +4422,7 @@ msgstr ""
 
 #: rocky/templates/403.html
 msgid "Please contact your system administrator."
-msgstr ""
+msgstr "Nim kontakt op mei jo systeembehearder."
 
 #: rocky/templates/403.html rocky/templates/404.html
 msgid "You may want to go back to the"
@@ -4703,7 +4761,7 @@ msgstr ""
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Clear filters"
-msgstr ""
+msgstr "Filters wiskje"
 
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
@@ -4711,7 +4769,7 @@ msgstr ""
 
 #: rocky/templates/forms/widgets/checkbox_group_table.html
 msgid "this field is required"
-msgstr ""
+msgstr "Dit fjild is ferplichte"
 
 #: rocky/templates/graph-d3.html
 msgid ""
@@ -4846,7 +4904,7 @@ msgstr ""
 
 #: rocky/templates/oois/error.html
 msgid "Object List"
-msgstr ""
+msgstr "Objektelist"
 
 #: rocky/templates/oois/error.html
 msgid "An error occurred. Please contact a system administrator."
@@ -4916,7 +4974,7 @@ msgstr ""
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Boefje"
-msgstr ""
+msgstr "Boefke"
 
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
 msgid "Scan profile"
@@ -5261,7 +5319,7 @@ msgstr ""
 #: rocky/templates/organizations/organization_member_list.html
 #: rocky/templates/organizations/organization_settings.html
 msgid "Organization:"
-msgstr ""
+msgstr "Organisaasje:"
 
 #: rocky/templates/organizations/organization_member_list.html
 #, python-format
@@ -5305,7 +5363,7 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "Active"
-msgstr ""
+msgstr "Aktyf"
 
 #: rocky/templates/organizations/organization_member_list.html
 msgid "New"
@@ -5452,7 +5510,7 @@ msgstr ""
 #: rocky/templates/partials/form/field_input_checkbox.html
 #: rocky/templates/partials/form/field_input_radio.html
 msgid "This field is required"
-msgstr ""
+msgstr "Dit fjild is ferplichte"
 
 #: rocky/templates/partials/form/field_input.html
 msgid "Not set"
@@ -5836,7 +5894,7 @@ msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Clearance level:"
-msgstr ""
+msgstr "Frijwarringsnivo:"
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared:"
@@ -5940,7 +5998,7 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Normalizer"
-msgstr ""
+msgstr "Normalizer"
 
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Boefje input OOI"
@@ -6009,7 +6067,7 @@ msgstr ""
 #: rocky/templates/two_factor/core/backup_tokens.html
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Backup Tokens"
-msgstr ""
+msgstr "Reservekopytokens"
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid ""
@@ -6300,6 +6358,8 @@ msgid ""
 "Could not raise clearance levels to L%s. Indemnification not present at "
 "organization %s."
 msgstr ""
+"Koe frijwarringsnivo net ferheegje nei L%s. Frijwarring net oanwêzich by "
+"organisaasje %s."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -6307,6 +6367,9 @@ msgid ""
 "Could not raise clearance level to L%s. You were trusted a clearance level "
 "of L%s. Contact your administrator to receive a higher clearance."
 msgstr ""
+"Kin frijwarringsnivo net ferheegje nei L%s. Jo binne in frijwarringsnivo "
+"tafertroud fan L%s. Nim kontakt op mei jo behearder om jo frijwarringsnivo "
+"te ferheegjen."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -6314,6 +6377,9 @@ msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of L%s. Please accept the clearance level below to proceed."
 msgstr ""
+"Kin frijwarringsnivo net ferheegje nei L%s. Jo hawwe in frijwarringsnivo "
+"befêstige fan L%s. Akseptearje it frijwarringsnivo ûnderoan de side om troch "
+"te gean."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
@@ -6400,7 +6466,7 @@ msgstr ""
 
 #: rocky/views/ooi_view.py
 msgid "Clearance level: "
-msgstr ""
+msgstr "Frijwarringsnivo: "
 
 #: rocky/views/ooi_view.py
 msgid "Clearance type: "
@@ -6576,6 +6642,11 @@ msgstr ""
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr ""
+
+#~ msgid "Selected object"
+#~ msgid_plural "Selected objects"
+#~ msgstr[0] "Selektearre objekt"
+#~ msgstr[1] "Selektearre objekten"
 
 #~ msgid "Permission to set OOI clearance levels "
 #~ msgstr "Tastimming om frijwarringsnivo’s fan OOI yn te stellen "

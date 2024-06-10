@@ -9,7 +9,6 @@ def test_update_clearance_level(rf, client_member, httpx_mock):
     httpx_mock.add_response(
         json={
             "id": "binaryedge",
-            "repository_id": "LOCAL",
             "name": "BinaryEdge",
             "version": None,
             "authors": None,
