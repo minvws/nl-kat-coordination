@@ -7,10 +7,9 @@ from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django_weasyprint import WeasyTemplateResponseMixin
-from tools.view_helpers import url_with_querystring
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
@@ -55,7 +54,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("generate_report_view", kwargs=kwargs) + selection,
-                "text": _("View report"),
+                "text": _("Save report"),
             },
         ]
         return breadcrumbs
@@ -149,9 +148,9 @@ class SetupScanGenerateReportView(
         return super().get(request, *args, **kwargs)
 
 
-class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
+class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
     """
-    Shows the report generated from OOIS and report types.
+    Save the report generated.
     """
 
     template_name = "generate_report.html"
@@ -160,15 +159,13 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
     report_types: Sequence[type[Report]]
     ooi_types = get_ooi_types_with_report()
 
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
             messages.error(request, _("Select at least one report type to proceed."))
             return redirect(
                 reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
             )
-        return super().get(request, *args, **kwargs)
 
-    def generate_reports_for_oois(self) -> dict[str, dict[str, dict[str, Any]]]:
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
@@ -183,28 +180,28 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
             by_type[ooi_type].append(ooi)
 
         sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
-        for report_type in sorted_report_types:
+        for report_class in sorted_report_types:
             oois = {
-                ooi for ooi_type in report_type.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
+                ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
             }
 
             try:
-                results = report_type(self.octopoes_api_connector).collect_data(oois, self.observed_at)
+                results = report_class(self.octopoes_api_connector).collect_data(oois, self.observed_at)
             except ObjectNotFoundException:
-                error_reports.append(report_type.id)
+                error_reports.append(report_class.id)
                 continue
             except TypeNotFound:
-                error_reports.append(report_type.id)
+                error_reports.append(report_class.id)
                 continue
 
             for ooi, data in results.items():
-                if report_type.id not in report_data:
-                    report_data[report_type.id] = {}
+                if report_class.id not in report_data:
+                    report_data[report_class.id] = {}
 
-                report_data[report_type.id][ooi] = {
+                report_data[report_class.id][ooi] = {
                     "data": data,
-                    "template": report_type.template_path,
-                    "report_name": report_type.name,
+                    "template": report_class.template_path,
+                    "report_name": report_class.name,
                 }
                 number_of_reports += 1
 
@@ -212,10 +209,10 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
 
         # if its not a single report, we need a parent
         if number_of_reports > 1:
-            parent_report_ooi = self.save_report(
+            report_ooi = self.save_report(
                 data={},
                 report_type=ConcatenatedReport,
-                input_ooi=None,
+                input_oois=[],
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
@@ -225,8 +222,8 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
                     self.save_report(
                         data=data["data"],
                         report_type=get_report_by_id(report_type),
-                        input_ooi=Reference.from_str(ooi),
-                        parent=parent_report_ooi.reference,
+                        input_oois=[ooi],
+                        parent=report_ooi.reference,
                         has_parent=True,
                         observed_at=observed_at,
                     )
@@ -235,10 +232,10 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
             report_type = next(iter(report_data))
             ooi = next(iter(report_data[report_type]))
             data = report_data[report_type][ooi]
-            self.save_report(
+            report_ooi = self.save_report(
                 data=data["data"],
                 report_type=get_report_by_id(report_type),
-                input_ooi=Reference.from_str(ooi),
+                input_oois=[ooi],
                 parent=None,
                 has_parent=False,
                 observed_at=observed_at,
@@ -253,33 +250,11 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
             }
             messages.error(self.request, error_message)
 
-        return report_data
+        return redirect(
+            reverse("view_report", kwargs={"organization_code": self.organization.code})
+            + "?"
+            + urlencode({"report_id": report_ooi.reference})
+        )
 
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["created_at"] = datetime.now()
-        context["total_oois"] = self.get_total_objects()
-        context["report_data"] = self.generate_reports_for_oois()
-        context["report_types"] = [report.class_attributes() for report in self.report_types]
-        context["report_download_url"] = url_with_querystring(
-            reverse(
-                "generate_report_pdf",
-                kwargs={"organization_code": self.organization.code},
-            ),
-            True,
-            **self.request.GET,
-        )
-        return context
-
-
-class GenerateReportPDFView(GenerateReportView, WeasyTemplateResponseMixin):
-    template_name = "generate_report_pdf.html"
-
-    pdf_filename = "generate_report.pdf"
-    pdf_attachment = False
-    pdf_options = {
-        "pdf_variant": "pdf/ua-1",
-    }

@@ -21,25 +21,24 @@ class ReportData(OOI):
 
 
 class Report(OOI):
-    name: str | None = None
-    report_type: str | None = None
+    object_type: Literal["Report"] = "Report"
+
+    name: str
+    report_type: str
     template: str | None = None
     date_generated: datetime
 
-    input_ooi: Reference | None = ReferenceField(OOI, max_issue_scan_level=1, max_inherit_scan_level=2, default=None)
+    input_oois: list[str]
 
     report_id: UUID
 
-    object_type: Literal["Report"] = "Report"
     organization_code: str
     organization_name: str
     organization_tags: list[str]
     data_raw_id: str
 
     observed_at: datetime
-    parent_report: Reference | None = ReferenceField(
-        "Report", max_issue_scan_level=1, max_inherit_scan_level=2, default=None
-    )
+    parent_report: Reference | None = ReferenceField("Report", default=None)
     has_parent: bool
 
     _natural_key_attrs = ["report_id"]

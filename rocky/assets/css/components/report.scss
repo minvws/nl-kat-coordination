@@ -86,8 +86,8 @@
 
     table {
       caption {
-        --table-base-caption-font-size: var(--heading-normal-font-size);
-        --table-base-caption-text-color: var(--text-color-dark);
+        --table-caption-font-size: var(--heading-normal-font-size);
+        --table-caption-text-color: var(--text-color-dark);
 
         font-family: var(--headings-base-set-font-family);
         font-weight: 600;

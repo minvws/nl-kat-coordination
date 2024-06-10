@@ -3,15 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # jan klopper <jan@underdark.nl>, 2023.
 # Wim Benes <fryskefirefox@gmail.com>, 2024.
+# Weblate Translation Memory <noreply-mt-weblate-translation-memory@weblate.org>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-23 15:00+0000\n"
-"PO-Revision-Date: 2024-05-29 09:09+0000\n"
+"PO-Revision-Date: 2024-06-04 12:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
-"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
-"coordination/fy/>\n"
+"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/"
+"nl-kat-coordination/fy/>\n"
 "Language: fy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1761,7 +1762,7 @@ msgstr ""
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Permission"
-msgstr ""
+msgstr "Tastimming"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -2216,7 +2217,7 @@ msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "2: Organization setup"
-msgstr ""
+msgstr "2: Organisaasjes"
 
 #: onboarding/view_helpers.py
 msgid "3: Indemnification"
@@ -2224,7 +2225,7 @@ msgstr ""
 
 #: onboarding/view_helpers.py
 msgid "4: Account setup"
-msgstr ""
+msgstr "4: Account ynstelle"
 
 #: onboarding/view_helpers.py
 msgid "OpenKAT Setup"
@@ -3641,7 +3642,7 @@ msgstr[1] ""
 #: rocky/views/ooi_add.py rocky/views/ooi_list.py rocky/views/ooi_view.py
 #: rocky/views/upload_csv.py rocky/views/upload_raw.py
 msgid "Objects"
-msgstr ""
+msgstr "Objekten"
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html
@@ -3670,7 +3671,7 @@ msgstr ""
 
 #: reports/templates/partials/report_setup_scan.html
 msgid "Plugins"
-msgstr ""
+msgstr "Ynstekkers"
 
 #: reports/templates/partials/report_setup_scan.html
 msgid ""
@@ -3847,7 +3848,7 @@ msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid "Select Objects"
-msgstr ""
+msgstr "Selektearje objekten"
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
 #: reports/views/multi_report.py
@@ -4209,7 +4210,7 @@ msgstr ""
 
 #: tools/models.py
 msgid "The name of the organisation"
-msgstr ""
+msgstr "De namme fan de organisaasje"
 
 #: tools/models.py
 msgid ""
@@ -4379,7 +4380,7 @@ msgstr ""
 
 #: rocky/templates/403.html
 msgid "Please contact your system administrator."
-msgstr ""
+msgstr "Nim kontakt op mei jo systeembehearder."
 
 #: rocky/templates/403.html rocky/templates/404.html
 msgid "You may want to go back to the"
@@ -4718,7 +4719,7 @@ msgstr ""
 #: rocky/templates/partials/elements/ooi_list_settings_form.html
 #: rocky/templates/tasks/partials/task_filter.html
 msgid "Clear filters"
-msgstr ""
+msgstr "Filters wiskje"
 
 #: rocky/templates/footer.html rocky/views/privacy_statement.py
 msgid "Privacy Statement"
@@ -4931,7 +4932,7 @@ msgstr ""
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Boefje"
-msgstr ""
+msgstr "Boefke"
 
 #: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
 msgid "Scan profile"
@@ -5955,7 +5956,7 @@ msgstr ""
 
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Normalizer"
-msgstr ""
+msgstr "Normalizer"
 
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Boefje input OOI"
@@ -6024,7 +6025,7 @@ msgstr ""
 #: rocky/templates/two_factor/core/backup_tokens.html
 #: rocky/templates/two_factor/profile/profile.html
 msgid "Backup Tokens"
-msgstr ""
+msgstr "Reservekopytokens"
 
 #: rocky/templates/two_factor/core/backup_tokens.html
 msgid ""
@@ -6315,6 +6316,8 @@ msgid ""
 "Could not raise clearance levels to L%s. Indemnification not present at "
 "organization %s."
 msgstr ""
+"Koe frijwarringsnivo net ferheegje nei L%s. Frijwarring net oanwêzich by "
+"organisaasje %s."
 
 #: rocky/views/ooi_list.py
 #, python-format
@@ -6332,6 +6335,9 @@ msgid ""
 "Could not raise clearance level to L%s. You acknowledged a clearance level "
 "of L%s. Please accept the clearance level below to proceed."
 msgstr ""
+"Kin frijwarringsnivo net ferheegje nei L%s. Jo hawwe in frijwarringsnivo "
+"befêstige fan L%s. Akseptearje it frijwarringsnivo ûnderoan de side om troch "
+"te gean."
 
 #: rocky/views/ooi_list.py
 msgid "An error occurred while saving clearance levels."
