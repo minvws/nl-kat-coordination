@@ -297,9 +297,9 @@ Good to know: XTDB tracks the history of each object by its **primary key**.
 
 ### XTDB-cli tool
 
-The XTDB-cli tool is a script that can be used to query the XTDB database (v1) directly. This can be useful to query for transactions, queries, attributes, keys, etc. It can be used to directly manipulate XTDB, without the interference of Octopoes. This can be useful for experimenting, bug hunting, optimisations, etc.
+The XTDB-cli tool is a script that can be used to query the XTDB database (v1) directly. This can be useful to query for transactions, queries, attributes, keys and more. It can be used to directly manipulate XTDB, without the interference of Octopoes. This can be useful for tasks such as experimenting, bug hunting and optimizations.
 
-Please note: the XTDB version within OpenKAT in not vanilla XTDB, but the version found at: [OpenKAT XTDB](https://github.com/dekkers/xtdb-http-multinode)
+Please note: The XTDB version within OpenKAT is not the standard XTDB. It is an extended module version that adds support for multiple nodes available at: [OpenKAT XTDB](https://github.com/dekkers/xtdb-http-multinode)
 
 The XTDB-cli tool can be found in the following folder:
 
