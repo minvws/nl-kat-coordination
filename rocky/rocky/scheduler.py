@@ -166,6 +166,7 @@ class LazyTaskList:
         )
 
         self._count = res.count
+
         return res.results
 
 
@@ -217,9 +218,6 @@ class SchedulerClient:
             raise SchedulerValidationError()
         except ConnectError:
             raise SchedulerConnectError()
-
-    def get_lazy_task_list(self, **kwargs) -> LazyTaskList:
-        return LazyTaskList(self, **kwargs)
 
     def get_task_details(self, task_id: str) -> Task:
         try:

@@ -58,12 +58,14 @@ def test_ooi_detail(
     client_member,
     mock_organization_view_octopoes,
     mock_scheduler,
-    mock_scheduler_client_task_list,
+    paginated_task_list,
     mocker,
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
+
+    mock_scheduler.list_tasks.return_value = paginated_task_list
 
     request = setup_request(rf.get("ooi_detail", {"ooi_id": "Network|testnetwork"}), client_member.user)
 
@@ -75,7 +77,7 @@ def test_ooi_detail(
     assertContains(response, "Network|testnetwork")
 
     assertContains(response, "Plugin")
-    assertContains(response, "dns-sec")
+    assertContains(response, "TestBoefje")
     assertContains(
         response,
         f'href="/en/{client_member.organization.code}/kat-alogus/plugins/boefje/test-boefje/">TestBoefje</a>',
@@ -91,9 +93,9 @@ def test_ooi_detail(
 def test_question_detail(
     rf,
     client_member,
-    mock_scheduler,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
+    mock_scheduler,
+    paginated_task_list,
     mocker,
 ):
     mocker.patch("katalogus.client.KATalogusClientV1")
@@ -179,13 +181,13 @@ def test_answer_question_bad_schema(
 def test_ooi_detail_start_scan(
     rf,
     client_member,
-    mock_scheduler,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
+    mock_scheduler,
+    paginated_task_list,
     mocker,
     network,
 ):
-    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus = mocker.patch("rocky.views.ooi_detail.get_katalogus")
 
     mock_organization_view_octopoes().get.return_value = network
 
@@ -224,9 +226,9 @@ def test_ooi_detail_start_scan(
 def test_ooi_detail_start_scan_no_indemnification(
     rf,
     client_member,
-    mock_scheduler,
     mock_organization_view_octopoes,
-    lazy_task_list_with_boefje,
+    mock_scheduler,
+    paginated_task_list,
     mocker,
     network,
 ):
@@ -234,6 +236,17 @@ def test_ooi_detail_start_scan_no_indemnification(
 
     mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
+    mock_katalogus().get_plugin.return_value = Boefje(
+        id="nmap",
+        name="",
+        description="",
+        enabled=True,
+        type="boefje",
+        scan_level=SCAN_LEVEL.L2,
+        consumes=[],
+        produces=[],
+    )
 
     Indemnification.objects.get(user=client_member.user).delete()
 
@@ -243,7 +256,7 @@ def test_ooi_detail_start_scan_no_indemnification(
         rf.post(
             f"/en/{client_member.organization.code}/objects/details/?{query_string}",
             data={
-                "boefje_id": "nmap",
+                "boefje_id": "test-boefje",
                 "action": "start_scan",
             },
         ),
