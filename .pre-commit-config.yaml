@@ -82,6 +82,13 @@ repos:
     rev: v1.10.0
     hooks:
       - id: mypy
+        args:
+          [
+            "--ignore-missing-imports",
+            "--scripts-are-modules",
+            "--linecoverage-report",
+            "mypy/",
+          ]
         additional_dependencies:
           - types-pyyaml
           - types-cachetools
