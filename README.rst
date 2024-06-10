@@ -23,6 +23,7 @@ Documentation
 - Guidelines
 - Templates
 - Technical documentation
+- Our `Figma / UX designs <https://docs.openkat.nl/ux_design/figma.html>`_.
 
 Brochures
 =========
@@ -31,6 +32,11 @@ The high level documentation on OpenKAT explains the purpose and operation of Op
 
 - `the 'TL;DR' of 2 pages (English) <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/introduction/pdf/OpenKAT%20handout_ENG.pdf>`_
 - `the extensive brochure on OpenKAT (Dutch) <https://github.com/minvws/nl-kat-coordination/blob/main/docs/source/introduction/pdf/introductie%20OpenKAT%20V20220621.pdf>`_
+
+Current release
+===============
+
+The current release of OpenKAT can be found via the `release page on this repository <https://github.com/minvws/nl-kat-coordination/releases>`_.
 
 Translations
 ============
@@ -45,10 +51,6 @@ Translations
 We gratefully use `Weblate <https://hosted.weblate.org/engage/openkat/>`_ to manage the translations.
 See `the docs <https://docs.openkat.nl/guidelines/contributions.html#contribute-translations>`_ for more information.
 
-Current release
-===============
-
-The current release of OpenKAT can be found via the `release page on this repository <https://github.com/minvws/nl-kat-coordination/releases>`_.
 
 Which license applies to OpenKAT?
 =================================
@@ -67,3 +69,14 @@ There several options to contact the OpenKAT team:
 - `OpenKAT group on Linkedin <https://www.linkedin.com/>`_ (search for OpenKAT)
 - IRC: #openkat on irc.libera.chat
 - `Signal group <https://signal.group/#CjQKIIS4T1mDK1RcTqelkv-vDvnzrsU4b2qGj3xIPPrqWO8HEhDISi92dF_m4g7tXEB_QwN_>`_
+
+Privacy
+=======
+
+OpenKAT is not designed to collect private information, and in does not act on Private information that its finds. Some information considered to be Identifiying information Might be collected trough one or more of OpenKAT's plugins and subsequently stored, but only if that information was accessible to OpenKAT. Eg, a phone number or emailadres listed on a website might end up being collected in the 'proofs' that OpenKAT collects of It's actions. No Email or Phone number Models are present and as such they wont be processed into Objects by OpenKAT.
+An OpenKAT installation requires user-accounts for users to be able to login. These accounts are stored only on the OpenKAT installation itself, and are not shared with other parties or outside of your OpenKAT install.
+
+Security
+=======
+
+OpenKAT is designed to be as secure as possibly, however the default setup for development has some debugging flags enabled, and does not include TLS out of the box. To setup a secure production OpenKAT install, please follow the `Production setup guidelines <https://docs.openkat.nl/installation_and_deployment/install.html#production-environments>`_ and `Hardening guidelines <https://docs.openkat.nl/installation_and_deployment/hardening.html>`_.
