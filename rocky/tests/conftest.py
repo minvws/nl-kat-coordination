@@ -30,6 +30,7 @@ from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, Scan
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
+from octopoes.models.ooi.reports import Report
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
@@ -1078,6 +1079,197 @@ def plugin_schema_no_required():
             },
         },
     }
+
+
+parent_report = [
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
+        name="Test Parent Report",
+        report_type=None,
+        template="report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=None,
+        report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b6d3ed",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=None,
+        has_parent=False,
+    ),
+]
+
+subreports = [
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
+        name="RPKI Report",
+        report_type="rpki-report",
+        template="rpki_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=Reference("Hostname|internet|example.com"),
+        report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff9"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="acbd2250-85f4-471a-ab70-ba1750280194",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
+        name="Safe Connections Report",
+        report_type="safe-connections-report",
+        template="safe_connections_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=Reference("Hostname|internet|example.com"),
+        report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abe"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34904",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|47a28977-04c6-43b6-9705-3c5f0c955833",
+        name="System Report",
+        report_type="systems-report",
+        template="systems_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=Reference("Hostname|internet|example.com"),
+        report_id=UUID("47a28977-04c6-43b6-9705-3c5f0c955833"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="3d2ea955-13c1-46f6-81f3-edfe72d8af0b",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|57c8f1b9-da3e-48ca-acb1-554e6966b4aa",
+        name="Mail Report",
+        report_type="mail-report",
+        template="mail_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=Reference("Hostname|internet|example.com"),
+        report_id=UUID("57c8f1b9-da3e-48ca-acb1-554e6966b4aa"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="fe4d0f5d-5447-47d3-952d-74544c8a9d8d",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|8075a64c-1acb-44b8-8376-b68d4ee972e5",
+        name="IPv6 Report",
+        report_type="ipv6-report",
+        template="ipv6_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=Reference("Hostname|internet|example.com"),
+        report_id=UUID("8075a64c-1acb-44b8-8376-b68d4ee972e5"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="3ca35c20-1139-4bf4-a11a-a0b83f3c48ff",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
+        name="Web System Report",
+        report_type="web-system-report",
+        template="web_system_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=Reference("Hostname|internet|example.com"),
+        report_id=UUID("8f3c6b75-b237-4c9a-8d9b-7745f3708d4a"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="1e419bee-672f-4561-b3b9-f47bd6ce60b7",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+    Report(
+        object_type="Report",
+        scan_profile=None,
+        primary_key="Report|8f3c6b75-b237-4c9a-8d9b-7745f3708d4a",
+        name="Web System Report",
+        report_type="web-system-report",
+        template="web_system_report/report.html",
+        date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        input_ooi=Reference("Hostname|internet|example2.com"),
+        report_id=UUID("8f3c6b75-b237-4c9a-8d9b-7745f3708d4a"),
+        organization_code="test_organization",
+        organization_name="Test Organization",
+        organization_tags=[],
+        data_raw_id="1e419bee-672f-4561-b3b9-f47bd6ce60b7",
+        observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+        parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+        has_parent=True,
+    ),
+]
+
+
+@pytest.fixture
+def report_list_one_subreport():
+    return [
+        (
+            subreports[0],
+            [],
+        )
+    ]
+
+
+@pytest.fixture
+def report_list_two_subreports():
+    return [
+        (
+            parent_report[0],
+            [
+                subreports[5],
+                subreports[6],
+            ],
+        )
+    ]
+
+
+@pytest.fixture
+def report_list_six_subreports():
+    return [
+        (
+            parent_report[0],
+            [
+                subreports[0],
+                subreports[1],
+                subreports[2],
+                subreports[3],
+                subreports[4],
+                subreports[5],
+            ],
+        )
+    ]
 
 
 def setup_request(request, user):
