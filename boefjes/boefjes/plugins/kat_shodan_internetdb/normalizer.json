@@ -1,0 +1,15 @@
+{
+  "id": "kat_shodan_internetdb_normalize",
+  "consumes": [
+    "boefje/shodan_internetdb"
+  ],
+  "produces": [
+    "Finding",
+    "IPPort",
+    "Hostname",
+    "CVEFindingType",
+    "DNSPTRRecord",
+    "Software",
+    "SoftwareInstance"
+  ]
+}

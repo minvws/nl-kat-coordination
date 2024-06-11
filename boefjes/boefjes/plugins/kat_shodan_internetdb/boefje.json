@@ -1,0 +1,10 @@
+{
+  "id": "shodan_internetdb",
+  "name": "'Shodan InternetDB",
+  "description": "Use Shodan InternetDB to find open ports with vulnerabilities that are found on an IP.",
+  "consumes": [
+    "IPAddressV4",
+    "IPAddressV6"
+  ],
+  "scan_level": 1
+}

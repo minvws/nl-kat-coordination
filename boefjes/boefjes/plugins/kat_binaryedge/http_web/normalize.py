@@ -3,7 +3,7 @@ import json
 from collections.abc import Iterable
 
 from boefjes.job_models import NormalizerOutput
-from boefjes.plugins.kat_binaryedge.services.normalize import get_name_from_cpe
+from boefjes.plugins.helpers import cpe_to_name_version
 from octopoes.models import Reference
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, PortState, Protocol
 from octopoes.models.ooi.software import Software, SoftwareInstance
@@ -64,7 +64,8 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
 
             for app in response.get("apps", {}):
                 if "cpe" in app:
-                    software_ooi = Software(name=get_name_from_cpe(app["cpe"]), cpe=app["cpe"])
+                    name, version = cpe_to_name_version(cpe=app["cpe"])
+                    software_ooi = Software(name=name, version=version, cpe=app["cpe"])
                     yield software_ooi
                     yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
                 else:
@@ -94,9 +95,8 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             for potential_software in data:
                 # Check all values for 'cpe'
                 if isinstance(potential_software, dict) and "cpe" in potential_software:
-                    software_ooi = Software(
-                        name=get_name_from_cpe(potential_software["cpe"]), cpe=potential_software["cpe"]
-                    )
+                    name, version = cpe_to_name_version(cpe=potential_software["cpe"])
+                    software_ooi = Software(name=name, version=version, cpe=potential_software["cpe"])
                     yield software_ooi
                     yield SoftwareInstance(ooi=ip_port_ooi.reference, software=software_ooi.reference)
 

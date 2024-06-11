@@ -2,7 +2,7 @@ import json
 import logging
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
+from boefjes.plugins.helpers import cpe_to_name_version
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.dns.records import DNSPTRRecord
 from octopoes.models.ooi.dns.zone import Hostname
@@ -13,21 +13,11 @@ from octopoes.models.ooi.software import Software, SoftwareInstance
 DNS_PTR_STR = ".in-addr.arpa"
 
 
-def cpe_to_name_version(cpe: str) -> tuple:
-    """Fetch the software name and version from a CPE string."""
-    cpe_split = cpe.split(":")
-    cpe_split_len = len(cpe_split)
-    name = None if cpe_split_len < 4 else cpe_split[3]
-    version = None if cpe_split_len < 5 else cpe_split[4]
-    return name, version
-
-
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[OOI]:
     """Normalize InternetDB output."""
     result = json.loads(raw)
-    input_ = normalizer_meta.raw_data.boefje_meta.arguments["input"]
-    input_ooi_reference = Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi)
-    input_ooi_str = input_["address"]
+    input_ooi_reference = Reference.from_str(input_ooi["primary_key"])
+    input_ooi_str = input_ooi["address"]
 
     if not result:
         logging.info("No InternetDB results available for normalization.")
@@ -35,13 +25,10 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         if result["detail"] == "No information available":
             logging.info("No information available for IP.")
         else:
-            logging.warning("Unexpected detail: %s", str(result["detail"]))
+            logging.warning("Unexpected detail: %s", result["detail"])
     else:
-        if result["ip"] != input_ooi_str:
-            logging.warning("Returned IP different from input OOI.")
-            logging.debug("Result IP: %s, Input IP: %s)", result["ip"], input_ooi_str)
         for hostname in result["hostnames"]:
-            hostname_ooi = Hostname(name=hostname, network=Network(name=input_["network"]["name"]).reference)
+            hostname_ooi = Hostname(name=hostname, network=Network(name=input_ooi["network"]["name"]).reference)
             yield hostname_ooi
             if hostname.endswith(DNS_PTR_STR):
                 yield DNSPTRRecord(hostname=hostname_ooi.reference, value=hostname, address=input_ooi_reference)
@@ -50,12 +37,11 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
             yield IPPort(address=input_ooi_reference, port=int(port), state=PortState("open"))
 
         for cve in result["vulns"]:
-            source_url = f"https://internetdb.shodan.io/{input_ooi_str}"
-            finding_type = CVEFindingType(id=cve, source=source_url)
+            finding_type = CVEFindingType(id=cve)
             finding = Finding(
                 finding_type=finding_type.reference,
                 ooi=input_ooi_reference,
-                proof=source_url,
+                proof=f"https://internetdb.shodan.io/{input_ooi_str}",
             )
             yield finding_type
             yield finding
