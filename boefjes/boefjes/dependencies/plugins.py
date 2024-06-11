@@ -16,7 +16,12 @@ from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
+from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
+from boefjes.katalogus.models import Boefje, FilterParameters, Normalizer, PaginationParameters, PluginType
+from boefjes.katalogus.storage.interfaces import (
+    ExistingPluginId,
     NotFound,
+    PluginEnabledStorage,
     PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
@@ -47,18 +52,17 @@ class PluginService:
         self.config_storage.__exit__(exc_type, exc_val, exc_tb)
 
     def get_all(self, organisation_id: str) -> list[PluginType]:
+        all_plugins = self.get_all_without_enabled()
+
+        return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
+
+    def get_all_without_enabled(self):
         all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
 
         for plugin in self.plugin_storage.get_all():
-            if plugin.id in all_plugins:
-                editable_fields = {"name", "description", "scan_level", "oci_image", "oci_arguments"}
-                all_plugins[plugin.id] = all_plugins[plugin.id].copy(
-                    update=plugin.dict(include=editable_fields), exclude=editable_fields
-                )
-            else:
-                all_plugins[plugin.id] = plugin
+            all_plugins[plugin.id] = plugin
 
-        return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
+        return all_plugins
 
     def by_plugin_id(self, plugin_id: str, organisation_id: str) -> PluginType:
         all_plugins = self.get_all(organisation_id)
@@ -103,43 +107,19 @@ class PluginService:
 
         return self.config_storage.upsert(organisation_id, plugin_id, settings=settings)
 
-    def upsert_boefje(self, boefje_id: str, data: dict) -> None:
-        """Update and/or insert a boefje. If it concerns a local boefje, make sure there is a database entry first"""
-
+    def create_boefje(self, boefje: Boefje) -> None:
         try:
-            plugin = self.local_repo.by_id(boefje_id)  # if we fail, it is non-local, so we can perform the update
-
-            if plugin.type != "boefje":
-                raise PluginNotFound(boefje_id)
-
-            try:
-                self.plugin_storage.boefje_by_id(boefje_id)
-            except PluginNotFound:
-                self.plugin_storage.create_boefje(plugin)  # If there is no database entry, we create one
+            self.local_repo.by_id(boefje.id)
+            raise ExistingPluginId(boefje.id)
         except KeyError:
-            pass
+            self.plugin_storage.create_boefje(boefje)
 
-        self.plugin_storage.update_boefje(boefje_id, data)  # Perform the update
-
-    def upsert_normalizer(self, normalizer_id: str, data: dict) -> None:
-        """
-        Update and/or insert a normalizer. If it concerns a local normalizer, make sure there is a database entry first
-        """
-
+    def create_normalizer(self, normalizer: Normalizer) -> None:
         try:
-            plugin = self.local_repo.by_id(normalizer_id)  # if we fail it is non-local, so we can perform the update
-
-            if plugin.type != "normalizer":
-                raise PluginNotFound(normalizer_id)
-
-            try:
-                self.plugin_storage.normalizer_by_id(normalizer_id)
-            except PluginNotFound:
-                self.plugin_storage.create_normalizer(plugin)  # If there is no database entry, we create one
+            self.local_repo.by_id(normalizer.id)
+            raise ExistingPluginId(normalizer.id)
         except KeyError:
-            pass
-
-        self.plugin_storage.update_normalizer(normalizer_id, data)  # Perform the update
+            self.plugin_storage.create_normalizer(normalizer)
 
     def delete_settings(self, organisation_id: str, plugin_id: str):
         self.config_storage.delete(organisation_id, plugin_id)
