@@ -60,3 +60,7 @@ env = [
     "QUEUE_URI=amqp://placeholder",
     "KATALOGUS_API=http://placeholder:8000",
 ]
+
+[tool.coverage.run]
+source = ['octopoes']
+relative_files = true
