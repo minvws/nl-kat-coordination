@@ -26,6 +26,7 @@ from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from reports.utils import JSONEncoder, debug_json_keys
@@ -473,7 +474,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         children_reports = self.get_children_reports()
 
-        if self.report_ooi.report_type == "concatenated-report":  # get single reports data (children's)
+        if issubclass(
+            get_report_by_id(self.report_ooi.report_type), ConcatenatedReport
+        ):  # get single reports data (children's)
             for report in children_reports:
                 for ooi in report.input_oois:
                     report_data[report.report_type] = {}
@@ -493,6 +496,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         else:
             # its a single report
             for ooi in self.report_ooi.input_oois:
+                report_data[self.report_ooi.report_type] = {}
                 report_data[self.report_ooi.report_type][ooi] = {
                     "data": self.get_report_data_from_bytes(self.report_ooi),
                     "template": self.report_ooi.template,
