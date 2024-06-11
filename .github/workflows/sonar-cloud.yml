@@ -1,15 +1,13 @@
 name: SonarCloud
 
 on:
-  # workflow_dispatch:
-  workflow_run:
-    workflows: ["Pre-commit checks"]
-    # branches: [main]
-    types: [completed]
+  workflow_dispatch:
+  # workflow_run:
+  #   workflows: ["Pre-commit checks"]
+  #   # branches: [main]
+  #   types: [completed]
 
   push:
-    branches: [main]
-    tags: ["releases-*"]
   pull_request:
 
 jobs:
