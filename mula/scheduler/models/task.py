@@ -72,8 +72,10 @@ class TaskDB(Base):
 
     scheduler_id = Column(String, nullable=False)
 
-    schedule_id = Column(GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True)
-    schedule = relationship("SchedueDB", back_populates="tasks")
+    schedule_id = Column(
+        GUID, ForeignKey("schedules.id", ondelete="SET NULL"), nullable=True
+    )
+    schedule = relationship("ScheduleDB", back_populates="tasks")
 
     hash = Column(String(32), index=True)
 
@@ -138,6 +140,8 @@ class BoefjeTask(BaseModel):
         in the PriorityQueue. We hash the combination of the attributes
         input_ooi and boefje.id since this combination is unique."""
         if self.input_ooi:
-            return mmh3.hash_bytes(f"{self.input_ooi}-{self.boefje.id}-{self.organization}").hex()
+            return mmh3.hash_bytes(
+                f"{self.input_ooi}-{self.boefje.id}-{self.organization}"
+            ).hex()
 
         return mmh3.hash_bytes(f"{self.boefje.id}-{self.organization}").hex()

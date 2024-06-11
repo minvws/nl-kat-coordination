@@ -24,8 +24,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
-                storage.SchemaStore.name: storage.SchemaStore(self.dbconn),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
+                    self.dbconn
+                ),
+                storage.ScheduleStore.name: storage.ScheduleStore(self.dbconn),
             }
         )
 
@@ -96,8 +98,10 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
         # Schedule should be in datastore
-        schedule_db = self.mock_ctx.datastores.schema_store.get_schema(task_db.schema_id)
-        self.assertEqual(schedule_db.id, task_db.schema_id)
+        schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+            task_db.schedule_id
+        )
+        self.assertEqual(schedule_db.id, task_db.schedule_id)
 
     def test_post_pop(self):
         """When a task is popped from the queue, it should be removed from the database"""
@@ -170,7 +174,9 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
+            self.scheduler.scheduler_id
+        )
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -210,7 +216,9 @@ class SchedulerTestCase(unittest.TestCase):
         self.assertEqual(0, self.scheduler.queue.qsize())
 
         # All tasks on queue should be set to CANCELLED
-        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(self.scheduler.scheduler_id)
+        tasks, _ = self.mock_ctx.datastores.task_store.get_tasks(
+            self.scheduler.scheduler_id
+        )
         for task in tasks:
             self.assertEqual(task.status, models.TaskStatus.CANCELLED)
 
@@ -247,13 +255,17 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
 
         # Get schedule
-        initial_schedule_db = self.mock_ctx.datastores.schema_store.get_schema(task_db.schema_id)
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+            task_db.schedule_id
+        )
         initial_timestamp = initial_schedule_db.deadline_at
 
         self.scheduler.signal_handler_task(task_db)
 
         # Assert: schedule should have same deadline
-        updated_schedule_db = self.mock_ctx.datastores.schema_store.get_schema(task_db.schema_id)
+        updated_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+            task_db.schedule_id
+        )
         updated_timestamp = updated_schedule_db.deadline_at
         self.assertEqual(initial_timestamp, updated_timestamp)
 
@@ -271,7 +283,9 @@ class SchedulerTestCase(unittest.TestCase):
         task_db = self.mock_ctx.datastores.task_store.get_task(str(item.id))
 
         # Get schedule
-        initial_schedule_db = self.mock_ctx.datastores.schema_store.get_schema(task_db.schema_id)
+        initial_schedule_db = self.mock_ctx.datastores.schedule_store.get_schedule(
+            task_db.schedule_id
+        )
 
         # Set cron expression to malformed
         with self.assertRaises(ValueError):

@@ -36,7 +36,9 @@ def create_test_model() -> TestModel:
     )
 
 
-def create_p_item_request(priority: int, data: TestModel | None = None) -> models.PrioritizedItemRequest:
+def create_p_item_request(
+    priority: int, data: TestModel | None = None
+) -> models.PrioritizedItemRequest:
     if data is None:
         data = TestModel(
             id=uuid.uuid4().hex,
@@ -49,7 +51,9 @@ def create_p_item_request(priority: int, data: TestModel | None = None) -> model
     )
 
 
-def create_item(scheduler_id: str, priority: int, task: models.Task | None = None) -> models.Task:
+def create_item(
+    scheduler_id: str, priority: int, task: models.Task | None = None
+) -> models.Task:
     if task is None:
         task = create_task(scheduler_id)
 
@@ -63,14 +67,14 @@ def create_item(scheduler_id: str, priority: int, task: models.Task | None = Non
     return item
 
 
-def create_schema(scheduler_id: str, data: Any | None = None) -> models.TaskSchema:
+def create_schema(scheduler_id: str, data: Any | None = None) -> models.Schedule:
     if data is None:
         data = TestModel(
             id=uuid.uuid4().hex,
             name=uuid.uuid4().hex,
         )
 
-    return models.TaskSchema(
+    return models.Schedule(
         scheduler_id=scheduler_id,
         hash=data.hash,
         data=data.model_dump(),
@@ -98,7 +102,9 @@ def create_boefje() -> models.Boefje:
 
 
 # TODO: arg input_ooi
-def create_boefje_task(organization_id: str, input_ooi: str | None = None) -> models.BoefjeTask:
+def create_boefje_task(
+    organization_id: str, input_ooi: str | None = None
+) -> models.BoefjeTask:
     scan_profile = factories.ScanProfileFactory(level=0)
     ooi = factories.OOIFactory(scan_profile=scan_profile)
     boefje = factories.BoefjeFactory()
@@ -111,4 +117,8 @@ def create_boefje_task(organization_id: str, input_ooi: str | None = None) -> mo
 
 
 def compile_query(query: Query) -> str:
-    return str(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
+    return str(
+        query.statement.compile(
+            dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}
+        )
+    )

@@ -80,19 +80,14 @@ class BoefjeScheduler(Scheduler):
         * New boefjes; when new boefjes are added or enabled we find the ooi's
         that boefjes can run on, and create tasks for it.
 
-        * Random OOI's from Octopoes; every minute we get a random OOI from
-        Octopoes and create a task for it for the available boefjes for this
-        OOI.
         """
         # Scan profile mutations
-        listener = listeners.ScanProfileMutation(
+        self.listeners["scan_profile_mutations"] = listeners.ScanProfileMutation(
             dsn=str(self.ctx.config.host_raw_data),
             queue=f"{self.organisation.id}__scan_profile_mutations",
             func=self.push_tasks_for_scan_profile_mutations,
             prefetch_count=self.ctx.config.rabbitmq_prefetch_count,
         )
-
-        self.listeners["scan_profile_mutations"] = listener
 
         self.run_in_thread(
             name=f"BoefjeScheduler-{self.scheduler_id}-mutations",
@@ -208,7 +203,9 @@ class BoefjeScheduler(Scheduler):
         boefjes can run on, and create tasks for it."""
         new_boefjes = None
         try:
-            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
+            new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(
+                self.organisation.id
+            )
         except ExternalServiceError:
             self.logger.error(
                 "Failed to get new boefjes for organisation: %s from katalogus",
@@ -247,10 +244,12 @@ class BoefjeScheduler(Scheduler):
 
             oois_by_object_type: list[OOI] = []
             try:
-                oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
-                    self.organisation.id,
-                    boefje.consumes,
-                    list(range(boefje.scan_level, 5)),
+                oois_by_object_type = (
+                    self.ctx.services.octopoes.get_objects_by_object_types(
+                        self.organisation.id,
+                        boefje.consumes,
+                        list(range(boefje.scan_level, 5)),
+                    )
                 )
             except ExternalServiceError as exc:
                 self.logger.error(
@@ -285,7 +284,6 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-<<<<<<< HEAD
             schedules, _ = self.ctx.datastores.schedule_store.get_schedules(
                 filters=filters.FilterRequest(
                     filters=[
@@ -296,48 +294,6 @@ class BoefjeScheduler(Scheduler):
                         ),
                         # TODO: ad enabled filter
                     ]
-=======
-            random_oois = self.ctx.services.octopoes.get_random_objects(
-                organisation_id=self.organisation.id,
-                n=self.ctx.config.pq_max_random_objects,
-                scan_level=[1, 2, 3, 4],
-            )
-        except ExternalServiceError:
-            self.logger.exception(
-                "Could not get random oois for organisation: %s from octopoes",
-                self.organisation.name,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        if not random_oois:
-            self.logger.debug(
-                "No random oois for organisation: %s",
-                self.organisation.name,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return
-
-        for ooi in random_oois:
-            self.logger.debug(
-                "Checking random ooi %s for rescheduling of tasks",
-                ooi.primary_key,
-                ooi_primary_key=ooi.primary_key,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-
-            boefjes = self.get_boefjes_for_ooi(ooi)
-            if boefjes is None or not boefjes:
-                self.logger.debug(
-                    "No boefjes available for ooi %s, skipping",
-                    ooi.primary_key,
-                    ooi_primary_key=ooi,
-                    organisation_id=self.organisation.id,
-                    scheduler_id=self.scheduler_id,
->>>>>>> main
                 )
             )
         except Exception as exc_db:
@@ -396,7 +352,9 @@ class BoefjeScheduler(Scheduler):
                 ooi = None
                 if boefje_task.input_ooi:
                     # OOI still exists?
-                    ooi = self.ctx.services.octopoes.get_object(boefje_task.organization, boefje_task.input_ooi)
+                    ooi = self.ctx.services.octopoes.get_object(
+                        boefje_task.organization, boefje_task.input_ooi
+                    )
                     if not ooi:
                         self.logger.debug(
                             "OOI does not exist anymore, skipping",
@@ -584,7 +542,8 @@ class BoefjeScheduler(Scheduler):
             and (
                 task_db.modified_at is not None
                 and task_db.modified_at
-                > datetime.now(timezone.utc) - timedelta(seconds=self.ctx.config.pq_grace_period)
+                > datetime.now(timezone.utc)
+                - timedelta(seconds=self.ctx.config.pq_grace_period)
             )
         ):
             self.logger.error(
@@ -597,7 +556,11 @@ class BoefjeScheduler(Scheduler):
             )
             raise RuntimeError("Task has been finished, but no results found in bytes")
 
-        if task_bytes is not None and task_bytes.ended_at is None and task_bytes.started_at is not None:
+        if (
+            task_bytes is not None
+            and task_bytes.ended_at is None
+            and task_bytes.started_at is not None
+        ):
             self.logger.debug(
                 "Task is still running, according to bytes",
                 task_id=task_bytes.id,
@@ -638,7 +601,8 @@ class BoefjeScheduler(Scheduler):
             and (
                 task_db.modified_at is not None
                 and datetime.now(timezone.utc)
-                > task_db.modified_at + timedelta(seconds=self.ctx.config.pq_grace_period)
+                > task_db.modified_at
+                + timedelta(seconds=self.ctx.config.pq_grace_period)
             )
         ):
             return True
@@ -713,7 +677,9 @@ class BoefjeScheduler(Scheduler):
                 )
 
                 # Update task in datastore to be failed
-                task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(boefje_task.hash)
+                task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(
+                    boefje_task.hash
+                )
                 task_db.status = TaskStatus.FAILED
                 self.ctx.datastores.task_store.update_task(task_db)
         except Exception as exc_stalled:
@@ -752,30 +718,11 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-<<<<<<< HEAD
         if self.is_item_on_queue_by_hash(boefje_task.hash):
             self.logger.debug(
                 "Task is already on queue: %s",
                 boefje_task.hash,
                 boefje_task_hash=boefje_task.hash,
-=======
-        try:
-            if self.is_item_on_queue_by_hash(task.hash):
-                self.logger.debug(
-                    'Task "%s" is already enqueued',
-                    task.id,
-                    task_id=task.id,
-                    organisation_id=self.organisation.id,
-                    scheduler_id=self.scheduler_id,
-                    caller=caller,
-                )
-                return
-        except Exception:
-            self.logger.warning(
-                "Could not check if task is running: %s",
-                task.id,
-                task_id=task.id,
->>>>>>> main
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
@@ -856,9 +803,9 @@ class BoefjeScheduler(Scheduler):
             raise exc_db
 
         # Has grace period passed according to datastore?
-        if task_db is not None and datetime.now(timezone.utc) - task_db.modified_at < timedelta(
-            seconds=self.ctx.config.pq_grace_period
-        ):
+        if task_db is not None and datetime.now(
+            timezone.utc
+        ) - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_grace_period):
             self.logger.debug(
                 "Task has not passed grace period, according to the datastore",
                 task_id=task_db.id,
@@ -888,7 +835,8 @@ class BoefjeScheduler(Scheduler):
         if (
             task_bytes is not None
             and task_bytes.ended_at is not None
-            and datetime.now(timezone.utc) - task_bytes.ended_at < timedelta(seconds=self.ctx.config.pq_grace_period)
+            and datetime.now(timezone.utc) - task_bytes.ended_at
+            < timedelta(seconds=self.ctx.config.pq_grace_period)
         ):
             self.logger.debug(
                 "Task has not passed grace period, according to bytes",
@@ -946,34 +894,3 @@ class BoefjeScheduler(Scheduler):
         )
 
         return boefjes
-
-    # TODO: test this
-    def evaluate_schedule(self, task: models.Task) -> str:
-        """Evaluate the schedule for a task.
-
-        Args:
-            task: The task to evaluate the schedule for.
-
-        Returns:
-            A cron expression for the task, or None if no schedule could be
-
-        """
-        if task.schedule:
-            # TODO: implement more advanced schedule evaluation
-            return task.schedule
-
-        # We at least delay a job by the grace period
-        minimum = self.ctx.config.pq_grace_period
-        deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)
-
-        # We want to delay the job by a random amount of time, in a range of 5 hours
-        jitter_range_seconds = 5 * 60 * 60
-        jitter_offset = timedelta(seconds=random.uniform(-jitter_range_seconds, jitter_range_seconds))
-
-        # Check if the adjusted time is earlier than the minimum, and
-        # ensure that the adjusted time is not earlier than the deadline
-        adjusted_time = deadline + jitter_offset
-        adjusted_time = max(adjusted_time, deadline)
-
-        # TODO: check and test this
-        return f"{adjusted_time.minute} {adjusted_time.hour} * * *"

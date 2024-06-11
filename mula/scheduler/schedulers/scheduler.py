@@ -1,4 +1,5 @@
 import abc
+import random
 import threading
 import time
 from collections.abc import Callable
@@ -96,7 +97,9 @@ class Scheduler(abc.ABC):
         self.lock: threading.Lock = threading.Lock()
         self.stop_event_threads: threading.Event = threading.Event()
         self.threads: list[thread.ThreadRunner] = []
-        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(max_workers=10)
+        self.executor: futures.ThreadPoolExecutor = futures.ThreadPoolExecutor(
+            max_workers=10
+        )
 
     @abc.abstractmethod
     def run(self) -> None:
@@ -273,7 +276,9 @@ class Scheduler(abc.ABC):
         # TODO: check exception handling here
         try:
             # FIXME: task.schedule instead of get
-            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(task.hash)
+            schedule = self.ctx.datastores.schedule_store.get_schedule_by_hash(
+                task.hash
+            )
             if schedule is None:
                 # TODO: naive cron schedule determination, should be improved
                 # with a random jitter approach to avoid scheduling tasks
@@ -307,12 +312,13 @@ class Scheduler(abc.ABC):
                 "Could not update schedule with deadline",
                 task_id=task.id,
                 task_hash=task.hash,
-                organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 exc_info=exc,
             )
 
-    def pop_item_from_queue(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
+    def pop_item_from_queue(
+        self, filters: storage.filters.FilterRequest | None = None
+    ) -> models.Task | None:
         """Pop an item from the queue.
 
         Args:
@@ -378,8 +384,37 @@ class Scheduler(abc.ABC):
 
         self.last_activity = datetime.now(timezone.utc)
 
+    # TODO: test this
     def evaluate_schedule(self, task: models.Task) -> str:
-        raise NotImplementedError
+        """Evaluate the schedule for a task.
+
+        Args:
+            task: The task to evaluate the schedule for.
+
+        Returns:
+            A cron expression for the task, or None if no schedule could be
+
+        """
+        if hasattr(task, "schedule") and task.schedule is not None:
+            return task.schedule
+
+        # We at least delay a job by the grace period
+        minimum = self.ctx.config.pq_grace_period
+        deadline = datetime.now(timezone.utc) + timedelta(seconds=minimum)
+
+        # We want to delay the job by a random amount of time, in a range of 5 hours
+        jitter_range_seconds = 5 * 60 * 60
+        jitter_offset = timedelta(
+            seconds=random.uniform(-jitter_range_seconds, jitter_range_seconds)
+        )
+
+        # Check if the adjusted time is earlier than the minimum, and
+        # ensure that the adjusted time is not earlier than the deadline
+        adjusted_time = deadline + jitter_offset
+        adjusted_time = max(adjusted_time, deadline)
+
+        # TODO: check and test this
+        return f"{adjusted_time.minute} {adjusted_time.hour} * * *"
 
     def enable(self) -> None:
         """Enable the scheduler.
@@ -390,14 +425,18 @@ class Scheduler(abc.ABC):
             self.logger.debug("Scheduler is already enabled")
             return
 
-        self.logger.info("Enabling scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Enabling scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
         self.enabled = True
 
         self.stop_event_threads.clear()
 
         self.run()
 
-        self.logger.info("Enabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Enabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
 
     def disable(self) -> None:
         """Disable the scheduler.
@@ -406,7 +445,11 @@ class Scheduler(abc.ABC):
         tasks that were on the queue will be set to CANCELLED.
         """
         if not self.is_enabled():
-            self.logger.warning("Scheduler already disabled: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+            self.logger.warning(
+                "Scheduler already disabled: %s",
+                self.scheduler_id,
+                scheduler_id=self.scheduler_id,
+            )
             return
 
         self.logger.info("Disabling scheduler: %s", self.scheduler_id)
@@ -423,9 +466,13 @@ class Scheduler(abc.ABC):
             status=models.TaskStatus.QUEUED,
         )
         task_ids = [task.id for task in tasks]
-        self.ctx.datastores.task_store.cancel_tasks(scheduler_id=self.scheduler_id, task_ids=task_ids)
+        self.ctx.datastores.task_store.cancel_tasks(
+            scheduler_id=self.scheduler_id, task_ids=task_ids
+        )
 
-        self.logger.info("Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Disabled scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
 
     def stop(self, callback: bool = True) -> None:
         """Stop the scheduler.
@@ -433,7 +480,9 @@ class Scheduler(abc.ABC):
         Args:
             callback: Whether to call the callback function.
         """
-        self.logger.info("Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Stopping scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
 
         # First, stop the listeners, when those are running in a thread and
         # they're using rabbitmq, they will block. Setting the stop event
@@ -444,7 +493,9 @@ class Scheduler(abc.ABC):
         if self.callback and callback:
             self.callback(self.scheduler_id)  # type: ignore [call-arg]
 
-        self.logger.info("Stopped scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id)
+        self.logger.info(
+            "Stopped scheduler: %s", self.scheduler_id, scheduler_id=self.scheduler_id
+        )
 
     def stop_listeners(self) -> None:
         """Stop the listeners."""
