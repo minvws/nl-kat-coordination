@@ -472,6 +472,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
         children_reports = self.get_children_reports()
+        report_types: list[dict[str, Any]] = []
 
         if self.report_ooi.report_type == "concatenated-report":  # get single reports data (children's)
             for report in children_reports:
@@ -484,15 +485,17 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     }
 
             input_oois = self.get_input_oois(children_reports)
+            report_types = self.get_report_types(children_reports)
 
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):  # its an aggregate report
             context["post_processed_data"] = self.get_report_data_from_bytes(self.report_ooi)
 
-            context["report_types"] = self.get_report_types([self.report_ooi])
+            report_types = self.get_report_types([self.report_ooi])
 
         else:
             # its a single report
             for ooi in self.report_ooi.input_oois:
+                report_data[self.report_ooi.report_type] = {}
                 report_data[self.report_ooi.report_type][ooi] = {
                     "data": self.get_report_data_from_bytes(self.report_ooi),
                     "template": self.report_ooi.template,
@@ -500,9 +503,10 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 }
 
             input_oois = self.get_input_oois([self.report_ooi])
+            report_types = self.get_report_types([self.report_ooi])
 
         context["report_data"] = report_data
-        context["report_types"] = self.get_report_types(children_reports)
+        context["report_types"] = report_types
         context["created_at"] = self.report_ooi.date_generated
         context["total_oois"] = len(input_oois)
         context["selected_oois"] = input_oois
