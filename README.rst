@@ -79,4 +79,4 @@ An OpenKAT installation requires user accounts for users to be able to login. Th
 Security
 ========
 
-OpenKAT is designed to be as secure as possibly, however the default setup for development has some debugging flags enabled, and does not include TLS out of the box. To setup a secure production OpenKAT install, please follow the `Production setup guidelines <https://docs.openkat.nl/installation_and_deployment/install.html#production-environments>`_ and `Hardening guidelines <https://docs.openkat.nl/installation_and_deployment/hardening.html>`_.
+OpenKAT is designed to be secure by default in its production setup. In the development setup some debugging flags are enabled by default and it will not include TLS out of the box. To setup a secure production OpenKAT install, please follow the `Production setup guidelines <https://docs.openkat.nl/installation_and_deployment/install.html#production-environments>`_ and `Hardening guidelines <https://docs.openkat.nl/installation_and_deployment/hardening.html>`_.
