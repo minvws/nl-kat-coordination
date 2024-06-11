@@ -492,8 +492,8 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):  # its an aggregate report
             context["post_processed_data"] = self.get_report_data_from_bytes(self.report_ooi)
-
-            report_types = self.get_report_types([self.report_ooi])
+            input_oois = self.get_input_oois(children_reports)
+            report_types = self.get_report_types(children_reports)
 
         else:
             # its a single report
