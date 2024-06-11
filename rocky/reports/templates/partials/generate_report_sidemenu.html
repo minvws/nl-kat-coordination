@@ -1,9 +1,9 @@
 {% load i18n %}
 
-<nav data-open-label="Zijbalknavigatie"
-     data-close-label="Sluit zijbalknavigatie"
-     aria-label="Zijbalknavigatie">
-    <div>
+<div class="sticky-container" id="sticky-container">
+    <nav data-open-label="Zijbalknavigatie"
+         data-close-label="Sluit zijbalknavigatie"
+         aria-label="Zijbalknavigatie">
         <h2 class="heading-large">{% translate "Table of contents" %}</h2>
         <ol class="chapter-numbers">
             <li>
@@ -19,5 +19,5 @@
                 {% endfor %}
             {% endfor %}
         </ol>
-    </div>
-</nav>
+    </nav>
+</div>

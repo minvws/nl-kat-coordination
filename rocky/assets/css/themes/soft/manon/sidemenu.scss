@@ -13,7 +13,11 @@ main.sidemenu {
 
   position: relative;
   align-items: stretch;
-  padding-left: var(--sidemenu-nav-width);
+  padding-left: var(--sidemenu-nav-padding-left);
+
+  @media (width >= 42rem) {
+    padding-left: var(--sidemenu-nav-width);
+  }
 
   /* Transition */
   transition: padding-left 1s;
@@ -22,12 +26,13 @@ main.sidemenu {
     /* Behaviour */
     position: sticky;
     top: 0;
+    z-index: 1;
 
     > nav {
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      left: calc(var(--sidemenu-nav-width) * -1);
+      left: 0;
       width: var(--sidemenu-nav-width);
       padding-top: var(--sidemenu-nav-padding-top);
       padding-right: 0;
@@ -39,6 +44,10 @@ main.sidemenu {
       border-right: 1px solid var(--sidemenu-nav-border-color);
       height: 100%;
       z-index: 1;
+
+      @media (width >= 42rem) {
+        left: calc(var(--sidemenu-nav-width) * -1);
+      }
 
       /* Transition */
       transition: all 1s;
@@ -85,15 +94,16 @@ main.sidemenu {
         /* Layout */
         display: flex;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: center;
         gap: 0;
         min-width: var(--sidemenu-toggle-button-min-width);
         min-height: var(--sidemenu-toggle-button-min-height);
-        margin-left: 0;
+        margin-left: -1rem;
         padding-top: 0;
         padding-right: 0;
         padding-bottom: 0;
         padding-left: 0;
+        background-color: rgb(255 255 255 / 75%);
 
         /* Needed to keep the button to stick to the top */
         z-index: 2;
@@ -121,7 +131,7 @@ main.sidemenu {
         }
 
         &[aria-expanded="false"] {
-          margin-left: var(--sidemenu-nav-width);
+          margin-left: calc(var(--sidemenu-nav-width) - 1rem);
           transition: margin-left 1s;
 
           &::before {
