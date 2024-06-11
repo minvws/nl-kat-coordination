@@ -78,7 +78,7 @@ class OOIRepository(Repository):
     def load_bulk(self, references: set[Reference], valid_time: datetime) -> dict[str, OOI]:
         raise NotImplementedError
 
-    def get_bulk(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
+    def load_bulk_as_list(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
         raise NotImplementedError
 
     def get_neighbours(
@@ -97,7 +97,7 @@ class OOIRepository(Repository):
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
-    def get_oois(
+    def faster_list_oois(
         self,
         types: set[type[OOI]],
         valid_time: datetime,
@@ -270,13 +270,10 @@ class XTDBOOIRepository(OOIRepository):
             raise
 
     def load_bulk(self, references: set[Reference], valid_time: datetime) -> dict[str, OOI]:
-        ids = list(map(str, references))
-        query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: ids})
-        res = self.session.client.query(query, valid_time)
-        oois = [self.deserialize(x[0]) for x in res]
+        oois = self.load_bulk_as_list(references, valid_time)
         return {ooi.primary_key: ooi for ooi in oois}
 
-    def get_bulk(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
+    def load_bulk_as_list(self, references: set[Reference], valid_time: datetime) -> list[OOI]:
         query = generate_pull_query(FieldSet.ALL_FIELDS, {self.pk_prefix: list(map(str, references))})
         return [self.deserialize(x[0]) for x in self.session.client.query(query, valid_time)]
 
@@ -343,7 +340,7 @@ class XTDBOOIRepository(OOIRepository):
             items=oois,
         )
 
-    def get_oois(
+    def faster_list_oois(
         self,
         types: set[type[OOI]],
         valid_time: datetime,
