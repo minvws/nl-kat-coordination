@@ -78,7 +78,10 @@ class ObservedAtMixin:
 
                 return ret
             except ValueError:
-                messages.error(self.request, _("Can not parse date, falling back to show current date."))
+                messages.error(
+                    self.request,
+                    _("Can not parse date, falling back to show current date."),
+                )
                 return datetime.now(timezone.utc)
 
 
@@ -253,7 +256,9 @@ class FindingList:
                     continue
                 hydrated_findings.append(
                     HydratedFinding(
-                        finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]
+                        finding=finding,
+                        finding_type=objects[finding.finding_type],
+                        ooi=objects[finding.ooi],
                     )
                 )
             return hydrated_findings
@@ -273,7 +278,10 @@ class ReportList:
     HARD_LIMIT = 99_999_999
 
     def __init__(
-        self, octopoes_connector: OctopoesAPIConnector, valid_time: datetime, parent_report_id: str | None = None
+        self,
+        octopoes_connector: OctopoesAPIConnector,
+        valid_time: datetime,
+        parent_report_id: str | None = None,
     ):
         self.octopoes_connector = octopoes_connector
         self.valid_time = valid_time
@@ -342,7 +350,12 @@ class ReportList:
             parent_report, children_reports = report
 
             hydrated_report.total_children_reports = len(children_reports)
-            hydrated_report.total_objects = len(parent_report.input_oois)
+
+            if len(parent_report.input_oois) > 0:
+                hydrated_report.total_objects = len(parent_report.input_oois)
+            else:
+                hydrated_report.total_objects = len(self.get_children_input_oois(children_reports))
+
             hydrated_report.report_type_summary = self.report_type_summary(children_reports)
 
             if not parent_report.has_parent:
@@ -359,6 +372,10 @@ class ReportList:
             hydrated_reports.append(hydrated_report)
 
         return hydrated_reports
+
+    @staticmethod
+    def get_children_input_oois(children_reports: list[Report]) -> set[str]:
+        return {input_ooi for child_report in children_reports for input_ooi in child_report.input_oois}
 
     @staticmethod
     def report_type_summary(reports: list[Report]) -> dict[str, int]:
