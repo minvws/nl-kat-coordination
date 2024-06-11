@@ -7,7 +7,7 @@ on:
   #   # branches: [main]
   #   types: [completed]
 
-  push:
+  # push:
   pull_request:
 
 jobs:
@@ -27,7 +27,6 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: SonarCloud
-        if: always()
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
