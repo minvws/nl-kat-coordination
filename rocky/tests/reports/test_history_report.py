@@ -37,11 +37,11 @@ def test_report_history_one_subreports_one_input_objects(
 
     # Check table rows
     subreport = report_list_one_subreport[0][0]
-    input_object = report_list_one_subreport[0][0].input_ooi.human_readable
+    input_object = report_list_one_subreport[0][0].input_oois[0]
     assertContains(response, subreport)
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7C{input_object}">{input_object}</a>',
+        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
         html=True,
     )
     assertNotContains(response, "Close children report object details")
@@ -144,11 +144,11 @@ def test_report_history_more_than_five_subreports_one_input_object(
 
     # Check table rows
     parent_report = report_list_six_subreports[0][0]
-    input_object = report_list_six_subreports[0][1][0].input_ooi.human_readable
+    input_object = report_list_six_subreports[0][1][0].input_oois[0]
     assertContains(response, parent_report)
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7C{input_object}">{input_object}</a>',
+        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
         html=True,
     )
     assertContains(response, "Close children report object details")
@@ -199,7 +199,6 @@ def test_report_history_subreports_table(
     parent_report = report_list_six_subreports[0][0].primary_key
 
     request = rf.get(url, {"report_id": parent_report})
-    print("Request: ", request)
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)
@@ -209,8 +208,6 @@ def test_report_history_subreports_table(
     )
 
     response = SubreportView.as_view()(request, organization_code=client_member.organization.code)
-
-    response.render()
 
     assert response.status_code == 200
 
@@ -231,10 +228,10 @@ def test_report_history_subreports_table(
     )
 
     # Check table rows
-    input_object = report_list_six_subreports[0][1][0].input_ooi.human_readable
+    input_object = report_list_six_subreports[0][1][0].input_oois[0]
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7C{input_object}">{input_object}</a>',
+        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
         html=True,
     )
 
