@@ -43,7 +43,7 @@ services:
       - ../init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
 
   ci_rabbitmq:
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     volumes:
       - ./.ci/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
     healthcheck:
@@ -77,7 +77,7 @@ services:
       target: dev
       args:
         ENVIRONMENT: dev
-    command: uvicorn boefjes.katalogus.api:app --host 0.0.0.0
+    command: uvicorn boefjes.katalogus.api.root:app --host 0.0.0.0
     ports:
       - "127.0.0.1:8003:8000"
     env_file:

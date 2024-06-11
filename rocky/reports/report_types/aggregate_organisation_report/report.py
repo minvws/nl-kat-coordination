@@ -80,9 +80,9 @@ class AggregateOrganisationReport(AggregateReport):
 
                         for service in system["services"]:
                             if service not in services:
-                                services[service] = {str(ip): systems["services"][ip]}
+                                services[service] = {ip: systems["services"][ip]}
                             else:
-                                services[service][str(ip)] = systems["services"][ip]
+                                services[service][ip] = systems["services"][ip]
                         unique_hostnames.update(systems["services"][ip]["hostnames"])
                     total_systems += report_specific_data["summary"]["total_systems"]
 
@@ -241,8 +241,7 @@ class AggregateOrganisationReport(AggregateReport):
                             {  # Flattening the finding_types field of the mail report output
                                 finding_type
                                 for mail_report in mail_report_data[ip]
-                                for hostname, finding_types in mail_report["finding_types"].items()
-                                for finding_type in finding_types
+                                for finding_type in mail_report["finding_types"]
                             },
                             reverse=True,
                             key=lambda x: x.risk_severity,
@@ -422,15 +421,15 @@ class AggregateOrganisationReport(AggregateReport):
             # Search for reports where the input ooi relates to the current service, based on ip or hostname
             for ip, system_for_service in systems_for_service.items():
                 # Assumes relevant hostnames have an ip address for now
-                if str(ip) not in report_data:
-                    report_data[str(ip)] = []
+                if ip not in report_data:
+                    report_data[ip] = []
 
-                if str(ip) in data and report_id in data[str(ip)] and system_type == service:
-                    report_data[str(ip)].append(data[str(ip)][report_id])
+                if ip in data and report_id in data[str(ip)] and system_type == service:
+                    report_data[ip].append(data[str(ip)][report_id])
 
                 for hostname in system_for_service["hostnames"]:
                     if str(hostname) in data and report_id in data[str(hostname)] and system_type == service:
-                        report_data[str(ip)].append(data[str(hostname)][report_id])
+                        report_data[ip].append(data[str(hostname)][report_id])
 
         report_data = {key: value for key, value in report_data.items() if value}
 

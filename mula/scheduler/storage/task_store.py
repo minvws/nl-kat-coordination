@@ -4,6 +4,7 @@ from sqlalchemy import exc, func
 
 from scheduler import models
 
+from .errors import StorageError, exception_handler
 from .filters import FilterRequest, apply_filter
 from .storage import DBConn, retry
 
@@ -15,6 +16,7 @@ class TaskStore:
         self.dbconn = dbconn
 
     @retry()
+    @exception_handler
     def get_tasks(
         self,
         scheduler_id: str | None = None,
@@ -51,14 +53,15 @@ class TaskStore:
                 count = query.count()
                 tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
             except exc.ProgrammingError as e:
-                raise ValueError(f"Invalid filter: {e}") from e
+                raise StorageError(f"Invalid filter: {e}") from e
 
             tasks = [models.Task.model_validate(task_orm) for task_orm in tasks_orm]
 
             return tasks, count
 
     @retry()
-    def get_task(self, task_id: str) -> models.Task | None:
+    @exception_handler
+    def get_task_by_id(self, task_id: str) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
             if task_orm is None:
@@ -69,6 +72,7 @@ class TaskStore:
             return task
 
     @retry()
+    @exception_handler
     def get_tasks_by_hash(self, task_hash: str) -> list[models.Task] | None:
         with self.dbconn.session.begin() as session:
             tasks_orm = (
@@ -86,6 +90,7 @@ class TaskStore:
             return tasks
 
     @retry()
+    @exception_handler
     def get_latest_task_by_hash(self, task_hash: str) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             task_orm = (
@@ -103,6 +108,7 @@ class TaskStore:
             return task
 
     @retry()
+    @exception_handler
     def create_task(self, task: models.Task) -> models.Task | None:
         with self.dbconn.session.begin() as session:
             task_orm = models.TaskDB(**task.model_dump())
@@ -113,18 +119,22 @@ class TaskStore:
             return created_task
 
     @retry()
+    @exception_handler
     def update_task(self, task: models.Task) -> None:
         with self.dbconn.session.begin() as session:
             (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump()))
 
     @retry()
+    @exception_handler
     def cancel_tasks(self, scheduler_id: str, task_ids: list[str]) -> None:
         with self.dbconn.session.begin() as session:
             session.query(models.TaskDB).filter(
-                models.TaskDB.scheduler_id == scheduler_id, models.TaskDB.id.in_(task_ids)
+                models.TaskDB.scheduler_id == scheduler_id,
+                models.TaskDB.id.in_(task_ids),
             ).update({"status": models.TaskStatus.CANCELLED.name})
 
     @retry()
+    @exception_handler
     def get_status_count_per_hour(
         self,
         scheduler_id: str | None = None,
@@ -159,6 +169,7 @@ class TaskStore:
             return response
 
     @retry()
+    @exception_handler
     def get_status_counts(self, scheduler_id: str | None = None) -> dict[str, int] | None:
         with self.dbconn.session.begin() as session:
             query = (

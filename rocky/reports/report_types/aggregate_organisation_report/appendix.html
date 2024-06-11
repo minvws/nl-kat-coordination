@@ -5,7 +5,7 @@
         <h2 id="appendix">{% translate "Appendix" %}</h2>
         {% include "aggregate_organisation_report/term_overview.html" %}
 
-        <h3 id="selected-oois">{% translate "Selected objects" %}</h3>
+        <h3 id="selected-oois">{% translate "Selected objects" %} ({{ total_oois }})</h3>
         {% if active_filters %}
             <p>
                 <span class="icon positive"></span><strong>{% translate "Currently filtered on" %}</strong>
@@ -28,7 +28,9 @@
         <tbody>
             {% for report_type in report_types %}
                 <tr>
-                    <td>{{ report_type.name }}</td>
+                    <td>
+                        <span class="label tags-color-{{ report_type.label_style }}">{{ report_type.name }}</span>
+                    </td>
                     <td>{{ report_type.description }}</td>
                 </tr>
             {% endfor %}

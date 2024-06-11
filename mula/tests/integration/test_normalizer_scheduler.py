@@ -7,16 +7,10 @@ import httpx
 from structlog.testing import capture_logs
 
 from scheduler import config, models, schedulers, storage
-from tests.factories import (
-    BoefjeFactory,
-    BoefjeMetaFactory,
-    NormalizerFactory,
-    OOIFactory,
-    OrganisationFactory,
-    PluginFactory,
-    RawDataFactory,
-    ScanProfileFactory,
-)
+from tests.factories import (BoefjeFactory, BoefjeMetaFactory,
+                             NormalizerFactory, OOIFactory,
+                             OrganisationFactory, PluginFactory,
+                             RawDataFactory, ScanProfileFactory)
 from tests.utils import functions
 
 
@@ -152,8 +146,8 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
     def test_get_normalizers_for_mime_type_request_exception(self, mock_get_normalizers_by_org_id_and_type):
         # Mocks
         mock_get_normalizers_by_org_id_and_type.side_effect = [
-            httpx.ConnectError("Connection error"),
-            httpx.ConnectError("Connection error"),
+            connectors.errors.ExternalServiceError("External service is not available."),
+            connectors.errors.ExternalServiceError("External service is not available."),
         ]
 
         # Act

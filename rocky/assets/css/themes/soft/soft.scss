@@ -17,14 +17,6 @@
 /* Base - Top level styling */
 @import "manon/application-base";
 
-/* Styling on the highest level */
-
-/* Helpers */
-
-/* @import "manon/center-only-child.scss"; */
-
-/* Can be added after v10.1.1 */
-
 /* Layout */
 @import "manon/layout-set";
 @import "manon/main";
@@ -50,6 +42,7 @@
 @import "manon/accordion";
 @import "manon/breadcrumb-bar";
 @import "manon/button-ghost";
+@import "manon/checkbox";
 @import "manon/collapsible";
 @import "manon/de-emphasized";
 @import "manon/emphasized";
@@ -78,6 +71,7 @@
 @import "manon/navigation";
 @import "manon/nota-bene";
 @import "manon/tabs";
+@import "manon/tags";
 @import "manon/sidemenu";
 @import "manon/hero";
 @import "manon/tile";
