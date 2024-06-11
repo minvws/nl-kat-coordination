@@ -62,5 +62,4 @@ env = [
 ]
 
 [tool.coverage.run]
-source = ['octopoes']
 relative_files = true
