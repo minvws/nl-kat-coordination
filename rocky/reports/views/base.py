@@ -26,6 +26,7 @@ from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
 from reports.utils import JSONEncoder, debug_json_keys
@@ -447,7 +448,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         self.bytes_client.login()
         report_data: dict = {}
-        if not self.report_ooi.report_type:
+        if issubclass(get_report_by_id(self.report_ooi.report_type), ConcatenatedReport):
             # its multiple single reports
             children = self.octopoes_api_connector.query(
                 "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
@@ -457,11 +458,11 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                     report_data[report.report_type] = {}
 
                 # Ensure the input_ooi exists within the report_type
-                if report.input_ooi not in report_data[report.report_type]:
-                    report_data[report.report_type][report.input_ooi] = {}
+                if report.input_oois[0] not in report_data[report.report_type]:
+                    report_data[report.report_type][report.input_oois[0]] = {}
 
                 # Set the data within the input_ooi
-                report_data[report.report_type][report.input_ooi] = {
+                report_data[report.report_type][report.input_oois[0]] = {
                     "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
                         self.bytes_client.get_raw(raw_id=report.data_raw_id)
                     ),
