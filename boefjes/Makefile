@@ -33,10 +33,7 @@ help: ## Show this help.
 ##			Development
 ##|------------------------------------------------------------------------|
 
-build: seed images
-
-seed:  # Seed the katalogus database
-	-docker compose run --rm katalogus python -m boefjes.seed
+build: images
 
 images:  # Build the images for the containerized boefjes
   # Dns-records is disabled for now, see the discussion in https://github.com/minvws/nl-kat-coordination/pull/2709

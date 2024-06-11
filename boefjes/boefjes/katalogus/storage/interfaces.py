@@ -1,6 +1,6 @@
 from abc import ABC
 
-from boefjes.katalogus.models import Organisation, Repository
+from boefjes.katalogus.models import Organisation
 
 
 class StorageError(Exception):
@@ -27,17 +27,9 @@ class OrganisationNotFound(NotFound):
         super().__init__(f"Organisation with id '{organisation_id}' not found")
 
 
-class RepositoryNotFound(NotFound):
-    def __init__(self, repository_id: str):
-        super().__init__(f"Repository with id '{repository_id}' not found")
-
-
 class PluginNotFound(NotFound):
-    def __init__(self, plugin_id: str, repository_id: str, organisation_id: str):
-        super().__init__(
-            f"State for plugin with id '{plugin_id}' not found for organisation '{organisation_id}' and repostitory "
-            f"'{repository_id}'"
-        )
+    def __init__(self, plugin_id: str, organisation_id: str):
+        super().__init__(f"State for plugin with id '{plugin_id}' not found for organisation '{organisation_id}'")
 
 
 class SettingsNotFound(NotFound):
@@ -65,26 +57,6 @@ class OrganisationStorage(ABC):
         raise NotImplementedError
 
 
-class RepositoryStorage(ABC):
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
-        pass
-
-    def get_by_id(self, id_: str) -> Repository:
-        raise NotImplementedError
-
-    def get_all(self) -> dict[str, Repository]:
-        raise NotImplementedError
-
-    def create(self, repository: Repository) -> None:
-        raise NotImplementedError
-
-    def delete_by_id(self, repository_id: str) -> None:
-        raise NotImplementedError
-
-
 class SettingsStorage(ABC):
     def __enter__(self):
         return self
@@ -109,14 +81,14 @@ class PluginEnabledStorage(ABC):
     def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
         pass
 
-    def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
+    def get_by_id(self, plugin_id: str, organisation_id: str) -> bool:
         raise NotImplementedError
 
-    def get_all_enabled(self, organisation_id: str) -> dict[str, list[str]]:
+    def get_all_enabled(self, organisation_id: str) -> list[str]:
         raise NotImplementedError
 
-    def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
+    def create(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
         raise NotImplementedError
 
-    def update_or_create_by_id(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
+    def update_or_create_by_id(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
         raise NotImplementedError
