@@ -1,17 +1,27 @@
 {% load i18n %}
 
-<div class="horizontal-scroll">
-    {% if data %}
-        {% include "partials/report_severity_totals.html" with data=data.summary %}
+{% if data.finding_types %}
+    {% if show_introduction %}
+        <p>
+            {% blocktranslate trimmed %}
+                The findings report provides an overview of the identified findings on the scanned
+                systems. For each finding it shows the risk level and the number of occurrences of
+                the finding. Under the 'Details' section a description, impact, recommendation and
+                location of the finding can be found. The risk level may be different for your
+                specific environment.
+            {% endblocktranslate %}
+        </p>
+    {% endif %}
+    <div class="horizontal-scroll">
+        {% include "partials/report_severity_totals_table.html" with data=data.summary %}
 
-        <h2>{% translate "Findings" %}</h2>
+        <h3>{% translate "Findings" %}</h3>
         <div class="horizontal-scroll">
             <table>
-                <caption class="visually-hidden">{% translate "Other findings found:" %}</caption>
+                <caption class="visually-hidden">{% translate "Other findings found" %}</caption>
                 <thead>
                     <tr>
-                        <th scope="col">{% translate "FindingType" %}</th>
-                        <th scope="col">{% translate "Type" %}</th>
+                        <th scope="col">{% translate "Finding" %}</th>
                         <th scope="col">{% translate "Risk level" %}</th>
                         <th scope="col">{% translate "Occurrences" %}</th>
                         <th scope="col">{% translate "Details" %}</th>
@@ -21,7 +31,6 @@
                     {% for info in data.finding_types %}
                         <tr>
                             <td>{{ info.finding_type.id }}</td>
-                            <td>{{ info.finding_type.object_type }}</td>
                             <td>
                                 <span class="{{ info.finding_type.risk_severity }}">{{ info.finding_type.risk_severity|capfirst }}</span>
                             </td>
@@ -37,21 +46,21 @@
                         </tr>
                         <tr class="expando-row">
                             <td colspan="5">
-                                <h2 class="heading-normal">{% translate "Description" %}</h2>
+                                <h4 class="heading-normal">{% translate "Description" %}</h4>
                                 <p>{{ info.finding_type.description }}</p>
-                                <h2 class="heading-normal">{% translate "Impact" %}</h2>
+                                <h4 class="heading-normal">{% translate "Impact" %}</h4>
                                 <p>{{ info.finding_type.impact }}</p>
-                                <h2 class="heading-normal">{% translate "Recommendation" %}</h2>
+                                <h4 class="heading-normal">{% translate "Recommendation" %}</h4>
                                 <p>{{ info.finding_type.recommendation }}</p>
-                                <h2 class="heading-normal">{% translate "Occurrences" %}</h2>
+                                <h4 class="heading-normal">{% translate "Occurrences" %}</h4>
                                 <ul class="accordion break-title">
                                     {% for occurrence in info.occurrences %}
                                         <li>
                                             <button aria-expanded="false">{{ occurrence.finding.ooi.human_readable }}</button>
                                             <div aria-labelledby="finding-details">
-                                                <h2>{% translate "First seen" %}</h2>
+                                                <h5>{% translate "First seen" %}</h5>
                                                 <p>{{ occurrence.first_seen }}</p>
-                                                <h2>{% translate "Description" %}</h2>
+                                                <h5>{% translate "Description" %}</h5>
                                                 <p>{{ occurrence.finding.description }}</p>
                                             </div>
                                         </li>
@@ -63,7 +72,7 @@
                 </tbody>
             </table>
         </div>
-    {% else %}
-        <p>{% translate "No findings have been found." %}</p>
-    {% endif %}
-</div>
+    </div>
+{% else %}
+    <p>{% translate "No findings have been found." %}</p>
+{% endif %}

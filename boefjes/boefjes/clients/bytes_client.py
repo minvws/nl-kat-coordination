@@ -1,33 +1,16 @@
 import logging
 import typing
-from collections.abc import Callable
+from collections.abc import Callable, Set
 from functools import wraps
 from typing import Any
 from uuid import UUID
 
-import requests
-from requests.adapters import HTTPAdapter
-from requests.models import HTTPError
+from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
-from boefjes.clients.scheduler_client import LogRetry
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
 logger = logging.getLogger(__name__)
-
-
-class BytesAPISession(requests.Session):
-    def __init__(self, base_url: str):
-        super().__init__()
-
-        self._base_url = base_url.rstrip("/")
-        self.headers["User-Agent"] = f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"
-
-    def request(self, method: str, url: str | bytes, **kwargs) -> requests.Response:  # type: ignore
-        url = self._base_url + str(url)
-
-        return super().request(method, url, **kwargs)
-
 
 ClientSessionMethod = Callable[..., Any]
 
@@ -37,7 +20,7 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
     def wrapper(self, *args, **kwargs):
         try:
             return function(self, *args, **kwargs)
-        except HTTPError as error:
+        except HTTPStatusError as error:
             if error.response.status_code != 401:
                 raise
 
@@ -49,11 +32,11 @@ def retry_with_login(function: ClientSessionMethod) -> ClientSessionMethod:
 
 class BytesAPIClient:
     def __init__(self, base_url: str, username: str, password: str):
-        self._session = BytesAPISession(base_url)
-
-        max_retries = LogRetry(total=6, backoff_factor=1, skip_log=True)
-        self._session.mount("https://", HTTPAdapter(max_retries=max_retries))
-        self._session.mount("http://", HTTPAdapter(max_retries=max_retries))
+        self._session = Client(
+            base_url=base_url,
+            headers={"User-Agent": f"bytes-api-client/{BYTES_API_CLIENT_VERSION}"},
+            transport=(HTTPTransport(retries=6)),
+        )
 
         self.credentials = {
             "username": username,
@@ -65,10 +48,10 @@ class BytesAPIClient:
         self.headers = self._get_authentication_headers()
 
     @staticmethod
-    def _verify_response(response: requests.Response) -> None:
+    def _verify_response(response: Response) -> None:
         try:
             response.raise_for_status()
-        except HTTPError as error:
+        except HTTPStatusError as error:
             if error.response.status_code != 401:
                 logger.error(response.text)
             else:
@@ -89,7 +72,7 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_boefje_meta(self, boefje_meta: BoefjeMeta) -> None:
-        response = self._session.post("/bytes/boefje_meta", data=boefje_meta.json(), headers=self.headers)
+        response = self._session.post("/bytes/boefje_meta", content=boefje_meta.json(), headers=self.headers)
 
         self._verify_response(response)
 
@@ -102,24 +85,22 @@ class BytesAPIClient:
 
     @retry_with_login
     def save_normalizer_meta(self, normalizer_meta: NormalizerMeta) -> None:
-        response = self._session.post("/bytes/normalizer_meta", data=normalizer_meta.json(), headers=self.headers)
+        response = self._session.post("/bytes/normalizer_meta", content=normalizer_meta.json(), headers=self.headers)
 
         self._verify_response(response)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: frozenset[str] = frozenset()) -> UUID:
+    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
         headers = {"content-type": "application/octet-stream"}
         headers.update(self.headers)
-
         response = self._session.post(
             "/bytes/raw",
-            raw,
+            content=raw,
             headers=headers,
-            params={"mime_types": mime_types, "boefje_meta_id": boefje_meta_id},
+            params={"mime_types": list(mime_types), "boefje_meta_id": boefje_meta_id},
         )
 
         self._verify_response(response)
-
         return UUID(response.json()["id"])
 
     @retry_with_login

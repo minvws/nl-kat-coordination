@@ -6,7 +6,7 @@ MAKEFLAGS += --warn-undefined-variables
 MAKEFLAGS += --no-builtin-rules
 # Makefile Reference: https://tech.davis-hansson.com/p/make/
 
-.PHONY: help sql migrate migrations debian ubuntu clean
+.PHONY: help sql migrate migrations debian ubuntu clean images
 
 # use HIDE to run commands invisibly, unless VERBOSE defined
 HIDE:=$(if $(VERBOSE),,@)
@@ -15,6 +15,10 @@ export m		# Message for alembic migration
 export revid	# Revision id to generate raw sql for
 export rev1		# Previous revision id for generating migrations
 export rev2		# New revision id for the new migration file
+
+# We set this to build images with the right target platform in the `images` target. This prevents arm systems such as
+# systems with an Apple silicon chip to build images they cannot use.
+export DOCKER_DEFAULT_PLATFORM=$(shell docker system info --format '{{.OSType}}/{{.Architecture}}')
 
 ##
 ##|------------------------------------------------------------------------|
@@ -28,10 +32,15 @@ help: ## Show this help.
 ##|------------------------------------------------------------------------|
 ##			Development
 ##|------------------------------------------------------------------------|
-build: seed
 
-seed:  # Seed the katalogus database
-	-docker compose run --rm katalogus python -m boefjes.seed
+build: images
+
+images:  # Build the images for the containerized boefjes
+  # Dns-records is disabled for now, see the discussion in https://github.com/minvws/nl-kat-coordination/pull/2709
+	# docker build -f images/base.Dockerfile -t openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
+	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-sec .
+	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t openkat/nmap  .
+
 
 ##
 ##|------------------------------------------------------------------------|
@@ -57,7 +66,7 @@ check:
 ##			Tests
 ##|------------------------------------------------------------------------|
 
-ci-docker-compose := docker compose -f base.yml  -f .ci/docker-compose.yml
+ci-docker-compose := docker compose --project-directory . -f .ci/docker-compose.yml
 
 
 test: itest ## Run all tests.

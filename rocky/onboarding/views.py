@@ -13,11 +13,11 @@ from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
+from httpx import HTTPError
 from katalogus.client import Plugin, get_katalogus
 from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import get_selection
-from requests import HTTPError
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb
@@ -30,9 +30,9 @@ from onboarding.forms import OnboardingCreateObjectURLForm, OnboardingSetClearan
 from onboarding.view_helpers import (
     DNS_REPORT_LEAST_CLEARANCE_LEVEL,
     ONBOARDING_PERMISSIONS,
-    KatIntroductionAdminStepsMixin,
-    KatIntroductionRegistrationStepsMixin,
-    KatIntroductionStepsMixin,
+    IntroductionAdminStepsMixin,
+    IntroductionRegistrationStepsMixin,
+    IntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     RegistrationBreadcrumbsMixin,
 )
@@ -58,7 +58,7 @@ class OnboardingStart(OrganizationView):
 
 class OnboardingIntroductionView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OrganizationView,
     TemplateView,
 ):
@@ -73,7 +73,7 @@ class OnboardingIntroductionView(
 
 class OnboardingChooseReportInfoView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OrganizationView,
     TemplateView,
 ):
@@ -88,7 +88,7 @@ class OnboardingChooseReportInfoView(
 
 class OnboardingChooseReportTypeView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OrganizationView,
     TemplateView,
 ):
@@ -103,7 +103,7 @@ class OnboardingChooseReportTypeView(
 
 class OnboardingSetupScanOOIInfoView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OrganizationView,
     TemplateView,
 ):
@@ -118,7 +118,7 @@ class OnboardingSetupScanOOIInfoView(
 
 class OnboardingSetupScanOOIAddView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     SingleOOITreeMixin,
     FormView,
 ):
@@ -163,7 +163,7 @@ class OnboardingSetupScanOOIAddView(
 
 class OnboardingClearanceLevelIntroductionView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     OrganizationView,
     TemplateView,
@@ -206,7 +206,7 @@ class OnboardingClearanceLevelIntroductionView(
 
 class OnboardingAcknowledgeClearanceLevelView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     OOIClearanceMixin,
     OrganizationView,
@@ -230,7 +230,7 @@ class OnboardingAcknowledgeClearanceLevelView(
 
 class OnboardingSetClearanceLevelView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     SingleOOITreeMixin,
     FormView,
@@ -268,7 +268,7 @@ class OnboardingSetClearanceLevelView(
 
 class OnboardingSetupScanSelectPluginsView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OrganizationView,
     TemplateView,
 ):
@@ -325,7 +325,7 @@ class OnboardingSetupScanSelectPluginsView(
 class OnboardingSetupScanOOIDetailView(
     OrganizationPermissionRequiredMixin,
     SingleOOITreeMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     OnboardingBreadcrumbsMixin,
     TemplateView,
 ):
@@ -345,7 +345,7 @@ class OnboardingSetupScanOOIDetailView(
 
 class OnboardingReportView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionStepsMixin,
+    IntroductionStepsMixin,
     SingleOOITreeMixin,
     TemplateView,
 ):
@@ -395,9 +395,7 @@ class OnboardingReportView(
 # account flow
 
 
-class OnboardingIntroductionRegistrationView(
-    PermissionRequiredMixin, KatIntroductionRegistrationStepsMixin, TemplateView
-):
+class OnboardingIntroductionRegistrationView(PermissionRequiredMixin, IntroductionRegistrationStepsMixin, TemplateView):
     """
     Step: 1 - Registration introduction
     """
@@ -409,7 +407,7 @@ class OnboardingIntroductionRegistrationView(
 
 class OnboardingOrganizationSetupView(
     PermissionRequiredMixin,
-    KatIntroductionRegistrationStepsMixin,
+    IntroductionRegistrationStepsMixin,
     CreateView,
 ):
     """
@@ -465,7 +463,7 @@ class OnboardingOrganizationSetupView(
 
 class OnboardingOrganizationUpdateView(
     OrganizationPermissionRequiredMixin,
-    KatIntroductionAdminStepsMixin,
+    IntroductionAdminStepsMixin,
     OrganizationView,
     UpdateView,
 ):
@@ -496,7 +494,7 @@ class OnboardingOrganizationUpdateView(
 
 
 class OnboardingIndemnificationSetupView(
-    KatIntroductionAdminStepsMixin,
+    IntroductionAdminStepsMixin,
     IndemnificationAddView,
 ):
     """
@@ -511,7 +509,7 @@ class OnboardingIndemnificationSetupView(
 
 
 class OnboardingAccountSetupIntroView(
-    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, TemplateView
+    OrganizationPermissionRequiredMixin, IntroductionAdminStepsMixin, OrganizationView, TemplateView
 ):
     """
     Step 4: Split flow to or continue with single account or continue to multiple account creation
@@ -523,7 +521,7 @@ class OnboardingAccountSetupIntroView(
 
 
 class OnboardingAccountCreationMixin(
-    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, FormView
+    OrganizationPermissionRequiredMixin, IntroductionAdminStepsMixin, OrganizationView, FormView
 ):
     account_type: str | None = None
     permission_required = "tools.add_organizationmember"
@@ -539,7 +537,7 @@ class OnboardingAccountCreationMixin(
 
 
 class OnboardingChooseUserTypeView(
-    OrganizationPermissionRequiredMixin, KatIntroductionAdminStepsMixin, OrganizationView, TemplateView
+    OrganizationPermissionRequiredMixin, IntroductionAdminStepsMixin, OrganizationView, TemplateView
 ):
     """
     Step 1: Introduction about how to create multiple user accounts

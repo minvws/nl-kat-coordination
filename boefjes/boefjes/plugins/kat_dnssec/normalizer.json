@@ -1,10 +1,10 @@
 {
-    "id": "kat_dnssec_normalize",
-    "consumes": [
-        "boefje/dns-sec"
-    ],
-    "produces": [
-        "KATFindingType",
-        "Finding"
-    ]
+  "id": "kat_dnssec_normalize",
+  "consumes": [
+    "boefje/dns-sec"
+  ],
+  "produces": [
+    "KATFindingType",
+    "Finding"
+  ]
 }

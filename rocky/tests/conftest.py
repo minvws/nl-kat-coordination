@@ -1,5 +1,4 @@
 import binascii
-import io
 import json
 import logging
 from datetime import datetime, timezone
@@ -17,11 +16,17 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.utils.translation import activate, deactivate
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.middleware import OTPMiddleware
+from httpx import Response
 from katalogus.client import parse_plugin
-from requests import Response
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Indemnification, Organization, OrganizationMember
 
-from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
+from octopoes.config.settings import (
+    DEFAULT_LIMIT,
+    DEFAULT_OFFSET,
+    DEFAULT_SCAN_LEVEL_FILTER,
+    DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+)
+from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel, ScanProfileType
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.findings import CVEFindingType, Finding, KATFindingType, RiskLevelSeverity
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol
@@ -29,6 +34,7 @@ from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.software import Software
 from octopoes.models.ooi.web import URL, SecurityTXT, Website
 from octopoes.models.origin import Origin, OriginType
+from octopoes.models.pagination import Paginated
 from octopoes.models.transaction import TransactionRecord
 from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import OOIType
@@ -346,7 +352,6 @@ def task() -> Task:
                         "id": "test-boefje",
                         "name": "TestBoefje",
                         "description": "Fetch the DNS record(s) of a hostname",
-                        "repository_id": None,
                         "version": None,
                         "scan_level": 1,
                         "consumes": ["Hostname"],
@@ -465,6 +470,11 @@ def ip_port(ipaddressv4) -> IPPort:
 
 
 @pytest.fixture
+def ip_port_443(ipaddressv4) -> IPPort:
+    return IPPort(address=ipaddressv4.reference, port=443, protocol=Protocol.TCP)
+
+
+@pytest.fixture
 def hostname(network) -> Hostname:
     return Hostname(name="example.com", network=network.reference)
 
@@ -498,6 +508,19 @@ def software() -> Software:
 
 
 @pytest.fixture
+def cve_finding_type_2023_38408() -> CVEFindingType:
+    return CVEFindingType(
+        id="CVE-2023-38408",
+        description="The PKCS#11 feature in ssh-agent in OpenSSH before 9.3p2 has an insufficiently "
+        "trustworthy search path, leading to remote code execution if an agent is forwarded to an "
+        "attacker-controlled system. ",
+        source="https://cve.circl.lu/cve/CVE-2023-38408",
+        risk_score=9.8,
+        risk_severity=RiskLevelSeverity.CRITICAL,
+    )
+
+
+@pytest.fixture
 def cve_finding_type_2019_8331() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-2019-8331",
@@ -520,6 +543,19 @@ def cve_finding_type_2019_2019() -> CVEFindingType:
         source="https://cve.circl.lu/cve/CVE-2019-2019",
         risk_score=6.5,
         risk_severity=RiskLevelSeverity.MEDIUM,
+    )
+
+
+@pytest.fixture
+def cve_finding_2023_38408() -> Finding:
+    return Finding(
+        finding_type=Reference.from_str("CVEFindingType|CVE-2023-38408"),
+        ooi=Reference.from_str(
+            "Finding|SoftwareInstance|HostnameHTTPURL|https|internet|mispo.es|443|/|Software|Bootstrap|3.3.7|cpe:/a:getbootstrap:bootstrap|CVE-2023-38408"
+        ),
+        proof=None,
+        description="Vulnerability CVE-2023-38408 detected",
+        reproduce=None,
     )
 
 
@@ -553,7 +589,7 @@ def cve_finding_2019_2019() -> Finding:
 def cve_finding_type_no_score() -> CVEFindingType:
     return CVEFindingType(
         id="CVE-0000-0001",
-        description="CVE Finding without scopre",
+        description="CVE Finding without score",
         source="https://cve.circl.lu/cve/CVE-0000-0001",
         risk_severity=RiskLevelSeverity.UNKNOWN,
     )
@@ -989,7 +1025,6 @@ def plugin_details():
             "type": "boefje",
             "name": "TestBoefje",
             "description": "Meows to the moon",
-            "repository_id": "test-repository",
             "scan_level": 1,
             "consumes": ["Network"],
             "produces": ["Network"],
@@ -1084,41 +1119,43 @@ def mock_mixins_katalogus(mocker):
 
 @pytest.fixture
 def mock_scheduler_client_task_list(mocker):
-    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client.session")
-    response = Response()
-    response.raw = io.BytesIO(
-        json.dumps(
-            {
-                "count": 1,
-                "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
-                "previous": None,
-                "results": [
-                    {
-                        "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
-                        "scheduler_id": "boefje-test",
-                        "type": "boefje",
-                        "p_item": {
+    mock_scheduler_client_session = mocker.patch("rocky.scheduler.client._client")
+    response = Response(
+        200,
+        content=(
+            json.dumps(
+                {
+                    "count": 1,
+                    "next": "http://scheduler:8000/tasks?scheduler_id=boefje-test&type=boefje&plugin_id=test_plugin&limit=10&offset=10",
+                    "previous": None,
+                    "results": [
+                        {
                             "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
                             "scheduler_id": "boefje-test",
-                            "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
-                            "priority": 631,
-                            "data": {
-                                "id": "2e757dd366c746b899877cd18252cc6d",
-                                "boefje": {"id": "test-plugin", "version": None},
-                                "input_ooi": "Hostname|internet|example.com",
-                                "organization": "test",
-                                "dispatches": [],
+                            "type": "boefje",
+                            "p_item": {
+                                "id": "2e757dd3-66c7-46b8-9987-7cd18252cc6d",
+                                "scheduler_id": "boefje-test",
+                                "hash": "416aa907e0b2a16c1b324f7d3261c5a4",
+                                "priority": 631,
+                                "data": {
+                                    "id": "2e757dd366c746b899877cd18252cc6d",
+                                    "boefje": {"id": "test-plugin", "version": None},
+                                    "input_ooi": "Hostname|internet|example.com",
+                                    "organization": "test",
+                                    "dispatches": [],
+                                },
+                                "created_at": "2023-05-09T09:37:20.899668+00:00",
+                                "modified_at": "2023-05-09T09:37:20.899675+00:00",
                             },
-                            "created_at": "2023-05-09T09:37:20.899668+00:00",
-                            "modified_at": "2023-05-09T09:37:20.899675+00:00",
-                        },
-                        "status": "completed",
-                        "created_at": "2023-05-09T09:37:20.909069+00:00",
-                        "modified_at": "2023-05-09T09:37:20.909071+00:00",
-                    }
-                ],
-            }
-        ).encode()
+                            "status": "completed",
+                            "created_at": "2023-05-09T09:37:20.909069+00:00",
+                            "modified_at": "2023-05-09T09:37:20.909071+00:00",
+                        }
+                    ],
+                }
+            ).encode()
+        ),
     )
 
     mock_scheduler_client_session.get.return_value = response
@@ -1185,6 +1222,17 @@ class MockOctopoesAPIConnector:
         origin_type: OriginType | None = None,
     ) -> list[Origin]:
         return []
+
+    def list_objects(
+        self,
+        types: set[type[OOI]],
+        valid_time: datetime,
+        offset: int = DEFAULT_OFFSET,
+        limit: int = DEFAULT_LIMIT,
+        scan_level: set[ScanLevel] = DEFAULT_SCAN_LEVEL_FILTER,
+        scan_profile_type: set[ScanProfileType] = DEFAULT_SCAN_PROFILE_TYPE_FILTER,
+    ) -> Paginated[OOIType]:
+        return Paginated[OOIType](items=list(self.oois.values()), count=len(self.oois))
 
 
 @pytest.fixture

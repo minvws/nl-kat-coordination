@@ -1,4 +1,5 @@
 """Boefje script for validating vrps records based on code from @trideeindhoven"""
+
 import hashlib
 import json
 import os
@@ -49,9 +50,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     return [
         (set(), json.dumps(results)),
         (
-            set(
-                "rpki/cache-meta",
-            ),
+            {"rpki/cache-meta"},
             json.dumps(rpki_meta),
         ),
     ]
@@ -65,7 +64,7 @@ def create_hash(data: bytes, algo: str) -> str:
 def cache_out_of_date() -> bool:
     """Returns True if the file is older than the allowed cache_timout"""
     now = datetime.utcnow()
-    maxage = getenv("RPKI_CACHE_TIMEOUT", RPKI_CACHE_TIMEOUT)
+    maxage = int(getenv("RPKI_CACHE_TIMEOUT", RPKI_CACHE_TIMEOUT))
     with RPKI_META_PATH.open() as meta_file:
         meta = json.load(meta_file)
     cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")

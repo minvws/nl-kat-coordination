@@ -1,6 +1,7 @@
 import ipaddress
 import re
 from collections.abc import Iterator
+from typing import Any
 
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.findings import Finding, KATFindingType
@@ -9,7 +10,7 @@ from octopoes.models.types import HTTPHeader
 NON_DECIMAL_FILTER = re.compile(r"[^\d.]+")
 
 
-def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) -> Iterator[OOI]:
+def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, Any]) -> Iterator[OOI]:
     header = input_ooi
     if header.key.lower() != "content-security-policy":
         return
@@ -65,6 +66,11 @@ def run(input_ooi: HTTPHeader, additional_oois: list, config: dict[str, str]) ->
         if (policy[0] == "default-src" or policy[0] == "object-src" or policy[0] == "script-src") and "data:" in policy:
             findings.append(
                 "'data:' should not be used in the value of default-src, object-src and script-src in the CSP settings."
+            )
+
+        if policy[0] == "script-src" and "'self'" in policy:
+            findings.append(
+                "'self' for `script-src` can be problematic if you host JSONP, Angular or user uploaded files."
             )
 
         if policy[0].endswith("-uri") and (

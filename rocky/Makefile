@@ -35,18 +35,17 @@ test:
 	python3 manage.py test
 
 testclean:
-	docker compose  -f .ci/docker-compose.yml kill
-	docker compose  -f .ci/docker-compose.yml down --remove-orphans
+	docker compose -f .ci/docker-compose.yml down --remove-orphans
 	docker compose -f .ci/docker-compose.yml build
 
 utest: testclean ## Run the unit tests.
-	docker compose  -f .ci/docker-compose.yml run --rm rocky_tests
+	docker compose -f .ci/docker-compose.yml run --rm rocky_tests
 
 itest: testclean ## Run the integration tests.
-	docker compose  -f .ci/docker-compose.yml run --rm rocky_integration
+	docker compose -f .ci/docker-compose.yml run --rm rocky_integration
 
 bench: testclean ## Run the report benchmark.
-	docker compose  -f .ci/docker-compose.yml run --rm rocky_integration \
+	docker compose -f .ci/docker-compose.yml run --rm rocky_integration \
 	python -m cProfile -o .ci/bench_$$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -m slow --no-cov tests/integration
 
 export_migrations:

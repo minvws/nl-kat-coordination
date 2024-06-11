@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from requests import RequestException
+from httpx import HTTPError
 
 from katalogus.views.mixins import SinglePluginView
 
@@ -32,7 +32,7 @@ class PluginEnableDisableView(SinglePluginView):
 
         try:
             plugin_settings = self.katalogus_client.get_plugin_settings(self.plugin.id)
-        except RequestException:
+        except HTTPError:
             messages.add_message(
                 self.request,
                 messages.ERROR,
@@ -74,8 +74,9 @@ class PluginEnableDisableView(SinglePluginView):
             )
         else:
             member_clearance_level_text = (
-                "Your clearance level is L{}. Contact your administrator to get a higher clearance level."
-            ).format(self.organization_member.acknowledged_clearance_level)
+                f"Your clearance level is L{self.organization_member.acknowledged_clearance_level}. Contact your "
+                f"administrator to get a higher clearance level."
+            )
 
             if (
                 self.organization_member.trusted_clearance_level < 0

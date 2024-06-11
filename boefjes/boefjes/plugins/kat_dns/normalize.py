@@ -4,7 +4,6 @@ from collections.abc import Iterable
 from ipaddress import IPv4Address, IPv6Address
 
 from dns.message import Message, from_text
-from dns.rdata import Rdata
 from dns.rdtypes.ANY.CAA import CAA
 from dns.rdtypes.ANY.CNAME import CNAME
 from dns.rdtypes.ANY.MX import MX
@@ -14,8 +13,8 @@ from dns.rdtypes.ANY.TXT import TXT
 from dns.rdtypes.IN.A import A
 from dns.rdtypes.IN.AAAA import AAAA
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, Reference
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import Reference
 from octopoes.models.ooi.dns.records import (
     NXDOMAIN,
     DNSAAAARecord,
@@ -33,11 +32,11 @@ from octopoes.models.ooi.email_security import DKIMExists, DMARCTXTRecord
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     internet = Network(name="internet")
 
     if raw.decode() == "NXDOMAIN":
-        yield NXDOMAIN(hostname=Reference.from_str(normalizer_meta.raw_data.boefje_meta.input_ooi))
+        yield NXDOMAIN(hostname=Reference.from_str(input_ooi["primary_key"]))
         return
 
     results = json.loads(raw)
@@ -66,7 +65,7 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
         return record
 
     # register argument hostname
-    input_hostname = register_hostname(normalizer_meta.raw_data.boefje_meta.arguments["input"]["name"])
+    input_hostname = register_hostname(input_ooi["name"])
 
     # keep track of discovered zones
     zone_links: dict[str, DNSZone] = {}
@@ -74,8 +73,6 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     for response in responses:
         for rrset in response.answer:
             for rr in rrset:
-                rr: Rdata
-
                 record_hostname = register_hostname(str(rrset.name))
                 default_args = {
                     "hostname": record_hostname.reference,
@@ -183,7 +180,6 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
     if dmarc_results not in ["NXDOMAIN", "Timeout"]:
         for rrset in from_text(dmarc_results).answer:
             for rr in rrset:
-                rr: Rdata
                 if isinstance(rr, TXT):
                     yield DMARCTXTRecord(
                         hostname=input_hostname.reference,

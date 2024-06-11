@@ -1,10 +1,10 @@
 import json
 import logging
-from collections.abc import Iterator
+from collections.abc import Iterable
 from ipaddress import IPv4Interface, ip_interface
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI, DeclaredScanProfile
+from boefjes.job_models import NormalizerOutput
+from octopoes.models import DeclaredScanProfile
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPV4NetBlock, IPV6NetBlock, Network
 
@@ -14,9 +14,9 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPV4NetBlock, 
 # are defined below.
 # T O D O add these variables as normalizer settings in UI.
 IP_ADDRESS_LIST_PATH = ["ip_addresses"]
-IP_ADDRESS_ITEM_PATH = ["ip_address"]
+IP_ADDRESS_ITEM_PATH = ["address"]
 DOMAIN_LIST_PATH = ["domains"]
-DOMAIN_ITEM_PATH = ["domain"]
+DOMAIN_ITEM_PATH = ["name"]
 
 
 def follow_path_in_dict(path, path_dict):
@@ -29,16 +29,16 @@ def follow_path_in_dict(path, path_dict):
     return path_dict
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterator[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     """Yields hostnames, IPv4/6 addresses or netblocks."""
     results = json.loads(raw)
-    network = Network(name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["name"])
+    network = Network(name=input_ooi["name"])
     addresses_count, blocks_count, hostnames_count = 0, 0, 0
 
     for address_item in follow_path_in_dict(path=IP_ADDRESS_LIST_PATH, path_dict=results):
         interface = ip_interface(follow_path_in_dict(path=IP_ADDRESS_ITEM_PATH, path_dict=address_item))
-        address, mask = interface.with_prefixlen.split("/")
-        mask = int(mask)
+        address, mask_str = interface.with_prefixlen.split("/")
+        mask = int(mask_str)
 
         # Decide whether we yield IPv4 or IPv6.
         if isinstance(interface, IPv4Interface):

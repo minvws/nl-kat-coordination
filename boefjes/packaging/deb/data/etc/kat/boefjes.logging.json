@@ -18,7 +18,7 @@
   "root": {
     "level": "INFO",
     "handlers": [
-        "console"
+      "console"
     ]
   },
   "loggers": {
@@ -26,7 +26,7 @@
       "level": "INFO",
       "propagate": 0,
       "handlers": [
-          "console"
+        "console"
       ]
     }
   }

@@ -8,25 +8,30 @@ import time
 from datetime import datetime, timedelta, timezone
 from urllib.parse import quote
 
-import requests
+import httpx
 
 logger = logging.getLogger("cveapi")
 
 
 def download_files(directory, last_update, update_timestamp):
     index = 0
-    session = requests.Session()
+    client = httpx.Client()
     error_count = 0
 
     while True:
+        parameters: dict[str, int | str] = {"startIndex": index}
+
         if last_update:
-            parameters = f"startIndex={index}&lastModStartDate={quote(last_update.isoformat())}"
-            parameters += f"&lastModEndDate={quote(update_timestamp.isoformat())}"
-        else:
-            parameters = f"startIndex={index}"
+            parameters.update(
+                {
+                    "lastModStartDate": quote(last_update.isoformat()),
+                    "lastModEndDate": quote(update_timestamp.isoformat()),
+                }
+            )
+
         logger.debug("Parameters are %s", parameters)
 
-        r = session.get(f"https://services.nvd.nist.gov/rest/json/cves/2.0/?{(parameters)}", timeout=60)
+        r = client.get("https://services.nvd.nist.gov/rest/json/cves/2.0/", params=parameters, timeout=60)
         if r.status_code != 200:
             error_count += 1
             if error_count == 5:

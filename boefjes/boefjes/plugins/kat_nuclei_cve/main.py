@@ -2,7 +2,7 @@ import docker
 
 from boefjes.job_models import BoefjeMeta
 
-NUCLEI_IMAGE = "projectdiscovery/nuclei:v2.9.4"
+NUCLEI_IMAGE = "projectdiscovery/nuclei:v3.2.4"
 
 
 def verify_hostname_meta(input_ooi):
