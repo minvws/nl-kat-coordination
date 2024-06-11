@@ -191,7 +191,9 @@ class ReportTypeView(BaseSelectionView):
         )
         self.report_ids = [report.id for report in self.report_types]
 
-    def get_report_types_from_choice(self) -> list[type[Report] | type[MultiReport] | type[AggregateReport]]:
+    def get_report_types_from_choice(
+        self,
+    ) -> list[type[Report] | type[MultiReport] | type[AggregateReport]]:
         report_types = []
         for report_type in self.selected_report_types:
             try:
@@ -328,7 +330,8 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         observed_at: datetime,
     ) -> ReportOOI:
         report_data_raw_id = self.bytes_client.upload_raw(
-            raw=ReportDataDict(data).model_dump_json().encode(), manual_mime_types={"openkat/report"}
+            raw=ReportDataDict(data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
         )
 
         report_ooi = ReportOOI(
@@ -440,81 +443,66 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "generate_report.html",
             ]
 
+    def get_children_reports(self):
+        return self.octopoes_api_connector.query(
+            "Report.<parent_report[is Report]",
+            valid_time=self.observed_at,
+            source=self.report_ooi.reference,
+        )
+
+    @staticmethod
+    def get_report_types(reports: list[OOI]) -> list[dict[str, Any]]:
+        return [report.class_attributes() for report in {get_report_by_id(report.report_type) for report in reports}]
+
+    def get_report_data_from_bytes(self, report: OOI) -> bytes:
+        return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
+            self.bytes_client.get_raw(raw_id=report.data_raw_id)
+        )
+
+    def get_input_oois(self, reports: ReportOOI) -> list[OOI]:
+        ooi_pks = {ooi for report in reports for ooi in report.input_oois}
+        return [self.octopoes_api_connector.get(ooi, valid_time=self.observed_at) for ooi in ooi_pks]
+
     def get_context_data(self, **kwargs):
         # TODO: add config and plugins
         # TODO: add template OOI
         context = super().get_context_data(**kwargs)
 
         self.bytes_client.login()
-        report_data: dict = {}
-        if not self.report_ooi.report_type:
-            # its multiple single reports
-            children = self.octopoes_api_connector.query(
-                "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
-            )
-            for report in children:
-                if report.report_type not in report_data:
+        report_data: dict[str, dict[str, dict[str, Any]]] = {}
+
+        children_reports = self.get_children_reports()
+
+        if self.report_ooi.report_type == "concatenated-report":  # get single reports data (children's)
+            for report in children_reports:
+                for ooi in report.input_oois:
                     report_data[report.report_type] = {}
+                    report_data[report.report_type][ooi] = {
+                        "data": self.get_report_data_from_bytes(report),
+                        "template": report.template,
+                        "report_name": get_report_by_id(report.report_type).name,
+                    }
 
-                # Ensure the input_ooi exists within the report_type
-                if report.input_ooi not in report_data[report.report_type]:
-                    report_data[report.report_type][report.input_ooi] = {}
+            input_oois = self.get_input_oois(children_reports)
 
-                # Set the data within the input_ooi
-                report_data[report.report_type][report.input_ooi] = {
-                    "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-                        self.bytes_client.get_raw(raw_id=report.data_raw_id)
-                    ),
-                    "template": report.template,
-                    "report_name": get_report_by_id(report.report_type).name,
-                }
-            context["report_data"] = report_data
-            context["report_types"] = [
-                report.class_attributes() for report in {get_report_by_id(report.report_type) for report in children}
-            ]
-            input_ooi_set = set()
-            for child in children:
-                for ooi in child.input_oois:
-                    input_ooi_set.add(ooi)
+        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):  # its an aggregate report
+            context["post_processed_data"] = self.get_report_data_from_bytes(self.report_ooi)
 
-            input_oois = [self.octopoes_api_connector.get(ooi, valid_time=self.observed_at) for ooi in input_ooi_set]
+            context["report_types"] = self.get_report_types([self.report_ooi])
 
-        elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):
-            # its an aggregate report
-            context["post_processed_data"] = TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-                self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
-            )
-            children = self.octopoes_api_connector.query(
-                "Report.<parent_report[is Report]", valid_time=self.observed_at, source=self.report_ooi.reference
-            )
-            context["report_types"] = [
-                report.class_attributes() for report in {get_report_by_id(report.report_type) for report in children}
-            ]
-            input_ooi_set = set()
-            for child in children:
-                for ooi in child.input_oois:
-                    input_ooi_set.add(ooi)
-
-            input_oois = [self.octopoes_api_connector.get(ooi, valid_time=self.observed_at) for ooi in input_ooi_set]
         else:
             # its a single report
-            report_data[self.report_ooi.report_type] = {}
-            report_data[self.report_ooi.report_type][self.report_ooi.input_oois[0]] = {
-                "data": TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
-                    self.bytes_client.get_raw(raw_id=self.report_ooi.data_raw_id)
-                ),
-                "template": self.report_ooi.template,
-                "report_name": get_report_by_id(self.report_ooi.report_type).name,
-            }
-            context["report_data"] = report_data
-            context["report_types"] = [get_report_by_id(self.report_ooi.report_type).class_attributes()]
+            for ooi in self.report_ooi.input_oois:
+                report_data[self.report_ooi.report_type][ooi] = {
+                    "data": self.get_report_data_from_bytes(self.report_ooi),
+                    "template": self.report_ooi.template,
+                    "report_name": get_report_by_id(self.report_ooi.report_type).name,
+                }
 
-            input_oois = [
-                self.octopoes_api_connector.get(
-                    Reference.from_str(self.report_ooi.input_oois[0]), valid_time=self.observed_at
-                )
-            ]
+            input_oois = self.get_input_oois([self.report_ooi])
 
+        context["report_data"] = report_data
+        context["report_types"] = self.get_report_types(children_reports)
         context["created_at"] = self.report_ooi.date_generated
         context["total_oois"] = len(input_oois)
         context["selected_oois"] = input_oois
