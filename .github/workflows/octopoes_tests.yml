@@ -1,6 +1,8 @@
 name: Octopoes tests
 
 on:
+  workflow_call:
+
   push:
     branches:
       - "main"
