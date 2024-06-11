@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run pre-commit
-        uses: minvws/nl-kat-coordination/.github/workflows/pre_commit_checks.yml
+        uses: minvws/nl-kat-coordination/.github/workflows/pre_commit_checks.yml@feature/sonar-cloud
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
