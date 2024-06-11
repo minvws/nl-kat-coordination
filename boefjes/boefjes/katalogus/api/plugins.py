@@ -110,7 +110,7 @@ def update_plugin_state(
         p.set_enabled_by_id(plugin_id, organisation_id, enabled)
 
 
-class PatchBoefje(BaseModel):
+class BoefjeIn(BaseModel):
     """
     For patching, we need all fields to be optional, hence we overwrite the definition here.
     Also see https://fastapi.tiangolo.com/tutorial/body-updates/ as a reference.
@@ -131,7 +131,7 @@ class PatchBoefje(BaseModel):
 @router.patch("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_boefje(
     boefje_id: str,
-    boefje: PatchBoefje,
+    boefje: BoefjeIn,
     storage: PluginStorage = Depends(get_plugin_storage),
 ):
     with storage as p:
@@ -144,7 +144,7 @@ def delete_boefje(boefje_id: str, plugin_storage: PluginStorage = Depends(get_pl
         p.delete_boefje_by_id(boefje_id)
 
 
-class PatchNormalizer(BaseModel):
+class NormalizerIn(BaseModel):
     """
     For patching, we need all fields to be optional, hence we overwrite the definition here.
     Also see https://fastapi.tiangolo.com/tutorial/body-updates/ as a reference.
@@ -162,7 +162,7 @@ class PatchNormalizer(BaseModel):
 @router.patch("/normalizers/{normalizer_id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_normalizer(
     normalizer_id: str,
-    normalizer: PatchNormalizer,
+    normalizer: NormalizerIn,
     storage: PluginStorage = Depends(get_plugin_storage),
 ):
     with storage as p:
