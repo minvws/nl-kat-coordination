@@ -26,4 +26,4 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: octopoes-coverage-unit
-                  path: octopoes/coverage.xml
+                  path: coverage.xml
