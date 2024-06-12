@@ -63,5 +63,5 @@ env = [
 
 [tool.coverage.run]
 relative_files = true
-source = ["octopoes/"]
+# source = ["octopoes/"]
 branch = true

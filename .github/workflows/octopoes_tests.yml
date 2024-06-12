@@ -38,8 +38,8 @@ jobs:
         working-directory: ./octopoes
 
       - name: Run unit tests
-        run: pytest --cov-report=xml
-        working-directory: ./octopoes
+        run: pytest --cov-report=xml octopoes/tests
+        # working-directory: ./octopoes
 
       - if: ${{ matrix.version == '3.11' }}
         name: Upload coverage as artifact
