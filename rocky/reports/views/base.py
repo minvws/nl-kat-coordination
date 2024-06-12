@@ -444,7 +444,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
                 "generate_report.html",
             ]
 
-    def get_children_reports(self):
+    def get_children_reports(self) -> list[ReportOOI]:
         return self.octopoes_api_connector.query(
             "Report.<parent_report[is Report]",
             valid_time=self.observed_at,
@@ -452,16 +452,17 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         )
 
     @staticmethod
-    def get_report_types(reports: list[OOI]) -> list[dict[str, Any]]:
+    def get_report_types(reports: list[ReportOOI]) -> list[dict[str, Any]]:
         return [report.class_attributes() for report in {get_report_by_id(report.report_type) for report in reports}]
 
-    def get_report_data_from_bytes(self, report: OOI) -> bytes:
+    def get_report_data_from_bytes(self, report: ReportOOI) -> dict[str, Any]:
         return TypeAdapter(Any, config={"arbitrary_types_allowed": True}).validate_json(
             self.bytes_client.get_raw(raw_id=report.data_raw_id)
         )
 
-    def get_input_oois(self, reports: ReportOOI) -> list[OOI]:
+    def get_input_oois(self, reports: list[ReportOOI]) -> list[OOI]:
         ooi_pks = {ooi for report in reports for ooi in report.input_oois}
+
         return [self.octopoes_api_connector.get(ooi, valid_time=self.observed_at) for ooi in ooi_pks]
 
     def get_context_data(self, **kwargs):
@@ -511,9 +512,10 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         context["report_data"] = report_data
         context["report_types"] = report_types
         context["created_at"] = self.report_ooi.date_generated
+        context["observed_at"] = self.report_ooi.observed_at
         context["total_oois"] = len(input_oois)
         context["selected_oois"] = input_oois
-        context["oois"] = input_oois
+
         context["template"] = self.report_ooi.template
         context["report_download_pdf_url"] = url_with_querystring(
             reverse(
