@@ -15,7 +15,7 @@ jobs:
   #   uses: minvws/nl-kat-coordination/.github/workflows/pre_commit_checks.yml@feature/sonar-cloud
 
   octopoes-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/octopoes_tests.yml@feature/sonar-cloud
+    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
 
   sonar-cloud:
     runs-on: ubuntu-latest
