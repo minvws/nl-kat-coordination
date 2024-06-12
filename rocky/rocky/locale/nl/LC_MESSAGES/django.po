@@ -14,7 +14,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-23 15:00+0000\n"
-"PO-Revision-Date: 2024-05-30 15:15+0000\n"
+"PO-Revision-Date: 2024-06-07 09:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Dutch <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/nl/>\n"
@@ -1576,7 +1576,7 @@ msgstr ""
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer"
-msgstr "Red teamer"
+msgstr "Red Teamer"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html

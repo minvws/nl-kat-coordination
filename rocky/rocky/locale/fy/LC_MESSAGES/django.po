@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-23 15:00+0000\n"
-"PO-Revision-Date: 2024-06-04 12:09+0000\n"
+"PO-Revision-Date: 2024-06-08 13:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/fy/>\n"
@@ -1525,29 +1525,35 @@ msgid ""
 "account. You can always add additional user accounts If you’re team expands "
 "in the future."
 msgstr ""
+"It is ek in opsje om OpenKAT te draaien fan in account fan ien brûker út. "
+"Dat is handich as jo de iennige brûker binne. Jo hawwe dan tagong ta de "
+"funksjonaliteit fan de ferskate rollen fan jo account út. Jo kinne altyd "
+"ekstra brûkersaccounts tafoegje as jo team yn de takomst útwreidet."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Create separate accounts"
-msgstr ""
+msgstr "Meardere accounts oanmeitsje"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Continue with this account, onboard me!"
-msgstr ""
+msgstr "Gean troch mei allinnich dizze account. Onboard my!"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Users"
-msgstr ""
+msgstr "Brûkers"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
 "Within OpenKAT there are three types of user accounts. Each has its own "
 "functions."
 msgstr ""
+"Binnen OpenKAT binne der trije soarten brûkersaccounts. Elk hat syn eigen "
+"funksjes."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
@@ -1555,25 +1561,26 @@ msgid ""
 "Each organization must have an admin. The admin can create and manage user "
 "accounts as well as organization details."
 msgstr ""
+"De admin kin brûkers oanmeitsje, beheare en organisaasjegegevens wizigje."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer"
-msgstr ""
+msgstr "Red Teamer"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "A red teamer account can run scans and generate reports."
-msgstr ""
+msgstr "In Red Teamer-account kin scans starte en rapporten oanmeitsje."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account"
-msgstr ""
+msgstr "Brûkersaccount"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "A client account can access reports."
-msgstr ""
+msgstr "In brûker kin rapporten ynsjen."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
@@ -1581,55 +1588,59 @@ msgid ""
 "function. This introduction will guide you through the setup of both. After "
 "that you can choose to add a client account as well."
 msgstr ""
+"Elke organisaasje hat in admin en in Red Teamer nedich. Dizze yntroduksje "
+"helpt mei it oanmeitsjen fan dizze accounts."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Let's add accounts"
-msgstr ""
+msgstr "Accounts tafoegje"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin account setup"
-msgstr ""
+msgstr "Admin-account ynstelle"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin details"
-msgstr ""
+msgstr "Admindetails"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Skip this step"
-msgstr ""
+msgstr "Oerslaan"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Go back to previous step"
-msgstr ""
+msgstr "Gean werom nei de foarige stap"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer account setup"
-msgstr ""
+msgstr "Red Teamer-account ynstelle"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer details"
-msgstr ""
+msgstr "Red Teamerdetails"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account setup (optional)"
-msgstr ""
+msgstr "Brûkersaccount ynstelle (opsjoneel)"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid ""
 "A client account can access reports. Adding a client account to the "
 "organization is optional."
 msgstr ""
+"In brûkersaccount kin rapporten ynsjen. In brûkersaccount oan de "
+"organisaasje tafoegje is opsjoneel."
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "User details"
-msgstr ""
+msgstr "Brûkersdetails"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Finish organization setup"
-msgstr ""
+msgstr "Organisaasje ynstelle foltôgje"
 
 #: onboarding/templates/dns_report.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -1639,12 +1650,12 @@ msgstr ""
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: onboarding/templates/step_4_report.html onboarding/view_helpers.py
 msgid "OpenKAT introduction"
-msgstr ""
+msgstr "Yntroduksje OpenKAT"
 
 #: onboarding/templates/dns_report.html
 #: reports/report_types/dns_report/report.py
 msgid "DNS Report"
-msgstr ""
+msgstr "DNS-rapport"
 
 #: onboarding/templates/dns_report.html
 #, python-format
@@ -1653,15 +1664,18 @@ msgid ""
 "finding for more detailed information about the issue, its origin, severity "
 "and possible solutions."
 msgstr ""
+"Dit binne de befiningen fan in OpenKAT-analyze (%(observed_at)s). Klik op in "
+"befining foar mear detaillearre ynformaasje oer it probleem, de oarsprong, "
+"earnst en mooglike oplossingen."
 
 #: onboarding/templates/dns_report.html
 msgid "DNS Tree"
-msgstr ""
+msgstr "DNS-beam"
 
 #: onboarding/templates/step_1_introduction.html
 #: rocky/templates/landing_page.html
 msgid "Welcome to OpenKAT"
-msgstr ""
+msgstr "Wolkom by OpenKAT"
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -1669,12 +1683,17 @@ msgid ""
 "Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
 "and Sport to make your and our world a safer place."
 msgstr ""
+"OpenKAT is de ‘Kwetsberheden Analyze Tool’. In iepen boarneprojekt "
+"ûntwikkele troch it Ministerie van Volksgezondheid, Welzijn en Sport om jo "
+"en ús wrâld feiliger te meitsjen."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "OpenKAT is able to give insight into security risks on your online objects. "
 "For example, your websites, mailservers or online data."
 msgstr ""
+"OpenKAT kin ynsjoch jaan yn befeiligingsrisiko’s op jo online objekten. "
+"Bygelyks jo websites, mailservers of online data."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -1684,18 +1703,26 @@ msgid ""
 "you would like to monitor or scan and which insight you would like to "
 "receive."
 msgstr ""
+"OpenKAT brûkt ynstekkers om de risikogebieten te finen en te beoardielen en "
+"rapportearret dizze oan jo. Elke ynstekker hat syn eigen feardichheden, "
+"lykas it scannen, normalisearjen of analysearjen fan gegevens. As brûker "
+"beslisse jo hokker gebieden jo monitoarje of scanne wolle en hokker ynsjoch "
+"jo ûntfange wolle."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "Within OpenKAT you can view the insights as well as all the data OpenKAT has "
 "found. You can choose to browse through the data or view reports."
 msgstr ""
+"Binnen OpenKAT kinne jo sawol de ynsichten as alle gegevens dy’t OpenKAT fûn "
+"hat besjen. Jo kinne derfoar kieze troch de gegevens te blêdzjen of "
+"rapporten te besjen."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "During this introduction you will be guided through the steps to create a "
 "report."
-msgstr ""
+msgstr "Dizze yntroduksje leit út hoe’t jo in rapport meitsje."
 
 #: onboarding/templates/step_1_introduction.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -1709,16 +1736,16 @@ msgstr ""
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
-msgstr ""
+msgstr "Onboarding oerslaan"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Choose a report - Introduction"
-msgstr ""
+msgstr "Kies in rapport – Yntroduksje"
 
 #: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
 #: rocky/templates/header.html
 msgid "Reports"
-msgstr ""
+msgstr "Rapporten"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1727,11 +1754,16 @@ msgid ""
 "vulnerable to. Each report gives a high overview of the state of the object "
 "as well as detailed information on what OpenKAT found and possible solutions."
 msgstr ""
+"Rapporten binnen OpenKAT befetsje in oersjoch fan de scande objekten, de "
+"dêryn fûne problemen en bekende befeiligingsrisiko’s wêrfoar it objekt "
+"kwetsber wêze kin. Elk rapport jout in heech oersjoch fan de tastân fan it "
+"objekt en detaillearre ynformaasje oer wat OpenKAT fûn hat en mooglike "
+"oplossingen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 #: reports/report_types/dns_report/report.html
 msgid "Data"
-msgstr ""
+msgstr "Gegevens"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1740,10 +1772,15 @@ msgid ""
 "manage the plugins within your account which let's OpenKAT know which "
 "plugins to run and on which objects or areas."
 msgstr ""
+"OpenKAT kin scanne en analysearje mei help fan ynstekkers. Elke ynstekker "
+"hat syn eigen unike feardichheden en sammelet spesifike gegevens of jout "
+"spesifike ynsichten. Jo beheare de ynstekkers binnen jo account, wêrtroch "
+"OpenKAT wit hokker ynstekkers útfierd wurde moatte en op hokker objekten of "
+"gebieden."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Generating a report"
-msgstr ""
+msgstr "Rapport generearje"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1752,6 +1789,11 @@ msgid ""
 "needs, as well as asks for permission to run plugins that you haven’t "
 "enabled yet but are needed to collect or analyze the data."
 msgstr ""
+"Wannear’t jo in rapporttype kieze, sil OpenKAT jo begeliede by de "
+"ynstallaasje. OpenKAT stelt de nedige fragen op basis fan de ynfier dy’t it "
+"rapport nedich hat, en freget om tastimming om ynstekkers te brûken dy’t jo "
+"noch net ynskeakele hawwe, mar dy’t nedich binne om de gegevens te sammeljen "
+"of te analysearjen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
