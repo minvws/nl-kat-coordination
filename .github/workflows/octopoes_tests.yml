@@ -46,7 +46,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage
-          path: octopoes/coverage.xml
+          # path: octopoes/coverage.xml
+          path: coverage.xml
 
       # - name: Run integration tests
       #   run: DOCKER_BUILDKIT=1 make itest build_args='--build-arg PYTHON_VERSION=${{ matrix.version }}'
