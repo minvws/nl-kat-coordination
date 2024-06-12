@@ -39,6 +39,8 @@
                     <td>
                         {% if report.parent_report.input_oois|length == 1 %}
                             <a href="{% ooi_url "ooi_detail" report.parent_report.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_oois.0 }}</a>
+                        {% elif report.total_objects == 1 %}
+                            <a href="{% ooi_url 'ooi_detail' report.children_reports.0.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.children_reports.0.input_oois.0 }}</a>
                         {% else %}
                             {{ report.total_objects }}
                         {% endif %}
