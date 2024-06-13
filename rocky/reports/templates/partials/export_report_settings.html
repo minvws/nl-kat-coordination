@@ -1,0 +1,51 @@
+{% load i18n %}
+{% load static %}
+{% load report_extra %}
+{% load ooi_extra %}
+
+<section>
+    <div>
+        {% if selected_oois and selected_report_types %}
+            <h2>{% translate "Report name" %}</h2>
+            <p>
+                {% blocktranslate trimmed %}
+                    Give your report a name. Currently, it is only possible to
+                    give a name to the parent report. Subreports cannot be given a name.
+                {% endblocktranslate %}
+            </p>
+            <form id="generate_report" class="inline" method="post" action="{{ next }}">
+                {% csrf_token %}
+                {% url "aggregate_report_landing" organization.code as index_url_aggregate_report %}
+                <p>
+                    <label for="report_name">Name</label>
+                    {% if index_url_aggregate_report in request.path|urlencode %}
+                        <input id="report_name"
+                               name="report_name"
+                               type="text"
+                               autocomplete="on"
+                               value="Aggregate Report">
+                    {% elif selected_oois|length > 1 or selected_report_types|length > 1 %}
+                        <input id="report_name"
+                               name="report_name"
+                               type="text"
+                               autocomplete="on"
+                               value="Concatenated Report">
+                    {% else %}
+                        <input id="report_name"
+                               name="report_name"
+                               type="text"
+                               autocomplete="on"
+                               value="{{ selected_report_types.0|get_report_type_name }} for {{ selected_oois.0|human_readable }}">
+                    {% endif %}
+                </p>
+                <button type="submit">
+                    {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
+                </button>
+            </form>
+        {% else %}
+            <a class="button ghost" href="{{ previous }}">
+                <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
+            </a>
+        {% endif %}
+    </div>
+</section>

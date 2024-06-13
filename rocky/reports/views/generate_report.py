@@ -42,7 +42,7 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("generate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select Objects"),
+                "text": _("Select objects"),
             },
             {
                 "url": reverse("generate_report_select_report_types", kwargs=kwargs) + selection,
@@ -51,6 +51,10 @@ class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
             {
                 "url": reverse("generate_report_setup_scan", kwargs=kwargs) + selection,
                 "text": _("Configuration"),
+            },
+            {
+                "url": reverse("generate_report_export_setup", kwargs=kwargs) + selection,
+                "text": _("Export setup"),
             },
             {
                 "url": reverse("generate_report_view", kwargs=kwargs) + selection,
@@ -139,13 +143,34 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_has_required_plugins():
+        if self.plugins_enabled() or not self.report_has_required_plugins():
             return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
-        if self.plugins_enabled():
-            return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
+
+
+class ExportSetupGenerateReportView(
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView
+):
+    """
+    Shows the export setup page where users can set their export preferences.
+    """
+
+    template_name = "generate_report/export_setup.html"
+    breadcrumbs_step = 6
+    current_step = 4
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(self.get_previous())
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
 
 class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
@@ -154,8 +179,7 @@ class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Te
     """
 
     template_name = "generate_report.html"
-    breadcrumbs_step = 6
-    current_step = 6
+    current_step = 5
     report_types: Sequence[type[Report]]
     ooi_types = get_ooi_types_with_report()
 

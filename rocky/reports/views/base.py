@@ -334,9 +334,10 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             raw=ReportDataDict(data).model_dump_json().encode(),
             manual_mime_types={"openkat/report"},
         )
+        report_name = self.request.POST.get("report_name")
 
         report_ooi = ReportOOI(
-            name=str(report_type.name),
+            name=report_name,
             report_type=str(report_type.id),
             template=report_type.template_path,
             report_id=uuid4(),

@@ -35,7 +35,7 @@ class BreadcrumbsMultiReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("multi_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select OOIs"),
+                "text": _("Select objects"),
             },
             {
                 "url": reverse("multi_report_select_report_types", kwargs=kwargs) + selection,
@@ -44,6 +44,10 @@ class BreadcrumbsMultiReportView(ReportBreadcrumbs):
             {
                 "url": reverse("multi_report_setup_scan", kwargs=kwargs) + selection,
                 "text": _("Configuration"),
+            },
+            {
+                "url": reverse("multi_report_export_setup", kwargs=kwargs) + selection,
+                "text": _("Export setup"),
             },
             {
                 "url": reverse("multi_report_view", kwargs=kwargs) + selection,
@@ -120,8 +124,31 @@ class SetupScanMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if self.plugins_enabled():
-            return redirect(self.get_next())
+            return redirect(reverse("multi_report_export_setup", kwargs=kwargs) + get_selection(request))
         return super().get(request, *args, **kwargs)
+
+
+class ExportSetupMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportPluginView, TemplateView):
+    """
+    Shows the export setup page where users can set their export preferences.
+    """
+
+    template_name = "generate_report/export_setup.html"
+    breadcrumbs_step = 6
+    current_step = 4
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
 
 class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView, TemplateView):
@@ -130,7 +157,7 @@ class MultiReportView(BreadcrumbsMultiReportView, ReportPluginView, TemplateView
     """
 
     template_name = "multi_report.html"
-    current_step = 6
+    current_step = 5
 
     def multi_reports_for_oois(self) -> dict[str, dict[str, Any]]:
         report = MultiOrganizationReport(self.octopoes_api_connector)

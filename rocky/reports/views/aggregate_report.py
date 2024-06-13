@@ -44,7 +44,7 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
             },
             {
                 "url": reverse("aggregate_report_select_oois", kwargs=kwargs) + selection,
-                "text": _("Select Objects"),
+                "text": _("Select objects"),
             },
             {
                 "url": reverse("aggregate_report_select_report_types", kwargs=kwargs) + selection,
@@ -53,6 +53,10 @@ class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
             {
                 "url": reverse("aggregate_report_setup_scan", kwargs=kwargs) + selection,
                 "text": _("Configuration"),
+            },
+            {
+                "url": reverse("aggregate_report_export_setup", kwargs=kwargs) + selection,
+                "text": _("Export setup"),
             },
             {
                 "url": reverse("aggregate_report_save", kwargs=kwargs) + selection,
@@ -152,13 +156,34 @@ class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggrega
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_has_required_plugins():
+        if self.plugins_enabled() or not self.report_has_required_plugins():
             return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
-        if self.plugins_enabled():
-            return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
+
+
+class ExportSetupAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
+    """
+    Shows the export setup page where users can set their export preferences.
+    """
+
+    template_name = "aggregate_report/export_setup.html"
+    breadcrumbs_step = 6
+    current_step = 4
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
 
 class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
@@ -166,7 +191,7 @@ class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
     Save the report and redirect to the saved report
     """
 
-    current_step = 6
+    current_step = 5
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
     report_types: Sequence[type[Report]]
 
