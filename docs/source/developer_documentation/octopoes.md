@@ -295,6 +295,92 @@ Good to know: XTDB tracks the history of each object by its **primary key**.
 
 [Read more about XTDB bitemporality](https://v1-docs.xtdb.com/concepts/bitemporality/)
 
+### XTDB-cli tool
+
+The XTDB-cli tool is a script that can be used to query the XTDB database (v1) directly. This can be useful to query for transactions, queries, attributes, keys and more. It can be used to directly manipulate XTDB, without the interference of Octopoes. This can be useful for tasks such as experimenting, bug hunting and optimizations.
+
+Please note: The XTDB version within OpenKAT is not the standard XTDB. It is an extended module version that adds support for multiple nodes available at: [OpenKAT XTDB](https://github.com/dekkers/xtdb-http-multinode)
+
+The XTDB-cli tool can be found in the following folder:
+
+```
+https://github.com/minvws/nl-kat-coordination/tree/main/octopoes/tools
+```
+
+It is recommended to create a virtual environment and install the developer-requirements (in the octopoes folder) within this virtual environment.
+
+The XTDB-cli tool can be queried as shown below.
+
+```
+$ ./xtdb-cli.py -h
+Usage: xtdb-cli.py [OPTIONS] COMMAND [ARGS]...
+
+This help functionality explains how to query XTDB using the xtdb-cli tool. The help functionality for all default XTDB commands was copied from the official XTDB docs for the HTTP implementation. Not all optional parameters as available on the HTTP docs may be implemented.
+
+Options:
+ -n, --node TEXT        XTDB node  [default: 0]
+ -u, --url TEXT         XTDB server base url  [default: http://localhost:3000]
+ -t, --timeout INTEGER  XTDB request timeout (in ms)  [default: 5000]
+ -v, --verbosity        Increase the verbosity level  [default: 0]
+ -h, --help             Show this message and exit.
+
+Commands:
+ active-queries       Returns a list of currently running queries.
+ attribute-stats      Returns frequencies of indexed attributes
+ await-tx             Waits until the node has indexed a transaction that is at or past the supplied tx-id.
+ await-tx-time        Blocks until the node has indexed a transaction that is past the supplied tx-time.
+ entity               Returns the document map for a particular entity.
+ entity-tx            Returns the transaction details for an entity - returns a map containing the tx-id and...
+ history              Returns the history of a particular entity.
+ latest-completed-tx  Returns the latest transaction to have been indexed by this node.
+ latest-submitted-tx  Returns the latest transaction to have been submitted to this cluster.
+ list-keys            List all keys in node
+ list-values          List all values in node
+ query                EDN Query (default: "{:query {:find [ ?var ] :where [[?var :xt/id ]]}}")
+ recent-queries       Returns a list of recently completed/failed queries.
+ slowest-queries      Returns a list of slowest completed/failed queries ran on the node.
+ status               Returns the current status information of the node
+ submit-tx            Takes a vector of transactions (any combination of put, delete, match, evict and fn) and...
+ sync                 Wait until the consumer’s lag is back to 0 (i.e.
+ tx-committed         Checks if a submitted tx was successfully committed, returning a map with tx-committed and...
+ tx-log               Returns a list of all transactions, from oldest to newest transaction time - optionally...
+ txs                  Show all document transactions
+```
+
+The help file for the commands can be queried as shown below.
+
+```
+$ ./xtdb-cli.py history -h
+Usage: xtdb-cli.py history [OPTIONS] KEY
+
+ Returns the history of a particular entity.
+
+Options:
+ --with-docs         Includes the documents in the response sequence, under the doc key (boolean, default: false)
+ --with-corrections  Includes bitemporal corrections in the response, inline, sorted by valid-time then tx-id
+                     (boolean, default: false)
+ -h, --help          Show this message and exit.
+```
+
+The output below gives an example for querying the XTDB database for an organisation called 'MyOrganisationName'. This is the organisation name, not the organisation code and can be found in the organisation overview at: `http://127.0.0.1:8000/en/organizations/`.
+
+```
+$ ./xtdb-cli.py -n MyOrganisationName attribute-stats |jq .
+{
+ "DNSSOARecord/serial": 14,
+ "Website/ip_service": 10,
+ "HTTPResource/website": 10,
+ "Hostname/primary_key": 8,
+ "DNSNSRecord/name_server_hostname": 3,
+ "DNSSOARecord/hostname": 14,
+ "HostnameHTTPURL/primary_key": 2,
+ "DNSTXTRecord/dns_record_type": 2,
+ "TLSCipher/ip_service": 4,
+ "DNSMXRecord/value":
+ ....
+ }
+```
+
 ## OOI
 
 OOI objects are instances of relatively simple classes, which inherit from `OOIBase`.
