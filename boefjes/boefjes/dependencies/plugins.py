@@ -10,18 +10,14 @@ from jsonschema.validators import validate
 from sqlalchemy.orm import Session
 
 from boefjes.local_repository import LocalPluginRepository, get_local_repository
-from boefjes.models import FilterParameters, PaginationParameters, PluginType
+from boefjes.models import Boefje, FilterParameters, Normalizer, PaginationParameters, PluginType
 from boefjes.sql.config_storage import create_config_storage
 from boefjes.sql.db import session_managed_iterator
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.storage.interfaces import (
     ConfigStorage,
-from boefjes.katalogus.local_repository import LocalPluginRepository, get_local_repository
-from boefjes.katalogus.models import Boefje, FilterParameters, Normalizer, PaginationParameters, PluginType
-from boefjes.katalogus.storage.interfaces import (
     ExistingPluginId,
     NotFound,
-    PluginEnabledStorage,
     PluginNotFound,
     PluginStorage,
     SettingsNotConformingToSchema,
@@ -52,11 +48,11 @@ class PluginService:
         self.config_storage.__exit__(exc_type, exc_val, exc_tb)
 
     def get_all(self, organisation_id: str) -> list[PluginType]:
-        all_plugins = self.get_all_without_enabled()
+        all_plugins = self._get_all_without_enabled()
 
         return [self._set_plugin_enabled(plugin, organisation_id) for plugin in all_plugins.values()]
 
-    def get_all_without_enabled(self):
+    def _get_all_without_enabled(self):
         all_plugins = {plugin.id: plugin for plugin in self.local_repo.get_all()}
 
         for plugin in self.plugin_storage.get_all():
@@ -103,7 +99,7 @@ class PluginService:
 
     def upsert_settings(self, settings: dict, organisation_id: str, plugin_id: str):
         self._assert_settings_match_schema(settings, organisation_id, plugin_id)
-        self.upsert_boefje(plugin_id, {})  # Settings are a boefje-only feature, so we do this naively
+        self._put_boefje(plugin_id)
 
         return self.config_storage.upsert(organisation_id, plugin_id, settings=settings)
 
@@ -120,6 +116,36 @@ class PluginService:
             raise ExistingPluginId(normalizer.id)
         except KeyError:
             self.plugin_storage.create_normalizer(normalizer)
+
+    def _put_boefje(self, boefje_id: str) -> None:
+        """Check existence of a boefje, and insert a database entry if it concerns a local boefje"""
+
+        try:
+            self.plugin_storage.boefje_by_id(boefje_id)
+        except PluginNotFound:
+            try:
+                plugin = self.local_repo.by_id(boefje_id)
+            except KeyError:
+                raise
+
+            if plugin.type != "boefje":
+                raise
+            self.plugin_storage.create_boefje(plugin)
+
+    def _put_normalizer(self, normalizer_id: str) -> None:
+        """Check existence of a normalizer, and insert a database entry if it concerns a local normalizer"""
+
+        try:
+            self.plugin_storage.normalizer_by_id(normalizer_id)
+        except PluginNotFound:
+            try:
+                plugin = self.local_repo.by_id(normalizer_id)
+            except KeyError:
+                raise
+
+            if plugin.type != "normalizer":
+                raise
+            self.plugin_storage.create_normalizer(plugin)
 
     def delete_settings(self, organisation_id: str, plugin_id: str):
         self.config_storage.delete(organisation_id, plugin_id)
@@ -158,9 +184,9 @@ class PluginService:
             self._assert_settings_match_schema(all_settings, organisation_id, plugin_id)
 
         try:
-            self.upsert_boefje(plugin_id, {})
+            self._put_boefje(plugin_id)
         except PluginNotFound:
-            self.upsert_normalizer(plugin_id, {})
+            self._put_normalizer(plugin_id)
 
         self.config_storage.upsert(organisation_id, plugin_id, enabled=enabled)
 

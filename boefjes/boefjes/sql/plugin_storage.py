@@ -8,7 +8,7 @@ from boefjes.models import Boefje, Normalizer, PluginType
 from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
 from boefjes.sql.db_models import BoefjeInDB, NormalizerInDB
 from boefjes.sql.session import SessionMixin
-from boefjes.storage.interfaces import PluginNotFound, PluginStorage
+from boefjes.storage.interfaces import CannotUpdateStaticPlugin, PluginNotFound, PluginStorage
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +46,9 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
 
         instance = self._db_boefje_instance_by_id(boefje_id)
 
+        if instance.static:
+            raise CannotUpdateStaticPlugin(boefje_id)
+
         for key, value in data.items():
             setattr(instance, key, value)
 
@@ -62,6 +65,9 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             return
 
         instance = self._db_normalizer_instance_by_id(normalizer_id)
+
+        if instance.static:
+            raise CannotUpdateStaticPlugin(normalizer_id)
 
         for key, value in data.items():
             setattr(instance, key, value)
@@ -108,6 +114,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             oci_image=boefje.oci_image,
             oci_arguments=boefje.oci_arguments,
             version=boefje.version,
+            static=boefje.static,
         )
 
     @staticmethod
@@ -121,6 +128,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             produces=normalizer.produces,
             environment_keys=normalizer.environment_keys,
             version=normalizer.version,
+            static=normalizer.static,
         )
 
     @staticmethod
@@ -138,7 +146,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             oci_image=boefje_in_db.oci_image,
             oci_arguments=boefje_in_db.oci_arguments,
             version=boefje_in_db.version,
-            static=False,
+            static=boefje_in_db.static,
         )
 
     @staticmethod
@@ -153,7 +161,7 @@ class SQLPluginStorage(SessionMixin, PluginStorage):
             produces=normalizer_in_db.produces,
             environment_keys=normalizer_in_db.environment_keys,
             version=normalizer_in_db.version,
-            static=False,
+            static=normalizer_in_db.static,
         )
 
 

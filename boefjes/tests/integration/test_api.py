@@ -57,12 +57,12 @@ class TestAPI(TestCase):
     def test_cannot_add_plugin_reserved_id(self):
         boefje = Boefje(id="dns-records", name="My test boefje", static=False)
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=boefje.json())
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message": "Plugin id 'dns-records' is already used"})
 
         normalizer = Normalizer(id="kat_nmap_normalize", name="My test normalizer", static=False)
         response = self.client.post(f"/v1/organisations/{self.org.id}/plugins", content=normalizer.json())
-        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), {"message": "Plugin id 'kat_nmap_normalize' is already used"})
 
     def test_add_boefje(self):
@@ -141,6 +141,17 @@ class TestAPI(TestCase):
 
         response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/{normalizer.id}")
         self.assertEqual(response.json()["version"], "v1.2")
+
+    def test_cannot_update_static_plugins(self):
+        self.client.patch(f"/v1/organisations/{self.org.id}/plugins/dns-records", json={"enabled": True})
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
+        self.assertTrue(response.json()["enabled"])
+
+        response = self.client.patch(f"/v1/organisations/{self.org.id}/boefjes/dns-records", json={"version": "v1.2"})
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.get(f"/v1/organisations/{self.org.id}/plugins/dns-records")
+        self.assertNotEqual(response.json()["version"], "v1.2")
 
     def test_basic_settings_api(self):
         plug = "dns-records"

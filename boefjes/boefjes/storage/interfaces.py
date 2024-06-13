@@ -38,14 +38,22 @@ class PluginStateNotFound(NotFound):
 
 
 class ConfigNotFound(NotFound):
-class ExistingPluginId(StorageError):
-    def __init__(self, plugin_id: str):
-        super().__init__(f"Plugin id '{plugin_id}' is already used")
-
-
-class SettingsNotFound(NotFound):
     def __init__(self, organisation_id: str, plugin_id: str):
         super().__init__(f"Setting not found for organisation '{organisation_id}' and plugin '{plugin_id}'")
+
+
+class NotAllowed(StorageError):
+    """Generic exception for operations that are not allowed at a domain level"""
+
+
+class CannotUpdateStaticPlugin(NotAllowed):
+    def __init__(self, plugin_id: str):
+        super().__init__(f"Plugin with id '{plugin_id}' is static, so updating it is not allowed")
+
+
+class ExistingPluginId(NotAllowed):
+    def __init__(self, plugin_id: str):
+        super().__init__(f"Plugin id '{plugin_id}' is already used")
 
 
 class OrganisationStorage(ABC):

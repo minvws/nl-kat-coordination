@@ -139,18 +139,7 @@ class TestPlugins(TestCase):
             json={"enabled": False},
         )
 
-        self.assertEqual(204, res.status_code)
+        self.assertEqual(404, res.status_code)
 
         res = self.client.get("/v1/organisations/non-existing-org/plugins")
-        self.assertEqual(200, res.status_code)
-        self.assertEqual(
-            {
-                "kat_test": False,
-                "kat_test_2": False,
-                "kat_test_4": False,
-                "kat_test_normalize": True,
-                "kat_test_normalize_2": True,
-            },
-            {plugin["id"]: plugin["enabled"] for plugin in res.json()},
-        )
         self.assertEqual(404, res.status_code)

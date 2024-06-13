@@ -65,6 +65,7 @@ class BoefjeInDB(SQL_BASE):
     id = Column(types.Integer, primary_key=True, autoincrement=True)
     plugin_id = Column(types.String(length=64), nullable=False, unique=True)
     created = Column(types.DateTime(timezone=True), nullable=True)
+    static = Column(Boolean, nullable=False, server_default="false")
 
     # Metadata
     name = Column(String(length=64), nullable=False)
@@ -88,6 +89,7 @@ class NormalizerInDB(SQL_BASE):
     id = Column(types.Integer, primary_key=True, autoincrement=True)
     plugin_id = Column(types.String(length=64), nullable=False, unique=True)
     created = Column(types.DateTime(timezone=True), nullable=True)
+    static = Column(Boolean, nullable=False, server_default="false")
 
     # Metadata
     name = Column(String(length=64), nullable=False)
