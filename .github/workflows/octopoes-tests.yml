@@ -20,7 +20,7 @@ jobs:
               working-directory: octopoes/
 
             - name: Run unit tests
-              run: pytest --cov octopoes/octopoes --cov-report xml octopoes/tests/
+              run: pytest --cov . --cov-report xml octopoes/tests/
 
             - name: Upload coverage as artifact
               uses: actions/upload-artifact@v4
