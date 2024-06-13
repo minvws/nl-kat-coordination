@@ -34,9 +34,12 @@ jobs:
       - name: test
         run: echo ${{ github.workspace }} && echo $GITHUB_WORKSPACE && tree ${{ github.workspace }}
 
+      - name: Rename directory
+        run: sed -i 's/home\/runner\/work\/my-repo\/my-repo/github\/workspace/' octopoes-coverage-unit/coverage.xml
+
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: ${{ github.workspace }}/octopoes
+        # with:
+        #   projectBaseDir: ${{ github.workspace }}/octopoes
