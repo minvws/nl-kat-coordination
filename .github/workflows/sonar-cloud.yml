@@ -31,14 +31,10 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
 
-      - name: test
-        run: echo ${{ github.workspace }} && echo $GITHUB_WORKSPACE && tree ${{ github.workspace }}
-
-      - name: Rename directory
+      # workaround for https://sonarsource.atlassian.net/browse/SONARPY-1203
+      # and https://community.sonarsource.com/t/sonar-on-github-actions-with-python-coverage-source-issue/36057
+      - name: Override coverage Source Path for Sonar
         run: sed -i 's/home\/runner\/work\/nl-kat-coordination\/nl-kat-coordination/github\/workspace/' octopoes-coverage-unit/coverage.xml
-
-      - name: View coverage
-        run: cat octopoes-coverage-unit/coverage.xml
 
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
