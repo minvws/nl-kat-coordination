@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load report_extra %}
+{% load ooi_extra %}
 
 <div class="horizontal-view">
     <table>
@@ -24,7 +25,7 @@
                         <span class="label tags-color-{{ subreport.report_type|get_report_type_label_style }}">{{ subreport.name }}</span>
                     </td>
                     <td>
-                        <a href="{% ooi_url "ooi_detail" subreport.input_oois.0 organization.code %}">{{ subreport.input_oois.0 }}</a>
+                        <a href="{% ooi_url "ooi_detail" subreport.input_oois.0 organization.code %}">{{ subreport.input_oois.0|human_readable }}</a>
                     </td>
                     <td>{{ subreport.observed_at|date }}</td>
                     <td>{{ subreport.date_generated }}</td>

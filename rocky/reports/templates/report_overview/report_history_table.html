@@ -23,7 +23,7 @@
                            title="{% translate "Shows parent report details" %}">{{ report.parent_report.reference }}</a>
                     </td>
                     <td>
-                        {% if report.parent_report.report_type is concatenated_report or report.parent_report.report_type is None %}
+                        {% if report.parent_report.report_type == "concatenated-report" or report.parent_report.report_type is None %}
                             {% for report_type, total_objects in report.report_type_summary.items %}
                                 {% if forloop.counter0 < 2 %}
                                     <span class="label tags-color-{{ report_type|get_report_type_label_style }}">{{ report_type|get_report_type_name }}</span>
@@ -38,9 +38,9 @@
                     </td>
                     <td>
                         {% if report.parent_report.input_oois|length == 1 %}
-                            <a href="{% ooi_url "ooi_detail" report.parent_report.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_oois.0 }}</a>
+                            <a href="{% ooi_url "ooi_detail" report.parent_report.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.parent_report.input_oois.0|human_readable }}</a>
                         {% elif report.total_objects == 1 %}
-                            <a href="{% ooi_url 'ooi_detail' report.children_reports.0.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.children_reports.0.input_oois.0 }}</a>
+                            <a href="{% ooi_url 'ooi_detail' report.children_reports.0.input_oois.0 organization.code query=ooi.mandatory_fields %}">{{ report.children_reports.0.input_oois.0|human_readable }}</a>
                         {% else %}
                             {{ report.total_objects }}
                         {% endif %}
@@ -107,7 +107,7 @@
                                                 <span class="label tags-color-{{ child_report.report_type|get_report_type_label_style }}">{{ child_report.report_type|get_report_type_name }}</span>
                                             </td>
                                             <td>
-                                                <a href="{% ooi_url 'ooi_detail' child_report.input_oois.0 organization.code %}">{{ child_report.input_oois.0 }}</a>
+                                                <a href="{% ooi_url 'ooi_detail' child_report.input_oois.0 organization.code %}">{{ child_report.input_oois.0|human_readable }}</a>
                                             </td>
                                             <td>
                                                 <a href="{% url "view_report" organization.code %}?report_id={{ child_report }}&observed_at={{ child_report.observed_at|date:"Y-m-d H:i:s:u" }}"
