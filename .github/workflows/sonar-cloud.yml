@@ -32,7 +32,7 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: test
-        run: echo ${{ github.workspace }} && tree ${{ github.workspace }}
+        run: echo ${{ github.workspace }} && echo $GITHUB_WORKSPACE && tree ${{ github.workspace }}
 
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
