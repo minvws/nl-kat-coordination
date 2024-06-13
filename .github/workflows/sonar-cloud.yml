@@ -31,9 +31,14 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
 
+      # workaround for https://sonarsource.atlassian.net/browse/SONARPY-1203
+      # and https://community.sonarsource.com/t/sonar-on-github-actions-with-python-coverage-source-issue/36057
+      - name: Override coverage Source Path for Sonar
+        run: sed -i 's/home\/runner\/work\/nl-kat-coordination\/nl-kat-coordination/github\/workspace/' octopoes-coverage-unit/coverage.xml
+
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          projectBaseDir: ${{ github.workspace }}
+        # with:
+        #   projectBaseDir: ${{ github.workspace }}/octopoes
