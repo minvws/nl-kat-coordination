@@ -54,15 +54,17 @@ pytest-timeout = "^2.3.1"
 pytest-httpx = "^0.30.0"
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-report=term-missing:skip-covered"
+addopts = "--cov --cov-report=term-missing:skip-covered --cov-report xml"
 env = [
     "XTDB_URI=http://testxtdb:3000",
     "QUEUE_URI=amqp://placeholder",
     "KATALOGUS_API=http://placeholder:8000",
 ]
 
-[tool.coverage.run]
-relative_files = true
-branch = true
+# [tool.coverage.run]
+# relative_files = true
+# branch = true
+# source = ["octopoes"]
 
-[tool.coverage.xml]
+# [tool.coverage.xml]
+# output = "coverage.xml"
