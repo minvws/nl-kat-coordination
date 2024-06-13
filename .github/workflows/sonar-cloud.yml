@@ -37,6 +37,9 @@ jobs:
       - name: Rename directory
         run: sed -i 's/home\/runner\/work\/my-repo\/my-repo/github\/workspace/' octopoes-coverage-unit/coverage.xml
 
+      - name: View coverage
+        run: cat octopoes-coverage-unit/coverage.xml
+
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:
