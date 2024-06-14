@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def construct_api(settings: Settings) -> FastAPI:
     """Construct the FastAPI object, with prefilled examples from disk."""
-    app = FastAPI()
+    app = FastAPI(title="Keiko API")
 
     # Set up OpenTelemetry instrumentation
     if settings.span_export_grpc_endpoint is not None:

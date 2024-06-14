@@ -12,7 +12,14 @@ class Katalogus(HTTPService):
 
     name = "katalogus"
 
-    def __init__(self, host: str, source: str, timeout: int, pool_connections: int, cache_ttl: int = 30):
+    def __init__(
+        self,
+        host: str,
+        source: str,
+        timeout: int,
+        pool_connections: int,
+        cache_ttl: int = 30,
+    ):
         super().__init__(host, source, timeout, pool_connections)
 
         self.lock = threading.Lock()
@@ -84,6 +91,9 @@ class Katalogus(HTTPService):
                     if plugin.enabled is False:
                         continue
 
+                    if not plugin.consumes:
+                        continue
+
                     # NOTE: backwards compatibility, when it is a boefje the
                     # consumes field is a string field.
                     if isinstance(plugin.consumes, str):
@@ -115,6 +125,9 @@ class Katalogus(HTTPService):
                         continue
 
                     if plugin.enabled is False:
+                        continue
+
+                    if not plugin.consumes:
                         continue
 
                     for type_ in plugin.consumes:
@@ -180,16 +193,24 @@ class Katalogus(HTTPService):
     def get_normalizers_by_org_id_and_type(self, organisation_id: str, normalizer_type: str) -> list[Plugin]:
         try:
             with self.lock:
-                return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
+                return dict_utils.deep_get(
+                    self.organisations_normalizer_type_cache,
+                    [organisation_id, normalizer_type],
+                )
         except dict_utils.ExpiredError:
             self.flush_organisations_normalizer_type_cache()
-            return dict_utils.deep_get(self.organisations_normalizer_type_cache, [organisation_id, normalizer_type])
+            return dict_utils.deep_get(
+                self.organisations_normalizer_type_cache,
+                [organisation_id, normalizer_type],
+            )
 
     def get_new_boefjes_by_org_id(self, organisation_id: str) -> list[Plugin]:
         # Get the enabled boefjes for the organisation from katalogus
         plugins = self.get_plugins_by_organisation(organisation_id)
         enabled_boefjes = {
-            plugin.id: plugin for plugin in plugins if plugin.enabled is True and plugin.type == "boefje"
+            plugin.id: plugin
+            for plugin in plugins
+            if plugin.enabled is True and plugin.type == "boefje" and plugin.consumes
         }
 
         # Check if there are new boefjes

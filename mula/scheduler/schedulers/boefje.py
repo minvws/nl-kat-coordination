@@ -242,6 +242,16 @@ class BoefjeScheduler(Scheduler):
         )
 
         for boefje in new_boefjes:
+            if not boefje.consumes:
+                self.logger.debug(
+                    "No consumes found for boefje: %s",
+                    boefje.name,
+                    boefje_id=boefje.id,
+                    organisation_id=self.organisation.id,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
             oois_by_object_type: list[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(

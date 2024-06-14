@@ -20,13 +20,19 @@
         {% else %}
             <h2>
                 {% blocktranslate trimmed count counter=oois|length %}
-                    Selected object
+                    Selected object ({{ total_oois }})
                 {% plural %}
-                    Selected objects
+                    Selected objects ({{ total_oois }})
                 {% endblocktranslate %}
             </h2>
-            {% if 'all' in oois %}
-                <p>{% translate "You have selected all objects in previous step." %}</p>
+            {% if 'all' in selected_oois %}
+                <p>
+                    {% blocktranslate trimmed count counter=oois|length %}
+                        You have selected {{ total_oois }} object in previous step.
+                    {% plural %}
+                        You have selected {{ total_oois }} objects in previous step.
+                    {% endblocktranslate %}
+                </p>
             {% else %}
                 {% include "summary/ooi_selection.html" %}
 

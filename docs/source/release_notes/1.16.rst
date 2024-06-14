@@ -1,0 +1,87 @@
+============================================
+[DRAFT for: v1.15.1...67f18e3] OpenKAT 1.16
+============================================
+
+This release includes some big optimizations in the new reporting functionality
+that was introduced in 1.14. Measurements show that generating a report on 100
+objects is approximately 20 times faster. The reports in general also got a lot
+of improvements and bugfixes.
+
+New Features
+============
+
+* Add xtdb-cli tool to Octopoes
+* Update several plugins: Wappalizer, dns-records, ssl-certificates, pdio_subfinder and remove the many-ports-open boefje/normalizer
+* Add backup scripts
+* Introduce importing/exporting capabilities in xtdb-multinode-tool
+* More Octopoes Query support for complex path queries
+* Introduce support for running custom built OCI images using only a boefje definition (boefje.json), applied to nmap.
+* Improvements of the design, plugin overview and Report titles.
+* Improvements of several Reports in terms of performance, styling, OOI selection and configuration.
+* More documentation on: Reports, the new OCI image functionality and architecture, IPv6 support in Docker and Octopoes Models.
+
+Bug fixes
+=========
+
+* Fix OOI Add/Edit form
+* Fix version handling when no version is present.
+* Fix aggregate plugin overview table
+* Fix task api status code response for malformed id in the scheduler
+* Fix select all OOIs
+* Fix openssl boefje being stuck on port 80
+* Fix pdf alignment
+* Fix critical vulnerability counter
+* Fix in System Specific Reports
+* fix schema errors on empty / missing schemas
+* Fix improve error handling
+* Fix missing cipher csv in Debian package
+* Fix Update nuclei
+* Fix and improve running boefjes/normalizer
+* Fix the KATalogus plugin API limit
+
+Upgrading
+=========
+
+It is no longer needed to seed the KATalogus database using `python -m boefjes.seed` on upgrades.
+This is because v1.16.0 phases out the `repository` database model in the KATalogus.
+The migration could potentially not be backward compatible for each install,
+So please read the following carefully before triggering an upgrade.
+
+Checking the KATalogus Migration
+================================
+If you are using OpenKAT as a regular user and never called APIs or tweaked the database manually,
+you can move forward with the normal instructions of upgrading :ref:`Debian packages<Upgrading Debian>`
+or upgrading :ref:`containers <Upgrading_Containers>`.
+
+If there is a chance you added entries to the seeded model,
+or you notice the KATalogus being down after the upgrade,
+please check your `katalogus` database to see if any records are returned for the following query:
+
+.. code-block:: sql
+
+  SELECT * from plugin_state join repository r on repository_pk = r.pk where r.id != 'LOCAL'
+
+If this raises an exception saying the `repository` table does not exist,
+the migration was applied successfully and this is not the issue.
+If this returns no records but the logs say:
+"Cannot perform migration: remove plugin_states that refer to nonlocal repositories first.",
+please contact us.
+
+If this returns one or more records, either delete these if these were not created intentionally,
+or contact us if you were in fact using a custom plugin repository.
+We will help migrating your setup towards the new custom built OCI image solution,
+after which the custom plugin repository is no longer needed.
+
+Alternatively, to check if there are repositories other than the 'LOCAL' repository,
+look at the result of the following KATalogus endpoint for your organisations:
+`/v1/organisations/{your_organisation_id}/repositories`.
+Then follow the steps above using the HTTP endpoints to delete the other entries if needed, or contact us.
+
+After these steps, again the normal instructions for upgrading :ref:`Debian packages<Upgrading Debian>`
+or upgrading :ref:`containers <Upgrading_Containers>` should be followed.
+
+Full Changelog
+==============
+
+The full changelog can be found on `Github
+<https://github.com/minvws/nl-kat-coordination/releases/tag/v1.16.0>`_.
