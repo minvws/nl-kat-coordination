@@ -50,7 +50,7 @@ class Server:
         self.schedulers: dict[str, schedulers.Scheduler] = s
         self.config: settings.Settings = settings.Settings()
 
-        self.api = fastapi.FastAPI()
+        self.api = fastapi.FastAPI(title="Scheduler (Mula) API")
 
         # Set up OpenTelemetry instrumentation
         if self.config.host_metrics is not None:
