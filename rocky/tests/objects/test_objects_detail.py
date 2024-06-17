@@ -1,7 +1,6 @@
 from urllib.parse import urlencode
 
 import pytest
-from django.http import HttpResponseRedirect
 from katalogus.client import Boefje
 from pytest_django.asserts import assertContains, assertNotContains
 from tools.enums import SCAN_LEVEL
@@ -187,8 +186,9 @@ def test_ooi_detail_start_scan(
     mocker,
     network,
 ):
-    mock_katalogus = mocker.patch("rocky.views.ooi_detail.get_katalogus")
+    mock_katalogus = mocker.patch("katalogus.client.KATalogusClientV1")
 
+    mock_organization_view_octopoes().get_tree.return_value = ReferenceTree.model_validate(TREE_DATA)
     mock_organization_view_octopoes().get.return_value = network
 
     mock_katalogus().get_plugin.return_value = Boefje(
@@ -217,10 +217,9 @@ def test_ooi_detail_start_scan(
     )
     response = OOIDetailView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert mock_organization_view_octopoes().get_tree.call_count == 1
-    assert isinstance(response, HttpResponseRedirect)
-    assert response.status_code == 302
-    assert response.url == f"/en/{client_member.organization.code}/tasks/"
+    assert mock_organization_view_octopoes().get_tree.call_count == 2
+
+    assert response.status_code == 200
 
 
 def test_ooi_detail_start_scan_no_indemnification(

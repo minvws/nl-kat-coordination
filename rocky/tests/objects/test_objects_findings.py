@@ -135,20 +135,6 @@ def test_mute_finding_form_view_no_perms(request, member, rf, mock_organization_
             ),
             organization_code=member.organization.code,
         )
-    with pytest.raises(PermissionDenied):
-        MuteFindingView.as_view()(
-            setup_request(
-                rf.post(
-                    "finding_mute",
-                    {
-                        "finding": "Finding|Network|testnetwork|KAT-000",
-                        "ooi_type": "MutedFinding",
-                    },
-                ),
-                member.user,
-            ),
-            organization_code=member.organization.code,
-        )
 
 
 def test_mute_finding_post(

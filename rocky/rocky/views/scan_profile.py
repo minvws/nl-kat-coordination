@@ -6,7 +6,6 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from tools.forms.ooi import SetClearanceLevelForm
-from tools.models import Indemnification
 from tools.view_helpers import Breadcrumb, get_mandatory_fields, get_ooi_url
 
 from octopoes.models import EmptyScanProfile, InheritedScanProfile
@@ -20,9 +19,6 @@ class ScanProfileDetailView(FormView, OOIDetailView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["mandatory_fields"] = get_mandatory_fields(self.request)
-        context["organization_indemnification"] = Indemnification.objects.filter(
-            organization=self.organization
-        ).exists()
         return context
 
     def get_initial(self):

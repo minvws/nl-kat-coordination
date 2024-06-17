@@ -38,7 +38,7 @@ class OOIDetailView(
 
     def set_clearance_level(self) -> None:
         if not self.indemnification_present:
-            self.indemnification_error()
+            return self.indemnification_error()
         else:
             clearance_level = int(self.request.POST.get("level"))
             self.can_raise_clearance_level(self.ooi, clearance_level)  # returns appropriate messages

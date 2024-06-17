@@ -96,7 +96,7 @@ def test_scan_profile_submit_no_indemnification(
     request = setup_request(
         rf.post(
             f"/en/{redteam_member.organization.code}/objects/scan-profile/?{query_string}",
-            data={"level": "L1"},
+            data={"level": "1", "action": "change_clearance_level"},
         ),
         redteam_member.user,
     )
@@ -105,7 +105,7 @@ def test_scan_profile_submit_no_indemnification(
     assert response.status_code == 200
     assertContains(
         response,
-        "Indemnification not present at organization " + redteam_member.organization.code,
+        "Indemnification not present at organization " + redteam_member.organization.name,
     )
 
 
