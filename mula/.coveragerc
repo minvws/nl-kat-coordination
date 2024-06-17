@@ -1,5 +1,5 @@
-[run]
-data_file = /tmp/.coverage
+#[run]
+#data_file = /tmp/.coverage
 
-[xml]
-output = /tmp/coverage.xml
+#[xml]
+#output = /tmp/coverage.xml
