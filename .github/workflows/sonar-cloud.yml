@@ -16,8 +16,8 @@ jobs:
 
   octopoes-tests:
     uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
-  bytes-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
+  # bytes-tests:
+  #   uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
   mula-tests:
     uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
 

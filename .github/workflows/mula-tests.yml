@@ -9,10 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install requirements
-        run: pip install -r requirements-dev.txt
-        working-directory: octopoes/
-
       - name: Run unit tests
         run: make utest
         working-directory: mula/
