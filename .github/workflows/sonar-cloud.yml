@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     # needs: pre-commit-run
     needs:
-      - octopoes-tests
+      # - octopoes-tests
      # - bytes-tests
       - mula-tests
 
