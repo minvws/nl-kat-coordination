@@ -5,7 +5,7 @@ from ipaddress import IPv4Address, ip_address
 from unittest.mock import Mock
 
 import pytest
-from bits.runner import BitRunner
+from bits.cache import BitCache
 
 from octopoes.config.settings import Settings
 from octopoes.connector.octopoes import OctopoesAPIConnector
@@ -208,8 +208,8 @@ def octopoes_service() -> OctopoesService:
 
 
 @pytest.fixture
-def bit_runner(mocker) -> BitRunner:
-    return mocker.patch("octopoes.core.service.BitRunner")
+def bit_cache(mocker) -> BitCache:
+    return mocker.patch("octopoes.core.service.BIT_CACHE")
 
 
 @pytest.fixture

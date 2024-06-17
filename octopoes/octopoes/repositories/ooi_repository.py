@@ -97,7 +97,7 @@ class OOIRepository(Repository):
     ) -> Paginated[OOI]:
         raise NotImplementedError
 
-    def faster_list_oois(
+    def list_oois_by_object_types(
         self,
         types: set[type[OOI]],
         valid_time: datetime,
@@ -340,7 +340,7 @@ class XTDBOOIRepository(OOIRepository):
             items=oois,
         )
 
-    def faster_list_oois(
+    def list_oois_by_object_types(
         self,
         types: set[type[OOI]],
         valid_time: datetime,

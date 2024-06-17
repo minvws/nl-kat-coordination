@@ -104,7 +104,7 @@ def test_on_update_origin(octopoes_service, valid_time):
 
 @pytest.mark.parametrize("new_data", [EmptyScanProfile(reference="test_reference"), None])
 @pytest.mark.parametrize("old_data", [EmptyScanProfile(reference="test_reference"), None])
-def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner: MagicMock):
+def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_cache: MagicMock):
     octopoes_service.origin_repository.list_origins.return_value = [
         Origin(
             origin_type=OriginType.INFERENCE,
@@ -118,7 +118,7 @@ def test_on_create_scan_profile(octopoes_service, new_data, old_data, bit_runner
     octopoes_service.ooi_repository.load_bulk.return_value = {}
 
     mock_oois = [Mock(reference="test1"), Mock(reference="test2")]
-    bit_runner().run.return_value = mock_oois
+    bit_cache.get_bit.return_value = mock_oois
 
     valid_time = datetime(2023, 1, 1)
     event = ScanProfileDBEvent(
