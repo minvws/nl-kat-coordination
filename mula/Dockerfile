@@ -3,8 +3,8 @@ FROM python:$PYTHON_VERSION-bookworm AS dev
 
 EXPOSE 8000
 
-ARG USER_UID=1000
-ARG USER_GID=1000
+ARG USER_UID=1001
+ARG USER_GID=1001
 
 ENTRYPOINT ["/app/scheduler/entrypoint.sh"]
 
