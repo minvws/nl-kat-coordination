@@ -9,14 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-          cache: "pip" # caching pip dependencies
-
       - name: Run unit tests
-        run: make utest build_args='--build-arg PYTHON_VERSION=${{ matrix.version }}'
+        run: make utest build_args='--build-arg PYTHON_VERSION=3.10'
         working-directory: bytes/
 
       - name: Upload coverage as artifact
