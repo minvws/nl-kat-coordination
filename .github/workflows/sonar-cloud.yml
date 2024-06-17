@@ -45,6 +45,12 @@ jobs:
       - name: Override coverage Source Path for Sonar
         run: sed -i 's/home\/runner\/work\/nl-kat-coordination\/nl-kat-coordination/github\/workspace/' *-coverage-unit/coverage.xml
 
+      - name: test
+        run: sed -i 's|<source></source>|<source>/github/workspace</source>|g' mula-coverage-unit/coverage.xml
+
+      - name: print test
+        run: cat mula-coverage-unit/coverage.xml
+
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:

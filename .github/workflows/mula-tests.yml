@@ -10,7 +10,8 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run unit tests
-        run: make -C mula/ utest
+        run: make utest
+        working-directory: mula/
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
