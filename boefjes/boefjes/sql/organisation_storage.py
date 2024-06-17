@@ -3,11 +3,10 @@ import logging
 from sqlalchemy.orm import Session
 
 from boefjes.config import Settings, settings
-from boefjes.katalogus.models import Organisation, Repository
+from boefjes.katalogus.models import Organisation
 from boefjes.katalogus.storage.interfaces import OrganisationNotFound, OrganisationStorage
 from boefjes.sql.db import ObjectNotFoundException
-from boefjes.sql.db_models import OrganisationInDB, RepositoryInDB
-from boefjes.sql.repository_storage import SQLRepositoryStorage
+from boefjes.sql.db_models import OrganisationInDB
 from boefjes.sql.session import SessionMixin
 
 logger = logging.getLogger(__name__)
@@ -35,22 +34,6 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
         organisation_in_db = self.to_organisation_in_db(organisation)
         self.session.add(organisation_in_db)
 
-    def add_repository(self, organisation_id: str, repository_id: str) -> None:
-        logger.info(
-            "Adding repository to organisation: %s -> %s",
-            organisation_id,
-            repository_id,
-        )
-
-        organisation_in_db = self._db_instance_by_id(organisation_id)
-        repo_in_db = self._db_repo_instance_by_id(repository_id)
-        organisation_in_db.repositories.append(repo_in_db)
-
-    def get_repositories(self, organisation_id: str) -> list[Repository]:
-        instance = self._db_instance_by_id(organisation_id)
-
-        return [SQLRepositoryStorage.to_repository(repo) for repo in instance.repositories]
-
     def delete_by_id(self, organisation_id: str) -> None:
         instance = self._db_instance_by_id(organisation_id)
 
@@ -63,14 +46,6 @@ class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
             raise OrganisationNotFound(organisation_id) from ObjectNotFoundException(
                 OrganisationInDB, id=organisation_id
             )
-
-        return instance
-
-    def _db_repo_instance_by_id(self, repository_id: str) -> RepositoryInDB:
-        instance = self.session.query(RepositoryInDB).filter(RepositoryInDB.id == repository_id).first()
-
-        if instance is None:
-            raise ObjectNotFoundException(RepositoryInDB, repository_id=repository_id)
 
         return instance
 

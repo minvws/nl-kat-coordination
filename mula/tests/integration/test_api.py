@@ -75,6 +75,10 @@ class APITestCase(APITemplateTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get("id"), self.scheduler.scheduler_id)
 
+    def test_get_scheduler_malformed_id(self):
+        response = self.client.get("/schedulers/123.123")
+        self.assertEqual(response.status_code, 404)
+
     def test_patch_scheduler(self):
         self.assertTrue(self.scheduler.is_enabled())
         response = self.client.patch(
@@ -145,6 +149,10 @@ class APITestCase(APITemplateTestCase):
         response = self.client.get(f"/queues/{self.scheduler.scheduler_id}")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get("id"), self.scheduler.scheduler_id)
+
+    def test_get_queue_malformed_id(self):
+        response = self.client.get("/queues/123.123")
+        self.assertEqual(response.status_code, 404)
 
     def test_push_queue(self):
         self.assertEqual(0, self.scheduler.queue.qsize())
@@ -615,6 +623,16 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response_get.status_code, 200)
         self.assertEqual(initial_item_id, response_get.json().get("id"))
 
+    def test_get_task_malformed_id(self):
+        response = self.client.get("/tasks/123.123")
+        self.assertEqual(422, response.status_code)
+        self.assertIn("Input should be a valid UUID", str(response.content))
+
+    def test_get_task_not_found(self):
+        response = self.client.get(f"/tasks/{uuid.uuid4()}")
+        self.assertEqual(404, response.status_code)
+        self.assertEqual("task not found", response.json().get("detail"))
+
     def test_get_tasks_min_and_max_created_at(self):
         # Get tasks based on datetime, both min_created_at and max_created_at, should return 2 items
         params = {
@@ -768,8 +786,8 @@ class APITasksEndpointTestCase(APITemplateTestCase):
     def test_patch_task_malformed_id(self):
         # Patch a task with malformed id
         response = self.client.patch("/tasks/123.123", json={"status": "completed"})
-        self.assertEqual(400, response.status_code)
-        self.assertIn("failed to get task", response.json().get("detail"))
+        self.assertEqual(422, response.status_code)
+        self.assertIn("Input should be a valid UUID", str(response.content))
 
     def test_patch_task_invalid_status(self):
         # Patch a task with invalid status

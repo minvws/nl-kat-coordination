@@ -8,10 +8,15 @@ from pydantic import ValidationError
 
 from boefjes.config import Settings
 from boefjes.job_handler import NormalizerHandler
-from boefjes.job_models import NormalizerMeta, NormalizerScanProfile
+from boefjes.job_models import NormalizerMeta
 from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.local import LocalNormalizerJobRunner
+from octopoes.models import DeclaredScanProfile
 from tests.loading import get_dummy_data
+
+RAW_DATA = json.dumps(
+    {"ip_addresses": [{"address": "127.0.0.1"}, {"address": "10.0.0.0"}], "domains": [{"name": "example.com"}]}
+)
 
 
 class ScanProfileTest(TestCase):
@@ -19,41 +24,30 @@ class ScanProfileTest(TestCase):
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")
         runner = LocalNormalizerJobRunner(local_repository)
         meta = NormalizerMeta.model_validate_json(get_dummy_data("external_db.json"))
-
-        raw = json.dumps(
-            {
-                "ip_addresses": [{"ip_address": "127.0.0.1"}, {"ip_address": "10.0.0.0"}],
-                "domains": [{"domain": "example.com"}],
-            }
-        )
-        output = runner.run(meta, bytes(raw, "UTF-8"))
+        output = runner.run(meta, bytes(RAW_DATA, "UTF-8"))
 
         self.assertEqual(1, len(output.observations))
         self.assertEqual(3, len(output.observations[0].results))
         self.assertEqual(3, len(output.scan_profiles))
 
         profile = output.scan_profiles[0]
-        self.assertIsInstance(profile, NormalizerScanProfile)
+        self.assertIsInstance(profile, DeclaredScanProfile)
         self.assertEqual("IPAddressV4|internet|127.0.0.1", profile.reference)
         self.assertEqual(3, profile.level)
 
         profile = output.scan_profiles[1]
-        self.assertIsInstance(profile, NormalizerScanProfile)
+        self.assertIsInstance(profile, DeclaredScanProfile)
         self.assertEqual("IPAddressV4|internet|10.0.0.0", profile.reference)
         self.assertEqual(3, profile.level)
 
         profile = output.scan_profiles[2]
-        self.assertIsInstance(profile, NormalizerScanProfile)
+        self.assertIsInstance(profile, DeclaredScanProfile)
         self.assertEqual("Hostname|internet|example.com", profile.reference)
         self.assertEqual(3, profile.level)
 
     def test_job_handler_respects_whitelist(self):
-        raw = {
-            "ip_addresses": [{"ip_address": "127.0.0.1"}, {"ip_address": "10.0.0.0"}],
-            "domains": [{"domain": "example.com"}],
-        }
         bytes_mock = mock.Mock()
-        bytes_mock.get_raw.return_value = json.dumps(raw)
+        bytes_mock.get_raw.return_value = RAW_DATA
         octopoes = mock.Mock()
 
         local_repository = LocalPluginRepository(Path(__file__).parent.parent / "boefjes" / "plugins")

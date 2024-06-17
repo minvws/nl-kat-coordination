@@ -41,24 +41,9 @@ Now you can pull and start the containers using the following command:
 docker compose --env-file .env-prod -f docker-compose.release-example.yml up -d
 ```
 
-
 The container image run the necessary database migration commands in the
 entrypoint if DATABASE_MIGRATION is set. You manually need to run setup commands
-in the katalogus and rocky containers to initialize everything. In the katalogus
-container we need to create an organisation, we can do this by running the
-following in the katalogus container:
-
-```shell
-python3 -m boefjes.seed
-```
-
-With docker compose you would run this as:
-
-```shell
-docker compose --env-file .env-prod -f docker-compose.release-example.yml exec katalogus python3 -m boefjes.seed
-```
-
-In the rocky container we first need to import the OOI database seed:
+in the rocky container to initialize everything. In the rocky container we first need to import the OOI database seed:
 
 ```shell
 python3 manage.py loaddata OOI_database_seed.json
@@ -82,7 +67,6 @@ With docker compose you would run this as:
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py createsuperuser
 ```
 
-
 We also need to create an organisation, this command will create a development organisation:
 
 ```shell
@@ -95,12 +79,31 @@ With docker compose you would run this as:
 docker compose --env-file .env-prod -f docker-compose.release-example.yml exec rocky python3 manage.py setup_dev_account
 ```
 
+## IPv6 support
+
+In order to perform scans against IPv6 addresses you need to manually enable IPv6 support in Dockerized setups. Add the following snippet to the file `/etc/docker/daemon.json`. If this file doesn't exist yet, you can create it and save it with the following configuration:
+
+```
+{
+  "experimental": true,
+  "ip6tables": true
+}
+```
+
+Restart the Docker daemon for your changes to take effect.
+
+```
+$ sudo systemctl restart docker
+```
+
+By default OpenKAT has an IPv6 subnet configured. This configuration (step 4 and onwards from the official Docker documentation as listed below) can be found in the `docker-compose.yml` file. For more information on IPv6 support within Docker look at the [Docker documentation](https://docs.docker.com/config/daemon/ipv6/).
+
 ## Container commands
 
 We have two container images that are used to run multiple containers. What the container runs is be specified by overriding the CMD of the container.
 
 | Container image | CMD         | Description                                                                       |
-|-----------------|-------------|-----------------------------------------------------------------------------------|
+| --------------- | ----------- | --------------------------------------------------------------------------------- |
 | boefjes         | boefje      | Boefjes runtime                                                                   |
 | boefjes         | normalizer  | Normalizers runtime                                                               |
 | boefjes         | katalogus   | Katalogus API                                                                     |
@@ -109,6 +112,7 @@ We have two container images that are used to run multiple containers. What the 
 | octopoes        | worker      | Celery worker. Use this if you need to more than one work container for scaling   |
 
 (Upgrading_Containers)=
+
 ## Upgrading
 
 When deploying new container images the database migrations are automatically

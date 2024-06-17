@@ -21,24 +21,20 @@ the normalizers.
 
 See the openAPI reference at http://localhost:8003/docs.
 The KATalogus has CRUD endpoints for several objects such as:
+
 - `Organisation`
-- `Repository`
 - `Plugin`
 - `Setting`
 
 ### Organisations
+
 Supported HTTP methods (for CRUD): `POST`, `GET`, `DELETE`.
 Includes an endpoint that lists all objects.
 All subsequent objects in the API are namespaced on the `organisation_id`.
 
-### Repositories
-Supported HTTP methods (for CRUD): `POST`, `GET`, `DELETE`.
-Includes an endpoint that lists all objects.
-
 ### Plugins
-Supported HTTP methods (for CRUD): `GET`, `PATCH`.
-Note: there are endpoints namespaced on the `repository_id` included.
 
+Supported HTTP methods (for CRUD): `GET`, `PATCH`.
 
 ### Settings
 
@@ -53,6 +49,7 @@ This could be changed in the future when the boefje-runner/plugin-code can decry
 although this would be more complicated.
 
 ## Environment variables
+
 By design, Boefjes do not have access to the host system's environment variables.
 If a Boefje requires access to an environment variable (e.g. `HTTP_PROXY` or `USER_AGENT`), it should note as such in its `boefje.json` manifest.
 The system-wide variables can be set as environment variable to the boefjes runner by prefixing it with `BOEFJE_`.
@@ -134,6 +131,7 @@ end
 ```
 
 #### Sending a SIGKILL to a worker process
+
 A representation of the failure mode when a SIGKILL has been sent to the worker (also see `boefjes/app.py`):
 
 ```{mermaid}
@@ -171,6 +169,7 @@ Note: the worker needs a running Bytes API and RabbitMQ. The service locations c
 ### Running the worker directly
 
 To start the worker process listening on the job queue, use the `python -m boefjes` module.
+
 ```bash
 $ python -m boefjes --help
 Usage: python -m boefjes [OPTIONS] {boefje|normalizer}
@@ -189,6 +188,7 @@ So to start either a `boefje` worker or `normalizer` worker, run:
 Again, service locations can be specified with environment variables.
 
 ### Example job
+
 The job file for a DNS scan might look like this:
 
 ```json
@@ -247,7 +247,6 @@ $ docker compose exec boefje ./tools/show_raw.py --json 794986d7-cf39-4a2c-8bdf-
 $ docker compose exec boefje ./tools/run_normalizer.py kat_dns_normalize 794986d7-cf39-4a2c-8bdf-17ae58f361ea
 ```
 
-
 ### Boefje and normalizer structure
 
 Each boefje and normalizer module is placed in `boefjes/<module>`. A module's main script is usually called `main.py`,
@@ -280,11 +279,13 @@ $ python -m pytest
 ```
 
 For the KATalogus integration tests, run:
+
 ```shell
 $ make itest
 ```
 
 To lint the code using pre-commit, run:
+
 ```shell
 $ pre-commit run --all-files
 ```

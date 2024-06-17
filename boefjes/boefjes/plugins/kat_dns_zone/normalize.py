@@ -1,17 +1,15 @@
 from collections.abc import Iterable
 
 from dns.message import Message, from_text
-from dns.rdata import Rdata
 from dns.rdtypes.ANY.SOA import SOA
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerOutput
 from octopoes.models.ooi.dns.records import DNSSOARecord
 from octopoes.models.ooi.dns.zone import DNSZone, Hostname
 from octopoes.models.ooi.network import Network
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     internet = Network(name="internet")
 
     # parse raw data into dns.message.Message
@@ -21,15 +19,13 @@ def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
 
     input_zone_hostname = Hostname(
         network=internet.reference,
-        name=normalizer_meta.raw_data.boefje_meta.arguments["input"]["hostname"]["name"],
+        name=input_ooi["hostname"]["name"],
     )
 
     input_zone = DNSZone(hostname=input_zone_hostname.reference)
 
     for rrset in message.answer:
         for rr in rrset:
-            rr: Rdata
-
             if isinstance(rr, SOA):
                 parent_zone_hostname = Hostname(network=internet.reference, name=str(rrset.name).rstrip("."))
                 parent_zone = DNSZone(hostname=parent_zone_hostname.reference)
