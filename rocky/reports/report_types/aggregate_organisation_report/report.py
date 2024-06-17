@@ -42,7 +42,7 @@ class AggregateOrganisationReport(AggregateReport):
     }
     template_path = "aggregate_organisation_report/report.html"
 
-    def post_process_data(self, data: dict[str, Any], valid_time, organization_code: str) -> dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any], valid_time: datetime, organization_code: str) -> dict[str, Any]:
         systems: dict[str, dict[str, Any]] = {"services": {}}
         services = {}
         open_ports = {}
