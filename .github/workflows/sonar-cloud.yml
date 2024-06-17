@@ -18,7 +18,9 @@ jobs:
     uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
   bytes-tests:
     uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
-  
+  mula-tests:
+    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
+
     # todo: bytes, rocky, mula, keiko, boefjes
 
   sonar-cloud:
@@ -26,7 +28,8 @@ jobs:
     # needs: pre-commit-run
     needs:
       - octopoes-tests
-      - bytes-tests
+     # - bytes-tests
+      - mula-tests
 
     steps:
       - name: Checkout repository

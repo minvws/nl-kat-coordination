@@ -1,0 +1,24 @@
+name: Mula Tests
+
+on:
+  workflow_call:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install requirements
+        run: pip install -r requirements-dev.txt
+        working-directory: octopoes/
+
+      - name: Run unit tests
+        run: make utest
+        working-directory: mula/
+
+      - name: Upload coverage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mula-coverage-unit
+          path: coverage.xml
