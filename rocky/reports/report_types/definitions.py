@@ -146,7 +146,7 @@ class AggregateReportSubReports(TypedDict):
 class AggregateReport(BaseReport):
     reports: AggregateReportSubReports
 
-    def post_process_data(self, data: dict[str, Any], valid_time: datetime) -> dict[str, Any]:
+    def post_process_data(self, data: dict[str, Any], valid_time: datetime, organization_code: str) -> dict[str, Any]:
         raise NotImplementedError
 
 
