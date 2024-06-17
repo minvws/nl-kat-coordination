@@ -14,8 +14,8 @@ jobs:
   # pre-commit-run:
   #   uses: minvws/nl-kat-coordination/.github/workflows/pre_commit_checks.yml@feature/sonar-cloud
 
-  octopoes-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
+  # octopoes-tests:
+  #   uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
   # bytes-tests:
   #   uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
   mula-tests:
