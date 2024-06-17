@@ -4,8 +4,8 @@ import unittest
 from unittest import mock
 
 import pika
-
 from scheduler import connectors, utils
+
 from tests.mocks import listener
 
 
@@ -17,13 +17,13 @@ class RabbitMQTestCase(unittest.TestCase):
         threading.excepthook = self.unhandled_exception
 
     def tearDown(self):
-        for l in self.listeners:
-            l.stop()
+        for lst in self.listeners:
+            lst.stop()
 
     def unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
         """An unhandled exception hook for threading."""
-        for l in self.listeners:
-            l.stop()
+        for lst in self.listeners:
+            lst.stop()
 
     def test_shutdown(self):
         """Test that the listener stops when the stop method is called."""

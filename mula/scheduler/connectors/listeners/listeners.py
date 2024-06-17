@@ -1,6 +1,5 @@
 import functools
 import socket
-import threading
 from collections.abc import Callable
 from concurrent import futures
 
@@ -207,9 +206,7 @@ class RabbitMQ(Listener):
         self.func(body)
 
         # Acknowledge the message
-        self.connection.add_callback_threadsafe(
-            functools.partial(self.ack_message, channel, delivery_tag)
-        )
+        self.connection.add_callback_threadsafe(functools.partial(self.ack_message, channel, delivery_tag))
 
     def ack_message(self, channel, delivery_tag):
         if channel.is_open:
