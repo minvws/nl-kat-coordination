@@ -17,4 +17,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mula-coverage-unit
-          path: **/coverage.xml
+          path: "**/coverage.xml"
