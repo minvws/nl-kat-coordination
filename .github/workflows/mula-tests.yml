@@ -12,9 +12,12 @@ jobs:
       - name: Run unit tests
         run: make utest
         working-directory: mula/
+        env:
+          USER_UID: 1001
+          USER_GID: 1001
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: mula-coverage-unit
-          path: /tmp/coverage.xml
+          path: coverage.xml
