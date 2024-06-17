@@ -16,11 +16,17 @@ jobs:
 
   octopoes-tests:
     uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
+  bytes-tests:
+    uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
+  
+    # todo: bytes, rocky, mula, keiko, boefjes
 
   sonar-cloud:
     runs-on: ubuntu-latest
     # needs: pre-commit-run
-    needs: octopoes-tests
+    needs:
+      - octopoes-tests
+      - bytes-tests
 
     steps:
       - name: Checkout repository
@@ -40,5 +46,3 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        # with:
-        #   projectBaseDir: ${{ github.workspace }}/octopoes

@@ -1,4 +1,4 @@
-name: Octopoes Tests
+name: Bytes Tests
 
 on:
   workflow_call:
@@ -15,15 +15,12 @@ jobs:
           python-version: "3.10"
           cache: "pip" # caching pip dependencies
 
-      - name: Install requirements
-        run: pip install -r requirements-dev.txt
-        working-directory: octopoes/
-
       - name: Run unit tests
-        run: pytest --cov octopoes/ octopoes/tests/
+        run: make utest build_args='--build-arg PYTHON_VERSION=${{ matrix.version }}'
+        working-directory: bytes/
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: octopoes-coverage-unit
+          name: bytes-coverage-unit
           path: coverage.xml
