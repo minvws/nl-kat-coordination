@@ -20,7 +20,7 @@ from .queue import PrioritizedItem
 from .raw_data import RawData
 
 
-class TaskStatus(enum.Enum):
+class TaskStatus(str, enum.Enum):
     # Task has been created but not yet queued
     PENDING = "pending"
 
@@ -45,7 +45,7 @@ class TaskStatus(enum.Enum):
 
 
 class Task(BaseModel):
-    model_config = ConfigDict(from_attributes=True, use_enum_values=True)
+    model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
 

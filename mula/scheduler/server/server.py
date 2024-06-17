@@ -447,12 +447,15 @@ class Server:
 
         return models.Task(**task.model_dump())
 
+    # NOTE: request.Task instead of models.Task is needed for patch endpoints
+    # to allow for partial updates.
     def patch_task(self, task_id: uuid.UUID, item: request.Task) -> Any:
-        if len(item) == 0:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
+        # TODO
+        # if len(item) == 0:
+        #     raise fastapi.HTTPException(
+        #         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
+        #         detail="no data to patch",
+        #     )
 
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
@@ -481,7 +484,6 @@ class Server:
                 detail="no data to patch",
             )
 
-        breakpoint()
         try:
             updated_task = task_db.model_copy(update=patch_data)
         except Exception as exc:

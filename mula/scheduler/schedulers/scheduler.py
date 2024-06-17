@@ -105,7 +105,6 @@ class Scheduler(abc.ABC):
             modified_at=datetime.now(timezone.utc),
         )
 
-        breakpoint()
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:
             self.ctx.datastores.task_store.update_task(task)

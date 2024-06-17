@@ -130,12 +130,11 @@ class TaskStore:
     @retry()
     @exception_handler
     def update_task(self, task: models.Task) -> None:
-        breakpoint()
         with self.dbconn.session.begin() as session:
             (
                 session.query(models.TaskDB)
                 .filter(models.TaskDB.id == task.id)
-                .update(task.model_dump())
+                .update(task.model_dump(mode="json"))
             )
 
     @retry()

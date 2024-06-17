@@ -757,7 +757,7 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()["results"]))
 
-    def test_patch_task__(self):
+    def test_patch_task(self):
         # Patch a task
         self.assertEqual(
             models.TaskStatus.QUEUED.value, self.first_item_api.get("status")
@@ -765,7 +765,6 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         response = self.client.patch(
             f"/tasks/{self.first_item_api.get('id')}", json={"status": "completed"}
         )
-        breakpoint()
         self.assertEqual(200, response.status_code)
         self.assertEqual("completed", response.json().get("status"))
 
