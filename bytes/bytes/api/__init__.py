@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 logging.config.fileConfig(get_settings().log_cfg, disable_existing_loggers=False)
 
-app = FastAPI()
+app = FastAPI(title="Bytes API")
 
 if get_settings().span_export_grpc_endpoint is not None:
     logger.info("Setting up instrumentation with span exporter endpoint [%s]", get_settings().span_export_grpc_endpoint)

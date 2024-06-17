@@ -383,7 +383,7 @@ $ ./xtdb-cli.py -n MyOrganisationName attribute-stats |jq .
 
 ## OOI
 
-OOI objects are instances of relatively simple classes, which inherit from `OOIBase`.
+OOI objects are instances of relatively simple classes, which inherit from `OOI`.
 
 Because all OOIs are stored in XTDB and XTDB tracks object history by primary key, KAT defines a way to reliably determine the primary key of an object by its attributes. This is called the [natural key](https://en.wikipedia.org/wiki/Natural_key) of an object.
 
@@ -608,13 +608,13 @@ $ docker compose exec octopoes_api ./tools/run_bit.py ORGANIZATION_CODE BIT_ID O
 Example usage:
 
 ```shell
-$ docker compose exec octopoes_api ./tools/run_bit.py ORGANIZATION_CODE BIT_ID OOI
+$ docker compose exec octopoes_api ./tools/run_bit.py comp dns-resolving "DNSARecord|internet|mispo.es|314.15.926.53."
 ```
 
 ## Tests
 
 The unit tests `octopoes/tests` are run using
 
-```bash
+```shell
 python -m unittest discover octopoes/tests
 ```
