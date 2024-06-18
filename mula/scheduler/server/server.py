@@ -66,9 +66,7 @@ class Server:
 
             resource = Resource(attributes={SERVICE_NAME: "mula"})
             provider = TracerProvider(resource=resource)
-            processor = BatchSpanProcessor(
-                OTLPSpanExporter(endpoint=str(self.config.host_metrics))
-            )
+            processor = BatchSpanProcessor(OTLPSpanExporter(endpoint=str(self.config.host_metrics)))
             provider.add_span_processor(processor)
             trace.set_tracer_provider(provider)
 
@@ -301,9 +299,7 @@ class Server:
         plugin_id: str | None = None,  # FIXME: deprecated
         filters: storage.filters.FilterRequest | None = None,
     ) -> Any:
-        if (
-            min_created_at is not None and max_created_at is not None
-        ) and min_created_at > max_created_at:
+        if (min_created_at is not None and max_created_at is not None) and min_created_at > max_created_at:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
                 detail="min_date must be less than max_date",
@@ -450,13 +446,6 @@ class Server:
     # NOTE: request.Task instead of models.Task is needed for patch endpoints
     # to allow for partial updates.
     def patch_task(self, task_id: uuid.UUID, item: request.Task) -> Any:
-        # TODO
-        # if len(item) == 0:
-        #     raise fastapi.HTTPException(
-        #         status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-        #         detail="no data to patch",
-        #     )
-
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
         except storage.errors.StorageError as exc:
@@ -505,13 +494,9 @@ class Server:
 
         return updated_task
 
-    def get_task_stats(
-        self, scheduler_id: str | None = None
-    ) -> dict[str, dict[str, int]] | None:
+    def get_task_stats(self, scheduler_id: str | None = None) -> dict[str, dict[str, int]] | None:
         try:
-            stats = self.ctx.datastores.task_store.get_status_count_per_hour(
-                scheduler_id
-            )
+            stats = self.ctx.datastores.task_store.get_status_count_per_hour(scheduler_id)
         except Exception as exc:
             self.logger.exception(exc)
             self.logger.exception(exc)
@@ -523,10 +508,7 @@ class Server:
         return stats
 
     def get_queues(self) -> Any:
-        return [
-            models.Queue(**s.queue.dict(include_pq=False))
-            for s in self.schedulers.copy().values()
-        ]
+        return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
     def get_queue(self, queue_id: str) -> Any:
         s = self.schedulers.get(queue_id)
@@ -545,9 +527,7 @@ class Server:
 
         return models.Queue(**q.dict())
 
-    def pop_queue(
-        self, queue_id: str, filters: storage.filters.FilterRequest | None = None
-    ) -> Any:
+    def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(

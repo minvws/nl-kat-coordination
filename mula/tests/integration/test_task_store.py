@@ -7,6 +7,7 @@ from unittest import mock
 
 from scheduler import config, models, storage
 from scheduler.storage import filters
+
 from tests.factories import OrganisationFactory
 from tests.utils import functions
 
@@ -25,9 +26,7 @@ class TaskStoreTestCase(unittest.TestCase):
         self.mock_ctx.datastores = SimpleNamespace(
             **{
                 storage.TaskStore.name: storage.TaskStore(self.dbconn),
-                storage.PriorityQueueStore.name: storage.PriorityQueueStore(
-                    self.dbconn
-                ),
+                storage.PriorityQueueStore.name: storage.PriorityQueueStore(self.dbconn),
             }
         )
 
