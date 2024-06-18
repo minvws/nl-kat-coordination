@@ -23,16 +23,16 @@ jobs:
 
     # todo: bytes, rocky, mula, keiko, boefjes
 
-  find-coverage-reports:
-    runs-on: ubuntu-latest
+  # find-coverage-reports:
+  #   runs-on: ubuntu-latest
 
-    needs: mula-tests
+  #   needs: mula-tests
 
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          pattern: "*-coverage-unit"
+  #   steps:
+  #     - name: Download artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: "*-coverage-unit"
 
       # - name: Get coverage files
       #   run: find . -name coverage.xml -exec dirname {} \; | xargs basename | xargs  | jq -R -c 'split(" ")'
@@ -44,20 +44,25 @@ jobs:
   fix-coverage-reports:
     runs-on: ubuntu-latest
 
-    needs: find-coverage-reports
+    # needs: find-coverage-reports
 
     strategy:
       matrix:
         module: ["mula"]
 
     steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.module }}-coverage-unit
+
       - name: Fix coverage reports
         uses: Mudlet/xmlstarlet-action@master
         with:
-          args: ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}" "${{ github.workspace }}/${{ matrix.module }}-coverage-unit/coverage.xml"
+          args: ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}" "${{ matrix.module }}-coverage-unit/coverage.xml"
     
       - name: Print
-        run: cat "${{ github.workspace }}/${{ matrix.module }}-coverage-unit/coverage.xml"
+        run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
 
   sonar-cloud:
     runs-on: ubuntu-latest
