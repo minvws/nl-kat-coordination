@@ -90,11 +90,11 @@ jobs:
 
       # workaround for https://sonarsource.atlassian.net/browse/SONARPY-1203
       # and https://community.sonarsource.com/t/sonar-on-github-actions-with-python-coverage-source-issue/36057
-      - name: Override coverage Source Path for Sonar
-        run: sed -i 's/home\/runner\/work\/nl-kat-coordination\/nl-kat-coordination/github\/workspace/' *-coverage-unit/coverage.xml
+      # - name: Override coverage Source Path for Sonar
+      #   run: sed -i 's/home\/runner\/work\/nl-kat-coordination\/nl-kat-coordination/github\/workspace/' *-coverage-unit/coverage.xml
 
-      - name: test
-        run: sed -i 's|<source></source>|<source>/github/workspace/mula</source>|g' mula-coverage-unit/coverage.xml
+      # - name: test
+      #   run: sed -i 's|<source></source>|<source>/github/workspace/mula</source>|g' mula-coverage-unit/coverage.xml
 
       # todo: create a job matrix for fixing all the coverage.xml file sources
       # todo: https://github.com/Mudlet/xmlstarlet-action
