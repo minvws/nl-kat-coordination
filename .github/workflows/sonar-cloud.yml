@@ -77,7 +77,8 @@ jobs:
     needs:
       # - octopoes-tests
      # - bytes-tests
-      - mula-tests
+      # - mula-tests
+      - fix-coverage-reports
 
     steps:
       - name: Checkout repository
