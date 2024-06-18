@@ -38,7 +38,9 @@ class TaskStore:
                 query = query.filter(models.TaskDB.type == task_type)
 
             if status is not None:
-                query = query.filter(models.TaskDB.status == models.TaskStatus(status).name)
+                query = query.filter(
+                    models.TaskDB.status == models.TaskStatus(status).name
+                )
 
             if min_created_at is not None:
                 query = query.filter(models.TaskDB.created_at >= min_created_at)
@@ -51,7 +53,12 @@ class TaskStore:
 
             try:
                 count = query.count()
-                tasks_orm = query.order_by(models.TaskDB.created_at.desc()).offset(offset).limit(limit).all()
+                tasks_orm = (
+                    query.order_by(models.TaskDB.created_at.desc())
+                    .offset(offset)
+                    .limit(limit)
+                    .all()
+                )
             except exc.ProgrammingError as e:
                 raise StorageError(f"Invalid filter: {e}") from e
 
@@ -63,7 +70,9 @@ class TaskStore:
     @exception_handler
     def get_task_by_id(self, task_id: str) -> models.Task | None:
         with self.dbconn.session.begin() as session:
-            task_orm = session.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
+            task_orm = (
+                session.query(models.TaskDB).filter(models.TaskDB.id == task_id).first()
+            )
             if task_orm is None:
                 return None
 
@@ -122,7 +131,13 @@ class TaskStore:
     @exception_handler
     def update_task(self, task: models.Task) -> None:
         with self.dbconn.session.begin() as session:
-            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump(mode="json")))
+            # NOTE: mode="json" is used specifically to convert the Enum to as_string
+            # sqlalchemy does not allow raw enums to be used in update
+            (
+                session.query(models.TaskDB)
+                .filter(models.TaskDB.id == task.id)
+                .update(task.model_dump(mode="json"))
+            )
 
     @retry()
     @exception_handler
@@ -147,7 +162,8 @@ class TaskStore:
                     func.count(models.TaskDB.id).label("count"),
                 )
                 .filter(
-                    models.TaskDB.modified_at >= datetime.now(timezone.utc) - timedelta(hours=24),
+                    models.TaskDB.modified_at
+                    >= datetime.now(timezone.utc) - timedelta(hours=24),
                 )
                 .group_by("hour", models.TaskDB.status)
                 .order_by("hour", models.TaskDB.status)
@@ -161,19 +177,25 @@ class TaskStore:
             response: dict[str, dict[str, int]] = {}
             for row in results:
                 date, status, task_count = row
-                response.setdefault(date.isoformat(), {k.value: 0 for k in models.TaskStatus}).update(
-                    {status.value: task_count}
+                response.setdefault(
+                    date.isoformat(), {k.value: 0 for k in models.TaskStatus}
+                ).update({status.value: task_count})
+                response[date.isoformat()].update(
+                    {"total": response[date.isoformat()].get("total", 0) + task_count}
                 )
-                response[date.isoformat()].update({"total": response[date.isoformat()].get("total", 0) + task_count})
 
             return response
 
     @retry()
     @exception_handler
-    def get_status_counts(self, scheduler_id: str | None = None) -> dict[str, int] | None:
+    def get_status_counts(
+        self, scheduler_id: str | None = None
+    ) -> dict[str, int] | None:
         with self.dbconn.session.begin() as session:
             query = (
-                session.query(models.TaskDB.status, func.count(models.TaskDB.id).label("count"))
+                session.query(
+                    models.TaskDB.status, func.count(models.TaskDB.id).label("count")
+                )
                 .group_by(models.TaskDB.status)
                 .order_by(models.TaskDB.status)
             )
