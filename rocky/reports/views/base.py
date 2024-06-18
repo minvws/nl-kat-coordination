@@ -24,12 +24,13 @@ from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
 
 from octopoes.models import OOI, Reference
+from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report
-from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
+from reports.report_types.helpers import REPORTS, get_plugins_for_report_ids, get_report_by_id
 from reports.utils import JSONEncoder, debug_json_keys
 from rocky.views.mixins import ObservedAtMixin, OOIList
 from rocky.views.ooi_view import OOIFilterView
@@ -361,22 +362,12 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
         return report_ooi
 
-    def create_report_ooi(self, data: dict[str, Any], report_type, input_oois: list[OOI]) -> ReportOOI:
-        return self.save_report(
-            data=data,
-            report_type=report_type,
-            input_oois=[ooi.primary_key for ooi in input_oois],
-            parent=None,
-            has_parent=False,
-            observed_at=self.get_observed_at(),
-        )
-
     def get_observed_at(self):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
-    def generate_aggregate_report(
-        self, input_oois: list[OOI]
-    ) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any]]:
+    def save_aggregate_report(self) -> ReportOOI:
+        input_oois = self.get_oois()
+
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
             input_oois,
@@ -394,11 +385,102 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             }
             messages.add_message(self.request, messages.ERROR, error_message)
 
-        return (
-            aggregate_report,
-            post_processed_data,
-            report_data,
+        return self.save_report(
+            data=post_processed_data,
+            report_type=type(aggregate_report),
+            input_oois=[ooi.primary_key for ooi in input_oois],
+            parent=None,
+            has_parent=False,
+            observed_at=self.get_observed_at(),
         )
+
+    def save_generate_report(self) -> ReportOOI:
+        input_oois = self.get_oois_pk()
+        error_reports = []
+        report_data: dict[str, dict[str, dict[str, Any]]] = {}
+        by_type: dict[str, list[str]] = {}
+
+        number_of_reports = 0
+        for ooi in input_oois:
+            ooi_type = Reference.from_str(ooi).class_
+
+            if ooi_type not in by_type:
+                by_type[ooi_type] = []
+
+            by_type[ooi_type].append(ooi)
+
+        sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
+        for report_class in sorted_report_types:
+            oois = {
+                ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
+            }
+
+            try:
+                results = report_class(self.octopoes_api_connector).collect_data(oois, self.observed_at)
+            except ObjectNotFoundException:
+                error_reports.append(report_class.id)
+                continue
+            except TypeNotFound:
+                error_reports.append(report_class.id)
+                continue
+
+            for ooi, data in results.items():
+                if report_class.id not in report_data:
+                    report_data[report_class.id] = {}
+
+                report_data[report_class.id][ooi] = {
+                    "data": data,
+                    "template": report_class.template_path,
+                    "report_name": report_class.name,
+                }
+                number_of_reports += 1
+
+        observed_at = self.get_observed_at()
+
+        # if its not a single report, we need a parent
+        if number_of_reports > 1:
+            report_ooi = self.save_report(
+                data={},
+                report_type=ConcatenatedReport,
+                input_oois=[],
+                parent=None,
+                has_parent=False,
+                observed_at=observed_at,
+            )
+            for report_type, ooi_data in report_data.items():
+                for ooi, data in ooi_data.items():
+                    self.save_report(
+                        data=data["data"],
+                        report_type=get_report_by_id(report_type),
+                        input_oois=[ooi],
+                        parent=report_ooi.reference,
+                        has_parent=True,
+                        observed_at=observed_at,
+                    )
+        # if its a single report we can just save it as complete
+        else:
+            report_type = next(iter(report_data))
+            ooi = next(iter(report_data[report_type]))
+            data = report_data[report_type][ooi]
+            report_ooi = self.save_report(
+                data=data["data"],
+                report_type=get_report_by_id(report_type),
+                input_oois=[ooi],
+                parent=None,
+                has_parent=False,
+                observed_at=observed_at,
+            )
+        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
+        if error_reports:
+            report_types = ", ".join(set(error_reports))
+            date = self.observed_at.date()
+            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
+                "report_types": report_types,
+                "date": date,
+            }
+            messages.error(self.request, error_message)
+
+        return report_ooi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
