@@ -1,5 +1,5 @@
 {
-  "id": "adr-validator",
+  "id": "adr-validator-normalize",
   "consumes": [
     "boefje/adr-validator"
   ],
