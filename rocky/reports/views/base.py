@@ -26,6 +26,7 @@ from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
 from octopoes.models import OOI, Reference
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
@@ -359,6 +360,45 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         )
 
         return report_ooi
+
+    def create_report_ooi(self, data: dict[str, Any], report_type, input_oois: list[OOI]) -> ReportOOI:
+        return self.save_report(
+            data=data,
+            report_type=report_type,
+            input_oois=[ooi.primary_key for ooi in input_oois],
+            parent=None,
+            has_parent=False,
+            observed_at=self.get_observed_at(),
+        )
+
+    def get_observed_at(self):
+        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
+
+    def generate_aggregate_report(
+        self, input_oois: list[OOI]
+    ) -> tuple[AggregateOrganisationReport, dict[str, Any], dict[str, Any]]:
+        aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
+            self.octopoes_api_connector,
+            input_oois,
+            self.selected_report_types,
+            self.observed_at,
+        )
+
+        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
+        if report_errors:
+            report_types = ", ".join(set(report_errors))
+            date = self.observed_at.date()
+            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
+                "report_types": report_types,
+                "date": date,
+            }
+            messages.add_message(self.request, messages.ERROR, error_message)
+
+        return (
+            aggregate_report,
+            post_processed_data,
+            report_data,
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -1,6 +1,5 @@
 import logging
 from collections.abc import Sequence
-from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -11,13 +10,9 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
+from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport
 from reports.report_types.definitions import Report
-from reports.report_types.helpers import (
-    get_ooi_types_from_aggregate_report,
-    get_report_by_id,
-    get_report_types_from_aggregate_report,
-)
+from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     ReportBreadcrumbs,
@@ -153,7 +148,20 @@ class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggrega
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.report_has_required_plugins() or self.plugins_enabled():
-            return redirect(self.get_next())
+            input_oois = self.get_oois()
+
+            (
+                report,
+                post_processed_data,
+                _,
+            ) = self.generate_aggregate_report(input_oois)
+
+            report_ooi = self.create_report_ooi(post_processed_data, type(report), input_oois)
+            return redirect(
+                reverse("view_report", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + urlencode({"report_id": report_ooi.reference})
+            )
         if not self.plugins:
             return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)
@@ -176,53 +184,17 @@ class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
             )
 
         input_oois = self.get_oois()
-
-        aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
-            self.octopoes_api_connector,
-            self.get_oois(),
-            self.selected_report_types,
-            self.observed_at,
-        )
-
-        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
-        if report_errors:
-            report_types = ", ".join(set(report_errors))
-            date = self.observed_at.date()
-            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
-                "report_types": report_types,
-                "date": date,
-            }
-            messages.add_message(self.request, messages.ERROR, error_message)
-
-        observed_at = self.get_observed_at()
+        (
+            report,
+            post_processed_data,
+            report_data,
+        ) = self.generate_aggregate_report(input_oois)
 
         # Create the report
-        report_ooi = self.save_report(
-            data=post_processed_data,
-            report_type=type(aggregate_report),
-            input_oois=[ooi.primary_key for ooi in input_oois],
-            parent=None,
-            has_parent=False,
-            observed_at=observed_at,
-        )
-
-        # Save the child reports if requested
-        for ooi, types in report_data.items():
-            for report_type, data in types.items():
-                self.save_report(
-                    data=data,
-                    report_type=get_report_by_id(report_type),
-                    input_oois=[ooi],
-                    parent=report_ooi.reference,
-                    has_parent=True,
-                    observed_at=observed_at,
-                )
+        report_ooi = self.create_report_ooi(post_processed_data, type(report), input_oois)
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
             + "?"
             + urlencode({"report_id": report_ooi.reference})
         )
-
-    def get_observed_at(self):
-        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
