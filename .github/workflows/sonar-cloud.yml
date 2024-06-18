@@ -51,7 +51,7 @@ jobs:
 
     strategy:
       matrix:
-        module: ["octooes", "mula"]
+        module: ["octopoes", "mula"]
 
     steps:
       - name: Download artifacts
