@@ -14,8 +14,8 @@ jobs:
   # pre-commit-run:
   #   uses: minvws/nl-kat-coordination/.github/workflows/pre_commit_checks.yml@feature/sonar-cloud
 
-  # octopoes-tests:
-  #   uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
+  octopoes-tests:
+    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
   # bytes-tests:
   #   uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
   mula-tests:
@@ -45,11 +45,13 @@ jobs:
     runs-on: ubuntu-latest
 
     # needs: find-coverage-reports
-    needs: mula-tests
+    needs:
+      - octopoes-tests
+      - mula-tests
 
     strategy:
       matrix:
-        module: ["mula"]
+        module: ["octooes", "mula"]
 
     steps:
       - name: Download artifacts
@@ -112,7 +114,7 @@ jobs:
 
       - run: cat *-coverage-unit-fixed/coverage.xml
 
-      
+
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
         env:
