@@ -1,7 +1,7 @@
 import enum
 import uuid
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from .p_item import PrioritizedItem
 
