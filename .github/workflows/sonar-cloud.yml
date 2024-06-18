@@ -45,6 +45,7 @@ jobs:
     runs-on: ubuntu-latest
 
     # needs: find-coverage-reports
+    needs: mula-tests
 
     strategy:
       matrix:
