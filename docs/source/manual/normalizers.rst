@@ -10,6 +10,7 @@ Uploading output from BurpSuite can only be done with paid versions (Professiona
 The `official BurpSuite documentation for this functionality can be found here: <https://portswigger.net/burp/documentation/desktop/getting-started/generate-reports>`_.
 
 In general the approach is:
+
 - Under Target > Site map, select all objects/hosts you wish to export.
 - Right click and select Issues > Report issues for this host.
 - Follow the wizard. Make sure you export the file to XML.
