@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 from .p_item import PrioritizedItem
 
 
-class TaskStatus(enum.Enum):
+class TaskStatus(str, enum.Enum):
     # Task has been created but not yet queued
     PENDING = "pending"
 
@@ -31,10 +31,6 @@ class TaskStatus(enum.Enum):
 
 
 class Task(BaseModel):
-    # Whether to populate models with the value property of enums, rather than
-    # the raw enum. This may be useful if you want to serialise model.dict()
-    # later (default: False). In this case the value property of the enum is
-    # a string.
     model_config = ConfigDict(from_attributes=True, use_enum_values=True)
 
     id: uuid.UUID | None = None

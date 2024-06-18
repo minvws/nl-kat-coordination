@@ -16,58 +16,42 @@
   },
   "root": {
     "level": "INFO",
-    "handlers": [
-      "console"
-    ]
+    "handlers": ["console"]
   },
   "loggers": {
     "alembic.runtime.migration": {
       "level": "CRITICAL",
-      "handlers": [
-        "console"
-      ],
+      "handlers": ["console"],
       "propagate": 0
     },
     "urllib3.connectionpool": {
       "level": "CRITICAL",
-      "handlers": [
-        "console"
-      ],
+      "handlers": ["console"],
       "propagate": 0
     },
     "uvicorn.error": {
-      "level": "DEBUG",
-      "handlers": [
-        "console"
-      ],
+      "level": "CRITICAL",
+      "handlers": ["console"],
       "propagate": 0
     },
     "uvicorn.access": {
-      "level": "DEBUG",
-      "handlers": [
-        "console"
-      ],
+      "level": "CRITICAL",
+      "handlers": ["console"],
       "propagate": 0
     },
     "pika": {
       "level": "CRITICAL",
-      "handlers": [
-        "console"
-      ],
+      "handlers": ["console"],
       "propagate": 0
     },
     "sqlalchemy.engine": {
       "level": "CRITICAL",
-      "handlers": [
-        "console"
-      ],
+      "handlers": ["console"],
       "propagate": 0
     },
     "httpx": {
       "level": "CRITICAL",
-      "handlers": [
-        "console"
-      ],
+      "handlers": ["console"],
       "propagate": 0
     }
   }
