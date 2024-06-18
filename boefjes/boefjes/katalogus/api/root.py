@@ -2,7 +2,7 @@ import json
 import logging.config
 from typing import Any
 
-from fastapi import FastAPI, Request, status
+from fastapi import APIRouter, FastAPI, Request, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -15,8 +15,9 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from pydantic import BaseModel, Field
 
 from boefjes.config import settings
+from boefjes.katalogus.api import organisations, plugins
+from boefjes.katalogus.api import settings as settings_router
 from boefjes.katalogus.storage.interfaces import StorageError
-from boefjes.katalogus.v1 import router
 from boefjes.katalogus.version import __version__
 
 with settings.log_cfg.open() as f:
@@ -40,6 +41,12 @@ if settings.span_export_grpc_endpoint is not None:
     trace.set_tracer_provider(provider)
 
     logger.debug("Finished setting up instrumentation")
+
+router = APIRouter()
+router.include_router(organisations.router)
+router.include_router(plugins.router)
+router.include_router(settings_router.router)
+
 
 app.include_router(router, prefix="/v1")
 
@@ -73,3 +80,8 @@ def root() -> RedirectResponse:
 @app.get("/health", response_model=ServiceHealth)
 def health() -> ServiceHealth:
     return ServiceHealth(service="katalogus", healthy=True, version=__version__)
+
+
+@router.get("/v1/", include_in_schema=False)
+def v1_root() -> RedirectResponse:
+    return RedirectResponse(url="/v1/docs")

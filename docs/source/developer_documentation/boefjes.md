@@ -23,7 +23,6 @@ See the openAPI reference at http://localhost:8003/docs.
 The KATalogus has CRUD endpoints for several objects such as:
 
 - `Organisation`
-- `Repository`
 - `Plugin`
 - `Setting`
 
@@ -33,15 +32,9 @@ Supported HTTP methods (for CRUD): `POST`, `GET`, `DELETE`.
 Includes an endpoint that lists all objects.
 All subsequent objects in the API are namespaced on the `organisation_id`.
 
-### Repositories
-
-Supported HTTP methods (for CRUD): `POST`, `GET`, `DELETE`.
-Includes an endpoint that lists all objects.
-
 ### Plugins
 
 Supported HTTP methods (for CRUD): `GET`, `PATCH`.
-Note: there are endpoints namespaced on the `repository_id` included.
 
 ### Settings
 

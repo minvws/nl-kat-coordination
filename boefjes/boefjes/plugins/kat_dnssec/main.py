@@ -1,5 +1,3 @@
-import json
-import os
 import re
 import subprocess
 
@@ -16,9 +14,7 @@ def run(boefje_meta: dict):
             "hostname?"
         )
 
-    remote_ns = os.getenv("REMOTE_NS", "1.1.1.1")
-    cmd = ["/usr/bin/drill", "-S", str(domain), "@" + remote_ns]
+    cmd = ["/usr/bin/drill", "-DT", domain]
     output = subprocess.run(cmd, capture_output=True)
 
-    results = json.dumps(output.stdout.decode())
-    return [(set(), results)]
+    return [(set(), output.stdout)]

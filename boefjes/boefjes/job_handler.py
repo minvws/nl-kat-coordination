@@ -137,11 +137,11 @@ class BoefjeHandler(Handler):
 
         boefje_meta.started_at = datetime.now(timezone.utc)
 
-        boefje_results = None
+        boefje_results: list[tuple[set, bytes | str]]
 
         try:
             boefje_results = self.job_runner.run(boefje_meta, boefje_meta.environment)
-        except Exception:
+        except:
             logger.exception("Error running boefje %s[%s]", boefje_meta.boefje.id, str(boefje_meta.id))
             boefje_results = [({"error/boefje"}, traceback.format_exc())]
 

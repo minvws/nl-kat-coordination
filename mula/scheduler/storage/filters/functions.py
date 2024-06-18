@@ -21,7 +21,7 @@ def apply_filter(entity, query: Query, filter_request: FilterRequest) -> Query:
         A filtered SQLAlchemy query.
     """
     if not isinstance(filter_request.filters, dict):
-        raise ValueError("Filter request must be a dict")
+        raise FilterError("Filter request must be a dict")
 
     for operator in filter_request.filters:
         expressions = []
