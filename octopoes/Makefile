@@ -55,3 +55,9 @@ itest:
 	docker compose --project-directory . -f .ci/docker-compose.yml down --remove-orphans
 	docker compose --project-directory . -f .ci/docker-compose.yml build $(build_args)
 	docker compose --project-directory . -f .ci/docker-compose.yml run --rm octopoes_integration
+
+bench: ## Run the benchmarks.
+	docker compose --project-directory . -f .ci/docker-compose.yml down --remove-orphans
+	docker compose --project-directory . -f .ci/docker-compose.yml build $(build_args)
+	docker compose --project-directory . -f .ci/docker-compose.yml run --rm octopoes_integration \
+	python -m cProfile -o .ci/bench_$$(date +%Y_%m_%d-%H:%M:%S).pstat -m pytest -m slow --no-cov tests/integration

@@ -23,6 +23,8 @@ services:
       - ci_octopoes
     env_file:
       - ".ci/ci.env"
+    volumes:
+      - ../octopoes:/app/octopoes
 
   xtdb:
     image: "ghcr.io/dekkers/xtdb-http-multinode:v1.0.8"

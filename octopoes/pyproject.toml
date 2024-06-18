@@ -54,9 +54,11 @@ pytest-timeout = "^2.3.1"
 pytest-httpx = "^0.30.0"
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered"
+addopts = "--cov --cov-branch --cov-report=term-missing:skip-covered -m 'not slow'"
+markers = ["slow: marks tests as slow"]
+
 env = [
-    "XTDB_URI=http://testxtdb:3000",
-    "QUEUE_URI=amqp://placeholder",
-    "KATALOGUS_API=http://placeholder:8000",
+    "XTDB_URI=http://xtdb:3000",
+    "QUEUE_URI=amqp://ci_user:ci_pass@rabbitmq:5672/kat",
+    "KATALOGUS_API=http://katalogus_mock:8080",
 ]

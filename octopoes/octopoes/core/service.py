@@ -582,10 +582,7 @@ class OctopoesService:
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
             # loop over all oois that are consumed by the bit
-            for ooi in self.ooi_repository.list_oois_by_object_types(
-                {bit_definition.consumes},
-                valid_time=valid_time,
-            ):
+            for ooi in self.ooi_repository.list_oois_by_object_types({bit_definition.consumes}, valid_time=valid_time):
                 if not isinstance(ooi, bit_definition.consumes):
                     logger.exception("Requested OOI type not met")
                     raise ObjectNotFoundException("Requested OOI type not met")
@@ -610,10 +607,13 @@ class OctopoesService:
                         param = OriginParameter(origin_id=bit_instance.id, reference=param_ooi.reference)
                         self.origin_parameter_repository.save(param, valid_time)
 
+        # TODO: should we commit first here? Perhaps self.origin_repository and self.origin_parameter_repository
+
         # TODO: remove all Origins and Origin Parameters, which are no longer in use
 
         # rerun all existing bits
         origins = self.origin_repository.list_origins(valid_time, origin_type=OriginType.INFERENCE)
+
         for origin in origins:
             self._run_inference(origin, valid_time)
             bit_counter.update({origin.method})
