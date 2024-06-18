@@ -141,8 +141,6 @@ class BoefjeTask(BaseModel):
         in the PriorityQueue. We hash the combination of the attributes
         input_ooi and boefje.id since this combination is unique."""
         if self.input_ooi:
-            return mmh3.hash_bytes(
-                f"{self.input_ooi}-{self.boefje.id}-{self.organization}"
-            ).hex()
+            return mmh3.hash_bytes(f"{self.input_ooi}-{self.boefje.id}-{self.organization}").hex()
 
         return mmh3.hash_bytes(f"{self.boefje.id}-{self.organization}").hex()
