@@ -139,12 +139,10 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_has_required_plugins():
+        if not self.report_has_required_plugins() or self.plugins_enabled():
             return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
-        if self.plugins_enabled():
-            return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
 
 

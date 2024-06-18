@@ -152,12 +152,10 @@ class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggrega
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_has_required_plugins():
+        if not self.report_has_required_plugins() or self.plugins_enabled():
             return redirect(self.get_next())
         if not self.plugins:
             return redirect(self.get_previous())
-        if self.plugins_enabled():
-            return redirect(self.get_next())
         return super().get(request, *args, **kwargs)
 
 
@@ -209,17 +207,16 @@ class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
         )
 
         # Save the child reports if requested
-        if "save_child_reports" in request.POST:
-            for ooi, types in report_data.items():
-                for report_type, data in types.items():
-                    self.save_report(
-                        data=data,
-                        report_type=get_report_by_id(report_type),
-                        input_oois=[ooi],
-                        parent=report_ooi.reference,
-                        has_parent=True,
-                        observed_at=observed_at,
-                    )
+        for ooi, types in report_data.items():
+            for report_type, data in types.items():
+                self.save_report(
+                    data=data,
+                    report_type=get_report_by_id(report_type),
+                    input_oois=[ooi],
+                    parent=report_ooi.reference,
+                    has_parent=True,
+                    observed_at=observed_at,
+                )
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
