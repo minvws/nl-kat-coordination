@@ -148,15 +148,8 @@ class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggrega
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.report_has_required_plugins() or self.plugins_enabled():
-            input_oois = self.get_oois()
+            report_ooi = self.save_aggregate_report()
 
-            (
-                report,
-                post_processed_data,
-                _,
-            ) = self.generate_aggregate_report(input_oois)
-
-            report_ooi = self.create_report_ooi(post_processed_data, type(report), input_oois)
             return redirect(
                 reverse("view_report", kwargs={"organization_code": self.organization.code})
                 + "?"
@@ -183,15 +176,7 @@ class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
                 reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
             )
 
-        input_oois = self.get_oois()
-        (
-            report,
-            post_processed_data,
-            report_data,
-        ) = self.generate_aggregate_report(input_oois)
-
-        # Create the report
-        report_ooi = self.create_report_ooi(post_processed_data, type(report), input_oois)
+        report_ooi = self.save_aggregate_report()
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})

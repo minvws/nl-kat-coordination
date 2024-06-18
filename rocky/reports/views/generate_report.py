@@ -1,6 +1,5 @@
 import logging
 from collections.abc import Sequence
-from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -11,11 +10,8 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from octopoes.models import Reference
-from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
-from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import Report
-from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_by_id, get_report_types_for_oois
+from reports.report_types.helpers import get_ooi_types_with_report, get_report_types_for_oois
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     ReportBreadcrumbs,
@@ -140,7 +136,12 @@ class SetupScanGenerateReportView(
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.report_has_required_plugins() or self.plugins_enabled():
-            return redirect(self.get_next())
+            report_ooi = self.save_generate_report()
+            return redirect(
+                reverse("view_report", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + urlencode({"report_id": report_ooi.reference})
+            )
         if not self.plugins:
             return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)
@@ -164,95 +165,10 @@ class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Te
                 reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
             )
 
-        error_reports = []
-        report_data: dict[str, dict[str, dict[str, Any]]] = {}
-        by_type: dict[str, list[str]] = {}
-
-        number_of_reports = 0
-        for ooi in self.get_oois_pk():
-            ooi_type = Reference.from_str(ooi).class_
-
-            if ooi_type not in by_type:
-                by_type[ooi_type] = []
-
-            by_type[ooi_type].append(ooi)
-
-        sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
-        for report_class in sorted_report_types:
-            oois = {
-                ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
-            }
-
-            try:
-                results = report_class(self.octopoes_api_connector).collect_data(oois, self.observed_at)
-            except ObjectNotFoundException:
-                error_reports.append(report_class.id)
-                continue
-            except TypeNotFound:
-                error_reports.append(report_class.id)
-                continue
-
-            for ooi, data in results.items():
-                if report_class.id not in report_data:
-                    report_data[report_class.id] = {}
-
-                report_data[report_class.id][ooi] = {
-                    "data": data,
-                    "template": report_class.template_path,
-                    "report_name": report_class.name,
-                }
-                number_of_reports += 1
-
-        observed_at = self.get_observed_at()
-
-        # if its not a single report, we need a parent
-        if number_of_reports > 1:
-            report_ooi = self.save_report(
-                data={},
-                report_type=ConcatenatedReport,
-                input_oois=[],
-                parent=None,
-                has_parent=False,
-                observed_at=observed_at,
-            )
-            for report_type, ooi_data in report_data.items():
-                for ooi, data in ooi_data.items():
-                    self.save_report(
-                        data=data["data"],
-                        report_type=get_report_by_id(report_type),
-                        input_oois=[ooi],
-                        parent=report_ooi.reference,
-                        has_parent=True,
-                        observed_at=observed_at,
-                    )
-        # if its a single report we can just save it as complete
-        else:
-            report_type = next(iter(report_data))
-            ooi = next(iter(report_data[report_type]))
-            data = report_data[report_type][ooi]
-            report_ooi = self.save_report(
-                data=data["data"],
-                report_type=get_report_by_id(report_type),
-                input_oois=[ooi],
-                parent=None,
-                has_parent=False,
-                observed_at=observed_at,
-            )
-        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
-        if error_reports:
-            report_types = ", ".join(set(error_reports))
-            date = self.observed_at.date()
-            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
-                "report_types": report_types,
-                "date": date,
-            }
-            messages.error(self.request, error_message)
+        report_ooi = self.save_generate_report()
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
             + "?"
             + urlencode({"report_id": report_ooi.reference})
         )
-
-    def get_observed_at(self):
-        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
