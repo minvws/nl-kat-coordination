@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 from boefjes.config import settings
 from boefjes.katalogus.api import organisations, plugins
 from boefjes.katalogus.api import settings as settings_router
-from boefjes.katalogus.storage.interfaces import StorageError
+from boefjes.katalogus.storage.interfaces import NotFound, StorageError
 from boefjes.katalogus.version import __version__
 
 with settings.log_cfg.open() as f:
@@ -51,12 +51,18 @@ router.include_router(settings_router.router)
 app.include_router(router, prefix="/v1")
 
 
-@app.exception_handler(StorageError)
-def entity_not_found_handler(request: Request, exc: StorageError):
-    logger.exception("some error", exc_info=exc)
-
+@app.exception_handler(NotFound)
+def entity_not_found_handler(request: Request, exc: NotFound):
     return JSONResponse(
         status_code=status.HTTP_404_NOT_FOUND,
+        content={"message": exc.message},
+    )
+
+
+@app.exception_handler(StorageError)
+def storage_error_handler(request: Request, exc: StorageError):
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"message": exc.message},
     )
 
