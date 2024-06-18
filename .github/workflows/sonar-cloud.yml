@@ -26,6 +26,8 @@ jobs:
   find-coverage-reports:
     runs-on: ubuntu-latest
 
+    needs: mula-tests
+
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
