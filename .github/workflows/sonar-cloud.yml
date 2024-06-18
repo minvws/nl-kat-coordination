@@ -75,7 +75,7 @@ jobs:
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ matrix.module }}-coverage-unit"
+          name: "${{ matrix.module }}-coverage-unit-fixed"
           path: "${{ matrix.module }}-coverage-unit/coverage.xml"
 
   sonar-cloud:
@@ -108,7 +108,7 @@ jobs:
       # todo: https://github.com/Mudlet/xmlstarlet-action
       # todo: cat coverage.xml | xml ed -L --update "coverage/sources" -v "test" | head
 
-      - run: cat *-coverage-unit/coverage.xml
+      - run: cat *-coverage-unit-fixed/coverage.xml
 
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
