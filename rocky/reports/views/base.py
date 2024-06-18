@@ -366,7 +366,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
     def save_aggregate_report(self) -> ReportOOI:
-        input_oois = self.get_oois()
+        input_oois = self.get_oois_pk()
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
@@ -388,7 +388,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         return self.save_report(
             data=post_processed_data,
             report_type=type(aggregate_report),
-            input_oois=[ooi.primary_key for ooi in input_oois],
+            input_oois=input_oois,
             parent=None,
             has_parent=False,
             observed_at=self.get_observed_at(),
