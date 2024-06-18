@@ -1272,6 +1272,18 @@ def report_list_six_subreports():
     ]
 
 
+@pytest.fixture
+def get_subreports() -> list[tuple[str, Report]]:
+    return [
+        (parent_report[0].primary_key, subreports[0]),
+        (parent_report[0].primary_key, subreports[1]),
+        (parent_report[0].primary_key, subreports[2]),
+        (parent_report[0].primary_key, subreports[3]),
+        (parent_report[0].primary_key, subreports[4]),
+        (parent_report[0].primary_key, subreports[5]),
+    ]
+
+
 def setup_request(request, user):
     request = SessionMiddleware(lambda r: r)(request)
     request.session[DEVICE_ID_SESSION_KEY] = user.staticdevice_set.get().persistent_id
