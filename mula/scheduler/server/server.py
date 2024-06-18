@@ -443,8 +443,8 @@ class Server:
 
         return models.Task(**task.model_dump())
 
-    # NOTE: request.Task instead of models.Task is needed for patch endpoints
-    # to allow for partial updates.
+    # NOTE: serializers.Task instead of models.Task is needed for patch
+    # endpoints # to allow for partial updates.
     def patch_task(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
@@ -473,14 +473,7 @@ class Server:
                 detail="no data to patch",
             )
 
-        try:
-            updated_task = task_db.model_copy(update=patch_data)
-        except Exception as exc:
-            self.logger.error(exc)
-            raise fastapi.HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="failed to update task",
-            ) from exc
+        updated_task = task_db.model_copy(update=patch_data)
 
         # Update task in database
         try:
