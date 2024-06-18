@@ -48,8 +48,9 @@ jobs:
       - name: test
         run: sed -i 's|<source></source>|<source>/github/workspace/mula</source>|g' mula-coverage-unit/coverage.xml
 
-      - name: print test
-        run: cat mula-coverage-unit/coverage.xml
+      # todo: create a job matrix for fixing all the coverage.xml file sources
+      # todo: https://github.com/Mudlet/xmlstarlet-action
+      # todo: cat coverage.xml | xml ed -L --update "coverage/sources" -v "test" | head
 
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
