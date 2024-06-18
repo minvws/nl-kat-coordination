@@ -57,8 +57,10 @@ jobs:
         with:
           name: ${{ matrix.module }}-coverage-unit
 
+      - run: tree "${{ github.workspace }}"
+
       - name: Print
-        run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
+        run: cat "${{ github.workspace }}/${{ matrix.module }}-coverage-unit/coverage.xml"
 
       - name: Fix coverage reports
         uses: Mudlet/xmlstarlet-action@master
