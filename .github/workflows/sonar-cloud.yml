@@ -95,6 +95,8 @@ jobs:
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
+        with:
+          pattern: "*-coverage-unit-fixed"
 
       # workaround for https://sonarsource.atlassian.net/browse/SONARPY-1203
       # and https://community.sonarsource.com/t/sonar-on-github-actions-with-python-coverage-source-issue/36057
