@@ -56,7 +56,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ matrix.module }}-coverage-unit
-          output: ${{ matrix.module }}-coverage-unit
+          path: ${{ matrix.module }}-coverage-unit
   
       - run: tree .
 
