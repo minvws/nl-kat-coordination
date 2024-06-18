@@ -23,6 +23,22 @@ jobs:
 
     # todo: bytes, rocky, mula, keiko, boefjes
 
+  find-coverage-reports:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Get coverage files
+        run: find . -name coverage.xml -exec dirname {} \; | xargs basename | xargs  | jq -R -c 'split(" ")'
+  
+      # - name: Fix coverage reports
+      #   run: |
+      #     sed -i 's|<source></source>|<source>/github/workspace/mula</source>|g' mula-coverage-unit/coverage.xml
+
+
+
   sonar-cloud:
     runs-on: ubuntu-latest
     # needs: pre-commit-run
