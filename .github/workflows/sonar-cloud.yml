@@ -86,8 +86,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      # - name: Download artifacts
+      #   uses: actions/download-artifact@v4
 
       # workaround for https://sonarsource.atlassian.net/browse/SONARPY-1203
       # and https://community.sonarsource.com/t/sonar-on-github-actions-with-python-coverage-source-issue/36057
@@ -100,6 +100,8 @@ jobs:
       # todo: create a job matrix for fixing all the coverage.xml file sources
       # todo: https://github.com/Mudlet/xmlstarlet-action
       # todo: cat coverage.xml | xml ed -L --update "coverage/sources" -v "test" | head
+
+      - run: cat *-coverage-unit/coverage.xml
 
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
