@@ -37,11 +37,10 @@ def test_report_history_one_subreports_one_input_objects(
 
     # Check table rows
     subreport = report_list_one_subreport[0][0]
-    input_object = report_list_one_subreport[0][0].input_oois[0]
     assertContains(response, subreport)
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
+        '<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">example.com</a>',
         html=True,
     )
     assertNotContains(response, "Close children report object details")
@@ -144,11 +143,10 @@ def test_report_history_more_than_five_subreports_one_input_object(
 
     # Check table rows
     parent_report = report_list_six_subreports[0][0]
-    input_object = report_list_six_subreports[0][1][0].input_oois[0]
     assertContains(response, parent_report)
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
+        '<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">example.com</a>',
         html=True,
     )
     assertContains(response, "Close children report object details")
@@ -228,10 +226,9 @@ def test_report_history_subreports_table(
     )
 
     # Check table rows
-    input_object = report_list_six_subreports[0][1][0].input_oois[0]
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
+        '<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">example.com</a>',
         html=True,
     )
 
@@ -243,7 +240,6 @@ def test_report_history_subreports_table(
     child_report_4 = report_list_six_subreports[0][1][3]
     child_report_5 = report_list_six_subreports[0][1][4]
     child_report_6 = report_list_six_subreports[0][1][5]
-    child_report_7 = report_list_six_subreports[0][1][6]
     assertContains(response, f"Showing {total_subreports} of {total_subreports} subreports ")
     assertContains(response, child_report_1)
     assertContains(response, child_report_2)
@@ -251,7 +247,6 @@ def test_report_history_subreports_table(
     assertContains(response, child_report_4)
     assertContains(response, child_report_5)
     assertContains(response, child_report_6)
-    assertContains(response, child_report_7)
 
     # Check if all report types are shown
     assertContains(response, "RPKI Report")
