@@ -54,7 +54,7 @@ jobs:
       - name: Fix coverage reports
         uses: Mudlet/xmlstarlet-action@master
         with:
-          args: xml ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}" "${{ matrix.module }}-coverage-unit/coverage.xml"
+          args: ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}" "${{ matrix.module }}-coverage-unit/coverage.xml"
     
       - name: Print
         run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
