@@ -375,15 +375,8 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             self.observed_at,
         )
 
-        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
         if report_errors:
-            report_types = ", ".join(set(report_errors))
-            date = self.observed_at.date()
-            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
-                "report_types": report_types,
-                "date": date,
-            }
-            messages.add_message(self.request, messages.ERROR, error_message)
+            self.show_error_message(report_errors)
 
         return self.save_report(
             data=post_processed_data,
@@ -396,7 +389,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
     def save_generate_report(self) -> ReportOOI:
         input_oois = self.get_oois_pk()
-        error_reports = []
+        report_errors = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
 
@@ -418,10 +411,10 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             try:
                 results = report_class(self.octopoes_api_connector).collect_data(oois, self.observed_at)
             except ObjectNotFoundException:
-                error_reports.append(report_class.id)
+                report_errors.append(report_class.id)
                 continue
             except TypeNotFound:
-                error_reports.append(report_class.id)
+                report_errors.append(report_class.id)
                 continue
 
             for ooi, data in results.items():
@@ -470,17 +463,21 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
                 has_parent=False,
                 observed_at=observed_at,
             )
-        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
-        if error_reports:
-            report_types = ", ".join(set(error_reports))
-            date = self.observed_at.date()
-            error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
-                "report_types": report_types,
-                "date": date,
-            }
-            messages.error(self.request, error_message)
+
+        if report_errors:
+            self.show_error_message(report_errors)
 
         return report_ooi
+
+    def show_error_message(self, report_errors):
+        # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error
+        report_types = ", ".join(set(report_errors))
+        date = self.observed_at.date()
+        error_message = _("No data could be found for %(report_types). Object(s) did not exist on %(date)s.") % {
+            "report_types": report_types,
+            "date": date,
+        }
+        messages.error(self.request, error_message)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
