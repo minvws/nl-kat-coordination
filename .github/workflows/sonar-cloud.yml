@@ -70,11 +70,11 @@ jobs:
         with:
           args: ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}" "${{ matrix.module }}-coverage-unit/coverage.xml"
 
-      - name: test mula
-        if: ${{ matrix.module == 'mula' }}
-        uses: Mudlet/xmlstarlet-action@master
-        with:
-          args: ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}/scheduler" "${{ matrix.module }}-coverage-unit/coverage.xml"
+      # - name: test mula
+      #   if: ${{ matrix.module == 'mula' }}
+      #   uses: Mudlet/xmlstarlet-action@master
+      #   with:
+      #     args: ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}/scheduler" "${{ matrix.module }}-coverage-unit/coverage.xml"
 
       - name: Print
         run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
