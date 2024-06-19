@@ -150,9 +150,8 @@ class LazyTaskList:
     def __getitem__(self, key) -> list[Task]:
         if isinstance(key, slice):
             offset = key.start or 0
-            limit = min(LazyTaskList.HARD_LIMIT, key.stop - offset if key.stop or LazyTaskList.HARD_LIMIT)
-            if key.stop:
-                limit = key.stop - offset
+            limit = min(LazyTaskList.HARD_LIMIT, key.stop - offset or key.stop or LazyTaskList.HARD_LIMIT)
+
         elif isinstance(key, int):
             offset = key
             limit = 1

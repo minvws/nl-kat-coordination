@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-17 14:51+0000\n"
+"POT-Creation-Date: 2024-06-19 11:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4161,6 +4161,10 @@ msgstr ""
 
 #: rocky/scheduler.py
 msgid "The Scheduler has received a conflict. Your task is already in queue."
+msgstr ""
+
+#: rocky/scheduler.py
+msgid "A HTTPError occurred. See Scheduler logs for more info."
 msgstr ""
 
 #: rocky/settings.py
