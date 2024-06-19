@@ -1,7 +1,7 @@
 ---
-authors: { author1 } ({ email }), { author2 } ({ github username })
+authors: { author1 } <{ email }>, { author2 } ({ github username })
 state: { draft|discussion|published|implemented|abandoned }
-discussion: { link to PR discussion }
+discussion: http://github.com/nl-kat-coordination/rfd/pull/{number}
 labels: { comma, separated, list }
 ---
 
