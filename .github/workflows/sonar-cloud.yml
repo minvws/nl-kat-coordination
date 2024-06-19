@@ -112,6 +112,8 @@ jobs:
       # todo: https://github.com/Mudlet/xmlstarlet-action
       # todo: cat coverage.xml | xml ed -L --update "coverage/sources" -v "test" | head
 
+      - run: pwd && tree .
+
       - run: cat *-coverage-unit-fixed/coverage.xml
 
 
