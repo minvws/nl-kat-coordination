@@ -1,5 +1,5 @@
-#[run]
-#relative_files = True
+[run]
+relative_files = True
 
 #[run]
 #data_file = /tmp/.coverage
