@@ -177,7 +177,11 @@ class SchedulerError(Exception):
 
 
 class SchedulerConnectError(SchedulerError):
-    message = _("Could not connect to Scheduler. Service is possibly down.")
+    def __init__(self, *args: object, extra_message: str | None = None) -> None:
+        super().__init__(*args)
+        self.message = _("Could not connect to Scheduler. Service is possibly down.")
+        if extra_message is not None:
+            self.message = extra_message + self.message
 
 
 class SchedulerValidationError(SchedulerError):
@@ -220,7 +224,7 @@ class SchedulerClient:
         except ValidationError:
             raise SchedulerValidationError()
         except ConnectError:
-            raise SchedulerConnectError()
+            raise SchedulerConnectError(extra_message=_("Task list: "))
 
     def get_task_details(self, task_id: str) -> Task:
         try:
@@ -270,12 +274,12 @@ class SchedulerClient:
         except ConnectError:
             raise SchedulerConnectError()
 
-    def get_task_stats(self, organization_code: str, task_type: str) -> dict:
+    def get_task_stats(self, task_type: str) -> dict:
         try:
-            res = self._client.get(f"/tasks/stats/{task_type}-{organization_code}")
+            res = self._client.get(f"/tasks/stats/{task_type}-{self.organization_code}")
             res.raise_for_status()
         except ConnectError:
-            raise SchedulerConnectError()
+            raise SchedulerConnectError(extra_message=_("Task stats: "))
         task_stats = json.loads(res.content)
         return task_stats
 

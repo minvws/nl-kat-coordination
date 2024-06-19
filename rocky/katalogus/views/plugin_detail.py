@@ -127,6 +127,7 @@ class BoefjeDetailView(PluginDetailView):
     template_name = "boefje_detail.html"
     limit_ooi_list = 9999
     plugin: Boefje
+    task_type = "boefje"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

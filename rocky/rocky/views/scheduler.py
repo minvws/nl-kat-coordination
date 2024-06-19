@@ -30,7 +30,7 @@ def get_date_time(date: str | None) -> datetime | None:
 
 
 class SchedulerView(OctopoesView):
-    task_type: str = "boefje"  # default task type
+    task_type: str
     task_filter_form = TaskFilterForm
 
     def setup(self, request, *args, **kwargs):
@@ -40,7 +40,7 @@ class SchedulerView(OctopoesView):
     def get_task_filters(self) -> dict[str, Any]:
         return {
             "scheduler_id": f"{self.task_type}-{self.organization.code}",
-            "task_type": self.request.GET.get("type", self.task_type),
+            "task_type": self.task_type,
             "plugin_id": None,  # plugin_id present and set at plugin detail
             **self.get_form_data(),
         }
@@ -68,7 +68,7 @@ class SchedulerView(OctopoesView):
     def get_task_statistics(self) -> dict[Any, Any]:
         stats = {}
         try:
-            stats = self.scheduler_client.get_task_stats(self.organization.code, self.task_type)
+            stats = self.scheduler_client.get_task_stats(self.task_type)
         except SchedulerError as error:
             messages.error(self.request, error.message)
         return stats

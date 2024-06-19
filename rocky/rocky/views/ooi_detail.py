@@ -26,6 +26,7 @@ class OOIDetailView(
 ):
     template_name = "oois/ooi_detail.html"
     task_filter_form = OOIDetailTaskFilterForm
+    task_type = "boefje"
 
     def post(self, request, *args, **kwargs):
         if self.action == self.CHANGE_CLEARANCE_LEVEL:

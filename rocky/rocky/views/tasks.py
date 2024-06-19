@@ -1,8 +1,6 @@
 from typing import Any
 
 from django.contrib import messages
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.list import ListView
@@ -14,17 +12,19 @@ from rocky.views.page_actions import PageActionsView
 from rocky.views.scheduler import SchedulerView
 
 
-class TaskListView(SchedulerView, ListView, PageActionsView):
+class SchedulerListView(ListView):
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        try:
+            return super().get_context_data(**kwargs)
+        except SchedulerError as error:
+            messages.error(self.request, error.message)
+        return {}
+
+
+class TaskListView(SchedulerView, SchedulerListView, PageActionsView):
     paginator_class = RockyPaginator
     paginate_by = 20
     context_object_name = "task_list"
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        try:
-            return super().get(request, *args, **kwargs)
-        except SchedulerError as error:
-            messages.error(request, error.message)
-        return redirect("health_beautified", organization_code=self.organization.code)
 
     def get_queryset(self):
         return self.get_task_list()
@@ -43,7 +43,6 @@ class TaskListView(SchedulerView, ListView, PageActionsView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["task_list"] = list(context["task_list"]) 
         context["task_filter_form"] = self.get_task_filter_form()
         context["stats"] = self.get_task_statistics()
         context["breadcrumbs"] = [
@@ -57,6 +56,7 @@ class TaskListView(SchedulerView, ListView, PageActionsView):
 
 class BoefjesTaskListView(TaskListView):
     template_name = "tasks/boefjes.html"
+    task_type = "boefje"
 
 
 class NormalizersTaskListView(TaskListView):
