@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.orm import Session, sessionmaker
 
 from boefjes.config import Settings, settings
-from boefjes.katalogus.storage.interfaces import OrganisationNotFound, PluginEnabledStorage, PluginNotFound
+from boefjes.katalogus.storage.interfaces import OrganisationNotFound, PluginEnabledStorage, PluginStateNotFound
 from boefjes.sql.db import ObjectNotFoundException, get_engine
 from boefjes.sql.db_models import OrganisationInDB, PluginStateInDB
 from boefjes.sql.session import SessionMixin
@@ -47,7 +47,7 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
         try:
             instance = self._db_instance_by_id(plugin_id, organisation_id)
             instance.enabled = enabled
-        except PluginNotFound:
+        except PluginStateNotFound:
             logger.info("Plugin state not found, creating new instance")
             self.create(plugin_id, enabled, organisation_id)
 
@@ -62,7 +62,7 @@ class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):
         )
 
         if instance is None:
-            raise PluginNotFound(plugin_id, organisation_id) from ObjectNotFoundException(
+            raise PluginStateNotFound(plugin_id, organisation_id) from ObjectNotFoundException(
                 PluginStateInDB,
                 plugin_id=plugin_id,
                 organisation_id=organisation_id,

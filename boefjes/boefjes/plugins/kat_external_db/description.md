@@ -25,11 +25,11 @@ For example:
 ```json
 {
   "ip_addresses": [
-    { "ip_address": "198.51.100.2" },
-    { "ip_address": "2001:db8:ffff:ffff:ffff:ffff:ffff:ffff" },
-    { "ip_address": "192.0.2.0/24" }
+    { "address": "198.51.100.2" },
+    { "address": "2001:db8:ffff:ffff:ffff:ffff:ffff:ffff" },
+    { "address": "192.0.2.0/24" }
   ],
-  "domains": [{ "domain": "example.com" }]
+  "domains": [{ "name": "example.com" }]
 }
 ```
 
