@@ -39,7 +39,7 @@ def get_bit_definitions() -> dict[str, BitDefinition]:
     bit_definitions = {}
 
     for package in pkgutil.walk_packages([str(BITS_DIR)]):
-        if package.name in ["definitions", "runner", "cache"]:
+        if package.name in ["definitions", "runner"]:
             continue
 
         try:
