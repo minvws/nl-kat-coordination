@@ -9,7 +9,7 @@ def test_tasks_view_connect_error(rf, client_member, mock_scheduler):
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
 
     assert list(request._messages)[0].message == "Could not connect to Scheduler. Service is possibly down."
 
@@ -20,7 +20,7 @@ def test_tasks_view_validation_error(rf, client_member, mock_scheduler):
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
 
     assert list(request._messages)[0].message == "Your request could not be validated."
 
@@ -31,7 +31,7 @@ def test_tasks_view_too_many_requests_error(rf, client_member, mock_scheduler):
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
 
     assert (
         list(request._messages)[0].message
