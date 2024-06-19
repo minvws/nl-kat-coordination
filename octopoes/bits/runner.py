@@ -28,7 +28,7 @@ class BitRunner:
 
     def _purge(self) -> None:
         now = datetime.now()
-        map(self.bit_cache.pop, [key for key, data in self.bit_cache.items() if now - data[1] <= self.cache_lifetime])
+        map(self.bit_cache.pop, [key for key, data in self.bit_cache.items() if now - data[1] > self.cache_lifetime])
 
     def _bit_cache_key(self, source: OOI, parameters: list[OOI], config: dict[str, JsonValue]) -> str:
         try:
