@@ -43,7 +43,7 @@
                         the process of creating them manually.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate method="post" class="horizontal-view help">
+                <form novalidate method="post" class="horizontal-view help layout-form">
                     {% csrf_token %}
                     {% translate type as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}

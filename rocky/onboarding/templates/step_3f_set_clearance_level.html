@@ -20,7 +20,10 @@
                         For the onboarding we will suggest to set the clearance level to L{{ dns_report_least_clearance_level }}.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate action="" method="post" class="horizontal-view help">
+                <form novalidate
+                      action=""
+                      method="post"
+                      class="horizontal-view help layout-form">
                     {% csrf_token %}
                     {% translate "Set clearance level" as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}
