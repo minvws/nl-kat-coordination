@@ -1,5 +1,10 @@
-from boefjes.katalogus.models import Organisation
-from boefjes.katalogus.storage.interfaces import OrganisationStorage, PluginEnabledStorage, SettingsStorage
+from boefjes.katalogus.models import Boefje, Normalizer, Organisation, PluginType
+from boefjes.katalogus.storage.interfaces import (
+    OrganisationStorage,
+    PluginEnabledStorage,
+    PluginStorage,
+    SettingsStorage,
+)
 
 # key = organisation id; value = organisation
 organisations: dict[str, Organisation] = {}
@@ -23,6 +28,33 @@ class OrganisationStorageMemory(OrganisationStorage):
 
     def delete_by_id(self, organisation_id: str) -> None:
         del self._data[organisation_id]
+
+
+class PluginStorageMemory(PluginStorage):
+    def __init__(self):
+        self._boefjes = {}
+        self._normalizers = {}
+
+    def get_all(self) -> list[PluginType]:
+        return list(self._boefjes.values()) + list(self._normalizers.values())
+
+    def boefje_by_id(self, boefje_id: str) -> Boefje:
+        return self._boefjes[boefje_id]
+
+    def normalizer_by_id(self, normalizer_id: str) -> Normalizer:
+        return self._normalizers[normalizer_id]
+
+    def create_boefje(self, boefje: Boefje) -> None:
+        self._boefjes[boefje.id] = boefje
+
+    def create_normalizer(self, normalizer: Normalizer) -> None:
+        self._normalizers[normalizer.id] = normalizer
+
+    def delete_boefje_by_id(self, boefje_id: str) -> None:
+        del self._boefjes[boefje_id]
+
+    def delete_normalizer_by_id(self, normalizer_id: str) -> None:
+        del self._normalizers[normalizer_id]
 
 
 class SettingsStorageMemory(SettingsStorage):
