@@ -1,6 +1,5 @@
 import importlib
 import pkgutil
-from datetime import timedelta
 from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
@@ -28,10 +27,6 @@ class BitDefinition(BaseModel):
     min_scan_level: int = 1
     default_enabled: bool = True
     config_ooi_relation_path: str | None = None
-    cache_lifetime: timedelta = timedelta(seconds=3600)
-
-    def __hash__(self) -> int:
-        return hash(self.id)
 
 
 @lru_cache(maxsize=32)
