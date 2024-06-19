@@ -167,6 +167,9 @@ class RabbitMQ(Listener):
 
             # Blocking call that processes the messages
             self.channel.start_consuming()
+        except pika.exceptions.PikaException as exc:
+            self.logger.error("PikaException: %s", exc)
+            raise exc
         except Exception as exc:
             self.logger.error("Error consuming messages: %s", exc)
             raise exc
