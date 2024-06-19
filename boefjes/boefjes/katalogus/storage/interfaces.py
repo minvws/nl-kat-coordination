@@ -1,6 +1,6 @@
 from abc import ABC
 
-from boefjes.katalogus.models import Organisation
+from boefjes.katalogus.models import Boefje, Normalizer, Organisation, PluginType
 
 
 class StorageError(Exception):
@@ -28,8 +28,18 @@ class OrganisationNotFound(NotFound):
 
 
 class PluginNotFound(NotFound):
+    def __init__(self, plugin_id: str):
+        super().__init__(f"Plugin with id '{plugin_id}' not found")
+
+
+class PluginStateNotFound(NotFound):
     def __init__(self, plugin_id: str, organisation_id: str):
         super().__init__(f"State for plugin with id '{plugin_id}' not found for organisation '{organisation_id}'")
+
+
+class ExistingPluginId(StorageError):
+    def __init__(self, plugin_id: str):
+        super().__init__(f"Plugin id '{plugin_id}' is already used")
 
 
 class SettingsNotFound(NotFound):
@@ -54,6 +64,41 @@ class OrganisationStorage(ABC):
         raise NotImplementedError
 
     def delete_by_id(self, organisation_id: str) -> None:
+        raise NotImplementedError
+
+
+class PluginStorage(ABC):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type: type[Exception], exc_value: str, exc_traceback: str) -> None:  # noqa: F841
+        pass
+
+    def get_all(self) -> list[PluginType]:
+        raise NotImplementedError
+
+    def boefje_by_id(self, boefje_id: str) -> Boefje:
+        raise NotImplementedError
+
+    def normalizer_by_id(self, normalizer_id: str) -> Normalizer:
+        raise NotImplementedError
+
+    def create_boefje(self, boefje: Boefje) -> None:
+        raise NotImplementedError
+
+    def create_normalizer(self, normalizer: Normalizer) -> None:
+        raise NotImplementedError
+
+    def update_boefje(self, boefje_id: str, data: dict) -> None:
+        raise NotImplementedError
+
+    def update_normalizer(self, normalizer_id: str, data: dict) -> None:
+        raise NotImplementedError
+
+    def delete_boefje_by_id(self, boefje_id: str) -> None:
+        raise NotImplementedError
+
+    def delete_normalizer_by_id(self, normalizer_id: str) -> None:
         raise NotImplementedError
 
 

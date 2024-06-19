@@ -107,7 +107,7 @@ class TestPlugins(TestCase):
             "/v1/organisations/test-org/plugins/test-boefje-1",
             json={"enabled": False},
         )
-        self.assertEqual(200, res.status_code)
+        self.assertEqual(204, res.status_code)
 
         res = self.client.get("/v1/organisations/test-org/plugins")
         self.assertEqual(200, res.status_code)
@@ -128,7 +128,7 @@ class TestPlugins(TestCase):
             json={"enabled": False},
         )
 
-        self.assertEqual(200, res.status_code)
+        self.assertEqual(204, res.status_code)
 
         res = self.client.get("/v1/organisations/non-existing-org/plugins")
         self.assertEqual(200, res.status_code)

@@ -1,8 +1,9 @@
+import datetime
 from functools import partial
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import FileResponse, JSONResponse, Response
-from httpx import HTTPStatusError
+from pydantic import BaseModel, Field
 
 from boefjes.katalogus.api.organisations import check_organisation_exists
 from boefjes.katalogus.dependencies.plugins import (
@@ -12,6 +13,8 @@ from boefjes.katalogus.dependencies.plugins import (
     get_plugins_filter_parameters,
 )
 from boefjes.katalogus.models import FilterParameters, PaginationParameters, PluginType
+from boefjes.katalogus.storage.interfaces import PluginStorage
+from boefjes.sql.plugin_storage import get_plugin_storage
 
 router = APIRouter(
     prefix="/organisations/{organisation_id}",
@@ -82,34 +85,99 @@ def get_plugin(
             return p.by_plugin_id(plugin_id, organisation_id)
     except KeyError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Plugin not found")
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
 
 
-@router.patch("/plugins/{plugin_id}")
+@router.post("/plugins", status_code=status.HTTP_201_CREATED)
+def add_plugin(plugin: PluginType, plugin_service: PluginService = Depends(get_plugin_service)):
+    with plugin_service as service:
+        if plugin.type == "boefje":
+            return service.create_boefje(plugin)
+
+        if plugin.type == "normalizer":
+            return service.create_normalizer(plugin)
+
+    raise HTTPException(status.HTTP_400_BAD_REQUEST, "Creation of Bits is not supported")
+
+
+@router.patch("/plugins/{plugin_id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_plugin_state(
     plugin_id: str,
     organisation_id: str,
     enabled: bool = Body(False, embed=True),
     plugin_service: PluginService = Depends(get_plugin_service),
 ):
-    try:
-        with plugin_service as p:
-            p.update_by_id(plugin_id, organisation_id, enabled)
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
+    with plugin_service as p:
+        p.set_enabled_by_id(plugin_id, organisation_id, enabled)
+
+
+class BoefjeIn(BaseModel):
+    """
+    For patching, we need all fields to be optional, hence we overwrite the definition here.
+    Also see https://fastapi.tiangolo.com/tutorial/body-updates/ as a reference.
+    """
+
+    name: str | None = None
+    version: str | None = None
+    created: datetime.datetime | None = None
+    description: str | None = None
+    environment_keys: list[str] = Field(default_factory=list)
+    scan_level: int = 1
+    consumes: set[str] = Field(default_factory=set)
+    produces: set[str] = Field(default_factory=set)
+    oci_image: str | None = None
+    oci_arguments: list[str] = Field(default_factory=list)
+
+
+@router.patch("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
+def update_boefje(
+    boefje_id: str,
+    boefje: BoefjeIn,
+    storage: PluginStorage = Depends(get_plugin_storage),
+):
+    with storage as p:
+        p.update_boefje(boefje_id, boefje.model_dump(exclude_unset=True))
+
+
+@router.delete("/boefjes/{boefje_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_boefje(boefje_id: str, plugin_storage: PluginStorage = Depends(get_plugin_storage)):
+    with plugin_storage as p:
+        p.delete_boefje_by_id(boefje_id)
+
+
+class NormalizerIn(BaseModel):
+    """
+    For patching, we need all fields to be optional, hence we overwrite the definition here.
+    Also see https://fastapi.tiangolo.com/tutorial/body-updates/ as a reference.
+    """
+
+    name: str | None = None
+    version: str | None = None
+    created: datetime.datetime | None = None
+    description: str | None = None
+    environment_keys: list[str] = Field(default_factory=list)
+    consumes: list[str] = Field(default_factory=list)  # mime types (and/ or boefjes)
+    produces: list[str] = Field(default_factory=list)  # oois
+
+
+@router.patch("/normalizers/{normalizer_id}", status_code=status.HTTP_204_NO_CONTENT)
+def update_normalizer(
+    normalizer_id: str,
+    normalizer: NormalizerIn,
+    storage: PluginStorage = Depends(get_plugin_storage),
+):
+    with storage as p:
+        p.update_normalizer(normalizer_id, normalizer.model_dump(exclude_unset=True))
+
+
+@router.delete("/normalizers/{normalizer_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_normalizer(normalizer_id: str, plugin_storage: PluginStorage = Depends(get_plugin_storage)):
+    with plugin_storage as p:
+        p.delete_normalizer_by_id(normalizer_id)
 
 
 @router.get("/plugins/{plugin_id}/schema.json", include_in_schema=False)
-def get_plugin_schema(
-    plugin_id: str,
-    plugin_service: PluginService = Depends(get_plugin_service),
-) -> JSONResponse:
-    try:
-        with plugin_service as p:
-            return JSONResponse(p.schema(plugin_id))
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
+def get_plugin_schema(plugin_id: str, plugin_service: PluginService = Depends(get_plugin_service)) -> JSONResponse:
+    return JSONResponse(plugin_service.schema(plugin_id))
 
 
 @router.get("/plugins/{plugin_id}/cover.jpg", include_in_schema=False)
@@ -117,11 +185,7 @@ def get_plugin_cover(
     plugin_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> FileResponse:
-    try:
-        with plugin_service as p:
-            return FileResponse(p.cover(plugin_id))
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
+    return FileResponse(plugin_service.cover(plugin_id))
 
 
 @router.get("/plugins/{plugin_id}/description.md", include_in_schema=False)
@@ -130,18 +194,10 @@ def get_plugin_description(
     organisation_id: str,
     plugin_service: PluginService = Depends(get_plugin_service),
 ) -> Response:
-    try:
-        with plugin_service as p:
-            return Response(p.description(plugin_id, organisation_id))
-    except HTTPStatusError as ex:
-        raise HTTPException(ex.response.status_code)
+    return Response(plugin_service.description(plugin_id, organisation_id))
 
 
-@router.post("/settings/clone/{to_organisation_id}")
-def clone_organisation_settings(
-    organisation_id: str,
-    to_organisation_id: str,
-    storage: PluginService = Depends(get_plugin_service),
-):
+@router.post("/settings/clone/{to_org}")
+def clone_settings(organisation_id: str, to_org: str, storage: PluginService = Depends(get_plugin_service)):
     with storage as store:
-        store.clone_settings_to_organisation(organisation_id, to_organisation_id)
+        store.clone_settings_to_organisation(organisation_id, to_org)
