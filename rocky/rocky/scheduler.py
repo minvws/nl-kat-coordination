@@ -11,7 +11,7 @@ from typing import Any
 import httpx
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from httpx import ConnectError, HTTPStatusError, RequestError, codes
+from httpx import ConnectError, HTTPError, HTTPStatusError, RequestError, codes
 from pydantic import BaseModel, ConfigDict, Field, SerializeAsAny, ValidationError
 
 from rocky.health import ServiceHealth
@@ -124,7 +124,7 @@ class PaginatedTasksResponse(BaseModel):
 
 
 class LazyTaskList:
-    HARD_LIMIT = 99_999_999
+    HARD_LIMIT = 500
 
     def __init__(
         self,
@@ -201,6 +201,10 @@ class SchedulerConflictError(SchedulerError):
     message = _("The Scheduler has received a conflict. Your task is already in queue.")
 
 
+class SchedulerHTTPError(SchedulerError):
+    message = _("A HTTPError occurred. See Scheduler logs for more info.")
+
+
 class SchedulerClient:
     def __init__(self, base_uri: str, organization_code: str):
         self._client = httpx.Client(base_url=base_uri)
@@ -262,6 +266,8 @@ class SchedulerClient:
             health_endpoint = self._client.get("/health")
             health_endpoint.raise_for_status()
             return ServiceHealth.model_validate_json(health_endpoint.content)
+        except HTTPError:
+            raise SchedulerHTTPError()
         except ConnectError:
             raise SchedulerConnectError()
 

@@ -41,8 +41,7 @@
                                             <a href="{% url "normalizer_detail" organization.code task.p_item.data.normalizer.id %}">{{ task.p_item.data.normalizer.id }}</a>
                                         </td>
                                         <td class="nowrap">
-                                            {% include "tasks/partials/task_status.html" %}
-
+                                            <i class="icon {{ task.status.value }}"></i>&nbsp;{{ task.status.value|capfirst }}
                                         </td>
                                         <td>{{ task.created_at }}</td>
                                         <td>

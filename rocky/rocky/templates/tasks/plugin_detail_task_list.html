@@ -23,8 +23,7 @@
                 {% for task in task_list %}
                     <tr data-task-id="{{ task.id }}">
                         <td class="nowrap">
-                            {% include "tasks/partials/task_status.html" %}
-
+                            <i class="icon {{ task.status.value }}"></i>&nbsp;{{ task.status.value|capfirst }}
                         </td>
                         <td>{{ task.created_at }}</td>
                         <td>

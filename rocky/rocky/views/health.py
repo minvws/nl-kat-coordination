@@ -55,7 +55,7 @@ def get_octopoes_health(octopoes_api_connector: OctopoesAPIConnector) -> Service
 def get_scheduler_health(organization_code: str) -> ServiceHealth:
     try:
         scheduler_health = scheduler_client(organization_code).health()
-    except (SchedulerError, HTTPError):
+    except SchedulerError:
         logger.exception("Error while retrieving Scheduler health state")
         scheduler_health = ServiceHealth(
             service="scheduler",
