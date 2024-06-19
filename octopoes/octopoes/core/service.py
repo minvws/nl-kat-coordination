@@ -5,8 +5,8 @@ from datetime import datetime, timezone
 from logging import getLogger
 from typing import overload
 
-from bits.cache import BIT_CACHE
 from bits.definitions import get_bit_definitions
+from bits.runner import BitRunner
 
 from octopoes.config.settings import (
     DEFAULT_LIMIT,
@@ -199,8 +199,8 @@ class OctopoesService:
                 config = configs[-1].config
 
         try:
-            oois = BIT_CACHE.get_bit(bit_definition, source, parameters, config)
-            self.save_origin(origin, oois, valid_time)
+            resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
+            self.save_origin(origin, resulting_oois, valid_time)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
 
