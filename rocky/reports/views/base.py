@@ -321,20 +321,23 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
         return plugin_data
 
-    def save_report(
+    def save_report_raw(self, data: dict) -> str:
+        report_data_raw_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict(data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
+
+        return report_data_raw_id
+
+    def save_report_ooi(
         self,
-        data: dict,
+        report_data_raw_id: str,
         report_type: type[Report] | type[MultiReport] | type[AggregateReport],
         input_oois: list[str],
         parent: Reference | None,
         has_parent: bool,
         observed_at: datetime,
     ) -> ReportOOI:
-        report_data_raw_id = self.bytes_client.upload_raw(
-            raw=ReportDataDict(data).model_dump_json().encode(),
-            manual_mime_types={"openkat/report"},
-        )
-
         report_ooi = ReportOOI(
             name=str(report_type.name),
             report_type=str(report_type.id),

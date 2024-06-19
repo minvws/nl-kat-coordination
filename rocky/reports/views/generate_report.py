@@ -209,8 +209,8 @@ class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Te
 
         # if its not a single report, we need a parent
         if number_of_reports > 1:
-            report_ooi = self.save_report(
-                data={},
+            report_ooi = self.save_report_ooi(
+                report_data_raw_id="",
                 report_type=ConcatenatedReport,
                 input_oois=[],
                 parent=None,
@@ -219,8 +219,9 @@ class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Te
             )
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
-                    self.save_report(
-                        data=data["data"],
+                    raw_id = self.save_report_raw(data=data["data"])
+                    self.save_report_ooi(
+                        report_data_raw_id=raw_id,
                         report_type=get_report_by_id(report_type),
                         input_oois=[ooi],
                         parent=report_ooi.reference,
@@ -232,8 +233,9 @@ class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Te
             report_type = next(iter(report_data))
             ooi = next(iter(report_data[report_type]))
             data = report_data[report_type][ooi]
-            report_ooi = self.save_report(
-                data=data["data"],
+            raw_id = self.save_report_raw(data=data["data"])
+            report_ooi = self.save_report_ooi(
+                report_data_raw_id=raw_id,
                 report_type=get_report_by_id(report_type),
                 input_oois=[ooi],
                 parent=None,

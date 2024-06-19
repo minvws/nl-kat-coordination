@@ -13,11 +13,7 @@ from django.views.generic import TemplateView
 
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.definitions import Report
-from reports.report_types.helpers import (
-    get_ooi_types_from_aggregate_report,
-    get_report_by_id,
-    get_report_types_from_aggregate_report,
-)
+from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
     ReportBreadcrumbs,
@@ -199,8 +195,9 @@ class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
         observed_at = self.get_observed_at()
 
         # Create the report
-        report_ooi = self.save_report(
-            data=post_processed_data,
+        report_data_raw_id = self.save_report_raw(data=post_processed_data)
+        report_ooi = self.save_report_ooi(
+            report_data_raw_id=report_data_raw_id,
             report_type=type(aggregate_report),
             input_oois=[ooi.primary_key for ooi in input_oois],
             parent=None,
@@ -208,18 +205,10 @@ class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
             observed_at=observed_at,
         )
 
-        # Save the child reports if requested
-        if "save_child_reports" in request.POST:
-            for ooi, types in report_data.items():
-                for report_type, data in types.items():
-                    self.save_report(
-                        data=data,
-                        report_type=get_report_by_id(report_type),
-                        input_oois=[ooi],
-                        parent=report_ooi.reference,
-                        has_parent=True,
-                        observed_at=observed_at,
-                    )
+        # Save the child reports to bytes
+        for ooi, types in report_data.items():
+            for report_type, data in types.items():
+                self.save_report_raw(data=data)
 
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
