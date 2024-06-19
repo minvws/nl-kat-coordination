@@ -1,0 +1,19 @@
+{
+  "title": "Arguments",
+  "type": "object",
+  "properties": {
+    "COMMAND": {
+      "title": "COMMAND",
+      "type": "string",
+      "description": "The command to execute remotely"
+    },
+    "REMOTE_URL": {
+      "title": "REMOTE_URL",
+      "type": "string",
+      "description": "The command location to execute the command"
+    }
+  },
+  "required": [
+    "COMMAND"
+  ]
+}

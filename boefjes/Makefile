@@ -40,6 +40,8 @@ images:  # Build the images for the containerized boefjes
 	# docker build -f images/base.Dockerfile -t openkat/dns-records --build-arg BOEFJE_PATH=./boefjes/plugins/kat_dns .
 	docker build -f ./boefjes/plugins/kat_dnssec/boefje.Dockerfile -t openkat/dns-sec .
 	docker build -f ./boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile -t openkat/nmap  .
+	docker build -f ./boefjes/plugins/kat_remote_scanner/boefje.Dockerfile -t openkat/remote-scanner  .
+
 
 
 ##

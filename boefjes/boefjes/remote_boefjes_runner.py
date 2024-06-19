@@ -26,7 +26,7 @@ class RemoteBoefjesRunner:
         )
 
     def run(self) -> None:
-        remote_url = self.boefje_meta.environment.get("remote_url", "")
+        remote_url = self.boefje_meta.environment.get("REMOTE_URL", "")
         if not remote_url:
             raise RuntimeError("Boefje does not have a URL")
 

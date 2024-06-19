@@ -106,7 +106,7 @@ class BoefjeHandler(Handler):
         boefje_resource = self.local_repository.by_id(boefje_meta.boefje.id)
 
         # Check if the user has provided the boefje with a `remote_url`, if so, use the `RemoteBoefjesRunner`
-        if boefje_meta.environment and boefje_meta.environment.get("remote_url", ""):
+        if boefje_meta.environment and boefje_meta.environment.get("REMOTE_URL", ""):
             logger.info(
                 "Forwarding boefje %s[task_id=%s] to a remote container",
                 boefje_meta.boefje.id,
