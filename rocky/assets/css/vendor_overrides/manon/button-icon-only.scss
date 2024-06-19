@@ -1,0 +1,11 @@
+button,
+a.button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  &.icon-only {
+    &::before {
+      color: var(--link-text-color);
+    }
+  }
+}
