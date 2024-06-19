@@ -34,12 +34,12 @@ jobs:
   #       with:
   #         pattern: "*-coverage-unit"
 
-      # - name: Get coverage files
-      #   run: find . -name coverage.xml -exec dirname {} \; | xargs basename | xargs  | jq -R -c 'split(" ")'
-  
-      # - name: Fix coverage reports
-      #   run: |
-      #     sed -i 's|<source></source>|<source>/github/workspace/mula</source>|g' mula-coverage-unit/coverage.xml
+  # - name: Get coverage files
+  #   run: find . -name coverage.xml -exec dirname {} \; | xargs basename | xargs  | jq -R -c 'split(" ")'
+
+  # - name: Fix coverage reports
+  #   run: |
+  #     sed -i 's|<source></source>|<source>/github/workspace/mula</source>|g' mula-coverage-unit/coverage.xml
 
   fix-coverage-reports:
     runs-on: ubuntu-latest
@@ -59,27 +59,48 @@ jobs:
         with:
           name: ${{ matrix.module }}-coverage-unit
           path: ${{ matrix.module }}-coverage-unit
-  
+
       - run: tree .
 
       - name: Print
         run: cat "${{ github.workspace }}/${{ matrix.module }}-coverage-unit/coverage.xml"
 
-      - name: Fix coverage reports
+      - name: Fix coverage report
         uses: Mudlet/xmlstarlet-action@master
         with:
-          args: ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}" "${{ matrix.module }}-coverage-unit/coverage.xml"
+          args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module }}/" "${{ matrix.module }}-coverage-unit/coverage.xml"
 
-      - name: test mula
+      # todo: find a way to fix the filename attribute in the coverage, these should be relative to the base dir and not the coverage source!
+      # - name: test mula
+      #   id: test_mula
+      #   if: ${{ matrix.module == 'mula' }}
+      #   uses: Mudlet/xmlstarlet-action@master
+      #   with:
+      #     # args: edit --inplace --update "coverage/sources" --value "/github/workspace/${{ matrix.module }}/scheduler/" "${{ matrix.module }}-coverage-unit/coverage.xml"
+      #     # args: edit --inplace --update "coverage/sources" --value "${{ matrix.module }}/scheduler/" "${{ matrix.module }}-coverage-unit/coverage.xml"
+      #     args: edit --inplace --update "//class/@filename" --expr "concat('mula/scheduler/', .)" "${{ matrix.module }}-coverage-unit/coverage.xml"
+
+
+      - name: fix via script
         if: ${{ matrix.module == 'mula' }}
-        uses: Mudlet/xmlstarlet-action@master
-        with:
-          args: ed -L --update "coverage/sources" -v "/github/workspace/${{ matrix.module }}/scheduler" "${{ matrix.module }}-coverage-unit/coverage.xml"
+        shell: python
+        run: |
+          #!/usr/bin/env python
+          import xml.etree.ElementTree as etree
+          from pathlib import Path
+
+          def path_prefixer(file: Path, prefix: Path) -> None:
+              xml = file.read_text()
+              root = etree.fromstring(xml)
+              for element in root.findall(".//*[@filename]"):
+                  element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
+              file.write_text(etree.tostring(root).decode())
+
+          path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("mula/scheduler"))
 
       - name: Print
         run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
 
-      
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -91,7 +112,7 @@ jobs:
     # needs: pre-commit-run
     needs:
       # - octopoes-tests
-     # - bytes-tests
+      # - bytes-tests
       # - mula-tests
       - fix-coverage-reports
 
@@ -116,12 +137,11 @@ jobs:
 
       # todo: create a job matrix for fixing all the coverage.xml file sources
       # todo: https://github.com/Mudlet/xmlstarlet-action
-      # todo: cat coverage.xml | xml ed -L --update "coverage/sources" -v "test" | head
+      # todo: cat coverage.xml | xml ed --inplace --update "coverage/sources" --value "test" | head
 
       - run: pwd && tree .
 
       - run: cat *-coverage-unit-fixed/coverage.xml
-
 
       - name: SonarCloud
         uses: SonarSource/sonarcloud-github-action@v2.2.0
