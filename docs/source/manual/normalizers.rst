@@ -16,7 +16,7 @@ In general the approach is:
 - Follow the wizard. Make sure you export the file to XML.
 
 In your OpenKAT browser tab:
-- Click on 'Objects > Upload raw file' or go through the Katalogus: Katalogus > Burpsuite normalizer. Under the tab 'Consumes' click on the 'xml/burp-export' link. The mime-type should be automatically filled in. 
+- Click on 'Objects > Upload raw file' or go through the Katalogus: Katalogus > Burpsuite normalizer. Under the tab 'Consumes' click on the 'xml/burp-export' link. The mime-type should be automatically filled in.
 - Select the burp raw file. As mime-type use `xml/burp-export`.
 - Click the 'Upload raw' button.
 
