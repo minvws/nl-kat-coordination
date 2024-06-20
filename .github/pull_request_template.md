@@ -4,7 +4,9 @@ _Please describe the essence of this PR in a few sentences. Mention any breaking
 
 ### Issue link
 
-_Please add a link to the issue after "Closes". If there is no issue for this PR, please add it to the project board directly._
+_You have to create an issue to link to this PR. If this really is not possible, write a very detailed description here and add this PR to the project board directly._
+
+_Please add the link to the issue after "Closes"._
 
 Closes ...
 
@@ -12,20 +14,27 @@ Closes ...
 
 _Please add some proof in the form of screenshots or screen recordings to show (off) new functionality, if there are interesting new features for end-users._
 
+### QA notes
+
+_Please add some information for QA on how to test the newly created code._
+
 ---
 
 ### Code Checklist
 
+<!--- Mandatory: --->
+
 - [ ] All the commits in this PR are properly PGP-signed and verified.
-- [ ] This PR only contains functionality relevant to the issue; tickets have been created for newly discovered issues.
+- [ ] This PR only contains functionality relevant to the issue.
 - [ ] I have written unit tests for the changes or fixes I made.
-- [ ] For any non-trivial functionality, I have added integration and/or end-to-end tests.
+- [ ] I have checked the documentation and made changes where necessary.
 - [ ] I have performed a self-review of my code and refactored it to the best of my abilities.
 
-### Communication
+<!--- If applicable: --->
 
+- [ ] Tickets have been created for newly discovered issues.
+- [ ] For any non-trivial functionality, I have added integration and/or end-to-end tests.
 - [ ] I have informed others of any required `.env` changes files if required and changed the `.env-dist` accordingly.
-- [ ] I have made corresponding changes to the documentation, if necessary.
 - [ ] I have included comments in the code to elaborate on what is not self-evident from the code itself, including references to issues and discussions online, or implicit behavior of an interface.
 
 ---
