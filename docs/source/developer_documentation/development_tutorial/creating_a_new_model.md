@@ -63,5 +63,63 @@ Now that our model is finished we need to add it to the lists of existing OOIs. 
 from octopoes.models.ooi.greeting import Greeting
 ```
 
-And then adding our Greeting model to the `ConcreteOOIType` set.
+And then adding our Greeting model to the `ConcreteOOIType` set. This is what that would look like:
+
+**BEFORE**
+
+```python
+...
+ConcreteOOIType = (
+    CertificateType
+    | DnsType
+    | DnsRecordType
+    | ConcreteNetworkType
+    | ServiceType
+    | SoftwareType
+    | WebType
+    | DNSSPFMechanismIP
+    | DNSSPFMechanismHostname
+    | DNSSPFMechanismNetBlock
+    | DNSSPFRecord
+    | MonitoringType
+    | EmailSecurityType
+    | Finding
+    | MutedFinding
+    | ConcreteFindingTypeType
+    | ConfigType
+    | Question
+    | ReportsType
+)
+...
+```
+
+**AFTER**
+
+```python
+...
+ConcreteOOIType = (
+    CertificateType
+    | DnsType
+    | DnsRecordType
+    | ConcreteNetworkType
+    | ServiceType
+    | SoftwareType
+    | WebType
+    | DNSSPFMechanismIP
+    | DNSSPFMechanismHostname
+    | DNSSPFMechanismNetBlock
+    | DNSSPFRecord
+    | MonitoringType
+    | EmailSecurityType
+    | Finding
+    | MutedFinding
+    | ConcreteFindingTypeType
+    | ConfigType
+    | Question
+    | ReportsType
+    | Greeting
+)
+...
+```
+
 After this. OpenKAT has all the information needed for our model. Next, we will make a normalizer that takes in the boefje's raw data and makes a Greeting OOI.
