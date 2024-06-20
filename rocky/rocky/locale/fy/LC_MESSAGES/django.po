@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-05-23 15:00+0000\n"
-"PO-Revision-Date: 2024-06-08 13:09+0000\n"
+"PO-Revision-Date: 2024-06-20 13:42+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
 "Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/"
 "nl-kat-coordination/fy/>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.6-dev\n"
+"X-Generator: Weblate 5.6-rc\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -1847,7 +1847,7 @@ msgstr ""
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "DNS report"
-msgstr ""
+msgstr "DNS-rapport"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
@@ -1983,7 +1983,7 @@ msgstr ""
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
 msgid "OpenKAT Introduction"
-msgstr ""
+msgstr "Yntroduksje OpenKAT"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
@@ -2210,7 +2210,7 @@ msgstr ""
 
 #: onboarding/templates/step_4_report.html
 msgid "Report"
-msgstr ""
+msgstr "Rapport"
 
 #: onboarding/templates/step_4_report.html
 msgid "Boefjes are scanning"
@@ -3553,7 +3553,7 @@ msgstr ""
 
 #: reports/templates/partials/main_navigation.html
 msgid "Generate a report"
-msgstr ""
+msgstr "Generearje in rapport"
 
 #: reports/templates/partials/main_navigation.html
 msgid ""
@@ -5189,6 +5189,9 @@ msgid ""
 "finding for more detailed information about the issue, its origin, severity "
 "and possible solutions."
 msgstr ""
+"Dit binne de befiningen fan in OpenKAT-analyze %(observed_at)s. Klik op in "
+"befining foar mear detaillearre ynformaasje oer it probleem, de oarsprong, "
+"earnst en mooglike oplossingen."
 
 #: rocky/templates/oois/ooi_report_404.html
 #, python-format
