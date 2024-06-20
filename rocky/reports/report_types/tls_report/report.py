@@ -22,7 +22,7 @@ TREE_DEPTH = 3
 class TLSReport(Report):
     id = "tls-report"
     name = _("TLS Report")
-    description: str = _("TLS reports assess the security of data encryption and transmission protocols.")
+    description: str = _("TLS Report assesses the security of data encryption and transmission protocols.")
     plugins = {"required": ["testssl-sh-ciphers"], "optional": []}
     input_ooi_types = {IPService}
     template_path = "tls_report/report.html"
