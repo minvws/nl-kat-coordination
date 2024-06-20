@@ -17,3 +17,4 @@ Contains documentation for developers and contributors.
    octopoes_models
    octopoes_research
    keiko
+   reports
