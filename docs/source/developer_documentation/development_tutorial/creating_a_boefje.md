@@ -84,7 +84,7 @@ This is an example of a `schema.json` file:
 - `properties`: This contains a list of objects which each will show the KAT-alogus what inputs are requested from the user. This can range from requesting for an API-key to extra commands the boefje should run.
   Inside the `boefje.json` file, we specified 2 environment variables that will be used by this boefje.
   - `MESSAGE`: For this property we ask the user to send us a string which this boefje will use to create some raw data.
-  - `NUMBER`: For this property we ask the user to send us an integer between 1 and 9.
+  - `NUMBER`: For this property we ask the user to send us an integer between 0 and 9.
 - `required`: In here we need to give a list of the objects' names that the user has to provide to run our boefje. For this example, we will only require the user to give us the `MESSAGE` variable. We do this by adding `"MESSAGE"` to the `required` list.
 
 ## `main.py`
