@@ -30,7 +30,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
             yield ip_port
 
             if "vulns" in scan:
-                for cve in scan["vulns"].settings():
+                for cve in scan["vulns"].values():
                     ft = CVEFindingType(id=cve)
                     f = Finding(finding_type=ft.reference, ooi=ip_port.reference)
                     yield ft
