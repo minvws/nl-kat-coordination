@@ -3,12 +3,12 @@ from concurrent import futures
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
-import httpx
 import structlog
 from opentelemetry import trace
 
 from scheduler import context, models, queues, rankers
 from scheduler.connectors import listeners
+from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
     OOI,
     Boefje,
@@ -216,8 +216,8 @@ class BoefjeScheduler(Scheduler):
         new_boefjes = None
         try:
             new_boefjes = self.ctx.services.katalogus.get_new_boefjes_by_org_id(self.organisation.id)
-        except httpx.HTTPError:
-            self.logger.warning(
+        except ExternalServiceError:
+            self.logger.error(
                 "Failed to get new boefjes for organisation: %s from katalogus",
                 self.organisation.name,
                 organisation_id=self.organisation.id,
@@ -242,6 +242,16 @@ class BoefjeScheduler(Scheduler):
         )
 
         for boefje in new_boefjes:
+            if not boefje.consumes:
+                self.logger.debug(
+                    "No consumes found for boefje: %s",
+                    boefje.name,
+                    boefje_id=boefje.id,
+                    organisation_id=self.organisation.id,
+                    scheduler_id=self.scheduler_id,
+                )
+                continue
+
             oois_by_object_type: list[OOI] = []
             try:
                 oois_by_object_type = self.ctx.services.octopoes.get_objects_by_object_types(
@@ -249,12 +259,13 @@ class BoefjeScheduler(Scheduler):
                     boefje.consumes,
                     list(range(boefje.scan_level, 5)),
                 )
-            except httpx.HTTPError:
-                self.logger.warning(
+            except ExternalServiceError as exc:
+                self.logger.error(
                     "Could not get oois for organisation: %s from octopoes",
                     self.organisation.name,
                     organisation_id=self.organisation.id,
                     scheduler_id=self.scheduler_id,
+                    exc_info=exc,
                 )
                 continue
 
@@ -287,8 +298,8 @@ class BoefjeScheduler(Scheduler):
                 n=self.ctx.config.pq_max_random_objects,
                 scan_level=[1, 2, 3, 4],
             )
-        except httpx.HTTPError:
-            self.logger.warning(
+        except ExternalServiceError:
+            self.logger.exception(
                 "Could not get random oois for organisation: %s from octopoes",
                 self.organisation.name,
                 organisation_id=self.organisation.id,
@@ -434,7 +445,10 @@ class BoefjeScheduler(Scheduler):
             )
             raise exc_db
 
-        if task_db is not None and task_db.status not in [TaskStatus.FAILED, TaskStatus.COMPLETED]:
+        if task_db is not None and task_db.status not in [
+            TaskStatus.FAILED,
+            TaskStatus.COMPLETED,
+        ]:
             self.logger.debug(
                 "Task is still running, according to the datastore",
                 task_id=task_db.id,
@@ -450,16 +464,16 @@ class BoefjeScheduler(Scheduler):
                 input_ooi=task.input_ooi,
                 organization_id=task.organization,
             )
-        except Exception as exc_bytes:
+        except ExternalServiceError as exc:
             self.logger.error(
                 "Failed to get last run boefje from bytes",
                 boefje_id=task.boefje.id,
                 input_ooi_primary_key=task.input_ooi,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
-                exc_info=exc_bytes,
+                exc_info=exc,
             )
-            raise exc_bytes
+            raise exc
 
         # Task has been finished (failed, or succeeded) according to
         # the datastore, but we have no results of it in bytes, meaning
@@ -637,14 +651,26 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        if self.is_item_on_queue_by_hash(task.hash):
-            self.logger.debug(
-                "Task is already on queue: %s",
+        try:
+            if self.is_item_on_queue_by_hash(task.hash):
+                self.logger.debug(
+                    'Task "%s" is already enqueued',
+                    task.id,
+                    task_id=task.id,
+                    organisation_id=self.organisation.id,
+                    scheduler_id=self.scheduler_id,
+                    caller=caller,
+                )
+                return
+        except Exception:
+            self.logger.warning(
+                "Could not check if task is running: %s",
                 task.id,
                 task_id=task.id,
                 organisation_id=self.organisation.id,
                 scheduler_id=self.scheduler_id,
                 caller=caller,
+                exc_info=True,
             )
             return
 
@@ -739,7 +765,7 @@ class BoefjeScheduler(Scheduler):
                 input_ooi=task.input_ooi,
                 organization_id=task.organization,
             )
-        except Exception as exc_bytes:
+        except ExternalServiceError as exc_bytes:
             self.logger.error(
                 "Failed to get last run boefje from bytes",
                 boefje_id=task.boefje.id,
@@ -780,8 +806,8 @@ class BoefjeScheduler(Scheduler):
                 ooi.object_type,
                 self.organisation.id,
             )
-        except httpx.ConnectError:
-            self.logger.warning(
+        except ExternalServiceError:
+            self.logger.error(
                 "Could not get boefjes for object_type: %s",
                 ooi.object_type,
                 object_type=ooi.object_type,

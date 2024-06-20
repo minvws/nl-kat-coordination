@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-import httpx
 from scheduler import config, connectors, models, schedulers, storage
 from structlog.testing import capture_logs
 
@@ -1288,8 +1287,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            httpx.ConnectError("Connection error"),
-            httpx.ConnectError("Connection error"),
+            connectors.errors.ExternalServiceError("External service is not available."),
+            connectors.errors.ExternalServiceError("External service is not available."),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1308,6 +1307,36 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
         # Mocks
         self.mock_get_objects_by_object_types.return_value = [ooi]
         self.mock_get_new_boefjes_by_org_id.return_value = []
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_new_boefjes_empty_consumes(self):
+        # Arrange
+        scan_profile = ScanProfileFactory(level=0)
+        ooi = OOIFactory(scan_profile=scan_profile)
+        boefje = PluginFactory(scan_level=0, consumes=[])
+
+        # Mocks
+        self.mock_get_objects_by_object_types.return_value = [ooi]
+        self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
+
+        # Act
+        self.scheduler.push_tasks_for_new_boefjes()
+
+        # Task should not be on priority queue
+        self.assertEqual(0, self.scheduler.queue.qsize())
+
+    def test_push_tasks_for_new_boefjes_empty_consumes_no_ooi(self):
+        # Arrange
+        boefje = PluginFactory(scan_level=0, consumes=[])
+
+        # Mocks
+        self.mock_get_objects_by_object_types.return_value = []
+        self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
         # Act
         self.scheduler.push_tasks_for_new_boefjes()
@@ -1339,8 +1368,8 @@ class NewBoefjesTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_objects_by_object_types.side_effect = [
-            httpx.ConnectError("Connection error"),
-            httpx.ConnectError("Connection error"),
+            connectors.errors.ExternalServiceError("External service is not available."),
+            connectors.errors.ExternalServiceError("External service is not available."),
         ]
         self.mock_get_new_boefjes_by_org_id.return_value = [boefje]
 
@@ -1492,8 +1521,8 @@ class RandomObjectsTestCase(BoefjeSchedulerBaseTestCase):
 
         # Mocks
         self.mock_get_random_objects.side_effect = [
-            httpx.ConnectError("Connection error"),
-            httpx.ConnectError("Connection error"),
+            connectors.errors.ExternalServiceError("External service is not available."),
+            connectors.errors.ExternalServiceError("External service is not available."),
         ]
 
         # Act

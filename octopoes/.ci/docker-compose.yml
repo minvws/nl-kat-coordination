@@ -1,13 +1,12 @@
 services:
-
   rabbitmq:
     restart: on-failure
-    image: "rabbitmq:3.12-management"
+    image: "docker.io/library/rabbitmq:3.12-management"
     ports:
       - "127.0.0.1:29003:15672"
       - "127.0.0.1:29004:5672"
     healthcheck:
-      test: [ "CMD", "rabbitmqctl", "status" ]
+      test: ["CMD", "rabbitmqctl", "status"]
       interval: 5s
       retries: 4
     env_file:
@@ -46,7 +45,7 @@ services:
     env_file:
       - ".ci/ci.env"
     ports:
-        - "127.0.0.1:29000:80"
+      - "127.0.0.1:29000:80"
 
   ci_octopoes_api_worker:
     build:
@@ -65,7 +64,7 @@ services:
         hard: 262144
 
   katalogus_mock:
-    image: "wiremock/wiremock:2.34.0"
+    image: "docker.io/wiremock/wiremock:2.34.0"
     volumes:
       - ./.ci/wiremock:/home/wiremock
     ports:

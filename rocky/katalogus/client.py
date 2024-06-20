@@ -3,6 +3,7 @@ from logging import getLogger
 
 import httpx
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import Draft202012Validator
 from pydantic import BaseModel, Field, field_serializer
@@ -18,7 +19,6 @@ logger = getLogger(__name__)
 
 class Plugin(BaseModel):
     id: str
-    repository_id: str
     name: str
     version: str | None = None
     authors: str | None = None
@@ -63,6 +63,22 @@ class Normalizer(Plugin):
         return {ooi_class.get_ooi_type() for ooi_class in produces}
 
 
+class KATalogusError(Exception):
+    message: str = _("The KATalogus has an unexpected error. Check the logs for further details.")
+
+    def __str__(self):
+        return str(self.message)
+
+
+class KATalogusHTTPStatusError(KATalogusError):
+    def __init__(self, *args: object, status_code: str | None = None) -> None:
+        super().__init__(*args)
+        status_message = ""
+        if status_code is not None:
+            status_message = f"{status_code}: "
+        self.message = status_message + _("A HTTP error occurred. Check logs for more info.")
+
+
 class KATalogusClientV1:
     def __init__(self, base_uri: str, organization: str):
         self.session = httpx.Client(base_url=base_uri)
@@ -83,11 +99,14 @@ class KATalogusClientV1:
         response.raise_for_status()
 
     def get_plugins(self, **params):
-        response = self.session.get(f"{self.organization_uri}/plugins", params=params)
-        response.raise_for_status()
+        try:
+            response = self.session.get(f"{self.organization_uri}/plugins", params=params)
+            response.raise_for_status()
+        except httpx.HTTPStatusError as error:
+            raise KATalogusHTTPStatusError(status_code=str(error.response.status_code))
         return [parse_plugin(plugin) for plugin in response.json()]
 
-    def get_plugin(self, plugin_id: str) -> Boefje | Normalizer:
+    def get_plugin(self, plugin_id: str) -> Plugin:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
         return parse_plugin(response.json())
@@ -135,30 +154,31 @@ class KATalogusClientV1:
 
         return ServiceHealth.model_validate_json(response.content)
 
-    def get_normalizers(self) -> list[Normalizer]:
+    def get_normalizers(self) -> list[Plugin]:
         return self.get_plugins(plugin_type="normalizer")
 
-    def get_boefjes(self) -> list[Boefje]:
+    def get_boefjes(self) -> list[Plugin]:
         return self.get_plugins(plugin_type="boefje")
 
-    def enable_boefje(self, plugin: Boefje) -> None:
-        self._patch_boefje_state(plugin.id, True, plugin.repository_id)
+    def enable_boefje(self, plugin: Plugin) -> None:
+        self._patch_boefje_state(plugin.id, True)
 
     def enable_boefje_by_id(self, boefje_id: str) -> None:
         self.enable_boefje(self.get_plugin(boefje_id))
 
-    def disable_boefje(self, plugin: Boefje) -> None:
-        self._patch_boefje_state(plugin.id, False, plugin.repository_id)
+    def disable_boefje(self, plugin: Plugin) -> None:
+        self._patch_boefje_state(plugin.id, False)
 
-    def get_enabled_boefjes(self) -> list[Boefje]:
+    def get_enabled_boefjes(self) -> list[Plugin]:
         return [plugin for plugin in self.get_boefjes() if plugin.enabled]
 
-    def get_enabled_normalizers(self) -> list[Normalizer]:
+    def get_enabled_normalizers(self) -> list[Plugin]:
         return [plugin for plugin in self.get_normalizers() if plugin.enabled]
 
-    def _patch_boefje_state(self, boefje_id: str, enabled: bool, repository_id: str) -> None:
+    def _patch_boefje_state(self, boefje_id: str, enabled: bool) -> None:
         response = self.session.patch(
-            f"{self.organization_uri}/repositories/{repository_id}/plugins/{boefje_id}", json={"enabled": enabled}
+            f"{self.organization_uri}/plugins/{boefje_id}",
+            json={"enabled": enabled},
         )
         response.raise_for_status()
 
@@ -187,7 +207,6 @@ def parse_boefje(boefje: dict) -> Boefje:
 
     return Boefje(
         id=boefje["id"],
-        repository_id=boefje["repository_id"],
         name=boefje.get("name") or boefje["id"],
         description=boefje["description"],
         enabled=boefje["enabled"],
@@ -213,7 +232,6 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
 
     return Normalizer(
         id=normalizer["id"],
-        repository_id=normalizer["repository_id"],
         name=name,
         description=normalizer["description"],
         enabled=normalizer["enabled"],
@@ -223,7 +241,7 @@ def parse_normalizer(normalizer: dict) -> Normalizer:
     )
 
 
-def parse_plugin(plugin: dict) -> Boefje | Normalizer:
+def parse_plugin(plugin: dict) -> Plugin:
     if plugin["type"] == "boefje":
         return parse_boefje(plugin)
     elif plugin["type"] == "normalizer":

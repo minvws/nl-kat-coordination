@@ -2,8 +2,7 @@ import json
 import logging
 from collections.abc import Iterable
 
-from boefjes.job_models import NormalizerMeta
-from octopoes.models import OOI
+from boefjes.job_models import NormalizerAffirmation, NormalizerOutput
 from octopoes.models.ooi.findings import RiskLevelSeverity, SnykFindingType
 
 logger = logging.getLogger(__name__)
@@ -25,20 +24,19 @@ def get_risk_level(severity_score):
     return None
 
 
-def run(normalizer_meta: NormalizerMeta, raw: bytes | str) -> Iterable[OOI]:
-    snyk_finding_type_id = normalizer_meta.raw_data.boefje_meta.arguments["input"]["id"]
+def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
+    snyk_finding_type_id = input_ooi["id"]
     data = json.loads(raw)
 
     risk_score = data.get("risk")
     risk_severity = get_risk_level(float(risk_score))
 
-    yield {
-        "type": "affirmation",
-        "ooi": SnykFindingType(
+    yield NormalizerAffirmation(
+        ooi=SnykFindingType(
             id=snyk_finding_type_id,
             description=data.get("summary"),
             source=f"https://snyk.io/vuln/{snyk_finding_type_id}",
             risk_severity=risk_severity,
             risk_score=risk_score,
-        ).dict(),
-    }
+        )
+    )

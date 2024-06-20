@@ -19,7 +19,7 @@
 </p>
 <div class="horizontal-scroll">
     <table>
-        <caption class="visually-hidden">{% translate "Check overview:" %}</caption>
+        <caption class="visually-hidden">{% translate "Check overview" %}</caption>
         <thead>
             <tr>
                 <th>{% translate "Check" %}</th>
@@ -45,9 +45,9 @@
 </div>
 {% for ip, findings in data.ips.items %}
     {% if findings %}
-        <h5>{{ ip }}</h5>
+        <h5>{% translate "Host:" %} {{ ip.human_readable }}</h5>
         <table>
-            <caption class="visually-hidden">{% translate "Findings:" %}</caption>
+            <caption class="visually-hidden">{% translate "Findings" %}</caption>
             <thead>
                 <tr>
                     <th>{% translate "Compliance issue" %}</th>

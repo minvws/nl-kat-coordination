@@ -7,7 +7,7 @@ import docker
 from boefjes.job_models import BoefjeMeta
 
 NMAP_IMAGE = "instrumentisto/nmap:latest"
-NMAP_VALID_PORTS = (
+NMAP_VALID_PORTS = re.compile(
     "\\s*([TUSP]:)?(\\d+|[a-z*?]+|(\\[?\\d*-\\d*\\]?))(,(([TUSP]:)|\\s)?(\\d+|[a-z*?]+|(\\[?\\d*-\\d*\\]?)))*"
 )
 
@@ -18,7 +18,7 @@ def run_nmap(args: list[str]) -> str:
     return client.containers.run(NMAP_IMAGE, args, remove=True).decode()
 
 
-def build_nmap_arguments(host: str, ports: str) -> list[str]:
+def build_nmap_arguments(host: str, ports: str | None) -> list[str]:
     """Build nmap arguments from the hosts IP with the required ports."""
     ip = ip_address(host)
     args = ["nmap", "-T4", "-Pn", "-r", "-v10", "-sV", "-sS", "-sU", f"-p{validate_ports(ports=ports)}"]
@@ -30,8 +30,7 @@ def build_nmap_arguments(host: str, ports: str) -> list[str]:
 
 
 def validate_ports(
-    ports,
-    valid=re.compile(NMAP_VALID_PORTS),
+    ports: str | None,
 ) -> str:
     """Returns ports argument if valid. Double slashes are for flake8 W605.
 
@@ -55,7 +54,7 @@ def validate_ports(
     """
     if ports is None:
         raise ValueError('"PORTS" argument is not specified.')
-    if valid.fullmatch(ports) is None:
+    if NMAP_VALID_PORTS.fullmatch(ports) is None:
         raise ValueError(f'Invalid PORTS argument "{ports}"')
     return ports
 

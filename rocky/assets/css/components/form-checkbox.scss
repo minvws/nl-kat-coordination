@@ -1,0 +1,7 @@
+form {
+  input[type="checkbox"] {
+    &:disabled {
+      opacity: 1;
+    }
+  }
+}

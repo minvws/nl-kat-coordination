@@ -1,11 +1,11 @@
 import logging
 import typing
-from collections.abc import Callable
+from collections.abc import Callable, Set
 from functools import wraps
 from typing import Any
 from uuid import UUID
 
-from httpx import Client, HTTPError, HTTPStatusError, HTTPTransport, Response
+from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
@@ -51,7 +51,7 @@ class BytesAPIClient:
     def _verify_response(response: Response) -> None:
         try:
             response.raise_for_status()
-        except HTTPError as error:
+        except HTTPStatusError as error:
             if error.response.status_code != 401:
                 logger.error(response.text)
             else:
@@ -90,7 +90,7 @@ class BytesAPIClient:
         self._verify_response(response)
 
     @retry_with_login
-    def save_raw(self, boefje_meta_id: str, raw: bytes, mime_types: frozenset[str] = frozenset()) -> UUID:
+    def save_raw(self, boefje_meta_id: str, raw: str | bytes, mime_types: Set[str] = frozenset()) -> UUID:
         headers = {"content-type": "application/octet-stream"}
         headers.update(self.headers)
         response = self._session.post(
