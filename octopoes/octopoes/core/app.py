@@ -2,7 +2,7 @@ import logging
 
 from amqp import AMQPError
 
-from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings
+from octopoes.config.settings import GATHER_BIT_METRICS, QUEUE_NAME_OCTOPOES, Settings
 from octopoes.core.service import OctopoesService
 from octopoes.events.manager import EventManager, get_rabbit_channel
 from octopoes.repositories.ooi_repository import XTDBOOIRepository
@@ -39,6 +39,9 @@ def bootstrap_octopoes(settings: Settings, client: str, xtdb_session: XTDBSessio
     origin_param_repository = XTDBOriginParameterRepository(event_manager, xtdb_session)
     scan_profile_repository = XTDBScanProfileRepository(event_manager, xtdb_session)
 
-    octopoes = OctopoesService(ooi_repository, origin_repository, origin_param_repository, scan_profile_repository)
-
-    return octopoes
+    if GATHER_BIT_METRICS:
+        return OctopoesService(
+            ooi_repository, origin_repository, origin_param_repository, scan_profile_repository, xtdb_session
+        )
+    else:
+        return OctopoesService(ooi_repository, origin_repository, origin_param_repository, scan_profile_repository)
