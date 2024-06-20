@@ -80,4 +80,3 @@ Let's go to the reports tab, and change our filters again so we can see our Gree
 ## Conclusion
 
 If everything looks correct, then you have just created your very first boefje, normalizer, model, bit and report! Hopefully, this has successfully taught you how you can create plugins on OpenKAT to more efficiently test networks.
-F
