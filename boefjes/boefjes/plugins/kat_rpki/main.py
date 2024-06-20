@@ -51,26 +51,41 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
         bgp_meta = load_json(BGP_META_PATH)
 
     exists = False
-    valid = False
     roas = []
     bgp_entries = []
-    for roa in rpki_json["roas"]:
-        if IPAddress(ip) in IPNetwork(roa["prefix"]):
-            expires = datetime.fromtimestamp(roa["expires"])
-            asn = roa["asn"]
-            roas.append(
-                {"prefix": roa["prefix"], "expires": expires.strftime("%Y-%m-%dT%H:%M%z"), "ta": roa["ta"], "asn": asn}
-            )
-            exists = True
+    invalid_bgp_entries = []
+    if isinstance(rpki_json, dict) and "roas" in rpki_json:
+        for roa in rpki_json["roas"]:
+            if IPAddress(ip) in IPNetwork(roa["prefix"]):
+                expires = datetime.fromtimestamp(roa["expires"])
+                asn = roa["asn"]
+                roas.append(
+                    {
+                        "prefix": roa["prefix"],
+                        "expires": expires.strftime("%Y-%m-%dT%H:%M%z"),
+                        "ta": roa["ta"],
+                        "asn": asn,
+                    }
+                )
+                exists = True
 
-            # check validity through bgp json
-            for entry in bgp_data:
-                if IPAddress(ip) in IPNetwork(entry["CIDR"]):
-                    bgp_entries.append(entry)
-                    if entry["ASN"] == asn:
-                        valid = True
+                # check validity through bgp json
+                invalid_exists = False
+                for entry in bgp_data:
+                    if IPAddress(ip) in IPNetwork(entry["CIDR"]):
+                        bgp_entries.append(entry)
+                        if entry["ASN"] != asn:
+                            invalid_exists = True
 
-    results = {"vrps_records": roas, "exists": exists, "bgp_entries": bgp_entries, "valid": valid}
+                if invalid_exists:
+                    invalid_bgp_entries.append({"ip": ip, "asn": asn})
+
+    results = {
+        "vrps_records": roas,
+        "exists": exists,
+        "bgp_entries": bgp_entries,
+        "invalid_bgp_entries": invalid_bgp_entries,
+    }
 
     return [
         (set(), json.dumps(results)),
@@ -88,7 +103,7 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
 def cache_out_of_date(meta_path: Path) -> bool:
     """Returns True if the cache file is older than the allowed cache_timeout"""
     now = datetime.utcnow()
-    maxage = getenv("RPKI_CACHE_TIMEOUT", RPKI_CACHE_TIMEOUT)
+    maxage = int(getenv("RPKI_CACHE_TIMEOUT", RPKI_CACHE_TIMEOUT))
     meta = load_json(meta_path)
     cached_file_timestamp = datetime.strptime(meta["timestamp"], "%Y-%m-%dT%H:%M:%SZ")
     return (now - cached_file_timestamp).total_seconds() > maxage

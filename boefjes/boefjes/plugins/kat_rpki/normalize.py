@@ -16,7 +16,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
         yield ft
         yield f
 
-    if not results["valid"]:
+    if results["invalid_bgp_entries"]:
         ft = KATFindingType(id="KAT-INVALID-RPKI")
         f = Finding(finding_type=ft.reference, ooi=ooi)
         yield ft
