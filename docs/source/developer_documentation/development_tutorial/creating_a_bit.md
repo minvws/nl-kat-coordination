@@ -92,4 +92,4 @@ We will add the following object to this file:
 }
 ```
 
-After all of this is done, we can run `run kat` and refresh our OpenKAT page. Now our bit should automatically run. But if it takes too long. We can go into the Settings tab and press the _Rerun all bits_ button. After a small delay, we can go to the Findings tab and see our Findings of each Greeting object. If it is... then congratulations! Our Bit is finally working! The last step to complete the introduction is enabling the user to create a report with our findings!
+After all of this is done, we can run `make kat` and refresh our OpenKAT page. Now our bit should automatically run. But if it takes too long. We can go into the Settings tab and press the _Rerun all bits_ button. After a small delay, we can go to the Findings tab and see our Findings of each Greeting object. If it is... then congratulations! Our Bit is finally working! The last step to complete the introduction is enabling the user to create a report with our findings!
