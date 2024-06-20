@@ -209,12 +209,13 @@ class OctopoesService:
                 resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
                 stop = perf_counter()
                 metrics: dict[str, str] = {
-                    "xt/id": "BIT_METRIC",
                     "bit": bit_definition.id,
-                    "source": source.model_dump_json(),
-                    "parameters": str(TypeAdapter(list[OOI]).dump_json(list(parameters.values()))),
                     "config": json.dumps(config),
                     "elapsed": str(stop - start),
+                    "parameters": str(TypeAdapter(list[OOI]).dump_json(list(parameters.values()))),
+                    "source": source.model_dump_json(),
+                    "xt/id": "BIT_METRIC",
+                    "yield": str(TypeAdapter(list[OOI]).dump_json(resulting_oois)),
                 }
                 ops: list[Operation] = [(OperationType.PUT, metrics, valid_time)]
                 self.session.client.submit_transaction(ops)
