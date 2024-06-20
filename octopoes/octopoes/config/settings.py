@@ -89,4 +89,4 @@ DEFAULT_SEVERITY_FILTER = {severity for severity in RiskLevelSeverity}
 DEFAULT_LIMIT = 50
 DEFAULT_OFFSET = 0
 QUEUE_NAME_OCTOPOES: str = "octopoes"
-GATHER_BIT_METRICS: bool = True
+GATHER_BIT_METRICS: bool = False
