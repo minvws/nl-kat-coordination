@@ -1,6 +1,5 @@
 import logging
 from collections.abc import Sequence
-from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -11,6 +10,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import get_ooi_types_from_aggregate_report, get_report_types_from_aggregate_report
@@ -138,39 +138,12 @@ class ReportTypesSelectionAggregateReportView(
         return context
 
 
-class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView):
-    """
-    Show required and optional plugins to start scans to generate OOIs to include in report.
-    """
-
-    template_name = "aggregate_report/setup_scan.html"
-    breadcrumbs_step = 5
-    current_step = 3
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_has_required_plugins():
-            return redirect(self.get_next())
-        if not self.plugins:
-            return redirect(self.get_previous())
-        if self.plugins_enabled():
-            return redirect(self.get_next())
-        return super().get(request, *args, **kwargs)
-
-
-class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
-    """
-    Save the report and redirect to the saved report
-    """
-
-    current_step = 6
-    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
-    report_types: Sequence[type[Report]]
-
-    def post(self, request, *args, **kwargs):
+class SaveAggregateReportMixin(ReportPluginView):
+    def save_report(self) -> ReportOOI:
         if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
+            messages.error(self.request, _("Select at least one report type to proceed."))
             return redirect(
-                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
             )
 
         input_oois = self.get_oois()
@@ -210,11 +183,48 @@ class SaveAggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
             for report_type, data in types.items():
                 self.save_report_raw(data=data)
 
+        return report_ooi
+
+
+class SetupScanAggregateReportView(
+    SaveAggregateReportMixin, AggregateReportStepsMixin, BreadcrumbsAggregateReportView, ReportPluginView
+):
+    """
+    Show required and optional plugins to start scans to generate OOIs to include in report.
+    """
+
+    template_name = "aggregate_report/setup_scan.html"
+    breadcrumbs_step = 5
+    current_step = 3
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.report_has_required_plugins() or self.plugins_enabled():
+            report_ooi = self.save_report()
+
+            return redirect(
+                reverse("view_report", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + urlencode({"report_id": report_ooi.reference})
+            )
+        if not self.plugins:
+            return redirect(self.get_previous())
+        return super().get(request, *args, **kwargs)
+
+
+class SaveAggregateReportView(SaveAggregateReportMixin, BreadcrumbsAggregateReportView, ReportPluginView):
+    """
+    Save the report and redirect to the saved report
+    """
+
+    current_step = 6
+    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
+    report_types: Sequence[type[Report]]
+
+    def post(self, request, *args, **kwargs):
+        report_ooi = self.save_report()
+
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
             + "?"
             + urlencode({"report_id": report_ooi.reference})
         )
-
-    def get_observed_at(self):
-        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)

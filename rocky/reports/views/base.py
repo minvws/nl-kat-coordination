@@ -363,6 +363,9 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
         return report_ooi
 
+    def get_observed_at(self):
+        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
@@ -517,7 +520,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         context["created_at"] = self.report_ooi.date_generated
         context["observed_at"] = self.report_ooi.observed_at
         context["total_oois"] = len(input_oois)
-        context["selected_oois"] = input_oois
+        context["oois"] = input_oois
 
         context["template"] = self.report_ooi.template
         context["report_download_pdf_url"] = url_with_querystring(

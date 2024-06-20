@@ -1,6 +1,5 @@
 import logging
 from collections.abc import Sequence
-from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -13,6 +12,7 @@ from django.views.generic import TemplateView
 
 from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException, TypeNotFound
+from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import Report
 from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_by_id, get_report_types_for_oois
@@ -124,46 +124,12 @@ class ReportTypesSelectionGenerateReportView(
         return context
 
 
-class SetupScanGenerateReportView(
-    GenerateReportStepsMixin,
-    BreadcrumbsGenerateReportView,
-    ReportPluginView,
-    TemplateView,
-):
-    """
-    Show required and optional plugins to start scans to generate OOIs to include in report.
-    """
-
-    template_name = "generate_report/setup_scan.html"
-    breadcrumbs_step = 5
-    current_step = 3
-
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.report_has_required_plugins():
-            return redirect(self.get_next())
-        if not self.plugins:
-            return redirect(self.get_previous())
-        if self.plugins_enabled():
-            return redirect(self.get_next())
-        return super().get(request, *args, **kwargs)
-
-
-class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
-    """
-    Save the report generated.
-    """
-
-    template_name = "generate_report.html"
-    breadcrumbs_step = 6
-    current_step = 6
-    report_types: Sequence[type[Report]]
-    ooi_types = get_ooi_types_with_report()
-
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+class SaveAggregateReportMixin(ReportPluginView):
+    def save_report(self) -> ReportOOI:
         if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
+            messages.error(self.request, _("Select at least one report type to proceed."))
             return redirect(
-                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
+                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
             )
 
         error_reports = []
@@ -252,11 +218,50 @@ class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Te
             }
             messages.error(self.request, error_message)
 
+
+class SetupScanGenerateReportView(
+    GenerateReportStepsMixin,
+    BreadcrumbsGenerateReportView,
+    ReportPluginView,
+    TemplateView,
+):
+    """
+    Show required and optional plugins to start scans to generate OOIs to include in report.
+    """
+
+    template_name = "generate_report/setup_scan.html"
+    breadcrumbs_step = 5
+    current_step = 3
+
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.report_has_required_plugins() or self.plugins_enabled():
+            report_ooi = self.save_report()
+            return redirect(
+                reverse("view_report", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + urlencode({"report_id": report_ooi.reference})
+            )
+        if not self.plugins:
+            return redirect(self.get_previous())
+        return super().get(request, *args, **kwargs)
+
+
+class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
+    """
+    Save the report generated.
+    """
+
+    template_name = "generate_report.html"
+    breadcrumbs_step = 6
+    current_step = 6
+    report_types: Sequence[type[Report]]
+    ooi_types = get_ooi_types_with_report()
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        report_ooi = self.save_report()
+
         return redirect(
             reverse("view_report", kwargs={"organization_code": self.organization.code})
             + "?"
             + urlencode({"report_id": report_ooi.reference})
         )
-
-    def get_observed_at(self):
-        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)

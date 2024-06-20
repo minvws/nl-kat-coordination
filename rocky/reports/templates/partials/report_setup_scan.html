@@ -94,13 +94,6 @@
             {% endif %}
             <form id="generate_report" class="inline" method="post" action="{{ next }}">
                 {% csrf_token %}
-                <div class="checkbox">
-                    <input type="checkbox"
-                           class="display-toggle"
-                           name="save_child_reports"
-                           id="save_child_reports">
-                    <label for="save_child_reports">{% translate "Save child reports" %}</label>
-                </div>
                 <button type="submit">
                     {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
                 </button>
