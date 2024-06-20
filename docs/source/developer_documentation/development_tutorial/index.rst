@@ -16,7 +16,7 @@ Glossary
 +------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Bit        | A plugin that waits for specified OOIs and creates more OOIs from these (mostly used to create findings).                                                                                                                                                             |
 +------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Finding    | A special OOI that tells the user certain events have happened that might interest them. For example, a Finding could say that the server's ssh port is open while it should not.                                                                                     |
+| Finding    | A special OOI that tells the user certain events have happened that might interest them. For example, a Finding could say that the server's SSH port is open while it should not.                                                                                     |
 +------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 
