@@ -14,15 +14,15 @@ After logging in, OpenKAT will guide you through their first-time setup.
 
 We recommend that you at least once go through the onboarding process before developing your boefje.
 
-8. Now we want to enable our boefje, for this we will need to go to the KAT-alogus (from the top nav bar) and look for our boefje and enable it.
-9. If you followed the steps correctly, you should see two text inputs being requested from you. In the first one, you can put in any text that you want to be part of the boefje's greeting. As you might remember the second input is asking for an integer between 1 and 9 (you can see the description of the text inputs by pressing the question mark to the right of the text input.)
+8. Now we want to enable our boefje, for this we will need to go to the KAT-alogus (in the navigation bar at the top) and look for our boefje and enable it.
+9. If you followed the steps correctly, you should see two text inputs being requested from you. In the first one, you can put in any text that you want to be part of the boefje's greeting. As you might remember the second input is asking for an integer between 0 and 9 (you can see the description of the text inputs by pressing the question mark to the right of the text input.)
 10. After having made your choice you can press the "Add settings and enable boefje" button.
-11. Now it should say that the boefje has been enabled, but if we go to the Tasks page (from the top nav-bar) we see that the boefje is currently not doing anything. This is because our boefje will only run if a valid IPAddressV4 or IPAddressV6 OOI is available. Let's create one of those by using existing boefjes and normalizers.
+11. Now it should say that the boefje has been enabled, but if we go to the Tasks page (in the navigation bar at the top) we see that the boefje is currently not doing anything. This is because our boefje will only run if a valid IPAddressV4 or IPAddressV6 OOI is available. Let's create one of those by using existing boefjes and normalizers.
 
-If you do not want to go through the trouble of seeing existing boefjes and normalizers to work you can go to Objects > Add new object > Object type: _IPAddressV4_ > Insert an IPv4 address and choose as network _Network|internet_ and then skip to step 19.
+If you do not want to go through the trouble of seeing existing boefjes and normalizers to work you can go to Objects > Add new object > Object type: _IPAddressV4_ > Insert an IPv4 address for which you have an indemnification, and choose as network _Network|internet_ and then skip to step 19 of this tutorial.
 
 12. Enable the "DnsRecords" boefje. This boefje takes in a hostname and makes a DNS-record from it.
-13. Let's add a URL OOI. Go to Objects (from the top nav-bat) and on the right you will see an "Add" button. After pressing this button press the "Add object" button.
+13. Let's add a URL OOI. Go to Objects (in the navigation bar at the top) and on the right you will see an "Add" button. After pressing this button press the "Add object" button.
 14. As an object type we will choose URL.
 15. As a network for the URL we will select the internet ("Network|internet") and now we have to give it a website URL. For this example, we can use "https://mispo.es/" and then press the "add url" button.
 16. If we now go to the Tasks tab, we will see that still no boefjes are being run. This is because our URL has too low of a clearance level. Go to the tab Objects and select the "mispo.es" OOI by pressing the checkbox in front of it. Then you can change the clearance level on the bottom of the page. To be able to get an IPAddressV4 OOI from this object, we will need to give it a clearance level of L1 or higher. For this example let's set it to L2.
