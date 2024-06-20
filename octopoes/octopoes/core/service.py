@@ -212,10 +212,10 @@ class OctopoesService:
                     "bit": bit_definition.id,
                     "config": json.dumps(config),
                     "elapsed": str(stop - start),
-                    "parameters": str(TypeAdapter(list[OOI]).dump_json(list(parameters.values()))),
+                    "parameters": TypeAdapter(list[OOI]).dump_json(list(parameters.values())).decode(),
                     "source": source.model_dump_json(),
                     "xt/id": "BIT_METRIC",
-                    "yield": str(TypeAdapter(list[OOI]).dump_json(resulting_oois)),
+                    "yield": TypeAdapter(list[OOI]).dump_json(resulting_oois).decode(),
                 }
                 ops: list[Operation] = [(OperationType.PUT, metrics, valid_time)]
                 self.session.client.submit_transaction(ops)
