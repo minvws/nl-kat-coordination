@@ -107,6 +107,7 @@ class ReportTypesSelectionAggregateReportView(
     template_name = "aggregate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
+    ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -129,14 +130,11 @@ class ReportTypesSelectionAggregateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if "all" not in self.selected_oois:
-            context["oois"] = self.get_oois()
-        else:
-            context["oois"] = "all"
         context["available_report_types_aggregate"] = self.available_report_types
         context["count_available_report_types_aggregate"] = len(self.available_report_types["required"]) + len(
             self.available_report_types["optional"]
         )
+        context["total_oois"] = self.get_total_objects()
         return context
 
 
@@ -234,13 +232,20 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
         context["template"] = aggregate_report.template_path
         context["post_processed_data"] = post_processed_data
         context["report_data"] = report_data
+        context["total_oois"] = self.get_total_objects()
         context["report_download_pdf_url"] = url_with_querystring(
-            reverse("aggregate_report_pdf", kwargs={"organization_code": self.organization.code}),
+            reverse(
+                "aggregate_report_pdf",
+                kwargs={"organization_code": self.organization.code},
+            ),
             True,
             **self.request.GET,
         )
         context["report_download_json_url"] = url_with_querystring(
-            reverse("aggregate_report_view", kwargs={"organization_code": self.organization.code}),
+            reverse(
+                "aggregate_report_view",
+                kwargs={"organization_code": self.organization.code},
+            ),
             True,
             **dict(json="true", **self.request.GET),
         )

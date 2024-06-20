@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-16 07:24+0000\n"
+"POT-Creation-Date: 2024-05-23 15:00+0000\n"
 "PO-Revision-Date: 2023-11-18 13:03+0000\n"
 "Last-Translator: jan klopper <jan@underdark.nl>\n"
 "Language-Team: English (Pirate) <https://hosted.weblate.org/projects/openkat/"
@@ -3416,8 +3416,9 @@ msgid "Multi Report"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Select object"
-msgid_plural "Select objects"
+#, python-format
+msgid "Select object (%(total_oois)s)"
+msgid_plural "Select objects (%(total_oois)s)"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3438,12 +3439,6 @@ msgid "Currently filtered on:"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-#: rocky/templates/oois/ooi_list.html
-#, python-format
-msgid "Showing %(length)s of %(total)s objects"
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
 msgid "No objects found."
 msgstr ""
 
@@ -3452,23 +3447,25 @@ msgid "Go to the object page"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "explanation select all"
+msgid "objects selected"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
-msgid "Explanation 'Continue with all OOIs:'"
+msgid "Deselect all objects"
+msgstr ""
+
+#: reports/templates/partials/report_ooi_list.html
+#: rocky/templates/oois/ooi_list.html
+#, python-format
+msgid "Showing %(length)s of %(total)s objects"
 msgstr ""
 
 #: reports/templates/partials/report_ooi_list.html
 #, python-format
-msgid ""
-"This option will select all OOIs (+ current filters) for %(organization)s "
-"organization."
-msgstr ""
-
-#: reports/templates/partials/report_ooi_list.html
-msgid "Continue with all OOIs"
-msgstr ""
+msgid "Select all %(total_oois)s object"
+msgid_plural "Select all %(total_oois)s objects"
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_ooi_list.html
 #: reports/templates/summary/ooi_selection.html tools/forms/ooi.py
@@ -3616,14 +3613,18 @@ msgid ""
 msgstr ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "Selected object"
-msgid_plural "Selected objects"
+#, python-format
+msgid "Selected object (%(total_oois)s)"
+msgid_plural "Selected objects (%(total_oois)s)"
 msgstr[0] ""
 msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
-msgid "You have selected all objects in previous step."
-msgstr ""
+#, python-format
+msgid "You have selected %(total_oois)s object in previous step."
+msgid_plural "You have selected %(total_oois)s objects in previous step."
+msgstr[0] ""
+msgstr[1] ""
 
 #: reports/templates/partials/report_types_selection.html
 msgid "Available report types"

@@ -43,7 +43,7 @@ class LocalPluginRepository:
         if plugin_id in normalizers:
             return normalizers[plugin_id].normalizer
 
-        raise Exception(f"Can't find plugin {plugin_id}")
+        raise KeyError(f"Can't find plugin {plugin_id}")
 
     def schema(self, id_: str) -> dict | None:
         boefjes = self.resolve_boefjes()
@@ -59,23 +59,23 @@ class LocalPluginRepository:
 
         return json.loads(path.read_text())
 
-    def cover_path(self, id_: str) -> Path:
+    def cover_path(self, plugin_id: str) -> Path:
         boefjes = self.resolve_boefjes()
         normalizers = self.resolve_normalizers()
         default_cover_path = self.default_cover_path()
         plugin: BoefjeResource | NormalizerResource
 
-        if id_ in boefjes:
-            plugin = boefjes[id_]
+        if plugin_id in boefjes:
+            plugin = boefjes[plugin_id]
             cover_path = plugin.path / "cover.jpg"
-        elif id_ in normalizers:
-            plugin = normalizers[id_]
+        elif plugin_id in normalizers:
+            plugin = normalizers[plugin_id]
             cover_path = plugin.path / "normalizer_cover.jpg"
         else:
             cover_path = default_cover_path
 
         if not cover_path.exists():
-            logger.debug("Did not find cover for plugin %s", plugin)
+            logger.debug("Did not find cover for plugin %s", plugin_id)
             return default_cover_path
 
         return cover_path

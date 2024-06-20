@@ -110,3 +110,20 @@ function reset_validity(error_element, event) {
   // we need to remove the custom error on change, because otherwise the submit won't allow us to revalidate as the form immediately raises an invalid state.
   error_element.setCustomValidity("");
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+  const select_all_objects_element = document.querySelectorAll(
+    ".select_all_objects_element",
+  );
+  const select_all_objects_form = document.getElementById(
+    "select_all_objects_form",
+  );
+
+  select_all_objects_element.forEach(function (element) {
+    if (select_all_objects_form) {
+      element.addEventListener("click", function () {
+        select_all_objects_form.submit();
+      });
+    }
+  });
+});

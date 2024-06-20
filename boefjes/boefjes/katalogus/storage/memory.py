@@ -1,8 +1,8 @@
-from boefjes.katalogus.models import RESERVED_LOCAL_ID, Organisation, Repository
+from boefjes.katalogus.models import Boefje, Normalizer, Organisation, PluginType
 from boefjes.katalogus.storage.interfaces import (
     OrganisationStorage,
     PluginEnabledStorage,
-    RepositoryStorage,
+    PluginStorage,
     SettingsStorage,
 )
 
@@ -11,9 +11,6 @@ organisations: dict[str, Organisation] = {}
 
 # key = organisation, repository/plugin id; value = enabled/ disabled
 plugins_state: dict[str, dict[str, bool]] = {}
-
-# key = organisation id, repository id; value = repository
-repositories: dict[str, dict[str, Repository]] = {}
 
 
 class OrganisationStorageMemory(OrganisationStorage):
@@ -33,26 +30,31 @@ class OrganisationStorageMemory(OrganisationStorage):
         del self._data[organisation_id]
 
 
-class RepositoryStorageMemory(RepositoryStorage):
-    def __init__(
-        self,
-        organisation_id: str,
-        defaults: dict[str, Repository] | None = None,
-    ):
-        self._data = repositories.setdefault(organisation_id, {}) if defaults is None else defaults
-        self._organisation_id = organisation_id
+class PluginStorageMemory(PluginStorage):
+    def __init__(self):
+        self._boefjes = {}
+        self._normalizers = {}
 
-    def get_by_id(self, id_: str) -> Repository:
-        return self._data[id_]
+    def get_all(self) -> list[PluginType]:
+        return list(self._boefjes.values()) + list(self._normalizers.values())
 
-    def get_all(self) -> dict[str, Repository]:
-        return self._data
+    def boefje_by_id(self, boefje_id: str) -> Boefje:
+        return self._boefjes[boefje_id]
 
-    def create(self, repository: Repository) -> None:
-        self._data[repository.id] = repository
+    def normalizer_by_id(self, normalizer_id: str) -> Normalizer:
+        return self._normalizers[normalizer_id]
 
-    def delete_by_id(self, id_: str) -> None:
-        del self._data[id_]
+    def create_boefje(self, boefje: Boefje) -> None:
+        self._boefjes[boefje.id] = boefje
+
+    def create_normalizer(self, normalizer: Normalizer) -> None:
+        self._normalizers[normalizer.id] = normalizer
+
+    def delete_boefje_by_id(self, boefje_id: str) -> None:
+        del self._boefjes[boefje_id]
+
+    def delete_normalizer_by_id(self, normalizer_id: str) -> None:
+        del self._normalizers[normalizer_id]
 
 
 class SettingsStorageMemory(SettingsStorage):
@@ -87,20 +89,18 @@ class PluginStatesStorageMemory(PluginEnabledStorage):
         self._data = plugins_state.setdefault(organisation, {}) if defaults is None else defaults
         self._organisation = organisation
 
-    def get_by_id(self, plugin_id: str, repository_id: str, organisation_id: str) -> bool:
+    def get_by_id(self, plugin_id: str, organisation_id: str) -> bool:
         return self._data[f"{organisation_id}.{plugin_id}"]
 
-    def get_all_enabled(self, organisation_id: str) -> dict[str, list[str]]:
-        return {
-            RESERVED_LOCAL_ID: [
-                key.split(".", maxsplit=1)[1]
-                for key, value in self._data.items()
-                if value and key.split(".", maxsplit=1)[0] == organisation_id
-            ]
-        }
+    def get_all_enabled(self, organisation_id: str) -> list[str]:
+        return [
+            key.split(".", maxsplit=1)[1]
+            for key, value in self._data.items()
+            if value and key.split(".", maxsplit=1)[0] == organisation_id
+        ]
 
-    def create(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
+    def create(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
         self._data[f"{organisation_id}.{plugin_id}"] = enabled
 
-    def update_or_create_by_id(self, plugin_id: str, repository_id: str, enabled: bool, organisation_id: str) -> None:
+    def update_or_create_by_id(self, plugin_id: str, enabled: bool, organisation_id: str) -> None:
         self._data[f"{organisation_id}.{plugin_id}"] = enabled

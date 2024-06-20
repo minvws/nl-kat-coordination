@@ -106,6 +106,7 @@ class ReportTypesSelectionGenerateReportView(
     template_name = "generate_report/select_report_types.html"
     breadcrumbs_step = 4
     current_step = 2
+    ooi_types = get_ooi_types_with_report()
 
     def get(self, request, *args, **kwargs):
         if not self.selected_oois:
@@ -115,7 +116,8 @@ class ReportTypesSelectionGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.selected_oois))
+        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.oois_pk))
+        context["total_oois"] = self.get_total_objects()
         return context
 
 
@@ -152,6 +154,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
     breadcrumbs_step = 6
     current_step = 6
     report_types: Sequence[type[Report]]
+    ooi_types = get_ooi_types_with_report()
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.selected_report_types:
@@ -166,7 +169,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
 
-        for ooi in self.selected_oois:
+        for ooi in self.get_oois_pk():
             ooi_type = Reference.from_str(ooi).class_
 
             if ooi_type not in by_type:
@@ -216,6 +219,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["created_at"] = datetime.now()
+        context["total_oois"] = self.get_total_objects()
         context["report_data"] = self.generate_reports_for_oois()
         context["report_types"] = [report.class_attributes() for report in self.report_types]
         context["report_download_url"] = url_with_querystring(

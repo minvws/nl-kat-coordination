@@ -39,7 +39,7 @@ except FileNotFoundError:
     logger.warning("No log config found at: %s", settings.log_cfg)
 
 
-app = FastAPI()
+app = FastAPI(title="Octopoes API")
 
 # Set up OpenTelemetry instrumentation
 if settings.span_export_grpc_endpoint is not None:
