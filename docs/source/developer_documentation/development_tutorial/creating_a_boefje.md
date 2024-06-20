@@ -1,6 +1,6 @@
 # Creating a boefje
 
-Inside `boefjes/boefjes/plugins/` create a new folder with a name starting with kat for this example we use `kat_hello_katty`
+Inside `boefjes/boefjes/plugins/` create a new folder with a name starting with `kat_` for this example we use `kat_hello_katty`
 
 Inside this folder we need to have the following files:
 
