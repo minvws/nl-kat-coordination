@@ -20,7 +20,7 @@ This file stays empty.
 
 ## `boefje.json`
 
-This file contains metadata about the boefje. For example, this boefje contains information about what OOI this boefje should look out for. This is the example we will be using:
+This file contains information about our boefje. For example, this file contains information about what OOIs our boefje should be looking out for. Here is the example we will be using:
 
 ```json
 {
@@ -124,7 +124,10 @@ def run(boefje_meta: dict) -> list[tuple[set, bytes | str]]:
     ]
 ```
 
-The most important part is the return value we send back:
+The most important part is the return value we send back. This is what will be used by our normalizer to create our new OOIs.
+
+---
+
 The final task of creating a boefje is specifying what DockerFile our boefje should use. We can do this inside the file located in `boefjes/Makefile`.
 Inside the `images` rule. We have to specify that we want to use `base.Dockerfile` since our boefje does not require any special packages to run. This is as simple as adding a single line. Here is what that would look like in our case:
 
