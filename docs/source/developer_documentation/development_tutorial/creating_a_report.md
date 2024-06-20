@@ -23,7 +23,7 @@ Inside this file, we will parse the data from the findings into our html. This f
 
 We also have to overwrite some attributes of the class to give information about what kind of report it should be. The attributes that we have to reassign are:
 
-- `id`
+- `id`, a unique identifier for our report.
 - `name`, which will be used to display the report type (encapsulated by `gettext_lazy` from the Django package.)
 - `description`, which will be used to explain to the user what kind of report will be generated (encapsulated by `gettext_lazy` from the Django package.)
 - `plugins`, which will tell the user what other plugins (mainly boefjes) are recommended to be enabled when generating this report. (in our case there will be none)
