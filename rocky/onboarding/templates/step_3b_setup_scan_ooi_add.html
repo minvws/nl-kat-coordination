@@ -30,7 +30,7 @@
                     {% blocktranslate trimmed %}
                         Most objects have dependencies on the existence of other objects.
                         For example a URL needs to be connected to a network, hostname,
-                        fqdn (fully qualified domain name) and ip-address.
+                        fqdn (fully qualified domain name) and IP address.
                         OpenKAT collects these additional object automatically when possible.
                         By running plugins to collect or extract this data.
                     {% endblocktranslate %}
@@ -43,7 +43,7 @@
                         the process of creating them manually.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate method="post" class="horizontal-view help">
+                <form novalidate method="post" class="horizontal-view help layout-form">
                     {% csrf_token %}
                     {% translate type as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}

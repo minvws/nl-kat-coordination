@@ -17,7 +17,7 @@ MAIL_FINDING_TYPES = ["KAT-NO-SPF", "KAT-NO-DMARC", "KAT-NO-DKIM"]
 class MailReport(Report):
     id = "mail-report"
     name = _("Mail Report")
-    description = _("System specific mail report that focusses on IP addresses and hostnames.")
+    description = _("System specific Mail Report that focusses on IP addresses and hostnames.")
     plugins = {"required": ["dns-records"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
     template_path = "mail_report/report.html"
