@@ -1,6 +1,6 @@
 import json
 from collections.abc import Iterable
-from ipaddress import IPv4Address
+from ipaddress import ip_address
 
 from boefjes.job_models import NormalizerOutput
 from octopoes.models import Reference
@@ -11,7 +11,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     results = json.loads(raw)
     ooi = Reference.from_str(input_ooi["primary_key"])
 
-    address = IPv4Address(ooi.tokenized.address)
+    address = ip_address(ooi.tokenized.address)
 
     # if the address is private, we do not need a ROA
     if address.is_global:
