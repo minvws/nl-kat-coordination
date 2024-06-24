@@ -35,42 +35,12 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
         yield ft
         yield finding
 
-    if "x-permitted-cross-domain-policies" not in header_keys:
-        ft = KATFindingType(id="KAT-NO-X-PERMITTED-CROSS-DOMAIN-POLICIES")
-        finding = Finding(
-            finding_type=ft.reference,
-            ooi=resource.reference,
-            description="Header x-permitted-cross-domain-policies is missing or not configured correctly.",
-        )
-        yield ft
-        yield finding
-
-    if "x-xss-protection" not in header_keys:
-        ft = KATFindingType(id="KAT-NO-EXPLICIT-XSS-PROTECTION")
-        finding = Finding(
-            finding_type=ft.reference,
-            ooi=resource.reference,
-            description="Header x-xss-protection is missing or not configured correctly.",
-        )
-        yield ft
-        yield finding
-
     if "x-frame-options" not in header_keys:
         ft = KATFindingType(id="KAT-NO-X-FRAME-OPTIONS")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
             description="Header x-frame-options is missing or not configured correctly.",
-        )
-        yield ft
-        yield finding
-
-    if "x-dns-prefetch-control" not in header_keys:
-        ft = KATFindingType(id="KAT-NO-X-DNS-PREFETCH-CONTROL")
-        finding = Finding(
-            finding_type=ft.reference,
-            ooi=resource.reference,
-            description="Header x-dns-prefetch-control is missing or not configured correctly.",
         )
         yield ft
         yield finding
