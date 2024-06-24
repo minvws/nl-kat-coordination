@@ -485,7 +485,9 @@ def test_query_children_of_reports(
     # a "_" to query in the reverse direction in a pull statement.
     query = Query(Report).pull(Report, fields="[* {:Report/_parent_report [*]}]").where(Report, has_parent=False)
 
-    assert xtdb_session.client.query(query) == [
-        [xtdb_ooi_repository.serialize(report2)],
-        [xtdb_ooi_repository.serialize(report) | {"Report/_parent_report": [xtdb_ooi_repository.serialize(child)]}],
-    ]
+    results = xtdb_session.client.query(query)
+    assert len(results) == 2
+    assert [xtdb_ooi_repository.serialize(report2)] in results
+    assert [
+        xtdb_ooi_repository.serialize(report) | {"Report/_parent_report": [xtdb_ooi_repository.serialize(child)]}
+    ] in results
