@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-20 09:41+0000\n"
+"POT-Creation-Date: 2024-06-24 10:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -343,7 +343,6 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_setup.html
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-#: rocky/templates/partials/organization_properties_table.html
 msgid "Organization"
 msgstr ""
 
@@ -718,7 +717,9 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Selected objects:"
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_asset_overview.html
+msgid "Selected objects"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -813,7 +814,7 @@ msgid "This is an overview of the latest settings of all plugins."
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
-msgid "Latest plugin settings:"
+msgid "Latest plugin settings"
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
@@ -994,7 +995,7 @@ msgid "All"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: rocky/templates/oois/ooi_detail.html rocky/templates/tasks/boefjes.html
+#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr ""
@@ -1075,7 +1076,7 @@ msgid " Details"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
-msgid "Overview of settings:"
+msgid "Overview of settings"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
@@ -1286,6 +1287,7 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 #: rocky/templates/organizations/organization_settings.html
+#: rocky/templates/partials/organization_properties_table.html
 msgid "Organization details"
 msgstr ""
 
@@ -1952,7 +1954,6 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/scan.html
 msgid "Boefjes:"
 msgstr ""
 
@@ -2120,11 +2121,6 @@ msgid "Appendix"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "Selected objects"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Currently filtered on"
 msgstr ""
 
@@ -2135,7 +2131,7 @@ msgid "Selected Report Types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-msgid "Report types:"
+msgid "Selected report types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2150,7 +2146,7 @@ msgid "Service Versions and Health"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-msgid "Service, Version and Health:"
+msgid "Service, version and health"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2183,7 +2179,7 @@ msgid "Used Config objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-msgid "Used config objects:"
+msgid "Used config objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2492,6 +2488,7 @@ msgstr ""
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
 #: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
@@ -4376,10 +4373,6 @@ msgid "Total findings"
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
-msgid "Findings:"
-msgstr ""
-
-#: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Total Findings"
 msgstr ""
 
@@ -4433,8 +4426,12 @@ msgstr ""
 msgid "Welcome"
 msgstr ""
 
-#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
+#: rocky/templates/dashboard_client.html
 msgid "User overview:"
+msgstr ""
+
+#: rocky/templates/dashboard_redteam.html
+msgid "User overview"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
@@ -4797,6 +4794,10 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "using boefjes"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
+msgid "Boefjes overview"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
@@ -5720,10 +5721,6 @@ msgstr ""
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Download task data"
-msgstr ""
-
-#: rocky/templates/scan.html
-msgid "Boefjes overview:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
