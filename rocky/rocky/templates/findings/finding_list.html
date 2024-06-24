@@ -28,9 +28,12 @@
                           action="{% url 'finding_mute_bulk' organization.code %}">
                         {% csrf_token %}
                     {% endif %}
+                    <p class="de-emphasized">
+                        {% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}
+                    </p>
                     <div class="horizontal-scroll">
                         <table class="action-buttons nowrap">
-                            <caption>{% translate "Showing " %}{{ object_list|length }} {% translate "of" %} {{ paginator.count }} {% translate "findings" %}</caption>
+                            <caption class="visually-hidden">{% translate "Findings table" %}</caption>
                             <thead>
                                 <tr>
                                     {% if object_list|length > 1 and perms.tools.can_mute_findings %}
@@ -84,16 +87,16 @@
                                     </tr>
                                     <tr class="expando-row">
                                         <td colspan="6">
-                                            <h2 class="heading-normal">{% translate "Finding type:" %}</h2>
+                                            <h2 class="heading-normal">{% translate "Finding type" %}</h2>
                                             <a href="{% ooi_url "ooi_detail" hydrated_finding.finding_type organization.code query=mandatory_fields %}"
                                                title="{% blocktranslate trimmed with finding_type=hydrated_finding.finding_type.human_readable %} Show details for {{ finding_type }} {% endblocktranslate %}">{{ hydrated_finding.finding_type.human_readable }}</a>
-                                            <h2 class="heading-normal">{% translate "OOI type:" %}</h2>
+                                            <h2 class="heading-normal">{% translate "OOI type" %}</h2>
                                             <a href="{% url "ooi_list" organization_code=organization.code %}?ooi_type={{ hydrated_finding.ooi.object_type }}"
                                                title="{% blocktranslate trimmed with ooi_type=hydrated_finding.ooi.object_type %} Show {{ ooi_type }} objects {% endblocktranslate %}">{{ hydrated_finding.ooi.object_type }}</a>
-                                            <h2 class="heading-normal">{% translate "Source OOI:" %}</h2>
+                                            <h2 class="heading-normal">{% translate "Source OOI" %}</h2>
                                             <a href="{% ooi_url "ooi_detail" hydrated_finding.finding.ooi organization.code query=mandatory_fields %}"
                                                title="{% blocktranslate trimmed with ooi=hydrated_finding.finding.ooi.human_readable %} Show details for {{ ooi }} {% endblocktranslate %}">{{ hydrated_finding.finding.ooi.human_readable }}</a>
-                                            <h2 class="heading-normal">{% translate "Risk score:" %}</h2>
+                                            <h2 class="heading-normal">{% translate "Risk score" %}</h2>
                                             <p>{{ hydrated_finding.finding_type.risk_score }}</p>
                                         </td>
                                     </tr>
