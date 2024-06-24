@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-24 15:26+0000\n"
+"POT-Creation-Date: 2024-06-24 15:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1481,6 +1481,7 @@ msgid "OpenKAT introduction"
 msgstr ""
 
 #: onboarding/templates/dns_report.html
+#: onboarding/templates/step_2b_choose_report_type.html
 #: reports/report_types/dns_report/report.py
 msgid "DNS Report"
 msgstr ""
@@ -1640,10 +1641,6 @@ msgstr ""
 msgid ""
 "When you start to generate this report. OpenKAT will guide you through the "
 "necessary steps."
-msgstr ""
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid "DNS report"
 msgstr ""
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
@@ -4424,11 +4421,7 @@ msgstr ""
 msgid "Welcome"
 msgstr ""
 
-#: rocky/templates/dashboard_client.html
-msgid "User overview:"
-msgstr ""
-
-#: rocky/templates/dashboard_redteam.html
+#: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 msgid "User overview"
 msgstr ""
 
