@@ -17,12 +17,12 @@
                     {% blocktranslate trimmed %}
                         Within OpenKAT you can view reports for each of your current objects. For
                         specific reports you can choose one of the available report types and generate
-                        a report. Such as a pen-test, a DNS-report or a Mail Report to give some examples.
+                        a report. Such as a pentest, a DNS-report or a Mail Report to give some examples.
                     {% endblocktranslate %}
                 </p>
                 <p>
                     {% blocktranslate trimmed %}
-                        For this tutorial we suggest a DNS-report to get you started.
+                        For this tutorial we will create a DNS-report to get you started.
                     {% endblocktranslate %}
                 </p>
                 <p>
@@ -38,9 +38,9 @@
                         {% if organization %}
                             <button name="report_type" value="dns-report" type="submit" class="button">{% translate "DNS report" %}</button>
                         {% endif %}
-                        <a href="" class="button disabled">Pen test</a>
-                        <a href="" class="button disabled">Mail report</a>
-                        <a href="" class="button disabled">DigiD</a>
+                        <a href="" class="button ghost disabled">Pentest</a>
+                        <a href="" class="button ghost disabled">Mail Report</a>
+                        <a href="" class="button ghost disabled">DigiD</a>
                         {% if organization %}
                             <a href="{% url "complete_onboarding" organization.code %}"
                                class="button ghost">{% translate "Skip onboarding" %}</a>
