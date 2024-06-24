@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-19 13:42+0000\n"
+"POT-Creation-Date: 2024-06-24 12:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4172,7 +4172,7 @@ msgid "Task list: "
 msgstr ""
 
 #: rocky/scheduler.py
-msgid "Task stats: "
+msgid "Task statistics: "
 msgstr ""
 
 #: rocky/settings.py
@@ -5815,7 +5815,7 @@ msgid "List of tasks for"
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html
-msgid "Stats - Last 24 hours"
+msgid "Task statistics - Last 24 hours"
 msgstr ""
 
 #: rocky/templates/tasks/partials/stats.html

@@ -279,7 +279,7 @@ class SchedulerClient:
             res = self._client.get(f"/tasks/stats/{task_type}-{self.organization_code}")
             res.raise_for_status()
         except ConnectError:
-            raise SchedulerConnectError(extra_message=_("Task stats: "))
+            raise SchedulerConnectError(extra_message=_("Task statistics: "))
         task_stats = json.loads(res.content)
         return task_stats
 
