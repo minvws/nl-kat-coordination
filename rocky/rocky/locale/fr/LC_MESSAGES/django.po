@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 15:00+0000\n"
+"POT-Creation-Date: 2024-06-20 11:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -1624,7 +1624,7 @@ msgstr ""
 msgid ""
 "Within OpenKAT you can view reports for each of your current objects. For "
 "specific reports you can choose one of the available report types and "
-"generate a report. Such as a pen-test, a DNS-report or a mail report to give "
+"generate a report. Such as a pen-test, a DNS-report or a Mail Report to give "
 "some examples."
 msgstr ""
 
@@ -1666,7 +1666,7 @@ msgstr ""
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "A lot of things can be an object within the scope of OpenKAT. For example a "
-"mailserver, an ip-address, a URL, a DNS record, a hostname or a network to "
+"mailserver, an IP address, a URL, a DNS record, a hostname or a network to "
 "name a few.  While these objects can be related to each other they are all "
 "objects within OpenKAT that can be scanned to gain valuable insight."
 msgstr ""
@@ -1714,7 +1714,7 @@ msgstr ""
 msgid ""
 "Most objects have dependencies on the existence of other objects. For "
 "example a URL needs to be connected to a network, hostname, fqdn (fully "
-"qualified domain name) and ip-address. OpenKAT collects these additional "
+"qualified domain name) and IP address. OpenKAT collects these additional "
 "object automatically when possible. By running plugins to collect or extract "
 "this data."
 msgstr ""
@@ -2718,7 +2718,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid ""
-"The findings report provides an overview of the identified findings on the "
+"The Findings Report provides an overview of the identified findings on the "
 "scanned systems. For each finding it shows the risk level and the number of "
 "occurrences of the finding. Under the 'Details' section a description, "
 "impact, recommendation and location of the finding can be found. The risk "
@@ -2760,7 +2760,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview"
+msgid "IPv6 overview"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -2773,13 +2773,13 @@ msgid "IPv6 Report"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.py
-msgid "Check whether hostnames point to ipv6 addresses."
+msgid "Check whether hostnames point to IPv6 addresses."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
 msgid ""
-"The mail report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance check the presence of SPF, DKIM "
+"The Mail Report provides an overview of the compliance checks associated "
+"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
@@ -2804,7 +2804,7 @@ msgstr ""
 
 #: reports/report_types/mail_report/report.py
 msgid ""
-"System specific mail report that focusses on IP addresses and hostnames."
+"System specific Mail Report that focusses on IP addresses and hostnames."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/asset_overview.html
@@ -2919,7 +2919,7 @@ msgid " systems have an IPv6 connection."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/ipv6.html
-msgid "Overview of ip version compliance"
+msgid "Overview of IP version compliance"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
@@ -2939,7 +2939,7 @@ msgid "Open ports"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
-msgid "Occurrences (IP addressees)"
+msgid "Occurrences (IP addresses)"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
@@ -2984,7 +2984,7 @@ msgstr ""
 
 #: reports/report_types/name_server_report/report.html
 msgid ""
-"The name server report provides an overview of the compliance checks that "
+"The Name Server Report provides an overview of the compliance checks that "
 "were performed against the identified Domain Name Servers (DNS). The "
 "compliance checks verify the presence and validity of DNSSEC and whether no "
 "unnecessary ports were identified to be open. The table below gives an "
@@ -3024,12 +3024,12 @@ msgid "Name Server Report"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.py
-msgid "Name server report checks name servers on basic security standards."
+msgid "Name Server Report checks name servers on basic security standards."
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
 msgid ""
-"The open ports report provides an overview of the open ports identified on a "
+"The Open Ports Report provides an overview of the open ports identified on a "
 "system. The ports that are marked as <b>bold</b> were identified by direct "
 "scans performed by OpenKAT (such as nmap). Ports that are not marked in bold "
 "were identified through external services and/or scans (such as Shodan). "
@@ -3063,7 +3063,7 @@ msgstr ""
 
 #: reports/report_types/rpki_report/report.html
 msgid ""
-"The RPKI report shows if an RPKI route announcement was available for the "
+"The RPKI Report shows if an RPKI route announcement was available for the "
 "system and if this announcement is not expired."
 msgstr ""
 
@@ -3098,8 +3098,8 @@ msgstr ""
 
 #: reports/report_types/rpki_report/report.py
 msgid ""
-"Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
-"the ip addresses and whether they are covered by a valid RPKI ROA."
+"Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows "
+"the IP addresses and whether they are covered by a valid RPKI ROA."
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
@@ -3126,7 +3126,7 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.html
 msgid ""
-"The system report provides an overview of the system types (types of similar "
+"The System Report provides an overview of the system types (types of similar "
 "services) that were identified for each system. The following system types "
 "can be identified: DNS servers, Web servers, Mail servers and those "
 "classified as 'Other' servers. Each hostname and/or IP address is given one "
@@ -3152,7 +3152,7 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 msgid ""
-"The TLS report shows which TLS protocols and ciphers were identified on the "
+"The TLS Report shows which TLS protocols and ciphers were identified on the "
 "host for the provided port."
 msgstr ""
 
@@ -3224,13 +3224,13 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.py
 msgid ""
-"TLS reports assess the security of data encryption and transmission "
+"TLS Report assesses the security of data encryption and transmission "
 "protocols."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
 msgid ""
-"The vulnerability report provides an overview of all identified CVE "
+"The Vulnerability Report provides an overview of all identified CVE "
 "vulnerabilities that were identified on the selected systems. For each CVE "
 "the table shows the CVE scoring, the number of occurrences, and the CVE "
 "details."
@@ -3269,7 +3269,7 @@ msgstr ""
 
 #: reports/report_types/web_system_report/report.html
 msgid ""
-"The web system report provides an overview of various web server checks that "
+"The Web System Report provides an overview of various web server checks that "
 "were performed against the scanned system(s). For each performed check the "
 "table below shows whether or not the server is compliant with the checks. A "
 "description of why this compliant check failed is also shown, including an "
@@ -3326,7 +3326,7 @@ msgid "Web System Report"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.py
-msgid "Web system reports check web systems on basic security standards."
+msgid "Web System Reports check web systems on basic security standards."
 msgstr ""
 
 #: reports/templates/generate_report.html
@@ -4469,6 +4469,11 @@ msgid "findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Findings table"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
@@ -4489,8 +4494,8 @@ msgid "Show details for %(finding)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Finding type:"
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+msgid "Finding type"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4500,8 +4505,7 @@ msgid "Show details for %(finding_type)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "OOI type:"
+msgid "OOI type"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4511,8 +4515,7 @@ msgid "Show %(ooi_type)s objects"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Source OOI:"
+msgid "Source OOI"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4521,7 +4524,7 @@ msgid "Show details for %(ooi)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Risk score:"
+msgid "Risk score"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -5055,6 +5058,18 @@ msgstr ""
 msgid "Top 10 most severe Findings"
 msgstr ""
 
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Finding type:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "OOI type:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Source OOI:"
+msgstr ""
+
 #: rocky/templates/organizations/organization_edit.html
 msgid "Edit organization"
 msgstr ""
@@ -5272,7 +5287,7 @@ msgid "graph"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
-msgid "Clearance level inheritance:"
+msgid "Clearance level inheritance"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
@@ -5491,10 +5506,6 @@ msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
-msgid "Finding type"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Open finding details"
 msgstr ""
 
@@ -5682,7 +5693,7 @@ msgid "Boefjes overview:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Clearance level:"
+msgid "Current clearance level"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
@@ -5726,10 +5737,6 @@ msgid ""
 "with\n"
 "                corresponding scan levels.\n"
 "            "
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Set clearance level:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
