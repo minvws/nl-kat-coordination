@@ -8,9 +8,16 @@ from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
 def is_xss_capable(content_type: str) -> bool:
     """Determine if the content type indicates XSS capability."""
-    xss_capable_types = ["text/html", "application/xhtml+xml", "application/xml", "text/xml", "text/plain"]
-    content_type_lower = content_type.lower()
-    return any(content_type_lower.startswith(xss_type) for xss_type in xss_capable_types)
+    xss_capable_types = [
+        "text/html",
+        "application/xhtml+xml",
+        "application/xml",
+        "text/xml",
+        "text/plain",
+        "image/svg+xml",
+    ]
+    main_type = content_type.split(";")[0].strip().lower()
+    return main_type in xss_capable_types
 
 
 def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, Any]) -> Iterator[OOI]:
