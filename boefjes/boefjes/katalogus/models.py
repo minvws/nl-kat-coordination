@@ -14,12 +14,11 @@ class Plugin(BaseModel):
     id: str
     name: str | None = None
     version: str | None = None
-    authors: list[str] | None = None
     created: datetime.datetime | None = None
     description: str | None = None
     environment_keys: list[str] = Field(default_factory=list)
-    related: list[str] | None = None
     enabled: bool = False
+    static: bool = True  # We need to differentiate between local and remote plugins to know which ones can be deleted
 
     def __str__(self):
         return f"{self.id}:{self.version}"
@@ -30,7 +29,6 @@ class Boefje(Plugin):
     scan_level: int = 1
     consumes: set[str] = Field(default_factory=set)
     produces: set[str] = Field(default_factory=set)
-    options: list[str] | None = None
     runnable_hash: str | None = None
     oci_image: str | None = None
     oci_arguments: list[str] = Field(default_factory=list)

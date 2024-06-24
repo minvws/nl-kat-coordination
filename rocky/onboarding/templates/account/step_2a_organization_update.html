@@ -21,7 +21,7 @@
                         page within OpenKAT when necessary.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate method="post" class="horizontal-view help">
+                <form novalidate method="post" class="horizontal-view help layout-form">
                     {% csrf_token %}
                     {% translate "Organization details" as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}

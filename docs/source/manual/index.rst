@@ -8,3 +8,5 @@ An overview of all KAT functionality, from a user perspective.
    :caption: Contents
 
    usermanual
+   reports
+   normalizers
