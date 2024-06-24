@@ -22,5 +22,5 @@ def run(hostname: Hostname, additional_oois: list[DNSAAAARecord | DNSARecord], c
         yield Finding(
             finding_type=finding_type.reference,
             ooi=dns_ns_record.reference,
-            description="This nameserver has no ipv6 address",
+            description="This nameserver has no IPv6 address",
         )

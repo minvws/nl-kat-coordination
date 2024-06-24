@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 15:00+0000\n"
-"PO-Revision-Date: 2024-06-04 12:09+0000\n"
+"POT-Creation-Date: 2024-06-20 11:37+0000\n"
+"PO-Revision-Date: 2024-06-21 14:09+0000\n"
 "Last-Translator: Wim Benes <fryskefirefox@gmail.com>\n"
-"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/"
-"nl-kat-coordination/fy/>\n"
+"Language-Team: Frisian <https://hosted.weblate.org/projects/openkat/nl-kat-"
+"coordination/fy/>\n"
 "Language: fy\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.6-dev\n"
+"X-Generator: Weblate 5.6-rc\n"
 
 #: account/admin.py
 msgid "Permissions"
@@ -1525,29 +1525,35 @@ msgid ""
 "account. You can always add additional user accounts If you’re team expands "
 "in the future."
 msgstr ""
+"It is ek in opsje om OpenKAT te draaien fan in account fan ien brûker út. "
+"Dat is handich as jo de iennige brûker binne. Jo hawwe dan tagong ta de "
+"funksjonaliteit fan de ferskate rollen fan jo account út. Jo kinne altyd "
+"ekstra brûkersaccounts tafoegje as jo team yn de takomst útwreidet."
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Create separate accounts"
-msgstr ""
+msgstr "Meardere accounts oanmeitsje"
 
 #: onboarding/templates/account/step_2c_account_setup_intro.html
 msgid "Continue with this account, onboard me!"
-msgstr ""
+msgstr "Gean troch mei allinnich dizze account. Onboard my!"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Users"
-msgstr ""
+msgstr "Brûkers"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
 "Within OpenKAT there are three types of user accounts. Each has its own "
 "functions."
 msgstr ""
+"Binnen OpenKAT binne der trije soarten brûkersaccounts. Elk hat syn eigen "
+"funksjes."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_4_account_setup_admin.html
@@ -1555,25 +1561,26 @@ msgid ""
 "Each organization must have an admin. The admin can create and manage user "
 "accounts as well as organization details."
 msgstr ""
+"De admin kin brûkers oanmeitsje, beheare en organisaasjegegevens wizigje."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer"
-msgstr ""
+msgstr "Red Teamer"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "A red teamer account can run scans and generate reports."
-msgstr ""
+msgstr "In Red Teamer-account kin scans starte en rapporten oanmeitsje."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account"
-msgstr ""
+msgstr "Brûkersaccount"
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "A client account can access reports."
-msgstr ""
+msgstr "In brûker kin rapporten ynsjen."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid ""
@@ -1581,55 +1588,59 @@ msgid ""
 "function. This introduction will guide you through the setup of both. After "
 "that you can choose to add a client account as well."
 msgstr ""
+"Elke organisaasje hat in admin en in Red Teamer nedich. Dizze yntroduksje "
+"helpt mei it oanmeitsjen fan dizze accounts."
 
 #: onboarding/templates/account/step_3_account_user_type.html
 msgid "Let's add accounts"
-msgstr ""
+msgstr "Accounts tafoegje"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin account setup"
-msgstr ""
+msgstr "Admin-account ynstelle"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 msgid "Admin details"
-msgstr ""
+msgstr "Admindetails"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Skip this step"
-msgstr ""
+msgstr "Oerslaan"
 
 #: onboarding/templates/account/step_4_account_setup_admin.html
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Go back to previous step"
-msgstr ""
+msgstr "Gean werom nei de foarige stap"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer account setup"
-msgstr ""
+msgstr "Red Teamer-account ynstelle"
 
 #: onboarding/templates/account/step_5_account_setup_red_teamer.html
 msgid "Red teamer details"
-msgstr ""
+msgstr "Red Teamerdetails"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Client account setup (optional)"
-msgstr ""
+msgstr "Brûkersaccount ynstelle (opsjoneel)"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid ""
 "A client account can access reports. Adding a client account to the "
 "organization is optional."
 msgstr ""
+"In brûkersaccount kin rapporten ynsjen. In brûkersaccount oan de "
+"organisaasje tafoegje is opsjoneel."
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "User details"
-msgstr ""
+msgstr "Brûkersdetails"
 
 #: onboarding/templates/account/step_6_account_setup_client.html
 msgid "Finish organization setup"
-msgstr ""
+msgstr "Organisaasje ynstelle foltôgje"
 
 #: onboarding/templates/dns_report.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -1639,12 +1650,12 @@ msgstr ""
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: onboarding/templates/step_4_report.html onboarding/view_helpers.py
 msgid "OpenKAT introduction"
-msgstr ""
+msgstr "Yntroduksje OpenKAT"
 
 #: onboarding/templates/dns_report.html
 #: reports/report_types/dns_report/report.py
 msgid "DNS Report"
-msgstr ""
+msgstr "DNS-rapport"
 
 #: onboarding/templates/dns_report.html
 #, python-format
@@ -1653,15 +1664,18 @@ msgid ""
 "finding for more detailed information about the issue, its origin, severity "
 "and possible solutions."
 msgstr ""
+"Dit binne de befiningen fan in OpenKAT-analyze (%(observed_at)s). Klik op in "
+"befining foar mear detaillearre ynformaasje oer it probleem, de oarsprong, "
+"earnst en mooglike oplossingen."
 
 #: onboarding/templates/dns_report.html
 msgid "DNS Tree"
-msgstr ""
+msgstr "DNS-beam"
 
 #: onboarding/templates/step_1_introduction.html
 #: rocky/templates/landing_page.html
 msgid "Welcome to OpenKAT"
-msgstr ""
+msgstr "Wolkom by OpenKAT"
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -1669,12 +1683,17 @@ msgid ""
 "Tool). An Open-Source-project developed by the Ministry of Health, Welfare "
 "and Sport to make your and our world a safer place."
 msgstr ""
+"OpenKAT is de ‘Kwetsberheden Analyze Tool’. In iepen boarneprojekt "
+"ûntwikkele troch it Ministerie van Volksgezondheid, Welzijn en Sport om jo "
+"en ús wrâld feiliger te meitsjen."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "OpenKAT is able to give insight into security risks on your online objects. "
 "For example, your websites, mailservers or online data."
 msgstr ""
+"OpenKAT kin ynsjoch jaan yn befeiligingsrisiko’s op jo online objekten. "
+"Bygelyks jo websites, mailservers of online data."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
@@ -1684,18 +1703,26 @@ msgid ""
 "you would like to monitor or scan and which insight you would like to "
 "receive."
 msgstr ""
+"OpenKAT brûkt ynstekkers om de risikogebieten te finen en te beoardielen en "
+"rapportearret dizze oan jo. Elke ynstekker hat syn eigen feardichheden, "
+"lykas it scannen, normalisearjen of analysearjen fan gegevens. As brûker "
+"beslisse jo hokker gebieden jo monitoarje of scanne wolle en hokker ynsjoch "
+"jo ûntfange wolle."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "Within OpenKAT you can view the insights as well as all the data OpenKAT has "
 "found. You can choose to browse through the data or view reports."
 msgstr ""
+"Binnen OpenKAT kinne jo sawol de ynsichten as alle gegevens dy’t OpenKAT fûn "
+"hat besjen. Jo kinne derfoar kieze troch de gegevens te blêdzjen of "
+"rapporten te besjen."
 
 #: onboarding/templates/step_1_introduction.html
 msgid ""
 "During this introduction you will be guided through the steps to create a "
 "report."
-msgstr ""
+msgstr "Dizze yntroduksje leit út hoe’t jo in rapport meitsje."
 
 #: onboarding/templates/step_1_introduction.html
 #: onboarding/templates/step_2a_choose_report_info.html
@@ -1709,16 +1736,16 @@ msgstr ""
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
 #: rocky/templates/partials/form/boefje_tiles_form.html
 msgid "Skip onboarding"
-msgstr ""
+msgstr "Onboarding oerslaan"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Choose a report - Introduction"
-msgstr ""
+msgstr "Kies in rapport – Yntroduksje"
 
 #: onboarding/templates/step_2a_choose_report_info.html reports/views/base.py
 #: rocky/templates/header.html
 msgid "Reports"
-msgstr ""
+msgstr "Rapporten"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1727,11 +1754,16 @@ msgid ""
 "vulnerable to. Each report gives a high overview of the state of the object "
 "as well as detailed information on what OpenKAT found and possible solutions."
 msgstr ""
+"Rapporten binnen OpenKAT befetsje in oersjoch fan de scande objekten, de "
+"dêryn fûne problemen en bekende befeiligingsrisiko’s wêrfoar it objekt "
+"kwetsber wêze kin. Elk rapport jout in heech oersjoch fan de tastân fan it "
+"objekt en detaillearre ynformaasje oer wat OpenKAT fûn hat en mooglike "
+"oplossingen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 #: reports/report_types/dns_report/report.html
 msgid "Data"
-msgstr ""
+msgstr "Gegevens"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1740,10 +1772,15 @@ msgid ""
 "manage the plugins within your account which let's OpenKAT know which "
 "plugins to run and on which objects or areas."
 msgstr ""
+"OpenKAT kin scanne en analysearje mei help fan ynstekkers. Elke ynstekker "
+"hat syn eigen unike feardichheden en sammelet spesifike gegevens of jout "
+"spesifike ynsichten. Jo beheare de ynstekkers binnen jo account, wêrtroch "
+"OpenKAT wit hokker ynstekkers útfierd wurde moatte en op hokker objekten of "
+"gebieden."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Generating a report"
-msgstr ""
+msgstr "Rapport generearje"
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1752,6 +1789,11 @@ msgid ""
 "needs, as well as asks for permission to run plugins that you haven’t "
 "enabled yet but are needed to collect or analyze the data."
 msgstr ""
+"Wannear’t jo in rapporttype kieze, sil OpenKAT jo begeliede by de "
+"ynstallaasje. OpenKAT stelt de nedige fragen op basis fan de ynfier dy’t it "
+"rapport nedich hat, en freget om tastimming om ynstekkers te brûken dy’t jo "
+"noch net ynskeakele hawwe, mar dy’t nedich binne om de gegevens te sammeljen "
+"of te analysearjen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
@@ -1759,6 +1801,9 @@ msgid ""
 "own report by selecting and running plugins on objects of your choice. "
 "OpenKAT will present the results."
 msgstr ""
+"Jo kinne der ek foar kieze de sammele gegevens daliks te besjen of jo eigen "
+"rapport te generearjen troch ynstekkers te selektearjen en út te fieren op "
+"objekten fan jo kar. OpenKAT sil de resultaten presentearje."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Permission"
@@ -1770,52 +1815,60 @@ msgid ""
 "community. Before a plugin can run, you need to give it permission by "
 "enabling it."
 msgstr ""
+"Ynstekkers kinne levere wurde troch OpenKAT, mar se kinne ek fan de mienskip "
+"komme. Eardat in ynstekker draaie kin, moatte jo dizze tastimming jaan troch "
+"dizze yn te skeakeljen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid ""
 "When you generate a report. OpenKAT will let you know which plugins it "
 "requires or suggests so you can choose to enable them."
 msgstr ""
+"Wannear’t jo in rapport generearje, sil OpenKAT jo litte witte hokker "
+"ynstekkers it fereasket of foarstelt, sadat jo derfoar kieze kinne om se yn "
+"te skeakeljen."
 
 #: onboarding/templates/step_2a_choose_report_info.html
 msgid "Let's choose a report"
-msgstr ""
+msgstr "Kies in rapport"
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "Choose a report - Type"
-msgstr ""
+msgstr "Kies in rapport – Type"
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
 "Within OpenKAT you can view reports for each of your current objects. For "
 "specific reports you can choose one of the available report types and "
-"generate a report. Such as a pen-test, a DNS-report or a mail report to give "
+"generate a report. Such as a pen-test, a DNS-report or a Mail Report to give "
 "some examples."
 msgstr ""
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "For this tutorial we suggest a DNS-report to get you started."
-msgstr ""
+msgstr "Dizze útlis makket gebrûk fan it DNS-rapport."
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
 "When you start to generate this report. OpenKAT will guide you through the "
 "necessary steps."
 msgstr ""
+"Wannear’t jo begjinne mei it generearjen fan dit rapport, sil OpenKAT jo "
+"troch de nedige stappen liede."
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid "DNS report"
-msgstr ""
+msgstr "DNS-rapport"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Setup scan"
-msgstr ""
+msgstr "Scanynstellingen"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Let OpenKAT know what object to scan"
-msgstr ""
+msgstr "Lit OpenKAT witte hokker objekt scand wurde moat"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
@@ -1823,63 +1876,70 @@ msgid ""
 "would like to scan and analyze for the DNS-report. So it can tell you which "
 "plugins are available for the chosen object."
 msgstr ""
+"Ynstekkers scanne en analysearje objekten. OpenKAT moat witte hokker "
+"objekt(en) jo scanne en analysearje wolle foar it DNS-rapport. Sa kin it jo "
+"fertelle hokker ynstekkers beskikber binne foar it keazen objekt."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Understanding objects"
-msgstr ""
+msgstr "Objekten begripe"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "A lot of things can be an object within the scope of OpenKAT. For example a "
-"mailserver, an ip-address, a URL, a DNS record, a hostname or a network to "
+"mailserver, an IP address, a URL, a DNS record, a hostname or a network to "
 "name a few.  While these objects can be related to each other they are all "
 "objects within OpenKAT that can be scanned to gain valuable insight."
 msgstr ""
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Creating, adding and editing objects"
-msgstr ""
+msgstr "Objekten oanmeitsje en oanpasse"
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "Within OpenKAT you can view, add and edit objects from the organization’s "
 "object page."
 msgstr ""
+"Binnen OpenKAT kinne jo objekten besjen, tafoegje en bewurkje fan de "
+"objektside fan de organisaasje út."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid ""
 "Let’s add an object to scan for the DNS-Report. For this introduction we "
 "suggest adding a URL."
-msgstr ""
+msgstr "Foegje in objekt ta foar it DNS-rapport, bygelyks in URL."
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
 msgid "Add URL"
-msgstr ""
+msgstr "URL tafoegje"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html onboarding/views.py
 msgid "Creating an object"
-msgstr ""
+msgstr "Objekten oanmeitsje"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid "Create your first object, a URL by filling out the form below."
-msgstr ""
+msgstr "Meitsje it earste objekt oan troch in URL yn te foljen."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
 "Additional details and examples can be found by pressing on the help button "
 "next to the input field."
 msgstr ""
+"Ekstra details en foarbylden binne te finen troch op de helpknop njonken it "
+"ynfierfjild te drukken."
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid "Dependencies"
-msgstr ""
+msgstr "Ofhinklikheden"
 
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 msgid ""
 "Most objects have dependencies on the existence of other objects. For "
 "example a URL needs to be connected to a network, hostname, fqdn (fully "
-"qualified domain name) and ip-address. OpenKAT collects these additional "
+"qualified domain name) and IP address. OpenKAT collects these additional "
 "object automatically when possible. By running plugins to collect or extract "
 "this data."
 msgstr ""
@@ -1894,17 +1954,19 @@ msgstr ""
 #: onboarding/templates/step_3b_setup_scan_ooi_add.html
 #: reports/templates/partials/report_ooi_list.html
 msgid "Create object"
-msgstr ""
+msgstr "Objekt oanmeitsje"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid ""
 "Based on the url you provided OpenKAT added the necessary additional objects "
 "to create a url object."
 msgstr ""
+"Op basis fan de troch jo opjûne URL hat OpenKAT de nedige ekstra objekten "
+"tafoege om in URL-objekt te meitsjen."
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 #: reports/report_types/dns_report/report.html
@@ -1915,43 +1977,43 @@ msgstr ""
 #: rocky/templates/partials/ooi_detail_related_object.html
 #: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Path"
-msgstr ""
+msgstr "Paad"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Hostname"
-msgstr ""
+msgstr "Hostnamme"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "scheme"
-msgstr ""
+msgstr "skema"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Network"
-msgstr ""
+msgstr "Netwurk"
 
 #: onboarding/templates/step_3c_setup_scan_ooi_detail.html
 msgid "Start scanning"
-msgstr ""
+msgstr "Begjin mei scannen"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #: onboarding/templates/step_3f_set_clearance_level.html
 msgid "OpenKAT Introduction"
-msgstr ""
+msgstr "Yntroduksje OpenKAT"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Setup scan - OOI clearance for"
-msgstr ""
+msgstr "Opset scan – OOI-frijwarring foar"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: reports/templates/partials/report_introduction.html
 msgid "Introduction"
-msgstr ""
+msgstr "Yntroduksje"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 #: rocky/templates/partials/form/indemnification_add_form.html
@@ -1966,7 +2028,7 @@ msgstr ""
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid "How to know required clearance level"
-msgstr ""
+msgstr "Hoe kieze jo it krekte frijwarringsnivo"
 
 #: onboarding/templates/step_3d_clearance_level_introduction.html
 msgid ""
@@ -2005,7 +2067,7 @@ msgstr ""
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "Acknowledge clearance level"
-msgstr ""
+msgstr "Frijwarringsnivo befêstigje"
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid ""
@@ -2027,7 +2089,7 @@ msgstr ""
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 msgid "What is my clearance level?"
-msgstr ""
+msgstr "Wat is myn frijwarringsnivo?"
 
 #: onboarding/templates/step_3e_trusted_acknowledge_clearance_level.html
 #, python-format
@@ -2086,11 +2148,11 @@ msgstr ""
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 #: rocky/templates/scan_profiles/scan_profile_reset.html
 msgid "Set clearance level"
-msgstr ""
+msgstr "Frijwarringsnivo ynstelle"
 
 #: onboarding/templates/step_3f_set_clearance_level.html
 msgid "Setup scan - Set clearance level for"
-msgstr ""
+msgstr "Opset scan – Frijwarringsnivo ynstelle foar"
 
 #: onboarding/templates/step_3f_set_clearance_level.html
 #, python-format
@@ -2168,7 +2230,7 @@ msgstr ""
 
 #: onboarding/templates/step_4_report.html
 msgid "Report"
-msgstr ""
+msgstr "Rapport"
 
 #: onboarding/templates/step_4_report.html
 msgid "Boefjes are scanning"
@@ -2887,7 +2949,7 @@ msgstr ""
 
 #: reports/report_types/findings_report/report.html
 msgid ""
-"The findings report provides an overview of the identified findings on the "
+"The Findings Report provides an overview of the identified findings on the "
 "scanned systems. For each finding it shows the risk level and the number of "
 "occurrences of the finding. Under the 'Details' section a description, "
 "impact, recommendation and location of the finding can be found. The risk "
@@ -2929,7 +2991,7 @@ msgid ""
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
-msgid "IPV6 overview"
+msgid "IPv6 overview"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.html
@@ -2942,13 +3004,13 @@ msgid "IPv6 Report"
 msgstr ""
 
 #: reports/report_types/ipv6_report/report.py
-msgid "Check whether hostnames point to ipv6 addresses."
+msgid "Check whether hostnames point to IPv6 addresses."
 msgstr ""
 
 #: reports/report_types/mail_report/report.html
 msgid ""
-"The mail report provides an overview of the compliance checks associated "
-"with e-mail servers. The current compliance check the presence of SPF, DKIM "
+"The Mail Report provides an overview of the compliance checks associated "
+"with e-mail servers. The current compliance checks the presence of SPF, DKIM "
 "and DMARC records. The table below shows for each of these checks how many "
 "of the identified mail servers are compliant, and if applicable a compliance "
 "issue description and risk level. The risk level may be different for your "
@@ -2973,7 +3035,7 @@ msgstr ""
 
 #: reports/report_types/mail_report/report.py
 msgid ""
-"System specific mail report that focusses on IP addresses and hostnames."
+"System specific Mail Report that focusses on IP addresses and hostnames."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/asset_overview.html
@@ -3088,7 +3150,7 @@ msgid " systems have an IPv6 connection."
 msgstr ""
 
 #: reports/report_types/multi_organization_report/ipv6.html
-msgid "Overview of ip version compliance"
+msgid "Overview of IP version compliance"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
@@ -3108,7 +3170,7 @@ msgid "Open ports"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
-msgid "Occurrences (IP addressees)"
+msgid "Occurrences (IP addresses)"
 msgstr ""
 
 #: reports/report_types/multi_organization_report/open_ports.html
@@ -3153,7 +3215,7 @@ msgstr ""
 
 #: reports/report_types/name_server_report/report.html
 msgid ""
-"The name server report provides an overview of the compliance checks that "
+"The Name Server Report provides an overview of the compliance checks that "
 "were performed against the identified Domain Name Servers (DNS). The "
 "compliance checks verify the presence and validity of DNSSEC and whether no "
 "unnecessary ports were identified to be open. The table below gives an "
@@ -3193,12 +3255,12 @@ msgid "Name Server Report"
 msgstr ""
 
 #: reports/report_types/name_server_report/report.py
-msgid "Name server report checks name servers on basic security standards."
+msgid "Name Server Report checks name servers on basic security standards."
 msgstr ""
 
 #: reports/report_types/open_ports_report/report.html
 msgid ""
-"The open ports report provides an overview of the open ports identified on a "
+"The Open Ports Report provides an overview of the open ports identified on a "
 "system. The ports that are marked as <b>bold</b> were identified by direct "
 "scans performed by OpenKAT (such as nmap). Ports that are not marked in bold "
 "were identified through external services and/or scans (such as Shodan). "
@@ -3232,7 +3294,7 @@ msgstr ""
 
 #: reports/report_types/rpki_report/report.html
 msgid ""
-"The RPKI report shows if an RPKI route announcement was available for the "
+"The RPKI Report shows if an RPKI route announcement was available for the "
 "system and if this announcement is not expired."
 msgstr ""
 
@@ -3267,8 +3329,8 @@ msgstr ""
 
 #: reports/report_types/rpki_report/report.py
 msgid ""
-"Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
-"the ip addresses and whether they are covered by a valid RPKI ROA."
+"Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows "
+"the IP addresses and whether they are covered by a valid RPKI ROA."
 msgstr ""
 
 #: reports/report_types/safe_connections_report/report.html
@@ -3295,7 +3357,7 @@ msgstr ""
 
 #: reports/report_types/systems_report/report.html
 msgid ""
-"The system report provides an overview of the system types (types of similar "
+"The System Report provides an overview of the system types (types of similar "
 "services) that were identified for each system. The following system types "
 "can be identified: DNS servers, Web servers, Mail servers and those "
 "classified as 'Other' servers. Each hostname and/or IP address is given one "
@@ -3321,7 +3383,7 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.html
 msgid ""
-"The TLS report shows which TLS protocols and ciphers were identified on the "
+"The TLS Report shows which TLS protocols and ciphers were identified on the "
 "host for the provided port."
 msgstr ""
 
@@ -3393,13 +3455,13 @@ msgstr ""
 
 #: reports/report_types/tls_report/report.py
 msgid ""
-"TLS reports assess the security of data encryption and transmission "
+"TLS Report assesses the security of data encryption and transmission "
 "protocols."
 msgstr ""
 
 #: reports/report_types/vulnerability_report/report.html
 msgid ""
-"The vulnerability report provides an overview of all identified CVE "
+"The Vulnerability Report provides an overview of all identified CVE "
 "vulnerabilities that were identified on the selected systems. For each CVE "
 "the table shows the CVE scoring, the number of occurrences, and the CVE "
 "details."
@@ -3438,7 +3500,7 @@ msgstr ""
 
 #: reports/report_types/web_system_report/report.html
 msgid ""
-"The web system report provides an overview of various web server checks that "
+"The Web System Report provides an overview of various web server checks that "
 "were performed against the scanned system(s). For each performed check the "
 "table below shows whether or not the server is compliant with the checks. A "
 "description of why this compliant check failed is also shown, including an "
@@ -3495,7 +3557,7 @@ msgid "Web System Report"
 msgstr ""
 
 #: reports/report_types/web_system_report/report.py
-msgid "Web system reports check web systems on basic security standards."
+msgid "Web System Reports check web systems on basic security standards."
 msgstr ""
 
 #: reports/templates/generate_report.html
@@ -3511,7 +3573,7 @@ msgstr ""
 
 #: reports/templates/partials/main_navigation.html
 msgid "Generate a report"
-msgstr ""
+msgstr "Generearje in rapport"
 
 #: reports/templates/partials/main_navigation.html
 msgid ""
@@ -4638,6 +4700,11 @@ msgid "findings"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Findings table"
+msgstr ""
+
+#: rocky/templates/findings/finding_list.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table_row.html
@@ -4658,8 +4725,8 @@ msgid "Show details for %(finding)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Finding type:"
+#: rocky/templates/partials/ooi_report_findings_block_table.html
+msgid "Finding type"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4669,8 +4736,7 @@ msgid "Show details for %(finding_type)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "OOI type:"
+msgid "OOI type"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4680,8 +4746,7 @@ msgid "Show %(ooi_type)s objects"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-#: rocky/templates/organizations/organization_crisis_room.html
-msgid "Source OOI:"
+msgid "Source OOI"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -4690,7 +4755,7 @@ msgid "Show details for %(ooi)s"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
-msgid "Risk score:"
+msgid "Risk score"
 msgstr ""
 
 #: rocky/templates/findings/finding_list.html
@@ -5147,6 +5212,9 @@ msgid ""
 "finding for more detailed information about the issue, its origin, severity "
 "and possible solutions."
 msgstr ""
+"Dit binne de befiningen fan in OpenKAT-analyze %(observed_at)s. Klik op in "
+"befining foar mear detaillearre ynformaasje oer it probleem, de oarsprong, "
+"earnst en mooglike oplossingen."
 
 #: rocky/templates/oois/ooi_report_404.html
 #, python-format
@@ -5222,6 +5290,18 @@ msgstr ""
 
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Top 10 most severe Findings"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Finding type:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "OOI type:"
+msgstr ""
+
+#: rocky/templates/organizations/organization_crisis_room.html
+msgid "Source OOI:"
 msgstr ""
 
 #: rocky/templates/organizations/organization_edit.html
@@ -5441,7 +5521,7 @@ msgid "graph"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
-msgid "Clearance level inheritance:"
+msgid "Clearance level inheritance"
 msgstr ""
 
 #: rocky/templates/partials/explanations.html
@@ -5660,10 +5740,6 @@ msgid "Findings for %(type)s %(name)s on %(observed_at)s:"
 msgstr ""
 
 #: rocky/templates/partials/ooi_report_findings_block_table.html
-msgid "Finding type"
-msgstr ""
-
-#: rocky/templates/partials/ooi_report_findings_block_table.html
 msgid "Open finding details"
 msgstr ""
 
@@ -5851,8 +5927,8 @@ msgid "Boefjes overview:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Clearance level:"
-msgstr "Frijwarringsnivo:"
+msgid "Current clearance level"
+msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
 msgid "Declared:"
@@ -5895,10 +5971,6 @@ msgid ""
 "with\n"
 "                corresponding scan levels.\n"
 "            "
-msgstr ""
-
-#: rocky/templates/scan_profiles/scan_profile_detail.html
-msgid "Set clearance level:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_reset.html
@@ -6600,6 +6672,20 @@ msgstr ""
 #: rocky/views/upload_raw.py
 msgid "Raw file successfully added."
 msgstr ""
+
+#~ msgid ""
+#~ "Within OpenKAT you can view reports for each of your current objects. For "
+#~ "specific reports you can choose one of the available report types and "
+#~ "generate a report. Such as a pen-test, a DNS-report or a mail report to "
+#~ "give some examples."
+#~ msgstr ""
+#~ "Binnen OpenKAT kinne jo rapporten besjen foar elk fan jo aktuele "
+#~ "objekten. Foar spesifike rapporten kinne jo ien fan de beskikbere "
+#~ "rapporttypen kieze en in rapport generearje. Lykas in pentest, in DNS-"
+#~ "rapport of in Mailrapport."
+
+#~ msgid "Clearance level:"
+#~ msgstr "Frijwarringsnivo:"
 
 #~ msgid "Selected object"
 #~ msgid_plural "Selected objects"

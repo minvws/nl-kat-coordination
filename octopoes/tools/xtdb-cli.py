@@ -34,6 +34,10 @@ logger = logging.getLogger(__name__)
 @click.option("-v", "--verbosity", count=True, help="Increase the verbosity level")
 @click.pass_context
 def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
+    """This help functionality explains how to query XTDB using the xtdb-cli tool.
+    The help functionality for all default XTDB commands was copied from the official
+    XTDB docs for the HTTP implementation. Not all optional parameters as available
+    on the HTTP docs may be implemented."""
     verbosities = [logging.WARN, logging.INFO, logging.DEBUG]
     try:
         if verbosity:
@@ -48,7 +52,7 @@ def cli(ctx: click.Context, url: str, node: str, timeout: int, verbosity: int):
     ctx.obj["client"] = client
 
 
-@cli.command
+@cli.command(help="Returns the current status information of the node")
 @click.pass_context
 def status(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
@@ -84,10 +88,10 @@ def list_values(ctx: click.Context):
     click.echo(json.dumps(client.query("{:query {:find [(pull ?var [*])] :where [[?var :xt/id]]}}")))
 
 
-@cli.command
-@click.option("--tx-id", type=int)
-@click.option("--tx-time", type=click.DateTime())
-@click.option("--valid-time", type=click.DateTime())
+@cli.command(help="Returns the document map for a particular entity.")
+@click.option("--tx-id", type=int, help="Defaulting to latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="Defaulting to latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
 @click.argument("key")
 @click.pass_context
 def entity(
@@ -102,9 +106,18 @@ def entity(
     click.echo(json.dumps(client.entity(key, valid_time, tx_time, tx_id)))
 
 
-@cli.command
-@click.option("--with-docs", is_flag=True)
-@click.option("--with-corrections", is_flag=True)
+@cli.command(help="Returns the history of a particular entity.")
+@click.option(
+    "--with-docs",
+    is_flag=True,
+    help="Includes the documents in the response sequence, under the doc key (boolean, default: false)",
+)
+@click.option(
+    "--with-corrections",
+    is_flag=True,
+    help="""Includes bitemporal corrections in the response, inline,
+    sorted by valid-time then tx-id (boolean, default: false)""",
+)
 @click.argument("key")
 @click.pass_context
 def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: bool):
@@ -113,10 +126,10 @@ def history(ctx: click.Context, key: str, with_corrections: bool, with_docs: boo
     click.echo(json.dumps(client.history(key, with_corrections, with_docs)))
 
 
-@cli.command
-@click.option("--tx-id", type=int)
-@click.option("--tx-time", type=click.DateTime())
-@click.option("--valid-time", type=click.DateTime())
+@cli.command(help="Returns the transaction details for an entity - returns a map containing the tx-id and tx-time.")
+@click.option("--tx-id", type=int, help="Defaulting to the latest transaction id (integer)")
+@click.option("--tx-time", type=click.DateTime(), help="Defaulting to the latest transaction time (date)")
+@click.option("--valid-time", type=click.DateTime(), help="Defaulting to now (date)")
 @click.argument("key")
 @click.pass_context
 def entity_tx(
@@ -131,7 +144,7 @@ def entity_tx(
     click.echo(json.dumps(client.entity_tx(key, valid_time, tx_time, tx_id)))
 
 
-@cli.command
+@cli.command(help="Returns frequencies of indexed attributes")
 @click.pass_context
 def attribute_stats(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
@@ -139,8 +152,11 @@ def attribute_stats(ctx: click.Context):
     click.echo(json.dumps(client.attribute_stats()))
 
 
-@cli.command
-@click.option("--timeout", type=int)
+@cli.command(
+    help="""Wait until the Kafka consumer’s lag is back to 0 (i.e. when it no longer has
+    pending transactions to write). Returns the transaction time of the most recent transaction."""
+)
+@click.option("--timeout", type=int, help="Specified in milliseconds (integer)")
 @click.pass_context
 def sync(ctx: click.Context, timeout: int | None):
     client: XTDBClient = ctx.obj["client"]
@@ -148,8 +164,11 @@ def sync(ctx: click.Context, timeout: int | None):
     click.echo(json.dumps(client.sync(timeout)))
 
 
-@cli.command
-@click.option("--timeout", type=int)
+@cli.command(
+    help="""Waits until the node has indexed a transaction that is at or past the
+    supplied tx-id. Returns the most recent tx indexed by the node."""
+)
+@click.option("--timeout", type=int, help="Specified in milliseconds, defaulting to 10 seconds (integer)")
 @click.argument("tx-id", type=int)
 @click.pass_context
 def await_tx(ctx: click.Context, tx_id: int, timeout: int | None):
@@ -158,8 +177,11 @@ def await_tx(ctx: click.Context, tx_id: int, timeout: int | None):
     click.echo(json.dumps(client.await_tx(tx_id, timeout)))
 
 
-@cli.command
-@click.option("--timeout", type=int)
+@cli.command(
+    help="""Blocks until the node has indexed a transaction that is past the supplied tx-time.
+    The returned date is the latest index time when this node has caught up as of this call."""
+)
+@click.option("--timeout", type=int, help="Specified in milliseconds, defaulting to 10 seconds (integer)")
 @click.argument("tx-time", type=click.DateTime())
 @click.pass_context
 def await_tx_time(
@@ -172,9 +194,13 @@ def await_tx_time(
     click.echo(json.dumps(client.await_tx_time(tx_time, timeout)))
 
 
-@cli.command
-@click.option("--with-ops", is_flag=True)
-@click.option("--after-tx-id", type=int)
+@cli.command(
+    help="Returns a list of all transactions, from oldest to newest transaction time - optionally including documents."
+)
+@click.option(
+    "--with-ops", is_flag=True, help="Should the operations with documents be included? (boolean, default: false)"
+)
+@click.option("--after-tx-id", type=int, help="Transaction id to start after (integer, default: unbounded)")
 @click.pass_context
 def tx_log(ctx: click.Context, after_tx_id: int | None, with_ops: bool):
     client: XTDBClient = ctx.obj["client"]
@@ -190,7 +216,10 @@ def txs(ctx: click.Context):
     click.echo(json.dumps(client.tx_log(None, True)))
 
 
-@cli.command
+@cli.command(
+    help="""Takes a vector of transactions (any combination of put, delete, match, evict and fn)
+    and executes them in order. This is the only 'write' endpoint."""
+)
 @click.argument("txs", nargs=-1)
 @click.pass_context
 def submit_tx(ctx: click.Context, txs):
@@ -199,7 +228,11 @@ def submit_tx(ctx: click.Context, txs):
     click.echo(json.dumps(client.submit_tx(txs)))
 
 
-@cli.command
+@cli.command(
+    help="""Checks if a submitted tx was successfully committed, returning a map with tx-committed and
+    either true or false (or a NodeOutOfSyncException exception response if the node has not yet indexed
+    the transaction)."""
+)
 @click.argument("tx-id", type=int)
 @click.pass_context
 def tx_committed(ctx: click.Context, tx_id: int) -> None:
@@ -208,7 +241,7 @@ def tx_committed(ctx: click.Context, tx_id: int) -> None:
     click.echo(json.dumps(client.tx_committed(tx_id)))
 
 
-@cli.command
+@cli.command(help="Returns the latest transaction to have been indexed by this node.")
 @click.pass_context
 def latest_completed_tx(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
@@ -216,7 +249,7 @@ def latest_completed_tx(ctx: click.Context):
     click.echo(json.dumps(client.latest_completed_tx()))
 
 
-@cli.command
+@cli.command(help="Returns the latest transaction to have been submitted to this cluster.")
 @click.pass_context
 def latest_submitted_tx(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
@@ -224,7 +257,7 @@ def latest_submitted_tx(ctx: click.Context):
     click.echo(json.dumps(client.latest_submitted_tx()))
 
 
-@cli.command
+@cli.command(help="Returns a list of currently running queries.")
 @click.pass_context
 def active_queries(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
@@ -232,7 +265,7 @@ def active_queries(ctx: click.Context):
     click.echo(json.dumps(client.active_queries()))
 
 
-@cli.command
+@cli.command(help="Returns a list of recently completed/failed queries.")
 @click.pass_context
 def recent_queries(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]
@@ -240,7 +273,7 @@ def recent_queries(ctx: click.Context):
     click.echo(json.dumps(client.recent_queries()))
 
 
-@cli.command
+@cli.command(help="Returns a list of slowest completed/failed queries ran on the node.")
 @click.pass_context
 def slowest_queries(ctx: click.Context):
     client: XTDBClient = ctx.obj["client"]

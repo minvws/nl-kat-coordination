@@ -308,18 +308,18 @@
     "recommendation": "Check if the hostname in the header is correct and update accordingly."
   },
   "KAT-NAMESERVER-NO-TWO-IPV6": {
-    "description": "This webserver does not have at least two nameservers with an ipv6 address.",
+    "description": "This webserver does not have at least two nameservers with an IPv6 address.",
     "source": "https://www.rfc-editor.org/rfc/rfc3901.txt",
     "risk": "low",
     "impact": "Some users may not be able to reach your website without IPv6 support.",
-    "recommendation": "Ensure that both nameservers have an reachable ipv6 address for higher availability."
+    "recommendation": "Ensure that both nameservers have an reachable IPv6 address for higher availability."
   },
   "KAT-NAMESERVER-NO-IPV6": {
-    "description": "This nameserver does not have an ipv6 address.",
+    "description": "This nameserver does not have an IPv6 address.",
     "source": "https://www.rfc-editor.org/rfc/rfc3901.txt",
     "risk": "recommendation",
     "impact": "Some users may not be able to reach your website without IPv6 support.",
-    "recommendation": "Ensure that the nameserver has an ipv6 address that can be reached."
+    "recommendation": "Ensure that the nameserver has an IPv6 address that can be reached."
   },
   "KAT-INTERNETNL": {
     "description": "This website does not comply to the internet.nl standards. Currently, we check the following standards: IPv6 on webservers and nameservers, DNSSEC, missing and mis-configured headers.",

@@ -106,6 +106,25 @@ class Report(BaseReport):
 
         return hostnames_by_input_ooi
 
+    @staticmethod
+    def hostnames_to_human_readable(
+        hostnames_by_input_ooi: dict,
+    ) -> dict[str, str]:
+        """Converts input_oois to human readable hostname strings.
+
+        Turns a list of either Hostname and IPAddress references into a string
+        of shortest related hostname and indication on more hostnames present,
+        grouped by input ooi.
+        """
+        return {
+            input_ooi: (
+                f'({min([h.human_readable for h in hostnames], key=len)}{", ..." if len(hostnames) > 1 else ""})'
+                if hostnames
+                else ""
+            )
+            for input_ooi, hostnames in hostnames_by_input_ooi.items()
+        }
+
     def to_ips(self, input_oois: Iterable[str], valid_time: datetime) -> dict[str, list[Reference]]:
         """
         Turn a list of either Hostname and IPAddress reference strings into a list of related ips.
