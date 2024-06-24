@@ -14,7 +14,7 @@ def run(input_ooi: dict, raw: bytes) -> Iterable[NormalizerOutput]:
     address = IPv4Address(ooi.tokenized.address)
 
     # if the address is private, we do not need a ROA
-    if not address.is_private:
+    if address.is_global:
         if not results["exists"]:
             ft = KATFindingType(id="KAT-NO-RPKI")
             f = Finding(finding_type=ft.reference, ooi=ooi)
