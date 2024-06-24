@@ -18,7 +18,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from katalogus.client import KATalogusError, Plugin, get_katalogus
+from katalogus.client import Boefje, KATalogusError, Plugin, get_katalogus
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
@@ -247,6 +247,24 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             return self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]
         return False
 
+    def get_plugin_data_for_saving(self) -> list[dict]:
+        plugin_data = []
+
+        for required_optional, plugins in self.plugins.items():
+            for plugin in plugins:
+                plugin_data.append(
+                    {
+                        "required": required_optional == "required",
+                        "enabled": plugin.enabled,
+                        "name": plugin.name,
+                        "scan_level": plugin.scan_level.value if isinstance(plugin, Boefje) else 0,
+                        "type": plugin.type,
+                        "description": plugin.description,
+                    }
+                )
+
+        return plugin_data
+
     def get_all_plugins(self) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
         return self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
 
@@ -469,7 +487,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_input_oois(self, reports: list[ReportOOI]) -> list[OOI]:
         ooi_pks = {ooi for report in reports for ooi in report.input_oois}
 
-        return [self.octopoes_api_connector.get(ooi, valid_time=self.observed_at) for ooi in ooi_pks]
+        return [
+            self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
+        ]
 
     def get_context_data(self, **kwargs):
         # TODO: add config and plugins
@@ -485,11 +505,12 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         if issubclass(
             get_report_by_id(self.report_ooi.report_type), ConcatenatedReport
         ):  # get single reports data (children's)
+            context["data"] = self.get_report_data_from_bytes(self.report_ooi)
             for report in children_reports:
                 for ooi in report.input_oois:
                     report_data[report.report_type] = {}
                     report_data[report.report_type][ooi] = {
-                        "data": self.get_report_data_from_bytes(report),
+                        "data": self.get_report_data_from_bytes(report)["report_data"],
                         "template": report.template,
                         "report_name": get_report_by_id(report.report_type).name,
                     }
@@ -499,15 +520,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):  # its an aggregate report
             context["post_processed_data"] = self.get_report_data_from_bytes(self.report_ooi)
-            input_oois = self.get_input_oois(children_reports)
+            input_oois = self.get_input_oois([self.report_ooi])
             report_types = self.get_report_types(children_reports)
 
         else:
             # its a single report
+            report_data[self.report_ooi.report_type] = {}
+            context["data"] = self.get_report_data_from_bytes(self.report_ooi)
             for ooi in self.report_ooi.input_oois:
-                report_data[self.report_ooi.report_type] = {}
                 report_data[self.report_ooi.report_type][ooi] = {
-                    "data": self.get_report_data_from_bytes(self.report_ooi),
+                    "data": context["data"]["report_data"],
                     "template": self.report_ooi.template,
                     "report_name": get_report_by_id(self.report_ooi.report_type).name,
                 }

@@ -10,6 +10,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
+from octopoes.models import ScanProfileType
 from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.report_types.aggregate_organisation_report.report import AggregateOrganisationReport, aggregate_reports
 from reports.report_types.definitions import Report
@@ -150,7 +151,7 @@ class SaveAggregateReportMixin(ReportPluginView):
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
             self.octopoes_api_connector,
-            self.get_oois(),
+            input_oois,
             self.selected_report_types,
             self.observed_at,
         )
@@ -166,6 +167,34 @@ class SaveAggregateReportMixin(ReportPluginView):
             messages.add_message(self.request, messages.ERROR, error_message)
 
         observed_at = self.get_observed_at()
+
+        post_processed_data["plugins"] = self.get_plugin_data_for_saving()
+        post_processed_data["oois"] = []
+        for input_ooi in input_oois:
+            post_processed_data["oois"].append(
+                {
+                    "name": input_ooi.human_readable,
+                    "type": input_ooi.object_type,
+                    "scan_profile_level": input_ooi.scan_profile.level.value if input_ooi.scan_profile else 0,
+                    "scan_profile_type": input_ooi.scan_profile.scan_profile_type
+                    if input_ooi.scan_profile
+                    else ScanProfileType.EMPTY,
+                }
+            )
+
+        logger.error(post_processed_data["oois"])
+
+        post_processed_data["report_types"] = []
+        for report_type in self.report_types:
+            post_processed_data["report_types"].append(
+                {
+                    "name": str(report_type.name),
+                    "description": str(report_type.description),
+                    "label_style": report_type.label_style,
+                }
+            )
+
+        logger.error(post_processed_data["report_types"])
 
         # Create the report
         report_data_raw_id = self.save_report_raw(data=post_processed_data)
@@ -208,6 +237,7 @@ class SetupScanAggregateReportView(
             )
         if not self.plugins:
             return redirect(self.get_previous())
+
         return super().get(request, *args, **kwargs)
 
 

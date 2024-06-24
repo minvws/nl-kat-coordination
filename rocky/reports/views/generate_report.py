@@ -124,7 +124,7 @@ class ReportTypesSelectionGenerateReportView(
         return context
 
 
-class SaveAggregateReportMixin(ReportPluginView):
+class SaveGenerateReportMixin(ReportPluginView):
     def save_report(self) -> ReportOOI:
         if not self.selected_report_types:
             messages.error(self.request, _("Select at least one report type to proceed."))
@@ -175,8 +175,9 @@ class SaveAggregateReportMixin(ReportPluginView):
 
         # if its not a single report, we need a parent
         if number_of_reports > 1:
+            raw_id = self.save_report_raw(data={"plugins": self.get_plugin_data_for_saving()})
             report_ooi = self.save_report_ooi(
-                report_data_raw_id="",
+                report_data_raw_id=raw_id,
                 report_type=ConcatenatedReport,
                 input_oois=[],
                 parent=None,
@@ -185,7 +186,7 @@ class SaveAggregateReportMixin(ReportPluginView):
             )
             for report_type, ooi_data in report_data.items():
                 for ooi, data in ooi_data.items():
-                    raw_id = self.save_report_raw(data=data["data"])
+                    raw_id = self.save_report_raw(data={"report_data": data["data"]})
                     self.save_report_ooi(
                         report_data_raw_id=raw_id,
                         report_type=get_report_by_id(report_type),
@@ -199,7 +200,9 @@ class SaveAggregateReportMixin(ReportPluginView):
             report_type = next(iter(report_data))
             ooi = next(iter(report_data[report_type]))
             data = report_data[report_type][ooi]
-            raw_id = self.save_report_raw(data=data["data"])
+            raw_id = self.save_report_raw(
+                data={"report_data": data["data"], "plugins": self.get_plugin_data_for_saving()}
+            )
             report_ooi = self.save_report_ooi(
                 report_data_raw_id=raw_id,
                 report_type=get_report_by_id(report_type),
@@ -218,8 +221,11 @@ class SaveAggregateReportMixin(ReportPluginView):
             }
             messages.error(self.request, error_message)
 
+        return report_ooi
+
 
 class SetupScanGenerateReportView(
+    SaveGenerateReportMixin,
     GenerateReportStepsMixin,
     BreadcrumbsGenerateReportView,
     ReportPluginView,
@@ -246,7 +252,7 @@ class SetupScanGenerateReportView(
         return super().get(request, *args, **kwargs)
 
 
-class SaveGenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
+class SaveGenerateReportView(SaveGenerateReportMixin, BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
     """
     Save the report generated.
     """
