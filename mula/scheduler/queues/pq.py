@@ -10,7 +10,13 @@ import structlog
 
 from scheduler import models, storage
 
-from .errors import InvalidItemError, ItemNotFoundError, NotAllowedError, QueueEmptyError, QueueFullError
+from .errors import (
+    InvalidItemError,
+    ItemNotFoundError,
+    NotAllowedError,
+    QueueEmptyError,
+    QueueFullError,
+)
 
 
 def with_lock(method):
@@ -97,7 +103,9 @@ class PriorityQueue(abc.ABC):
         self.pq_store: storage.PriorityQueueStore = pq_store
         self.lock: threading.Lock = threading.Lock()
 
-    def pop(self, filters: storage.filters.FilterRequest | None = None) -> models.Task | None:
+    def pop(
+        self, filters: storage.filters.FilterRequest | None = None
+    ) -> models.Task | None:
         """Remove and return the highest priority item from the queue.
         Optionally apply filters to the queue.
 

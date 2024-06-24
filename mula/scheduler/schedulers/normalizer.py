@@ -41,7 +41,7 @@ class NormalizerScheduler(Scheduler):
         queue: queues.PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
     ):
-        self.logger = structlog.getLogger(__name__)
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
 
         self.queue = queue or queues.NormalizerPriorityQueue(
@@ -133,7 +133,9 @@ class NormalizerScheduler(Scheduler):
         # Get all normalizers for the mime types of the raw data
         normalizers: dict[str, Normalizer] = {}
         for mime_type in latest_raw_data.raw_data.mime_types:
-            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(mime_type.get("value"))
+            normalizers_by_mime_type: list[Plugin] = self.get_normalizers_for_mime_type(
+                mime_type.get("value")
+            )
 
             for normalizer in normalizers_by_mime_type:
                 normalizers[normalizer.id] = normalizer
@@ -159,7 +161,9 @@ class NormalizerScheduler(Scheduler):
                 )
 
     @tracer.start_as_current_span("normalizer_push_task")
-    def push_task(self, normalizer: Plugin, raw_data: RawData, caller: str = "") -> None:
+    def push_task(
+        self, normalizer: Plugin, raw_data: RawData, caller: str = ""
+    ) -> None:
         """Given a normalizer and raw data, create a task and push it to the
         queue.
 
@@ -235,7 +239,7 @@ class NormalizerScheduler(Scheduler):
         )
 
         try:
-            self.push_task_to_queue_with_timeout(task, self.max_tries)
+            self.push_item_to_queue_with_timeout(task, self.max_tries)
         except queues.QueueFullError:
             self.logger.warning(
                 "Could not add task to queue, queue was full: %s",
@@ -271,9 +275,11 @@ class NormalizerScheduler(Scheduler):
             A list of normalizers for the given mime type.
         """
         try:
-            normalizers = self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
-                self.organisation.id,
-                mime_type,
+            normalizers = (
+                self.ctx.services.katalogus.get_normalizers_by_org_id_and_type(
+                    self.organisation.id,
+                    mime_type,
+                )
             )
         except ExternalServiceError:
             self.logger.warning(
@@ -287,11 +293,11 @@ class NormalizerScheduler(Scheduler):
 
         if normalizers is None:
             self.logger.debug(
-                "No normalizer found for mime_type: %s [mime_type=%s, organisation_id=%s, scheduler_id=%s]",
+                "No normalizer found for mime_type: %s",
                 mime_type,
-                mime_type,
-                self.organisation.id,
-                self.scheduler_id,
+                mime_type=mime_type,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
             )
             return []
 
@@ -301,7 +307,7 @@ class NormalizerScheduler(Scheduler):
             mime_type,
             mime_type=mime_type,
             normalizers=[normalizer.id for normalizer in normalizers],
-            organisation=self.organisation.id,
+            organisation_=self.organisation.id,
             scheduler_id=self.scheduler_id,
         )
 
@@ -360,12 +366,11 @@ class NormalizerScheduler(Scheduler):
             TaskStatus.FAILED,
         ]:
             self.logger.debug(
-                "Task is still running, according to the datastore "
-                "[task_id=%s, task_hash=%s, organisation_id=%s, scheduler_id=%s]",
-                task_db.id,
-                task.hash,
-                self.organisation.id,
-                self.scheduler_id,
+                "Task is still running, according to the datastore",
+                task_id=task_db.id,
+                task_hash=task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
             )
             return True
 

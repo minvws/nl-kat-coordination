@@ -6,7 +6,7 @@ from unittest import mock
 import httpx
 from structlog.testing import capture_logs
 
-from scheduler import config, models, schedulers, storage
+from scheduler import config, connectors, models, schedulers, storage
 from tests.factories import (
     BoefjeFactory,
     BoefjeMetaFactory,
@@ -216,29 +216,8 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
 
     def test_push_tasks_for_received_raw_file(self):
         # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
+        ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-        task = functions.create_task(
-            scheduler_id=self.scheduler.scheduler_id,
-            data=boefje_task,
-        )
-
-        item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id,
-            priority=1,
-            task=task,
-        )
-
-        # Arrange: create the BoefjeTask
-        task = functions.create_task(item)
-        self.mock_ctx.datastores.task_store.create_task(task)
-
         boefje_meta = BoefjeMetaFactory(
             boefje=boefje,
             input_ooi=ooi.primary_key,
@@ -263,33 +242,19 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
 
         # Task should be on priority queue
-        task_pq = models.NormalizerTask(**self.scheduler.queue.peek(0).data)
+        task_pq = self.scheduler.queue.peek(0)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         # Task should be in datastore
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
     def test_push_tasks_for_received_raw_file_no_normalizers_found(self):
         # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
+        ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        p_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
-        )
-        task = functions.create_task(p_item)
-        self.mock_ctx.datastores.task_store.create_task(task)
-
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -323,14 +288,13 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        task = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id,
+            data=boefje_task,
         )
-        task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -367,14 +331,13 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        task = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id,
+            data=boefje_task,
         )
-        task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -412,14 +375,13 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        task = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id,
+            data=boefje_task,
         )
-        task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -448,28 +410,13 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
 
     def test_push_tasks_for_received_raw_file_item_on_queue(self):
         # Arrange
-        scan_profile = ScanProfileFactory(level=0)
-        ooi = OOIFactory(scan_profile=scan_profile)
+        ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
         boefje = BoefjeFactory()
-        boefje_task = models.BoefjeTask(
-            boefje=boefje,
-            input_ooi=ooi.primary_key,
-            organization=self.organisation.id,
-        )
-
-        p_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
-        )
-        task = functions.create_task(p_item)
-        self.mock_ctx.datastores.task_store.create_task(task)
-
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
 
-        # Mocks
         raw_data_event1 = models.RawDataReceivedEvent(
             raw_data=RawDataFactory(
                 boefje_meta=boefje_meta,
@@ -488,6 +435,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             created_at=datetime.datetime.now(),
         ).model_dump_json()
 
+        # Mocks
         self.mock_get_normalizers_for_mime_type.return_value = [
             NormalizerFactory(),
         ]
@@ -497,11 +445,11 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event2)
 
         # Task should be on priority queue (only one)
-        task_pq = models.NormalizerTask(**self.scheduler.queue.peek(0).data)
+        task_pq = self.scheduler.queue.peek(0)
         self.assertEqual(1, self.scheduler.queue.qsize())
 
-        # Task should be in datastore
-        task_db = self.mock_ctx.datastores.task_store.get_task_by_id(task_pq.id)
+        # Task should be in datastore, and queued
+        task_db = self.mock_ctx.datastores.task_store.get_task(task_pq.id)
         self.assertEqual(task_db.id, task_pq.id)
         self.assertEqual(task_db.status, models.TaskStatus.QUEUED)
 
@@ -516,14 +464,13 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             organization=self.organisation.id,
         )
 
-        p_item = functions.create_item(
-            scheduler_id=self.scheduler.scheduler_id, priority=1, data=boefje_task
+        task = functions.create_task(
+            scheduler_id=self.scheduler.scheduler_id,
+            data=boefje_task,
         )
-        task = functions.create_task(p_item)
         self.mock_ctx.datastores.task_store.create_task(task)
 
         boefje_meta = BoefjeMetaFactory(
-            id=p_item.id,
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
@@ -559,17 +506,9 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
                 scheduler_id=self.scheduler.scheduler_id,
                 data=boefje_task,
             )
-
-            item = functions.create_item(
-                scheduler_id=self.scheduler.scheduler_id,
-                priority=1,
-                task=task,
-            )
-            task = functions.create_task(item)
             self.mock_ctx.datastores.task_store.create_task(task)
 
             boefje_meta = BoefjeMetaFactory(
-                id=item.id,
                 boefje=boefje,
                 input_ooi=ooi.primary_key,
             )

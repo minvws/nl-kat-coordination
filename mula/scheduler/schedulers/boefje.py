@@ -46,7 +46,16 @@ class BoefjeScheduler(Scheduler):
         queue: queues.PriorityQueue | None = None,
         callback: Callable[..., None] | None = None,
     ):
-        self.logger = structlog.getLogger(__name__)
+        """Initializes the BoefjeScheduler.
+
+        Args:
+            ctx: The application context.
+            scheduler_id: The id of the scheduler.
+            organisation: The organisation that this scheduler is for.
+            queue: The queue to use for this scheduler.
+            callback: The callback function to call when a task is completed.
+        """
+        self.logger: structlog.BoundLogger = structlog.getLogger(__name__)
         self.organisation: Organisation = organisation
 
         self.queue = queue or queues.BoefjePriorityQueue(
@@ -72,14 +81,16 @@ class BoefjeScheduler(Scheduler):
         start the listeners and the scheduling loops in separate threads. It
         is mainly tasked with populating the queue with tasks.
 
-        * Scan profile mutations; when a scan profile is updated for an ooi
+        - Scan profile mutations; when a scan profile is updated for an ooi
         e.g. the scan level is changed, we need to create new tasks for the
         ooi. We gather all boefjes that can run on the ooi and create tasks
         for them.
 
-        * New boefjes; when new boefjes are added or enabled we find the ooi's
+        - New boefjes; when new boefjes are added or enabled we find the ooi's
         that boefjes can run on, and create tasks for it.
 
+        - Rescheduling; when a task has passed its deadline, we need to
+        reschedule it.
         """
         # Scan profile mutations
         self.listeners["scan_profile_mutations"] = listeners.ScanProfileMutation(
@@ -136,7 +147,7 @@ class BoefjeScheduler(Scheduler):
             scheduler_id=self.scheduler_id,
         )
 
-        # Should be an OOI in value
+        # There should be an OOI in value
         ooi = mutation.value
         if ooi is None:
             self.logger.debug(
@@ -292,7 +303,7 @@ class BoefjeScheduler(Scheduler):
                             operator="lt",
                             value=datetime.now(timezone.utc),
                         ),
-                        # TODO: ad enabled filter
+                        # TODO: add enabled filter
                     ]
                 )
             )
