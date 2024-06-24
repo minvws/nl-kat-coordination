@@ -6,11 +6,19 @@ from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
 
+def is_xss_capable(content_type: str) -> bool:
+    """Determine if the content type indicates XSS capability."""
+    xss_capable_types = ["text/html", "application/xhtml+xml", "application/xml", "text/xml", "text/plain"]
+    content_type_lower = content_type.lower()
+    return any(content_type_lower.startswith(xss_type) for xss_type in xss_capable_types)
+
+
 def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, Any]) -> Iterator[OOI]:
     if not additional_oois:
         return
 
     header_keys = [header.key.lower() for header in additional_oois]
+    header_dict = {header.key.lower(): header.value for header in additional_oois}
 
     if "location" in header_keys:
         return
@@ -25,7 +33,7 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
         )
         yield finding
 
-    if "content-security-policy" not in header_keys:
+    if "content-security-policy" not in header_keys and is_xss_capable(header_dict.get("content-type", "")):
         ft = KATFindingType(id="KAT-NO-CSP")
         finding = Finding(
             finding_type=ft.reference,
