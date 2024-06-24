@@ -15,12 +15,11 @@ from django.views.generic import TemplateView
 from katalogus.client import KATalogusError, Plugin, get_katalogus
 from tools.view_helpers import BreadcrumbsMixin
 
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.definitions import BaseReportType, MultiReport, Report
 from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
-from rocky.views.mixins import OOIList
-from rocky.views.ooi_view import OOIFilterView
+from rocky.views.ooi_view import BaseOOIListView
 
 REPORTS_PRE_SELECTION = {
     "clearance_level": ["2", "3", "4"],
@@ -89,69 +88,31 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return context
 
 
-class BaseSelectionView(OrganizationView):
+class OOISelectionView(BaseOOIListView, ReportBreadcrumbs):
     """
-    Some views just need to check on user selection and pass selection from view to view.
-    The calculations for the selections are done in their own view.
-    """
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.selected_oois = self.check_oois_selection(sorted(set(request.GET.getlist("ooi", []))))
-        self.selected_report_types = request.GET.getlist("report_type", [])
-
-    def check_oois_selection(self, selected_oois: list[str]) -> list[str]:
-        """all in selection overrides the rest of the selection."""
-        if "all" in selected_oois and len(selected_oois) > 1:
-            selected_oois = ["all"]
-        return selected_oois
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["selected_oois"] = self.selected_oois
-        context["selected_report_types"] = self.selected_report_types
-        return context
-
-
-class ReportOOIView(OOIFilterView, BaseSelectionView):
-    """
-    This class will show a list of OOIs with filters and handles OOIs selections.
-    Needs BaseSelectionView to get selected oois.
+    Handles OOIs selection and post request.
     """
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.oois = self.get_oois()
-        self.oois_pk = self.get_oois_pk()
-
-    def get_oois_pk(self) -> list[str]:
-        oois_pk = self.selected_oois
-        if "all" in self.selected_oois:
-            oois_pk = [ooi.primary_key for ooi in self.oois]
-        return oois_pk
+        self.selected_oois = sorted(set(request.POST.getlist("ooi", [])))  # returns a list of oois primary key
 
     def get_total_objects(self):
-        if "all" in self.selected_oois:
-            return len(self.oois_pk)
         return len(self.selected_oois)
 
-    def get_oois(self) -> list[OOI]:
-        if "all" in self.selected_oois:
-            return self.octopoes_api_connector.list_objects(
-                self.get_ooi_types(),
-                valid_time=self.observed_at,
-                limit=OOIList.HARD_LIMIT,
-                scan_level=self.get_ooi_scan_levels(),
-                scan_profile_type=self.get_ooi_profile_types(),
-            ).items
+    def get_oois_references(self) -> set[Reference]:
+        references = set()
+        for ooi in self.selected_oois:
+            references.add(Reference.from_str(ooi))
+        return references
 
-        oois = []
-        for ooi_id in self.selected_oois:
-            try:
-                oois.append(self.get_single_ooi(ooi_id))
-            except Exception:
-                logger.warning("No data could be found for '%s' ", ooi_id)
-        return oois
+    def get_oois(self) -> list[OOI | Any]:
+        references = self.get_oois_references()
+        try:
+            return self.octopoes_api_connector.load_objects_bulk(references=references, valid_time=self.observed_at)
+        except Exception:
+            logger.warning("Fetching oois failed.")
+        return []
 
     def get_ooi_filter_forms(self, ooi_types: Iterable[type[OOI]]) -> dict[str, Form]:
         return {
@@ -161,13 +122,32 @@ class ReportOOIView(OOIFilterView, BaseSelectionView):
             )
         }
 
+    def none_selection_error(self):
+        return messages.error(self.request, _("Select at least one OOI to proceed."))
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["oois"] = self.oois
+        context["selected_oois"] = self.selected_oois
         return context
 
 
-class ReportTypeView(BaseSelectionView):
+class ReportTypeSelectionView(ReportBreadcrumbs):
+    """
+    Some views just need to check on user selection and pass selection from view to view.
+    The calculations for the selections are done in their own view.
+    """
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.selected_report_types = request.GET.getlist("report_type", [])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["selected_report_types"] = self.selected_report_types
+        return context
+
+
+class ReportTypeView(OOISelectionView, ReportTypeSelectionView):
     """
     This view lists all report types that is being fetched from the OOIs selection.
     Each report type has its own input ooi witch will be matched with the oois selection.
@@ -203,7 +183,7 @@ class ReportTypeView(BaseSelectionView):
         ]
 
 
-class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
+class ReportPluginView(ReportTypeView, TemplateView):
     """
     This view shows the required and optional plugins.
     Needs ReportTypeView to know which report type is selected to get their plugins.

@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load static %}
 
 <section>
     <div>
@@ -19,7 +20,7 @@
                 {% for filter, value in active_filters.items %}<strong>{{ filter }}</strong>{{ value|title }}&nbsp;{% endfor %}
             {% endif %}
         </p>
-        {% if not object_list %}
+        {% if not ooi_list %}
             <p>{% translate "No objects found." %}</p>
             <div class="button-container">
                 <a class="button"
@@ -31,7 +32,7 @@
             {% if "all" in request.GET.ooi %}
                 <div class="horizontal-view horizontal-scroll toolbar start">
                     <p class="de-emphasized">{{ total_oois }} {% translate "objects selected" %}</p>
-                    <a class="select_all_objects_element">{% translate "Deselect all objects" %}</a>
+                    <a class="toggle-all" data-toggle-target="ooi">{% translate "Deselect all objects" %}</a>
                     <p class="de-emphasized end">
                         {% blocktranslate with length=ooi_list|length total=total_oois %}Showing {{ length }} of {{ total }} objects{% endblocktranslate %}
                     </p>
@@ -39,7 +40,7 @@
             {% else %}
                 <div class="horizontal-view horizontal-scroll toolbar">
                     <div>
-                        <a class="select_all_objects_element">
+                        <a class="toggle-all" data-toggle-target="ooi">
                             {% blocktranslate trimmed count counter=object_list|length %}
                                 Select all {{ total_oois }} object
                             {% plural %}
@@ -54,16 +55,10 @@
                     </div>
                 </div>
             {% endif %}
-            <form method="get"
+            <form method="post"
                   action="{{ next }}"
                   class="inline layout-wide checkboxes_required">
-                {% if "all" in selected_oois %}
-                    {% include "forms/report_form_fields.html" %}
-
-                {% else %}
-                    {% include "forms/report_form_fields.html" with selected_oois=None %}
-
-                {% endif %}
+                {% csrf_token %}
                 <table>
                     <caption class="visually-hidden">{% translate "Objects" %}</caption>
                     <thead>
@@ -78,10 +73,10 @@
                         <th>{% translate "Clearance type" %}</th>
                     </thead>
                     <tbody>
-                        {% for object in object_list %}
+                        {% for object in ooi_list %}
                             <tr>
                                 <td>
-                                    <input type="checkbox" id="submit-form" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois or "all" in request.GET.ooi %}checked{% endif %} {% if "all" in request.GET.ooi %}disabled{% endif %}>
+                                    <input type="checkbox" id="submit-form" name="ooi" value={{ object.primary_key }} {% if object.primary_key in selected_oois %}checked{% endif %}>
                                 </td>
                                 <td>{{ object.human_readable }}</td>
                                 <td>{{ object.ooi_type }}</td>
@@ -108,3 +103,4 @@
 
     {% if "all" not in selected_oois %}<input type="hidden" name="ooi" value="all">{% endif %}
 </form>
+<script src="{% static "js/checkboxToggler.js" %}" nonce="{{ request.csp_nonce }}"></script>

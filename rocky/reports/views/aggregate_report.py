@@ -18,14 +18,13 @@ from reports.report_types.helpers import get_ooi_types_from_aggregate_report, ge
 from reports.utils import JSONEncoder, debug_json_keys
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
+    OOISelectionView,
     ReportBreadcrumbs,
-    ReportOOIView,
     ReportPluginView,
     ReportTypeView,
     get_selection,
 )
 from reports.views.view_helpers import AggregateReportStepsMixin
-from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
@@ -70,12 +69,7 @@ class LandingAggregateReportView(BreadcrumbsAggregateReportView):
         )
 
 
-class OOISelectionAggregateReportView(
-    AggregateReportStepsMixin,
-    BreadcrumbsAggregateReportView,
-    ReportOOIView,
-    BaseOOIListView,
-):
+class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggregateReportView, OOISelectionView):
     """
     Select Objects for the 'Aggregate Report' flow.
     """
@@ -95,7 +89,6 @@ class OOISelectionAggregateReportView(
 class ReportTypesSelectionAggregateReportView(
     AggregateReportStepsMixin,
     BreadcrumbsAggregateReportView,
-    ReportOOIView,
     ReportTypeView,
     TemplateView,
 ):

@@ -17,14 +17,13 @@ from reports.report_types.definitions import Report
 from reports.report_types.helpers import REPORTS, get_ooi_types_with_report, get_report_types_for_oois
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
+    OOISelectionView,
     ReportBreadcrumbs,
-    ReportOOIView,
     ReportPluginView,
     ReportTypeView,
     get_selection,
 )
 from reports.views.view_helpers import GenerateReportStepsMixin
-from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsGenerateReportView(ReportBreadcrumbs):
@@ -69,12 +68,7 @@ class LandingGenerateReportView(BreadcrumbsGenerateReportView):
         )
 
 
-class OOISelectionGenerateReportView(
-    GenerateReportStepsMixin,
-    BreadcrumbsGenerateReportView,
-    ReportOOIView,
-    BaseOOIListView,
-):
+class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenerateReportView, OOISelectionView):
     """
     Select objects for the 'Generate Report' flow.
     """
@@ -94,9 +88,7 @@ class OOISelectionGenerateReportView(
 class ReportTypesSelectionGenerateReportView(
     GenerateReportStepsMixin,
     BreadcrumbsGenerateReportView,
-    ReportOOIView,
     ReportTypeView,
-    TemplateView,
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -108,15 +100,16 @@ class ReportTypesSelectionGenerateReportView(
     current_step = 2
     ooi_types = get_ooi_types_with_report()
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         if not self.selected_oois:
-            messages.error(self.request, _("Select at least one OOI to proceed."))
+            self.none_selection_error()
             return redirect(self.get_previous())
-        return super().get(request, *args, **kwargs)
+        return self.get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.oois_pk))
+        context["oois"] = self.get_oois()
+        context["available_report_types"] = self.get_report_types(get_report_types_for_oois(self.selected_oois))
         context["total_oois"] = self.get_total_objects()
         return context
 

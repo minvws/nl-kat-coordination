@@ -13,14 +13,13 @@ from tools.view_helpers import url_with_querystring
 from reports.report_types.multi_organization_report.report import MultiOrganizationReport, collect_report_data
 from reports.views.base import (
     REPORTS_PRE_SELECTION,
+    OOISelectionView,
     ReportBreadcrumbs,
-    ReportOOIView,
     ReportPluginView,
     ReportTypeView,
     get_selection,
 )
 from reports.views.view_helpers import MultiReportStepsMixin
-from rocky.views.ooi_view import BaseOOIListView
 
 
 class BreadcrumbsMultiReportView(ReportBreadcrumbs):
@@ -65,7 +64,7 @@ class LandingMultiReportView(BreadcrumbsMultiReportView):
         )
 
 
-class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, ReportOOIView, BaseOOIListView):
+class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportView, OOISelectionView):
     """
     Select OOIs for the 'Multi Report' flow.
     """
@@ -84,7 +83,6 @@ class OOISelectionMultiReportView(MultiReportStepsMixin, BreadcrumbsMultiReportV
 class ReportTypesSelectionMultiReportView(
     MultiReportStepsMixin,
     BreadcrumbsMultiReportView,
-    ReportOOIView,
     ReportTypeView,
     TemplateView,
 ):
