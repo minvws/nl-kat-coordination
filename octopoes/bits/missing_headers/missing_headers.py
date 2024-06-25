@@ -5,6 +5,16 @@ from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
+DEPRECATED_HEADER = {
+    "x-forwarded-host",
+    "x-forwarded-proto",
+    "x-dns-prefetch-control",
+    "x-forwarded-for",
+    "x-robots-tag",
+    "pragma",
+    "warning",
+}
+
 
 def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, Any]) -> Iterator[OOI]:
     if not additional_oois:
@@ -71,6 +81,17 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
             finding_type=ft.reference,
             ooi=resource.reference,
             description="Header x-content-type-options is missing or not configured correctly.",
+        )
+        yield ft
+        yield finding
+
+    if set(header_keys) & DEPRECATED_HEADER:
+        ft = KATFindingType(id="KAT-DEPRECATED-HEADERS")
+        finding = Finding(
+            finding_type=ft.reference,
+            ooi=resource.reference,
+            description=f"Deprecated headers are used. Avoid using the following headers: "
+            f"{' '.join(DEPRECATED_HEADER & set(header_keys))}",
         )
         yield ft
         yield finding
