@@ -53,7 +53,7 @@ class RabbitMQTestCase(unittest.TestCase):
         thread.start()
 
         # Make sure the listener is running
-        self.assertTrue(t.is_alive())
+        self.assertTrue(thread.is_alive())
 
         # Stop the listener
         lst.channel.stop_consuming()
@@ -69,7 +69,7 @@ class RabbitMQTestCase(unittest.TestCase):
             max_wait -= 1
 
         # Make sure the listener is stopped
-        self.assertFalse(t.is_alive())
+        self.assertFalse(thread.is_alive())
 
     def test_shutdown_no_connection(self):
         """Test that the listener stops when the stop method is called without
@@ -99,7 +99,7 @@ class RabbitMQTestCase(unittest.TestCase):
         thread.start()
 
         # Make sure the listener is running
-        self.assertTrue(t.is_alive())
+        self.assertTrue(thread.is_alive())
 
         # Stop the listener
         lst.connection = None
@@ -111,7 +111,7 @@ class RabbitMQTestCase(unittest.TestCase):
             max_wait -= 1
 
         # Make sure the listener is stopped
-        self.assertFalse(t.is_alive())
+        self.assertFalse(thread.is_alive())
 
     @mock.patch("pika.adapters.blocking_connection.BlockingChannel.start_consuming")
     def test_start_consuming_exception(self, mock_start_consuming):
@@ -154,7 +154,7 @@ class RabbitMQTestCase(unittest.TestCase):
             if thread is threading.main_thread():
                 continue
 
-            self.assertFalse(t.is_alive())
+            self.assertFalse(thread.is_alive())
 
     def test_func_exception(self):
         """Test that the listener does NOT stop when an exception is raised in
@@ -214,4 +214,4 @@ class RabbitMQTestCase(unittest.TestCase):
             if thread is threading.main_thread():
                 continue
 
-            self.assertTrue(t.is_alive())
+            self.assertTrue(thread.is_alive())
