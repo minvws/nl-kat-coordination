@@ -14,12 +14,12 @@ jobs:
   # pre-commit-run:
   #   uses: minvws/nl-kat-coordination/.github/workflows/pre_commit_checks.yml@feature/sonar-cloud
 
-  octopoes-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
-  # bytes-tests:
-  #   uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
-  mula-tests:
-    uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
+  # octopoes-tests:
+  # uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
+  bytes-tests:
+    uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
+  # mula-tests:
+  #   uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
 
     # todo: bytes, rocky, mula, keiko, boefjes
 
@@ -46,8 +46,9 @@ jobs:
 
     # needs: find-coverage-reports
     needs:
-      - octopoes-tests
-      - mula-tests
+      # - octopoes-tests
+      # - mula-tests
+      - bytes-tests
 
     strategy:
       matrix:
@@ -93,7 +94,7 @@ jobs:
               xml = file.read_text()
               root = etree.fromstring(xml)
               for element in root.findall(".//*[@filename]"):
-                  element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
+                  element["filename"] = prefix.joinpath(element["filename"]).as_posix())
               file.write_text(etree.tostring(root).decode())
 
           path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("mula/scheduler"))

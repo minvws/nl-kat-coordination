@@ -3,6 +3,7 @@ services:
     build:
       args:
         ENVIRONMENT: dev
+        PYTHON_VERSION: "3.10"
       context: .
       dockerfile: Dockerfile
     command: pytest tests/unit
