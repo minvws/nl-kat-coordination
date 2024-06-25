@@ -196,7 +196,7 @@ class RabbitMQ(Listener):
 
     def dispatch(self, channel, delivery_tag, body: bytes) -> None:
         # Check if we still have a connection
-        if not self.connection or self.connection.is_closed:
+        if self.connection is None or self.connection.is_closed:
             self.logger.debug("No connection available, cannot dispatch message!")
             return
 
