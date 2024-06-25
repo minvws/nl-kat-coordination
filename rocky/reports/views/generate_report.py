@@ -146,6 +146,7 @@ class SaveGenerateReportMixin(ReportPluginView):
             by_type[ooi_type].append(ooi)
 
         sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
+
         for report_class in sorted_report_types:
             oois = {
                 ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
