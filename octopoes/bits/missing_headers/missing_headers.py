@@ -25,7 +25,7 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
         return
 
     header_keys = [header.key.lower() for header in additional_oois]
-    header_dict = {header.key.lower(): header.value for header in additional_oois}
+    headers = {header.key.lower(): header.value for header in additional_oois}
 
     if "location" in header_keys:
         return
