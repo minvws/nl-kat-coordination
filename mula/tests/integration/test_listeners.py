@@ -4,14 +4,15 @@ import unittest
 from unittest import mock
 
 import pika
-from scheduler import connectors, utils
 
+from scheduler import connectors, utils
 from tests.mocks import listener
 
 
 class RabbitMQTestCase(unittest.TestCase):
+    DSN = "amqp://guest:guest@ci_rabbitmq:5672/%2Fkat"
+
     def setUp(self):
-        self.dsn = "amqp://guest:guest@ci_rabbitmq:5672/%2Fkat"
         self.listeners: list[connectors.listeners.Listener] = []
 
         threading.excepthook = self.unhandled_exception
@@ -34,7 +35,7 @@ class RabbitMQTestCase(unittest.TestCase):
         stop_event = threading.Event()
 
         lst = listener.MockRabbitMQ(
-            dsn=self.dsn,
+            dsn=self.DSN,
             queue="test",
             func=test_func,
         )
@@ -80,7 +81,7 @@ class RabbitMQTestCase(unittest.TestCase):
         stop_event = threading.Event()
 
         lst = listener.MockRabbitMQ(
-            dsn=self.dsn,
+            dsn=self.DSN,
             queue="test",
             func=test_func,
         )
@@ -122,7 +123,7 @@ class RabbitMQTestCase(unittest.TestCase):
         stop_event = threading.Event()
 
         lst = listener.MockRabbitMQ(
-            dsn=self.dsn,
+            dsn=self.DSN,
             queue="test",
             func=test_func,
         )
@@ -171,7 +172,7 @@ class RabbitMQTestCase(unittest.TestCase):
         stop_event = threading.Event()
 
         lst = listener.MockRabbitMQ(
-            dsn=self.dsn,
+            dsn=self.DSN,
             queue="test",
             func=test_func,
         )
@@ -192,7 +193,7 @@ class RabbitMQTestCase(unittest.TestCase):
         self.assertTrue(t.is_alive())
 
         # Act: send a message
-        connection = pika.BlockingConnection(pika.URLParameters(self.dsn))
+        connection = pika.BlockingConnection(pika.URLParameters(self.DSN))
         channel = connection.channel()
         channel.queue_declare(queue="test", durable=True)
         channel.basic_publish(
