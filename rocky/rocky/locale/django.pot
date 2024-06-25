@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-20 11:37+0000\n"
+"POT-Creation-Date: 2024-06-24 15:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -340,8 +340,6 @@ msgid "Member type"
 msgstr ""
 
 #: account/templates/account_detail.html
-#: onboarding/templates/account/step_2a_organization_setup.html
-#: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
 msgid "Organization"
 msgstr ""
@@ -717,7 +715,9 @@ msgid ""
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
-msgid "Selected objects:"
+#: reports/report_types/aggregate_organisation_report/appendix.html
+#: reports/templates/summary/report_asset_overview.html
+msgid "Selected objects"
 msgstr ""
 
 #: katalogus/templates/change_clearance_level.html
@@ -812,7 +812,7 @@ msgid "This is an overview of the latest settings of all plugins."
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
-msgid "Latest plugin settings:"
+msgid "Latest plugin settings"
 msgstr ""
 
 #: katalogus/templates/katalogus_settings.html
@@ -898,6 +898,7 @@ msgstr ""
 
 #: katalogus/templates/partials/objects_to_scan.html
 #: rocky/templates/findings/finding_list.html
+#: rocky/templates/forms/widgets/checkbox_group_table.html
 #: rocky/templates/oois/ooi_list.html
 #: rocky/templates/organizations/organization_crisis_room.html
 msgid "Object list"
@@ -992,7 +993,7 @@ msgid "All"
 msgstr ""
 
 #: katalogus/templates/partials/plugins_navigation.html
-#: rocky/templates/tasks/boefjes.html
+#: rocky/templates/scan.html rocky/templates/tasks/boefjes.html
 #: rocky/templates/tasks/partials/tab_navigation.html
 msgid "Boefjes"
 msgstr ""
@@ -1073,7 +1074,7 @@ msgid " Details"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
-msgid "Overview of settings:"
+msgid "Overview of settings"
 msgstr ""
 
 #: katalogus/templates/plugin_settings_list.html
@@ -1284,6 +1285,7 @@ msgstr ""
 #: onboarding/templates/account/step_2a_organization_update.html
 #: rocky/templates/organizations/organization_add.html
 #: rocky/templates/organizations/organization_settings.html
+#: rocky/templates/partials/organization_properties_table.html
 msgid "Organization details"
 msgstr ""
 
@@ -1479,6 +1481,7 @@ msgid "OpenKAT introduction"
 msgstr ""
 
 #: onboarding/templates/dns_report.html
+#: onboarding/templates/step_2b_choose_report_type.html
 #: reports/report_types/dns_report/report.py
 msgid "DNS Report"
 msgstr ""
@@ -1626,22 +1629,18 @@ msgstr ""
 msgid ""
 "Within OpenKAT you can view reports for each of your current objects. For "
 "specific reports you can choose one of the available report types and "
-"generate a report. Such as a pen-test, a DNS-report or a Mail Report to give "
+"generate a report. Such as a pentest, a DNS-report or a Mail Report to give "
 "some examples."
 msgstr ""
 
 #: onboarding/templates/step_2b_choose_report_type.html
-msgid "For this tutorial we suggest a DNS-report to get you started."
+msgid "For this tutorial we will create a DNS-report to get you started."
 msgstr ""
 
 #: onboarding/templates/step_2b_choose_report_type.html
 msgid ""
 "When you start to generate this report. OpenKAT will guide you through the "
 "necessary steps."
-msgstr ""
-
-#: onboarding/templates/step_2b_choose_report_type.html
-msgid "DNS report"
 msgstr ""
 
 #: onboarding/templates/step_3a_setup_scan_ooi_info.html
@@ -1950,7 +1949,6 @@ msgid ""
 msgstr ""
 
 #: onboarding/templates/step_3g_setup_scan_select_plugins.html
-#: rocky/templates/scan.html
 msgid "Boefjes:"
 msgstr ""
 
@@ -2118,11 +2116,6 @@ msgid "Appendix"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
-#: reports/templates/summary/report_asset_overview.html
-msgid "Selected objects"
-msgstr ""
-
-#: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Currently filtered on"
 msgstr ""
 
@@ -2130,6 +2123,10 @@ msgstr ""
 #: reports/templates/partials/report_sidemenu.html
 #: reports/templates/summary/report_asset_overview.html
 msgid "Selected Report Types"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Selected report types"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2141,6 +2138,10 @@ msgstr ""
 #: reports/report_types/aggregate_organisation_report/appendix.html
 #: reports/templates/partials/report_sidemenu.html
 msgid "Service Versions and Health"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Service, version and health"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2170,6 +2171,10 @@ msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
 msgid "Used Config objects"
+msgstr ""
+
+#: reports/report_types/aggregate_organisation_report/appendix.html
+msgid "Used config objects"
 msgstr ""
 
 #: reports/report_types/aggregate_organisation_report/appendix.html
@@ -2478,12 +2483,14 @@ msgstr ""
 #: reports/report_types/vulnerability_report/report.html
 #: reports/report_types/web_system_report/report.html
 #: reports/templates/partials/report_severity_totals_table.html
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
 #: rocky/templates/header.html
 #: rocky/templates/oois/ooi_detail_findings_list.html
 #: rocky/templates/oois/ooi_detail_findings_overview.html
 #: rocky/templates/oois/ooi_page_tabs.html
 #: rocky/templates/partials/ooi_report_findings_block.html
+#: rocky/templates/partials/ooi_report_findings_block_table.html
 #: rocky/views/finding_list.py rocky/views/finding_type_add.py
 #: rocky/views/ooi_view.py
 msgid "Findings"
@@ -3658,6 +3665,10 @@ msgid ""
 msgstr ""
 
 #: reports/templates/summary/selected_plugins.html
+msgid "Required and optional plugins"
+msgstr ""
+
+#: reports/templates/summary/selected_plugins.html
 msgid "Plugin enabled"
 msgstr ""
 
@@ -4365,6 +4376,12 @@ msgid " Finding Details"
 msgstr ""
 
 #: rocky/templates/crisis_room/crisis_room_findings_block.html
+#: rocky/templates/oois/ooi_detail_findings_list.html
+#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
+msgid "Finding details"
+msgstr ""
+
+#: rocky/templates/crisis_room/crisis_room_findings_block.html
 #: rocky/templates/organizations/organization_list.html
 msgid "There were no organizations found for your user account"
 msgstr ""
@@ -4405,7 +4422,7 @@ msgid "Welcome"
 msgstr ""
 
 #: rocky/templates/dashboard_client.html rocky/templates/dashboard_redteam.html
-msgid "User overview:"
+msgid "User overview"
 msgstr ""
 
 #: rocky/templates/dashboard_redteam.html
@@ -4599,6 +4616,10 @@ msgid "Health Checks"
 msgstr ""
 
 #: rocky/templates/health.html
+msgid "Health checks"
+msgstr ""
+
+#: rocky/templates/health.html
 msgid "Additional"
 msgstr ""
 
@@ -4744,6 +4765,10 @@ msgid "Here you can delete the %(display_type)s."
 msgstr ""
 
 #: rocky/templates/oois/ooi_delete.html
+msgid "To be deleted object(s)"
+msgstr ""
+
+#: rocky/templates/oois/ooi_delete.html
 #: rocky/templates/partials/elements/ooi_tree_condensed_table.html
 msgid "Key"
 msgstr ""
@@ -4760,6 +4785,10 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
 msgid "using boefjes"
+msgstr ""
+
+#: rocky/templates/oois/ooi_detail.html rocky/templates/scan.html
+msgid "Boefjes overview"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail.html
@@ -4837,11 +4866,6 @@ msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_list.html
 msgid "Score"
-msgstr ""
-
-#: rocky/templates/oois/ooi_detail_findings_list.html
-#: rocky/templates/partials/ooi_report_findings_block_table_expanded_row.html
-msgid "Finding details"
 msgstr ""
 
 #: rocky/templates/oois/ooi_detail_findings_overview.html
@@ -5688,10 +5712,6 @@ msgstr ""
 #: rocky/templates/tasks/partials/boefje_task_history.html
 #: rocky/templates/tasks/partials/normalizer_task_history.html
 msgid "Download task data"
-msgstr ""
-
-#: rocky/templates/scan.html
-msgid "Boefjes overview:"
 msgstr ""
 
 #: rocky/templates/scan_profiles/scan_profile_detail.html
