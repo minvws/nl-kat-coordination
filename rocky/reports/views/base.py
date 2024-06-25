@@ -499,15 +499,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         self.bytes_client.login()
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
-        children_reports = self.get_children_reports()
-        sorted_children_reports = [child for x in REPORTS for child in children_reports if child.report_type == x.id]
+        children_reports = [
+            child for x in REPORTS for child in self.get_children_reports() if child.report_type == x.id
+        ]
         report_types: list[dict[str, Any]] = []
 
         if issubclass(
             get_report_by_id(self.report_ooi.report_type), ConcatenatedReport
         ):  # get single reports data (children's)
             context["data"] = self.get_report_data_from_bytes(self.report_ooi)
-            for report in sorted_children_reports:
+            for report in children_reports:
                 for ooi in report.input_oois:
                     report_data[report.report_type] = {}
                     report_data[report.report_type][ooi] = {
