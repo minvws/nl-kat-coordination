@@ -616,7 +616,13 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
         ooi = OOIFactory(scan_profile=scan_profile)
-        boefje = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+        plugin = PluginFactory(scan_level=0, consumes=[ooi.object_type])
+
+        boefje_task = models.BoefjeTask(
+            boefje=models.Boefje.parse_obj(plugin.dict()),
+            input_ooi=ooi.primary_key,
+            organization=self.organisation.id,
+        )
 
         self.scheduler.queue.maxsize = 1
         self.scheduler.max_tries = 1
@@ -629,13 +635,13 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_get_tasks_by_hash.return_value = None
 
         # Act
-        self.scheduler.push_task(boefje, ooi)
+        self.scheduler.push_task(boefje_task)
 
         # Assert
         self.assertEqual(1, self.scheduler.queue.qsize())
 
         with capture_logs() as cm:
-            self.scheduler.push_task(boefje, ooi)
+            self.scheduler.push_task(boefje_task)
 
         self.assertIn(
             "Could not add task to queue, queue was full", cm[-1].get("event")
@@ -716,7 +722,7 @@ class BoefjeSchedulerTestCase(BoefjeSchedulerBaseTestCase):
         mock_get_tasks_by_hash.return_value = None
 
         # Act
-        self.scheduler.push_task(boefje, ooi)
+        self.scheduler.push_task(boefje_task)
 
         # Assert: task should be in datastore, and failed
         task_db = self.mock_ctx.datastores.task_store.get_task(item.id)
@@ -1463,7 +1469,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
     def tearDown(self):
         mock.patch.stopall()
 
-    def test_push_tasks_for_rescheduling(self):
+    def test_push_tasks_for_rescheduling__(self):
         """When the deadline of schedules have passed, the resulting task should be added to the queue"""
         # Arrange
         scan_profile = ScanProfileFactory(level=0)
@@ -1488,6 +1494,7 @@ class RescheduleTestCase(BoefjeSchedulerBaseTestCase):
             hash=boefje_task.hash,
             data=boefje_task.model_dump(),
         )
+        breakpoint()
 
         schedule_db = self.mock_ctx.datastores.schedule_store.create_schedule(schedule)
 

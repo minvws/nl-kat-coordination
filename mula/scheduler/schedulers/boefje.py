@@ -201,10 +201,15 @@ class BoefjeScheduler(Scheduler):
             thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-mutations"
         ) as executor:
             for boefje in boefjes:
+                boefje_task = BoefjeTask(
+                    boefje=Boefje.parse_obj(boefje.dict()),
+                    input_ooi=ooi.primary_key if ooi else None,
+                    organization=self.organisation.id,
+                )
+
                 executor.submit(
                     self.push_task,
-                    boefje,
-                    ooi,
+                    boefje_task,
                     self.push_tasks_for_scan_profile_mutations.__name__,
                 )
 
@@ -276,10 +281,15 @@ class BoefjeScheduler(Scheduler):
                 thread_name_prefix=f"BoefjeScheduler-TPE-{self.scheduler_id}-new_boefjes"
             ) as executor:
                 for ooi in oois_by_object_type:
+                    boefje_task = BoefjeTask(
+                        boefje=Boefje.parse_obj(boefje.dict()),
+                        input_ooi=ooi.primary_key,
+                        organization=self.organisation.id,
+                    )
+
                     executor.submit(
                         self.push_task,
-                        boefje,
-                        ooi,
+                        boefje_task,
                         self.push_tasks_for_new_boefjes.__name__,
                     )
 
@@ -303,7 +313,11 @@ class BoefjeScheduler(Scheduler):
                             operator="lt",
                             value=datetime.now(timezone.utc),
                         ),
-                        # TODO: add enabled filter
+                        filters.Filter(
+                            column="enabled",
+                            operator="eq",
+                            value=True,
+                        ),
                     ]
                 )
             )
@@ -326,6 +340,8 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
+        # TODO: is confusing on what is boefje and what a plugin is
+        # and what is persisted in the data field and how to reconstruct this
         with futures.ThreadPoolExecutor() as executor:
             for schedule in schedules:
                 boefje_task = BoefjeTask.parse_obj(schedule.data)
@@ -333,7 +349,7 @@ class BoefjeScheduler(Scheduler):
                 # Boefje still exists?
                 boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
                     boefje_task.boefje.id,
-                    self.organisation.id,  # TODO: check if you want org from scheduler or org from task
+                    self.organisation.id,
                 )
                 if not boefje:
                     self.logger.debug(
@@ -403,15 +419,15 @@ class BoefjeScheduler(Scheduler):
                         self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
+                breakpoint()
                 executor.submit(
                     self.push_task,
-                    boefje,
-                    ooi,
+                    boefje_task,
                     self.push_tasks_for_rescheduling.__name__,
                 )
 
     @tracer.start_as_current_span("boefje_is_task_allowed_to_run")
-    def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI) -> bool:
+    def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI | None) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
 
         Args:
@@ -621,7 +637,7 @@ class BoefjeScheduler(Scheduler):
         return False
 
     @tracer.start_as_current_span("boefje_push_task")
-    def push_task(self, boefje: Plugin, ooi: OOI | None, caller: str = "") -> None:
+    def push_task(self, boefje_task: models.BoefjeTask, caller: str = "") -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -631,16 +647,7 @@ class BoefjeScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
 
         """
-        # TODO: move this up to the caller, push_task() should receive a task
-        boefje_task = BoefjeTask(
-            boefje=Boefje.parse_obj(boefje.dict()),
-            organization=self.organisation.id,
-        )
-
-        if ooi:
-            boefje_task.input_ooi = ooi.primary_key
-
-        if not self.is_task_allowed_to_run(boefje, ooi):
+        if not self.is_task_allowed_to_run(boefje_task.boefje, boefje_task.input_ooi):
             self.logger.debug(
                 "Task is not allowed to run: %s",
                 boefje_task.hash,
@@ -780,7 +787,7 @@ class BoefjeScheduler(Scheduler):
             "Created boefje task",
             task_id=task.id,
             task_hash=task.hash,
-            boefje_id=boefje.id,
+            boefje_id=boefje_task.boefje.id,
             organisation_id=self.organisation.id,
             scheduler_id=self.scheduler_id,
             caller=caller,
