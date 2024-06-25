@@ -83,7 +83,9 @@ buttons.forEach((button) => {
           let object_list = "";
           // set the observed at time a fews seconds into the future, as the job finish time is not the same as the ooi-creation time. Due to async reasons the object might be a bit slow.
           data["timestamp"] = Date.parse(data["valid_time"]);
-          data["valid_time_async"] = new Date(data["timestamp"] + asyncoffset).toISOString().substring(0, 22);
+          data["valid_time_async"] = new Date(data["timestamp"] + asyncoffset)
+            .toISOString()
+            .substring(0, 22);
           // Build HTML snippet for every yielded object.
           data["oois"].forEach((object) => {
             object_list += `<li><a href='${url}/objects/detail/?observed_at=${data["valid_time_async"]}&ooi_id=${escapeHTMLEntities(encodeURIComponent(object))}'>${escapeHTMLEntities(object)}</a></li>`;
