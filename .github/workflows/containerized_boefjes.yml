@@ -1,4 +1,4 @@
-name: Boefjes Create container image
+name: Build containerized boefjes
 
 on:
   push:
