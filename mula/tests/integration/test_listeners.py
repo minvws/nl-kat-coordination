@@ -42,7 +42,7 @@ class RabbitMQTestCase(unittest.TestCase):
         self.listeners.append(lst)
 
         # Run the listener
-        t = utils.ThreadRunner(
+        thread = utils.ThreadRunner(
             name="MockRabbitMQ",
             target=lst.listen,
             stop_event=stop_event,
@@ -50,7 +50,7 @@ class RabbitMQTestCase(unittest.TestCase):
             daemon=False,
             loop=False,
         )
-        t.start()
+        thread.start()
 
         # Make sure the listener is running
         self.assertTrue(t.is_alive())
@@ -64,7 +64,7 @@ class RabbitMQTestCase(unittest.TestCase):
         lst.stop()
 
         max_wait = 5
-        while t.is_alive() and max_wait > 0:
+        while thread.is_alive() and max_wait > 0:
             time.sleep(1)
             max_wait -= 1
 
@@ -88,7 +88,7 @@ class RabbitMQTestCase(unittest.TestCase):
         self.listeners.append(lst)
 
         # Run the listener
-        t = utils.ThreadRunner(
+        thread = utils.ThreadRunner(
             name="MockRabbitMQ",
             target=lst.listen,
             stop_event=stop_event,
@@ -96,7 +96,7 @@ class RabbitMQTestCase(unittest.TestCase):
             daemon=False,
             loop=False,
         )
-        t.start()
+        thread.start()
 
         # Make sure the listener is running
         self.assertTrue(t.is_alive())
@@ -106,7 +106,7 @@ class RabbitMQTestCase(unittest.TestCase):
         lst.stop()
 
         max_wait = 5
-        while t.is_alive() and max_wait > 0:
+        while thread.is_alive() and max_wait > 0:
             time.sleep(1)
             max_wait -= 1
 
@@ -134,7 +134,7 @@ class RabbitMQTestCase(unittest.TestCase):
         mock_start_consuming.side_effect = Exception("Test Exception")
 
         # Run the listener
-        t = utils.ThreadRunner(
+        thread = utils.ThreadRunner(
             name="MockRabbitMQ",
             target=lst.listen,
             stop_event=stop_event,
@@ -142,16 +142,16 @@ class RabbitMQTestCase(unittest.TestCase):
             daemon=False,
             loop=False,
         )
-        t.start()
+        thread.start()
 
         max_wait = 5
-        while t.is_alive() and max_wait > 0:
+        while thread.is_alive() and max_wait > 0:
             time.sleep(1)
             max_wait -= 1
 
         # Make sure the listener stopped running
-        for t in threading.enumerate():
-            if t is threading.main_thread():
+        for thread in threading.enumerate():
+            if thread is threading.main_thread():
                 continue
 
             self.assertFalse(t.is_alive())
@@ -179,7 +179,7 @@ class RabbitMQTestCase(unittest.TestCase):
         self.listeners.append(lst)
 
         # Run the listener
-        t = utils.ThreadRunner(
+        thread = utils.ThreadRunner(
             name="MockRabbitMQ",
             target=lst.listen,
             stop_event=stop_event,
@@ -187,10 +187,10 @@ class RabbitMQTestCase(unittest.TestCase):
             daemon=False,
             loop=False,
         )
-        t.start()
+        thread.start()
 
         # Make sure the listener is running
-        self.assertTrue(t.is_alive())
+        self.assertTrue(thread.is_alive())
 
         # Act: send a message
         connection = pika.BlockingConnection(pika.URLParameters(self.DSN))
@@ -206,12 +206,12 @@ class RabbitMQTestCase(unittest.TestCase):
         connection.close()
 
         max_wait = 5
-        while t.is_alive() and max_wait > 0:
+        while thread.is_alive() and max_wait > 0:
             time.sleep(1)
             max_wait -= 1
 
-        for t in threading.enumerate():
-            if t is threading.main_thread():
+        for thread in threading.enumerate():
+            if thread is threading.main_thread():
                 continue
 
             self.assertTrue(t.is_alive())
