@@ -4,8 +4,8 @@ import unittest
 from unittest import mock
 
 import pika
-
 from scheduler import connectors, utils
+
 from tests.mocks import listener
 
 
