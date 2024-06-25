@@ -95,7 +95,7 @@ jobs:
               xml = file.read_text()
               root = etree.fromstring(xml)
               for element in root.findall(".//*[@filename]"):
-                  element["filename"] = prefix.joinpath(element["filename"]).as_posix()
+                  element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
               file.write_text(etree.tostring(root).decode())
 
           path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("mula/scheduler/"))
@@ -113,7 +113,7 @@ jobs:
               xml = file.read_text()
               root = etree.fromstring(xml)
               for element in root.findall(".//*[@filename]"):
-                  element["filename"] = prefix.joinpath(element["filename"]).as_posix()
+                  element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
               file.write_text(etree.tostring(root).decode())
 
           path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/bytes/"))
