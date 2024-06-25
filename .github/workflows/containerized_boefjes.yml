@@ -24,9 +24,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - dockerfile: boefjes/boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile
+          - dockerfile: boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile
             image: openkat/nmap
-          - dockerfile: boefjes/boefjes/plugins/kat_dnssec/boefje.Dockerfile
+          - dockerfile: boefjes/plugins/kat_dnssec/boefje.Dockerfile
             image: openkat/dns-sec
     runs-on: ubuntu-22.04
     steps:
@@ -60,7 +60,7 @@ jobs:
         with:
           # We don't use git context because that doesn't process .dockerignore
           # https://github.com/docker/cli/issues/2827
-          context: .
+          context: ./boefjes
           file: ${{ matrix.dockerfile }}
           push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
           tags: ${{ steps.meta.outputs.tags }}
