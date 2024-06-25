@@ -203,7 +203,13 @@ class SchedulerClient:
         # Endpoint expects a str.
         res = self._client.post(endpoint, params=kwargs, data=json.dumps(kwargs.get("filters", None)))  # type: ignore
         if res.status_code != httpx.codes.OK:
-            logger.warning("Unexpected response %s from %s", res.content, endpoint)
+            logger.warning(
+                "Unexpected response %s from endpoint %s with args %s which returns code %s.",
+                res.content,
+                endpoint,
+                kwargs,
+                res.status_code,
+            )
         return PaginatedTasksResponse.model_validate_json(res.content)
 
     def get_lazy_task_list(
