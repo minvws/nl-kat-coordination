@@ -2,12 +2,13 @@
 {% load ooi_extra %}
 
 <div class="horizontal-scroll">
+    <p class="de-emphasized">
+        {% blocktranslate trimmed with name=ooi.human_readable type=ooi.get_ooi_type %}
+            Findings for {{ type }} {{ name }} on {{ observed_at }}:
+        {% endblocktranslate %}
+    </p>
     <table>
-        <caption>
-            {% blocktranslate trimmed with name=ooi.human_readable type=ooi.get_ooi_type %}
-                Findings for {{ type }} {{ name }} on {{ observed_at }}:
-            {% endblocktranslate %}
-        </caption>
+        <caption class="visually-hidden">{% translate "Findings" %}</caption>
         <thead>
             <tr>
                 <th scope="col">{% translate "Risk level" %}</th>
