@@ -101,22 +101,22 @@ jobs:
           path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("mula/scheduler/"))
 
 
-          - name: fix via script
-          if: ${{ matrix.module == 'bytes' }}
-          shell: python
-          run: |
-            #!/usr/bin/env python
-            import xml.etree.ElementTree as etree
-            from pathlib import Path
-  
-            def path_prefixer(file: Path, prefix: Path) -> None:
-                xml = file.read_text()
-                root = etree.fromstring(xml)
-                for element in root.findall(".//*[@filename]"):
-                    element["filename"] = prefix.joinpath(element["filename"]).as_posix())
-                file.write_text(etree.tostring(root).decode())
-  
-            path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/bytes/"))
+      - name: fix via script
+        if: ${{ matrix.module == 'bytes' }}
+        shell: python
+        run: |
+          #!/usr/bin/env python
+          import xml.etree.ElementTree as etree
+          from pathlib import Path
+
+          def path_prefixer(file: Path, prefix: Path) -> None:
+              xml = file.read_text()
+              root = etree.fromstring(xml)
+              for element in root.findall(".//*[@filename]"):
+                  element["filename"] = prefix.joinpath(element["filename"]).as_posix())
+              file.write_text(etree.tostring(root).decode())
+
+          path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/bytes/"))
 
       - name: Print
         run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
