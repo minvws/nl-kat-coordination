@@ -201,7 +201,7 @@ class RabbitMQ(Listener):
             return
 
         # Check if we still have a channel
-        if not self.channel or self.channel.is_closed:
+        if self.channel is None or self.channel.is_closed:
             self.logger.debug("No channel available, cannot dispatch message!")
             return
 
