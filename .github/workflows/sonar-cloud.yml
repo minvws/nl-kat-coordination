@@ -102,7 +102,7 @@ jobs:
 
 
       - name: fix via script
-        if: ${{ matrix.module == 'bytes' }}
+        if: ${{ matrix.module == 'mula' }}
         shell: python
         run: |
           #!/usr/bin/env python
