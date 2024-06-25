@@ -24,9 +24,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - dockerfile: boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile
+          - dockerfile: boefjes/boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile
             image: openkat/nmap
-          - dockerfile: boefjes/plugins/kat_dnssec/boefje.Dockerfile
+          - dockerfile: boefjes/boefjes/plugins/kat_dnssec/boefje.Dockerfile
             image: openkat/dns-sec
     runs-on: ubuntu-22.04
     steps:
