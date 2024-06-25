@@ -48,7 +48,7 @@ def test_deprecated_header(http_resource_https):
 
     results = list(run(http_resource_https, headers, {}))
     deprecated_headers_findings = [
-        r for r in results if r.object_type == "Finding" and r.finding_type.natural_key == "KAT-DEPRECATED-HEADER"
+        r for r in results if r.object_type == "Finding" and r.finding_type.natural_key == "KAT-DEPRECATED-HEADERS"
     ]
 
     assert len(deprecated_headers_findings) == 1
