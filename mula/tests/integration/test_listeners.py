@@ -18,13 +18,13 @@ class RabbitMQTestCase(unittest.TestCase):
         threading.excepthook = self.unhandled_exception
 
     def tearDown(self):
-        for lst in self.listeners:
-            lst.stop()
+        for listener_ in self.listeners:
+            listener_.stop()
 
     def unhandled_exception(self, args: threading.ExceptHookArgs) -> None:
         """An unhandled exception hook for threading."""
-        for lst in self.listeners:
-            lst.stop()
+        for listener_ in self.listeners:
+            listener_.stop()
 
     def test_shutdown(self):
         """Test that the listener stops when the stop method is called."""
@@ -34,17 +34,17 @@ class RabbitMQTestCase(unittest.TestCase):
 
         stop_event = threading.Event()
 
-        lst = listener.MockRabbitMQ(
+        listener_ = listener.MockRabbitMQ(
             dsn=self.DSN,
             queue="test",
             func=test_func,
         )
-        self.listeners.append(lst)
+        self.listeners.append(listener_)
 
         # Run the listener
         thread = utils.ThreadRunner(
             name="MockRabbitMQ",
-            target=lst.listen,
+            target=listener_.listen,
             stop_event=stop_event,
             interval=0.01,
             daemon=False,
@@ -56,12 +56,12 @@ class RabbitMQTestCase(unittest.TestCase):
         self.assertTrue(thread.is_alive())
 
         # Stop the listener
-        lst.channel.stop_consuming()
-        lst.channel.close()
-        lst.connection.close()
+        listener_.channel.stop_consuming()
+        listener_.channel.close()
+        listener_.connection.close()
 
         # Call stop on the listener
-        lst.stop()
+        listener_.stop()
 
         max_wait = 5
         while thread.is_alive() and max_wait > 0:
@@ -80,17 +80,17 @@ class RabbitMQTestCase(unittest.TestCase):
 
         stop_event = threading.Event()
 
-        lst = listener.MockRabbitMQ(
+        listener_ = listener.MockRabbitMQ(
             dsn=self.DSN,
             queue="test",
             func=test_func,
         )
-        self.listeners.append(lst)
+        self.listeners.append(listener_)
 
         # Run the listener
         thread = utils.ThreadRunner(
             name="MockRabbitMQ",
-            target=lst.listen,
+            target=listener_.listen,
             stop_event=stop_event,
             interval=0.01,
             daemon=False,
@@ -102,8 +102,8 @@ class RabbitMQTestCase(unittest.TestCase):
         self.assertTrue(thread.is_alive())
 
         # Stop the listener
-        lst.connection = None
-        lst.stop()
+        listener_.connection = None
+        listener_.stop()
 
         max_wait = 5
         while thread.is_alive() and max_wait > 0:
@@ -122,12 +122,12 @@ class RabbitMQTestCase(unittest.TestCase):
 
         stop_event = threading.Event()
 
-        lst = listener.MockRabbitMQ(
+        listener_ = listener.MockRabbitMQ(
             dsn=self.DSN,
             queue="test",
             func=test_func,
         )
-        self.listeners.append(lst)
+        self.listeners.append(listener_)
 
         # Mocks
         # This will issue an unhandled_exception
@@ -136,7 +136,7 @@ class RabbitMQTestCase(unittest.TestCase):
         # Run the listener
         thread = utils.ThreadRunner(
             name="MockRabbitMQ",
-            target=lst.listen,
+            target=listener_.listen,
             stop_event=stop_event,
             interval=0.01,
             daemon=False,
@@ -171,17 +171,17 @@ class RabbitMQTestCase(unittest.TestCase):
 
         stop_event = threading.Event()
 
-        lst = listener.MockRabbitMQ(
+        listener_ = listener.MockRabbitMQ(
             dsn=self.DSN,
             queue="test",
             func=test_func,
         )
-        self.listeners.append(lst)
+        self.listeners.append(listener_)
 
         # Run the listener
         thread = utils.ThreadRunner(
             name="MockRabbitMQ",
-            target=lst.listen,
+            target=listener_.listen,
             stop_event=stop_event,
             interval=0.01,
             daemon=False,
