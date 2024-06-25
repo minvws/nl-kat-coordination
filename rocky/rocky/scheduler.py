@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import collections
 import datetime
+import json
 import uuid
 from enum import Enum
 from logging import getLogger
@@ -197,9 +198,12 @@ class SchedulerClient:
         **kwargs,
     ) -> PaginatedTasksResponse:
         kwargs = {k: v for k, v in kwargs.items() if v is not None}  # filter Nones from kwargs
-        logger.warning("hello there")
-        logger.warning(kwargs)
-        res = self._client.get("/tasks", params=kwargs)
+        endpoint = "/tasks"
+        logger.debug("Making request to %s with args %s", endpoint, kwargs)
+        # Endpoint expects a str.
+        res = self._client.post(endpoint, params=kwargs, data=json.dumps(kwargs.get("filters", None)))  # type: ignore
+        if res.status_code != httpx.codes.OK:
+            logger.warning("Unexpected response %s from %s", res.content, endpoint)
         return PaginatedTasksResponse.model_validate_json(res.content)
 
     def get_lazy_task_list(
@@ -212,6 +216,7 @@ class SchedulerClient:
         input_ooi: str | None = None,
         plugin_id: str | None = None,
         boefje_name: str | None = None,
+        filters: dict | None = None,
     ) -> LazyTaskList:
         return LazyTaskList(
             self,
@@ -223,6 +228,7 @@ class SchedulerClient:
             input_ooi=input_ooi,
             plugin_id=plugin_id,
             boefje_name=boefje_name,
+            filters=filters,
         )
 
     def get_task_details(self, organization_code: str, task_id: str) -> Task:
@@ -283,21 +289,23 @@ class SchedulerClient:
         return self._get_task_stats(scheduler_id=f"{task_type}-{organization_code}")
 
     @staticmethod
-    def _merge_stat_dicts(dicts: list) -> dict:
+    def _merge_stat_dicts(dicts: list[dict]) -> dict:
         """Merge multiple stats dicts."""
-        stat_sum: dict = collections.defaultdict(collections.Counter)
+        stat_sum: dict[str, collections.Counter] = collections.defaultdict(collections.Counter)
         for dct in dicts:
             for timeslot, counts in dct.items():
                 stat_sum[timeslot].update(counts)
         return dict(stat_sum)
 
-    def get_all_task_stats(self, task_type: str) -> dict:
+    def get_all_task_stats(self, task_type: str, scheduler_ids: list | None = None) -> dict:
         """Return all task stats for specific task type (e.g. 'boefje')."""
-        all_stats = [
-            self._get_task_stats(scheduler_id=scheduler.get("id"))
-            for scheduler in self._get(f"/schedulers/by_type/{task_type}")
-        ]
-        return SchedulerClient._merge_stat_dicts(dicts=all_stats)
+        return SchedulerClient._merge_stat_dicts(
+            dicts=[
+                self._get_task_stats(scheduler_id=scheduler.get("id"))
+                for scheduler in self._get(f"/schedulers/by_type/{task_type}")
+                if (scheduler_ids is None or scheduler["id"] in scheduler_ids)
+            ]
+        )
 
 
 client = SchedulerClient(settings.SCHEDULER_API)

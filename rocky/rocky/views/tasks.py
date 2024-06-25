@@ -123,12 +123,13 @@ class NormalizersTaskListView(NormalizerMixin, TaskListView):
 class AllTaskListView(ListView):
     paginate_by = 100
     paginator_class = RockyPaginator
+    schedulers: list[str] = []
 
-    # @staff_member_required
     def get_queryset(self):
         task_type = self.request.GET.get("type", self.plugin_type)
-        status = self.request.GET.get("scan_history_status") if self.request.GET.get("scan_history_status") else None
-        input_ooi = self.request.GET.get("scan_history_search") if self.request.GET.get("scan_history_search") else None
+        status = self.request.GET.get("scan_history_status", "") or None
+        input_ooi = self.request.GET.get("scan_history_search", "") or None
+        self.schedulers = [f"{task_type}-{o.code}" for o in self.request.user.organizations]
 
         if self.request.GET.get("scan_history_from"):
             min_created_at = datetime.strptime(self.request.GET.get("scan_history_from"), "%Y-%m-%d")
@@ -140,15 +141,15 @@ class AllTaskListView(ListView):
             max_created_at = None
 
         try:
-            reply = client.get_lazy_task_list(
+            return client.get_lazy_task_list(
                 scheduler_id=None,
                 task_type=task_type,
                 status=status,
                 min_created_at=min_created_at,
                 max_created_at=max_created_at,
                 input_ooi=input_ooi,
+                filters={"filters": [{"column": "scheduler_id", "operator": "in", "value": self.schedulers}]},
             )
-            return reply
         except HTTPError:
             error_message = _("Fetching tasks failed: no connection with scheduler")
             messages.add_message(self.request, messages.ERROR, error_message)
@@ -158,7 +159,6 @@ class AllTaskListView(ListView):
         self.handle_page_action(request.POST["action"])
         return redirect(request.path)
 
-    # @staff_member_required
     def handle_page_action(self, action: str) -> None:
         if action == PageActions.RESCHEDULE_TASK.value:
             task_id = self.request.POST.get("task_id")
@@ -166,19 +166,19 @@ class AllTaskListView(ListView):
             logging.info("Rescheduling task %s for organization %s", task_id, organization_code)
             reschedule_task(self.request, organization_code, task_id)
 
-    # @staff_member_required
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context["stats"] = client.get_all_task_stats(self.plugin_type)
-        except SchedulerError:
+            context["stats"] = client.get_all_task_stats(self.plugin_type, scheduler_ids=self.schedulers)
+        except SchedulerError as exc:
             context["stats_error"] = True
+            logging.warning("Stats error %s", exc)
         else:
             context["stats_error"] = False
         context["breadcrumbs"] = [
             {"url": reverse("all_task_list", kwargs={}), "text": _("All Boefje Tasks")},
         ]
-        logging.error("context %s", context["stats"])
+        logging.debug("context %s", context["stats"])
         return context
 
 
