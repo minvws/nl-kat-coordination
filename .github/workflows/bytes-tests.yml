@@ -10,11 +10,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run unit tests
-        run: make utest build_args='--build-arg PYTHON_VERSION=3.10'
+        run: make utest
         working-directory: bytes/
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
         with:
           name: bytes-coverage-unit
-          path: coverage.xml
+          path: bytes/coverage.xml
