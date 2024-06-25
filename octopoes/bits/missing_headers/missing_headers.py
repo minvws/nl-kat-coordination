@@ -5,19 +5,20 @@ from octopoes.models import OOI
 from octopoes.models.ooi.findings import Finding, KATFindingType
 from octopoes.models.ooi.web import HTTPHeader, HTTPResource
 
+XSS_CAPABLE_TYPES = [
+    "text/html",
+    "application/xhtml+xml",
+    "application/xml",
+    "text/xml",
+    "text/plain",
+    "image/svg+xml",
+]
+
 
 def is_xss_capable(content_type: str) -> bool:
     """Determine if the content type indicates XSS capability."""
-    xss_capable_types = [
-        "text/html",
-        "application/xhtml+xml",
-        "application/xml",
-        "text/xml",
-        "text/plain",
-        "image/svg+xml",
-    ]
     main_type = content_type.split(";")[0].strip().lower()
-    return main_type in xss_capable_types
+    return main_type in XSS_CAPABLE_TYPES
 
 
 def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[str, Any]) -> Iterator[OOI]:
@@ -40,7 +41,7 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
         )
         yield finding
 
-    if "content-security-policy" not in header_keys and is_xss_capable(header_dict.get("content-type", "")):
+    if "content-security-policy" not in header_keys and is_xss_capable(headers.get("content-type", "")):
         ft = KATFindingType(id="KAT-NO-CSP")
         finding = Finding(
             finding_type=ft.reference,
