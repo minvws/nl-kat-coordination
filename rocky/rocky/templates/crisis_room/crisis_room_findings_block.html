@@ -6,6 +6,7 @@
             <h1>{% translate "Total findings" %}</h1>
             {% if organizations %}
                 <table>
+                    <caption class="visually-hidden">{% translate "Findings" %}</caption>
                     <thead>
                         <tr>
                             <th>{% translate "Organization" %}</th>
@@ -33,6 +34,7 @@
                                 <td colspan="3">
                                     <span class="sr-only">{{ org_finding_count.name }} {% translate " Finding Details" %}</span>
                                     <table>
+                                        <caption class="visually-hidden">{% translate "Finding details" %}</caption>
                                         <thead>
                                             <th>{% translate "Severity" %}</th>
                                             <th>{% translate "Occurrences" %}</th>
@@ -75,6 +77,7 @@
             {% endif %}
             {% if organizations %}
                 <table>
+                    <caption class="visually-hidden">{% translate "Critical findings" %}</caption>
                     <thead>
                         <tr>
                             <th>{% translate "Organization" %}</th>
@@ -102,6 +105,7 @@
                                 <td colspan="3">
                                     <span class="sr-only">{{ org_finding_count.name }} {% translate " Finding Details" %}</span>
                                     <table>
+                                        <caption class="visually-hidden">{% translate "Finding details" %}</caption>
                                         <thead>
                                             <th>{% translate "Severity" %}</th>
                                             <th>{% translate "Occurrences" %}</th>
