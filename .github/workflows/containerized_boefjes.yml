@@ -1,0 +1,69 @@
+name: Boefjes Create container image
+
+on:
+  push:
+    branches:
+      - "main"
+      - "release-*"
+    tags:
+      - "*"
+    paths:
+      - boefjes/boefjes/plugins/**
+      - boefjes/images/**
+      - .github/workflows/containerized_boefjes.yml
+  pull_request:
+    paths:
+      - boefjes/boefjes/plugins/kat_nmap_tcp/**
+      - boefjes/boefjes/plugins/kat_nmap_udp/**
+      - boefjes/boefjes/plugins/kat_dnssec/**
+      - boefjes/images/**
+      - .github/workflows/containerized_boefjes.yml
+
+jobs:
+  build_containerized_boefjes:
+    strategy:
+      matrix:
+        include:
+          - dockerfile: boefjes/boefjes/plugins/kat_nmap_tcp/boefje.Dockerfile
+            image: openkat/nmap
+          - dockerfile: boefjes/boefjes/plugins/kat_dnssec/boefje.Dockerfile
+            image: openkat/dns-sec
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=ref,event=pr
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        id: buildx
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build container image for ${{ matrix.image }}
+        uses: docker/build-push-action@v5
+        with:
+          # We don't use git context because that doesn't process .dockerignore
+          # https://github.com/docker/cli/issues/2827
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.owner.login == github.event.pull_request.base.repo.owner.login }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
