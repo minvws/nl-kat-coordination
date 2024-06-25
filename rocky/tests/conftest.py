@@ -1158,7 +1158,7 @@ def mock_scheduler_client_task_list(mocker):
         ),
     )
 
-    mock_scheduler_client_session.get.return_value = response
+    mock_scheduler_client_session.post.return_value = response
 
     return mock_scheduler_client_session
 
