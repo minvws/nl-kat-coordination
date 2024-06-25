@@ -116,7 +116,7 @@ jobs:
                   element.set("filename", prefix.joinpath(element.get("filename")).as_posix())
               file.write_text(etree.tostring(root).decode())
 
-          path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/bytes/"))
+          path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/"))
 
       - name: Print
         run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
