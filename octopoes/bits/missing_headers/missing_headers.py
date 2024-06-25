@@ -10,7 +10,6 @@ XSS_CAPABLE_TYPES = [
     "application/xhtml+xml",
     "application/xml",
     "text/xml",
-    "text/plain",
     "image/svg+xml",
 ]
 
