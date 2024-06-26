@@ -13,7 +13,6 @@
                 {% include "partials/stepper.html" %}
 
                 <h2>{% translate "Organization setup" %}</h2>
-                <strong>{% translate "Organization" %}</strong>
                 <p>
                     {% blocktranslate trimmed %}
                         Please enter the following organization details.
@@ -21,7 +20,7 @@
                         page within OpenKAT when necessary.
                     {% endblocktranslate %}
                 </p>
-                <form novalidate method="post" class="horizontal-view help">
+                <form novalidate method="post" class="horizontal-view help layout-form">
                     {% csrf_token %}
                     {% translate "Organization details" as fieldset_legend %}
                     {% include "partials/form/fieldset.html" with legend=fieldset_legend fields=form %}

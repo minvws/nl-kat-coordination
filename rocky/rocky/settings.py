@@ -298,6 +298,7 @@ LANGUAGES = [
     ("nl", "nl"),
     ("pap", "pap"),
     ("it", "it"),
+    ("fy", "fy"),
 ]
 
 if env.bool("PIRATE", False):

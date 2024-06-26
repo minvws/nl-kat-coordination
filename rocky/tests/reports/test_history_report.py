@@ -37,11 +37,10 @@ def test_report_history_one_subreports_one_input_objects(
 
     # Check table rows
     subreport = report_list_one_subreport[0][0]
-    input_object = report_list_one_subreport[0][0].input_oois[0]
     assertContains(response, subreport)
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
+        '<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">example.com</a>',
         html=True,
     )
     assertNotContains(response, "Close children report object details")
@@ -144,11 +143,10 @@ def test_report_history_more_than_five_subreports_one_input_object(
 
     # Check table rows
     parent_report = report_list_six_subreports[0][0]
-    input_object = report_list_six_subreports[0][1][0].input_oois[0]
     assertContains(response, parent_report)
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
+        '<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">example.com</a>',
         html=True,
     )
     assertContains(response, "Close children report object details")
@@ -191,21 +189,19 @@ def test_report_history_more_than_five_subreports_one_input_object(
 
 # Test if the subreports that belong to one parent are collected well enough
 def test_report_history_subreports_table(
-    rf, client_member, mock_organization_view_octopoes, mocker, report_list_six_subreports
+    rf, client_member, mock_organization_view_octopoes, mocker, report_list_six_subreports, get_subreports
 ):
     mocker.patch("reports.views.base.get_katalogus")
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("subreports", kwargs=kwargs)
-    parent_report = report_list_six_subreports[0][0].primary_key
+    parent_report = report_list_six_subreports[0][0]
 
-    request = rf.get(url, {"report_id": parent_report})
+    request = rf.get(url, {"report_id": parent_report.primary_key})
     request.resolver_match = resolve(url)
 
     setup_request(request, client_member.user)
 
-    mock_organization_view_octopoes().list_reports.return_value = Paginated[tuple[Report, list[Report | None]]](
-        count=len(report_list_six_subreports), items=report_list_six_subreports
-    )
+    mock_organization_view_octopoes().query_many.return_value = get_subreports
 
     response = SubreportView.as_view()(request, organization_code=client_member.organization.code)
 
@@ -228,10 +224,9 @@ def test_report_history_subreports_table(
     )
 
     # Check table rows
-    input_object = report_list_six_subreports[0][1][0].input_oois[0]
     assertContains(
         response,
-        f'<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">{input_object}</a>',
+        '<a href="/en/test/objects/detail/?ooi_id=Hostname%7Cinternet%7Cexample.com">example.com</a>',
         html=True,
     )
 
@@ -243,15 +238,13 @@ def test_report_history_subreports_table(
     child_report_4 = report_list_six_subreports[0][1][3]
     child_report_5 = report_list_six_subreports[0][1][4]
     child_report_6 = report_list_six_subreports[0][1][5]
-    child_report_7 = report_list_six_subreports[0][1][6]
-    assertContains(response, f"Showing {total_subreports} of {total_subreports} subreports ")
+    assertContains(response, f"Showing {total_subreports} of {total_subreports} subreports")
     assertContains(response, child_report_1)
     assertContains(response, child_report_2)
     assertContains(response, child_report_3)
     assertContains(response, child_report_4)
     assertContains(response, child_report_5)
     assertContains(response, child_report_6)
-    assertContains(response, child_report_7)
 
     # Check if all report types are shown
     assertContains(response, "RPKI Report")

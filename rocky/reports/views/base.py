@@ -18,7 +18,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
-from katalogus.client import KATalogusError, Plugin, get_katalogus
+from katalogus.client import Boefje, KATalogusError, Plugin, get_katalogus
 from pydantic import RootModel, TypeAdapter
 from tools.ooi_helpers import create_ooi
 from tools.view_helpers import BreadcrumbsMixin, url_with_querystring
@@ -28,7 +28,7 @@ from octopoes.models.ooi.reports import Report as ReportOOI
 from reports.forms import OOITypeMultiCheckboxForReportForm
 from reports.report_types.concatenated_report.report import ConcatenatedReport
 from reports.report_types.definitions import AggregateReport, BaseReportType, MultiReport, Report
-from reports.report_types.helpers import get_plugins_for_report_ids, get_report_by_id
+from reports.report_types.helpers import REPORTS, get_plugins_for_report_ids, get_report_by_id
 from reports.utils import JSONEncoder, debug_json_keys
 from rocky.views.mixins import ObservedAtMixin, OOIList
 from rocky.views.ooi_view import OOIFilterView
@@ -247,6 +247,24 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
             return self.all_plugins_enabled["required"] and self.all_plugins_enabled["optional"]
         return False
 
+    def get_plugin_data_for_saving(self) -> list[dict]:
+        plugin_data = []
+
+        for required_optional, plugins in self.plugins.items():
+            for plugin in plugins:
+                plugin_data.append(
+                    {
+                        "required": required_optional == "required",
+                        "enabled": plugin.enabled,
+                        "name": plugin.name,
+                        "scan_level": plugin.scan_level.value if isinstance(plugin, Boefje) else 0,
+                        "type": plugin.type,
+                        "description": plugin.description,
+                    }
+                )
+
+        return plugin_data
+
     def get_all_plugins(self) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
         return self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
 
@@ -321,21 +339,24 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
 
         return plugin_data
 
-    def save_report(
+    def save_report_raw(self, data: dict) -> str:
+        report_data_raw_id = self.bytes_client.upload_raw(
+            raw=ReportDataDict(data).model_dump_json().encode(),
+            manual_mime_types={"openkat/report"},
+        )
+
+        return report_data_raw_id
+
+    def save_report_ooi(
         self,
-        data: dict,
+        report_data_raw_id: str,
         report_type: type[Report] | type[MultiReport] | type[AggregateReport],
         input_oois: list[str],
         parent: Reference | None,
         has_parent: bool,
         observed_at: datetime,
     ) -> ReportOOI:
-        report_data_raw_id = self.bytes_client.upload_raw(
-            raw=ReportDataDict(data).model_dump_json().encode(),
-            manual_mime_types={"openkat/report"},
-        )
         report_name = self.request.POST.get("report_name")
-
         report_ooi = ReportOOI(
             name=report_name,
             report_type=str(report_type.id),
@@ -360,6 +381,9 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         )
 
         return report_ooi
+
+    def get_observed_at(self):
+        return self.observed_at if self.observed_at < datetime.now(timezone.utc) else datetime.now(timezone.utc)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -464,7 +488,9 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
     def get_input_oois(self, reports: list[ReportOOI]) -> list[OOI]:
         ooi_pks = {ooi for report in reports for ooi in report.input_oois}
 
-        return [self.octopoes_api_connector.get(ooi, valid_time=self.observed_at) for ooi in ooi_pks]
+        return [
+            self.octopoes_api_connector.get(Reference.from_str(ooi), valid_time=self.observed_at) for ooi in ooi_pks
+        ]
 
     def get_context_data(self, **kwargs):
         # TODO: add config and plugins
@@ -474,17 +500,19 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
         self.bytes_client.login()
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
 
-        children_reports = self.get_children_reports()
+        children_reports = [
+            child for x in REPORTS for child in self.get_children_reports() if child.report_type == x.id
+        ]
         report_types: list[dict[str, Any]] = []
 
         if issubclass(
             get_report_by_id(self.report_ooi.report_type), ConcatenatedReport
         ):  # get single reports data (children's)
+            context["data"] = self.get_report_data_from_bytes(self.report_ooi)
             for report in children_reports:
                 for ooi in report.input_oois:
-                    report_data[report.report_type] = {}
-                    report_data[report.report_type][ooi] = {
-                        "data": self.get_report_data_from_bytes(report),
+                    report_data.setdefault(report.report_type, {})[ooi] = {
+                        "data": self.get_report_data_from_bytes(report)["report_data"],
                         "template": report.template,
                         "report_name": get_report_by_id(report.report_type).name,
                     }
@@ -494,15 +522,16 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
 
         elif issubclass(get_report_by_id(self.report_ooi.report_type), AggregateReport):  # its an aggregate report
             context["post_processed_data"] = self.get_report_data_from_bytes(self.report_ooi)
-            input_oois = self.get_input_oois(children_reports)
+            input_oois = self.get_input_oois([self.report_ooi])
             report_types = self.get_report_types(children_reports)
 
         else:
             # its a single report
+            report_data[self.report_ooi.report_type] = {}
+            context["data"] = self.get_report_data_from_bytes(self.report_ooi)
             for ooi in self.report_ooi.input_oois:
-                report_data[self.report_ooi.report_type] = {}
                 report_data[self.report_ooi.report_type][ooi] = {
-                    "data": self.get_report_data_from_bytes(self.report_ooi),
+                    "data": context["data"]["report_data"],
                     "template": self.report_ooi.template,
                     "report_name": get_report_by_id(self.report_ooi.report_type).name,
                 }
@@ -511,11 +540,13 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             report_types = self.get_report_types([self.report_ooi])
 
         context["report_data"] = report_data
-        context["report_types"] = report_types
+        context["report_types"] = [
+            report_type for x in REPORTS for report_type in report_types if report_type["id"] == x.id
+        ]
         context["created_at"] = self.report_ooi.date_generated
         context["observed_at"] = self.report_ooi.observed_at
         context["total_oois"] = len(input_oois)
-        context["selected_oois"] = input_oois
+        context["oois"] = input_oois
 
         context["template"] = self.report_ooi.template
         context["report_download_pdf_url"] = url_with_querystring(
