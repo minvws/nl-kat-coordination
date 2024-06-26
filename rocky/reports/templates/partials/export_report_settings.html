@@ -13,35 +13,57 @@
                     give a name to the parent report. Subreports cannot be given a name.
                 {% endblocktranslate %}
             </p>
-            <form id="generate_report" class="inline" method="post" action="{{ next }}">
-                {% csrf_token %}
-                {% url "aggregate_report_landing" organization.code as index_url_aggregate_report %}
-                <p>
-                    <label for="report_name">Name</label>
-                    {% if index_url_aggregate_report in request.path|urlencode %}
-                        <input id="report_name"
-                               name="report_name"
-                               type="text"
-                               autocomplete="on"
-                               value="Aggregate Report">
-                    {% elif selected_oois|length > 1 or selected_report_types|length > 1 %}
-                        <input id="report_name"
-                               name="report_name"
-                               type="text"
-                               autocomplete="on"
-                               value="Concatenated Report">
-                    {% else %}
-                        <input id="report_name"
-                               name="report_name"
-                               type="text"
-                               autocomplete="on"
-                               value="{{ selected_report_types.0|get_report_type_name }} for {{ selected_oois.0|human_readable }}">
-                    {% endif %}
-                </p>
-                <button type="submit">
-                    {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
-                </button>
-            </form>
+            <div class="modal-wrapper">
+                <button class="modal-trigger" data-target="{{ dialogid }}">Open modal {{ dialogid }}</button>
+                <dialog class="modal {{ size }}"
+                        aria-modal="true"
+                        role="dialog"
+                        id="{{ dialogid }}">
+                    <div class="content-wrapper">
+                        <section class="header">
+                            <h2>Header</h2>
+                            <button class="icon-only ti-x close-modal-button"
+                                    aria-label="{% translate "Close modal" %}"></button>
+                        </section>
+                        <form id="generate_report" class="inline" method="post" action="{{ next }}">
+                            <section class="content">
+                                {% csrf_token %}
+                                {% url "aggregate_report_landing" organization.code as index_url_aggregate_report %}
+                                <p>
+                                    <label for="report_name">Name</label>
+                                    {% if index_url_aggregate_report in request.path|urlencode %}
+                                        <input id="report_name"
+                                               name="report_name"
+                                               type="text"
+                                               autocomplete="on"
+                                               value="Aggregate Report">
+                                    {% elif selected_oois|length > 1 or selected_report_types|length > 1 %}
+                                        <input id="report_name"
+                                               name="report_name"
+                                               type="text"
+                                               autocomplete="on"
+                                               value="Concatenated Report">
+                                    {% else %}
+                                        <input id="report_name"
+                                               name="report_name"
+                                               type="text"
+                                               autocomplete="on"
+                                               value="{{ selected_report_types.0|get_report_type_name }} for {{ selected_oois.0|human_readable }}">
+                                    {% endif %}
+                                </p>
+                            </section>
+                            <section class="footer">
+                                <div class="toolbar">
+                                    <button type="submit">
+                                        {% translate "Generate report" %}<span class="icon ti-chevron-right"></span>
+                                    </button>
+                                    <button class="ghost close-modal-button">{% translate "Cancel" %}</button>
+                                </div>
+                            </section>
+                        </form>
+                    </div>
+                </dialog>
+            </div>
         {% else %}
             <a class="button ghost" href="{{ previous }}">
                 <span class="icon ti-chevron-left"></span>{% translate "Go back" %}
