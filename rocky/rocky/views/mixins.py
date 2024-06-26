@@ -339,6 +339,8 @@ class ReportList:
             [report_id],
         )
 
+        subreports = sorted(subreports, key=lambda x: (x[1].report_type, x[1].input_oois))
+
         return subreports
 
     def hydrate_report_list(self, reports: list[Report]) -> list[HydratedReport]:
