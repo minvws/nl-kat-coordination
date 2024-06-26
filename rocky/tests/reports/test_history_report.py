@@ -253,3 +253,23 @@ def test_report_history_subreports_table(
     assertContains(response, "Mail Report")
     assertContains(response, "IPv6 Report")
     assertContains(response, "Web System Report")
+
+
+def test_report_history_report_typr_summary(
+    rf, client_member, mock_organization_view_octopoes, mocker, reports_more_input_oois
+):
+    mocker.patch("reports.views.base.get_katalogus")
+    request = setup_request(rf.get("report_history"), client_member.user)
+
+    mock_organization_view_octopoes().list_reports.return_value = Paginated[tuple[Report, list[Report | None]]](
+        count=len(reports_more_input_oois), items=reports_more_input_oois
+    )
+
+    response = ReportHistoryView.as_view()(request, organization_code=client_member.organization.code)
+
+    assert response.status_code == 200
+
+    assertContains(response, "RPKI Report")
+    assertContains(response, "Safe Connections Report")
+    assertContains(response, "This report consist of 4 subreports with the following report types and objects.")
+    assertContains(response, "<td>4</td>", html=True)
