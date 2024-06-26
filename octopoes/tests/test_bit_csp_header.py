@@ -16,7 +16,7 @@ def test_check_csp_headers(http_resource_https):
 
     results = []
 
-    # Iterate over headers and execute `run` function for each
+    # Iterate over headers and execute `run` function for each adding the content type header for xss capability check
     for key, value in headers_to_test:
         result = list(
             run(
@@ -126,7 +126,7 @@ def test_check_csp_headers_non_xss_capable(http_resource_https):
 
     results = []
 
-    # Iterate over headers and execute `run` function for each
+    # Iterate over headers and execute `run` function for each adding the content type header for xss capability check
     for key, value in headers_to_test:
         result = list(
             run(
