@@ -1,4 +1,3 @@
-import itertools
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -271,7 +270,7 @@ class HydratedReport:
     children_reports: list[Report] | None
     total_children_reports: int
     total_objects: int
-    report_type_summary: dict[str, int]
+    report_type_summary: dict[str, int] | None
 
 
 class ReportList:
@@ -380,7 +379,7 @@ class ReportList:
         return {input_ooi for child_report in children_reports for input_ooi in child_report.input_oois}
 
     @staticmethod
-    def report_type_summary(reports: list[Report]) -> dict[str, int]:
+    def report_type_summary(reports: list[Report]) -> dict[str, int] | None:
         """
         Calculates per report type how many objects it consumed.
         """
@@ -388,15 +387,13 @@ class ReportList:
         summary: dict[str, int] = {}
         report_types: set[str] = {report.report_type for report in reports}
 
-        for report_type in report_types:
-            summary[report_type] = len(
-                {
-                    itertools.chain.from_iterable(
-                        [report.input_oois for report in reports if report_type == report.report_type]
-                    )
-                }
-            )
-
+        if report_types:
+            for report_type in sorted(list(report_types)):
+                count_oois = 0
+                for report in reports:
+                    if report_type == report.report_type:
+                        count_oois += len(report.input_oois)
+                summary[report_type] = count_oois
         return summary
 
 
