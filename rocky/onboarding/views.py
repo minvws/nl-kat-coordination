@@ -24,7 +24,8 @@ from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization,
 from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
+from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
 from onboarding.forms import OnboardingCreateObjectURLForm, OnboardingSetClearanceLevelForm
@@ -40,7 +41,7 @@ from onboarding.view_helpers import (
 from rocky.exceptions import RockyError
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
-from rocky.views.ooi_view import SingleOOITreeMixin
+from rocky.views.ooi_view import SingleOOIMixin, SingleOOITreeMixin
 
 User = get_user_model()
 
@@ -348,7 +349,7 @@ class OnboardingReportView(
     OrganizationPermissionRequiredMixin,
     SaveGenerateReportMixin,
     IntroductionStepsMixin,
-    SingleOOITreeMixin,
+    SingleOOIMixin,
     TemplateView,
 ):
     """
@@ -364,26 +365,14 @@ class OnboardingReportView(
         """
         Gets the Hostname and DNSZone primary keys out of a URL object.
         """
-        ooi_pk = self.request.POST.get("ooi", "")
+        ooi_pk = self.request.GET.get("ooi", "")
         ooi = self.get_ooi(ooi_pk)
 
-        tree = self.octopoes_api_connector.get_tree(
-            Reference.from_str(ooi.primary_key),
-            valid_time=datetime.now(timezone.utc),
-            depth=3,
-        )
-
-        hostname_ref = tree.store[ooi.web_url].netloc
-
-        hostname = tree.store[str(hostname_ref)]
-        dns_zone = hostname.dns_zone
-
-        return [str(hostname), str(dns_zone)]
+        return [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network).primary_key]
 
     def post(self, request, *args, **kwargs):
         self.set_member_onboarded()
 
-        self.selected_report_types = request.POST.getlist("report_type", [])
         report_ooi = self.save_report()
 
         return redirect(
