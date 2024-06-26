@@ -14,7 +14,7 @@ jobs:
         run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose -f rocky/.ci/docker-compose.yml build --build-arg USER_UID=1001 --build-arg USER_GID=1001 --build-arg PYTHON_VERSION=3.10 rocky_tests
 
       - name: Run tests
-        run: DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 docker compose -f rocky/.ci/docker-compose.yml run --rm rocky_tests
+        run: docker compose -f rocky/.ci/docker-compose.yml run --rm rocky_tests
 
       - name: Upload coverage as artifact
         uses: actions/upload-artifact@v4
