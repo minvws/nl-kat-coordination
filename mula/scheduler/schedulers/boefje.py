@@ -208,7 +208,7 @@ class BoefjeScheduler(Scheduler):
                 )
 
                 executor.submit(
-                    self.push_task,
+                    self.push_boefje_task,
                     boefje_task,
                     self.push_tasks_for_scan_profile_mutations.__name__,
                 )
@@ -288,7 +288,7 @@ class BoefjeScheduler(Scheduler):
                     )
 
                     executor.submit(
-                        self.push_task,
+                        self.push_boefje_task,
                         boefje_task,
                         self.push_tasks_for_new_boefjes.__name__,
                     )
@@ -309,6 +309,11 @@ class BoefjeScheduler(Scheduler):
                 filters=filters.FilterRequest(
                     filters=[
                         filters.Filter(
+                            column="scheduler_id",
+                            operator="eq",
+                            value=self.scheduler_id,
+                        ),
+                        filters.Filter(
                             column="deadline_at",
                             operator="lt",
                             value=datetime.now(timezone.utc),
@@ -322,6 +327,7 @@ class BoefjeScheduler(Scheduler):
                 )
             )
         except Exception as exc_db:
+            # TODO: catch StorageError
             self.logger.error(
                 "Could not get schedules for rescheduling %s",
                 self.scheduler_id,
@@ -340,18 +346,16 @@ class BoefjeScheduler(Scheduler):
             )
             return
 
-        # TODO: is confusing on what is boefje and what a plugin is
-        # and what is persisted in the data field and how to reconstruct this
         with futures.ThreadPoolExecutor() as executor:
             for schedule in schedules:
                 boefje_task = BoefjeTask.parse_obj(schedule.data)
 
-                # Boefje still exists?
-                boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+                # Plugin still exists?
+                plugin = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
                     boefje_task.boefje.id,
                     self.organisation.id,
                 )
-                if not boefje:
+                if not plugin:
                     self.logger.debug(
                         "Boefje does not exist anymore, skipping",
                         boefje_id=boefje_task.boefje.id,
@@ -362,8 +366,8 @@ class BoefjeScheduler(Scheduler):
                     self.ctx.datastores.schedule_store.update_schedule(schedule)
                     continue
 
-                # Boefje still enabled?
-                if not boefje.enabled:
+                # Plugin still enabled?
+                if not plugin.enabled:
                     self.logger.debug(
                         "Boefje is disabled, skipping",
                         boefje_id=boefje_task.boefje.id,
@@ -374,10 +378,23 @@ class BoefjeScheduler(Scheduler):
                     self.ctx.datastores.schedule_store.update_schedule(schedule)
                     continue
 
-                # We check if the task has an input_ooi, since it is possible
-                # that task can have no ooi's
+                # Plugin a boefje?
+                if plugin.type != "boefje":
+                    # We don't disable the schedule, since we should've gotten
+                    # schedules for boefjes only.
+                    self.logger.warning(
+                        "Plugin is not a boefje, skipping",
+                        plugin_id=plugin.id,
+                        organisation_id=self.organisation.id,
+                        scheduler_id=self.scheduler_id,
+                    )
+                    continue
+
+                # When the boefje task has an ooi, we need to do some additional
+                # checks.
                 ooi = None
                 if boefje_task.input_ooi:
+
                     # OOI still exists?
                     ooi = self.ctx.services.octopoes.get_object(
                         boefje_task.organization, boefje_task.input_ooi
@@ -393,8 +410,8 @@ class BoefjeScheduler(Scheduler):
                         self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
-                    # Boefje still consuming ooi?
-                    if ooi.object_type not in boefje.consumes:
+                    # Boefje still consuming ooi type?
+                    if ooi.object_type not in plugin.consumes:
                         self.logger.debug(
                             "Boefje does not consume ooi anymore, skipping",
                             boefje_id=boefje_task.boefje.id,
@@ -406,8 +423,10 @@ class BoefjeScheduler(Scheduler):
                         self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
+                    # TODO: do we want to disable the schedule when a
+                    # boefje is not allowed to scan an ooi?
                     # Boefje allowed to scan ooi?
-                    if not self.is_task_allowed_to_run(boefje, ooi):
+                    if not self.has_boefje_task_permission_to_run(boefje_task):
                         self.logger.debug(
                             "Boefje not allowed to scan ooi, skipping",
                             boefje_id=boefje_task.boefje.id,
@@ -419,15 +438,20 @@ class BoefjeScheduler(Scheduler):
                         self.ctx.datastores.schedule_store.update_schedule(schedule)
                         continue
 
-                breakpoint()
+                new_boefje_task = BoefjeTask(
+                    boefje=Boefje.parse_obj(plugin.dict()),
+                    input_ooi=ooi.primary_key if ooi else None,
+                    organization=self.organisation.id,
+                )
+
                 executor.submit(
-                    self.push_task,
-                    boefje_task,
+                    self.push_boefje_task,
+                    new_boefje_task,
                     self.push_tasks_for_rescheduling.__name__,
                 )
 
-    @tracer.start_as_current_span("boefje_is_task_allowed_to_run")
-    def is_task_allowed_to_run(self, boefje: Plugin, ooi: OOI | None) -> bool:
+    @tracer.start_as_current_span("boefje_has_boefje_task_permission_to_run")
+    def has_boefje_task_permission_to_run(self, boefje_task: models.BoefjeTask) -> bool:
         """Checks whether a boefje is allowed to run on an ooi.
 
         Args:
@@ -437,6 +461,11 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the boefje is allowed to run on the ooi, False otherwise.
         """
+        boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            boefje_task.boefje.id,
+            self.organisation.id,
+        )
+
         if boefje.enabled is False:
             self.logger.debug(
                 "Boefje: %s is disabled",
@@ -459,8 +488,13 @@ class BoefjeScheduler(Scheduler):
             return False
 
         # We allow boefjes without an ooi to run.
-        if not ooi:
+        if boefje_task.input_ooi is None:
             return True
+
+        ooi = self.ctx.services.octopoes.get_object(
+            self.organisation.id,
+            boefje_task.input_ooi,
+        )
 
         if ooi.scan_profile is None:
             self.logger.debug(
@@ -503,8 +537,8 @@ class BoefjeScheduler(Scheduler):
 
         return True
 
-    @tracer.start_as_current_span("boefje_is_task_running")
-    def is_task_running(self, task: BoefjeTask) -> bool:
+    @tracer.start_as_current_span("boefje_has_boefje_task_started_running")
+    def has_boefje_task_started_running(self, task: BoefjeTask) -> bool:
         """Check if the same task is already running.
 
         Args:
@@ -599,7 +633,7 @@ class BoefjeScheduler(Scheduler):
         return False
 
     @tracer.start_as_current_span("boefje_is_task_stalled")
-    def is_task_stalled(self, task: BoefjeTask) -> bool:
+    def has_boefje_task_stalled(self, task: BoefjeTask) -> bool:
         """Check if the same task is stalled.
 
         Args:
@@ -636,8 +670,84 @@ class BoefjeScheduler(Scheduler):
 
         return False
 
+    @tracer.start_as_current_span("boefje_has_boefje_task_grace_period_passed")
+    def has_boefje_task_grace_period_passed(self, task: BoefjeTask) -> bool:
+        """Check if the grace period has passed for a task in both the
+        datastore and bytes.
+
+        NOTE: We don't check the status of the task since this needs to be done
+        by checking if the task is still running or not.
+
+        Args:
+            task: Task to check.
+
+        Returns:
+            True if the grace period has passed, False otherwise.
+        """
+        try:
+            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
+        except Exception as exc_db:
+            self.logger.warning(
+                "Could not get latest task by hash: %s",
+                task.hash,
+                task_hash=task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                exc_info=exc_db,
+            )
+            raise exc_db
+
+        # Has grace period passed according to datastore?
+        if task_db is not None and datetime.now(
+            timezone.utc
+        ) - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_grace_period):
+            self.logger.debug(
+                "Task has not passed grace period, according to the datastore",
+                task_id=task_db.id,
+                task_hash=task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return False
+
+        try:
+            task_bytes = self.ctx.services.bytes.get_last_run_boefje(
+                boefje_id=task.boefje.id,
+                input_ooi=task.input_ooi,
+                organization_id=task.organization,
+            )
+        except ExternalServiceError as exc_bytes:
+            self.logger.error(
+                "Failed to get last run boefje from bytes",
+                boefje_id=task.boefje.id,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+                exc_info=exc_bytes,
+            )
+            raise exc_bytes
+
+        # Did the grace period pass, according to bytes?
+        if (
+            task_bytes is not None
+            and task_bytes.ended_at is not None
+            and datetime.now(timezone.utc) - task_bytes.ended_at
+            < timedelta(seconds=self.ctx.config.pq_grace_period)
+        ):
+            self.logger.debug(
+                "Task has not passed grace period, according to bytes",
+                task_id=task_bytes.id,
+                task_hash=task.hash,
+                organisation_id=self.organisation.id,
+                scheduler_id=self.scheduler_id,
+            )
+            return False
+
+        return True
+
     @tracer.start_as_current_span("boefje_push_task")
-    def push_task(self, boefje_task: models.BoefjeTask, caller: str = "") -> None:
+    def push_boefje_task(
+        self, boefje_task: models.BoefjeTask, caller: str = ""
+    ) -> None:
         """Given a Boefje and OOI create a BoefjeTask and push it onto
         the queue.
 
@@ -647,7 +757,7 @@ class BoefjeScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
 
         """
-        if not self.is_task_allowed_to_run(boefje_task.boefje, boefje_task.input_ooi):
+        if not self.has_boefje_task_permission_to_run(boefje_task):
             self.logger.debug(
                 "Task is not allowed to run: %s",
                 boefje_task.hash,
@@ -659,7 +769,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-            grace_period_passed = self.has_grace_period_passed(boefje_task)
+            grace_period_passed = self.has_boefje_task_grace_period_passed(boefje_task)
             if not grace_period_passed:
                 self.logger.debug(
                     "Task has not passed grace period: %s",
@@ -683,7 +793,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-            is_stalled = self.is_task_stalled(boefje_task)
+            is_stalled = self.has_boefje_task_stalled(boefje_task)
             if is_stalled:
                 self.logger.debug(
                     "Task is stalled: %s",
@@ -713,7 +823,7 @@ class BoefjeScheduler(Scheduler):
             return
 
         try:
-            is_running = self.is_task_running(boefje_task)
+            is_running = self.has_boefje_task_started_running(boefje_task)
             if is_running:
                 self.logger.debug(
                     "Task is still running: %s",
@@ -792,80 +902,6 @@ class BoefjeScheduler(Scheduler):
             scheduler_id=self.scheduler_id,
             caller=caller,
         )
-
-    @tracer.start_as_current_span("boefje_has_grace_period_passed")
-    def has_grace_period_passed(self, task: BoefjeTask) -> bool:
-        """Check if the grace period has passed for a task in both the
-        datastore and bytes.
-
-        NOTE: We don't check the status of the task since this needs to be done
-        by checking if the task is still running or not.
-
-        Args:
-            task: Task to check.
-
-        Returns:
-            True if the grace period has passed, False otherwise.
-        """
-        try:
-            task_db = self.ctx.datastores.task_store.get_latest_task_by_hash(task.hash)
-        except Exception as exc_db:
-            self.logger.warning(
-                "Could not get latest task by hash: %s",
-                task.hash,
-                task_hash=task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_db,
-            )
-            raise exc_db
-
-        # Has grace period passed according to datastore?
-        if task_db is not None and datetime.now(
-            timezone.utc
-        ) - task_db.modified_at < timedelta(seconds=self.ctx.config.pq_grace_period):
-            self.logger.debug(
-                "Task has not passed grace period, according to the datastore",
-                task_id=task_db.id,
-                task_hash=task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return False
-
-        try:
-            task_bytes = self.ctx.services.bytes.get_last_run_boefje(
-                boefje_id=task.boefje.id,
-                input_ooi=task.input_ooi,
-                organization_id=task.organization,
-            )
-        except ExternalServiceError as exc_bytes:
-            self.logger.error(
-                "Failed to get last run boefje from bytes",
-                boefje_id=task.boefje.id,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-                exc_info=exc_bytes,
-            )
-            raise exc_bytes
-
-        # Did the grace period pass, according to bytes?
-        if (
-            task_bytes is not None
-            and task_bytes.ended_at is not None
-            and datetime.now(timezone.utc) - task_bytes.ended_at
-            < timedelta(seconds=self.ctx.config.pq_grace_period)
-        ):
-            self.logger.debug(
-                "Task has not passed grace period, according to bytes",
-                task_id=task_bytes.id,
-                task_hash=task.hash,
-                organisation_id=self.organisation.id,
-                scheduler_id=self.scheduler_id,
-            )
-            return False
-
-        return True
 
     def get_boefjes_for_ooi(self, ooi) -> list[Plugin]:
         """Get available all boefjes (enabled and disabled) for an ooi.
