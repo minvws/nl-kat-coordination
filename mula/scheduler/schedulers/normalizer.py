@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import structlog
 from opentelemetry import trace
 
-from scheduler import context, queues, rankers
+from scheduler import context, models, queues, rankers
 from scheduler.connectors import listeners
 from scheduler.connectors.errors import ExternalServiceError
 from scheduler.models import (
@@ -153,16 +153,19 @@ class NormalizerScheduler(Scheduler):
             thread_name_prefix=f"NormalizerScheduler-TPE-{self.scheduler_id}-raw_data"
         ) as executor:
             for normalizer in normalizers.values():
+                normalizer_task = NormalizerTask(
+                    normalizer=normalizer,
+                    raw_data=latest_raw_data.raw_data,
+                )
                 executor.submit(
-                    self.push_task,
-                    normalizer,
-                    latest_raw_data.raw_data,
+                    self.push_normalizer_task,
+                    normalizer_task,
                     self.push_tasks_for_received_raw_data.__name__,
                 )
 
     @tracer.start_as_current_span("normalizer_push_task")
-    def push_task(
-        self, normalizer: Plugin, raw_data: RawData, caller: str = ""
+    def push_normalizer_task(
+        self, normalizer_task: models.NormalizerTask, caller: str = ""
     ) -> None:
         """Given a normalizer and raw data, create a task and push it to the
         queue.
@@ -172,12 +175,8 @@ class NormalizerScheduler(Scheduler):
             raw_data: The raw data to create a task for.
             caller: The name of the function that called this function, used for logging.
         """
-        normalizer_task = NormalizerTask(
-            normalizer=Normalizer(id=normalizer.id),
-            raw_data=raw_data,
-        )
 
-        if not self.is_task_allowed_to_run(normalizer):
+        if not self.has_normalizer_task_permission_to_run(normalizer):
             self.logger.debug(
                 "Task is not allowed to run: %s",
                 normalizer_task.id,
@@ -313,8 +312,10 @@ class NormalizerScheduler(Scheduler):
 
         return normalizers
 
-    @tracer.start_as_current_span("normalizer_is_task_allowed_to_run")
-    def is_task_allowed_to_run(self, normalizer: Plugin) -> bool:
+    @tracer.start_as_current_span("normalizer_has_normalizer_task_permission_to_run")
+    def has_normalizer_task_permission_to_run(
+        self, normalizer_task: models.NormalizerTask
+    ) -> bool:
         """Check if the task is allowed to run.
 
         Args:
@@ -323,6 +324,12 @@ class NormalizerScheduler(Scheduler):
         Returns:
             True if the task is allowed to run, False otherwise.
         """
+        # TODO: check if we can optimize this call
+        normalizer = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
+            normalizer_task.normalizer.id,
+            self.organisation.id,
+        )
+
         if not normalizer.enabled:
             self.logger.debug(
                 "Normalizer: %s is disabled",

@@ -120,10 +120,26 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
 
     def test_is_allowed_to_run(self):
         # Arrange
-        normalizer = PluginFactory()
+        ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
+        boefje = BoefjeFactory()
+        boefje_meta = BoefjeMetaFactory(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+        )
+
+        raw_data = RawDataFactory(
+            boefje_meta=boefje_meta,
+            mime_types=[{"value": "text/plain"}],
+        )
+        normalizer = NormalizerFactory()
+
+        normalizer_task = models.NormalizerTask(
+            normalizer=normalizer,
+            raw_data=raw_data,
+        )
 
         # Act
-        result = self.scheduler.is_task_allowed_to_run(normalizer)
+        result = self.scheduler.has_normalizer_task_permission_to_run(normalizer_task)
 
         # Assert
         self.assertTrue(result)
@@ -134,7 +150,7 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
         normalizer.enabled = False
 
         # Act
-        result = self.scheduler.is_task_allowed_to_run(normalizer)
+        result = self.scheduler.has_normalizer_task_permission_to_run(normalizer)
 
         # Assert
         self.assertFalse(result)
@@ -205,8 +221,8 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
             return_value=False,
         ).start()
 
-        self.mock_is_task_allowed_to_run = mock.patch(
-            "scheduler.schedulers.NormalizerScheduler.is_task_allowed_to_run",
+        self.mock_has_normalizer_task_permission_to_run = mock.patch(
+            "scheduler.schedulers.NormalizerScheduler.has_normalizer_task_permission_to_run",
             return_value=True,
         ).start()
 
@@ -312,7 +328,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = [
             NormalizerFactory(),
         ]
-        self.mock_is_task_allowed_to_run.return_value = False
+        self.mock_has_normalizer_task_permission_to_run.return_value = False
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)
@@ -355,7 +371,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = [
             NormalizerFactory(),
         ]
-        self.mock_is_task_allowed_to_run.return_value = True
+        self.mock_has_normalizer_task_permission_to_run.return_value = True
         self.mock_is_task_running.return_value = True
 
         # Act
@@ -399,7 +415,7 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         self.mock_get_normalizers_for_mime_type.return_value = [
             NormalizerFactory(),
         ]
-        self.mock_is_task_allowed_to_run.return_value = True
+        self.mock_has_normalizer_task_permission_to_run.return_value = True
         self.mock_is_task_running.side_effect = Exception("Something went wrong")
 
         # Act

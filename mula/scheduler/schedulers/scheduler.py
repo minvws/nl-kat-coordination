@@ -289,11 +289,11 @@ class Scheduler(abc.ABC):
                 # with a random jitter approach to avoid scheduling tasks
                 # during office hours
                 now = datetime.now(timezone.utc)
-                cron_expression = self.evaluate_schedule(task)
+                cron_expression = self.evaluate_schedule(item)
                 schedule_db = self.ctx.datastores.schedule_store.create_schedule(
                     models.Schedule(
                         scheduler_id=self.scheduler_id,
-                        hash=task.hash,
+                        hash=item.hash,
                         schedule=cron_expression,
                         deadline_at=cron.next_run(cron_expression),
                         created_at=now,
