@@ -74,7 +74,7 @@ def test_plugin_settings_list_perms(
     )
 
     assert response.status_code == 200
-    assertContains(response, "Overview of settings:")
+    assertContains(response, "Overview of settings")
     assertContains(response, "Object list")
 
 
@@ -109,4 +109,4 @@ def test_plugin_settings_list_perms_2(
 
     assert response.status_code == 200
 
-    assertNotContains(response, "Overview of settings:")
+    assertNotContains(response, "Overview of settings")
