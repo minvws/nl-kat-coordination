@@ -22,8 +22,8 @@ class RPKIReport(Report):
     id = "rpki-report"
     name = _("RPKI Report")
     description = _(
-        "Shows whether the ip is covered by a valid RPKI ROA. For a hostname it shows "
-        "the ip addresses and whether they are covered by a valid RPKI ROA."
+        "Shows whether the IP is covered by a valid RPKI ROA. For a hostname it shows "
+        "the IP addresses and whether they are covered by a valid RPKI ROA."
     )
     plugins = {"required": ["dns-records", "rpki"], "optional": []}
     input_ooi_types = {Hostname, IPAddressV4, IPAddressV6}
