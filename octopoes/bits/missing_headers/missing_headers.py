@@ -85,13 +85,14 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
         yield ft
         yield finding
 
-    if set(header_keys) & DEPRECATED_HEADER:
+    deprecated_headers = set(header_keys) & DEPRECATED_HEADER
+    if deprecated_headers:
         ft = KATFindingType(id="KAT-DEPRECATED-HEADERS")
         finding = Finding(
             finding_type=ft.reference,
             ooi=resource.reference,
             description=f"Deprecated headers are used. Avoid using the following headers: "
-            f"{' '.join(DEPRECATED_HEADER & set(header_keys))}",
+            f"{' '.join(deprecated_headers)}",
         )
         yield ft
         yield finding
