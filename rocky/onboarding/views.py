@@ -345,8 +345,8 @@ class OnboardingSetupScanOOIDetailView(
 
 
 class OnboardingReportView(
-    SaveGenerateReportMixin,
     OrganizationPermissionRequiredMixin,
+    SaveGenerateReportMixin,
     IntroductionStepsMixin,
     SingleOOITreeMixin,
     TemplateView,
@@ -364,9 +364,13 @@ class OnboardingReportView(
         """
         Gets the Hostname and DNSZone primary keys out of a URL object.
         """
-        ooi = self.get_ooi(self.request.GET.get("ooi", ""))
+        ooi_pk = self.request.POST.get("ooi", "")
+        ooi = self.get_ooi(ooi_pk)
+
         tree = self.octopoes_api_connector.get_tree(
-            Reference.from_str(ooi.primary_key), valid_time=datetime.now(timezone.utc), depth=3
+            Reference.from_str(ooi.primary_key),
+            valid_time=datetime.now(timezone.utc),
+            depth=3,
         )
 
         hostname_ref = tree.store[ooi.web_url].netloc
@@ -378,6 +382,8 @@ class OnboardingReportView(
 
     def post(self, request, *args, **kwargs):
         self.set_member_onboarded()
+
+        self.selected_report_types = request.POST.getlist("report_type", [])
         report_ooi = self.save_report()
 
         return redirect(

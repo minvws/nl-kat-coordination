@@ -314,7 +314,7 @@ def test_onboarding_ooi_detail_scan(request, member, rf, mock_organization_view_
 
 
 @pytest.mark.parametrize("member", ["superuser_member", "admin_member", "redteam_member", "client_member"])
-def test_onboarding_scanning_boefjes(request, member, rf, mock_organization_view_octopoes, url, hostname, valid_time):
+def test_onboarding_scanning_boefjes(request, member, rf, mock_organization_view_octopoes, url):
     member = request.getfixturevalue(member)
 
     response = OnboardingReportView.as_view()(
@@ -322,7 +322,6 @@ def test_onboarding_scanning_boefjes(request, member, rf, mock_organization_view
             rf.post(
                 "step_report",
                 {
-                    "observed_at": valid_time.strftime("%Y-%m-%d"),
                     "ooi": url.primary_key,
                     "report_type": "dns-report",
                 },

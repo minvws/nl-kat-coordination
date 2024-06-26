@@ -1455,3 +1455,27 @@ def listed_hostnames(network) -> list[Hostname]:
         Hostname(network=network.reference, name="e.example.com"),
         Hostname(network=network.reference, name="f.example.com"),
     ]
+
+
+@pytest.fixture
+def onboarding_collect_data():
+    return {
+        "Hostname|internet|mispo.es": {
+            "input_ooi": "Hostname|internet|mispo.es",
+            "records": [
+                {"type": "A", "ttl": 480, "name": "mispo.es", "content": "134.209.85.72"},
+                {"type": "MX", "ttl": 480, "name": "mispo.es", "content": "10 mx.wijmailenveilig.nl."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns1.domaindiscount24.net."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns2.domaindiscount24.net."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns3.domaindiscount24.net."},
+                {
+                    "type": "SOA",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns1.domaindiscount24.net. tech.key-systems.net. 2023012324 10800 3600 604800 3600",
+                },
+            ],
+            "security": {"spf": False, "dkim": False, "dmarc": False, "dnssec": False, "caa": False},
+            "finding_types": [],
+        }
+    }
