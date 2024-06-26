@@ -255,7 +255,7 @@ def test_report_history_subreports_table(
     assertContains(response, "Web System Report")
 
 
-def test_report_history_report_typr_summary(
+def test_report_history_report_type_summary(
     rf, client_member, mock_organization_view_octopoes, mocker, reports_more_input_oois
 ):
     mocker.patch("reports.views.base.get_katalogus")
