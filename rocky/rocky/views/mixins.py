@@ -389,11 +389,8 @@ class ReportList:
 
         if report_types:
             for report_type in sorted(list(report_types)):
-                count_oois = 0
-                for report in reports:
-                    if report_type == report.report_type:
-                        count_oois += len(report.input_oois)
-                summary[report_type] = count_oois
+                total_oois = [len(report.input_oois) for report in reports if report_type == report.report_type]
+                summary[report_type] = sum(total_oois)
         return summary
 
 
