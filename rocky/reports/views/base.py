@@ -510,8 +510,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             context["data"] = self.get_report_data_from_bytes(self.report_ooi)
             for report in children_reports:
                 for ooi in report.input_oois:
-                    report_data[report.report_type] = {}
-                    report_data[report.report_type][ooi] = {
+                    report_data.setdefault(report.report_type, {})[ooi] = {
                         "data": self.get_report_data_from_bytes(report)["report_data"],
                         "template": report.template,
                         "report_name": get_report_by_id(report.report_type).name,
