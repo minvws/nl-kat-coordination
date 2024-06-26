@@ -387,10 +387,11 @@ class ReportList:
         summary: dict[str, int] = {}
         report_types: set[str] = {report.report_type for report in reports}
 
-        if report_types:
-            for report_type in sorted(list(report_types)):
-                total_oois = [len(report.input_oois) for report in reports if report_type == report.report_type]
-                summary[report_type] = sum(total_oois)
+        for report_type in sorted(report_types):
+            summary[report_type] = sum(
+                [len(report.input_oois) for report in reports if report_type == report.report_type]
+            )
+
         return summary
 
 
