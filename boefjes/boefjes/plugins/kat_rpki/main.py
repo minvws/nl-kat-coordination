@@ -5,6 +5,7 @@ import json
 import os
 import tempfile
 from datetime import datetime
+from ipaddress import ip_address
 from os import getenv
 from pathlib import Path
 
@@ -34,6 +35,12 @@ def run(boefje_meta: BoefjeMeta) -> list[tuple[set, bytes | str]]:
     input_ = boefje_meta.arguments["input"]
     ip = input_["address"]
     hash_algorithm = HASHFUNC
+
+    # if the address is private, we do not need a ROA
+    if not ip_address(ip).is_global:
+        return [
+            (set(), json.dumps("IP address is private, no need for RPKI validation")),
+        ]
 
     # RPKI cache check and refresh
     if not RPKI_PATH.exists() or cache_out_of_date(RPKI_META_PATH):
