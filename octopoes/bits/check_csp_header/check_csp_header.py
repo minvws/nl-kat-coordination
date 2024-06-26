@@ -31,7 +31,9 @@ def run(resource: HTTPResource, additional_oois: list[HTTPHeader], config: dict[
 
     headers = {header.key.lower(): header.value for header in additional_oois}
 
-    if not is_xss_capable(headers.get("content-type", "")):
+    content_type = headers.get("content-type", "")
+    # if no content type is present, we can't determine if the resource is XSS capable, so assume it is
+    if content_type and not is_xss_capable(content_type):
         return
 
     csp_header = headers.get("content-security-policy", "")
