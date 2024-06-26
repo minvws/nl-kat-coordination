@@ -20,4 +20,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rocky-coverage-unit
-          path: coverage.xml
+          path: rocky/coverage.xml
