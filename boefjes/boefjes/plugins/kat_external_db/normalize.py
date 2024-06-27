@@ -14,9 +14,9 @@ from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPV4NetBlock, 
 # are defined below.
 # T O D O add these variables as normalizer settings in UI.
 IP_ADDRESS_LIST_PATH = ["ip_addresses"]
-IP_ADDRESS_ITEM_PATH = ["ip_address"]
+IP_ADDRESS_ITEM_PATH = ["address"]
 DOMAIN_LIST_PATH = ["domains"]
-DOMAIN_ITEM_PATH = ["domain"]
+DOMAIN_ITEM_PATH = ["name"]
 
 
 def follow_path_in_dict(path, path_dict):
