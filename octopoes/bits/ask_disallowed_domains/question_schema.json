@@ -3,14 +3,13 @@
   "$id": "/bit/disallowed-csp-hostnames",
   "type": "object",
   "default": {},
-  "Port Configuration": "Root Schema",
   "required": [],
   "properties": {
     "disallowed_hostnames": {
       "description": "Comma separated list of disallowed hostnames in CSP headers",
       "type": "string",
       "pattern": "^(\\s*(,*)[^,]+,?\\s*)*$",
-      "default": "github.com,google.com"
+      "default": "githubpages.com,jsdelivr.com,cdn.skypack.dev"
     },
     "disallow_url_shorteners": {
       "description": "Do you want to disallow url shorteners in csp headers?",
