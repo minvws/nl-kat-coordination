@@ -84,10 +84,10 @@ class TaskStoreTestCase(unittest.TestCase):
         results = self.mock_ctx.datastores.task_store.get_status_counts()
 
         # Assert
-        self.assertEqual(results[models.TaskStatus.QUEUED], 2)
-        self.assertEqual(results[models.TaskStatus.COMPLETED], 2)
-        self.assertEqual(results[models.TaskStatus.FAILED], 2)
-        self.assertEqual(results[models.TaskStatus.DISPATCHED], 4)
+        self.assertEqual(results[models.TaskStatus.QUEUED.value], 2)
+        self.assertEqual(results[models.TaskStatus.COMPLETED.value], 2)
+        self.assertEqual(results[models.TaskStatus.FAILED.value], 2)
+        self.assertEqual(results[models.TaskStatus.DISPATCHED.value], 4)
 
     def test_get_status_count_per_hour(self):
         # Arrange
