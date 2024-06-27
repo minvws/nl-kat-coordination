@@ -461,6 +461,7 @@ class BoefjeScheduler(Scheduler):
         Returns:
             True if the boefje is allowed to run on the ooi, False otherwise.
         """
+        # TODO: check if we can optimize this call
         boefje = self.ctx.services.katalogus.get_plugin_by_id_and_org_id(
             boefje_task.boefje.id,
             self.organisation.id,
@@ -491,6 +492,7 @@ class BoefjeScheduler(Scheduler):
         if boefje_task.input_ooi is None:
             return True
 
+        # TODO: check if we can optimize this call
         ooi = self.ctx.services.octopoes.get_object(
             self.organisation.id,
             boefje_task.input_ooi,
