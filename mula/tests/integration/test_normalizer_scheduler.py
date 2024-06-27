@@ -63,6 +63,10 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             "scheduler.context.AppContext.datastores.task_store.get_latest_task_by_hash"
         ).start()
 
+        self.mock_get_plugin = mock.patch(
+            "scheduler.context.AppContext.services.katalogus.get_plugin_by_id_and_org_id",
+        ).start()
+
     def test_disable_scheduler(self):
         # Act
         self.scheduler.disable()
@@ -126,34 +130,60 @@ class NormalizerSchedulerTestCase(NormalizerSchedulerBaseTestCase):
             boefje=boefje,
             input_ooi=ooi.primary_key,
         )
-
         raw_data = RawDataFactory(
             boefje_meta=boefje_meta,
             mime_types=[{"value": "text/plain"}],
         )
-        normalizer = NormalizerFactory()
+
+        plugin = PluginFactory(type="normalizer", consumes=["text/plain"])
 
         normalizer_task = models.NormalizerTask(
-            normalizer=normalizer,
+            normalizer=models.Normalizer.parse_obj(plugin.dict()),
             raw_data=raw_data,
         )
 
+        # Mocks
+        self.mock_get_plugin.return_value = plugin
+
         # Act
-        result = self.scheduler.has_normalizer_task_permission_to_run(normalizer_task)
+        allowed_to_run = self.scheduler.has_normalizer_task_permission_to_run(
+            normalizer_task
+        )
 
         # Assert
-        self.assertTrue(result)
+        self.assertTrue(allowed_to_run)
 
     def test_is_not_allowed_to_run(self):
         # Arrange
-        normalizer = PluginFactory()
-        normalizer.enabled = False
+        ooi = OOIFactory(scan_profile=ScanProfileFactory(level=0))
+        boefje = BoefjeFactory()
+        boefje_meta = BoefjeMetaFactory(
+            boefje=boefje,
+            input_ooi=ooi.primary_key,
+        )
+        raw_data = RawDataFactory(
+            boefje_meta=boefje_meta,
+            mime_types=[{"value": "text/plain"}],
+        )
+
+        plugin = PluginFactory(type="normalizer", consumes=["text/plain"])
+        plugin.enabled = False
+
+        normalizer_task = models.NormalizerTask(
+            normalizer=models.Normalizer.parse_obj(plugin.dict()),
+            raw_data=raw_data,
+        )
+
+        # Mocks
+        self.mock_get_plugin.return_value = plugin
 
         # Act
-        result = self.scheduler.has_normalizer_task_permission_to_run(normalizer)
+        allowed_to_run = self.scheduler.has_normalizer_task_permission_to_run(
+            normalizer_task
+        )
 
         # Assert
-        self.assertFalse(result)
+        self.assertFalse(allowed_to_run)
 
     @mock.patch(
         "scheduler.context.AppContext.services.katalogus.get_normalizers_by_org_id_and_type"
@@ -250,9 +280,8 @@ class RawFileReceivedTestCase(NormalizerSchedulerBaseTestCase):
         ).model_dump_json()
 
         # Mocks
-        self.mock_get_normalizers_for_mime_type.return_value = [
-            NormalizerFactory(),
-        ]
+        plugin = PluginFactory(type="normalizer", consumes=["text/plain"])
+        self.mock_get_normalizers_for_mime_type.return_value = [plugin]
 
         # Act
         self.scheduler.push_tasks_for_received_raw_data(raw_data_event)

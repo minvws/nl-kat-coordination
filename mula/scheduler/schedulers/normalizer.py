@@ -154,7 +154,7 @@ class NormalizerScheduler(Scheduler):
         ) as executor:
             for normalizer in normalizers.values():
                 normalizer_task = NormalizerTask(
-                    normalizer=normalizer,
+                    normalizer=Normalizer.parse_obj(normalizer.dict()),
                     raw_data=latest_raw_data.raw_data,
                 )
                 executor.submit(
@@ -175,8 +175,7 @@ class NormalizerScheduler(Scheduler):
             raw_data: The raw data to create a task for.
             caller: The name of the function that called this function, used for logging.
         """
-
-        if not self.has_normalizer_task_permission_to_run(normalizer):
+        if not self.has_normalizer_task_permission_to_run(normalizer_task):
             self.logger.debug(
                 "Task is not allowed to run: %s",
                 normalizer_task.id,
@@ -223,7 +222,7 @@ class NormalizerScheduler(Scheduler):
 
         score = self.ranker.rank(
             SimpleNamespace(
-                raw_data=raw_data,
+                raw_data=normalizer_task.raw_data,
                 task=normalizer_task,
             ),
         )
@@ -255,10 +254,10 @@ class NormalizerScheduler(Scheduler):
         self.logger.info(
             "Created normalizer task: %s for raw data: %s",
             task.id,
-            raw_data.id,
+            normalizer_task.raw_data.id,
             task_id=task.id,
-            normalizer_id=normalizer.id,
-            raw_data_id=raw_data.id,
+            normalizer_id=normalizer_task.normalizer.id,
+            raw_data_id=normalizer_task.raw_data.id,
             organisation_id=self.organisation.id,
             scheduler_id=self.scheduler_id,
             caller=caller,
@@ -271,7 +270,7 @@ class NormalizerScheduler(Scheduler):
             mime_type : The mime type to get normalizers for.
 
         Returns:
-            A list of normalizers for the given mime type.
+            A list of Plugins of type normalizer for the given mime type.
         """
         try:
             normalizers = (
