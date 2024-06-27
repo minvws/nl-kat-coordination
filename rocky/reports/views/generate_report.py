@@ -126,17 +126,12 @@ class ReportTypesSelectionGenerateReportView(
 
 class SaveGenerateReportMixin(ReportPluginView):
     def save_report(self) -> ReportOOI:
-        if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
-            return redirect(
-                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
-            )
-
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
 
         number_of_reports = 0
+
         for ooi in self.get_oois_pk():
             ooi_type = Reference.from_str(ooi).class_
 
@@ -146,6 +141,7 @@ class SaveGenerateReportMixin(ReportPluginView):
             by_type[ooi_type].append(ooi)
 
         sorted_report_types = list(filter(lambda x: x in self.report_types, REPORTS))
+
         for report_class in sorted_report_types:
             oois = {
                 ooi for ooi_type in report_class.input_ooi_types for ooi in by_type.get(ooi_type.get_object_type(), [])
@@ -153,6 +149,7 @@ class SaveGenerateReportMixin(ReportPluginView):
 
             try:
                 results = report_class(self.octopoes_api_connector).collect_data(oois, self.observed_at)
+
             except ObjectNotFoundException:
                 error_reports.append(report_class.id)
                 continue
@@ -240,6 +237,11 @@ class SetupScanGenerateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(self.request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
+            )
         if not self.report_has_required_plugins() or self.plugins_enabled():
             report_ooi = self.save_report()
             return redirect(
