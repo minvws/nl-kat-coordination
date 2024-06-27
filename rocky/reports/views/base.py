@@ -190,6 +190,7 @@ class ReportTypeView(BaseSelectionView):
         self.report_types: Sequence[type[Report] | type[MultiReport] | type[AggregateReport]] = (
             self.get_report_types_from_choice()
         )
+
         self.report_ids = [report.id for report in self.report_types]
 
     def get_report_types_from_choice(

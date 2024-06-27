@@ -719,9 +719,9 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual(1, len(response.json()["results"]))
 
-    def test_patch_tasks(self):
+    def test_patch_task(self):
         # Patch a task
-        self.assertEqual("queued", self.first_item_api.get("status"))
+        self.assertEqual(models.TaskStatus.QUEUED.value, self.first_item_api.get("status"))
         response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"status": "completed"})
         self.assertEqual(200, response.status_code)
         self.assertEqual("completed", response.json().get("status"))
@@ -729,6 +729,12 @@ class APITasksEndpointTestCase(APITemplateTestCase):
     def test_patch_task_empty(self):
         # Patch a task with empty body
         response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={})
+        self.assertEqual(400, response.status_code)
+        self.assertEqual("no data to patch", response.json().get("detail"))
+
+    def test_patch_task_invalid_content(self):
+        # Patch a task with invalid content
+        response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"invalid": "invalid"})
         self.assertEqual(400, response.status_code)
         self.assertEqual("no data to patch", response.json().get("detail"))
 
@@ -743,6 +749,12 @@ class APITasksEndpointTestCase(APITemplateTestCase):
         response = self.client.patch("/tasks/123.123", json={"status": "completed"})
         self.assertEqual(422, response.status_code)
         self.assertIn("Input should be a valid UUID", str(response.content))
+
+    def test_patch_task_invalid_status(self):
+        # Patch a task with invalid status
+        response = self.client.patch(f"/tasks/{self.first_item_api.get('id')}", json={"status": "invalid"})
+        self.assertEqual(422, response.status_code)
+        self.assertIn("Input should be", response.json().get("detail")[0].get("msg"))
 
     def test_get_tasks_stats(self):
         response = self.client.get("/tasks/stats")
