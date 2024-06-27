@@ -17,7 +17,7 @@ jobs:
   # octopoes-tests:
   # uses: minvws/nl-kat-coordination/.github/workflows/octopoes-tests.yml@feature/sonar-cloud
   # bytes-tests:
-    # uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
+  # uses: minvws/nl-kat-coordination/.github/workflows/bytes-tests.yml@feature/sonar-cloud
   # mula-tests:
   #   uses: minvws/nl-kat-coordination/.github/workflows/mula-tests.yml@feature/sonar-cloud
   rocky-tests:
@@ -56,7 +56,7 @@ jobs:
     strategy:
       matrix:
         # module: ["octopoes", "mula", "rocky", "bytes"]
-        module: ["rocky"]
+        module: [ "rocky" ]
 
     steps:
       - name: Download artifacts
@@ -121,9 +121,6 @@ jobs:
 
           path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("bytes/"))
 
-      # todo: fix for rocky, octopoes folder should be prefixed with octopoes/ instead
-      # e.g. "rocky/octopoes/__init__.py" should be "octopoes/octopoes/__init__.py"
-      # or just exclude octopoes/ using the .coveragerc omit option
       - name: fix via script
         if: ${{ matrix.module == 'rocky' }}
         shell: python
@@ -141,7 +138,7 @@ jobs:
 
           path_prefixer(Path("${{ matrix.module }}-coverage-unit/coverage.xml"), Path("rocky/"))
 
-            
+
       - name: Print
         run: cat "${{ matrix.module }}-coverage-unit/coverage.xml"
 
