@@ -63,9 +63,9 @@ def test_onboarding_choose_report_type(request, member, rf):
     assertContains(response, "KAT introduction")
     assertContains(response, "Choose a report - Type")
     assertContains(response, "Skip onboarding")
-    assertContains(response, "DNS report")
-    assertContains(response, "Pen test")
-    assertContains(response, "Mail report")
+    assertContains(response, "DNS Report")
+    assertContains(response, "Pentest")
+    assertContains(response, "Mail Report")
     assertContains(response, "DigiD")
 
 

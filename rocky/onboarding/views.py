@@ -265,6 +265,7 @@ class OnboardingSetClearanceLevelView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["ooi"] = self.url
+        context["dns_report_least_clearance_level"] = DNS_REPORT_LEAST_CLEARANCE_LEVEL
         return context
 
 

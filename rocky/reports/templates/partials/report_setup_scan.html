@@ -54,7 +54,7 @@
                     </div>
                     <div class="column-4 tiles plugins images-cover">
                         {% for required_plugin in plugins.required|dictsort:"enabled" %}
-                            {% include "partials/plugin_tile.html" with plugin=required_plugin show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
+                            {% include "partials/plugin_tile.html" with plugin=required_plugin plugin_report_types=plugin_data.plugin_report_types show_report_types="yes" plugin_report_types=plugin_data.plugin_report_types %}
 
                         {% endfor %}
                     </div>
