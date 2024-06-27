@@ -122,7 +122,9 @@ class TaskStore:
     @exception_handler
     def update_task(self, task: models.Task) -> None:
         with self.dbconn.session.begin() as session:
-            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump()))
+            # NOTE: mode="json" is used specifically to convert the Enum to as_string
+            # sqlalchemy does not allow raw enums to be used in update
+            (session.query(models.TaskDB).filter(models.TaskDB.id == task.id).update(task.model_dump(mode="json")))
 
     @retry()
     @exception_handler
