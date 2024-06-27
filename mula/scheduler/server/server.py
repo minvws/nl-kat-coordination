@@ -19,6 +19,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from scheduler import context, models, queues, schedulers, storage, version
 from scheduler.config import settings
 
+from . import serializers
 from .pagination import PaginatedResponse, paginate
 
 
@@ -171,6 +172,7 @@ class Server:
             endpoint=self.patch_task,
             methods=["PATCH"],
             response_model=models.Task,
+            response_model_exclude_unset=True,
             status_code=status.HTTP_200_OK,
             description="Update a task",
         )
@@ -441,13 +443,9 @@ class Server:
 
         return models.Task(**task.model_dump())
 
-    def patch_task(self, task_id: uuid.UUID, item: dict) -> Any:
-        if len(item) == 0:
-            raise fastapi.HTTPException(
-                status_code=fastapi.status.HTTP_400_BAD_REQUEST,
-                detail="no data to patch",
-            )
-
+    # NOTE: serializers.Task instead of models.Task is needed for patch
+    # endpoints # to allow for partial updates.
+    def patch_task(self, task_id: uuid.UUID, item: serializers.Task) -> Any:
         try:
             task_db = self.ctx.datastores.task_store.get_task_by_id(task_id)
         except storage.errors.StorageError as exc:
@@ -468,7 +466,14 @@ class Server:
                 detail="task not found",
             )
 
-        updated_task = task_db.model_copy(update=item)
+        patch_data = item.model_dump(exclude_unset=True)
+        if len(patch_data) == 0:
+            raise fastapi.HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="no data to patch",
+            )
+
+        updated_task = task_db.model_copy(update=patch_data)
 
         # Update task in database
         try:
@@ -536,7 +541,7 @@ class Server:
 
         return models.PrioritizedItem(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.PrioritizedItemRequest) -> Any:
+    def push_queue(self, queue_id: str, item: serializers.PrioritizedItem) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
