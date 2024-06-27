@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Sequence
+from datetime import datetime, timezone
 from typing import Any
 
 from django.contrib import messages
@@ -148,6 +149,7 @@ class ExportSetupGenerateReportView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["reference_date"] = datetime.now(timezone.utc)
         return context
 
 

@@ -356,7 +356,7 @@ class ReportPluginView(ReportOOIView, ReportTypeView, TemplateView):
         has_parent: bool,
         observed_at: datetime,
     ) -> ReportOOI:
-        report_name = self.request.POST.get("report_name")
+        report_name = self.request.POST.get("report-name") + " (" + str(self.request.POST.get("reference-date")) + ")"
         report_ooi = ReportOOI(
             name=report_name,
             report_type=str(report_type.id),
