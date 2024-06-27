@@ -141,6 +141,8 @@ class RabbitMQ(Listener):
             else:
                 raise
 
+        self.logger.debug("Connected to RabbitMQ", dsn=self.dsn, queue=queue)
+
     @retry(
         (
             pika.exceptions.AMQPConnectionError,
@@ -167,8 +169,8 @@ class RabbitMQ(Listener):
 
             # Blocking call that processes the messages
             self.channel.start_consuming()
-        except pika.exceptions.PikaException as exc:
-            self.logger.error("PikaException: %s", exc)
+        except pika.exceptions.AMQPError as exc:
+            self.logger.error("AMQPError: %s", exc)
             raise exc
         except Exception as exc:
             self.logger.error("Error consuming messages: %s", exc)
