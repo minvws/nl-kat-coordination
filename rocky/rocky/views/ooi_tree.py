@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 from tools.forms.ooi import OoiTreeSettingsForm
 from tools.ooi_helpers import create_object_tree_item_from_ref, filter_ooi_tree, get_ooi_types_from_tree
 from tools.view_helpers import Breadcrumb, get_ooi_url
@@ -6,7 +7,7 @@ from tools.view_helpers import Breadcrumb, get_ooi_url
 from rocky.views.ooi_view import BaseOOIDetailView
 
 
-class OOITreeView(BaseOOIDetailView):
+class OOITreeView(BaseOOIDetailView, TemplateView):
     template_name = "oois/ooi_tree.html"
     connector_form_class = OoiTreeSettingsForm
 

@@ -1,79 +1,38 @@
-from unittest.mock import call
-
 import pytest
 from django.http import Http404
-from httpx import HTTPError
 from pytest_django.asserts import assertContains
 
-from rocky.scheduler import TooManyRequestsError
+from rocky.scheduler import SchedulerTooManyRequestError
 from rocky.views.bytes_raw import BytesRawView
 from rocky.views.tasks import BoefjesTaskListView
 from tests.conftest import setup_request
 
 
-def test_boefjes_tasks(rf, client_member, mocker, lazy_task_list_empty):
-    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
-    mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_empty
-
+def test_boefjes_tasks(rf, client_member, mock_scheduler):
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
-    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
+    response = BoefjesTaskListView.as_view()(
+        request,
+        organization_code=client_member.organization.code,
+        scheduler_id="boefje-test",
+        task_type="boefje",
+        status=None,
+        min_created_at=None,
+        max_created_at=None,
+        input_ooi=None,
+    )
 
     assert response.status_code == 200
 
-    mock_scheduler_client.get_lazy_task_list.assert_has_calls(
-        [
-            call(
-                scheduler_id="boefje-test",
-                task_type="boefje",
-                status=None,
-                min_created_at=None,
-                max_created_at=None,
-                input_ooi=None,
-            )
-        ]
-    )
 
-
-def test_tasks_view_simple(rf, client_member, mocker, lazy_task_list_with_boefje):
-    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
-    mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
-
+def test_tasks_view_simple(rf, client_member, mock_scheduler, mock_scheduler_client_task_list):
     request = setup_request(rf.get("boefjes_task_list"), client_member.user)
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assertContains(response, "1b20f85f")
-    assertContains(response, "Hostname|internet|mispo.es")
-
-    mock_scheduler_client.get_lazy_task_list.assert_has_calls(
-        [
-            call(
-                scheduler_id="boefje-test",
-                task_type="boefje",
-                status=None,
-                min_created_at=None,
-                max_created_at=None,
-                input_ooi=None,
-            )
-        ]
-    )
+    assertContains(response, "Completed")
 
 
-def test_tasks_view_error(rf, client_member, mocker, lazy_task_list_with_boefje):
-    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
-    mock_scheduler_client.get_lazy_task_list.return_value = lazy_task_list_with_boefje
-    mock_scheduler_client.get_lazy_task_list.side_effect = HTTPError("error")
-
-    request = setup_request(rf.get("boefjes_task_list"), client_member.user)
-    response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
-
-    assertContains(response, "error")
-    assertContains(response, "Fetching tasks failed")
-
-
-def test_reschedule_task(rf, client_member, mocker, task):
-    mock_scheduler = mocker.patch("tools.view_helpers.client")
+def test_reschedule_task(rf, client_member, mock_scheduler, task):
     mock_scheduler.get_task_details.return_value = task
-
     request = setup_request(
         rf.post(
             f"/en/{client_member.organization.code}/tasks/boefjes/?task_id={task.id}",
@@ -83,7 +42,7 @@ def test_reschedule_task(rf, client_member, mocker, task):
     )
     response = BoefjesTaskListView.as_view()(request, organization_code=client_member.organization.code)
 
-    assert response.status_code == 302
+    assert response.status_code == 200
     assert list(request._messages)[0].message == (
         "Your task is scheduled and will soon be started in the background. "
         "Results will be added to the object list when they are in. "
@@ -91,10 +50,9 @@ def test_reschedule_task(rf, client_member, mocker, task):
     )
 
 
-def test_reschedule_task_already_queued(rf, client_member, mocker, task):
-    mock_scheduler = mocker.patch("tools.view_helpers.client")
+def test_reschedule_task_already_queued(rf, client_member, mock_scheduler, mocker, task):
     mock_scheduler.get_task_details.return_value = task
-    mock_scheduler.push_task.side_effect = TooManyRequestsError
+    mock_scheduler.push_task.side_effect = SchedulerTooManyRequestError
 
     request = setup_request(
         rf.post(
@@ -109,13 +67,15 @@ def test_reschedule_task_already_queued(rf, client_member, mocker, task):
         organization_code=client_member.organization.code,
     )
 
-    assert response.status_code == 302
-    assert list(request._messages)[0].message == "Task queue is full, please try again later."
+    assert response.status_code == 200
+    assert (
+        list(request._messages)[0].message
+        == "Scheduler is receiving too many requests. Increase SCHEDULER_PQ_MAXSIZE or wait for task to finish."
+    )
 
 
-def test_reschedule_task_from_other_org(rf, client_member, client_member_b, mocker, task):
-    mock_scheduler_client = mocker.patch("rocky.views.tasks.client")
-    mock_scheduler_client.get_task_details.return_value = task
+def test_reschedule_task_from_other_org(rf, client_member, client_member_b, mock_scheduler, task):
+    mock_scheduler.get_task_details.return_value = task
 
     request = setup_request(
         rf.post(

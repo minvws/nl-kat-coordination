@@ -109,6 +109,7 @@ class KATalogusClientV1:
     def get_plugin(self, plugin_id: str) -> Plugin:
         response = self.session.get(f"{self.organization_uri}/plugins/{plugin_id}")
         response.raise_for_status()
+
         return parse_plugin(response.json())
 
     def get_plugin_schema(self, plugin_id) -> dict | None:

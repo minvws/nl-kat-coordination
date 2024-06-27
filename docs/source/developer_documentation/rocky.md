@@ -220,16 +220,18 @@ classDiagram
 direction RL
     class OrganizationView
     class OctopoesView
-    class BoefjeMixin
+    class SchedulerView
+    class TaskListView
 
     OctopoesView <|-- OrganizationView
 
-    BoefjeMixin <|-- OctopoesView
-    BoefjeDetailView <|-- BoefjeMixin
-    OOIDetailView <|-- BoefjeMixin
+    SchedulerView <|-- OctopoesView
+    TaskListView <|-- SchedulerView
+    BoefjeDetailView <|-- TaskListView
+    OOIDetailView <|-- TaskListView
     OOIDetailView <|-- OOIRelatedObjectAddView
     OOIDetailView <|-- OOIFindingManager
-    ChangeClearanceLevel <|-- BoefjeMixin
+    ChangeClearanceLevel <|-- SchedulerView
 
     SingleOOIMixin <|-- OctopoesView
     SingleOOITreeMixin <|-- SingleOOIMixin
@@ -300,13 +302,14 @@ direction RL
 
     class PluginSettingsDeleteView
     class BoefjeDetailView
+    class TaskListView
 
     KATalogusView  <|--  OrganizationView
     KATalogusView  <|--  FormView
     SinglePluginView  <|--  OrganizationView
     SingleSettingView  <|--  SinglePluginView
     BoefjeDetailView  <|--  PluginSettingsListView
-    BoefjeDetailView  <|--  BoefjeMixin
+    BoefjeDetailView  <|--  TaskListView
     PluginEnableDisableView  <|--  SinglePluginView
     PluginSettingsAddView  <|--  FormView
     PluginSettingsAddView  <|--  SinglePluginView

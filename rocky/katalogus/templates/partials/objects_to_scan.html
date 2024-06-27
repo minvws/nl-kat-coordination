@@ -36,7 +36,7 @@
             </p>
         {% endif %}
         {% if select_oois_form.fields.ooi.choices %}
-            {% include "partials/form/checkbox_group_table_form.html" with checkbox_group_table_form=select_oois_form btn_text="Start scan" plugin_enabled=plugin.enabled key="boefje_id" value=plugin.id action="scan" checkbox_group_table_filter_form=select_ooi_filter_form unique_id="" %}
+            {% include "partials/form/checkbox_group_table_form.html" with checkbox_group_table_form=select_oois_form btn_text="Start scan" plugin_enabled=plugin.enabled key="boefje_id" value=plugin.id action="scan_oois" checkbox_group_table_filter_form=select_ooi_filter_form unique_id="" %}
 
         {% elif has_consumable_oois %}
             {% blocktranslate trimmed with name=plugin.name %}

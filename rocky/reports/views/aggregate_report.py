@@ -210,6 +210,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
             self.get_oois(),
             self.selected_report_types,
             self.observed_at,
+            self.organization.code,
         )
 
         # If OOI could not be found or the date is incorrect, it will be shown to the user as a message error

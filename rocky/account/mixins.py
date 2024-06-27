@@ -108,6 +108,12 @@ class OrganizationView(View):
         context["perms"] = OrganizationPermWrapper(self.organization_member)
         return context
 
+    def indemnification_error(self):
+        return messages.error(
+            self.request,
+            f"Indemnification not present at organization {self.organization}.",
+        )
+
     @property
     def may_update_clearance_level(self) -> bool:
         if not self.indemnification_present:
