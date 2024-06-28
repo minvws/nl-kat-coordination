@@ -489,6 +489,7 @@ WEASYPRINT_BASEURL = env("WEASYPRINT_BASEURL", default="http://127.0.0.1:8000/")
 
 KNOX_TOKEN_MODEL = "account.AuthToken"
 
+# todo: enable colors for console rendering only, not for JSON rendering
 structlog.configure(
     processors=[
         structlog.contextvars.merge_contextvars,
