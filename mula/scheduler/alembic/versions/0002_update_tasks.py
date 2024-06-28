@@ -30,6 +30,7 @@ def upgrade():
             sa.Column("data", sa.JSON(), nullable=False),
             sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
             sa.Column("modified_at", sa.DateTime(timezone=True), nullable=False),
+            sa.Column("remote", sa.Boolean, nullable=False),
             sa.PrimaryKeyConstraint("id"),
         )
 

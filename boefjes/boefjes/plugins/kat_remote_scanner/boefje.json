@@ -3,12 +3,15 @@
   "name": "Remote scanner",
   "description": "Scans from the remote",
   "consumes": [
-    "HTTPResource"
+    "HTTPResource",
+    "IPAddressV4",
+    "IPAddressV6"
   ],
   "environment_keys": [
     "REMOTE_URL",
     "COMMAND"
   ],
   "scan_level": 4,
-  "oci_image": "openkat/remote-scanner"
+  "oci_image": "openkat/remote-scanner",
+  "remote": true
 }

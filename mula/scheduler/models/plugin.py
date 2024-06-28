@@ -18,3 +18,4 @@ class Plugin(BaseModel):
     consumes: str | list[str]
     options: list[str] | None = None
     produces: list[str]
+    remote: bool = False

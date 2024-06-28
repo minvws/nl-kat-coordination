@@ -209,10 +209,7 @@ def reschedule_task(request: HttpRequest, organization_code: str, task_id: str) 
         return
 
     try:
-        new_p_item = PrioritizedItem(
-            data=task.p_item.data,
-            priority=1,
-        )
+        new_p_item = PrioritizedItem(data=task.p_item.data, priority=1, remote=task.p_item.remote)
 
         schedule_task(request, organization_code, new_p_item)
     except SchedulerError as error:

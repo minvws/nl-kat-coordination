@@ -26,6 +26,7 @@ class QueuePrioritizedItem(BaseModel):
     priority: int
     hash: str | None = None
     data: BoefjeMeta | NormalizerMeta
+    remote: bool
 
 
 class TaskStatus(Enum):
@@ -47,6 +48,7 @@ class Task(BaseModel):
     status: TaskStatus
     created_at: datetime.datetime
     modified_at: datetime.datetime
+    remote: bool
 
 
 class SchedulerClientInterface:
@@ -81,7 +83,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         return TypeAdapter(list[Queue]).validate_json(response.content)
 
     def pop_item(self, queue: str) -> QueuePrioritizedItem | None:
-        response = self._session.post(f"/queues/{queue}/pop")
+        response = self._session.post(f"/queues/{queue}/pop")  # TODO: SOUF only pop non-remote items
         self._verify_response(response)
 
         return TypeAdapter(QueuePrioritizedItem | None).validate_json(response.content)

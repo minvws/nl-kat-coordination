@@ -24,6 +24,7 @@ class Boefje(BaseModel):
     id: str
     name: str | None = Field(default=None)
     version: str | None = Field(default=None)
+    remote: bool = Field(default=False)
 
 
 class BoefjeMeta(BaseModel):
@@ -79,6 +80,7 @@ class BoefjeTask(BaseModel):
     input_ooi: str | None = None
     organization: str
     type: str = "boefje"
+    remote: bool = False
 
 
 class PrioritizedItem(BaseModel):
@@ -91,6 +93,7 @@ class PrioritizedItem(BaseModel):
     hash: str | None = None
     priority: int
     data: SerializeAsAny[BoefjeTask | NormalizerTask]
+    remote: bool = False
 
 
 class TaskStatus(Enum):

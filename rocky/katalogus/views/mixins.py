@@ -84,9 +84,10 @@ class BoefjeMixin(OctopoesView):
             boefje=Boefje.model_validate(katalogus_boefje.model_dump()),
             input_ooi=ooi.reference if ooi else None,
             organization=self.organization.code,
+            remote=katalogus_boefje.remote,
         )
 
-        task = PrioritizedItem(priority=1, data=boefje_task)
+        task = PrioritizedItem(priority=1, data=boefje_task, remote=katalogus_boefje.remote)
         schedule_task(self.request, self.organization.code, task)
 
     def run_boefje_for_oois(

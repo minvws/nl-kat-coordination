@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 
@@ -34,6 +34,8 @@ class PrioritizedItem(BaseModel):
 
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+    remote: bool = Field(default=False)
+
 
 class PrioritizedItemDB(Base):
     __tablename__ = "items"
@@ -60,6 +62,8 @@ class PrioritizedItemDB(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    remote = Column(Boolean)
 
 
 class Queue(BaseModel):

@@ -516,6 +516,8 @@ class Server:
         return models.Queue(**q.dict())
 
     def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
+        self.logger.info("SOUF: POPPING FROM QUEUE")
+
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -533,6 +535,8 @@ class Server:
                 status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="could not pop item from queue, check your filters",
             )
+        self.logger.info("SOUF: FOUND ITEM IN QUEUE")
+        self.logger.info(p_item.model_dump())
 
         return models.PrioritizedItem(**p_item.model_dump())
 
@@ -553,7 +557,7 @@ class Server:
                 p_item.scheduler_id = s.scheduler_id
 
             p_item.priority = item.priority
-
+            p_item.remote = item.data["remote"]
             if s.queue.item_type == models.BoefjeTask:
                 p_item.data = models.BoefjeTask(**item.data).dict()
                 p_item.id = p_item.data["id"]

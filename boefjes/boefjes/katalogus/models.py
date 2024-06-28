@@ -20,6 +20,7 @@ class Plugin(BaseModel):
     environment_keys: list[str] = Field(default_factory=list)
     related: list[str] | None = None
     enabled: bool = False
+    remote: bool = False
 
     def __str__(self):
         return f"{self.id}:{self.version}"

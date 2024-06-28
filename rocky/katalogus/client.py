@@ -28,6 +28,7 @@ class Plugin(BaseModel):
     related: list[str] = Field(default_factory=list)
     enabled: bool
     type: str
+    remote: bool = Field(default=False, description="Field that describes the boefje runs locally or on the remote.")
 
     # def dict(self, *args, **kwargs):
     #     """Pydantic does not stringify the OOI classes, but then templates can't render them"""
@@ -214,6 +215,7 @@ def parse_boefje(boefje: dict) -> Boefje:
         scan_level=scan_level,
         consumes=consumes,
         produces=boefje["produces"],
+        remote=boefje.get("remote", False),
     )
 
 
