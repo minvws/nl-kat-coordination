@@ -1,4 +1,3 @@
-import itertools
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -388,13 +387,9 @@ class ReportList:
         summary: dict[str, int] = {}
         report_types: set[str] = {report.report_type for report in reports}
 
-        for report_type in report_types:
-            summary[report_type] = len(
-                {
-                    itertools.chain.from_iterable(
-                        [report.input_oois for report in reports if report_type == report.report_type]
-                    )
-                }
+        for report_type in sorted(report_types):
+            summary[report_type] = sum(
+                [len(report.input_oois) for report in reports if report_type == report.report_type]
             )
 
         return summary
