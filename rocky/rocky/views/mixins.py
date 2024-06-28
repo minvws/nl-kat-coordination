@@ -1,8 +1,8 @@
-import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import cached_property
 
+import structlog
 from account.mixins import OrganizationView
 from django.contrib import messages
 from django.http import Http404, HttpRequest
@@ -27,7 +27,7 @@ from octopoes.models.tree import ReferenceTree
 from octopoes.models.types import get_relations
 from rocky.bytes_client import get_bytes_client
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 @dataclass
