@@ -103,7 +103,11 @@ class Scheduler(abc.ABC):
             status=models.TaskStatus.QUEUED,
             created_at=datetime.now(timezone.utc),
             modified_at=datetime.now(timezone.utc),
+            remote=p_item.remote,
         )
+
+        self.logger.info("SOUF CREATING/UPDATING IN TASKSTORE")
+        self.logger.info(task.model_dump_json())
 
         task_db = self.ctx.datastores.task_store.get_task_by_id(str(p_item.id))
         if task_db is not None:

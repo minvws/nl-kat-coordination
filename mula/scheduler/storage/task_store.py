@@ -25,6 +25,7 @@ class TaskStore:
         min_created_at: datetime | None = None,
         max_created_at: datetime | None = None,
         filters: FilterRequest | None = None,
+        remote: bool | None = None,
         offset: int = 0,
         limit: int = 100,
     ) -> tuple[list[models.Task], int]:
@@ -45,6 +46,9 @@ class TaskStore:
 
             if max_created_at is not None:
                 query = query.filter(models.TaskDB.created_at <= max_created_at)
+
+            if remote is not None:
+                query = query.filter(models.TaskDB.remote == remote)
 
             if filters is not None:
                 query = apply_filter(models.TaskDB, query, filters)

@@ -5,7 +5,7 @@ from typing import ClassVar
 
 import mmh3
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import Column, DateTime, Enum, String
+from sqlalchemy import Boolean, Column, DateTime, Enum, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.schema import Index
 from sqlalchemy.sql import func
@@ -61,6 +61,8 @@ class Task(BaseModel):
 
     modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+    remote: bool
+
     def __repr__(self):
         return f"Task(id={self.id}, scheduler_id={self.scheduler_id}, type={self.type}, status={self.status})"
 
@@ -94,6 +96,8 @@ class TaskDB(Base):
         server_default=func.now(),
         onupdate=func.now(),
     )
+
+    remote = Column(Boolean)
 
     __table_args__ = (
         Index(

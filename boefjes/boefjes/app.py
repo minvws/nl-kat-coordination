@@ -99,8 +99,6 @@ class SchedulerWorkerManager(WorkerManager):
         all_queues_empty = True
 
         for queue_type in queues:
-            logger.debug("Popping from queue %s", queue_type.id)
-
             try:
                 p_item = self.scheduler_client.pop_item(queue_type.id)
             except (HTTPError, ValidationError):

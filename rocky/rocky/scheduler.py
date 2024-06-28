@@ -116,6 +116,7 @@ class Task(BaseModel):
     created_at: datetime.datetime
     modified_at: datetime.datetime
     model_config = ConfigDict(from_attributes=True)
+    remote: bool = False
 
 
 class PaginatedTasksResponse(BaseModel):

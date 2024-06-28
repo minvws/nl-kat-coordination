@@ -36,6 +36,7 @@ def upgrade():
             ),
             sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
             sa.Column("modified_at", sa.DateTime(timezone=True), nullable=False),
+            sa.Column("remote", sa.Boolean(), nullable=True),
             sa.PrimaryKeyConstraint("id"),
         )
         # ### end Alembic commands ###

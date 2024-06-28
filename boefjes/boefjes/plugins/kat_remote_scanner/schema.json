@@ -13,7 +13,5 @@
       "description": "The command location to execute the command"
     }
   },
-  "required": [
-    "COMMAND"
-  ]
+  "required": []
 }

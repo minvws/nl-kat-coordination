@@ -560,13 +560,11 @@ class BoefjeScheduler(Scheduler):
             caller: The name of the function that called this function, used for logging.
 
         """
-        self.logger.info("SOUF: STARTED CREATING TASK")
         task = BoefjeTask(
             boefje=Boefje.parse_obj(boefje.dict()),
             input_ooi=ooi.primary_key,
             organization=self.organisation.id,
         )
-        self.logger.info("SOUF: TASK CREATED")
         if not self.is_task_allowed_to_run(boefje, ooi):
             self.logger.debug(
                 "Task is not allowed to run: %s",
@@ -687,7 +685,6 @@ class BoefjeScheduler(Scheduler):
 
         # We need to create a PrioritizedItem for this task, to push
         # it to the priority queue.
-        self.logger.info("SOUF: CREATING p_item")
         p_item = PrioritizedItem(
             id=task.id,
             scheduler_id=self.scheduler_id,
@@ -696,7 +693,7 @@ class BoefjeScheduler(Scheduler):
             hash=task.hash,
             remote=boefje.remote,
         )
-        self.logger.info("SOUF: CREATED p_item")
+        self.logger.info(boefje.model_dump_json())
         self.logger.info(p_item.model_dump_json())
 
         try:

@@ -496,6 +496,7 @@ class Server:
         return stats
 
     def get_queues(self) -> Any:
+        self.logger.info("SOUF: GETTING QUEUES")
         return [models.Queue(**s.queue.dict(include_pq=False)) for s in self.schedulers.copy().values()]
 
     def get_queue(self, queue_id: str) -> Any:
@@ -516,8 +517,6 @@ class Server:
         return models.Queue(**q.dict())
 
     def pop_queue(self, queue_id: str, filters: storage.filters.FilterRequest | None = None) -> Any:
-        self.logger.info("SOUF: POPPING FROM QUEUE")
-
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -535,7 +534,6 @@ class Server:
                 status_code=fastapi.status.HTTP_404_NOT_FOUND,
                 detail="could not pop item from queue, check your filters",
             )
-        self.logger.info("SOUF: FOUND ITEM IN QUEUE")
         self.logger.info(p_item.model_dump())
 
         return models.PrioritizedItem(**p_item.model_dump())
