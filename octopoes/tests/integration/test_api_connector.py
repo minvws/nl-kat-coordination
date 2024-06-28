@@ -10,7 +10,8 @@ from octopoes.connector.octopoes import OctopoesAPIConnector
 from octopoes.models import OOI, DeclaredScanProfile, Reference, ScanLevel
 from octopoes.models.ooi.dns.records import DNSAAAARecord, DNSARecord, DNSMXRecord, DNSNSRecord
 from octopoes.models.ooi.dns.zone import Hostname
-from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network
+from octopoes.models.ooi.findings import RiskLevelSeverity, Finding, KATFindingType
+from octopoes.models.ooi.network import IPAddressV4, IPAddressV6, IPPort, Network, Protocol, PortState
 from octopoes.models.ooi.service import IPService, Service
 from octopoes.models.ooi.web import Website
 from octopoes.models.origin import OriginType
@@ -221,3 +222,65 @@ def test_query(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetim
     assert len(result) == 3
     assert result[0][0] == hostnames[0].reference
     assert result[0][1] == dns_ns_records[0]
+
+
+def test_disappearing_ports(octopoes_api_connector: OctopoesAPIConnector, valid_time: datetime):
+    network = Network(name="test")
+    octopoes_api_connector.save_declaration(
+        Declaration(
+            ooi=network,
+            valid_time=valid_time,
+        )
+    )
+
+    ip = IPAddressV4(network=network.reference, address="10.10.10.10")
+    ip_port = IPPort(
+        address=ip.reference,
+        protocol=Protocol.TCP,
+        port=3306,
+        state=PortState.OPEN,
+    )
+
+    octopoes_api_connector.save_observation(
+        Observation(
+            method="kat_nmap_normalize",
+            source=ip.reference,
+            task_id=uuid.uuid4(),
+            valid_time=valid_time,
+            result=[ip, ip_port],
+        )
+    )
+
+    octopoes_api_connector.save_many_scan_profiles(
+        [DeclaredScanProfile(reference=ooi.reference, level=ScanLevel.L2) for ooi in [ip, ip_port, network]], valid_time
+    )
+
+    octopoes_api_connector.recalculate_bits()
+    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
+
+    assert findings.items == [Finding(
+        finding_type=KATFindingType(id="KAT-OPEN-DATABASE-PORT").reference,
+        description='Port 3306/tcp is a database port and should not be open.',
+        ooi=ip_port.reference,
+    )]
+
+    ip_port = IPPort(
+        address=ip.reference,
+        protocol=Protocol.UDP,
+        port=53,
+        state=PortState.OPEN,
+    )
+    octopoes_api_connector.save_observation(
+        Observation(
+            method="kat_nmap_normalize",
+            source=ip.reference,
+            task_id=uuid.uuid4(),
+            valid_time=valid_time,
+            result=[ip, ip_port],
+        )
+    )
+
+    octopoes_api_connector.recalculate_bits()
+    findings = octopoes_api_connector.list_findings({severity for severity in RiskLevelSeverity}, valid_time)
+
+    assert findings.items == []
