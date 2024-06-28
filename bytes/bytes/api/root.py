@@ -1,7 +1,7 @@
-import structlog
 from typing import Any
 
 import prometheus_client
+import structlog
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.requests import Request

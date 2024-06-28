@@ -1,5 +1,4 @@
 import structlog
-
 from amqp import AMQPError
 
 from octopoes.config.settings import QUEUE_NAME_OCTOPOES, Settings

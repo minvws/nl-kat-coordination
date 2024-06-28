@@ -1,8 +1,8 @@
-import structlog
 from collections.abc import Callable, Iterator
 from functools import cache
 from typing import Any
 
+import structlog
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import Session, declarative_base, sessionmaker

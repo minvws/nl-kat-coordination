@@ -1,5 +1,4 @@
 import datetime
-import structlog
 import uuid
 from enum import Enum
 
@@ -89,9 +88,7 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
-        response = self._session.patch(
-            f"/tasks/{task_id}", json={"status": status.value}
-        )
+        response = self._session.patch(f"/tasks/{task_id}", json={"status": status.value})
         self._verify_response(response)
 
     def get_task(self, task_id: uuid.UUID) -> Task:

@@ -1,9 +1,9 @@
 import contextlib
-import structlog
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Literal
 
+import structlog
 from fastapi import Query
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate

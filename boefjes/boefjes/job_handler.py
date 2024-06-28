@@ -1,4 +1,3 @@
-import structlog
 import os
 import traceback
 from collections.abc import Callable
@@ -7,6 +6,7 @@ from enum import Enum
 from typing import Any, cast
 
 import httpx
+import structlog
 from httpx import HTTPError
 
 from boefjes.clients.bytes_client import BytesAPIClient

@@ -1,14 +1,9 @@
 import json
-import structlog
 
 from sqlalchemy.orm import Session
 
 from boefjes.config import settings
-from boefjes.katalogus.dependencies.encryption import (
-    EncryptMiddleware,
-    IdentityMiddleware,
-    NaclBoxMiddleware,
-)
+from boefjes.katalogus.dependencies.encryption import EncryptMiddleware, IdentityMiddleware, NaclBoxMiddleware
 from boefjes.katalogus.models import EncryptionMiddleware
 from boefjes.katalogus.storage.interfaces import SettingsNotFound, SettingsStorage
 from boefjes.sql.db import ObjectNotFoundException
@@ -29,11 +24,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
             instance = self._db_instance_by_id(organisation_id, plugin_id)
             instance.values = encrypted_values
         except SettingsNotFound:
-            organisation = (
-                self.session.query(OrganisationInDB)
-                .filter(OrganisationInDB.id == organisation_id)
-                .first()
-            )
+            organisation = self.session.query(OrganisationInDB).filter(OrganisationInDB.id == organisation_id).first()
 
             setting_in_db = SettingsInDB(
                 values=encrypted_values,
@@ -66,9 +57,7 @@ class SQLSettingsStorage(SessionMixin, SettingsStorage):
         )
 
         if instance is None:
-            raise SettingsNotFound(
-                organisation_id, plugin_id
-            ) from ObjectNotFoundException(
+            raise SettingsNotFound(organisation_id, plugin_id) from ObjectNotFoundException(
                 SettingsInDB, organisation_id=organisation_id
             )
 
@@ -82,8 +71,6 @@ def create_setting_storage(session) -> SettingsStorage:
 
 def create_encrypter():
     if settings.encryption_middleware == EncryptionMiddleware.NACL_SEALBOX:
-        return NaclBoxMiddleware(
-            settings.katalogus_private_key, settings.katalogus_public_key
-        )
+        return NaclBoxMiddleware(settings.katalogus_private_key, settings.katalogus_public_key)
 
     return IdentityMiddleware()

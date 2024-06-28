@@ -1,10 +1,10 @@
-import structlog
 import typing
 from collections.abc import Callable, Set
 from functools import wraps
 from typing import Any
 from uuid import UUID
 
+import structlog
 from httpx import Client, HTTPStatusError, HTTPTransport, Response
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta

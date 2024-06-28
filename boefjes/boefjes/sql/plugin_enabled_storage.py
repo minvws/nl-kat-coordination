@@ -1,5 +1,4 @@
 import structlog
-
 from sqlalchemy.orm import Session, sessionmaker
 
 from boefjes.config import Settings, settings

@@ -1,4 +1,3 @@
-import structlog
 import multiprocessing as mp
 import os
 import signal
@@ -6,6 +5,7 @@ import sys
 import time
 from queue import Queue
 
+import structlog
 from httpx import HTTPError
 from pydantic import ValidationError
 

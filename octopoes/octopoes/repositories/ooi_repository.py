@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import json
-import structlog
 from collections import Counter
 from datetime import datetime
 from typing import Any, cast
 
+import structlog
 from bits.definitions import BitDefinition
 from httpx import HTTPStatusError, codes
 from pydantic import RootModel, TypeAdapter

@@ -1,10 +1,10 @@
 import base64
-import structlog
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
 from uuid import UUID
 
+import structlog
 from fastapi import Depends, FastAPI, HTTPException, Response
 from httpx import HTTPError, HTTPStatusError
 from pydantic import BaseModel, ConfigDict, Field

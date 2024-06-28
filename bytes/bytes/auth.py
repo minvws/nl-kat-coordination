@@ -1,7 +1,7 @@
-import structlog
 from datetime import datetime, timedelta, timezone
 
 import jwt
+import structlog
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import InvalidTokenError

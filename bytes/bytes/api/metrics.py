@@ -1,5 +1,4 @@
 import structlog
-
 from cachetools import TTLCache, cached
 from prometheus_client import CollectorRegistry, Gauge
 

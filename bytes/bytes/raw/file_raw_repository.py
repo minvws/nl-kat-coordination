@@ -1,6 +1,7 @@
-import structlog
 from pathlib import Path
 from uuid import UUID
+
+import structlog
 
 from bytes.config import Settings
 from bytes.models import BoefjeMeta, RawData

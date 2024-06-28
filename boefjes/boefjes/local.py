@@ -1,6 +1,7 @@
-import structlog
 import os
 from collections.abc import Iterable
+
+import structlog
 
 from boefjes.job_models import (
     BoefjeMeta,

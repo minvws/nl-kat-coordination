@@ -1,10 +1,10 @@
 import json
-import structlog
 import threading
 import uuid
 from collections.abc import Callable
 
 import pika
+import structlog
 from celery import Celery
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.exceptions import StreamLostError

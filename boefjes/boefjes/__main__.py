@@ -1,8 +1,8 @@
 import json
 import logging.config
-import structlog
 
 import click
+import structlog
 
 from boefjes.app import get_runtime_manager
 from boefjes.config import settings

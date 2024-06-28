@@ -1,7 +1,7 @@
-import structlog
 import uuid
 from collections.abc import Iterator
 
+import structlog
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker

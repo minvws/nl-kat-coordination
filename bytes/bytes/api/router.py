@@ -1,6 +1,6 @@
-import structlog
 from uuid import UUID
 
+import structlog
 from cachetools import TTLCache, cached
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import Response

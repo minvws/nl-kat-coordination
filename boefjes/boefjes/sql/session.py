@@ -1,5 +1,4 @@
 import structlog
-
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 

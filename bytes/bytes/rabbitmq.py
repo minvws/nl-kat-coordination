@@ -1,8 +1,8 @@
-import structlog
 from functools import lru_cache
 
 import pika
 import pika.exceptions
+import structlog
 
 from bytes.config import get_settings
 from bytes.events.events import Event

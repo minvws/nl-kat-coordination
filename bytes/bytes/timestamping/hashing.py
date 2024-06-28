@@ -1,7 +1,7 @@
 import hashlib
-import structlog
 from typing import Any
 
+import structlog
 from pydantic import AwareDatetime
 
 from bytes.models import HashingAlgorithm, RawData, SecureHash

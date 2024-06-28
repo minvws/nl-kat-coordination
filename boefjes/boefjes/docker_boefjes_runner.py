@@ -1,7 +1,7 @@
-import structlog
 from datetime import datetime, timezone
 
 import docker
+import structlog
 from docker.errors import APIError, ContainerError, ImageNotFound
 from httpx import HTTPError
 

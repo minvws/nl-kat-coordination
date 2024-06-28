@@ -1,6 +1,6 @@
-import structlog
 from functools import lru_cache
 
+import structlog
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import declarative_base
