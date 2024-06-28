@@ -1,4 +1,4 @@
-import logging
+import structlog
 from datetime import datetime, timezone
 
 import docker
@@ -11,7 +11,7 @@ from boefjes.config import settings
 from boefjes.job_models import BoefjeMeta
 from boefjes.katalogus.models import Boefje
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class DockerBoefjesRunner:

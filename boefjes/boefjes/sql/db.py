@@ -1,4 +1,4 @@
-import logging
+import structlog
 from collections.abc import Callable, Iterator
 from functools import cache
 from typing import Any
@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from boefjes.config import settings
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SQL_BASE = declarative_base()
 

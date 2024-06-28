@@ -1,4 +1,4 @@
-import logging
+import structlog
 import os
 from collections.abc import Iterable
 
@@ -17,7 +17,7 @@ from boefjes.katalogus.local_repository import LocalPluginRepository
 from boefjes.runtime_interfaces import BoefjeJobRunner, JobRuntimeError, NormalizerJobRunner
 from octopoes.models import OOI, DeclaredScanProfile
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class TemporaryEnvironment:

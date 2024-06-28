@@ -1,4 +1,4 @@
-import logging
+import structlog
 from collections.abc import Iterator
 
 from sqlalchemy.orm import Session
@@ -10,7 +10,7 @@ from boefjes.sql.db import ObjectNotFoundException, session_managed_iterator
 from boefjes.sql.db_models import BoefjeInDB, NormalizerInDB
 from boefjes.sql.session import SessionMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLPluginStorage(SessionMixin, PluginStorage):

@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -8,7 +8,7 @@ from boefjes.sql.db import ObjectNotFoundException, get_engine
 from boefjes.sql.db_models import OrganisationInDB, PluginStateInDB
 from boefjes.sql.session import SessionMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLPluginEnabledStorage(SessionMixin, PluginEnabledStorage):

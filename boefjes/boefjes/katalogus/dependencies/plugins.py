@@ -1,5 +1,5 @@
 import contextlib
-import logging
+import structlog
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Literal
@@ -24,7 +24,7 @@ from boefjes.sql.plugin_enabled_storage import create_plugin_enabled_storage
 from boefjes.sql.plugin_storage import create_plugin_storage
 from boefjes.sql.setting_storage import create_setting_storage
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class PluginService:

@@ -1,5 +1,5 @@
 import base64
-import logging
+import structlog
 import multiprocessing
 from datetime import datetime, timezone
 from enum import Enum
@@ -21,7 +21,7 @@ from octopoes.models import Reference
 from octopoes.models.exception import ObjectNotFoundException
 
 app = FastAPI(title="Boefje API")
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class UvicornServer(multiprocessing.Process):

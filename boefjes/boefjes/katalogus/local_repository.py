@@ -1,8 +1,9 @@
 import json
-import logging
 import pkgutil
 from pathlib import Path
 from typing import Any
+
+import structlog
 
 from boefjes.katalogus.models import PluginType
 from boefjes.plugins.models import (
@@ -15,7 +16,7 @@ from boefjes.plugins.models import (
     NormalizerResource,
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class LocalPluginRepository:
@@ -133,14 +134,14 @@ class LocalPluginRepository:
 
         for package in pkgutil.walk_packages([str(self.path)], prefix):
             if not package.ispkg:
-                logging.debug("%s is not a package", package.name)
+                logger.debug("%s is not a package", package.name)
                 continue
 
             path = self.path / package.name.replace(prefix, "").replace(".", "/")
             missing_files = [file for file in required_files if not (path / file).exists()]
 
             if missing_files:
-                logging.debug("Files %s not found for %s", missing_files, package.name)
+                logger.debug("Files %s not found for %s", missing_files, package.name)
                 continue
 
             paths.append((path, package.name))

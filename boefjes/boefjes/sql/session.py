@@ -1,11 +1,11 @@
-import logging
+import structlog
 
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import Session
 
 from boefjes.katalogus.storage.interfaces import StorageError
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SessionMixin:

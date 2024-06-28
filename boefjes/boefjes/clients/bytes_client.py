@@ -1,4 +1,4 @@
-import logging
+import structlog
 import typing
 from collections.abc import Callable, Set
 from functools import wraps
@@ -10,7 +10,7 @@ from httpx import Client, HTTPStatusError, HTTPTransport, Response
 from boefjes.job_models import BoefjeMeta, NormalizerMeta, RawDataMeta
 
 BYTES_API_CLIENT_VERSION = "0.3"
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ClientSessionMethod = Callable[..., Any]
 

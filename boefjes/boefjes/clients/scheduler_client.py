@@ -1,5 +1,5 @@
 import datetime
-import logging
+import structlog
 import uuid
 from enum import Enum
 
@@ -7,8 +7,6 @@ from httpx import Client, HTTPTransport, Response
 from pydantic import BaseModel, TypeAdapter
 
 from boefjes.job_models import BoefjeMeta, NormalizerMeta
-
-logger = logging.getLogger(__name__)
 
 
 class Queue(BaseModel):
@@ -91,7 +89,9 @@ class SchedulerAPIClient(SchedulerClientInterface):
         self._verify_response(response)
 
     def patch_task(self, task_id: uuid.UUID, status: TaskStatus) -> None:
-        response = self._session.patch(f"/tasks/{task_id}", json={"status": status.value})
+        response = self._session.patch(
+            f"/tasks/{task_id}", json={"status": status.value}
+        )
         self._verify_response(response)
 
     def get_task(self, task_id: uuid.UUID) -> Task:

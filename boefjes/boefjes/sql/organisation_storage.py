@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 from sqlalchemy.orm import Session
 
@@ -9,7 +9,7 @@ from boefjes.sql.db import ObjectNotFoundException
 from boefjes.sql.db_models import OrganisationInDB
 from boefjes.sql.session import SessionMixin
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SQLOrganisationStorage(SessionMixin, OrganisationStorage):
