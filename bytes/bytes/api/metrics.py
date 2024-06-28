@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 from cachetools import TTLCache, cached
 from prometheus_client import CollectorRegistry, Gauge
@@ -21,7 +21,7 @@ bytes_database_raw_files_total = Gauge(
     labelnames=["organization_id"],
 )
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def ignore_arguments_key(meta_repository: MetaDataRepository):

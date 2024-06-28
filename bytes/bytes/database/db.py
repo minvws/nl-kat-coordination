@@ -1,11 +1,11 @@
-import logging
+import structlog
 from functools import lru_cache
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import declarative_base
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 SQL_BASE = declarative_base()
 

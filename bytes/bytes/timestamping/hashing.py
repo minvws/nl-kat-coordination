@@ -1,12 +1,12 @@
 import hashlib
-import logging
+import structlog
 from typing import Any
 
 from pydantic import AwareDatetime
 
 from bytes.models import HashingAlgorithm, RawData, SecureHash
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def hash_data(

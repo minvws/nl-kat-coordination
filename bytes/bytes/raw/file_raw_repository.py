@@ -1,4 +1,4 @@
-import logging
+import structlog
 from pathlib import Path
 from uuid import UUID
 
@@ -7,7 +7,7 @@ from bytes.models import BoefjeMeta, RawData
 from bytes.raw.middleware import FileMiddleware, make_middleware
 from bytes.repositories.raw_repository import BytesFileNotFoundException, RawRepository
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def create_raw_repository(settings: Settings) -> RawRepository:

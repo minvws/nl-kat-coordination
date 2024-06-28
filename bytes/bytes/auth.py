@@ -1,4 +1,4 @@
-import logging
+import structlog
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -11,7 +11,7 @@ from starlette import status
 
 from bytes.config import get_settings
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
