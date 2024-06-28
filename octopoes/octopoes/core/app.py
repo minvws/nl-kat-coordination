@@ -1,4 +1,4 @@
-import logging
+import structlog
 
 from amqp import AMQPError
 
@@ -12,7 +12,7 @@ from octopoes.repositories.scan_profile_repository import XTDBScanProfileReposit
 from octopoes.tasks.app import app as celery_app
 from octopoes.xtdb.client import XTDBHTTPClient, XTDBSession
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def get_xtdb_client(base_uri: str, client: str) -> XTDBHTTPClient:

@@ -1,5 +1,5 @@
 import json
-import logging
+import structlog
 import threading
 import uuid
 from collections.abc import Callable
@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from octopoes.events.events import DBEvent, OperationType, ScanProfileDBEvent
 from octopoes.models import ScanProfile, format_id_short
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class AbstractOOI(BaseModel):

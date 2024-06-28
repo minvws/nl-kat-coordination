@@ -1,5 +1,5 @@
 import functools
-import logging
+import structlog
 from collections.abc import Callable
 from datetime import datetime, timezone
 from enum import Enum
@@ -14,7 +14,7 @@ from octopoes.models.transaction import TransactionRecord
 from octopoes.xtdb.exceptions import NodeNotFound, XTDBException
 from octopoes.xtdb.query import Query
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class OperationType(Enum):

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-import logging
+import structlog
 from collections import Counter
 from datetime import datetime
 from typing import Any, cast
@@ -35,7 +35,7 @@ from octopoes.xtdb.query import Query
 from octopoes.xtdb.query_builder import generate_pull_query, str_val
 from octopoes.xtdb.related_field_generator import RelatedFieldNode
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def merge_ooi(ooi_new: OOI, ooi_old: OOI) -> tuple[OOI, bool]:
