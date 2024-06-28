@@ -270,7 +270,7 @@ class HydratedReport:
     children_reports: list[Report] | None
     total_children_reports: int
     total_objects: int
-    report_type_summary: dict[str, int] | None
+    report_type_summary: dict[str, int]
 
 
 class ReportList:
@@ -379,7 +379,7 @@ class ReportList:
         return {input_ooi for child_report in children_reports for input_ooi in child_report.input_oois}
 
     @staticmethod
-    def report_type_summary(reports: list[Report]) -> dict[str, int] | None:
+    def report_type_summary(reports: list[Report]) -> dict[str, int]:
         """
         Calculates per report type how many objects it consumed.
         """
