@@ -84,7 +84,7 @@ def check_version_agains_versionlist(my_version: str, all_versions: list[str]):
     lowerbound_ok = False
 
     # Check if lowerbound is < or <=
-    if re.search("^[[(]", lowerbound):
+    if re.search(r"^[\[(]", lowerbound):
         # Example: "(1.1,1.4]"  # https://snyk.io/vuln/maven%3Aorg.apache.nifi%3Anifi-security-utils
         upperbound = all_versions.pop(0).strip()
         end_bracket = re.search("[])]$", upperbound)
