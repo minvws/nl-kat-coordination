@@ -4,7 +4,7 @@ from urllib import parse
 
 from django import template
 
-from octopoes.models import OOI
+from octopoes.models import OOI, Reference, ScanLevel
 from octopoes.models.ooi.findings import Finding, FindingType
 from tools.view_helpers import get_ooi_url
 
@@ -81,3 +81,21 @@ def index(indexable, i):
 @register.filter
 def pretty_json(obj: dict):
     return json.dumps(obj, default=str, indent=4)
+
+
+@register.filter
+def human_readable(reference_string: str) -> str:
+    return Reference.from_str(reference_string).human_readable
+
+
+@register.filter
+def clearance_level(ooi: OOI) -> ScanLevel:
+    if ooi.scan_profile:
+        return ooi.scan_profile.level
+    else:
+        return ScanLevel.L0
+
+
+@register.filter
+def ooi_type(reference_string: str) -> str:
+    return Reference.from_str(reference_string).class_

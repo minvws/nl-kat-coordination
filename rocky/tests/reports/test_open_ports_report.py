@@ -21,7 +21,7 @@ def test_open_ports_report_ip_no_port(mock_octopoes_api_connector, valid_time, s
 
     data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
-    assert data[ipaddressv4.reference] == {"ports": {}, "hostnames": [hostname.name], "services": {}}
+    assert data[str(ipaddressv4.address)] == {"ports": {}, "hostnames": [hostname.name], "services": {}}
 
 
 def test_open_ports_report_ip_one_port(
@@ -46,7 +46,7 @@ def test_open_ports_report_ip_one_port(
 
     data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
-    assert data[ipaddressv4.reference] == {
+    assert data[str(ipaddressv4.address)] == {
         "ports": {80: False},
         "hostnames": [hostname.name],
         "services": {80: [service.name]},
@@ -73,7 +73,7 @@ def test_open_ports_report_ip_multiple_ports_sorting(
 
     data = report.collect_data([str(ipaddressv4.reference)], valid_time)[str(ipaddressv4.reference)]
 
-    assert data[ipaddressv4.reference] == {
+    assert data[str(ipaddressv4.address)] == {
         "ports": {80: False, 443: False},
         "hostnames": [hostname.name],
         "services": {80: [service.name], 443: [service.name]},
@@ -105,7 +105,7 @@ def test_open_ports_report_hostname_one_port(
 
     data = report.collect_data([str(hostname.reference)], valid_time)[str(hostname.reference)]
 
-    assert data[ipaddressv4.reference] == {
+    assert data[str(ipaddressv4.address)] == {
         "ports": {80: False},
         "hostnames": [hostname.name],
         "services": {80: [service.name]},

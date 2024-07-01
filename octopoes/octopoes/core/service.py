@@ -190,7 +190,7 @@ class OctopoesService:
         source = self.ooi_repository.get(origin.source, valid_time)
 
         parameters_references = self.origin_parameter_repository.list_by_origin({origin.id}, valid_time)
-        parameters = self.ooi_repository.load_bulk({x.reference for x in parameters_references}, valid_time)
+        parameters = self.ooi_repository.load_bulk_as_list({x.reference for x in parameters_references}, valid_time)
 
         config = {}
         if bit_definition.config_ooi_relation_path is not None:
@@ -199,12 +199,10 @@ class OctopoesService:
                 config = configs[-1].config
 
         try:
-            resulting_oois = BitRunner(bit_definition).run(source, list(parameters.values()), config=config)
+            resulting_oois = BitRunner(bit_definition).run(source, parameters, config=config)
+            self.save_origin(origin, resulting_oois, valid_time)
         except Exception as e:
             logger.exception("Error running inference", exc_info=e)
-            return
-
-        self.save_origin(origin, resulting_oois, valid_time)
 
     @staticmethod
     def check_path_level(path_level: int | None, current_level: int):
@@ -584,11 +582,13 @@ class OctopoesService:
         bit_definitions = get_bit_definitions()
         for bit_id, bit_definition in bit_definitions.items():
             # loop over all oois that are consumed by the bit
-            for ooi in self.ooi_repository.list_oois(
-                {bit_definition.consumes}, limit=20000, valid_time=valid_time
-            ).items:
+            for ooi in self.ooi_repository.list_oois_by_object_types(
+                {bit_definition.consumes},
+                valid_time=valid_time,
+            ):
                 if not isinstance(ooi, bit_definition.consumes):
-                    logger.exception("Wut?")
+                    logger.exception("Requested OOI type not met")
+                    raise ObjectNotFoundException("Requested OOI type not met")
 
                 # insert, if not exists
                 bit_instance = Origin(
