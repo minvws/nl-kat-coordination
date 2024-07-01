@@ -91,7 +91,6 @@ function adjustMaxHeight(sidemenu) {
   determineSidebarMaxHeight();
 
   window.addEventListener("resize", (event) => {
-    console.log("resize event");
     // Set the height of the page header and footer
     // when the size of the window changes,
     // to account for responsive behaviour
@@ -102,7 +101,6 @@ function adjustMaxHeight(sidemenu) {
   });
 
   window.addEventListener("scroll", (event) => {
-    console.log("scroll event");
     pageHeight = document.documentElement.scrollHeight;
     determineSidebarMaxHeight();
   });
@@ -117,14 +115,6 @@ function adjustMaxHeight(sidemenu) {
         "calc(100vh - (" + pageHeaderHeight + "px - " + scrollCount + "px))";
     } else {
       var viewPortHeight = document.documentElement.clientHeight;
-
-      // console.log("Scroll count: " + scrollCount)
-      // console.log("VP height: " + viewPortHeight)
-      // console.log("'onderkant van de window' =" + (viewPortHeight + scrollCount))
-      console.log("Page height: " + pageHeight);
-      // console.log("Footer height: " + pageFooterHeight)
-      // console.log("'bovenkant van de footer' =" + (pageHeight - pageFooterHeight))
-      // console.log("Header height:" + pageHeaderHeight)
 
       // When the page footer is in viewport while scrolling, adjust sidebar max-height
       if (scrollCount + viewPortHeight >= pageHeight - pageFooterHeight) {
