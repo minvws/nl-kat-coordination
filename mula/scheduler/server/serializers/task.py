@@ -1,9 +1,8 @@
 import enum
 import uuid
+from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
-
-from .p_item import PrioritizedItem
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TaskStatus(str, enum.Enum):
@@ -37,8 +36,15 @@ class Task(BaseModel):
 
     scheduler_id: str | None = None
 
-    type: str | None = None
+    schedule_id: uuid.UUID | None = None
 
-    p_item: PrioritizedItem | None = None
+    priority: int | None = 0
 
-    status: TaskStatus | None = None
+    status: TaskStatus = TaskStatus.PENDING
+
+    hash: str | None = None
+
+    data: dict | None = None
+
+    created_at: datetime | None = None
+    modified_at: datetime | None = None

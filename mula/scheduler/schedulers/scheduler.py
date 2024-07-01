@@ -226,7 +226,7 @@ class Scheduler(abc.ABC):
             raise queues.errors.NotAllowedError("Scheduler is disabled")
 
         try:
-            item.status = models.TaskStatus.QUEUED.value
+            item.status = models.TaskStatus.QUEUED
             item = self.queue.push(item)
         except queues.errors.NotAllowedError as exc:
             self.logger.warning(
@@ -269,6 +269,8 @@ class Scheduler(abc.ABC):
         )
 
         self.post_push(item)
+
+        # TODO: return item
 
     def post_push(self, item: models.Task) -> None:
         """After an in item is pushed to the queue, we execute this function

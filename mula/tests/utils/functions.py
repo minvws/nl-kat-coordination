@@ -1,3 +1,4 @@
+import json
 import uuid
 from typing import Any, ClassVar
 
@@ -7,6 +8,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Query
 
 from scheduler import models
+from scheduler.server import serializers
 from tests import factories
 
 
@@ -36,18 +38,18 @@ def create_test_model() -> TestModel:
     )
 
 
-def create_p_item_request(
-    priority: int, data: TestModel | None = None
-) -> models.PrioritizedItemRequest:
+def create_task_in(priority: int, data: TestModel | None = None) -> str:
     if data is None:
         data = TestModel(
             id=uuid.uuid4().hex,
             name=uuid.uuid4().hex,
         )
 
-    return models.PrioritizedItemRequest(
-        priority=priority,
-        data=data.model_dump(),
+    return json.dumps(
+        {
+            "priority": priority,
+            "data": data.model_dump(),
+        }
     )
 
 

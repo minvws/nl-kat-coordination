@@ -490,7 +490,6 @@ class Server:
                 detail="failed to update task",
             ) from exc
 
-        # Send signal event
         s = self.schedulers.get(updated_task.scheduler_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -563,7 +562,7 @@ class Server:
 
         return models.Task(**p_item.model_dump())
 
-    def push_queue(self, queue_id: str, item: models.Task) -> Any:
+    def push_queue(self, queue_id: str, item_in: serializers.Task) -> Any:
         s = self.schedulers.get(queue_id)
         if s is None:
             raise fastapi.HTTPException(
@@ -573,23 +572,15 @@ class Server:
 
         try:
             # Load default values
-            p_item = models.Task()
+            default_item = models.Task()
+            patch_data = item_in.model_dump(exclude_unset=True)
+            new_item = default_item.model_copy(update=patch_data)
 
             # Set values
-            if p_item.scheduler_id is None:
-                p_item.scheduler_id = s.scheduler_id
-
-            p_item.priority = item.priority
-
-            if s.queue.item_type == models.BoefjeTask:
-                p_item.data = models.BoefjeTask(**item.data).dict()
-                p_item.id = p_item.data["id"]
-            elif s.queue.item_type == models.NormalizerTask:
-                p_item.data = models.NormalizerTask(**item.data).dict()
-                p_item.id = p_item.data["id"]
-            else:
-                p_item.data = item.data
+            if new_item.scheduler_id is None:
+                new_item.scheduler_id = s.scheduler_id
         except Exception as exc:
+            # TODO: better exception handling
             self.logger.exception(exc)
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -597,7 +588,7 @@ class Server:
             ) from exc
 
         try:
-            s.push_item_to_queue(p_item)
+            s.push_item_to_queue(new_item)
         except ValueError as exc_value:
             raise fastapi.HTTPException(
                 status_code=fastapi.status.HTTP_400_BAD_REQUEST,
@@ -615,7 +606,7 @@ class Server:
                 detail=str(exc_not_allowed),
             ) from exc_not_allowed
 
-        return p_item
+        return new_item
 
     def run(self) -> None:
         uvicorn.run(

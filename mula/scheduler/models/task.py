@@ -49,7 +49,7 @@ class Task(BaseModel):
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
 
-    scheduler_id: str
+    scheduler_id: str | None = None
 
     schedule_id: uuid.UUID | None = None
 

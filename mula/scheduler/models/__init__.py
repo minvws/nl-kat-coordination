@@ -7,7 +7,6 @@ from .ooi import OOI, MutationOperationType, ScanProfile, ScanProfileMutation
 from .organisation import Organisation
 from .plugin import Plugin
 from .queue import Queue
-from .request import PrioritizedItemRequest
 from .schedule import Schedule, ScheduleDB
 from .scheduler import Scheduler
 from .task import BoefjeTask, NormalizerTask, Task, TaskDB, TaskStatus
