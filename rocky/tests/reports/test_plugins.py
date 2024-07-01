@@ -13,6 +13,7 @@ def test_generate_report_setup_scan_wrong_plugin_id(
     valid_time,
     mocker,
     mock_organization_view_octopoes,
+    mock_bytes_client,
     listed_hostnames,
 ):
     katalogus_client = mocker.patch("reports.views.base.get_katalogus")()
@@ -21,6 +22,7 @@ def test_generate_report_setup_scan_wrong_plugin_id(
     )
 
     katalogus_client.get_plugins.side_effect = KATalogusHTTPStatusError
+    mock_bytes_client().upload_raw.return_value = "raw_id"
 
     kwargs = {"organization_code": client_member.organization.code}
     url = reverse("generate_report_setup_scan", kwargs=kwargs)

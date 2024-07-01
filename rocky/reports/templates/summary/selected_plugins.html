@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <h3>{% translate "Selected Plugins" %}</h3>
-{% if plugins.required or plugins.optional %}
+{% if data.plugins %}
     <p>
         {% blocktranslate trimmed %}
             The table below shows all required or optional plugins for the selected reports.
@@ -20,28 +20,32 @@
             </tr>
         </thead>
         <tbody>
-            {% for option, plugins in plugins.items %}
-                {% for plugin in plugins %}
-                    <tr>
-                        <td>
-                            {% if plugin.enabled %}
-                                <span class="icon positive"></span>
-                            {% else %}
-                                <span class="icon incomplete"></span>
-                            {% endif %}
-                        </td>
-                        <td>{{ option }}</td>
-                        <td>{{ plugin.name }}</td>
-                        <td>
-                            {% include "partials/scan_level_indicator.html" with value=plugin.scan_level.value custom_class="left" %}
+            {% for plugin in data.plugins %}
+                <tr>
+                    <td>
+                        {% if plugin.enabled %}
+                            <span class="icon positive"></span>
+                        {% else %}
+                            <span class="icon incomplete"></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if plugin.required %}
+                            required
+                        {% else %}
+                            optional
+                        {% endif %}
+                    </td>
+                    <td>{{ plugin.name }}</td>
+                    <td>
+                        {% include "partials/scan_level_indicator.html" with value=plugin.scan_level custom_class="left" %}
 
-                        </td>
-                        <td>
-                            <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
-                        </td>
-                        <td>{{ plugin.description }}</td>
-                    </tr>
-                {% endfor %}
+                    </td>
+                    <td>
+                        <span class="label-plugin-type {{ plugin.type }}">{{ plugin.type|title }}</span>
+                    </td>
+                    <td>{{ plugin.description }}</td>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
