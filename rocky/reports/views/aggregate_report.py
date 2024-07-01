@@ -1,4 +1,3 @@
-import logging
 from collections.abc import Sequence
 from typing import Any
 
@@ -25,8 +24,6 @@ from reports.views.base import (
 )
 from reports.views.view_helpers import AggregateReportStepsMixin
 from rocky.views.ooi_view import BaseOOIListView
-
-logger = logging.getLogger(__name__)
 
 
 class BreadcrumbsAggregateReportView(ReportBreadcrumbs):
@@ -176,8 +173,6 @@ class SaveAggregateReportMixin(ReportPluginView):
                 }
             )
 
-        logger.error(post_processed_data["oois"])
-
         post_processed_data["report_types"] = []
         for report_type in self.report_types:
             post_processed_data["report_types"].append(
@@ -187,8 +182,6 @@ class SaveAggregateReportMixin(ReportPluginView):
                     "label_style": report_type.label_style,
                 }
             )
-
-        logger.error(post_processed_data["report_types"])
 
         # Create the report
         report_data_raw_id = self.save_report_raw(data=post_processed_data)

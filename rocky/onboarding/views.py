@@ -364,7 +364,7 @@ class OnboardingReportView(
 
     def get_oois_pk(self) -> list[str]:
         """
-        Gets the Hostname and DNSZone primary keys out of a URL object.
+        Gets the Hostname primary key out of the URL object specified by the ooi query parameter.
         """
         ooi_pk = self.request.GET.get("ooi", "")
         ooi = self.get_ooi(ooi_pk)
