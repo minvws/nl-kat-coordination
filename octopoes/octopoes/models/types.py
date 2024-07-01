@@ -59,6 +59,7 @@ from octopoes.models.ooi.network import (
 )
 from octopoes.models.ooi.question import Question
 from octopoes.models.ooi.reports import ReportData
+from octopoes.models.ooi.scans import Scan
 from octopoes.models.ooi.service import IPService, Service, TLSCipher
 from octopoes.models.ooi.software import Software, SoftwareInstance
 from octopoes.models.ooi.web import (
@@ -136,6 +137,7 @@ EmailSecurityType = (
 MonitoringType = Application | Incident
 ConfigType = Config
 ReportsType = ReportData
+ScanType = Scan
 
 ConcreteOOIType = (
     CertificateType
@@ -157,6 +159,7 @@ ConcreteOOIType = (
     | ConfigType
     | Question
     | ReportsType
+    | ScanType
 )
 
 OOIType = ConcreteOOIType | NetworkType | FindingTypeType
