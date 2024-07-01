@@ -846,7 +846,6 @@ class APITasksEndpointTestCase(APITemplateTestCase):
 
 # TODO: implement api server schema endpoints
 # TODO: fix schedule references to schema
-@unittest.skip("Not implemented")
 class APISchemaEndpointTestCase(APITemplateTestCase):
     def setUp(self):
         super().setUp()
