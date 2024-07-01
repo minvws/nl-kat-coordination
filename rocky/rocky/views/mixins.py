@@ -77,10 +77,7 @@ class ObservedAtMixin:
 
                 return ret
             except ValueError:
-                messages.error(
-                    self.request,
-                    _("Can not parse date, falling back to show current date."),
-                )
+                messages.error(self.request, _("Can not parse date, falling back to show current date."))
                 return datetime.now(timezone.utc)
 
 
@@ -255,9 +252,7 @@ class FindingList:
                     continue
                 hydrated_findings.append(
                     HydratedFinding(
-                        finding=finding,
-                        finding_type=objects[finding.finding_type],
-                        ooi=objects[finding.ooi],
+                        finding=finding, finding_type=objects[finding.finding_type], ooi=objects[finding.ooi]
                     )
                 )
             return hydrated_findings

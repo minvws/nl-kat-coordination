@@ -2,8 +2,6 @@
 
 {% load i18n %}
 {% load static %}
-{% load compress %}
-{% load component_tags %}
 
 {% block content %}
     {% include "header.html" %}
@@ -86,7 +84,4 @@
 {% endblock content %}
 {% block html_at_end_body %}
     {{ block.super }}
-    {% compress js %}
-        <script src="{% static "js/script.js" %}" nonce="{{ request.csp_nonce }}" type="module"></script>
-    {% endcompress %}
 {% endblock html_at_end_body %}
