@@ -540,6 +540,7 @@ class ViewReportView(ObservedAtMixin, OrganizationView, TemplateView):
             report_types = self.get_report_types([self.report_ooi])
 
         context["report_data"] = report_data
+        context["report_name"] = self.report_ooi.name
         context["report_types"] = [
             report_type for x in REPORTS for report_type in report_types if report_type["id"] == x.id
         ]
