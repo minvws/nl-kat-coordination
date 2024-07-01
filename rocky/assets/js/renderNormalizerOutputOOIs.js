@@ -85,7 +85,7 @@ buttons.forEach((button) => {
           data["timestamp"] = Date.parse(data["valid_time"]);
           data["valid_time_async"] = new Date(data["timestamp"] + asyncoffset)
             .toISOString()
-            .substring(0, 22);
+            .substring(0, 19); // strip miliseconds
           // Build HTML snippet for every yielded object.
           data["oois"].forEach((object) => {
             object_list += `<li><a href='${url}/objects/detail/?observed_at=${data["valid_time_async"]}&ooi_id=${escapeHTMLEntities(encodeURIComponent(object))}'>${escapeHTMLEntities(object)}</a></li>`;
