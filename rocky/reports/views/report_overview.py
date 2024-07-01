@@ -1,5 +1,3 @@
-import logging
-
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -7,8 +5,6 @@ from django.views.generic import ListView
 from reports.views.base import ReportBreadcrumbs, get_selection
 from rocky.paginator import RockyPaginator
 from rocky.views.mixins import OctopoesView, ReportList
-
-logger = logging.getLogger(__name__)
 
 
 class BreadcrumbsReportOverviewView(ReportBreadcrumbs):

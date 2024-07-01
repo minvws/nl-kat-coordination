@@ -145,12 +145,6 @@ class ReportTypesSelectionAggregateReportView(
 
 class SaveAggregateReportMixin(ReportPluginView):
     def save_report(self) -> ReportOOI:
-        if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
-            return redirect(
-                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
-            )
-
         input_oois = self.get_oois()
 
         aggregate_report, post_processed_data, report_data, report_errors = aggregate_reports(
@@ -180,13 +174,11 @@ class SaveAggregateReportMixin(ReportPluginView):
                     "name": input_ooi.human_readable,
                     "type": input_ooi.object_type,
                     "scan_profile_level": input_ooi.scan_profile.level.value if input_ooi.scan_profile else 0,
-                    "scan_profile_type": input_ooi.scan_profile.scan_profile_type
-                    if input_ooi.scan_profile
-                    else ScanProfileType.EMPTY,
+                    "scan_profile_type": (
+                        input_ooi.scan_profile.scan_profile_type if input_ooi.scan_profile else ScanProfileType.EMPTY
+                    ),
                 }
             )
-
-        logger.error(post_processed_data["oois"])
 
         post_processed_data["report_types"] = []
         for report_type in self.report_types:
@@ -197,8 +189,6 @@ class SaveAggregateReportMixin(ReportPluginView):
                     "label_style": report_type.label_style,
                 }
             )
-
-        logger.error(post_processed_data["report_types"])
 
         # Create the report
         report_data_raw_id = self.save_report_raw(data=post_processed_data)
@@ -231,8 +221,19 @@ class SetupScanAggregateReportView(
     current_step = 3
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        if not self.selected_report_types:
+            messages.error(self.request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("aggregate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
+            )
         if not self.report_has_required_plugins() or self.plugins_enabled():
-            return redirect(self.get_next())
+            report_ooi = self.save_report()
+
+            return redirect(
+                reverse("view_report", kwargs={"organization_code": self.organization.code})
+                + "?"
+                + urlencode({"report_id": report_ooi.reference})
+            )
         if not self.plugins:
             return redirect(self.get_previous())
 

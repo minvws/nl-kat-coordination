@@ -10,6 +10,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, FormView, UpdateView
@@ -18,11 +19,12 @@ from katalogus.client import Plugin, get_katalogus
 from reports.report_types.definitions import ReportPlugins
 from reports.report_types.dns_report.report import DNSReport
 from reports.views.base import get_selection
+from reports.views.generate_report import SaveGenerateReportMixin
 from tools.models import GROUP_ADMIN, GROUP_CLIENT, GROUP_REDTEAM, Organization, OrganizationMember
 from tools.ooi_helpers import get_or_create_ooi
 from tools.view_helpers import Breadcrumb
 
-from octopoes.models import OOI, Reference
+from octopoes.models import OOI
 from octopoes.models.ooi.dns.zone import Hostname
 from octopoes.models.ooi.network import Network
 from octopoes.models.ooi.web import URL
@@ -39,7 +41,7 @@ from onboarding.view_helpers import (
 from rocky.exceptions import RockyError
 from rocky.messaging import clearance_level_warning_dns_report
 from rocky.views.indemnification_add import IndemnificationAddView
-from rocky.views.ooi_view import SingleOOITreeMixin
+from rocky.views.ooi_view import SingleOOIMixin, SingleOOITreeMixin
 
 User = get_user_model()
 
@@ -346,8 +348,9 @@ class OnboardingSetupScanOOIDetailView(
 
 class OnboardingReportView(
     OrganizationPermissionRequiredMixin,
+    SaveGenerateReportMixin,
     IntroductionStepsMixin,
-    SingleOOITreeMixin,
+    SingleOOIMixin,
     TemplateView,
 ):
     """
@@ -359,31 +362,24 @@ class OnboardingReportView(
     current_step = 4
     permission_required = "tools.can_scan_organization"
 
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.report_type = request.GET.get("report_type", "")
-        self.ooi = self.get_ooi(self.request.GET.get("ooi", ""))
-        self.hostname = self.get_hostname_from_url_tree()
+    def get_oois_pk(self) -> list[str]:
+        """
+        Gets the Hostname primary key out of the URL object specified by the ooi query parameter.
+        """
+        ooi_pk = self.request.GET.get("ooi", "")
+        ooi = self.get_ooi(ooi_pk)
 
-    def get_hostname_from_url_tree(self) -> Hostname:
-        tree = self.octopoes_api_connector.get_tree(
-            Reference.from_str(self.ooi.primary_key), valid_time=datetime.now(timezone.utc), depth=2
-        )
-        hostname_ref = tree.store[self.ooi.web_url].netloc
-        return tree.store[str(hostname_ref)]
+        return [Hostname(name=ooi.web_url.tokenized["netloc"]["name"], network=ooi.network).primary_key]
 
     def post(self, request, *args, **kwargs):
-        selection = {
-            "observed_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-            "ooi": self.hostname.primary_key,
-            "report_type": self.report_type,
-        }
-
         self.set_member_onboarded()
 
+        report_ooi = self.save_report()
+
         return redirect(
-            reverse("generate_report_view", kwargs={"organization_code": self.organization.code})
-            + get_selection(self.request, selection)
+            reverse("view_report", kwargs={"organization_code": self.organization.code})
+            + "?"
+            + urlencode({"report_id": report_ooi.reference})
         )
 
     def set_member_onboarded(self):

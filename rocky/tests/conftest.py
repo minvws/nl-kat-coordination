@@ -1455,3 +1455,138 @@ def listed_hostnames(network) -> list[Hostname]:
         Hostname(network=network.reference, name="e.example.com"),
         Hostname(network=network.reference, name="f.example.com"),
     ]
+
+
+@pytest.fixture
+def reports_more_input_oois():
+    return [
+        (
+            Report(
+                object_type="Report",
+                scan_profile=None,
+                primary_key="Report|e821aaeb-a6bd-427f-b064-e46837911a5d",
+                name="Test Parent Report",
+                report_type="concatenated-report",
+                template="report.html",
+                date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                input_oois=[],
+                report_id=UUID("e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                organization_code="test_organization",
+                organization_name="Test Organization",
+                organization_tags=[],
+                data_raw_id="a5ccf97b-d4e9-442d-85bf-84e739b6d3ed",
+                observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                parent_report=None,
+                has_parent=False,
+            ),
+            [
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff7",
+                    name="RPKI Report",
+                    report_type="rpki-report",
+                    template="rpki_report/report.html",
+                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    input_oois=[
+                        Reference("Hostname|internet|example1.com"),
+                        Reference("Hostname|internet|example2.com"),
+                    ],
+                    report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff7"),
+                    organization_code="test_organization",
+                    organization_name="Test Organization",
+                    organization_tags=[],
+                    data_raw_id="acbd2250-85f4-471a-ab70-ba1750280192",
+                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                    has_parent=True,
+                ),
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    primary_key="Report|1730b72f-b115-412e-ad44-dae6ab3edff9",
+                    name="RPKI Report",
+                    report_type="rpki-report",
+                    template="rpki_report/report.html",
+                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    input_oois=[
+                        Reference("Hostname|internet|example3.com"),
+                        Reference("Hostname|internet|example4.com"),
+                    ],
+                    report_id=UUID("1730b72f-b115-412e-ad44-dae6ab3edff9"),
+                    organization_code="test_organization",
+                    organization_name="Test Organization",
+                    organization_tags=[],
+                    data_raw_id="acbd2250-85f4-471a-ab70-ba1750280194",
+                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                    has_parent=True,
+                ),
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abf",
+                    name="Safe Connections Report",
+                    report_type="safe-connections-report",
+                    template="safe_connections_report/report.html",
+                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    input_oois=[
+                        Reference("Hostname|internet|example5.com"),
+                        Reference("Hostname|internet|example6.com"),
+                    ],
+                    report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abf"),
+                    organization_code="test_organization",
+                    organization_name="Test Organization",
+                    organization_tags=[],
+                    data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34906",
+                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                    has_parent=True,
+                ),
+                Report(
+                    object_type="Report",
+                    scan_profile=None,
+                    primary_key="Report|463c7f72-fef9-42ef-baf9-f10fcfb91abe",
+                    name="Safe Connections Report",
+                    report_type="safe-connections-report",
+                    template="safe_connections_report/report.html",
+                    date_generated=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    input_oois=[
+                        Reference("Hostname|internet|example7.com"),
+                        Reference("Hostname|internet|example8.com"),
+                    ],
+                    report_id=UUID("463c7f72-fef9-42ef-baf9-f10fcfb91abe"),
+                    organization_code="test_organization",
+                    organization_name="Test Organization",
+                    organization_tags=[],
+                    data_raw_id="ba2d86b8-aca8-4009-adc0-e3d59ea34904",
+                    observed_at=datetime(2024, 1, 1, 23, 59, 59, 999999),
+                    parent_report=Reference("Report|e821aaeb-a6bd-427f-b064-e46837911a5d"),
+                    has_parent=True,
+                ),
+            ],
+        )
+    ]
+
+
+def onboarding_collect_data():
+    return {
+        "Hostname|internet|mispo.es": {
+            "input_ooi": "Hostname|internet|mispo.es",
+            "records": [
+                {"type": "A", "ttl": 480, "name": "mispo.es", "content": "134.209.85.72"},
+                {"type": "MX", "ttl": 480, "name": "mispo.es", "content": "10 mx.wijmailenveilig.nl."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns1.domaindiscount24.net."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns2.domaindiscount24.net."},
+                {"type": "NS", "ttl": 480, "name": "mispo.es", "content": "ns3.domaindiscount24.net."},
+                {
+                    "type": "SOA",
+                    "ttl": 480,
+                    "name": "mispo.es",
+                    "content": "ns1.domaindiscount24.net. tech.key-systems.net. 2023012324 10800 3600 604800 3600",
+                },
+            ],
+            "security": {"spf": False, "dkim": False, "dmarc": False, "dnssec": False, "caa": False},
+            "finding_types": [],
+        }
+    }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-25 12:27+0000\n"
+"POT-Creation-Date: 2024-06-27 09:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3849,13 +3849,13 @@ msgid "Select at least one OOI to proceed."
 msgstr ""
 
 #: reports/views/aggregate_report.py reports/views/generate_report.py
-msgid "Select at least one report type to proceed."
-msgstr ""
-
-#: reports/views/aggregate_report.py reports/views/generate_report.py
 msgid ""
 "No data could be found for %(report_types). Object(s) did not exist on "
 "%(date)s."
+msgstr ""
+
+#: reports/views/aggregate_report.py reports/views/generate_report.py
+msgid "Select at least one report type to proceed."
 msgstr ""
 
 #: reports/views/base.py

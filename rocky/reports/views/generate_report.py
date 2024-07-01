@@ -155,12 +155,6 @@ class ExportSetupGenerateReportView(
 
 class SaveGenerateReportMixin(ReportPluginView):
     def save_report(self) -> ReportOOI:
-        if not self.selected_report_types:
-            messages.error(self.request, _("Select at least one report type to proceed."))
-            return redirect(
-                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
-            )
-
         error_reports = []
         report_data: dict[str, dict[str, dict[str, Any]]] = {}
         by_type: dict[str, list[str]] = {}
@@ -271,6 +265,11 @@ class SetupScanGenerateReportView(
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.report_has_required_plugins() or self.plugins_enabled():
             return redirect(self.get_next())
+        if not self.selected_report_types:
+            messages.error(self.request, _("Select at least one report type to proceed."))
+            return redirect(
+                reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(self.request)
+            )
         if not self.plugins:
             return redirect(self.get_previous())
         return super().get(request, *args, **kwargs)

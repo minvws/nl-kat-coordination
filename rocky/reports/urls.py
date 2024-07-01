@@ -35,11 +35,14 @@ urlpatterns = [
     path("report-history/subreports", SubreportView.as_view(), name="subreports"),
 ]
 
-
-# Generate report urls
+# View report urls
 urlpatterns += [
     path("view", ViewReportView.as_view(), name="view_report"),
     path("view/pdf/", ViewReportPDFView.as_view(), name="view_report_pdf"),
+]
+
+# Generate report urls
+urlpatterns += [
     path("generate-report/", LandingGenerateReportView.as_view(), name="generate_report_landing"),
     path("generate-report/select/oois/", OOISelectionGenerateReportView.as_view(), name="generate_report_select_oois"),
     path(
