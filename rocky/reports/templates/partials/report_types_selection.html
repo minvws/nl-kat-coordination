@@ -37,9 +37,12 @@
                 {% include "summary/ooi_selection.html" %}
 
             {% endif %}
-            <a href="{{ previous }}" class="button ghost">
-                <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
-            </a>
+            <form method="post" action="{{ previous }}" class="inline">
+                {% csrf_token %}
+                <button type="submit" class="button ghost">
+                    <span class="icon ti-chevron-left"></span>{% translate "Change selection" %}
+                </button>
+            </form>
             {% if available_report_types_aggregate %}
                 <h2>{% translate "Available report types" %} ({{ count_available_report_types_aggregate }})</h2>
             {% else %}

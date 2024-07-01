@@ -20,7 +20,7 @@ from reports.views.base import (
     OOISelectionView,
     ReportBreadcrumbs,
     ReportPluginView,
-    ReportTypeView,
+    ReportTypeSelectionView,
     get_selection,
 )
 from reports.views.view_helpers import GenerateReportStepsMixin
@@ -78,17 +78,19 @@ class OOISelectionGenerateReportView(GenerateReportStepsMixin, BreadcrumbsGenera
     current_step = 1
     ooi_types = get_ooi_types_with_report()
 
+    def post(self, request, *args, **kwargs):
+        if not self.ooi_selection_is_valid():
+            return self.get(request, *args, **kwargs)
+        return redirect(self.get_next())
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["channel"] = "generate_report"
-        context.update(self.get_ooi_filter_forms(self.ooi_types))
         return context
 
 
 class ReportTypesSelectionGenerateReportView(
-    GenerateReportStepsMixin,
-    BreadcrumbsGenerateReportView,
-    ReportTypeView,
+    GenerateReportStepsMixin, BreadcrumbsGenerateReportView, OOISelectionView, ReportTypeSelectionView
 ):
     """
     Shows all possible report types from a list of OOIs.
@@ -101,10 +103,9 @@ class ReportTypesSelectionGenerateReportView(
     ooi_types = get_ooi_types_with_report()
 
     def post(self, request, *args, **kwargs):
-        if not self.selected_oois:
-            self.none_selection_error()
+        if not self.ooi_selection_is_valid():
             return redirect(self.get_previous())
-        return self.get(request, *args, **kwargs)
+        return redirect(self.get_next())
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -138,7 +139,7 @@ class SetupScanGenerateReportView(
         return super().get(request, *args, **kwargs)
 
 
-class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, TemplateView):
+class GenerateReportView(BreadcrumbsGenerateReportView, OOISelectionView, ReportPluginView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -150,8 +151,7 @@ class GenerateReportView(BreadcrumbsGenerateReportView, ReportPluginView, Templa
     ooi_types = get_ooi_types_with_report()
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
+        if not self.report_type_selection_is_valid():
             return redirect(
                 reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
             )

@@ -8,7 +8,6 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
 from django_weasyprint import WeasyTemplateResponseMixin
 from tools.view_helpers import url_with_querystring
 
@@ -21,7 +20,7 @@ from reports.views.base import (
     OOISelectionView,
     ReportBreadcrumbs,
     ReportPluginView,
-    ReportTypeView,
+    ReportTypeSelectionView,
     get_selection,
 )
 from reports.views.view_helpers import AggregateReportStepsMixin
@@ -79,9 +78,13 @@ class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggr
     current_step = 1
     ooi_types = get_ooi_types_from_aggregate_report(AggregateOrganisationReport)
 
+    def post(self, request, *args, **kwargs):
+        if not self.ooi_selection_is_valid():
+            return self.get(request, *args, **kwargs)
+        return redirect(self.get_next())
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(self.get_ooi_filter_forms(self.ooi_types))
         context["channel"] = "aggregate_report"
         return context
 
@@ -89,8 +92,8 @@ class OOISelectionAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggr
 class ReportTypesSelectionAggregateReportView(
     AggregateReportStepsMixin,
     BreadcrumbsAggregateReportView,
-    ReportTypeView,
-    TemplateView,
+    OOISelectionView,
+    ReportTypeSelectionView,
 ):
     """
     Shows all possible report types from a list of Objects.
@@ -108,10 +111,10 @@ class ReportTypesSelectionAggregateReportView(
             get_report_types_from_aggregate_report(AggregateOrganisationReport)
         )
 
-    def get(self, request, *args, **kwargs):
-        if not self.selected_oois:
-            messages.error(self.request, _("Select at least one OOI to proceed."))
-        return super().get(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        if not self.ooi_selection_is_valid():
+            return redirect(self.get_previous())
+        return redirect(self.get_next())
 
     def get_report_types_for_aggregate_report(
         self, reports_dict: dict[str, set[type[Report]]]
@@ -150,7 +153,7 @@ class SetupScanAggregateReportView(AggregateReportStepsMixin, BreadcrumbsAggrega
         return super().get(request, *args, **kwargs)
 
 
-class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
+class AggregateReportView(BreadcrumbsAggregateReportView, OOISelectionView, ReportPluginView):
     """
     Shows the report generated from OOIS and report types.
     """
@@ -161,8 +164,7 @@ class AggregateReportView(BreadcrumbsAggregateReportView, ReportPluginView):
     report_types: Sequence[type[Report]]
 
     def get(self, request, *args, **kwargs):
-        if not self.selected_report_types:
-            messages.error(request, _("Select at least one report type to proceed."))
+        if not self.report_type_selection_is_valid():
             return redirect(
                 reverse("generate_report_select_report_types", kwargs=self.get_kwargs()) + get_selection(request)
             )

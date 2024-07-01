@@ -88,28 +88,29 @@ class ReportBreadcrumbs(OrganizationView, BreadcrumbsMixin):
         return context
 
 
-class OOISelectionView(BaseOOIListView, ReportBreadcrumbs):
+class OOISelectionView(BaseOOIListView):
     """
-    Handles OOIs selection and post request.
+    Shows a list of OOIs to select from and handles OOIs selection requests.
     """
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.selected_oois = sorted(set(request.POST.getlist("ooi", [])))  # returns a list of oois primary key
+        self.selected_oois = self.get_ooi_selection()
 
-    def get_total_objects(self):
+    def get_ooi_selection(self) -> list[str]:
+        return sorted(set(self.request.POST.getlist("ooi", [])))
+
+    def get_total_objects(self) -> int:
         return len(self.selected_oois)
 
-    def get_oois_references(self) -> set[Reference]:
-        references = set()
-        for ooi in self.selected_oois:
-            references.add(Reference.from_str(ooi))
-        return references
+    def get_ooi_references(self) -> set[Reference]:
+        return {Reference.from_str(ooi) for ooi in self.selected_oois}
 
-    def get_oois(self) -> list[OOI | Any]:
-        references = self.get_oois_references()
+    def get_oois(self) -> list[OOI | None]:
         try:
-            return self.octopoes_api_connector.load_objects_bulk(references=references, valid_time=self.observed_at)
+            return self.octopoes_api_connector.load_objects_bulk(
+                references=self.get_ooi_references(), valid_time=self.observed_at
+            )
         except Exception:
             logger.warning("Fetching oois failed.")
         return []
@@ -122,42 +123,34 @@ class OOISelectionView(BaseOOIListView, ReportBreadcrumbs):
             )
         }
 
-    def none_selection_error(self):
-        return messages.error(self.request, _("Select at least one OOI to proceed."))
+    def ooi_selection_is_valid(self) -> bool:
+        is_valid = True
+        if not self.selected_oois:
+            is_valid = False
+            messages.error(self.request, _("Select at least one OOI to proceed."))
+        return is_valid
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context.update(self.get_ooi_filter_forms(self.ooi_types))
         context["selected_oois"] = self.selected_oois
         return context
 
 
-class ReportTypeSelectionView(ReportBreadcrumbs):
+class ReportTypeSelectionView(TemplateView):
     """
-    Some views just need to check on user selection and pass selection from view to view.
-    The calculations for the selections are done in their own view.
-    """
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-        self.selected_report_types = request.GET.getlist("report_type", [])
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["selected_report_types"] = self.selected_report_types
-        return context
-
-
-class ReportTypeView(OOISelectionView, ReportTypeSelectionView):
-    """
-    This view lists all report types that is being fetched from the OOIs selection.
-    Each report type has its own input ooi witch will be matched with the oois selection.
-    Needs BaseSelectionView to get and remember report type selection.
+    Shows report types based on the OOIs selections.
+    Handles all request for report types selections.
     """
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        self.selected_report_types = self.get_report_type_selection()
         self.report_types: Sequence[type[Report] | type[MultiReport]] = self.get_report_types_from_choice()
-        self.report_ids = [report.id for report in self.report_types]
+        self.report_type_ids = [report_type for report_type in self.selected_report_types]
+
+    def get_report_type_selection(self) -> list[str]:
+        return sorted(set(self.request.POST.getlist("report_type", [])))
 
     def get_report_types_from_choice(self) -> list[type[Report] | type[MultiReport]]:
         report_types = []
@@ -182,8 +175,15 @@ class ReportTypeView(OOISelectionView, ReportTypeSelectionView):
             for report_type in reports
         ]
 
+    def report_type_selection_is_valid(self):
+        is_valid = True
+        if not self.selected_report_types:
+            is_valid = False
+            messages.error(self.request, _("Select at least one report type to proceed."))
+        return is_valid
 
-class ReportPluginView(ReportTypeView, TemplateView):
+
+class ReportPluginView(OrganizationView, ReportTypeSelectionView):
     """
     This view shows the required and optional plugins.
     Needs ReportTypeView to know which report type is selected to get their plugins.
@@ -222,7 +222,7 @@ class ReportPluginView(ReportTypeView, TemplateView):
         return False
 
     def get_all_plugins(self) -> tuple[dict[str, list[Plugin]], dict[str, bool]]:
-        return self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_ids))
+        return self.get_required_optional_plugins(get_plugins_for_report_ids(self.report_type_ids))
 
     def get_required_optional_plugins(
         self, plugin_ids_dict: dict[str, set[str]]
